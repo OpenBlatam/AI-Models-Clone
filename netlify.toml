@@ -1,0 +1,10 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20.11.1"
+  MISE_SETTINGS = "idiomatic_version_file_enable_tools=node"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs" 
