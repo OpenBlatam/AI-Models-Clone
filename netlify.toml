@@ -1,5 +1,5 @@
 [build]
-  command = "npm install && npm run build"
+  command = "npm install --legacy-peer-deps && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -12,6 +12,7 @@
   GOOGLE_CLIENT_SECRET='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'
   DATABASE_URL='postgresql://neondb_owner:npg_ejg2Yr1EZMOw@ep-dark-sky-a5c88yly-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require'
   NEXT_SHARP_PATH = "/opt/buildhome/.netlify/builders/node_modules/sharp"
+  NPM_CONFIG_PACKAGE_MANAGER = "npm"
 
 [build.cache]
   paths = [
