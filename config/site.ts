@@ -4,44 +4,44 @@ import { env } from "@/env.mjs";
 const site_url = env.NEXT_PUBLIC_APP_URL;
 
 export const siteConfig: SiteConfig = {
-  name: "SaaS Starter",
+  name: "Blatam Academy",
   description:
-    "Get your project off to an explosive start with SaaS Starter! Harness the power of Next.js 14, Prisma, Neon, Auth.js v5, Resend, React Email, Shadcn/ui and Stripe to build your next big thing.",
+    "Empowering the next generation of tech leaders through innovative education and practical experience.",
   url: site_url,
   ogImage: `${site_url}/_static/og.jpg`,
   links: {
-    twitter: "https://twitter.com/miickasmt",
-    github: "https://github.com/mickasmt/next-saas-stripe-starter",
+    twitter: "https://twitter.com/blatamacademy",
+    github: "https://github.com/blatamacademy",
   },
-  mailSupport: "support@saas-starter.com",
+  mailSupport: "support@blatamacademy.com",
 };
 
 export const footerLinks: SidebarNavItem[] = [
   {
-    title: "Company",
+    title: "Academy",
     items: [
-      { title: "About", href: "#" },
-      { title: "Enterprise", href: "#" },
+      { title: "About Us", href: "/about" },
+      { title: "Our Mission", href: "/mission" },
       { title: "Terms", href: "/terms" },
       { title: "Privacy", href: "/privacy" },
     ],
   },
   {
-    title: "Product",
+    title: "Programs",
     items: [
-      { title: "Security", href: "#" },
-      { title: "Customization", href: "#" },
-      { title: "Customers", href: "#" },
-      { title: "Changelog", href: "#" },
+      { title: "Courses", href: "/courses" },
+      { title: "Workshops", href: "/workshops" },
+      { title: "Events", href: "/events" },
+      { title: "Career Support", href: "/career" },
     ],
   },
   {
-    title: "Docs",
+    title: "Resources",
     items: [
-      { title: "Introduction", href: "#" },
-      { title: "Installation", href: "#" },
-      { title: "Components", href: "#" },
-      { title: "Code Blocks", href: "#" },
+      { title: "Blog", href: "/blog" },
+      { title: "Student Portal", href: "/portal" },
+      { title: "FAQ", href: "/faq" },
+      { title: "Contact", href: "/contact" },
     ],
   },
 ];

@@ -1,23 +1,25 @@
-import { infos } from "@/config/landing";
-import BentoGrid from "@/components/sections/bentogrid";
-import Features from "@/components/sections/features";
-import HeroLanding from "@/components/sections/hero-landing";
-import InfoLanding from "@/components/sections/info-landing";
-import Powered from "@/components/sections/powered";
-import PreviewLanding from "@/components/sections/preview-landing";
-import Testimonials from "@/components/sections/testimonials";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, GraduationCap, BookOpen, Users, Trophy, Calendar, Sparkles } from "lucide-react";
+import { AnimatedHero } from "@/components/sections/animated-hero";
+import { AnimatedFeatures } from "@/components/sections/animated-features";
+import { AnimatedEvents } from "@/components/sections/animated-events";
+import { AnimatedCTA } from "@/components/sections/animated-cta";
 
-export default function IndexPage() {
+export default function HomePage() {
   return (
-    <>
-      <HeroLanding />
-      <PreviewLanding />
-      <Powered />
-      <BentoGrid />
-      <InfoLanding data={infos[0]} reverse={true} />
-      {/* <InfoLanding data={infos[1]} /> */}
-      <Features />
-      <Testimonials />
-    </>
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <AnimatedHero />
+
+      {/* Features Section */}
+      <AnimatedFeatures />
+
+      {/* Upcoming Events Section */}
+      <AnimatedEvents />
+
+      {/* CTA Section */}
+      <AnimatedCTA />
+    </div>
   );
 }

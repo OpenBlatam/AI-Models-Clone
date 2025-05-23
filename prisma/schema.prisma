@@ -6,8 +6,8 @@ generator client {
 }
 
 datasource db {
-  provider     = "postgresql"
-  url          = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum UserRole {
@@ -28,14 +28,13 @@ model Account {
   scope             String?
   id_token          String?  @db.Text
   session_state     String?
-  createdAt         DateTime @default(now()) @map(name: "created_at")
-  updatedAt         DateTime @default(now()) @map(name: "updated_at")
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
-  @@map(name: "accounts")
 }
 
 model Session {
@@ -46,7 +45,6 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@map(name: "sessions")
 }
 
 model User {
@@ -55,19 +53,20 @@ model User {
   email         String?   @unique
   emailVerified DateTime?
   image         String?
-  createdAt     DateTime  @default(now()) @map(name: "created_at")
-  updatedAt     DateTime  @default(now()) @map(name: "updated_at")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @default(now())
   role          UserRole  @default(USER)
 
   accounts Account[]
   sessions Session[]
+  notifications Notification[]
 
-  stripeCustomerId       String?   @unique @map(name: "stripe_customer_id")
-  stripeSubscriptionId   String?   @unique @map(name: "stripe_subscription_id")
-  stripePriceId          String?   @map(name: "stripe_price_id")
-  stripeCurrentPeriodEnd DateTime? @map(name: "stripe_current_period_end")
+  stripeCustomerId       String?   @unique
+  stripeSubscriptionId   String?   @unique
+  stripePriceId          String?
+  stripeCurrentPeriodEnd DateTime?
 
-  @@map(name: "users")
+  userProgress UserProgress[]
 }
 
 model VerificationToken {
@@ -76,5 +75,72 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
-  @@map(name: "verification_tokens")
+}
+
+model UserProgress {
+  id          String        @id @default(cuid())
+  userId      String        @unique
+  experience  Int          @default(0)
+  level       Int          @default(1)
+  streak      Int          @default(0)
+  lastActive  DateTime     @default(now())
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievements Achievement[]
+  completedLessons Lesson[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([userId])
+}
+
+model Lesson {
+  id              String   @id @default(cuid())
+  title           String
+  description     String
+  difficulty      String
+  category        String   @default("General")
+  exercises       Exercise[]
+  requiredLevel   Int
+  experienceReward Int
+  completedBy     UserProgress[]
+}
+
+model Exercise {
+  id              String   @id @default(cuid())
+  type            String
+  question        String
+  correctAnswer   String
+  options         String[]
+  audioUrl        String?
+  points          Int
+  lesson          Lesson   @relation(fields: [lessonId], references: [id])
+  lessonId        String
+}
+
+model Achievement {
+  id              String      @id @default(cuid())
+  title           String
+  description     String
+  icon            String
+  unlockedAt      DateTime?
+  userProgressId  String
+  userProgress    UserProgress @relation(fields: [userProgressId], references: [id], onDelete: Cascade)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([userProgressId])
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  userId      String
+  type        String   // "LESSON_COMPLETED", "ACHIEVEMENT_UNLOCKED", "LEVEL_UP", etc.
+  title       String
+  message     String
+  isRead      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

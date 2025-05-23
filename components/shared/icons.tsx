@@ -31,6 +31,12 @@ import {
   Trash,
   User,
   X,
+  Trophy,
+  Lock,
+  Star,
+  Sparkles,
+  Flame,
+  Target,
 } from "lucide-react";
 
 export type Icon = LucideIcon;
@@ -134,4 +140,10 @@ export const Icons = {
   ),
   user: User,
   warning: AlertTriangle,
+  trophy: Trophy,
+  lock: Lock,
+  star: Star,
+  sparkles: Sparkles,
+  flame: Flame,
+  target: Target,
 };
