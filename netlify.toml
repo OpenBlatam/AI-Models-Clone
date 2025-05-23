@@ -1,5 +1,5 @@
 [build]
-  command = "mise settings add idiomatic_version_file_enable_tools node && nvm install 20.11.1 && nvm use 20.11.1 && npm install && npm run build"
+  command = "npm install && npm run build"
   publish = ".next"
 
 [build.environment]
