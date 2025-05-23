@@ -1,5 +1,5 @@
 [build]
-  command = "npm ci && npm run build"
+  command = "npm install --no-audit --no-fund --no-optional && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -9,6 +9,10 @@
   GOOGLE_CLIENT_ID='766657034501-2fcprad0507agtsvn5gvgvpv0ggqm80i.apps.googleusercontent.com'
   GOOGLE_CLIENT_SECRET='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'
   DATABASE_URL='postgresql://neondb_owner:npg_ejg2Yr1EZMOw@ep-dark-sky-a5c88yly-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require'
+  NPM_CONFIG_PRODUCTION = "false"
+  NPM_CONFIG_AUDIT = "false"
+  NPM_CONFIG_FUND = "false"
+  NPM_CONFIG_OPTIONAL = "false"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
