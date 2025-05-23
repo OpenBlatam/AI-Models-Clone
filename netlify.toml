@@ -11,6 +11,14 @@
   GOOGLE_CLIENT_ID='766657034501-2fcprad0507agtsvn5gvgvpv0ggqm80i.apps.googleusercontent.com'
   GOOGLE_CLIENT_SECRET='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'
   DATABASE_URL='postgresql://neondb_owner:npg_ejg2Yr1EZMOw@ep-dark-sky-a5c88yly-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require'
+  NEXT_SHARP_PATH = "/opt/buildhome/.netlify/builders/node_modules/sharp"
+
+[build.cache]
+  paths = [
+    ".next/cache",
+    "node_modules/.cache",
+    ".contentlayer"
+  ]
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
