@@ -1,32 +1,14 @@
 [build]
-  command = "npm install --legacy-peer-deps && npm run build"
+  command = "npm ci && npm run build"
   publish = ".next"
 
 [build.environment]
   NODE_VERSION = "18.19.1"
   NEXT_TELEMETRY_DISABLED = "1"
-  NPM_FLAGS = "--legacy-peer-deps"
-  NETLIFY_NEXT_PLUGIN_SKIP = "true"
   AUTH_SECRET='32mwUMnlOtkH1H8irIqxlaL80KvgdjUlbg2IovnhL1s='
   GOOGLE_CLIENT_ID='766657034501-2fcprad0507agtsvn5gvgvpv0ggqm80i.apps.googleusercontent.com'
   GOOGLE_CLIENT_SECRET='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'
   DATABASE_URL='postgresql://neondb_owner:npg_ejg2Yr1EZMOw@ep-dark-sky-a5c88yly-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require'
-  NEXT_SHARP_PATH = "/opt/buildhome/.netlify/builders/node_modules/sharp"
-  NPM_CONFIG_PACKAGE_MANAGER = "npm"
-  NPM_CONFIG_ENGINE_STRICT = "true"
-  NPM_CONFIG_LEGACY_PEER_DEPS = "true"
-  NPM_CONFIG_STRICT_PEER_DEPENDENCIES = "false"
-  NPM_CONFIG_AUTO_INSTALL_PEERS = "true"
-  NPM_CONFIG_NODE_LINKER = "hoisted"
-  NPM_CONFIG_SAVE_EXACT = "true"
-  NPM_CONFIG_USE_NODE_VERSION = "18.19.1"
-
-[build.cache]
-  paths = [
-    ".next/cache",
-    "node_modules/.cache",
-    ".contentlayer"
-  ]
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
