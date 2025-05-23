@@ -1,5 +1,5 @@
 [build]
-  command = "npm install && npm run build"
+  command = "nvm install 20.11.1 && nvm use 20.11.1 && npm install && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -7,12 +7,11 @@
   NEXT_TELEMETRY_DISABLED = "1"
   NPM_FLAGS = "--legacy-peer-deps"
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
-AUTH_SECRET='32mwUMnlOtkH1H8irIqxlaL80KvgdjUlbg2IovnhL1s='
+  AUTH_SECRET='32mwUMnlOtkH1H8irIqxlaL80KvgdjUlbg2IovnhL1s='
+  GOOGLE_CLIENT_ID='766657034501-2fcprad0507agtsvn5gvgvpv0ggqm80i.apps.googleusercontent.com'
+  GOOGLE_CLIENT_SECRET='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'
+  DATABASE_URL='postgresql://neondb_owner:npg_ejg2Yr1EZMOw@ep-dark-sky-a5c88yly-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require'
 
-GOOGLE_CLIENT_ID='766657034501-2fcprad0507agtsvn5gvgvpv0ggqm80i.apps.googleusercontent.com'
-GOOGLE_CLIENT_SECRET='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'
-
-DATABASE_URL='postgresql://neondb_owner:npg_ejg2Yr1EZMOw@ep-dark-sky-a5c88yly-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require'
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
