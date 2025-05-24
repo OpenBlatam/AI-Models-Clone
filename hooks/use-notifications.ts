@@ -14,6 +14,7 @@ export function useNotifications() {
   const { data: session } = useSession();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (session?.user) {
@@ -23,10 +24,15 @@ export function useNotifications() {
 
   const fetchNotifications = async () => {
     try {
+      setIsLoading(true);
+      setError(null);
       const response = await fetch("/api/notifications");
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
-      setNotifications(data);
-    } catch (error) {
+      setNotifications(Array.isArray(data) ? data : []);
+    } catch (error: any) {
+      setNotifications([]);
+      setError(error?.message || "Error de red al obtener notificaciones");
       console.error("Error fetching notifications:", error);
     } finally {
       setIsLoading(false);
@@ -60,6 +66,7 @@ export function useNotifications() {
   return {
     notifications,
     isLoading,
+    error,
     markAsRead,
     refetch: fetchNotifications,
   };

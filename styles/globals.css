@@ -90,3 +90,39 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
+
+/* --- FullCalendar Now Indicator Custom --- */
+.fc-now-indicator {
+  background: linear-gradient(90deg, #ef4444 60%, #f87171 100%) !important; /* rojo degradado */
+  height: 4px !important;
+  z-index: 10;
+  position: relative;
+  box-shadow: 0 2px 8px 0 #ef444455;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.fc-now-indicator::before {
+  content: '';
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 18px;
+  height: 18px;
+  background: radial-gradient(circle at 60% 40%, #ef4444 80%, #fff 100%);
+  border-radius: 50%;
+  box-shadow: 0 0 0 3px #fff, 0 2px 8px 0 #ef444455;
+  border: 2px solid #ef4444;
+  z-index: 11;
+  transition: background 0.3s, box-shadow 0.3s;
+}
+
+/* Mejorar contraste y visibilidad en dark mode */
+.dark .fc-now-indicator {
+  background: linear-gradient(90deg, #f87171 60%, #ef4444 100%) !important;
+  box-shadow: 0 2px 8px 0 #ef4444bb;
+}
+.dark .fc-now-indicator::before {
+  background: radial-gradient(circle at 60% 40%, #f87171 80%, #222 100%);
+  box-shadow: 0 0 0 3px #222, 0 2px 8px 0 #ef4444bb;
+  border: 2px solid #f87171;
+}

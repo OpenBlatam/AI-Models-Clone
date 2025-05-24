@@ -48,10 +48,9 @@ export default function ProjectSwitcher({
   return (
     <div>
       <Popover open={openPopover} onOpenChange={setOpenPopover}>
-        <PopoverTrigger>
-          <Button
-            className="h-8 px-2"
-            variant={openPopover ? "secondary" : "ghost"}
+        <PopoverTrigger asChild>
+          <div
+            className="h-8 px-2 inline-flex items-center justify-center text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground rounded-md"
             onClick={() => setOpenPopover(!openPopover)}
           >
             <div className="flex items-center space-x-3 pr-2">
@@ -76,7 +75,7 @@ export default function ProjectSwitcher({
               className="size-4 text-muted-foreground"
               aria-hidden="true"
             />
-          </Button>
+          </div>
         </PopoverTrigger>
         <PopoverContent align="start" className="max-w-60 p-2">
           <ProjectList

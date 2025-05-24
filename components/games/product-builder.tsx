@@ -1,8 +1,12 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { Stage, Layer, Image, Group } from "react-konva"
+import { DynamicKonva as Stage, DynamicLayer as Layer, DynamicImage as Image, DynamicGroup as Group } from "@/components/konva-wrapper"
 import useImage from "use-image"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Card } from "@/components/ui/card"
+import { Loader2, Wand2 } from "lucide-react"
 
 interface ProductBuilderProps {
   initialCategory?: string
@@ -55,11 +59,16 @@ export function ProductBuilder({ initialCategory = "bebida" }: ProductBuilderPro
     extras: [] as string[],
   })
   
+  const [prompt, setPrompt] = useState("")
+  const [generatedImage, setGeneratedImage] = useState<string | null>(null)
+  const [isGenerating, setIsGenerating] = useState(false)
+  
   const stageRef = useRef(null)
   const config = GAME_CONFIGS[selectedCategory as keyof typeof GAME_CONFIGS]
   const [baseImage] = useImage(config.baseImage)
   const [lidImage] = useImage(config.lidImage)
   const [strawImage] = useImage(config.strawImage)
+  const [aiImage] = useImage(generatedImage || "")
 
   useEffect(() => {
     setSelectedCategory(initialCategory)
@@ -73,7 +82,6 @@ export function ProductBuilder({ initialCategory = "bebida" }: ProductBuilderPro
   const handleDragEnd = (e: any) => {
     const node = e.target
     const newCustomizations = { ...customizations }
-    // Actualizar posición del elemento arrastrado
     setCustomizations(newCustomizations)
   }
 
@@ -92,6 +100,37 @@ export function ProductBuilder({ initialCategory = "bebida" }: ProductBuilderPro
         ? prev.extras.filter(e => e !== extra)
         : [...prev.extras, extra]
     }))
+  }
+
+  const generateImage = async () => {
+    if (!prompt) return
+
+    setIsGenerating(true)
+    try {
+      const response = await fetch("https://openrouter.ai/api/v1/images/generations", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${process.env.NEXT_PUBLIC_OPENROUTER_API_KEY}`,
+          "HTTP-Referer": window.location.origin,
+        },
+        body: JSON.stringify({
+          model: "stability-ai/sdxl",
+          prompt: `${prompt}, ${selectedCategory}, ${customizations.color}, ${customizations.size}, ${customizations.extras.join(", ")}`,
+          n: 1,
+          size: "1024x1024",
+        }),
+      })
+
+      const data = await response.json()
+      if (data.data?.[0]?.url) {
+        setGeneratedImage(data.data[0].url)
+      }
+    } catch (error) {
+      console.error("Error generating image:", error)
+    } finally {
+      setIsGenerating(false)
+    }
   }
 
   return (
@@ -135,9 +174,44 @@ export function ProductBuilder({ initialCategory = "bebida" }: ProductBuilderPro
               draggable
               onDragEnd={handleDragEnd}
             />
+
+            {/* AI Generated Image */}
+            {aiImage && (
+              <Image
+                image={aiImage}
+                x={50}
+                y={50}
+                width={300}
+                height={300}
+                draggable
+                onDragEnd={handleDragEnd}
+              />
+            )}
           </Layer>
         </Stage>
       </div>
+
+      <Card className="p-4">
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            <Input
+              placeholder="Describe tu producto ideal..."
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+            />
+            <Button
+              onClick={generateImage}
+              disabled={isGenerating || !prompt}
+            >
+              {isGenerating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Wand2 className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
+        </div>
+      </Card>
 
       <div className="space-y-4">
         <div>

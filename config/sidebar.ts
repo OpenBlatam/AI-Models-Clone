@@ -29,8 +29,8 @@ export const sidebarLinks: SidebarNavItem[] = [
       },
       {
         href: "/dashboard/calendar",
-        icon: "dashboard",
-        title: "Calendar",
+        icon: "calendar",
+        title: "Calendario",
         authorizeOnly: UserRole.USER
       },
       {
@@ -57,4 +57,4 @@ export const sidebarLinks: SidebarNavItem[] = [
       },
     ],
   },
-];
+]; 

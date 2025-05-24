@@ -27,6 +27,24 @@ const nextConfig = {
   experimental: {
     // serverActions está habilitado por defecto en Next.js 14
   },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      // Don't resolve 'canvas' package on the client to prevent this error on build --> Error: Can't resolve 'canvas'
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        canvas: false,
+      };
+    }
+
+    // Add specific handling for react-konva
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      'react-konva': 'react-konva/lib/ReactKonva',
+      'konva': 'konva/lib/index-umd',
+    };
+
+    return config;
+  },
 };
 
 module.exports = withContentlayer(nextConfig);
