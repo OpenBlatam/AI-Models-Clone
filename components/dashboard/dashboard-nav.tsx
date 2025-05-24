@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
-import { Home, BookOpen, Target, LineChart, Trophy } from "lucide-react";
+import { Home, BookOpen, Target, LineChart, Trophy, Gamepad2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 const navItems = [
@@ -26,6 +26,11 @@ const navItems = [
     title: "Ejercicios",
     href: "/dashboard/exercises",
     icon: LineChart,
+  },
+  {
+    title: "Juegos",
+    href: "/dashboard/games",
+    icon: Gamepad2,
   },
   {
     title: "Logros",

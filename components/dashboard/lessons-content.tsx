@@ -1,9 +1,20 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from "framer-motion";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Icons } from "@/components/shared/icons";
 import { cn } from "@/lib/utils";
+import { LessonContent } from "./lesson-content";
+
+interface Exercise {
+  id: string;
+  type: string;
+  question: string;
+  options: string[];
+  correctAnswer: string;
+  points: number;
+}
 
 interface Lesson {
   id: string;
@@ -11,6 +22,7 @@ interface Lesson {
   description: string;
   requiredLevel: number;
   experienceReward: number;
+  exercises: Exercise[];
 }
 
 interface LessonsContentProps {
@@ -34,6 +46,26 @@ const item = {
 };
 
 export function LessonsContent({ lessons, userLevel }: LessonsContentProps) {
+  const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
+
+  const handleLessonClick = (lesson: Lesson) => {
+    if (lesson.requiredLevel <= userLevel) {
+      setSelectedLesson(lesson);
+    }
+  };
+
+  const handleLessonComplete = () => {
+    setSelectedLesson(null);
+  };
+
+  if (selectedLesson) {
+    return (
+      <div className="p-8 pt-6">
+        <LessonContent lesson={selectedLesson} onComplete={handleLessonComplete} />
+      </div>
+    );
+  }
+
   return (
     <motion.div 
       className="space-y-4 p-8 pt-6"
@@ -47,10 +79,13 @@ export function LessonsContent({ lessons, userLevel }: LessonsContentProps) {
           
           return (
             <motion.div key={lesson.id} variants={item}>
-              <Card className={cn(
-                "relative overflow-hidden",
-                isLocked && "opacity-50"
-              )}>
+              <Card 
+                className={cn(
+                  "relative overflow-hidden cursor-pointer transition-all hover:shadow-md",
+                  isLocked && "opacity-50 cursor-not-allowed"
+                )}
+                onClick={() => handleLessonClick(lesson)}
+              >
                 <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">
                     {lesson.title}

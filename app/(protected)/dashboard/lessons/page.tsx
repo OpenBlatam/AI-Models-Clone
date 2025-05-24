@@ -20,7 +20,7 @@ export default async function LessonsPage() {
     }
   });
 
-  // Get all lessons
+  // Get all lessons with their exercises
   const lessons = await prisma.lesson.findMany({
     include: {
       exercises: true
@@ -30,14 +30,20 @@ export default async function LessonsPage() {
   // Create notifications for completed lessons
   if (userProgress) {
     for (const lesson of userProgress.completedLessons) {
-      await createLessonCompletedNotification(user.id, lesson.title);
+      await createLessonCompletedNotification({ userId: user.id!, lessonTitle: lesson.title });
     }
   }
 
   return (
     <div className="flex flex-col gap-8 p-8">
-      <DashboardHeader />
-      <LessonsContent lessons={lessons} userProgress={userProgress} />
+      <DashboardHeader 
+        heading="Lecciones"
+        text="Explora y completa lecciones para ganar experiencia y subir de nivel."
+      />
+      <LessonsContent 
+        lessons={lessons} 
+        userLevel={userProgress?.level || 1} 
+      />
     </div>
   );
 } 

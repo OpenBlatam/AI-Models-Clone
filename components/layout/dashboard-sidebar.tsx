@@ -4,7 +4,7 @@ import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavItem, SidebarNavItem } from "@/types";
-import { Menu, PanelLeftClose, PanelRightClose } from "lucide-react";
+import { Menu, PanelLeftClose, PanelRightClose, Gamepad2 } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
@@ -212,54 +212,90 @@ export function MobileSheetSidebar({ links }: DashboardSidebarProps) {
 
                 <ProjectSwitcher large />
 
-                {links.map((section) => (
-                  <section
-                    key={section.title}
-                    className="flex flex-col gap-0.5"
+                <div className="flex flex-col gap-2">
+                  <Link
+                    href="/dashboard"
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                      path === "/dashboard"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground"
+                    )}
                   >
-                    <p className="text-xs text-muted-foreground">
-                      {section.title}
-                    </p>
+                    <Icons.dashboard className="size-4" />
+                    <span>Dashboard</span>
+                  </Link>
 
-                    {section.items.map((item) => {
-                      const Icon = Icons[item.icon || "arrowRight"];
-                      return (
-                        item.href && (
-                          <Fragment key={`link-fragment-${item.title}`}>
-                            <Link
-                              key={`link-${item.title}`}
-                              onClick={() => {
-                                if (!item.disabled) setOpen(false);
-                              }}
-                              href={item.disabled ? "#" : item.href}
-                              className={cn(
-                                "flex items-center gap-3 rounded-md p-2 text-sm font-medium hover:bg-muted",
-                                path === item.href
-                                  ? "bg-muted"
-                                  : "text-muted-foreground hover:text-accent-foreground",
-                                item.disabled &&
-                                  "cursor-not-allowed opacity-80 hover:bg-transparent hover:text-muted-foreground",
-                              )}
-                            >
-                              <Icon className="size-5" />
-                              {item.title}
-                              {item.badge && (
-                                <Badge className="ml-auto flex size-5 shrink-0 items-center justify-center rounded-full">
-                                  {item.badge}
-                                </Badge>
-                              )}
-                            </Link>
-                          </Fragment>
-                        )
-                      );
-                    })}
-                  </section>
-                ))}
+                  <Link
+                    href="/dashboard/lessons"
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                      path === "/dashboard/lessons"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    <Icons.bookOpen className="size-4" />
+                    <span>Lecciones</span>
+                  </Link>
 
-                <div className="mt-auto">
-                  <UpgradeCard />
+                  <Link
+                    href="/dashboard/academy"
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                      path === "/dashboard/academy"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    <Icons.target className="size-4" />
+                    <span>Academy</span>
+                  </Link>
+
+                  <Link
+                    href="/dashboard/exercises"
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                      path === "/dashboard/exercises"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    <Icons.lineChart className="size-4" />
+                    <span>Ejercicios</span>
+                  </Link>
+
+                  <Link
+                    href="/dashboard/games"
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                      path === "/dashboard/games"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    <Gamepad2 className="size-4" />
+                    <span>Juegos</span>
+                  </Link>
+
+                  <Link
+                    href="/dashboard/achievements"
+                    className={cn(
+                      "flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                      path === "/dashboard/achievements"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground"
+                    )}
+                  >
+                    <Icons.trophy className="size-4" />
+                    <span>Logros</span>
+                  </Link>
                 </div>
               </nav>
+
+              <div className="mt-auto p-6">
+                <UpgradeCard />
+              </div>
             </div>
           </ScrollArea>
         </SheetContent>

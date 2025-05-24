@@ -1,18 +1,18 @@
-import { redirect } from "next/navigation";
+import { Metadata } from "next";
 
-import { getCurrentUser } from "@/lib/session";
+export const metadata: Metadata = {
+  title: "Autenticación",
+  description: "Páginas de autenticación para la plataforma",
+};
 
-interface AuthLayoutProps {
+export default function AuthLayout({
+  children,
+}: {
   children: React.ReactNode;
-}
-
-export default async function AuthLayout({ children }: AuthLayoutProps) {
-  const user = await getCurrentUser();
-
-  if (user) {
-    if (user.role === "ADMIN") redirect("/admin");
-    redirect("/dashboard");
-  }
-
-  return <div className="min-h-screen">{children}</div>;
+}) {
+  return (
+    <div className="min-h-screen bg-background">
+      {children}
+    </div>
+  );
 }

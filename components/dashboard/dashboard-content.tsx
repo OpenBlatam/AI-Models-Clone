@@ -19,6 +19,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useState } from "react";
 
 interface GameStats {
   currentStreak: number;
@@ -79,6 +80,18 @@ const chartConfig = {
 };
 
 export function DashboardContent({ gameStats, achievements }: DashboardContentProps) {
+  const [globalScore, setGlobalScore] = useState(0);
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  const handleAnswer = (answer: string, correctAnswer: string) => {
+    if (answer === correctAnswer) {
+      setGlobalScore(globalScore + 25);
+      setFeedback("¡Correcto! Has ganado 25 XP.");
+    } else {
+      setFeedback(`Incorrecto. La respuesta correcta es: ${correctAnswer}`);
+    }
+  };
+
   const chartData = gameStats.weeklyProgress.map(day => ({
     ...day,
     goal: gameStats.dailyGoal,
@@ -280,6 +293,15 @@ export function DashboardContent({ gameStats, achievements }: DashboardContentPr
           </CardContent>
         </Card>
       </motion.div>
+
+      <Card className="col-span-4">
+        <CardHeader>
+          <CardTitle>Experiencia Global</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="mt-2 text-sm">Experiencia Global: {globalScore} XP</p>
+        </CardContent>
+      </Card>
     </motion.div>
   );
 } 

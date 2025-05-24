@@ -8,7 +8,18 @@ import { UserSubscriptionPlan } from "types";
 export async function getUserSubscriptionPlan(
   userId: string
 ): Promise<UserSubscriptionPlan> {
-  if(!userId) throw new Error("Missing parameters");
+  if(!userId) {
+    return {
+      ...pricingData[0],
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      stripePriceId: null,
+      stripeCurrentPeriodEnd: null,
+      isPaid: false,
+      interval: null,
+      isCanceled: false
+    };
+  }
 
   const user = await prisma.user.findFirst({
     where: {
@@ -23,7 +34,16 @@ export async function getUserSubscriptionPlan(
   })
 
   if (!user) {
-    throw new Error("User not found")
+    return {
+      ...pricingData[0],
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      stripePriceId: null,
+      stripeCurrentPeriodEnd: null,
+      isPaid: false,
+      interval: null,
+      isCanceled: false
+    };
   }
 
   // Check if user is on a paid plan.
