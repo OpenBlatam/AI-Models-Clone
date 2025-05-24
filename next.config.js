@@ -4,6 +4,7 @@ import("./env.mjs");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'standalone',
   reactStrictMode: true,
   swcMinify: true,
   images: {
@@ -21,9 +22,10 @@ const nextConfig = {
         hostname: "randomuser.me",
       },
     ],
+    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
   },
   experimental: {
-    serverComponentsExternalPackages: ["@prisma/client"],
+    serverActions: true,
   },
 };
 

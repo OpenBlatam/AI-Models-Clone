@@ -1,5 +1,5 @@
 [build]
-  command = "npm install --no-audit && npm run build"
+  command = "npm install && npm run build"
   publish = ".next"
 
 [build.environment]
@@ -12,7 +12,8 @@
   NPM_CONFIG_PRODUCTION = "false"
   NPM_CONFIG_AUDIT = "false"
   NPM_CONFIG_FUND = "false"
-  NPM_CONFIG_OPTIONAL = "false"
+  NPM_CONFIG_OPTIONAL = "true"
+  NEXT_PUBLIC_SITE_URL = "https://blatam-academy.netlify.app"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
