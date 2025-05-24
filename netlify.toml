@@ -3,8 +3,8 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "18.19.1"
   NEXT_TELEMETRY_DISABLED = "1"
+  NODE_VERSION = "18.19.1"
   AUTH_SECRET='32mwUMnlOtkH1H8irIqxlaL80KvgdjUlbg2IovnhL1s='
   GOOGLE_CLIENT_ID='766657034501-2fcprad0507agtsvn5gvgvpv0ggqm80i.apps.googleusercontent.com'
   GOOGLE_CLIENT_SECRET='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'
@@ -38,4 +38,8 @@
 [[redirects]]
   from = "/*"
   to = "/index.html"
-  status = 200 
+  status = 200
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["@prisma/client"] 

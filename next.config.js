@@ -25,7 +25,7 @@ const nextConfig = {
     domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
   },
   experimental: {
-    serverActions: true,
+    // serverActions está habilitado por defecto en Next.js 14
   },
 };
 
