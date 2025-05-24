@@ -1,11 +1,12 @@
 [build]
-  command = "npm install && npm run build"
+  command = "npm run build"
   publish = ".next"
+  ignore = "git diff --quiet $CACHED_COMMIT_REF $COMMIT_REF ./"
 
 [build.environment]
-  NEXT_TELEMETRY_DISABLED = "1"
   NODE_VERSION = "18.19.1"
   NPM_VERSION = "10.2.4"
+  NEXT_TELEMETRY_DISABLED = "1"
   AUTH_SECRET='32mwUMnlOtkH1H8irIqxlaL80KvgdjUlbg2IovnhL1s='
   GOOGLE_CLIENT_ID='766657034501-2fcprad0507agtsvn5gvgvpv0ggqm80i.apps.googleusercontent.com'
   GOOGLE_CLIENT_SECRET='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'
