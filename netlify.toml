@@ -5,6 +5,7 @@
 [build.environment]
   NEXT_TELEMETRY_DISABLED = "1"
   NODE_VERSION = "18.19.1"
+  NPM_VERSION = "10.2.4"
   AUTH_SECRET='32mwUMnlOtkH1H8irIqxlaL80KvgdjUlbg2IovnhL1s='
   GOOGLE_CLIENT_ID='766657034501-2fcprad0507agtsvn5gvgvpv0ggqm80i.apps.googleusercontent.com'
   GOOGLE_CLIENT_SECRET='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'
@@ -42,4 +43,18 @@
 
 [functions]
   node_bundler = "esbuild"
-  external_node_modules = ["@prisma/client"] 
+  external_node_modules = ["@prisma/client"]
+
+[build.processing.optimize]
+  bundle = true
+  minify = true
+  compress = true
+  cache = true
+
+[[build.cache]]
+  path = "node_modules"
+  ttl = 3600
+
+[[build.cache]]
+  path = ".next/cache"
+  ttl = 3600 
