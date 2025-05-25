@@ -1,7 +1,8 @@
-import authConfig from "@/auth.config";
+import { NextAuthOptions, DefaultSession } from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { UserRole } from "@prisma/client";
-import NextAuth, { type DefaultSession } from "next-auth";
+import NextAuth from "next-auth";
+import GoogleProvider from "next-auth/providers/google";
 
 import { prisma } from "@/lib/db";
 import { getUserById } from "@/lib/user";
@@ -10,64 +11,44 @@ import { getUserById } from "@/lib/user";
 declare module "next-auth" {
   interface Session {
     user: {
+      id: string;
       role: UserRole;
     } & DefaultSession["user"];
     accessToken?: string;
   }
+
+  interface User {
+    role: UserRole;
+  }
 }
 
-export const {
-  handlers: { GET, POST },
-  auth,
-} = NextAuth({
-  adapter: PrismaAdapter(prisma),
-  session: { strategy: "jwt" },
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(prisma) as any,
+  session: { 
+    strategy: "database",
+    maxAge: 30 * 24 * 60 * 60, // 30 days
+  },
+  secret: process.env.NEXTAUTH_SECRET,
   pages: {
     signIn: "/login",
     error: "/auth/error",
   },
+  providers: [
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+  ],
   callbacks: {
-    async session({ token, session }) {
+    async session({ session, user }) {
       if (session.user) {
-        if (token.sub) {
-          session.user.id = token.sub;
-        }
-
-        if (token.email) {
-          session.user.email = token.email;
-        }
-
-        if (token.role) {
-          session.user.role = token.role;
-        }
-
-        session.user.name = token.name;
-        session.user.image = token.picture;
-        session.accessToken = token.accessToken;
+        session.user.id = user.id;
+        session.user.role = user.role;
       }
-
       return session;
     },
-
-    async jwt({ token, account }) {
-      if (account) {
-        token.accessToken = account.access_token;
-      }
-
-      if (!token.sub) return token;
-
-      const dbUser = await getUserById(token.sub);
-
-      if (!dbUser) return token;
-
-      token.name = dbUser.name;
-      token.email = dbUser.email;
-      token.picture = dbUser.image;
-      token.role = dbUser.role;
-
-      return token;
-    },
   },
-  ...authConfig,
-  // debug: process.env.NODE_ENV !== "production"
-});
+};
+
+const handler = NextAuth(authOptions);
+export default handler;

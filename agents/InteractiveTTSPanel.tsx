@@ -1,7 +1,8 @@
+"use client";
+
 // components/InteractiveTTSPanel.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import { Room, RoomEvent, RemoteParticipant } from 'livekit-client';
-import styles from './InteractiveTTSPanel.module.css'; // Crearemos este archivo
 
 // Iconos SVG simples (puedes reemplazarlos con una librería como lucide-react)
 const SpeakerIcon = () => (
@@ -10,9 +11,27 @@ const SpeakerIcon = () => (
     <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
   </svg>
 );
-const LoaderIcon = () => ( // Un spinner simple
-  <svg className={styles.spinner} viewBox="0 0 50 50">
-    <circle className={styles.path} cx="25" cy="25" r="20" fill="none" strokeWidth="5"></circle>
+
+const LoaderIcon = () => (
+  <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+  </svg>
+);
+
+const UsersIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500">
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+    <circle cx="9" cy="7" r="4"></circle>
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+  </svg>
+);
+
+const LiveIcon = () => (
+  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-blue-500">
+    <circle cx="12" cy="12" r="10"></circle>
+    <circle cx="12" cy="12" r="4"></circle>
   </svg>
 );
 
@@ -29,10 +48,7 @@ const InteractiveTTSPanel: React.FC = () => {
   const [room, setRoom] = useState<Room | null>(null);
   const [isConnected, setIsConnected] = useState(false);
   const [participants, setParticipants] = useState<RemoteParticipant[]>([]);
-  const remoteMediaContainerRef = useRef<HTMLDivElement>(null);
 
-
-  // Efecto para conectar/desconectar de LiveKit
   useEffect(() => {
     if (!LIVEKIT_URL || !TEMP_TOKEN || TEMP_TOKEN === 'tu_token_temporal_aqui') {
       console.warn("LiveKit URL or temporary token not set properly for demo.");
@@ -51,15 +67,6 @@ const InteractiveTTSPanel: React.FC = () => {
       .on(RoomEvent.ParticipantDisconnected, (participant: RemoteParticipant) => {
         setParticipants((prev) => prev.filter(p => p.sid !== participant.sid));
       })
-      .on(RoomEvent.TrackSubscribed, (track, publication, participant) => {
-        if ((track.kind === 'audio' || track.kind === 'video') && remoteMediaContainerRef.current) {
-          const element = track.attach();
-          remoteMediaContainerRef.current.appendChild(element);
-        }
-      })
-      .on(RoomEvent.TrackUnsubscribed, (track) => {
-         track.detach().forEach(element => element.remove());
-      })
       .on(RoomEvent.Disconnected, () => {
         setIsConnected(false);
         setParticipants([]);
@@ -69,7 +76,7 @@ const InteractiveTTSPanel: React.FC = () => {
       try {
         await newRoom.connect(LIVEKIT_URL!, TEMP_TOKEN!);
         setIsConnected(true);
-        setParticipants(Array.from(newRoom.participants.values()));
+        setParticipants(Array.from(newRoom.remoteParticipants.values()));
         setRoom(newRoom);
       } catch (error) {
         console.error('Failed to connect to LiveKit room:', error);
@@ -83,7 +90,6 @@ const InteractiveTTSPanel: React.FC = () => {
     };
   }, []);
 
-
   const handleSynthesizeAndPlay = async () => {
     if (!text.trim()) {
       setTtsError('Por favor, introduce algún texto.');
@@ -93,7 +99,7 @@ const InteractiveTTSPanel: React.FC = () => {
     setTtsError(null);
 
     try {
-      const response = await fetch('/api/tts-elevenlabs', { // Asume que esta API route existe
+      const response = await fetch('/api/tts-elevenlabs', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +119,7 @@ const InteractiveTTSPanel: React.FC = () => {
         audioRef.current.src = url;
         audioRef.current.play();
         audioRef.current.onended = () => {
-          URL.revokeObjectURL(url); // Limpiar el object URL después de reproducir
+          URL.revokeObjectURL(url);
         };
       }
     } catch (err: any) {
@@ -125,45 +131,73 @@ const InteractiveTTSPanel: React.FC = () => {
   };
 
   return (
-    <div className={styles.panelContainer}>
-      <div className={styles.ttsSection}>
-        <h2 className={styles.sectionTitle}>Voz IA con ElevenLabs</h2>
-        <textarea
-          className={styles.textArea}
-          rows={5}
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-          placeholder="Escribe el texto que quieres convertir a voz..."
-          disabled={isLoadingTTS}
-        />
-        <button
-          className={styles.actionButton}
-          onClick={handleSynthesizeAndPlay}
-          disabled={isLoadingTTS}
-        >
-          {isLoadingTTS ? <LoaderIcon /> : <SpeakerIcon />}
-          {isLoadingTTS ? 'Generando Audio...' : 'Escuchar con IA'}
-        </button>
-        {ttsError && <p className={styles.errorMessage}>{ttsError}</p>}
-        <audio ref={audioRef} style={{ display: 'none' }} /> {/* Audio element for playback */}
-      </div>
+    <div className="sticky top-20 float-right w-[400px] bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-700 overflow-hidden transform hover:scale-[1.02] transition-transform duration-200">
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center">
+              <SpeakerIcon />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold text-white">Voz IA</h2>
+              <p className="text-sm text-gray-400">Genera voz natural con IA</p>
+            </div>
+          </div>
+          <div className={`px-3 py-1 rounded-full text-xs font-medium ${isConnected ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+            {isConnected ? 'Conectado' : 'Desconectado'}
+          </div>
+        </div>
 
-      <div className={styles.livekitSection}>
-        <h2 className={styles.sectionTitle}>Sala en Vivo con LiveKit</h2>
-        <div className={styles.status}>
-          Estado: {isConnected ? <span className={styles.connected}>Conectado</span> : <span className={styles.disconnected}>Desconectado</span>}
-          {isConnected && room && <span className={styles.roomName}> ({room.name})</span>}
+        <div className="space-y-4">
+          <textarea
+            className="w-full h-32 bg-gray-800/50 border border-gray-700 rounded-xl p-4 text-white placeholder-gray-500 focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Escribe el texto que quieres convertir a voz..."
+            disabled={isLoadingTTS}
+          />
+
+          <button
+            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-blue-500 text-white font-medium rounded-xl hover:bg-blue-600 transition-colors disabled:bg-gray-600 disabled:cursor-not-allowed shadow-lg hover:shadow-blue-500/25"
+            onClick={handleSynthesizeAndPlay}
+            disabled={isLoadingTTS}
+          >
+            {isLoadingTTS ? (
+              <>
+                <LoaderIcon />
+                <span>Generando audio...</span>
+              </>
+            ) : (
+              <>
+                <SpeakerIcon />
+                <span>Generar y reproducir</span>
+              </>
+            )}
+          </button>
+
+          {ttsError && (
+            <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl">
+              <p className="text-sm text-red-400">{ttsError}</p>
+            </div>
+          )}
         </div>
-        <div className={styles.participantsList}>
-          <strong>Participantes ({room?.participants.size || 0}):</strong>
-          <ul>
-            {participants.map(p => <li key={p.sid}>{p.identity}</li>)}
-          </ul>
-        </div>
-        <div id="remote-media-container" ref={remoteMediaContainerRef} className={styles.remoteMedia}>
-          {/* Las pistas de audio/video remotas se añadirán aquí */}
+
+        <div className="mt-6 pt-6 border-t border-gray-700">
+          <div className="flex items-center justify-between text-sm text-gray-400">
+            <span>Participantes en sala</span>
+            <span className="font-medium text-white">{room?.numParticipants || 0}</span>
+          </div>
+          <div className="mt-3 space-y-2">
+            {participants.map(p => (
+              <div key={p.sid} className="flex items-center gap-3 text-sm text-gray-300">
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                {p.identity}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
+      <audio ref={audioRef} className="hidden" />
     </div>
   );
 };

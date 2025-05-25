@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { GraduationCap, BookOpen, Users, Trophy, ArrowRight, Sparkles, Code2, Brain, Zap, Terminal, Crown, Star, Diamond } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { cn } from "@/lib/utils";
@@ -10,10 +10,30 @@ import { cn } from "@/lib/utils";
 export function AnimatedFeatures() {
   const ref = useRef(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [floatingElements, setFloatingElements] = useState<Array<{ left: number; top: number; duration: number; delay: number }>>([]);
+  const [matrixElements, setMatrixElements] = useState<Array<{ x: number; duration: number; delay: number }>>([]);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"]
   });
+
+  useEffect(() => {
+    // Generar valores aleatorios solo en el cliente
+    const floating = Array.from({ length: 12 }).map(() => ({
+      left: Math.random() * 100,
+      top: Math.random() * 100,
+      duration: 5 + Math.random() * 5,
+      delay: Math.random() * 2
+    }));
+    setFloatingElements(floating);
+
+    const matrix = Array.from({ length: 15 }).map(() => ({
+      x: Math.random() * 100,
+      duration: Math.random() * 10 + 5,
+      delay: Math.random() * 5
+    }));
+    setMatrixElements(matrix);
+  }, []);
 
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 0]);
@@ -105,13 +125,13 @@ export function AnimatedFeatures() {
       </motion.div>
 
       {/* Floating Elements */}
-      {[...Array(12)].map((_, i) => (
+      {floatingElements.map((element, i) => (
         <motion.div
           key={i}
           className="absolute"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: `${element.left}%`,
+            top: `${element.top}%`,
           }}
           animate={{
             y: [0, -20, 0],
@@ -119,10 +139,10 @@ export function AnimatedFeatures() {
             scale: [1, 1.2, 1],
           }}
           transition={{
-            duration: 5 + Math.random() * 5,
+            duration: element.duration,
             repeat: Infinity,
             ease: "easeInOut",
-            delay: Math.random() * 2,
+            delay: element.delay,
           }}
         >
           <div className={cn(
@@ -135,16 +155,16 @@ export function AnimatedFeatures() {
 
       {/* Matrix-like Code Rain Effect */}
       <div className="absolute inset-0 overflow-hidden">
-        {[...Array(15)].map((_, i) => (
+        {matrixElements.map((element, i) => (
           <motion.div
             key={i}
             className="absolute text-[#00F5A0]/10 text-sm font-mono"
-            initial={{ y: -100, x: Math.random() * 100 + "%" }}
+            initial={{ y: -100, x: `${element.x}%` }}
             animate={{ y: "100vh" }}
             transition={{
-              duration: Math.random() * 10 + 5,
+              duration: element.duration,
               repeat: Infinity,
-              delay: Math.random() * 5,
+              delay: element.delay,
             }}
           >
             {[...Array(10)].map((_, j) => (

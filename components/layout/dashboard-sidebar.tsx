@@ -92,7 +92,7 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
         <ScrollArea className="h-full overflow-y-auto border-r">
           <aside
             className={cn(
-              isSidebarExpanded ? "w-[220px] xl:w-[260px]" : "w-[68px]",
+              isSidebarExpanded ? "w-[260px] xl:w-[300px]" : "w-[90px]",
               "hidden h-screen md:block",
             )}
             onMouseEnter={() => !isPinned && setIsSidebarExpanded(true)}
@@ -100,10 +100,10 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
           >
             <div className="flex h-full max-h-screen flex-1 flex-col gap-2">
               <div className="flex flex-col items-center justify-center h-20 p-4 lg:h-[90px]">
-                {(!isSidebarExpanded) && (
+                {(!isSidebarExpanded || isPinned) && (
                   <span className="mb-2">
                     <span
-                      className="inline-flex items-center justify-center w-16 h-16 rounded bg-white shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                      className="inline-flex items-center justify-center w-20 h-20 rounded bg-white shadow-lg cursor-pointer hover:scale-105 transition-transform"
                       style={{
                         boxShadow: "0 0 24px 8px #fff, 0 2px 12px #0002, 0 1.5px 0 #fff8",
                         border: "1.5px solid rgba(255,255,255,0.7)",
@@ -111,11 +111,11 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
                         transition: "box-shadow 0.2s, border 0.2s"
                       }}
                     >
-                      <img src="/b_logo.png" alt="b logo" className="w-12 h-12 object-contain" />
+                      <img src="/b_logo.png" alt="Blatam Academy Assistant" className="w-16 h-16 object-contain" />
                     </span>
                   </span>
                 )}
-                {isSidebarExpanded && (
+                {isSidebarExpanded && !isPinned && (
                   <span
                     className="text-2xl font-extrabold tracking-wider text-white transition-all duration-200 mb-2"
                     style={{ fontFamily: "'Montserrat', Arial, sans-serif", textShadow: "0 2px 12px #00000066, 0 1.5px 0 #fff" }}

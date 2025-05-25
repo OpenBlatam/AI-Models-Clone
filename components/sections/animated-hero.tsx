@@ -4,15 +4,27 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Star, Zap, ChevronDown, Code2, Brain, Terminal, Rocket, Target, Trophy, Flame, Gem } from "lucide-react";
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export function AnimatedHero() {
   const ref = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
+  const [matrixLines, setMatrixLines] = useState<Array<{ id: number; x: number; duration: number; delay: number }>>([]);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end start"]
   });
+
+  useEffect(() => {
+    // Generar los valores aleatorios solo en el cliente
+    const lines = Array.from({ length: 20 }).map((_, i) => ({
+      id: i,
+      x: (i * 5) % 100,
+      duration: Math.random() * 5 + 5,
+      delay: Math.random() * 5
+    }));
+    setMatrixLines(lines);
+  }, []);
 
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "50%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
@@ -70,19 +82,19 @@ export function AnimatedHero() {
       {/* Matrix Code Rain Effect */}
       <div className="absolute inset-0 overflow-hidden z-0">
         <div className="absolute inset-0 opacity-20">
-          {Array.from({ length: 20 }).map((_, i) => (
+          {matrixLines.map((line) => (
             <motion.div
-              key={`matrix-line-${i}`}
+              key={`matrix-line-${line.id}`}
               className="absolute text-[#00F5A0] text-sm font-mono"
-              initial={{ y: -100, x: `${(i * 5) % 100}%` }}
+              initial={{ y: -100, x: `${line.x}%` }}
               animate={{ y: 1000 }}
               transition={{
-                duration: Math.random() * 5 + 5,
+                duration: line.duration,
                 repeat: Infinity,
-                delay: Math.random() * 5,
+                delay: line.delay,
               }}
             >
-              {`matrix-${i}-${Math.floor(Math.random() * 1000)}`}
+              {`matrix-${line.id}-${Math.floor(Math.random() * 1000)}`}
             </motion.div>
           ))}
         </div>
