@@ -4,7 +4,7 @@ import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { NavItem, SidebarNavItem } from "@/types";
-import { Menu, PanelLeftClose, PanelRightClose, Gamepad2 } from "lucide-react";
+import { Menu, PanelLeftClose, PanelRightClose, Gamepad2, Pin, PinOff } from "lucide-react";
 
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils";
@@ -51,14 +51,40 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
 
   const { isTablet } = useMediaQuery();
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(!isTablet);
+  const [isPinned, setIsPinned] = useState(false);
+  const [typedText, setTypedText] = useState("");
 
   const toggleSidebar = () => {
     setIsSidebarExpanded(!isSidebarExpanded);
   };
 
+  const togglePin = () => {
+    setIsPinned(!isPinned);
+  };
+
   useEffect(() => {
-    setIsSidebarExpanded(!isTablet);
-  }, [isTablet]);
+    if (!isPinned) {
+      setIsSidebarExpanded(!isTablet);
+    }
+  }, [isTablet, isPinned]);
+
+  useEffect(() => {
+    if (isSidebarExpanded) {
+      const text = "blatam";
+      let index = 0;
+      const interval = setInterval(() => {
+        if (index < text.length) {
+          setTypedText(text.slice(0, index + 1));
+          index++;
+        } else {
+          clearInterval(interval);
+        }
+      }, 100);
+      return () => clearInterval(interval);
+    } else {
+      setTypedText("");
+    }
+  }, [isSidebarExpanded]);
 
   return (
     <TooltipProvider delayDuration={0}>
@@ -69,11 +95,38 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
               isSidebarExpanded ? "w-[220px] xl:w-[260px]" : "w-[68px]",
               "hidden h-screen md:block",
             )}
+            onMouseEnter={() => !isPinned && setIsSidebarExpanded(true)}
+            onMouseLeave={() => !isPinned && setIsSidebarExpanded(false)}
           >
             <div className="flex h-full max-h-screen flex-1 flex-col gap-2">
-              <div className="flex h-14 items-center p-4 lg:h-[60px]">
-                {isSidebarExpanded ? <ProjectSwitcher /> : null}
+              <div className="flex flex-col items-center justify-center h-20 p-4 lg:h-[90px]">
+                {(!isSidebarExpanded) && (
+                  <span className="mb-2">
+                    <span
+                      className="inline-flex items-center justify-center w-16 h-16 rounded bg-white shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                      style={{
+                        boxShadow: "0 0 24px 8px #fff, 0 2px 12px #0002, 0 1.5px 0 #fff8",
+                        border: "1.5px solid rgba(255,255,255,0.7)",
+                        background: "linear-gradient(135deg, #fff 80%, #f3f3f3 100%)",
+                        transition: "box-shadow 0.2s, border 0.2s"
+                      }}
+                    >
+                      <img src="/b_logo.png" alt="b logo" className="w-12 h-12 object-contain" />
+                    </span>
+                  </span>
+                )}
+                {isSidebarExpanded && (
+                  <span
+                    className="text-2xl font-extrabold tracking-wider text-white transition-all duration-200 mb-2"
+                    style={{ fontFamily: "'Montserrat', Arial, sans-serif", textShadow: "0 2px 12px #00000066, 0 1.5px 0 #fff" }}
+                  >
+                    {typedText}
+                  </span>
+                )}
+                {isSidebarExpanded && <ProjectSwitcher />}
+              </div>
 
+              <div className="flex h-14 items-center p-4 lg:h-[60px]">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -93,6 +146,21 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
                   )}
                   <span className="sr-only">Toggle Sidebar</span>
                 </Button>
+                {isSidebarExpanded && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="ml-2 size-9 lg:size-8"
+                    onClick={togglePin}
+                  >
+                    {isPinned ? (
+                      <Pin className="size-5" />
+                    ) : (
+                      <PinOff className="size-5" />
+                    )}
+                    <span className="sr-only">Pin Sidebar</span>
+                  </Button>
+                )}
               </div>
 
               <nav className="flex flex-1 flex-col gap-8 px-4 pt-4">

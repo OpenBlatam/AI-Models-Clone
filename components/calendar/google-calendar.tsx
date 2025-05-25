@@ -10,7 +10,7 @@ import type { EventInput } from '@fullcalendar/core';
 import { EventModal } from './event-modal';
 import { AINotesModal } from './ai-notes-modal';
 import { Button } from '@/components/ui/button';
-import { Plus, Calendar as CalendarIcon, List, Grid, Clock, Sparkles, MapPin, CheckCircle, XCircle } from 'lucide-react';
+import { Plus, Calendar as CalendarIcon, List, Grid, Clock, Sparkles, MapPin, CheckCircle, XCircle, Link, Link2Off } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { addWeeks, setHours, setMinutes, setSeconds, nextSaturday, startOfWeek, endOfWeek, format, subWeeks } from 'date-fns';
 import * as Tooltip from '@radix-ui/react-tooltip';
@@ -27,6 +27,7 @@ import { DayPicker } from 'react-day-picker';
 import 'react-day-picker/dist/style.css';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import 'react-perfect-scrollbar/dist/css/styles.css';
+import { useSession } from 'next-auth/react';
 
 interface GoogleCalendarProps {
   calendarId?: string;
@@ -36,6 +37,7 @@ interface GoogleCalendarProps {
 const ZOOM_LINK = 'https://us04web.zoom.us/j/1234567890?pwd=abcdefg';
 
 export default function GoogleCalendar({ calendarId = 'primary', height = '800px' }: GoogleCalendarProps) {
+  const { data: session } = useSession();
   const [events, setEvents] = useState<EventInput[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAINotesModalOpen, setIsAINotesModalOpen] = useState(false);
@@ -46,66 +48,75 @@ export default function GoogleCalendar({ calendarId = 'primary', height = '800px
   const [currentDate, setCurrentDate] = useState(new Date());
   const [showConfetti, setShowConfetti] = useState(false);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isGoogleCalendarConnected, setIsGoogleCalendarConnected] = useState(false);
 
   useEffect(() => {
     const loadEvents = async () => {
       try {
-        const response = await fetch(
-          `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY}`
-        );
-        const data = await response.json();
-        const formattedEvents = Array.isArray(data.items)
-          ? data.items.map((event: any) => ({
-              id: event.id,
-              title: event.summary,
-              start: event.start.dateTime || event.start.date,
-              end: event.end.dateTime || event.end.date,
-              description: event.description,
-              location: event.location,
-              backgroundColor: event.colorId ? getColorFromId(event.colorId) : '#3788d8',
-              borderColor: event.colorId ? getColorFromId(event.colorId) : '#3788d8',
-              textColor: '#ffffff',
-              extendedProps: {
+        if (isGoogleCalendarConnected && session?.accessToken) {
+          const response = await fetch(
+            `https://www.googleapis.com/calendar/v3/calendars/${calendarId}/events?key=${process.env.NEXT_PUBLIC_GOOGLE_CALENDAR_API_KEY}`,
+            {
+              headers: {
+                Authorization: `Bearer ${session.accessToken}`,
+              },
+            }
+          );
+          const data = await response.json();
+          const formattedEvents = Array.isArray(data.items)
+            ? data.items.map((event: any) => ({
+                id: event.id,
+                title: event.summary,
+                start: event.start.dateTime || event.start.date,
+                end: event.end.dateTime || event.end.date,
                 description: event.description,
                 location: event.location,
-                attendees: event.attendees,
-              },
-            }))
-          : [];
+                backgroundColor: event.colorId ? getColorFromId(event.colorId) : '#3788d8',
+                borderColor: event.colorId ? getColorFromId(event.colorId) : '#3788d8',
+                textColor: '#ffffff',
+                extendedProps: {
+                  description: event.description,
+                  location: event.location,
+                  attendees: event.attendees,
+                },
+              }))
+            : [];
 
-        // Agregar eventos de clase vía Zoom cada sábado de 6 a 8 pm durante 4 semanas
-        const now = new Date();
-        let firstSaturday = nextSaturday(now);
-        firstSaturday = setHours(setMinutes(setSeconds(firstSaturday, 0), 0), 18); // 6:00pm
-        const zoomEvents = Array.from({ length: 4 }).map((_, i) => {
-          const start = addWeeks(firstSaturday, i);
-          const end = setHours(setMinutes(setSeconds(addWeeks(firstSaturday, i), 0), 0), 20); // 8:00pm
-          return {
-            id: `zoom-class-${i}`,
-            title: 'Clase vía Zoom',
-            start,
-            end,
-            description: `Clase recurrente de Zoom.\nEnlace: ${ZOOM_LINK}`,
-            location: 'Zoom',
-            backgroundColor: '#039be5',
-            borderColor: '#039be5',
-            textColor: '#fff',
-            extendedProps: {
-              description: 'Clase recurrente de Zoom',
+          // Agregar eventos de clase vía Zoom cada sábado de 6 a 8 pm durante 4 semanas
+          const now = new Date();
+          let firstSaturday = nextSaturday(now);
+          firstSaturday = setHours(setMinutes(setSeconds(firstSaturday, 0), 0), 18); // 6:00pm
+          const zoomEvents = Array.from({ length: 4 }).map((_, i) => {
+            const start = addWeeks(firstSaturday, i);
+            const end = setHours(setMinutes(setSeconds(addWeeks(firstSaturday, i), 0), 0), 20); // 8:00pm
+            return {
+              id: `zoom-class-${i}`,
+              title: 'Clase vía Zoom',
+              start,
+              end,
+              description: `Clase recurrente de Zoom.\nEnlace: ${ZOOM_LINK}`,
               location: 'Zoom',
-              zoomLink: ZOOM_LINK,
-            },
-          };
-        });
+              backgroundColor: '#039be5',
+              borderColor: '#039be5',
+              textColor: '#fff',
+              extendedProps: {
+                description: 'Clase recurrente de Zoom',
+                location: 'Zoom',
+                zoomLink: ZOOM_LINK,
+              },
+            };
+          });
 
-        setEvents([...formattedEvents, ...zoomEvents]);
+          setEvents([...formattedEvents, ...zoomEvents]);
+        }
       } catch (error) {
         console.error('Error loading calendar events:', error);
+        toast.error('Error al cargar los eventos de Google Calendar');
       }
     };
 
     loadEvents();
-  }, [calendarId]);
+  }, [calendarId, isGoogleCalendarConnected, session?.accessToken]);
 
   // Atajo de teclado Shift+W para vista semana
   useEffect(() => {
@@ -250,6 +261,40 @@ export default function GoogleCalendar({ calendarId = 'primary', height = '800px
   const weekEnd = endOfWeek(currentDate, { weekStartsOn: 1, locale: es });
   const weekLabel = `${format(weekStart, "d 'de' MMMM", { locale: es })} - ${format(weekEnd, "d 'de' MMMM yyyy", { locale: es })}`;
 
+  const handleGoogleCalendarConnect = async () => {
+    if (!isGoogleCalendarConnected) {
+      try {
+        const response = await fetch('/api/calendar/connect', {
+          method: 'POST',
+        });
+        if (response.ok) {
+          setIsGoogleCalendarConnected(true);
+          toast.success('Calendario de Google conectado exitosamente');
+        } else {
+          toast.error('Error al conectar con Google Calendar');
+        }
+      } catch (error) {
+        console.error('Error connecting to Google Calendar:', error);
+        toast.error('Error al conectar con Google Calendar');
+      }
+    } else {
+      try {
+        const response = await fetch('/api/calendar/disconnect', {
+          method: 'POST',
+        });
+        if (response.ok) {
+          setIsGoogleCalendarConnected(false);
+          toast.success('Calendario de Google desconectado exitosamente');
+        } else {
+          toast.error('Error al desconectar de Google Calendar');
+        }
+      } catch (error) {
+        console.error('Error disconnecting from Google Calendar:', error);
+        toast.error('Error al desconectar de Google Calendar');
+      }
+    }
+  };
+
   return (
     <motion.div
       className="flex flex-col gap-6"
@@ -296,6 +341,27 @@ export default function GoogleCalendar({ calendarId = 'primary', height = '800px
             >
               <CalendarIcon className="h-5 w-5" /> Ir a fecha
             </button>
+            <motion.button
+              whileHover={{ scale: 1.06 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={handleGoogleCalendarConnect}
+              className={cn(
+                "ml-2 flex items-center gap-2 px-5 py-2 rounded-xl font-semibold shadow-lg transition-all focus:outline-none focus:ring-2 focus:ring-violet-400 animate-in fade-in",
+                isGoogleCalendarConnected
+                  ? "bg-gradient-to-r from-red-500 to-pink-500 text-white hover:from-red-600 hover:to-pink-600"
+                  : "bg-gradient-to-r from-violet-500 to-blue-500 text-white hover:from-violet-600 hover:to-blue-600"
+              )}
+            >
+              {isGoogleCalendarConnected ? (
+                <>
+                  <Link2Off className="h-5 w-5" /> Desconectar Google Calendar
+                </>
+              ) : (
+                <>
+                  <Link className="h-5 w-5" /> Conectar Google Calendar
+                </>
+              )}
+            </motion.button>
           </div>
         </div>
         {/* Tabs animados */}

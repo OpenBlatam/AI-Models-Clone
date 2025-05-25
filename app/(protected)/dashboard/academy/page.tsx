@@ -6,6 +6,7 @@ import { DashboardHeader } from "@/components/dashboard/header";
 import { AcademyContent } from "@/components/dashboard/academy-content";
 import { Icons } from "@/components/shared/icons";
 import { useRouter } from "next/navigation";
+import { MarketingAgentCard } from "@/components/marketing-agent-card";
 
 export default function AcademyPage() {
   const router = useRouter();
@@ -47,6 +48,9 @@ export default function AcademyPage() {
         heading="Academy"
         text="Explora rutas de aprendizaje y cursos especializados."
       />
+      <div className="mb-6">
+        <MarketingAgentCard />
+      </div>
       <AcademyContent learningPaths={learningPaths} />
     </>
   );

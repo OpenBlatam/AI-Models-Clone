@@ -12,6 +12,7 @@ declare module "next-auth" {
     user: {
       role: UserRole;
     } & DefaultSession["user"];
+    accessToken?: string;
   }
 }
 
@@ -42,12 +43,17 @@ export const {
 
         session.user.name = token.name;
         session.user.image = token.picture;
+        session.accessToken = token.accessToken;
       }
 
       return session;
     },
 
-    async jwt({ token }) {
+    async jwt({ token, account }) {
+      if (account) {
+        token.accessToken = account.access_token;
+      }
+
       if (!token.sub) return token;
 
       const dbUser = await getUserById(token.sub);

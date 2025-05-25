@@ -1,0 +1,173 @@
+/* components/InteractiveTTSPanel.module.css */
+.panelContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+    padding: 25px;
+    background-color: #f8f9fa; /* Fondo gris claro para la sección general */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    border-radius: 8px;
+    max-width: 900px;
+    margin: 20px auto; /* Centrar el panel */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  }
+  
+  @media (min-width: 768px) {
+    .panelContainer {
+      flex-direction: row; /* Lado a lado en pantallas más grandes */
+    }
+  }
+  
+  .ttsSection,
+  .livekitSection {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    flex: 1; /* Ambas secciones toman espacio igual */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .sectionTitle {
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1a202c;
+    margin: 0 0 10px 0;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+  
+  .textArea {
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid #cbd5e0;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    resize: vertical;
+    min-height: 80px;
+    box-sizing: border-box; /* Asegura que padding no aumente el tamaño total */
+  }
+  
+  .textArea:focus {
+    outline: none;
+    border-color: #4299e1; /* Azul para foco, similar a Chakra o Bootstrap */
+    box-shadow: 0 0 0 1px #4299e1;
+  }
+  
+  .actionButton {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background-color: #2d3748; /* Botón oscuro (como el actionButton del header claro) */
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+    align-self: flex-start; /* Alinear botón a la izquierda */
+  }
+  
+  .actionButton:hover:not(:disabled) {
+    background-color: #1a202c; /* Más oscuro en hover */
+    transform: translateY(-1px);
+  }
+  
+  .actionButton:disabled {
+    background-color: #a0aec0;
+    cursor: not-allowed;
+  }
+  
+  .actionButton svg { /* Estilo para iconos dentro del botón */
+    margin-right: 5px;
+  }
+  
+  .errorMessage {
+    color: #e53e3e; /* Rojo para errores */
+    font-size: 0.875rem;
+    margin-top: 5px;
+  }
+  
+  /* Estilos para el spinner (LoaderIcon) */
+  .spinner {
+    animation: rotate 1s linear infinite;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .path {
+    stroke: #ffffff; /* Color del spinner */
+    stroke-linecap: round;
+    animation: dash 1.5s ease-in-out infinite;
+  }
+  
+  @keyframes rotate {
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+  
+  @keyframes dash {
+    0% {
+      stroke-dasharray: 1, 150;
+      stroke-dashoffset: 0;
+    }
+    50% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -35;
+    }
+    100% {
+      stroke-dasharray: 90, 150;
+      stroke-dashoffset: -124;
+    }
+  }
+  
+  /* Estilos para la sección de LiveKit */
+  .livekitSection .status {
+    font-size: 0.9rem;
+    color: #4a5568;
+    margin-bottom: 10px;
+  }
+  .connected {
+    color: #38a169; /* Verde */
+    font-weight: bold;
+  }
+  .disconnected {
+    color: #e53e3e; /* Rojo */
+    font-weight: bold;
+  }
+  .roomName {
+    font-style: italic;
+    color: #718096;
+  }
+  
+  .participantsList ul {
+    list-style: none;
+    padding-left: 0;
+    margin: 5px 0 0 0;
+  }
+  .participantsList li {
+    font-size: 0.85rem;
+    color: #4a5568;
+    padding: 2px 0;
+  }
+  
+  .remoteMedia {
+    margin-top: 10px;
+    /* Aquí se añadirán los elementos de audio/video de LiveKit */
+    /* Puedes añadir estilos para cómo se muestran estos elementos */
+  }
+  .remoteMedia video,
+  .remoteMedia audio {
+    display: block;
+    margin-bottom: 5px;
+    max-width: 100%; /* Para que los videos no se desborden */
+    border-radius: 4px;
+  }
