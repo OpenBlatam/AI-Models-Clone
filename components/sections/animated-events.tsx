@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import { Calendar, Clock, MapPin, Users, ArrowRight, Sparkles, Code2, Brain, Zap, Terminal, Rocket, Crown, Star, Trophy } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import * as HoverCard from "@radix-ui/react-hover-card";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { cn } from "@/lib/utils";
@@ -10,10 +10,15 @@ import { cn } from "@/lib/utils";
 export function AnimatedEvents() {
   const ref = useRef(null);
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start end", "end start"]
   });
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const y = useTransform(scrollYProgress, [0, 1], ["0%", "20%"]);
   const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 0]);
@@ -107,14 +112,14 @@ export function AnimatedEvents() {
         />
       </motion.div>
 
-      {/* Floating Elements */}
-      {[...Array(12)].map((_, i) => (
+      {/* Floating Elements - Only render on client side */}
+      {isMounted && [...Array(12)].map((_, i) => (
         <motion.div
           key={i}
           className="absolute"
           style={{
-            left: `${Math.random() * 100}%`,
-            top: `${Math.random() * 100}%`,
+            left: `${(i * 8.33) % 100}%`,
+            top: `${(i * 7.5) % 100}%`,
           }}
           animate={{
             y: [0, -20, 0],
@@ -122,10 +127,10 @@ export function AnimatedEvents() {
             scale: [1, 1.2, 1],
           }}
           transition={{
-            duration: 5 + Math.random() * 5,
+            duration: 5 + (i % 5),
             repeat: Infinity,
             ease: "easeInOut",
-            delay: Math.random() * 2,
+            delay: i * 0.2,
           }}
         >
           <div className={cn(
@@ -136,28 +141,30 @@ export function AnimatedEvents() {
         </motion.div>
       ))}
 
-      {/* Matrix-like Code Rain Effect */}
-      <div className="absolute inset-0 overflow-hidden">
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute text-[#00F5A0]/10 text-sm font-mono"
-            initial={{ y: -100, x: Math.random() * 100 + "%" }}
-            animate={{ y: "100vh" }}
-            transition={{
-              duration: Math.random() * 10 + 5,
-              repeat: Infinity,
-              delay: Math.random() * 5,
-            }}
-          >
-            {[...Array(10)].map((_, j) => (
-              <span key={j} className="inline-block mx-1">
-                {Math.random() > 0.5 ? "1" : "0"}
-              </span>
-            ))}
-          </motion.div>
-        ))}
-      </div>
+      {/* Matrix-like Code Rain Effect - Only render on client side */}
+      {isMounted && (
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(15)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute text-[#00F5A0]/10 text-sm font-mono"
+              initial={{ y: -100, x: `${(i * 6.66) % 100}%` }}
+              animate={{ y: "100vh" }}
+              transition={{
+                duration: 5 + (i % 5),
+                repeat: Infinity,
+                delay: i * 0.3,
+              }}
+            >
+              {[...Array(10)].map((_, j) => (
+                <span key={j} className="inline-block mx-1">
+                  {(i + j) % 2 === 0 ? "1" : "0"}
+                </span>
+              ))}
+            </motion.div>
+          ))}
+        </div>
+      )}
 
       <motion.div 
         style={{ y, opacity }}

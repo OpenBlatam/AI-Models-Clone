@@ -5,10 +5,10 @@ const { fontFamily } = require("tailwindcss/defaultTheme");
 const config = {
   darkMode: ["class"],
   content: [
-    "./app/**/*.{ts,tsx}",
+    "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
-    "./ui/**/*.{ts,tsx}",
-    "./content/**/*.{md,mdx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
   ],
   future: {
     hoverOnlyWhenSupported: true,
@@ -17,7 +17,10 @@ const config = {
   theme: {
     container: {
       center: true,
-      padding: ".8rem",
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
     },
     extend: {
       colors: {
@@ -75,68 +78,41 @@ const config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-        // Fade up and down
-        "fade-up": {
-          "0%": {
-            opacity: "0",
-            transform: "translateY(10px)",
-          },
-          "80%": {
-            opacity: "0.7",
-          },
-          "100%": {
-            opacity: "1",
-            transform: "translateY(0px)",
-          },
+        float: {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-10px)" },
         },
-        "fade-down": {
-          "0%": {
-            opacity: "0",
-            transform: "translateY(-10px)",
-          },
-          "80%": {
-            opacity: "0.6",
-          },
-          "100%": {
-            opacity: "1",
-            transform: "translateY(0px)",
-          },
+        "spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
         },
-        // Fade in and out
-        "fade-in": {
-          "0%": {
-            opacity: "0",
+        "bounce-slow": {
+          "0%, 100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-5px)" },
+        },
+        "bounce-x": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "50%": { transform: "translateX(5px)" },
+        },
+        "gradient-x": {
+          "0%, 100%": {
+            "background-size": "200% 200%",
+            "background-position": "left center",
           },
           "50%": {
-            opacity: "0.6",
-          },
-          "100%": {
-            opacity: "1",
-          },
-        },
-        "fade-out": {
-          "0%": {
-            opacity: "0",
-          },
-          "50%": {
-            opacity: "0.6",
-          },
-          "100%": {
-            opacity: "1",
+            "background-size": "200% 200%",
+            "background-position": "right center",
           },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-
-        // Fade up and down
-        "fade-up": "fade-up 0.5s",
-        "fade-down": "fade-down 0.5s",
-
-        // Fade in and out
-        "fade-in": "fade-in 0.4s",
-        "fade-out": "fade-out 0.4s",
+        float: "float 3s ease-in-out infinite",
+        "spin-slow": "spin-slow 8s linear infinite",
+        "bounce-slow": "bounce-slow 2s ease-in-out infinite",
+        "bounce-x": "bounce-x 1s ease-in-out infinite",
+        "gradient-x": "gradient-x 3s ease infinite",
       },
     },
   },

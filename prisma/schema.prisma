@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,28 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum UserRole {
-  ADMIN
-  USER
-}
-
 model Account {
   id                String   @id @default(cuid())
   userId            String
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?  @db.Text
-  access_token      String?  @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?  @db.Text
+  id_token          String?
   session_state     String?
   createdAt         DateTime @default(now())
   updatedAt         DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
   @@index([userId])
@@ -48,27 +39,25 @@ model Session {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @default(now())
-  role          UserRole  @default(USER)
-
-  accounts Account[]
-  sessions Session[]
-  notifications Notification[]
-  notes         Note[]
-  documents     Document[]
-
-  stripeCustomerId       String?   @unique
-  stripeSubscriptionId   String?   @unique
+  id                     String         @id @default(cuid())
+  name                   String?
+  email                  String?        @unique
+  emailVerified          DateTime?
+  image                  String?
+  createdAt              DateTime       @default(now())
+  updatedAt              DateTime       @default(now())
+  role                   UserRole       @default(USER)
+  stripeCustomerId       String?        @unique
+  stripeSubscriptionId   String?        @unique
   stripePriceId          String?
   stripeCurrentPeriodEnd DateTime?
-
-  userProgress UserProgress[]
+  accounts               Account[]
+  documents              Document[]
+  notes                  Note[]
+  notifications          Notification[]
+  sessions               Session[]
+  userProgress           UserProgress?
+  comments               Comment[]
 }
 
 model VerificationToken {
@@ -80,69 +69,70 @@ model VerificationToken {
 }
 
 model UserProgress {
-  id          String        @id @default(cuid())
-  userId      String        @unique
-  experience  Int          @default(0)
-  level       Int          @default(1)
-  streak      Int          @default(0)
-  lastActive  DateTime     @default(now())
-  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String        @id @default(cuid())
+  userId       String        @unique
+  experience   Int           @default(0)
+  level        Int           @default(1)
+  streak       Int           @default(0)
+  lastActive   DateTime      @default(now())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   achievements Achievement[]
-  completedLessons Lesson[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  Lesson       Lesson[]      @relation("LessonToUserProgress")
 
   @@index([userId])
 }
 
 model Lesson {
-  id              String   @id @default(cuid())
-  title           String
-  description     String
-  difficulty      String
-  category        String   @default("General")
-  exercises       Exercise[]
-  requiredLevel   Int
+  id               String         @id @default(cuid())
+  title            String
+  description      String
+  difficulty       String
+  category         String         @default("General")
+  requiredLevel    Int
   experienceReward Int
-  completedBy     UserProgress[]
+  content          Json?
+  exercises        Exercise[]
+  UserProgress     UserProgress[] @relation("LessonToUserProgress")
 }
 
 model Exercise {
-  id              String   @id @default(cuid())
-  type            String
-  question        String
-  correctAnswer   String
-  options         String[]
-  audioUrl        String?
-  points          Int
-  lesson          Lesson   @relation(fields: [lessonId], references: [id])
-  lessonId        String
+  id            String   @id @default(cuid())
+  type          String
+  question      String
+  correctAnswer String
+  options       String[]
+  audioUrl      String?
+  points        Int
+  lessonId      String
+  lesson        Lesson   @relation(fields: [lessonId], references: [id])
 }
 
 model Achievement {
-  id              String      @id @default(cuid())
-  title           String
-  description     String
-  icon            String
-  unlockedAt      DateTime?
-  userProgressId  String
-  userProgress    UserProgress @relation(fields: [userProgressId], references: [id], onDelete: Cascade)
-  createdAt       DateTime    @default(now())
-  updatedAt       DateTime    @updatedAt
+  id             String       @id @default(cuid())
+  title          String
+  description    String
+  icon           String
+  unlockedAt     DateTime?
+  userProgressId String
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime
+  userProgress   UserProgress @relation(fields: [userProgressId], references: [id], onDelete: Cascade)
 
   @@index([userProgressId])
 }
 
 model Notification {
-  id          String   @id @default(cuid())
-  userId      String
-  type        String   // "LESSON_COMPLETED", "ACHIEVEMENT_UNLOCKED", "LEVEL_UP", etc.
-  title       String
-  message     String
-  isRead      Boolean  @default(false)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
 }
@@ -150,7 +140,7 @@ model Notification {
 model Note {
   id        String   @id @default(cuid())
   title     String
-  content   String   @db.Text
+  content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
@@ -163,11 +153,42 @@ model Document {
   id        String   @id @default(cuid())
   title     String
   type      String   @default("text")
-  content   String   @default("")
   userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String   @default("")
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Video {
+  id          String    @id @default(cuid())
+  title       String
+  subtitle    String
+  src         String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  comments    Comment[]
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  video   Video  @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  videoId String
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+
+  @@index([videoId])
   @@index([userId])
+}
+
+enum UserRole {
+  ADMIN
+  USER
 }

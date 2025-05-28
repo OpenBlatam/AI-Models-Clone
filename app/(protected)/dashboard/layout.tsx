@@ -1,4 +1,5 @@
 import { DashboardNav } from "@/components/dashboard/dashboard-nav";
+import MobileBottomNavWrapper from "@/components/MobileBottomNavWrapper";
 
 export default function DashboardLayout({
   children,
@@ -15,6 +16,7 @@ export default function DashboardLayout({
       <div className="container flex-1">
         {children}
       </div>
+      <MobileBottomNavWrapper />
     </div>
   );
 } 

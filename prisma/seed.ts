@@ -4,11 +4,8 @@ const prisma = new PrismaClient();
 
 async function main() {
   // Create Marketing con IA lesson
-  const marketingLesson = await prisma.lesson.upsert({
-    where: { id: "marketing-ia-1" },
-    update: {},
-    create: {
-      id: "marketing-ia-1",
+  const marketingLesson = await prisma.lesson.create({
+    data: {
       title: "Marketing con IA",
       description: "Aprende a utilizar la inteligencia artificial para mejorar tus estrategias de marketing.",
       difficulty: "Intermedio",
@@ -78,7 +75,6 @@ async function main() {
   // Create 10 basic marketing lessons for the "Principiante" path
   const basicMarketingLessons = [
     {
-      id: "basic-marketing-1",
       title: "Introducción al Marketing",
       description: "Aprende los conceptos fundamentales del marketing y su importancia en el negocio.",
       difficulty: "Principiante",
@@ -103,7 +99,6 @@ async function main() {
       }
     },
     {
-      id: "basic-marketing-2",
       title: "Segmentación de Mercado",
       description: "Aprende a identificar y segmentar tu mercado objetivo.",
       difficulty: "Principiante",
@@ -128,7 +123,6 @@ async function main() {
       }
     },
     {
-      id: "basic-marketing-3",
       title: "Posicionamiento de Marca",
       description: "Aprende a posicionar tu marca en la mente de los consumidores.",
       difficulty: "Principiante",
@@ -153,7 +147,6 @@ async function main() {
       }
     },
     {
-      id: "basic-marketing-4",
       title: "Marketing Mix (4P's)",
       description: "Aprende sobre Producto, Precio, Plaza y Promoción.",
       difficulty: "Principiante",
@@ -178,7 +171,6 @@ async function main() {
       }
     },
     {
-      id: "basic-marketing-5",
       title: "Investigación de Mercado",
       description: "Aprende a realizar investigación de mercado efectiva.",
       difficulty: "Principiante",
@@ -203,7 +195,6 @@ async function main() {
       }
     },
     {
-      id: "basic-marketing-6",
       title: "Marketing Digital",
       description: "Aprende los conceptos básicos del marketing digital.",
       difficulty: "Principiante",
@@ -228,7 +219,6 @@ async function main() {
       }
     },
     {
-      id: "basic-marketing-7",
       title: "Content Marketing",
       description: "Aprende a crear y distribuir contenido valioso.",
       difficulty: "Principiante",
@@ -253,7 +243,6 @@ async function main() {
       }
     },
     {
-      id: "basic-marketing-8",
       title: "Email Marketing",
       description: "Aprende a utilizar el email marketing efectivamente.",
       difficulty: "Principiante",
@@ -278,7 +267,6 @@ async function main() {
       }
     },
     {
-      id: "basic-marketing-9",
       title: "Social Media Marketing",
       description: "Aprende a utilizar las redes sociales para marketing.",
       difficulty: "Principiante",
@@ -303,7 +291,6 @@ async function main() {
       }
     },
     {
-      id: "basic-marketing-10",
       title: "Analítica Web",
       description: "Aprende a medir y analizar el rendimiento de tu marketing digital.",
       difficulty: "Principiante",
@@ -330,10 +317,8 @@ async function main() {
   ];
 
   for (const lesson of basicMarketingLessons) {
-    await prisma.lesson.upsert({
-      where: { id: lesson.id },
-      update: {},
-      create: lesson,
+    await prisma.lesson.create({
+      data: lesson,
       include: {
         exercises: true
       }

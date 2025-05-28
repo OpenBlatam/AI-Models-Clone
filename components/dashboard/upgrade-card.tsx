@@ -11,14 +11,14 @@ export function UpgradeCard() {
   return (
     <Card className="md:max-xl:rounded-none md:max-xl:border-none md:max-xl:shadow-none">
       <CardHeader className="md:max-xl:px-4">
-        <CardTitle>Upgrade to Pro</CardTitle>
+        <CardTitle>¡Desbloquea Todo con Premium! 🚀</CardTitle>
         <CardDescription>
-          Unlock all features and get unlimited access to our support team.
+          Todas las lecciones + soporte VIP. ¡Empieza hoy por solo $8.99/mes!
         </CardDescription>
       </CardHeader>
       <CardContent className="md:max-xl:px-4">
         <Button size="sm" className="w-full">
-          Upgrade
+          Actualizar
         </Button>
       </CardContent>
     </Card>

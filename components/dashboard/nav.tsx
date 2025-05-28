@@ -10,14 +10,21 @@ import {
   Gamepad2,
   Trophy,
   FileText,
+  Video,
 } from "lucide-react";
 
 const routes = [
   {
     label: "Lecciones",
     icon: BookOpen,
-    href: "/dashboard/lecciones",
+    href: "/dashboard/lessons",
     color: "text-violet-500",
+  },
+  {
+    label: "Videos",
+    icon: Video,
+    href: "/dashboard/videos",
+    color: "text-blue-500",
   },
   {
     label: "Academy",
@@ -28,25 +35,25 @@ const routes = [
   {
     label: "Ejercicios",
     icon: Dumbbell,
-    href: "/dashboard/ejercicios",
+    href: "/dashboard/exercises",
     color: "text-orange-700",
   },
   {
     label: "Juegos",
     icon: Gamepad2,
-    href: "/dashboard/juegos",
+    href: "/dashboard/games",
     color: "text-emerald-500",
   },
   {
     label: "Logros",
     icon: Trophy,
-    href: "/dashboard/logros",
+    href: "/dashboard/achievements",
     color: "text-yellow-500",
   },
   {
     label: "Apuntes",
     icon: FileText,
-    href: "/dashboard/apuntes",
+    href: "/dashboard/notes",
     color: "text-[#00F5A0]",
   },
 ];

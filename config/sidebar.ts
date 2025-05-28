@@ -34,6 +34,13 @@ export const sidebarLinks: SidebarNavItem[] = [
         authorizeOnly: UserRole.USER
       },
       {
+        href: "/dashboard/Blatam IA",
+        icon: "brain",
+        title: "Blatam IA",
+        authorizeOnly: UserRole.USER
+      },
+
+      {
         href: "#/dashboard/posts",
         icon: "post",
         title: "User Posts",

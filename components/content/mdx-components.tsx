@@ -2,6 +2,7 @@ import * as React from "react";
 import NextImage, { ImageProps } from "next/image";
 import Link from "next/link";
 import { useMDXComponent } from "next-contentlayer2/hooks";
+import "@/styles/animations.css";
 
 import { cn } from "@/lib/utils";
 import { MdxCard } from "@/components/content/mdx-card";

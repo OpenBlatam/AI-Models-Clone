@@ -90,6 +90,7 @@ export default async function ExercisesPage() {
       title: "Marketing con IA",
       description: "Aprende a utilizar la inteligencia artificial para mejorar tus estrategias de marketing.",
       difficulty: "Intermedio",
+      category: "Marketing",
       requiredLevel: 2,
       experienceReward: 150
     }

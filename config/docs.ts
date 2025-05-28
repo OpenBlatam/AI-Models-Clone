@@ -13,35 +13,35 @@ export const docsConfig: DocsConfig = {
   ],
   sidebarNav: [
     {
-      title: "Getting Started",
+      title: "Marketing",
       items: [
         {
-          title: "Introduction",
+          title: "Introducción",
           href: "/docs",
         },
         {
-          title: "Installation",
+          title: "¿Que se necesita para empezar?",
           href: "/docs/installation",
         },
       ],
     },
     {
-      title: "Configuration",
+      title: "Configuración",
       items: [
         {
-          title: "Authentification",
+          title: "Conceptos Básicos",
           href: "/docs/configuration/authentification",
         },
         {
-          title: "Blog",
+          title: "Herramientas Esenciales del Marketing Digital",
           href: "/docs/configuration/blog",
         },
         {
-          title: "Components",
+          title: "Habilidades de Comunicación en Marketing Digital",
           href: "/docs/configuration/components",
         },
         {
-          title: "Config files",
+          title: "Automatización de Marketing",
           href: "/docs/configuration/config-files",
         },
         {

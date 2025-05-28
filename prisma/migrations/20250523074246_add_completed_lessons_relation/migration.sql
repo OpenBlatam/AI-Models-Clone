@@ -1,17 +1,19 @@
 -- CreateTable
-CREATE TABLE "_LessonToUserProgress" (
-    "A" TEXT NOT NULL,
-    "B" TEXT NOT NULL
+CREATE TABLE "CompletedLesson" (
+    "id" TEXT NOT NULL,
+    "lessonId" TEXT NOT NULL,
+    "userProgressId" TEXT NOT NULL,
+    "completedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "score" INTEGER NOT NULL,
+
+    CONSTRAINT "CompletedLesson_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "_LessonToUserProgress_AB_unique" ON "_LessonToUserProgress"("A", "B");
-
--- CreateIndex
-CREATE INDEX "_LessonToUserProgress_B_index" ON "_LessonToUserProgress"("B");
+CREATE UNIQUE INDEX "CompletedLesson_lessonId_userProgressId_key" ON "CompletedLesson"("lessonId", "userProgressId");
 
 -- AddForeignKey
-ALTER TABLE "_LessonToUserProgress" ADD CONSTRAINT "_LessonToUserProgress_A_fkey" FOREIGN KEY ("A") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "CompletedLesson" ADD CONSTRAINT "CompletedLesson_lessonId_fkey" FOREIGN KEY ("lessonId") REFERENCES "Lesson"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "_LessonToUserProgress" ADD CONSTRAINT "_LessonToUserProgress_B_fkey" FOREIGN KEY ("B") REFERENCES "UserProgress"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "CompletedLesson" ADD CONSTRAINT "CompletedLesson_userProgressId_fkey" FOREIGN KEY ("userProgressId") REFERENCES "UserProgress"("id") ON DELETE CASCADE ON UPDATE CASCADE;
