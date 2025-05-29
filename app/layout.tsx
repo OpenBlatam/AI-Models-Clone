@@ -2,7 +2,6 @@ import "@/styles/globals.css";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { fontGeist, fontHeading, fontSans, fontUrban } from "@/assets/fonts";
-import { ThemeProvider } from "next-themes";
 import { cn, constructMetadata } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
 import { Analytics } from "@/components/analytics";
@@ -10,6 +9,7 @@ import ModalProvider from "@/components/modals/providers";
 import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { ChatLayout } from "@/components/chat-layout";
 import { AuthProvider } from "@/components/auth-provider";
+import { ThemeProvider } from "next-themes";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -37,13 +37,13 @@ export default function RootLayout({ children }: RootLayoutProps) {
         )}
         suppressHydrationWarning
       >
-        <AuthProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <AuthProvider>
             {/* Custom widgets as raw HTML to avoid React/JSX errors */}
             <div
               suppressHydrationWarning
@@ -67,8 +67,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
             <Analytics />
             <Toaster richColors closeButton />
             <TailwindIndicator />
-          </ThemeProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

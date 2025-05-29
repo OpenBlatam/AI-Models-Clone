@@ -1,50 +1,72 @@
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ChevronLeft, ChevronRight, Languages, Flag, PlayCircle } from "lucide-react";
+"use client";
+
+import { motion } from "framer-motion";
+import { Award, Clock, ListVideo } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
-import { cn } from "@/lib/utils";
 
 interface VideoHeaderProps {
   title: string;
-  subtitle: string;
-  onNextVideo: () => void;
-  onPreviousVideo: () => void;
-  isFirstVideo?: boolean;
-  onShowSidebar?: () => void;
+  instructor: string;
+  progress: number;
+  experience: number;
+  currentClass: number;
+  totalClasses: number;
+  duration: string;
+  onToggleContent: () => void;
+  isContentVisible: boolean;
 }
 
-export function VideoHeader({
+export default function VideoHeader({
   title,
-  subtitle,
-  onNextVideo,
-  onPreviousVideo,
-  isFirstVideo = false,
-  onShowSidebar,
+  instructor,
+  progress,
+  experience,
+  currentClass,
+  totalClasses,
+  duration,
+  onToggleContent,
+  isContentVisible,
 }: VideoHeaderProps) {
   return (
-    <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800 bg-zinc-950 gap-2">
-      <div className="flex items-center gap-3 min-w-0">
-        <div className="flex-shrink-0">
-          <Image src="/ai-logo.png" alt="AI Logo" width={40} height={40} className="rounded-full border-2 border-green-400 bg-zinc-900" />
+    <div className="space-y-4">
+      <div className="flex items-start justify-between">
+        <div className="space-y-2">
+          <h1 className="text-2xl font-bold text-foreground">{title}</h1>
+          <div className="flex items-center gap-4 text-sm text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Award className="w-4 h-4" />
+              {experience} XP
+            </span>
+            <span>•</span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-4 h-4" />
+              {duration}
+            </span>
+          </div>
         </div>
-        <div className="min-w-0">
-          <div className="text-xs text-zinc-300 truncate">{subtitle}</div>
-          <div className="text-lg sm:text-xl font-bold truncate">{title}</div>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={onToggleContent}
+          className="text-muted-foreground hover:text-foreground"
+        >
+          <ListVideo className="w-4 h-4 mr-2" />
+          {isContentVisible ? "Ocultar Contenido" : "Ver Contenido"}
+        </Button>
       </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
-        <button className="rounded bg-zinc-800 hover:bg-zinc-700 p-2 text-zinc-300" title="Idioma"><Languages className="w-5 h-5" /></button>
-        <button className="rounded bg-zinc-800 hover:bg-zinc-700 p-2 text-zinc-300" title="Reportar"><Flag className="w-5 h-5" /></button>
-        <button onClick={onShowSidebar} className="rounded bg-zinc-800 hover:bg-zinc-700 px-3 py-2 text-sm font-medium text-zinc-100 flex items-center gap-2"><PlayCircle className="w-4 h-4" />Ver clases</button>
-        {!isFirstVideo && (
-          <button 
-            onClick={onPreviousVideo} 
-            className="rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-100 px-4 py-2 text-sm font-semibold flex items-center gap-2"
-          >
-            <ChevronLeft className="w-4 h-4" /> Clase anterior
-          </button>
-        )}
-        <button onClick={onNextVideo} className="rounded bg-white text-zinc-900 px-4 py-2 text-sm font-semibold flex items-center gap-2">Siguiente clase <span className="ml-1">→</span></button>
+
+      {/* Progress Bar */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-sm">
+          <span className="text-muted-foreground">
+            Progreso: {progress}%
+          </span>
+          <span className="text-muted-foreground">
+            Clase {currentClass} de {totalClasses}
+          </span>
+        </div>
+        <Progress value={progress} className="h-2 bg-muted" />
       </div>
     </div>
   );

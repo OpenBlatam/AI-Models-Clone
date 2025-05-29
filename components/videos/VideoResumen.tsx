@@ -1,27 +1,57 @@
-import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+"use client";
+import { motion } from "framer-motion";
 import { BookOpen } from "lucide-react";
-import ReactMarkdown from "react-markdown";
 
 interface VideoResumenProps {
-  resumen: string;
+  resumen: {
+    titulo: string;
+    descripcion: string;
+    puntos: string[];
+  };
 }
 
-export function VideoResumen({ resumen }: VideoResumenProps) {
+export default function VideoResumen({ resumen }: VideoResumenProps) {
   return (
-    <Card className="w-full max-w-5xl bg-zinc-900 border-zinc-800">
-      <CardContent className="p-6">
-        <div className="flex items-center gap-2 mb-4">
-          <BookOpen className="w-5 h-5 text-blue-400" />
-          <h2 className="text-lg font-semibold">Resumen de la clase</h2>
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-zinc-900 rounded-2xl p-6 border border-zinc-800"
+    >
+      <div className="flex items-center gap-3 mb-6">
+        <div className="p-2 bg-primary/10 rounded-lg">
+          <BookOpen className="w-6 h-6 text-primary" />
         </div>
-        
-        <ScrollArea className="h-[400px] pr-4">
-          <div className="prose prose-invert max-w-none">
-            <ReactMarkdown>{resumen}</ReactMarkdown>
+        <h2 className="text-xl font-semibold text-white">Resumen de la Clase</h2>
+      </div>
+
+      <div className="space-y-6">
+        {/* Título y descripción */}
+        <div>
+          <h3 className="text-lg font-medium text-white mb-2">{resumen.titulo}</h3>
+          <p className="text-zinc-400">{resumen.descripcion}</p>
+        </div>
+
+        {/* Puntos clave */}
+        {resumen.puntos.length > 0 && (
+          <div>
+            <h4 className="text-sm font-medium text-zinc-400 mb-3">Puntos Clave</h4>
+            <ul className="space-y-2">
+              {resumen.puntos.map((punto, index) => (
+                <motion.li
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="flex items-start gap-2 text-zinc-300"
+                >
+                  <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 flex-shrink-0" />
+                  <span>{punto}</span>
+                </motion.li>
+              ))}
+            </ul>
           </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
+        )}
+      </div>
+    </motion.div>
   );
 } 

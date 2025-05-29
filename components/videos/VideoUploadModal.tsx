@@ -1,7 +1,9 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Video as VideoIcon, UploadCloud, X } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useState } from "react";
+import { uploadVideoToS3 } from '@/lib/s3-utils';
+import { toast } from "react-hot-toast";
 
 interface VideoUploadModalProps {
   open: boolean;
@@ -13,9 +15,39 @@ interface VideoUploadModalProps {
   onStop: () => void;
   onReset: () => void;
   onUpload: () => void;
+  onUploadComplete: (videoUrl: string) => void;
 }
 
-export function VideoUploadModal({ open, onClose, recording, videoURL, videoRef, onStart, onStop, onReset, onUpload }: VideoUploadModalProps) {
+export function VideoUploadModal({ open, onClose, recording, videoURL, videoRef, onStart, onStop, onReset, onUpload, onUploadComplete }: VideoUploadModalProps) {
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    try {
+      setIsUploading(true);
+      setUploadProgress(0);
+
+      // Generar una key única para el video
+      const key = `videos/${Date.now()}-${file.name}`;
+      
+      // Subir el video a S3
+      const videoUrl = await uploadVideoToS3(file, key);
+      
+      // Notificar que la subida se completó
+      onUploadComplete(videoUrl);
+      onClose();
+    } catch (error) {
+      console.error('Error uploading video:', error);
+      toast.error('Error al subir el video');
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={v => !v && onClose()}>
       <DialogContent className="bg-zinc-900 rounded-xl p-6 w-full max-w-md shadow-2xl flex flex-col items-center">

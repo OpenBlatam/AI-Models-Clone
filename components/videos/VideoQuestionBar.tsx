@@ -1,32 +1,43 @@
-import { Input } from "@/components/ui/input";
+"use client";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { useState, FormEvent } from "react";
+import { Input } from "@/components/ui/input";
+import { Send } from "lucide-react";
 
 interface VideoQuestionBarProps {
   onAsk: (question: string) => void;
 }
 
 export function VideoQuestionBar({ onAsk }: VideoQuestionBarProps) {
-  const [value, setValue] = useState("");
-  const handleSubmit = (e: FormEvent) => {
+  const [question, setQuestion] = useState("");
+
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (value.trim()) {
-      onAsk(value);
-      setValue("");
+    if (question.trim()) {
+      onAsk(question);
+      setQuestion("");
     }
   };
+
   return (
-    <form onSubmit={handleSubmit} className="flex items-center bg-zinc-900 border border-gradient-to-r from-purple-400 to-blue-400 rounded-2xl px-4 py-2 shadow-sm max-w-3xl w-full self-center mt-6 mb-2">
-      <Input
-        type="text"
-        placeholder="¿Tienes preguntas sobre la clase? Obtén respuesta inmediata"
-        className="flex-1 bg-transparent outline-none text-white placeholder-zinc-400 text-base py-2 border-none shadow-none"
-        value={value}
-        onChange={e => setValue(e.target.value)}
-      />
-      <Button type="submit" className="ml-2 bg-white text-zinc-900 font-semibold px-5 py-2 rounded-xl hover:bg-zinc-200 transition">
-        Preguntar
-      </Button>
+    <form onSubmit={handleSubmit} className="space-y-4">
+      <h2 className="text-xl font-bold text-foreground">Preguntas</h2>
+      <div className="flex gap-4">
+        <Input
+          value={question}
+          onChange={(e) => setQuestion(e.target.value)}
+          placeholder="Escribe tu pregunta..."
+          className="bg-muted border-border text-foreground placeholder:text-muted-foreground"
+        />
+        <Button
+          type="submit"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground"
+          disabled={!question.trim()}
+        >
+          <Send className="w-4 h-4 mr-2" />
+          Enviar
+        </Button>
+      </div>
     </form>
   );
 } 

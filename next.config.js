@@ -6,7 +6,6 @@ import("./env.mjs");
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
-  swcMinify: true,
   images: {
     remotePatterns: [
       {
@@ -21,8 +20,16 @@ const nextConfig = {
         protocol: "https",
         hostname: "randomuser.me",
       },
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+      },
+      {
+        protocol: "https",
+        hostname: "example.com",
+      },
     ],
-    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com'],
+    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com', 'images.unsplash.com', 'example.com'],
   },
   experimental: {
     // serverActions está habilitado por defecto en Next.js 14

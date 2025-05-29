@@ -6,15 +6,15 @@
   :root {
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
+    --card: #fff;
     --card-foreground: 0 0% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
+    --primary: #2563eb;
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
+    --secondary: #4ade80;
     --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
+    --muted: #475569;
     --muted-foreground: 0 0% 45.1%;
     --accent: 0 0% 98%;
     --accent-foreground: 0 0% 9%;
@@ -30,20 +30,25 @@
     --chart-3: 270 91% 65%;
     --chart-4: 269 97% 85%;
     --chart-5: 269 100% 92%;
+    --bg: #f8fafc;
+    --fg: #18181b;
+    --shadow: 0 4px 32px 0 #0001;
+    --input-bg: #f1f5f9;
+    --input-border: #e5e7eb;
   }
 
   .dark {
     --background: 0 0% 3.9%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
+    --card: #23272f;
     --card-foreground: 0 0% 98%;
     --popover: 0 0% 3.9%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
+    --primary: #4ade80;
     --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
+    --secondary: #2563eb;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
+    --muted: #94a3b8;
     --muted-foreground: 0 0% 63.9%;
     --accent: 0 0% 8%;
     --accent-foreground: 0 0% 98%;
@@ -52,12 +57,17 @@
     --border: 0 0% 14.9%;
     --input: 0 0% 14.9%;
     --ring: 0 0% 83.1%;
-
+    --radius: 0.5rem;
     --chart-1: 271.5 81.3% 55.9%;
     --chart-2: 270 95% 75%;
     --chart-3: 270 91% 65%;
     --chart-4: 269 97% 85%;
     --chart-5: 269 100% 92%;
+    --bg: #18181b;
+    --fg: #f4f4f5;
+    --shadow: 0 4px 32px 0 #0008;
+    --input-bg: #23272f;
+    --input-border: #23272f;
   }
 }
 
@@ -69,6 +79,37 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    background: var(--bg);
+    color: var(--fg);
+    transition: background 0.3s, color 0.3s;
+  }
+
+  .card, .bg-zinc-900, .bg-zinc-800, .bg-zinc-950 {
+    background: var(--card) !important;
+    border-color: var(--card-border) !important;
+    box-shadow: var(--shadow) !important;
+    color: var(--fg) !important;
+  }
+
+  input, textarea, .input, .bg-zinc-900 {
+    background: var(--input-bg) !important;
+    border-color: var(--input-border) !important;
+    color: var(--fg) !important;
+  }
+
+  .text-muted {
+    color: var(--muted) !important;
+  }
+
+  .text-strong {
+    color: var(--fg) !important;
+    font-weight: 600;
+  }
+
+  .text-title {
+    color: var(--fg) !important;
+    font-weight: 700;
+    letter-spacing: -0.01em;
   }
 }
 

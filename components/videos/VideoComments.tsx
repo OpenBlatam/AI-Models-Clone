@@ -1,105 +1,303 @@
-import { useState, useRef } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Button } from "@/components/ui/button";
+"use client";
+import React, { useState } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { MessageSquare, Send } from "lucide-react";
-
-export interface Comment {
-  id: string;
-  user: {
-    name: string;
-    image?: string | null;
-  };
-  content: string;
-  createdAt: string;
-}
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { ThumbsUp, MessageSquare, MoreVertical, Flag, ThumbsDown, Reply } from "lucide-react";
+import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { useSession, signIn } from "next-auth/react";
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
+import { LoadingState } from "@/components/ui/loading-state";
+import { useVideoData } from "@/lib/hooks/useVideoData";
 
 interface VideoCommentsProps {
-  comments: Comment[];
-  onAddComment: (content: string) => void;
+  videoId: string;
+  courseId: string;
 }
 
-export function VideoComments({ comments, onAddComment }: VideoCommentsProps) {
+export default function VideoComments({ videoId, courseId }: VideoCommentsProps) {
+  const { data: session } = useSession();
+  const { data, isLoading, error, addComment } = useVideoData(videoId, courseId);
   const [newComment, setNewComment] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyContent, setReplyContent] = useState("");
+  const [expandedReplies, setExpandedReplies] = useState<Set<string>>(new Set());
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (newComment.trim()) {
-      onAddComment(newComment);
+  if (isLoading) {
+    return <LoadingState text="Cargando comentarios..." />;
+  }
+
+  if (error) {
+    return (
+      <div className="text-center py-8">
+        <p className="text-destructive">{error}</p>
+      </div>
+    );
+  }
+
+  const comments = data?.comments || [];
+
+  const handleAddComment = async () => {
+    if (!session?.user) {
+      toast.error("Debes iniciar sesión para comentar");
+      return;
+    }
+
+    if (!newComment.trim()) return;
+
+    try {
+      await addComment(newComment);
       setNewComment("");
-      if (textareaRef.current) textareaRef.current.style.height = "40px";
+      toast.success("Comentario publicado");
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Error al publicar el comentario");
     }
   };
 
-  // Auto-resize textarea
-  const handleInput = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNewComment(e.target.value);
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "40px";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+  const handleAddReply = async (commentId: string) => {
+    if (!session?.user) {
+      toast.error("Debes iniciar sesión para responder");
+      return;
     }
+
+    if (!replyContent.trim()) return;
+
+    try {
+      await addComment(replyContent);
+      setReplyContent("");
+      setReplyingTo(null);
+      toast.success("Respuesta publicada");
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Error al publicar la respuesta");
+    }
+  };
+
+  const handleLike = async (commentId: string) => {
+    if (!session?.user) {
+      toast.error("Debes iniciar sesión para dar me gusta");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/comments?id=${commentId}&action=like&videoId=${videoId}&courseId=${courseId}`, {
+        method: "PUT",
+      });
+
+      if (!response.ok) throw new Error("Error liking comment");
+
+      const updatedComment = await response.json();
+      // Actualizar el comentario en el estado local
+      const updatedComments = comments.map((comment) =>
+        comment.id === commentId
+          ? {
+              ...comment,
+              likes: updatedComment.likes,
+              isLiked: updatedComment.isLiked,
+            }
+          : comment
+      );
+    } catch (error) {
+      console.error("Error:", error);
+      toast.error("Error al dar me gusta");
+    }
+  };
+
+  const CommentItem = ({ comment, isReply = false }: { comment: any; isReply?: boolean }) => {
+    const hasReplies = comment.replies && comment.replies.length > 0;
+    const isExpanded = expandedReplies.has(comment.id);
+
+    return (
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        className={cn(
+          "flex gap-4",
+          isReply && "ml-8 border-l-2 border-border pl-4"
+        )}
+      >
+        <Avatar className="w-10 h-10">
+          <AvatarImage src={comment.user.image} />
+          <AvatarFallback>
+            {comment.user.name.charAt(0)}
+          </AvatarFallback>
+        </Avatar>
+        <div className="flex-1 space-y-2">
+          <div className="flex items-start justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="font-medium">{comment.user.name}</span>
+                <span className="text-sm text-muted-foreground">
+                  {formatDistanceToNow(new Date(comment.createdAt), {
+                    addSuffix: true,
+                    locale: es,
+                  })}
+                </span>
+              </div>
+              <p className="mt-1 text-sm">{comment.content}</p>
+            </div>
+            {session?.user && (
+              <DropdownMenu.Root>
+                <DropdownMenu.Trigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical className="w-4 h-4" />
+                  </Button>
+                </DropdownMenu.Trigger>
+                <DropdownMenu.Content>
+                  <DropdownMenu.Item className="gap-2">
+                    <Flag className="w-4 h-4" />
+                    Reportar
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Root>
+            )}
+          </div>
+
+          <div className="flex items-center gap-4">
+            <Button
+              variant="ghost"
+              size="sm"
+              className={cn(
+                "gap-2",
+                comment.isLiked && "text-primary"
+              )}
+              onClick={() => handleLike(comment.id)}
+            >
+              <ThumbsUp className="w-4 h-4" />
+              {comment.likes}
+            </Button>
+            {session?.user && !isReply && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2"
+                onClick={() => setReplyingTo(comment.id)}
+              >
+                <Reply className="w-4 h-4" />
+                Responder
+              </Button>
+            )}
+            {hasReplies && !isReply && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-2"
+                onClick={() => {
+                  setExpandedReplies(prev => {
+                    const next = new Set(prev);
+                    if (next.has(comment.id)) {
+                      next.delete(comment.id);
+                    } else {
+                      next.add(comment.id);
+                    }
+                    return next;
+                  });
+                }}
+              >
+                <MessageSquare className="w-4 h-4" />
+                {isExpanded ? "Ocultar respuestas" : `Ver ${comment.replies?.length} respuestas`}
+              </Button>
+            )}
+          </div>
+
+          {replyingTo === comment.id && !isReply && (
+            <div className="mt-4 space-y-2">
+              <Textarea
+                placeholder="Escribe tu respuesta..."
+                value={replyContent}
+                onChange={(e) => setReplyContent(e.target.value)}
+                className="min-h-[80px]"
+              />
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setReplyingTo(null);
+                    setReplyContent("");
+                  }}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => handleAddReply(comment.id)}
+                >
+                  Responder
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {isExpanded && hasReplies && (
+            <div className="mt-4 space-y-4">
+              {comment.replies?.map((reply: any) => (
+                <CommentItem key={reply.id} comment={reply} isReply />
+              ))}
+            </div>
+          )}
+        </div>
+      </motion.div>
+    );
   };
 
   return (
-    <Card className="w-full max-w-5xl bg-transparent border-none shadow-none">
-      <CardContent className="p-0">
-        <div className="flex items-center gap-2 mb-4">
-          <MessageSquare className="w-5 h-5 text-blue-400" />
-          <h2 className="text-lg font-semibold">Comentarios</h2>
-        </div>
-        <ScrollArea className="h-[340px] pr-2 mb-4">
-          <div className="space-y-4">
-            {comments.map((comment) => (
-              <div
-                key={comment.id}
-                className="flex gap-4 p-4 bg-zinc-800/80 rounded-xl border border-zinc-700 shadow-sm"
-              >
-                <Avatar className="w-12 h-12">
-                  <AvatarImage src={comment.user.image || undefined} />
-                  <AvatarFallback>
-                    {(comment.user?.name?.slice(0, 2) || "??").toUpperCase()}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="font-bold text-base text-white truncate">{comment.user.name}</span>
-                    <span className="text-xs text-zinc-400">{new Date(comment.createdAt).toLocaleDateString()}</span>
-                  </div>
-                  <p className="mt-1 text-zinc-200 whitespace-pre-line break-words text-base leading-relaxed">{comment.content}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-        <form onSubmit={handleSubmit} className="flex gap-2 items-end bg-zinc-800/80 border border-zinc-700 rounded-xl p-3 mt-2 shadow-lg">
+    <div className="space-y-6">
+      {/* Comment Input */}
+      {session?.user ? (
+        <div className="flex gap-4">
           <Avatar className="w-10 h-10">
-            <AvatarImage src={undefined} />
-            <AvatarFallback>YO</AvatarFallback>
+            <AvatarImage src={session.user.image || undefined} />
+            <AvatarFallback>
+              {session.user.name?.charAt(0) || "U"}
+            </AvatarFallback>
           </Avatar>
-          <div className="flex-1 flex items-end">
-            <textarea
-              ref={textareaRef}
+          <div className="flex-1 space-y-4">
+            <Textarea
+              placeholder="Añade un comentario..."
               value={newComment}
-              onChange={handleInput}
-              placeholder="Comparte tu opinión o pregunta…"
-              className="flex-1 resize-none bg-transparent outline-none text-white placeholder-zinc-400 text-base py-2 px-3 rounded-xl border-none min-h-[40px] max-h-[120px]"
-              rows={1}
-              maxLength={800}
-              required
+              onChange={(e) => setNewComment(e.target.value)}
+              className="min-h-[80px] resize-none"
             />
-            <Button
-              type="submit"
-              className="ml-2 bg-blue-600 hover:bg-blue-700 rounded-full p-3 shadow-lg flex-shrink-0"
-              disabled={!newComment.trim()}
-              aria-label="Enviar comentario"
-            >
-              <Send className="w-5 h-5" />
-            </Button>
+            <div className="flex justify-end gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => setNewComment("")}
+                disabled={!newComment.trim()}
+              >
+                Cancelar
+              </Button>
+              <Button onClick={handleAddComment} disabled={!newComment.trim()}>
+                Comentar
+              </Button>
+            </div>
           </div>
-        </form>
-      </CardContent>
-    </Card>
+        </div>
+      ) : (
+        <div className="p-4 bg-muted rounded-lg text-center">
+          <p className="text-sm text-muted-foreground mb-2">
+            Inicia sesión para comentar
+          </p>
+          <Button variant="default" onClick={() => signIn()}>
+            Iniciar sesión
+          </Button>
+        </div>
+      )}
+
+      {/* Comments List */}
+      <div className="space-y-6">
+        <AnimatePresence>
+          {comments.map((comment) => (
+            <CommentItem key={comment.id} comment={comment} />
+          ))}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 } 

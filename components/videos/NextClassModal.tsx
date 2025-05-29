@@ -1,77 +1,94 @@
-import { useEffect, useState } from "react";
+"use client";
+import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Play, CheckCircle2 } from "lucide-react";
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { CheckCircle } from "lucide-react";
 
 interface NextClassModalProps {
   open: boolean;
   onClose: () => void;
   onNext: () => void;
-  currentTitle: string;
-  nextTitle?: string;
-  nextThumbnail?: string;
-  countdownSeconds?: number;
+  onComplete: () => void;
 }
 
-export default function NextClassModal({
+const NextClassModal: React.FC<NextClassModalProps> = ({
   open,
   onClose,
   onNext,
-  currentTitle,
-  nextTitle,
-  nextThumbnail,
-  countdownSeconds = 5,
-}: NextClassModalProps) {
-  const [seconds, setSeconds] = useState(countdownSeconds);
-
-  useEffect(() => {
-    if (!open) return;
-    setSeconds(countdownSeconds);
-    if (!nextTitle) return;
-    const interval = setInterval(() => {
-      setSeconds((s) => {
-        if (s <= 1) {
-          clearInterval(interval);
-          onNext();
-          return 0;
-        }
-        return s - 1;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [open, nextTitle, countdownSeconds, onNext]);
-
+  onComplete,
+}) => {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-      <div className="bg-zinc-900 rounded-2xl p-8 max-w-lg w-full flex flex-col items-center shadow-2xl border border-zinc-800 relative animate-fade-in">
-        <div className="flex items-center gap-2 mb-2 w-full">
-          <CheckCircle className="w-6 h-6 text-green-400" />
-          <span className="text-lg font-bold text-white">Ya viste:</span>
-        </div>
-        <div className="w-full text-left mb-2 text-white text-base font-semibold truncate">{currentTitle}</div>
-        {nextTitle && (
-          <div className="w-full text-left text-zinc-300 mb-2">
-            Próxima clase en <span className="font-bold text-white">{seconds}</span>
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+      >
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          exit={{ scale: 0.9, opacity: 0 }}
+          className="bg-zinc-900 rounded-2xl w-full max-w-2xl overflow-hidden border border-zinc-800 shadow-2xl"
+        >
+          <div className="p-6">
+            <div className="text-center mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">
+                ¡Clase Completada!
+              </h2>
+              <p className="text-zinc-400">
+                ¿Qué te gustaría hacer a continuación?
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Botón de siguiente clase */}
+              <Button
+                onClick={onNext}
+                className="h-auto p-4 bg-primary hover:bg-primary/90 text-white"
+              >
+                <Play className="w-5 h-5 mr-2" />
+                <div className="text-left">
+                  <div className="font-semibold">Siguiente Clase</div>
+                  <div className="text-sm text-white/80">
+                    Continuar con el siguiente tema
+                  </div>
+                </div>
+              </Button>
+
+              {/* Botón de completar curso */}
+              <Button
+                onClick={onComplete}
+                className="h-auto p-4 bg-zinc-800 hover:bg-zinc-700 text-white"
+              >
+                <CheckCircle2 className="w-5 h-5 mr-2" />
+                <div className="text-left">
+                  <div className="font-semibold">Completar Curso</div>
+                  <div className="text-sm text-white/80">
+                    Finalizar y obtener certificado
+                  </div>
+                </div>
+              </Button>
+            </div>
+
+            {/* Botón de cerrar */}
+            <div className="mt-6 text-center">
+              <Button
+                variant="ghost"
+                onClick={onClose}
+                className="text-zinc-400 hover:text-white"
+              >
+                Cerrar
+              </Button>
+            </div>
           </div>
-        )}
-        {nextThumbnail && (
-          <img src={nextThumbnail} alt={nextTitle} className="w-full rounded-xl mb-4 object-cover aspect-video bg-zinc-800" />
-        )}
-        <div className="flex gap-4 w-full mt-4">
-          <Button onClick={onClose} variant="secondary" className="flex-1">Detener</Button>
-          {nextTitle && (
-            <Button onClick={onNext} className="flex-1 bg-white text-zinc-900 font-bold">Ver siguiente clase</Button>
-          )}
-        </div>
-      </div>
-      <style jsx global>{`
-        @keyframes fade-in {
-          from { opacity: 0; transform: translateY(24px);}
-          to { opacity: 1; transform: translateY(0);}
-        }
-        .animate-fade-in { animation: fade-in 0.5s; }
-      `}</style>
-    </div>
+        </motion.div>
+      </motion.div>
+    </AnimatePresence>
   );
-} 
+};
+
+export default NextClassModal; 
