@@ -4,6 +4,8 @@ export interface Academy {
   description: string;
   thumbnail: string;
   instructor: string;
+  instructorAvatar?: string;
+  instructorSubscribers?: number;
   category: string;
   level: 'beginner' | 'intermediate' | 'advanced';
   totalClasses: number;
@@ -14,9 +16,10 @@ export interface Academy {
     clientKey: string;
     region: string;
   };
-  classes?: AcademyClass[];
+  classes: AcademyClass[];
   createdAt: string;
   updatedAt: string;
+  rating?: number;
 }
 
 export interface AcademyClass {
@@ -31,6 +34,7 @@ export interface AcademyClass {
   isCompleted: boolean;
   progress: number;
   experience: number;
+  views?: number;
   resources?: Resource[];
   createdAt: string;
   updatedAt: string;

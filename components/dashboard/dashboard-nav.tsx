@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
 import { Home, BookOpen, Target, LineChart, Trophy, Gamepad2, Video } from "lucide-react";
 import { motion } from "framer-motion";
+import { memo } from "react";
 
 const navItems = [
   {
@@ -42,9 +43,39 @@ const navItems = [
     href: "/dashboard/achievements",
     icon: Trophy,
   },
-];
+] as const;
 
-export function DashboardNav() {
+const NavItem = memo(function NavItem({ 
+  item, 
+  isActive 
+}: { 
+  item: typeof navItems[number]; 
+  isActive: boolean;
+}) {
+  const Icon = item.icon;
+  
+  return (
+    <Link
+      href={item.href}
+      className={cn(
+        "flex items-center text-sm font-medium transition-colors hover:text-primary",
+        isActive ? "text-primary" : "text-muted-foreground"
+      )}
+    >
+      <motion.div
+        className="flex items-center gap-2"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
+        layout
+      >
+        <Icon className="h-4 w-4" />
+        <span>{item.title}</span>
+      </motion.div>
+    </Link>
+  );
+});
+
+export const DashboardNav = memo(function DashboardNav() {
   const pathname = usePathname();
 
   return (
@@ -55,31 +86,14 @@ export function DashboardNav() {
       </div>
       {/* Desktop: show nav */}
       <nav className="hidden sm:flex items-center space-x-4 lg:space-x-6">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          const Icon = item.icon;
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "flex items-center text-sm font-medium transition-colors hover:text-primary",
-                isActive ? "text-primary" : "text-muted-foreground"
-              )}
-            >
-              <motion.div
-                className="flex items-center gap-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <Icon className="h-4 w-4" />
-                <span>{item.title}</span>
-              </motion.div>
-            </Link>
-          );
-        })}
+        {navItems.map((item) => (
+          <NavItem
+            key={item.href}
+            item={item}
+            isActive={pathname === item.href}
+          />
+        ))}
       </nav>
     </>
   );
-} 
+}); 

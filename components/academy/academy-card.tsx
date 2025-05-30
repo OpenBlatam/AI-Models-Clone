@@ -6,6 +6,9 @@ import { motion } from "framer-motion";
 import { Thumbnail } from "./thumbnail";
 import { InstructorInfo } from "./instructor-info";
 import { CourseMeta } from "./course-meta";
+import { Star, ArrowRight, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface AcademyCardProps {
   academy: Academy;
@@ -14,51 +17,67 @@ interface AcademyCardProps {
 }
 
 export function AcademyCard({ academy, onSelect, variant = "grid" }: AcademyCardProps) {
-  const handleClick = () => {
-    if (onSelect) {
-      onSelect(academy);
-    }
+  const handleSelect = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (onSelect) onSelect(academy);
   };
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.02 }}
-      transition={{ duration: 0.2 }}
-      className="group"
+      whileHover={{ scale: 1.04, boxShadow: "0 8px 32px 0 rgba(31, 38, 135, 0.37)" }}
+      transition={{ duration: 0.25, type: "spring" }}
+      className="group bg-gradient-to-br from-[#232326] to-[#18181b] rounded-2xl p-5 shadow-xl hover:shadow-2xl transition-shadow"
     >
-      <Link href={`/academy/${academy.id}`} className="block">
-        <div className={variant === "grid" ? "space-y-3" : "flex gap-4"}>
-          <div className={variant === "grid" ? "w-full" : "w-64 flex-shrink-0"}>
-            <Thumbnail
-              src={academy.thumbnail}
-              alt={academy.name}
-              duration={academy.totalDuration}
-            />
-          </div>
-
-          <div className={variant === "grid" ? "space-y-2" : "flex-1 space-y-3"}>
-            <div className="space-y-1">
-              <h3 className="font-semibold line-clamp-2 text-base">
-                {academy.name}
-              </h3>
-              <p className="text-sm text-muted-foreground line-clamp-2">
-                {academy.description}
-              </p>
-            </div>
-
-            <InstructorInfo name={academy.instructor} />
-
-            <CourseMeta
-              level={academy.level}
-              category={academy.category}
-              totalClasses={academy.totalClasses}
-              experience={academy.experience}
-            />
-          </div>
+      <div className="relative w-full aspect-video rounded-xl overflow-hidden mb-4">
+        <img
+          src={academy.thumbnail}
+          alt={academy.name}
+          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+        />
+        <div className="absolute bottom-3 right-3 bg-[#232326]/80 backdrop-blur-md rounded-lg px-3 py-1 flex items-center gap-1 text-yellow-400 font-bold text-base shadow-lg z-10">
+          <Star size={18} /> {academy.rating?.toFixed(1) ?? "4.8"}
         </div>
-      </Link>
+        <div className="absolute inset-0 flex items-center justify-center gap-4 bg-gradient-to-br from-black/60 to-[#232326]/70 backdrop-blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="lg"
+                  className="text-base font-semibold gap-2 shadow-lg"
+                  onClick={handleSelect}
+                >
+                  Ir al curso <ArrowRight className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Ver detalles del curso</TooltipContent>
+            </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  size="lg"
+                  variant="secondary"
+                  className="text-base font-semibold gap-2 shadow-lg"
+                  onClick={handleSelect}
+                >
+                  Agregar <Plus className="w-5 h-5" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Agregar a favoritos</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </div>
+      <div className="flex items-center gap-4 mb-2">
+        <img
+          src={`https://ui-avatars.com/api/?name=${encodeURIComponent(academy.name)}&background=8b5cf6&color=fff&size=80`}
+          alt={academy.name}
+          className="w-12 h-12 rounded-full border-4 border-primary bg-white shadow-lg"
+        />
+        <span className="text-xl font-bold text-white line-clamp-2">{academy.name}</span>
+      </div>
+      <div className="text-base text-[#b3b3b3] font-medium">Por {academy.instructor}</div>
     </motion.div>
   );
 } 

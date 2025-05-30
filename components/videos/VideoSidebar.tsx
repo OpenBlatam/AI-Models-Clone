@@ -23,40 +23,7 @@ interface VideoSidebarProps {
   onSelect: (index: number) => void;
 }
 
-export default function VideoSidebar({ open, onClose, currentIndex, onSelect }: VideoSidebarProps) {
-  const classes: Class[] = [
-    {
-      id: "1",
-      title: "Introducción al curso",
-      duration: "10:00",
-      thumbnail: "/images/video-placeholder.jpg",
-      isLocked: false,
-      isCompleted: true,
-      progress: 100,
-      experience: 50,
-    },
-    {
-      id: "2",
-      title: "Configuración del entorno",
-      duration: "15:00",
-      thumbnail: "/images/video-placeholder.jpg",
-      isLocked: false,
-      isCompleted: false,
-      progress: 0,
-      experience: 75,
-    },
-    {
-      id: "3",
-      title: "Primeros pasos",
-      duration: "20:00",
-      thumbnail: "/images/video-placeholder.jpg",
-      isLocked: true,
-      isCompleted: false,
-      progress: 0,
-      experience: 100,
-    },
-  ];
-
+export default function VideoSidebar({ open, onClose, currentIndex, onSelect, classes }: VideoSidebarProps & { classes: any[] }) {
   return (
     <div className="bg-background rounded-xl border border-border p-4">
       <h2 className="text-lg font-semibold text-foreground mb-4">Lista de Clases</h2>

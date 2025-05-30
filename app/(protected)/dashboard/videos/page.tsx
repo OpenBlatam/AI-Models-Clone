@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils";
 import { Flag, Languages, PlayCircle, ChevronDown, ChevronUp, Download, Link2, X, Video as VideoIcon, UploadCloud, Camera, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
-import { VideoHeader } from "@/components/videos/VideoHeader";
+import VideoHeader from "@/components/videos/VideoHeader";
 import VideoResumen from "@/components/videos/VideoResumen";
 import { VideoResources } from "@/components/videos/VideoResources";
 import VideoComments from "@/components/videos/VideoComments";
@@ -16,7 +16,7 @@ import dynamic from "next/dynamic";
 import NextClassModal from "@/components/videos/NextClassModal";
 import { ThemeProvider } from "next-themes";
 import VideoLearningPaths from "@/components/videos/VideoLearningPaths";
-import VideoQuestions from "@/components/videos/VideoQuestions";
+import { VideoQuestions } from "@/components/videos/VideoQuestions";
 import { useSearchParams, useRouter } from "next/navigation";
 import ContinueLearningCarousel from "@/components/videos/ContinueLearningCarousel";
 import { motion } from "framer-motion";
@@ -28,6 +28,7 @@ import { Clock, Users, Award, Play } from "lucide-react";
 import { academies } from "@/lib/academies";
 import VideoPlayer from "@/components/videos/VideoPlayer";
 import { Academy } from "@/lib/types/academy";
+import { AcademyCard } from "@/components/academy/academy-card";
 
 interface Comment {
   id: string;
@@ -404,53 +405,11 @@ export default function VideosPage() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {academies.map((academy) => (
-                  <Card
+                  <AcademyCard
                     key={academy.id}
-                    className="group cursor-pointer transition-all duration-300 hover:shadow-lg"
-                    onClick={() => handleAcademySelect(academy)}
-                  >
-                    <CardContent className="p-0">
-                      <div className="relative aspect-video">
-                        <img
-                          src={academy.thumbnail}
-                          alt={academy.name}
-                          className="w-full h-full object-cover rounded-t-lg"
-                        />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <Button variant="secondary" size="lg">
-                            <Play className="w-6 h-6 mr-2" />
-                            Ver Academia
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="p-4 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Badge variant="secondary">{academy.level}</Badge>
-                          <Badge variant="outline">{academy.category}</Badge>
-                        </div>
-                        <h3 className="text-xl font-semibold line-clamp-1">
-                          {academy.name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {academy.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{academy.totalDuration}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            <span>{academy.totalClasses} clases</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Award className="w-4 h-4" />
-                            <span>{academy.experience} XP</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    academy={academy}
+                    onSelect={handleAcademySelect}
+                  />
                 ))}
               </div>
             )}
@@ -461,53 +420,11 @@ export default function VideosPage() {
               {academies
                 .filter((academy) => academy.level === "beginner")
                 .map((academy) => (
-                  <Card
+                  <AcademyCard
                     key={academy.id}
-                    className="group cursor-pointer transition-all duration-300 hover:shadow-lg"
-                    onClick={() => handleAcademySelect(academy)}
-                  >
-                    <CardContent className="p-0">
-                      <div className="relative aspect-video">
-                        <img
-                          src={academy.thumbnail}
-                          alt={academy.name}
-                          className="w-full h-full object-cover rounded-t-lg"
-                        />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <Button variant="secondary" size="lg">
-                            <Play className="w-6 h-6 mr-2" />
-                            Ver Academia
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="p-4 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Badge variant="secondary">{academy.level}</Badge>
-                          <Badge variant="outline">{academy.category}</Badge>
-                        </div>
-                        <h3 className="text-xl font-semibold line-clamp-1">
-                          {academy.name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {academy.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{academy.totalDuration}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            <span>{academy.totalClasses} clases</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Award className="w-4 h-4" />
-                            <span>{academy.experience} XP</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    academy={academy}
+                    onSelect={handleAcademySelect}
+                  />
                 ))}
             </div>
           </TabsContent>
@@ -517,53 +434,11 @@ export default function VideosPage() {
               {academies
                 .filter((academy) => academy.level === "intermediate")
                 .map((academy) => (
-                  <Card
+                  <AcademyCard
                     key={academy.id}
-                    className="group cursor-pointer transition-all duration-300 hover:shadow-lg"
-                    onClick={() => handleAcademySelect(academy)}
-                  >
-                    <CardContent className="p-0">
-                      <div className="relative aspect-video">
-                        <img
-                          src={academy.thumbnail}
-                          alt={academy.name}
-                          className="w-full h-full object-cover rounded-t-lg"
-                        />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <Button variant="secondary" size="lg">
-                            <Play className="w-6 h-6 mr-2" />
-                            Ver Academia
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="p-4 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Badge variant="secondary">{academy.level}</Badge>
-                          <Badge variant="outline">{academy.category}</Badge>
-                        </div>
-                        <h3 className="text-xl font-semibold line-clamp-1">
-                          {academy.name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {academy.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{academy.totalDuration}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            <span>{academy.totalClasses} clases</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Award className="w-4 h-4" />
-                            <span>{academy.experience} XP</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    academy={academy}
+                    onSelect={handleAcademySelect}
+                  />
                 ))}
             </div>
           </TabsContent>
@@ -573,53 +448,11 @@ export default function VideosPage() {
               {academies
                 .filter((academy) => academy.level === "advanced")
                 .map((academy) => (
-                  <Card
+                  <AcademyCard
                     key={academy.id}
-                    className="group cursor-pointer transition-all duration-300 hover:shadow-lg"
-                    onClick={() => handleAcademySelect(academy)}
-                  >
-                    <CardContent className="p-0">
-                      <div className="relative aspect-video">
-                        <img
-                          src={academy.thumbnail}
-                          alt={academy.name}
-                          className="w-full h-full object-cover rounded-t-lg"
-                        />
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <Button variant="secondary" size="lg">
-                            <Play className="w-6 h-6 mr-2" />
-                            Ver Academia
-                          </Button>
-                        </div>
-                      </div>
-                      <div className="p-4 space-y-2">
-                        <div className="flex items-center justify-between">
-                          <Badge variant="secondary">{academy.level}</Badge>
-                          <Badge variant="outline">{academy.category}</Badge>
-                        </div>
-                        <h3 className="text-xl font-semibold line-clamp-1">
-                          {academy.name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2">
-                          {academy.description}
-                        </p>
-                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                          <div className="flex items-center gap-1">
-                            <Clock className="w-4 h-4" />
-                            <span>{academy.totalDuration}</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Users className="w-4 h-4" />
-                            <span>{academy.totalClasses} clases</span>
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <Award className="w-4 h-4" />
-                            <span>{academy.experience} XP</span>
-                          </div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                    academy={academy}
+                    onSelect={handleAcademySelect}
+                  />
                 ))}
             </div>
           </TabsContent>

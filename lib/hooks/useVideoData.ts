@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { getAcademyById } from '@/lib/academies';
+import { S3_VIDEO_BUCKET_URL } from '@/lib/aws-config';
 
 interface VideoData {
   video: {
@@ -45,28 +47,40 @@ export function useVideoData(videoId: string, courseId: string) {
         setIsLoading(true);
         setError(null);
 
-        // Fetch all data in parallel
-        const [videoRes, resourcesRes, commentsRes] = await Promise.all([
-          fetch(`/api/videos/${videoId}?courseId=${courseId}`),
-          fetch(`/api/resources?videoId=${videoId}&courseId=${courseId}`),
-          fetch(`/api/comments?videoId=${videoId}&courseId=${courseId}`)
-        ]);
-
-        if (!videoRes.ok || !resourcesRes.ok || !commentsRes.ok) {
-          throw new Error('Error fetching video data');
+        // Get academy data
+        const academy = getAcademyById(courseId);
+        if (!academy || !academy.classes) {
+          throw new Error('Academy not found');
         }
 
-        const [video, resources, comments] = await Promise.all([
-          videoRes.json(),
-          resourcesRes.json(),
-          commentsRes.json()
-        ]);
+        // Find the class
+        const classData = academy.classes.find(c => c.id === videoId);
+        if (!classData) {
+          throw new Error('Class not found');
+        }
 
-        setData({
-          video,
-          resources,
-          comments
-        });
+        // Use the video URL directly from the class object
+        const videoUrl = classData.videoUrl;
+        console.log('Video URL in useVideoData:', videoUrl);
+
+        // Transform class data to match VideoData interface
+        const videoData: VideoData = {
+          video: {
+            id: classData.id,
+            title: classData.title,
+            description: classData.description,
+            url: videoUrl,
+            thumbnail: classData.thumbnail,
+            duration: classData.duration,
+            progress: 0, // You might want to get this from user progress
+            experience: classData.experience,
+            isCompleted: false, // You might want to get this from user progress
+          },
+          resources: classData.resources ? JSON.parse(JSON.stringify(classData.resources)) : [],
+          comments: [] // You might want to implement comments separately
+        };
+
+        setData(videoData);
       } catch (err) {
         console.error('Error:', err);
         setError('Error al cargar los datos del video');
@@ -83,16 +97,7 @@ export function useVideoData(videoId: string, courseId: string) {
 
   const updateProgress = async (progress: number) => {
     try {
-      const response = await fetch(`/api/videos/${videoId}/progress`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ progress, courseId }),
-      });
-
-      if (!response.ok) throw new Error('Error updating progress');
-
+      // You might want to implement progress tracking
       setData(prev => prev ? {
         ...prev,
         video: {
@@ -108,21 +113,20 @@ export function useVideoData(videoId: string, courseId: string) {
 
   const addComment = async (content: string) => {
     try {
-      const response = await fetch('/api/comments', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          content,
-          videoId,
-          courseId,
-        }),
-      });
+      // You might want to implement comments
+      const newComment = {
+        id: Date.now().toString(),
+        content,
+        createdAt: new Date().toISOString(),
+        likes: 0,
+        isLiked: false,
+        user: {
+          name: 'User',
+          image: '',
+          email: ''
+        }
+      };
 
-      if (!response.ok) throw new Error('Error adding comment');
-
-      const newComment = await response.json();
       setData(prev => prev ? {
         ...prev,
         comments: [newComment, ...prev.comments]
@@ -135,21 +139,12 @@ export function useVideoData(videoId: string, courseId: string) {
 
   const addResource = async (resource: { title: string; type: "file" | "reading"; url: string }) => {
     try {
-      const response = await fetch('/api/resources', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...resource,
-          videoId,
-          courseId,
-        }),
-      });
+      // You might want to implement resources
+      const newResource = {
+        id: Date.now().toString(),
+        ...resource
+      };
 
-      if (!response.ok) throw new Error('Error adding resource');
-
-      const newResource = await response.json();
       setData(prev => prev ? {
         ...prev,
         resources: [...prev.resources, newResource]

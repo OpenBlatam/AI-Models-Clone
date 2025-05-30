@@ -30,13 +30,19 @@ export function VideoUploadModal({ open, onClose, recording, videoURL, videoRef,
       setIsUploading(true);
       setUploadProgress(0);
 
-      // Generar una key única para el video
-      const key = `videos/${Date.now()}-${file.name}`;
+      // Extract the original filename without extension
+      const originalName = file.name.replace(/\.[^/.]+$/, '');
       
-      // Subir el video a S3
+      // Ensure the filename follows the pattern: "number. title.mp4"
+      const formattedName = originalName.replace(/^(\d+)\s*\.?\s*(.+)$/, '$1. $2');
+      
+      // Generate a key that preserves the original filename structure
+      const key = `cursos/${formattedName}.mp4`;
+      
+      // Upload the video to S3
       const videoUrl = await uploadVideoToS3(file, key);
       
-      // Notificar que la subida se completó
+      // Notify that the upload is complete
       onUploadComplete(videoUrl);
       onClose();
     } catch (error) {

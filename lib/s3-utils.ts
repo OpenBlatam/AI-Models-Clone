@@ -1,4 +1,4 @@
-import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3';
+import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
 import { s3Client, S3_BUCKET_NAME, S3_VIDEO_BUCKET_NAME, S3_VIDEO_BUCKET_URL } from './aws-config';
 
 // General file upload
@@ -23,21 +23,19 @@ export async function uploadFileToS3(file: File, key: string) {
 // Video upload with specific settings
 export async function uploadVideoToS3(file: File, key: string) {
   try {
+    // Ensure the key starts with 'Cursos/'
+    const formattedKey = key.startsWith('Cursos/') ? key : `Cursos/${key}`;
+    
     const command = new PutObjectCommand({
       Bucket: S3_VIDEO_BUCKET_NAME,
-      Key: key,
+      Key: formattedKey,
       Body: file,
-      ContentType: file.type,
+      ContentType: 'video/mp4',
       ACL: 'public-read',
-      // Add video-specific metadata
-      Metadata: {
-        'x-amz-meta-video-type': 'course-video',
-        'x-amz-meta-upload-date': new Date().toISOString(),
-      },
     });
 
     await s3Client.send(command);
-    return getVideoUrl(key);
+    return getVideoUrl(formattedKey);
   } catch (error) {
     console.error('Error uploading video to S3:', error);
     throw error;
@@ -81,7 +79,9 @@ export function getFileUrl(key: string) {
 
 // Get video URL
 export function getVideoUrl(key: string) {
-  return `${S3_VIDEO_BUCKET_URL}/${key}`;
+  // Ensure the key starts with 'Cursos/'
+  const formattedKey = key.startsWith('Cursos/') ? key : `Cursos/${key}`;
+  return `${S3_VIDEO_BUCKET_URL}/${formattedKey}`;
 }
 
 // Get video thumbnail URL

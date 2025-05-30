@@ -17,9 +17,16 @@ export const env = createEnv({
     DATABASE_URL: isDevelopment
       ? z.string().default("postgresql://postgres:postgres@localhost:5432/postgres")
       : z.string().min(1, "DATABASE_URL is required"),
+    // AWS Configuration
+    AWS_REGION: z.string().default("us-east-1"),
+    AWS_ACCESS_KEY_ID: z.string().min(1, "AWS_ACCESS_KEY_ID is required"),
+    AWS_SECRET_ACCESS_KEY: z.string().min(1, "AWS_SECRET_ACCESS_KEY is required"),
+    AWS_S3_VIDEO_BUCKET_NAME: z.string().default("blatamcursos"),
   },
   client: {
     NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
+    NEXT_PUBLIC_AWS_REGION: z.string().default("us-east-1"),
+    NEXT_PUBLIC_AWS_S3_VIDEO_BUCKET_NAME: z.string().default("blatamcursos"),
   },
   runtimeEnv: {
     AUTH_SECRET: process.env.AUTH_SECRET,
@@ -27,6 +34,13 @@ export const env = createEnv({
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     DATABASE_URL: process.env.DATABASE_URL,
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+    // AWS Configuration
+    AWS_REGION: process.env.AWS_REGION,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    AWS_S3_VIDEO_BUCKET_NAME: process.env.AWS_S3_VIDEO_BUCKET_NAME,
+    NEXT_PUBLIC_AWS_REGION: process.env.AWS_REGION,
+    NEXT_PUBLIC_AWS_S3_VIDEO_BUCKET_NAME: process.env.AWS_S3_VIDEO_BUCKET_NAME,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 });

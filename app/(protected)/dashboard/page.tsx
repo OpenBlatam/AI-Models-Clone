@@ -3,6 +3,8 @@ import { constructMetadata } from "@/lib/utils";
 import { DashboardHeader } from "@/components/dashboard/header";
 import { prisma } from "@/lib/db";
 import { DashboardContent } from "@/components/dashboard/dashboard-content";
+import { Suspense } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const metadata = constructMetadata({
   title: "Dashboard – Learning Progress",
@@ -24,6 +26,10 @@ async function getWeeklyProgress(userId: string) {
     orderBy: {
       lastActive: 'asc',
     },
+    select: {
+      experience: true,
+      lastActive: true,
+    },
   });
 
   const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
@@ -38,18 +44,24 @@ async function getWeeklyProgress(userId: string) {
   });
 }
 
-export default async function DashboardPage() {
-  const user = await getCurrentUser();
-  if (!user?.id) return null;
-
-  const userProgress = await prisma.userProgress.findUnique({
-    where: { userId: user.id },
-    include: {
-      achievements: true,
-    },
-  });
-
-  const weeklyProgress = await getWeeklyProgress(user.id);
+async function UserProgress({ userId }: { userId: string }) {
+  const [userProgress, weeklyProgress] = await Promise.all([
+    prisma.userProgress.findUnique({
+      where: { userId },
+      include: {
+        achievements: {
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            icon: true,
+            unlockedAt: true,
+          },
+        },
+      },
+    }),
+    getWeeklyProgress(userId),
+  ]);
 
   const gameStats = {
     currentStreak: userProgress?.streak || 0,
@@ -62,15 +74,42 @@ export default async function DashboardPage() {
   };
 
   return (
+    <DashboardContent 
+      gameStats={gameStats}
+      achievements={userProgress?.achievements || []}
+    />
+  );
+}
+
+function DashboardSkeleton() {
+  return (
+    <div className="space-y-8">
+      <div className="space-y-4">
+        <Skeleton className="h-8 w-[250px]" />
+        <Skeleton className="h-4 w-[300px]" />
+      </div>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-[125px]" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default async function DashboardPage() {
+  const user = await getCurrentUser();
+  if (!user?.id) return null;
+
+  return (
     <>
       <DashboardHeader
         heading="Learning Dashboard"
         text={`Welcome back, ${user?.name}! Track your progress and achievements.`}
       />
-      <DashboardContent 
-        gameStats={gameStats}
-        achievements={userProgress?.achievements || []}
-      />
+      <Suspense fallback={<DashboardSkeleton />}>
+        <UserProgress userId={user.id} />
+      </Suspense>
     </>
   );
 }

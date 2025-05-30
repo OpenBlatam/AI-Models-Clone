@@ -28,8 +28,12 @@ const nextConfig = {
         protocol: "https",
         hostname: "example.com",
       },
+      {
+        protocol: "https",
+        hostname: "blatamcursos.s3.amazonaws.com",
+      },
     ],
-    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com', 'images.unsplash.com', 'example.com'],
+    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com', 'images.unsplash.com', 'example.com', 'blatamcursos.s3.amazonaws.com'],
   },
   experimental: {
     // serverActions está habilitado por defecto en Next.js 14
