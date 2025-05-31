@@ -92,29 +92,51 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
         <ScrollArea className="h-full overflow-y-auto border-r">
           <aside
             className={cn(
-              isSidebarExpanded ? "w-[260px] xl:w-[300px]" : "w-[90px]",
-              "hidden h-screen md:block",
+              isSidebarExpanded ? "w-[200px] xl:w-[220px]" : "w-[90px]",
+              "hidden h-screen md:block fixed left-0 top-0 z-50",
+              "transition-all duration-300 ease-in-out"
             )}
             onMouseEnter={() => !isPinned && setIsSidebarExpanded(true)}
             onMouseLeave={() => !isPinned && setIsSidebarExpanded(false)}
           >
-            <div className="flex h-full max-h-screen flex-1 flex-col gap-2">
+            <div className="flex h-full max-h-screen flex-1 flex-col gap-2 bg-background">
               <div className="flex flex-col items-center justify-center h-20 p-4 lg:h-[90px]">
-                {(!isSidebarExpanded || isPinned) && (
-                  <span className="mb-2">
-                    <span
-                      className="inline-flex items-center justify-center w-20 h-20 rounded bg-white shadow-lg cursor-pointer hover:scale-105 transition-transform"
-                      style={{
-                        boxShadow: "0 0 24px 8px #fff, 0 2px 12px #0002, 0 1.5px 0 #fff8",
-                        border: "1.5px solid rgba(255,255,255,0.7)",
-                        background: "linear-gradient(135deg, #fff 80%, #f3f3f3 100%)",
-                        transition: "box-shadow 0.2s, border 0.2s"
-                      }}
-                    >
-                      <img src="/b_logo.png" alt="Blatam Academy Assistant" className="w-16 h-16 object-contain" />
+                <div className="flex flex-col items-center">
+                  {(!isSidebarExpanded || isPinned) && (
+                    <span className="mb-1">
+                      <span
+                        className="inline-flex items-center justify-center w-20 h-20 rounded bg-white shadow-lg cursor-pointer hover:scale-105 transition-transform"
+                        style={{
+                          boxShadow: "0 0 24px 8px #fff, 0 2px 12px #0002, 0 1.5px 0 #fff8",
+                          border: "1.5px solid rgba(255,255,255,0.7)",
+                          background: "linear-gradient(135deg, #fff 80%, #f3f3f3 100%)",
+                          transition: "box-shadow 0.2s, border 0.2s"
+                        }}
+                      >
+                        <img src="/b_logo.png" alt="Blatam Academy Assistant" className="w-16 h-16 object-contain" />
+                      </span>
                     </span>
-                  </span>
-                )}
+                  )}
+                  {!isSidebarExpanded && !isPinned && (
+                    <div className="relative group">
+                      <span
+                        className="text-sm mt-1 inline-block transition-all duration-300 ease-in-out group-hover:-translate-y-0.5 bg-gradient-to-br from-white/95 to-white/75 bg-clip-text text-transparent tracking-[0.2em]"
+                        style={{
+                          fontFamily: "-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'San Francisco', sans-serif",
+                          textShadow: "0 1px 2px rgba(0,0,0,0.15)",
+                          fontWeight: "500",
+                          fontSize: "0.8125rem",
+                          letterSpacing: "0.2em",
+                          WebkitFontSmoothing: "antialiased",
+                          MozOsxFontSmoothing: "grayscale"
+                        }}
+                      >
+                        blatam
+                      </span>
+                      <div className="absolute bottom-0 left-0 w-full h-[0.5px] bg-gradient-to-r from-transparent via-white/90 to-transparent scale-x-0 group-hover:scale-x-100 transition-transform duration-300 ease-in-out" />
+                    </div>
+                  )}
+                </div>
                 {isSidebarExpanded && !isPinned && (
                   <span
                     className="text-2xl font-extrabold tracking-wider text-white transition-all duration-200 mb-2"
@@ -177,62 +199,60 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
                       <div className="h-4" />
                     )}
                     {section.items.map((item) => {
-                      const Icon = Icons[item.icon || "arrowRight"];
+                      const Icon = item.icon ? Icons[item.icon as keyof typeof Icons] : Icons.arrowRight;
                       return (
-                        item.href && (
-                          <Fragment key={`link-fragment-${item.title}`}>
-                            {isSidebarExpanded ? (
-                              <Link
-                                key={`link-${item.title}`}
-                                href={item.disabled ? "#" : item.href}
+                        <Fragment key={item.title}>
+                          {item.href ? (
+                            <Link
+                              href={item.href}
+                              className={cn(
+                                "group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                                path === item.href
+                                  ? "bg-accent"
+                                  : "transparent",
+                                !isSidebarExpanded && "justify-center"
+                              )}
+                            >
+                              <Icon
                                 className={cn(
-                                  "flex items-center gap-3 rounded-md p-2 text-sm font-medium hover:bg-muted",
-                                  path === item.href
-                                    ? "bg-muted"
-                                    : "text-muted-foreground hover:text-accent-foreground",
-                                  item.disabled &&
-                                    "cursor-not-allowed opacity-80 hover:bg-transparent hover:text-muted-foreground",
+                                  "mr-2 h-4 w-4",
+                                  !isSidebarExpanded && "mr-0"
                                 )}
-                              >
-                                <Icon className="size-5" />
-                                {item.title}
-                                {item.badge && (
-                                  <Badge className="ml-auto flex size-5 shrink-0 items-center justify-center rounded-full">
-                                    {item.badge}
-                                  </Badge>
+                              />
+                              {isSidebarExpanded && <span>{item.title}</span>}
+                            </Link>
+                          ) : (
+                            <span
+                              className={cn(
+                                "group flex items-center rounded-md px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground",
+                                !isSidebarExpanded && "justify-center"
+                              )}
+                            >
+                              <Icon
+                                className={cn(
+                                  "mr-2 h-4 w-4",
+                                  !isSidebarExpanded && "mr-0"
                                 )}
-                              </Link>
-                            ) : (
-                              <Tooltip key={`tooltip-${item.title}`}>
-                                <TooltipTrigger asChild>
-                                  <Link
-                                    key={`link-tooltip-${item.title}`}
-                                    href={item.disabled ? "#" : item.href}
-                                    className={cn(
-                                      "flex items-center gap-3 rounded-md py-2 text-sm font-medium hover:bg-muted",
-                                      path === item.href
-                                        ? "bg-muted"
-                                        : "text-muted-foreground hover:text-accent-foreground",
-                                      item.disabled &&
-                                        "cursor-not-allowed opacity-80 hover:bg-transparent hover:text-muted-foreground",
-                                    )}
-                                  >
-                                    <span className="flex size-full items-center justify-center">
-                                      <Icon className="size-5" />
-                                    </span>
-                                  </Link>
-                                </TooltipTrigger>
-                                <TooltipContent side="right">
-                                  {item.title}
-                                </TooltipContent>
-                              </Tooltip>
-                            )}
-                          </Fragment>
-                        )
+                              />
+                              {isSidebarExpanded && <span>{item.title}</span>}
+                            </span>
+                          )}
+                        </Fragment>
                       );
                     })}
                   </section>
                 ))}
+
+                {/* Add Collaboration Section */}
+                <section className="flex flex-col gap-0.5">
+                  {isSidebarExpanded ? (
+                    <p className="text-xs text-muted-foreground">
+                      Collaboration
+                    </p>
+                  ) : (
+                    <div className="h-4" />
+                  )}
+                </section>
               </nav>
 
               <div className="mt-auto xl:p-4">
@@ -242,6 +262,13 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
           </aside>
         </ScrollArea>
       </div>
+      <div 
+        className={cn(
+          "hidden md:block",
+          isSidebarExpanded ? "w-[200px] xl:w-[220px]" : "w-[90px]",
+          "transition-all duration-300 ease-in-out"
+        )} 
+      />
     </TooltipProvider>
   );
 }

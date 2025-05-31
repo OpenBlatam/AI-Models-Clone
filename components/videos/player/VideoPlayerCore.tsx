@@ -24,6 +24,8 @@ interface VideoPlayerCoreProps {
   onEnded?: () => void;
   onProgress?: (progress: number) => void;
   onError?: (error: string) => void;
+  volume?: number;
+  onVolumeChange?: (volume: number) => void;
 }
 
 const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
@@ -33,11 +35,13 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
   onEnded,
   onProgress,
   onError,
+  volume = 1,
+  onVolumeChange,
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const [volume, setVolume] = useState(1);
+  const [currentVolume, setCurrentVolume] = useState(volume);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -48,6 +52,9 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
   const playPromiseRef = useRef<Promise<void> | null>(null);
   const isPlayRequestedRef = useRef(false);
   const [playbackRate, setPlaybackRate] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [previewTime, setPreviewTime] = useState<number | null>(null);
+  const progressBarRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (videoRef.current) {
@@ -233,8 +240,9 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
     const newVolume = value[0];
     if (videoRef.current) {
       videoRef.current.volume = newVolume;
-      setVolume(newVolume);
+      setCurrentVolume(newVolume);
       setIsMuted(newVolume === 0);
+      onVolumeChange?.(newVolume);
     }
   };
 
@@ -245,6 +253,61 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
       setCurrentTime(newTime);
     }
   };
+
+  const handleProgressBarMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!videoRef.current || !progressBarRef.current) return;
+    
+    const progressBar = progressBarRef.current;
+    const rect = progressBar.getBoundingClientRect();
+    const position = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const newTime = position * duration;
+    
+    setPreviewTime(newTime);
+  };
+
+  const handleProgressBarMouseLeave = () => {
+    setPreviewTime(null);
+  };
+
+  const handleProgressBarMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!videoRef.current || !progressBarRef.current) return;
+    
+    setIsDragging(true);
+    const progressBar = progressBarRef.current;
+    const rect = progressBar.getBoundingClientRect();
+    const position = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    const newTime = position * duration;
+    
+    videoRef.current.currentTime = newTime;
+    setCurrentTime(newTime);
+    setPreviewTime(null);
+  };
+
+  useEffect(() => {
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!isDragging || !videoRef.current || !progressBarRef.current) return;
+      
+      const progressBar = progressBarRef.current;
+      const rect = progressBar.getBoundingClientRect();
+      const position = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const newTime = position * duration;
+      
+      videoRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    };
+
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
+
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, [isDragging, duration]);
 
   const toggleFullscreen = () => {
     if (!document.fullscreenElement) {
@@ -257,8 +320,13 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
   };
 
   const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
     const seconds = Math.floor(time % 60);
+    
+    if (hours > 0) {
+      return `${hours}:${minutes.toString().padStart(2, "0")}:${seconds.toString().padStart(2, "0")}`;
+    }
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
   };
 
@@ -292,7 +360,7 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
   return (
     <div 
       className={cn(
-        "relative w-full h-full bg-black",
+        "relative w-full h-full bg-black group",
         isFullscreen && "fixed inset-0 z-50"
       )}
       onMouseMove={handleMouseMove}
@@ -301,14 +369,14 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
       {/* Loading State */}
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50 z-10">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <div className="w-16 h-16 border-4 border-[#ff0000] border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
       {/* Error State */}
       {error && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/90 text-white p-4">
-          <div className="text-red-500 mb-2">
+          <div className="text-[#ff0000] mb-2">
             <svg
               className="w-12 h-12"
               fill="none"
@@ -380,24 +448,92 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
             className="absolute inset-0 flex flex-col justify-end p-4 z-10"
           >
             {/* Progress Bar */}
-            <div className="w-full h-1 bg-white/30 rounded-full mb-2">
-              <div 
-                className="h-full rounded-full"
-                style={{ width: `${(currentTime / duration) * 100}%`, background: '#ff0000' }}
-              />
+            <div 
+              ref={progressBarRef}
+              className="absolute bottom-16 left-0 right-0 px-4 cursor-pointer group/progress"
+              onMouseMove={handleProgressBarMouseMove}
+              onMouseLeave={handleProgressBarMouseLeave}
+              onMouseDown={handleProgressBarMouseDown}
+            >
+              <div className="relative h-1 bg-white/20 rounded-full group-hover/progress:h-2 transition-all duration-200">
+                {/* Buffered Progress */}
+                <div
+                  className="absolute h-full bg-white/40 rounded-full"
+                  style={{ width: `${(videoRef.current?.buffered.length ? videoRef.current.buffered.end(videoRef.current.buffered.length - 1) / duration : 0) * 100}%` }}
+                />
+                {/* Played Progress */}
+                <div
+                  className="absolute h-full bg-[#ff0000] rounded-full"
+                  style={{ width: `${(currentTime / duration) * 100}%` }}
+                />
+                {/* Preview Progress */}
+                {previewTime !== null && (
+                  <div
+                    className="absolute h-full bg-[#ff0000]/50 rounded-full"
+                    style={{ width: `${(previewTime / duration) * 100}%` }}
+                  />
+                )}
+                {/* Progress Handle */}
+                <div
+                  className="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-[#ff0000] rounded-full opacity-0 group-hover/progress:opacity-100 transition-opacity duration-200 shadow-lg cursor-pointer"
+                  style={{ 
+                    left: `${((previewTime ?? currentTime) / duration) * 100}%`, 
+                    transform: 'translate(-50%, -50%)'
+                  }}
+                />
+                {/* Time Preview Tooltip */}
+                {previewTime !== null && (
+                  <div className="absolute bottom-full left-0 transform -translate-x-1/2 mb-2 px-2 py-1 bg-black/90 rounded text-white text-xs whitespace-nowrap shadow-lg">
+                    {formatTime(previewTime)}
+                  </div>
+                )}
+              </div>
             </div>
+
             {/* Controls Row */}
-            <div className="flex items-center justify-between w-full bg-black/70 rounded-lg px-4 py-2 shadow-lg backdrop-blur-md">
+            <div className="flex items-center justify-between w-full bg-gradient-to-t from-black/90 to-black/70 rounded-lg px-4 py-2 shadow-lg backdrop-blur-md">
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={() => skip(-15)} className="text-white hover:text-[#ff0000] transition-colors"><RotateCcw className="h-7 w-7" /><span className="text-xs absolute ml-1">15</span></Button>
-                <Button variant="ghost" size="icon" onClick={togglePlay} className="text-white hover:text-[#ff0000] transition-colors">{isPlaying ? <Pause className="h-7 w-7" /> : <Play className="h-7 w-7" />}</Button>
-                <Button variant="ghost" size="icon" onClick={() => skip(15)} className="text-white hover:text-[#ff0000] transition-colors"><RotateCw className="h-7 w-7" /><span className="text-xs absolute ml-1">15</span></Button>
-                <Button variant="ghost" size="icon" onClick={toggleMute} className="text-white hover:text-[#ff0000] transition-colors">{isMuted ? <VolumeX className="h-7 w-7" /> : <Volume2 className="h-7 w-7" />}</Button>
-                <span className="text-white text-base font-mono min-w-[70px] text-center">{formatTime(currentTime)} / {formatTime(duration)}</span>
+                <Button variant="ghost" size="icon" onClick={() => skip(-15)} className="text-white hover:text-[#ff0000] transition-colors">
+                  <RotateCcw className="h-6 w-6" />
+                  <span className="text-xs absolute ml-1">15</span>
+                </Button>
+                <Button variant="ghost" size="icon" onClick={togglePlay} className="text-white hover:text-[#ff0000] transition-colors">
+                  {isPlaying ? <Pause className="h-6 w-6" /> : <Play className="h-6 w-6" />}
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => skip(15)} className="text-white hover:text-[#ff0000] transition-colors">
+                  <RotateCw className="h-6 w-6" />
+                  <span className="text-xs absolute ml-1">15</span>
+                </Button>
+                <div className="flex items-center gap-2">
+                  <Button variant="ghost" size="icon" onClick={toggleMute} className="text-white hover:text-[#ff0000] transition-colors">
+                    {isMuted ? <VolumeX className="h-6 w-6" /> : <Volume2 className="h-6 w-6" />}
+                  </Button>
+                  <input
+                    type="range"
+                    min="0"
+                    max="1"
+                    step="0.1"
+                    value={currentVolume}
+                    onChange={(e) => handleVolumeChange([parseFloat(e.target.value)])}
+                    className="w-24 h-1 bg-white/30 rounded-full appearance-none cursor-pointer hover:h-2 transition-all duration-200"
+                    style={{
+                      background: `linear-gradient(to right, #ff0000 0%, #ff0000 ${currentVolume * 100}%, rgba(255, 255, 255, 0.3) ${currentVolume * 100}%, rgba(255, 255, 255, 0.3) 100%)`
+                    }}
+                  />
+                </div>
+                <div className="flex items-center gap-1 text-white text-sm font-mono min-w-[120px]">
+                  <span>{formatTime(currentTime)}</span>
+                  <span className="text-white/60">/</span>
+                  <span className="text-white/60">{formatTime(duration)}</span>
+                </div>
               </div>
               <div className="flex items-center gap-2">
-                <Button variant="ghost" size="icon" onClick={changePlaybackRate} className="text-white hover:text-[#ff0000] transition-colors">{playbackRate}x</Button>
-                <Button variant="ghost" size="icon" onClick={toggleFullscreen} className="text-white hover:text-[#ff0000] transition-colors">{isFullscreen ? <Minimize className="h-7 w-7" /> : <Maximize2 className="h-7 w-7" />}</Button>
+                <Button variant="ghost" size="icon" onClick={changePlaybackRate} className="text-white hover:text-[#ff0000] transition-colors text-sm font-medium">
+                  {playbackRate}x
+                </Button>
+                <Button variant="ghost" size="icon" onClick={toggleFullscreen} className="text-white hover:text-[#ff0000] transition-colors">
+                  {isFullscreen ? <Minimize className="h-6 w-6" /> : <Maximize2 className="h-6 w-6" />}
+                </Button>
               </div>
             </div>
           </motion.div>

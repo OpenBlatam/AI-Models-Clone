@@ -5,6 +5,9 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import React, { useState, useRef } from "react";
+import ReactPlayer from "react-player";
+import { useRouter } from "next/navigation";
 
 interface Class {
   id: string;
@@ -12,9 +15,11 @@ interface Class {
   duration: string;
   thumbnail: string;
   isLocked: boolean;
-  isCompleted: boolean;
-  progress: number; // 0-100
-  experience: number; // XP ganada
+  isCompleted?: boolean;
+  progress?: number;
+  experience: number;
+  videoUrl?: string;
+  academyId: string;
 }
 
 interface ClassesModalProps {
@@ -26,7 +31,10 @@ interface ClassesModalProps {
 }
 
 export default function ClassesModal({ open, onClose, classes, currentClassId, onSelectClass }: ClassesModalProps) {
-  const totalProgress = classes.reduce((acc, curr) => acc + curr.progress, 0) / classes.length;
+  const [hoveredClassId, setHoveredClassId] = useState<string | null>(null);
+  const videoRefs = useRef<{ [key: string]: HTMLVideoElement | null }>({});
+  const router = useRouter();
+  const totalProgress = classes.reduce((acc, curr) => acc + (curr.progress ?? 0), 0) / classes.length;
   const totalExperience = classes.reduce((acc, curr) => acc + curr.experience, 0);
 
   return (
@@ -103,21 +111,49 @@ export default function ClassesModal({ open, onClose, classes, currentClassId, o
                   className={`p-4 border-b border-border hover:bg-muted/50 transition-all duration-300 cursor-pointer ${
                     classItem.id === currentClassId ? "bg-muted/50" : ""
                   }`}
-                  onClick={() => !classItem.isLocked && onSelectClass(classItem.id)}
+                  onClick={() => {
+                    if (!classItem.isLocked) {
+                      onSelectClass(classItem.id);
+                      router.push(`/dashboard/videos?courseId=${classItem.academyId}&classId=${classItem.id}`);
+                    }
+                  }}
                 >
                   <div className="flex items-center gap-4">
-                    {/* Thumbnail */}
+                    {/* Thumbnail/Preview */}
                     <motion.div 
                       className="relative w-24 h-16 rounded-lg overflow-hidden flex-shrink-0"
                       whileHover={{ scale: 1.05 }}
                       transition={{ duration: 0.2 }}
+                      onMouseEnter={() => setHoveredClassId(classItem.id)}
+                      onMouseLeave={() => setHoveredClassId(null)}
                     >
-                      <Image
-                        src={classItem.thumbnail}
-                        alt={classItem.title}
-                        fill
-                        className="object-cover"
-                      />
+                      {hoveredClassId === classItem.id && !classItem.isLocked && classItem.videoUrl ? (
+                        <ReactPlayer
+                          url={classItem.videoUrl}
+                          playing={true}
+                          muted={true}
+                          loop={true}
+                          width="100%"
+                          height="100%"
+                          playsinline={true}
+                          style={{ objectFit: 'cover', pointerEvents: 'none' }}
+                          config={{
+                            file: {
+                              attributes: {
+                                poster: classItem.thumbnail,
+                                preload: 'auto',
+                              }
+                            }
+                          }}
+                        />
+                      ) : (
+                        <Image
+                          src={classItem.thumbnail}
+                          alt={classItem.title}
+                          fill
+                          className="object-cover"
+                        />
+                      )}
                       <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
                         {classItem.isLocked ? (
                           <Lock className="w-6 h-6 text-foreground" />

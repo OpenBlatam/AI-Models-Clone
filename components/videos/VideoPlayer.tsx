@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import VideoPlayerCore from "./player/VideoPlayerCore";
@@ -14,6 +14,7 @@ import VideoComments from "./VideoComments";
 import { VideoResources } from "./VideoResources";
 import { VideoQuestionBar } from "./VideoQuestionBar";
 import { toast } from "sonner";
+import NextVideoCountdownModal from "./NextVideoCountdownModal";
 
 interface VideoPlayerProps {
   courseId: string;
@@ -42,6 +43,8 @@ const VideoPlayer = ({
   const [showExperienceGained, setShowExperienceGained] = useState(false);
   const [gainedExperience, setGainedExperience] = useState(0);
   const [currentVideoUrl, setCurrentVideoUrl] = useState<string>("");
+  const [showNextVideoModal, setShowNextVideoModal] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     setIsMounted(true);
@@ -82,6 +85,10 @@ const VideoPlayer = ({
 
     setClasses(updatedClasses);
 
+    if (currentIndex < classes.length - 1) {
+      setShowNextVideoModal(true);
+    }
+
     if (onEnded) {
       onEnded();
     }
@@ -89,6 +96,18 @@ const VideoPlayer = ({
     setTimeout(() => {
       setShowExperienceGained(false);
     }, 3000);
+  };
+
+  const handleNextVideo = () => {
+    if (currentIndex < classes.length - 1) {
+      const nextIndex = currentIndex + 1;
+      setCurrentIndex(nextIndex);
+      setCurrentVideoUrl(classes[nextIndex].videoUrl);
+      if (onSelectClass) {
+        onSelectClass(classes[nextIndex].id);
+      }
+    }
+    setShowNextVideoModal(false);
   };
 
   if (!isMounted) {
@@ -102,16 +121,16 @@ const VideoPlayer = ({
   }
 
   return (
-    <div className="max-w-[1600px] mx-auto px-4">
+    <div className="max-w-[3840px] mx-auto px-4">
       {/* Main Content Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-8 gap-6">
         {/* Video Player Section */}
-        <div className="lg:col-span-3 space-y-4">
+        <div className="lg:col-span-7 space-y-4">
           {/* Video Player */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="w-full aspect-video rounded-xl overflow-hidden bg-black relative"
+            className="w-full aspect-[16/9] rounded-xl overflow-hidden bg-black relative"
           >
             <VideoPlayerCore
               videoUrl={currentVideoUrl}
@@ -119,6 +138,12 @@ const VideoPlayer = ({
               onTimeUpdate={onTimeUpdate}
               onEnded={handleVideoEnded}
               onProgress={onProgress}
+              volume={1}
+              onVolumeChange={(volume) => {
+                if (videoRef.current) {
+                  videoRef.current.volume = volume;
+                }
+              }}
             />
 
             {/* Classes Button */}
@@ -250,6 +275,18 @@ const VideoPlayer = ({
             setShowClasses(false);
           }
         }}
+      />
+
+      {/* Next Video Countdown Modal */}
+      <NextVideoCountdownModal
+        isOpen={showNextVideoModal}
+        onClose={() => setShowNextVideoModal(false)}
+        onNext={handleNextVideo}
+        nextTitle={classes[currentIndex + 1]?.title || ""}
+        nextThumbnail={classes[currentIndex + 1]?.thumbnail || ""}
+        nextDuration={classes[currentIndex + 1]?.duration}
+        completedTitle={classes[currentIndex]?.title || ""}
+        countdownSeconds={5}
       />
     </div>
   );

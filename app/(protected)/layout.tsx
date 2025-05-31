@@ -40,8 +40,10 @@ export default async function Dashboard({ children }: ProtectedLayoutProps) {
               <SearchCommand links={filteredLinks} />
             </div>
 
-            <ModeToggle />
-            <UserAccountNav />
+            <div className="flex items-center gap-2">
+              <ModeToggle />
+              <UserAccountNav />
+            </div>
           </MaxWidthWrapper>
         </header>
 

@@ -1,0 +1,17 @@
+fastapi
+uvicorn[standard]
+requests
+beautifulsoup4
+python-dotenv
+pydantic
+pydantic-settings # Para configuración mejorada
+
+# Dependencias de Langchain
+langchain
+langchain-community
+langchain-core
+httpx # Usado por ChatOllama y para health checks
+
+# Utilidades
+tenacity # Para reintentos
+cachetools # Para caching

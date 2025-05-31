@@ -35,11 +35,40 @@ export const sidebarLinks: SidebarNavItem[] = [
       },
       {
         href: "/dashboard/Blatam IA",
-        icon: "brain",
+        icon: "calendar",
         title: "Blatam IA",
         authorizeOnly: UserRole.USER
       },
-
+      {
+        href: "/dashboard/exercises",
+        icon: "lineChart",
+        title: "Ejercicios",
+        authorizeOnly: UserRole.USER
+      },
+      {
+        href: "/dashboard/games",
+        icon: "target",
+        title: "Juegos",
+        authorizeOnly: UserRole.USER
+      },
+      {
+        href: "/dashboard/colaboracion-ia",
+        icon: "user",
+        title: "Colaboración IA",
+        authorizeOnly: UserRole.USER
+      },
+      {
+        href: "/dashboard/ads-ia",
+        icon: "calendar",
+        title: "ADS IA",
+        authorizeOnly: UserRole.USER
+      },
+      {
+        href: "/dashboard/achievements",
+        icon: "trophy",
+        title: "Logros",
+        authorizeOnly: UserRole.USER
+      },
       {
         href: "#/dashboard/posts",
         icon: "post",

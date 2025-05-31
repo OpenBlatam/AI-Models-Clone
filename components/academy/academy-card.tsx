@@ -9,6 +9,7 @@ import { CourseMeta } from "./course-meta";
 import { Star, ArrowRight, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useRouter } from "next/navigation";
 
 interface AcademyCardProps {
   academy: Academy;
@@ -17,9 +18,12 @@ interface AcademyCardProps {
 }
 
 export function AcademyCard({ academy, onSelect, variant = "grid" }: AcademyCardProps) {
+  const router = useRouter();
   const handleSelect = (e: React.MouseEvent) => {
     e.preventDefault();
     if (onSelect) onSelect(academy);
+    // Navegación directa a la página de videos de la academia
+    router.push(`/dashboard/videos?courseId=${academy.id}`);
   };
 
   return (

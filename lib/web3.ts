@@ -1,0 +1,60 @@
+import { ethers } from 'ethers';
+
+export const getProvider = () => {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    if (window.ethereum) {
+      return new ethers.providers.Web3Provider(window.ethereum);
+    } else {
+      console.warn('MetaMask no está instalado. Por favor, instala MetaMask para usar esta función.');
+      return null;
+    }
+  } catch (error) {
+    console.error('Error al conectar con MetaMask:', error);
+    return null;
+  }
+};
+
+export const connectWallet = async () => {
+  try {
+    if (!window.ethereum) {
+      throw new Error('MetaMask no está instalado. Por favor, instala MetaMask para continuar.');
+    }
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    await provider.send("eth_requestAccounts", []);
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
+    return { address, provider, signer };
+  } catch (error) {
+    if (error instanceof Error) {
+      if (error.message.includes('MetaMask no está instalado')) {
+        window.open('https://metamask.io/download/', '_blank');
+      }
+      throw error;
+    }
+    throw new Error('Error al conectar con la wallet');
+  }
+};
+
+export const getBalance = async (address: string) => {
+  try {
+    const provider = getProvider();
+    if (!provider) {
+      throw new Error('No se pudo conectar con MetaMask');
+    }
+    const balance = await provider.getBalance(address);
+    return ethers.utils.formatEther(balance);
+  } catch (error) {
+    console.error('Error al obtener el balance:', error);
+    return '0';
+  }
+};
+
+// Tipos para TypeScript
+declare global {
+  interface Window {
+    ethereum?: any;
+  }
+} 

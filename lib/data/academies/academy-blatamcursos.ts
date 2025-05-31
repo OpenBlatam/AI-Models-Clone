@@ -2,9 +2,9 @@ import { Academy } from "@/lib/types/academy";
 
 export const blatamcursosAcademy: Academy = {
   id: "blatamcursos-cursos",
-  name: "Academia Blatamcursos - Cursos",
+  name: "Contenido Con IA generativa",
   description: "Academia generada automáticamente con los primeros 12 videos del bucket S3 'blatamcursos' en la carpeta 'Cursos'.",
-  thumbnail: "/images/academies/blatamcursos.jpg",
+  thumbnail: "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=100&w=2000&auto=format&fit=crop",
   instructor: "Equipo Blatam",
   category: "Cursos",
   level: "intermediate",

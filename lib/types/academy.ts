@@ -20,6 +20,8 @@ export interface Academy {
   createdAt: string;
   updatedAt: string;
   rating?: number;
+  difficulty: "beginner" | "intermediate" | "advanced";
+  tags: string[];
 }
 
 export interface AcademyClass {
@@ -31,8 +33,9 @@ export interface AcademyClass {
   thumbnail: string;
   duration: string;
   order: number;
-  isCompleted: boolean;
-  progress: number;
+  isLocked?: boolean;
+  isCompleted?: boolean;
+  progress?: number;
   experience: number;
   views?: number;
   resources?: Resource[];
