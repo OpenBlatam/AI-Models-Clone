@@ -42,41 +42,61 @@ export function BrandKitWizardModal({ open, onClose, onGenerate, brandKit }) {
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl">
+      <DialogContent className="max-w-sm">
         <DialogHeader>
-          <DialogTitle>Refine post details</DialogTitle>
-          <div className="text-muted-foreground mb-2">Suggestions are based on your brand kit</div>
+          <DialogTitle>Refinar detalles del post</DialogTitle>
+          <div className="text-muted-foreground mb-2">Las sugerencias se basan en el tema de tu publicación</div>
         </DialogHeader>
         <div className="mb-4">
-          <div className="font-medium mb-2">Select a design you'd like to start with <span className="text-red-500">*</span></div>
-          <div className="flex gap-4 overflow-x-auto pb-2">
-            {templates.map((tpl, idx) => (
-              <div
-                key={tpl.id}
-                className={`rounded-2xl border-2 cursor-pointer min-w-[180px] max-w-[200px] p-2 flex flex-col items-center transition-all ${
-                  selected === idx ? "border-primary shadow-lg" : "border-transparent"
-                }`}
-                style={{ background: tpl.color }}
-                onClick={() => setSelected(idx)}
-              >
-                <img src={tpl.image} alt={tpl.title} className="rounded-xl w-full h-32 object-cover mb-2" />
-                <div className="font-bold text-lg mb-1">{tpl.title}</div>
-                <div className="text-sm mb-2">{tpl.subtitle}</div>
-                <div className="text-xs font-medium mt-auto">{tpl.cta}</div>
-              </div>
-            ))}
+          <div className="font-medium mb-2 flex items-center justify-between">
+            <span>Selecciona un diseño para comenzar <span className="text-red-500">*</span></span>
+            <button className="text-primary text-sm font-medium hover:underline">Ver todos los templates</button>
           </div>
-          <div className="text-right mt-2">
-            <button className="text-primary text-sm font-medium hover:underline">See All Templates</button>
+          <div className="flex flex-col md:flex-row gap-6 items-center justify-center">
+            {/* Template seleccionado grande */}
+            {selected !== null && (
+              <div className="flex flex-col items-center">
+                <div className="rounded-2xl border-2 border-primary shadow-lg overflow-hidden mb-2 w-[260px] h-[260px] md:w-[320px] md:h-[320px] bg-white flex items-center justify-center">
+                  <img
+                    src={templates[selected].image}
+                    alt={templates[selected].title}
+                    className="object-cover w-full h-full"
+                  />
+                </div>
+                <div className="font-bold text-lg mb-1 text-center max-w-xs truncate">{templates[selected].title}</div>
+                <div className="text-sm mb-2 text-center max-w-xs truncate">{templates[selected].subtitle}</div>
+                <div className="text-xs font-medium mt-auto text-center">{templates[selected].cta}</div>
+              </div>
+            )}
+            {/* Thumbnails de los demás templates */}
+            <div className="flex flex-col items-center justify-center">
+              <div className="grid grid-cols-3 grid-rows-1 gap-3 justify-center items-center">
+                {templates.slice(0, 3).map((tpl, idx) => (
+                  <div
+                    key={tpl.id}
+                    className={`rounded-2xl border-2 cursor-pointer min-w-[70px] max-w-[80px] min-h-[70px] max-h-[80px] p-1 flex flex-col items-center transition-all ${
+                      selected === idx ? "border-primary shadow-lg" : "border-transparent hover:border-primary hover:shadow-lg"
+                    } bg-white`}
+                    style={{ background: tpl.color }}
+                    onClick={() => setSelected(idx)}
+                  >
+                    <img src={tpl.image} alt={tpl.title} className="rounded-xl w-full h-full object-cover mb-1" />
+                    {selected === idx && (
+                      <div className="font-bold text-xs mb-0.5 truncate w-full text-center">{tpl.title}</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
         <DialogFooter>
-          <Button variant="ghost" onClick={onClose}>Cancel</Button>
+          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
           <Button
             disabled={selected === null}
             onClick={() => onGenerate(templates[selected!])}
           >
-            Generate Post
+            Generar Post
           </Button>
         </DialogFooter>
       </DialogContent>

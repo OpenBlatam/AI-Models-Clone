@@ -8,9 +8,35 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BrandKitWizardModal } from "@/components/BrandKit/BrandKitWizardModal";
 import { parseBrandKit } from "@/utils/parseBrandKit";
 import { BrandKit as BrandKitComponent } from "@/components/BrandKit/BrandKit";
-import { TemplateSelector } from "@/components/BrandKit/TemplateSelector";
+import { TemplateCarousel, templateCategories, TemplateDetailModal } from "@/components/BrandKit/TemplateSelector";
 import { AudienceModal } from "@/components/BrandKit/AudienceModal";
 import type { BrandKitData } from "@/components/BrandKit/BrandKit";
+import { motion, AnimatePresence } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { Sparkles, Send, Wand2, Palette, Rocket, Crown, Star, Gem } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Badge } from "@/components/ui/badge";
+import BrandKitDisplay from "@/components/BrandKit/BrandKitDisplay";
+import HeroSection from "@/components/ui/HeroSection";
+import UrlInputBox from "@/components/ui/UrlInputBox";
+
+function mapBrandKitDataToDisplay(data) {
+  return {
+    brand: {
+      name: "Brand Name",
+      logo: "/logo-placeholder.png",
+    },
+    voice: {
+      purpose: data.fonts?.title || "",
+      audience: data.fonts?.subtitle || "",
+      tone: [],
+      emotions: [],
+    },
+    materials: [],
+    media: [],
+  };
+}
 
 export default function AdsIaPage() {
   const [url, setUrl] = useState("");
@@ -26,6 +52,8 @@ export default function AdsIaPage() {
   const [audienceModalOpen, setAudienceModalOpen] = useState(false);
   const [audienceLoading, setAudienceLoading] = useState(false);
   const [generatedContent, setGeneratedContent] = useState("");
+  const [selectedTemplateDetail, setSelectedTemplateDetail] = useState(null);
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
 
   const handleExtract = async (type: "ads" | "brand-kit") => {
     setLoading(true);
@@ -91,132 +119,250 @@ export default function AdsIaPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto py-12 space-y-8">
-      <h1 className="text-3xl font-bold mb-4">Herramientas de Marketing</h1>
-      <p className="text-muted-foreground mb-6">
-        Genera anuncios y brand kits automáticamente a partir de cualquier URL.
-      </p>
-
-      <div className="flex gap-2 mb-4">
-        <input
-          type="url"
-          className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
-          placeholder="Pega aquí la URL de cualquier web..."
+    <>
+      <HeroSection
+        title={
+          <span>
+            Herramientas de{" "}
+            <motion.span
+              className="bg-gradient-to-r from-[#7b61ff] via-[#fbbf24] to-[#22c55e] bg-clip-text text-transparent font-extrabold tracking-tight drop-shadow-lg"
+              initial={{ backgroundPosition: "0% 50%" }}
+              animate={{ backgroundPosition: "100% 50%" }}
+              transition={{
+                repeat: Infinity,
+                repeatType: "reverse",
+                duration: 4,
+                ease: "linear"
+              }}
+              style={{
+                backgroundSize: "200% 200%",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent"
+              }}
+            >
+              Marketing
+            </motion.span>
+          </span>
+        }
+        subtitle="Genera anuncios y brand kits automáticamente a partir de cualquier URL."
+        backgroundClass="bg-black"
+        textClass="text-white"
+        linearGradientBackground={true}
+        multicolorBackground={false}
+      >
+        <UrlInputBox
           value={url}
-          onChange={e => setUrl(e.target.value)}
+          onChange={setUrl}
+          loading={loading}
+          onGenerate={() => handleExtract(activeTab as "ads" | "brand-kit")}
+          onTryExample={() => setUrl("https://ejemplo.com")}
+          onUseText={() => setUrl("Ejemplo de texto para anuncio")}
+          extraClass=""
         />
-      </div>
+      </HeroSection>
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="ads">Generar Anuncios</TabsTrigger>
-          <TabsTrigger value="brand-kit">Generar Brand Kit</TabsTrigger>
-        </TabsList>
+      <motion.div 
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-5xl mx-auto py-12 space-y-8 px-4 relative"
+      >
+        {/* Decorative elements */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.1 }}
+          transition={{ delay: 1 }}
+          className="absolute inset-0 pointer-events-none"
+        >
+          <div className="absolute top-0 left-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl" />
+          <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-primary/20 rounded-full blur-3xl" />
+        </motion.div>
 
-        <TabsContent value="ads">
-          <Card>
-            <CardHeader>
-              <CardTitle>Generador de Anuncios</CardTitle>
-              <CardDescription>
-                Genera anuncios optimizados para redes sociales a partir de cualquier web.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => handleExtract("ads")} 
-                disabled={!url || loading}
-                className="w-full"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generando anuncios...
-                  </>
-                ) : (
-                  "Generar Anuncios"
-                )}
-              </Button>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 p-1 bg-muted/50 rounded-xl backdrop-blur-sm border border-border/50">
+            <TabsTrigger 
+              value="ads"
+              className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 flex items-center gap-2"
+            >
+              <Rocket className="w-4 h-4" />
+              Generar Anuncios
+            </TabsTrigger>
+            <TabsTrigger 
+              value="brand-kit"
+              className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 flex items-center gap-2"
+            >
+              <Palette className="w-4 h-4" />
+              Generar Brand Kit
+            </TabsTrigger>
+          </TabsList>
 
-              {error && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>
-                    {error.message}
-                    {error.details && error.details !== error.message && (
-                      <p className="mt-2 text-sm opacity-80">{error.details}</p>
-                    )}
-                  </AlertDescription>
-                </Alert>
-              )}
-              
-              {ads.length > 0 && (
-                <div className="mt-6 space-y-4">
-                  <h2 className="text-xl font-semibold">Anuncios Generados:</h2>
-                  <ul className="space-y-2">
-                    {ads.map((ad, i) => (
-                      <li key={i} className="bg-muted rounded-lg p-4 border border-border whitespace-pre-line">
-                        {ad}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="brand-kit">
-          <Card>
-            <CardHeader>
-              <CardTitle>Generador de Brand Kit</CardTitle>
-              <CardDescription>
-                Extrae y genera un brand kit completo a partir de cualquier web.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Button 
-                onClick={() => handleExtract("brand-kit")} 
-                disabled={!url || loading}
-                className="w-full"
-              >
-                {loading ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generando brand kit...
-                  </>
-                ) : (
-                  "Generar Brand Kit"
-                )}
-              </Button>
-
-              {error && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertCircle className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>
-                    {error.message}
-                    {error.details && error.details !== error.message && (
-                      <p className="mt-2 text-sm opacity-80">{error.details}</p>
-                    )}
-                  </AlertDescription>
-                </Alert>
-              )}
-              
-              {brandKit && (
-                <>
-                  <div className="mt-6 space-y-4">
-                    <h2 className="text-xl font-semibold">Brand Kit Generado:</h2>
-                    <div className="bg-muted rounded-lg p-4 border border-border whitespace-pre-line">
-                      {brandKit}
-                    </div>
-                  </div>
-                  {brandKitData && (
-                    <div className="mt-6 space-y-4">
-                      <h2 className="text-xl font-semibold">Brand Kit Modular:</h2>
-                      <BrandKitComponent data={brandKitData} />
-                    </div>
+          <TabsContent value="ads">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Card className="border-2 hover:border-primary/50 transition-all duration-200 bg-background/50 backdrop-blur-sm shadow-xl shadow-primary/5">
+                <CardHeader>
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    <Rocket className="w-6 h-6 text-primary" />
+                    Generador de Anuncios
+                  </CardTitle>
+                  <CardDescription className="text-lg">
+                    Genera anuncios optimizados para redes sociales a partir de cualquier web.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <Alert variant="destructive" className="mt-4">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>
+                          {error.message}
+                          {error.details && error.details !== error.message && (
+                            <p className="mt-2 text-sm opacity-80">{error.details}</p>
+                          )}
+                        </AlertDescription>
+                      </Alert>
+                    </motion.div>
                   )}
+                  
+                  {ads.length > 0 && (
+                    <motion.div 
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="mt-6 space-y-4"
+                    >
+                      <h2 className="text-xl font-semibold flex items-center gap-2">
+                        <Sparkles className="w-5 h-5 text-primary" />
+                        Anuncios Generados:
+                      </h2>
+                      <ul className="space-y-3">
+                        {ads.map((ad, i) => (
+                          <motion.li 
+                            key={i}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: i * 0.1 }}
+                            className="bg-muted/50 backdrop-blur-sm rounded-xl p-4 border border-border hover:border-primary/50 transition-all duration-200 group shadow-lg shadow-primary/5"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1 ring-2 ring-primary/20">
+                                <span className="text-primary font-medium">{i + 1}</span>
+                              </div>
+                              <p className="text-base leading-relaxed">{ad}</p>
+                            </div>
+                          </motion.li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  )}
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+
+          <TabsContent value="brand-kit">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+            >
+              <Card className="border-2 hover:border-primary/50 transition-all duration-200 bg-background/50 backdrop-blur-sm shadow-xl shadow-primary/5">
+                <CardHeader>
+                  <CardTitle className="text-2xl flex items-center gap-2">
+                    <Palette className="w-6 h-6 text-primary" />
+                    Generador de Brand Kit
+                  </CardTitle>
+                  <CardDescription className="text-lg">
+                    Extrae y genera un brand kit completo a partir de cualquier web.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                    >
+                      <Alert variant="destructive" className="mt-4">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>
+                          {error.message}
+                          {error.details && error.details !== error.message && (
+                            <p className="mt-2 text-sm opacity-80">{error.details}</p>
+                          )}
+                        </AlertDescription>
+                      </Alert>
+                    </motion.div>
+                  )}
+                  
+                  {brandKit && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="space-y-6"
+                    >
+                      <div className="mt-6 space-y-4">
+                        <h2 className="text-xl font-semibold flex items-center gap-2">
+                          <Sparkles className="w-5 h-5 text-primary" />
+                          Brand Kit Generado:
+                        </h2>
+                        <div className="bg-muted/50 backdrop-blur-sm rounded-xl p-4 border border-border hover:border-primary/50 transition-all duration-200 shadow-lg shadow-primary/5">
+                          {brandKit}
+                        </div>
+                      </div>
+                      {brandKitData && (
+                        <div className="mt-10">
+                          <BrandKitDisplay
+                            {...mapBrandKitDataToDisplay(brandKitData)}
+                            onCreate={() => {}}
+                          />
+                        </div>
+                      )}
+                    </motion.div>
+                  )}
+                  <div className="space-y-12 mt-8">
+                    {templateCategories.map(cat => (
+                      <TemplateCarousel
+                        key={cat.title}
+                        title={cat.title}
+                        templates={cat.templates}
+                        onCardClick={tpl => {
+                          setSelectedTemplateDetail(tpl);
+                          setDetailModalOpen(true);
+                        }}
+                      />
+                    ))}
+                  </div>
+                  <AudienceModal
+                    open={audienceModalOpen}
+                    onClose={() => {
+                      setAudienceModalOpen(false);
+                      setGeneratedContent("");
+                    }}
+                    onRegenerate={() => handleGenerateContent("")}
+                    onNext={(audience, brandKitId, language) => {
+                      handleGenerateContent(audience);
+                    }}
+                    suggestion={selectedTemplateForAudience?.title || ""}
+                    loading={audienceLoading}
+                    brandKitId={1}
+                    language="es"
+                  />
+                  <TemplateDetailModal
+                    open={detailModalOpen}
+                    onClose={() => setDetailModalOpen(false)}
+                    template={selectedTemplateDetail}
+                    onUseTemplate={tpl => {
+                      setSelectedTemplateForAudience(tpl);
+                      setAudienceModalOpen(true);
+                    }}
+                  />
                   <BrandKitWizardModal
                     open={wizardOpen}
                     onClose={() => setWizardOpen(false)}
@@ -226,28 +372,12 @@ export default function AdsIaPage() {
                     }}
                     brandKit={brandKit}
                   />
-                </>
-              )}
-              <TemplateSelector
-                onSelect={tpl => {
-                  setSelectedTemplateForAudience(tpl);
-                  setAudienceModalOpen(true);
-                }}
-              />
-              <AudienceModal
-                open={audienceModalOpen}
-                onClose={() => {
-                  setAudienceModalOpen(false);
-                  setGeneratedContent("");
-                }}
-                onGenerate={handleGenerateContent}
-                loading={audienceLoading}
-                generatedContent={generatedContent}
-              />
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-    </div>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </TabsContent>
+        </Tabs>
+      </motion.div>
+    </>
   );
 } 

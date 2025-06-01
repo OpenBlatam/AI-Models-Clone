@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Image as ImageIcon } from "lucide-react";
 import { RefinePostDetailsModal } from "./RefinePostDetailsModal";
 
 const brandKits = [

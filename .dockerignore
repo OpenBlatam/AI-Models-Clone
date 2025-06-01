@@ -67,4 +67,8 @@ logs
 
 # System Files
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# New additions
+docker-compose.yml
+.env 

@@ -89,4 +89,10 @@ aws application-autoscaling put-scaling-policy \
   }'
 
 echo "Despliegue completado. La aplicación estará disponible en:"
-echo "https://blatam-academy.${AWS_REGION}.elasticbeanstalk.com" 
+echo "https://blatam-academy.${AWS_REGION}.elasticbeanstalk.com"
+
+# CONFIGURA ESTAS VARIABLES:
+EC2_USER=ec2-user
+EC2_HOST=ec2-18-206-225-74.compute-1.amazonaws.com
+KEY_PATH=/Users/adan/blatam.pem   # <-- Cambia esto si tu llave está en otra ruta
+PROJECT_DIR=next-saas-stripe-starter 
