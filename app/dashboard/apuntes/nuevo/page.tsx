@@ -35,7 +35,6 @@ export default function NewNotePage() {
 
       router.push("/dashboard/apuntes");
     } catch (error) {
-      console.error("Error:", error);
     } finally {
       setLoading(false);
     }
@@ -104,4 +103,4 @@ export default function NewNotePage() {
       </div>
     </div>
   );
-} 
+}  

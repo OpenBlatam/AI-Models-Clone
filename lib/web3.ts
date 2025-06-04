@@ -7,11 +7,9 @@ export const getProvider = () => {
     if (window.ethereum) {
       return new ethers.providers.Web3Provider(window.ethereum);
     } else {
-      console.warn('MetaMask no está instalado. Por favor, instala MetaMask para usar esta función.');
       return null;
     }
   } catch (error) {
-    console.error('Error al conectar con MetaMask:', error);
     return null;
   }
 };
@@ -47,7 +45,6 @@ export const getBalance = async (address: string) => {
     const balance = await provider.getBalance(address);
     return ethers.utils.formatEther(balance);
   } catch (error) {
-    console.error('Error al obtener el balance:', error);
     return '0';
   }
 };
@@ -57,4 +54,4 @@ declare global {
   interface Window {
     ethereum?: any;
   }
-} 
+}  

@@ -15,7 +15,6 @@ redis.on("error", (error) => {
 });
 
 redis.on("connect", () => {
-  console.log("[REDIS] Connected successfully");
 });
 
 // Helper function to safely get data from Redis
@@ -50,4 +49,4 @@ export async function deleteFromRedis(key: string): Promise<void> {
   } catch (error) {
     console.error("[REDIS_DELETE_ERROR]", error);
   }
-} 
+}  

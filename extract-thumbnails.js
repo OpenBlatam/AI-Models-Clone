@@ -44,7 +44,7 @@ async function downloadAndExtractThumbnail(key) {
   fs.unlinkSync(localVideo);
   fs.unlinkSync(localThumbnail);
 
-  console.log(`Thumbnail generado y subido: ${THUMBNAIL_PREFIX}${thumbnailName}`);
+
 }
 
 (async () => {
@@ -52,4 +52,4 @@ async function downloadAndExtractThumbnail(key) {
   for (const video of videos) {
     await downloadAndExtractThumbnail(video.Key);
   }
-})(); 
+})();  

@@ -61,7 +61,6 @@ export function useVideoData(videoId: string, courseId: string) {
 
         // Use the video URL directly from the class object
         const videoUrl = classData.videoUrl;
-        console.log('Video URL in useVideoData:', videoUrl);
 
         // Transform class data to match VideoData interface
         const videoData: VideoData = {
@@ -82,7 +81,7 @@ export function useVideoData(videoId: string, courseId: string) {
 
         setData(videoData);
       } catch (err) {
-        console.error('Error:', err);
+        console.error('Error loading video data:', err);
         setError('Error al cargar los datos del video');
         toast.error('Error al cargar los datos del video');
       } finally {
@@ -106,7 +105,7 @@ export function useVideoData(videoId: string, courseId: string) {
         }
       } : null);
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Error updating progress:', err);
       toast.error('Error al actualizar el progreso');
     }
   };
@@ -132,7 +131,7 @@ export function useVideoData(videoId: string, courseId: string) {
         comments: [newComment, ...prev.comments]
       } : null);
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Error adding comment:', err);
       toast.error('Error al agregar el comentario');
     }
   };
@@ -150,7 +149,7 @@ export function useVideoData(videoId: string, courseId: string) {
         resources: [...prev.resources, newResource]
       } : null);
     } catch (err) {
-      console.error('Error:', err);
+      console.error('Error adding resource:', err);
       toast.error('Error al agregar el recurso');
     }
   };
@@ -163,4 +162,4 @@ export function useVideoData(videoId: string, courseId: string) {
     addComment,
     addResource,
   };
-} 
+}  

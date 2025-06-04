@@ -35,7 +35,6 @@ export default function EditNotePage({ params }: { params: { id: string } }) {
         setTitle(data.title);
         setContent(data.content);
       } catch (error) {
-        console.error("Error:", error);
         router.push("/dashboard/apuntes");
       } finally {
         setLoading(false);
@@ -67,7 +66,6 @@ export default function EditNotePage({ params }: { params: { id: string } }) {
 
       router.push("/dashboard/apuntes");
     } catch (error) {
-      console.error("Error:", error);
     } finally {
       setSaving(false);
     }
@@ -140,4 +138,4 @@ export default function EditNotePage({ params }: { params: { id: string } }) {
       </div>
     </div>
   );
-} 
+}  

@@ -13,7 +13,6 @@ async function handleTokenRequest() {
   const apiKey = process.env.ABLY_API_KEY;
   
   if (!apiKey) {
-    console.error("ABLY_API_KEY is not set in environment variables");
     return NextResponse.json(
       { error: "Ably API key is not configured" },
       { status: 500 }
@@ -34,10 +33,9 @@ async function handleTokenRequest() {
 
     return NextResponse.json(tokenRequestData);
   } catch (error) {
-    console.error("Error creating Ably token:", error);
     return NextResponse.json(
       { error: "Error creating token request" },
       { status: 500 }
     );
   }
-} 
+}  

@@ -39,10 +39,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ answer });
   } catch (error) {
-    console.error("Error al procesar la pregunta con DeepSeek:", error);
+    console.error("Error processing DeepSeek question:", error);
     return NextResponse.json(
       { error: "Error al procesar la pregunta" },
       { status: 500 }
     );
   }
-} 
+}  

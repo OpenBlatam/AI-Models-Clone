@@ -54,7 +54,6 @@ export default function VideoComments({ videoId, courseId }: VideoCommentsProps)
       setNewComment("");
       toast.success("Comentario publicado");
     } catch (error) {
-      console.error("Error:", error);
       toast.error("Error al publicar el comentario");
     }
   };
@@ -73,7 +72,6 @@ export default function VideoComments({ videoId, courseId }: VideoCommentsProps)
       setReplyingTo(null);
       toast.success("Respuesta publicada");
     } catch (error) {
-      console.error("Error:", error);
       toast.error("Error al publicar la respuesta");
     }
   };
@@ -103,7 +101,6 @@ export default function VideoComments({ videoId, courseId }: VideoCommentsProps)
           : comment
       );
     } catch (error) {
-      console.error("Error:", error);
       toast.error("Error al dar me gusta");
     }
   };
@@ -300,4 +297,4 @@ export default function VideoComments({ videoId, courseId }: VideoCommentsProps)
       </div>
     </div>
   );
-} 
+}  

@@ -64,7 +64,10 @@ export function ChatLayout({ children }: { children: React.ReactNode }) {
       const data = await response.json();
       setMessages((prev) => [...prev, data]);
     } catch (error) {
-      console.error("Error:", error);
+      setMessages((prev) => [...prev, { 
+        role: "assistant", 
+        content: "Lo siento, hubo un error al procesar tu mensaje. Por favor, inténtalo de nuevo." 
+      }]);
     } finally {
       setIsLoading(false);
     }
@@ -173,4 +176,4 @@ export function ChatLayout({ children }: { children: React.ReactNode }) {
       )}
     </div>
   );
-} 
+}  

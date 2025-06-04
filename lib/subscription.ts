@@ -1,5 +1,3 @@
-// @ts-nocheck
-// TODO: Fix this when we turn strict mode on.
 import { pricingData } from "@/config/subscriptions";
 import { prisma } from "@/lib/db";
 import { stripe } from "@/lib/stripe";
@@ -8,7 +6,7 @@ import { UserSubscriptionPlan } from "types";
 export async function getUserSubscriptionPlan(
   userId: string
 ): Promise<UserSubscriptionPlan> {
-  if(!userId) {
+  if (!userId) {
     return {
       ...pricingData[0],
       stripeCustomerId: null,
@@ -31,7 +29,7 @@ export async function getUserSubscriptionPlan(
       stripeCustomerId: true,
       stripePriceId: true,
     },
-  })
+  });
 
   if (!user) {
     return {
@@ -56,7 +54,7 @@ export async function getUserSubscriptionPlan(
     pricingData.find((plan) => plan.stripeIds.monthly === user.stripePriceId) ||
     pricingData.find((plan) => plan.stripeIds.yearly === user.stripePriceId);
 
-  const plan = isPaid && userPlan ? userPlan : pricingData[0]
+  const plan = isPaid && userPlan ? userPlan : pricingData[0];
 
   const interval = isPaid
     ? userPlan?.stripeIds.monthly === user.stripePriceId
@@ -70,8 +68,8 @@ export async function getUserSubscriptionPlan(
   if (isPaid && user.stripeSubscriptionId) {
     const stripePlan = await stripe.subscriptions.retrieve(
       user.stripeSubscriptionId
-    )
-    isCanceled = stripePlan.cancel_at_period_end
+    );
+    isCanceled = stripePlan.cancel_at_period_end;
   }
 
   return {
@@ -80,6 +78,6 @@ export async function getUserSubscriptionPlan(
     stripeCurrentPeriodEnd: user.stripeCurrentPeriodEnd?.getTime(),
     isPaid,
     interval,
-    isCanceled
-  }
+    isCanceled,
+  };
 }

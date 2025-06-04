@@ -110,7 +110,6 @@ export default function GoogleCalendar({ calendarId = 'primary', height = '800px
           setEvents([...formattedEvents, ...zoomEvents]);
         }
       } catch (error) {
-        console.error('Error loading calendar events:', error);
         toast.error('Error al cargar los eventos de Google Calendar');
       }
     };
@@ -274,7 +273,6 @@ export default function GoogleCalendar({ calendarId = 'primary', height = '800px
           toast.error('Error al conectar con Google Calendar');
         }
       } catch (error) {
-        console.error('Error connecting to Google Calendar:', error);
         toast.error('Error al conectar con Google Calendar');
       }
     } else {
@@ -289,7 +287,6 @@ export default function GoogleCalendar({ calendarId = 'primary', height = '800px
           toast.error('Error al desconectar de Google Calendar');
         }
       } catch (error) {
-        console.error('Error disconnecting from Google Calendar:', error);
         toast.error('Error al desconectar de Google Calendar');
       }
     }
@@ -460,10 +457,8 @@ export default function GoogleCalendar({ calendarId = 'primary', height = '800px
               setIsModalOpen(true);
             }}
             eventDrop={(info) => {
-              console.log('Evento movido:', info.event.title);
             }}
             eventResize={(info) => {
-              console.log('Evento redimensionado:', info.event.title);
             }}
             select={(info) => {
               setSelectedEvent(null);
@@ -582,4 +577,4 @@ export default function GoogleCalendar({ calendarId = 'primary', height = '800px
       </Popover>
     );
   }
-} 
+}  

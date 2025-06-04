@@ -51,7 +51,6 @@ const InteractiveTTSPanel: React.FC = () => {
 
   useEffect(() => {
     if (!LIVEKIT_URL || !TEMP_TOKEN || TEMP_TOKEN === 'tu_token_temporal_aqui') {
-      console.warn("LiveKit URL or temporary token not set properly for demo.");
       return;
     }
 
@@ -79,7 +78,6 @@ const InteractiveTTSPanel: React.FC = () => {
         setParticipants(Array.from(newRoom.remoteParticipants.values()));
         setRoom(newRoom);
       } catch (error) {
-        console.error('Failed to connect to LiveKit room:', error);
       }
     };
 
@@ -123,7 +121,6 @@ const InteractiveTTSPanel: React.FC = () => {
         };
       }
     } catch (err: any) {
-      console.error('Error al sintetizar voz:', err);
       setTtsError(err.message || 'Fallo al sintetizar la voz.');
     } finally {
       setIsLoadingTTS(false);

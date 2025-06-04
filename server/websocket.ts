@@ -7,4 +7,6 @@ wss.on('connection', (ws, req) => {
   setupWSConnection(ws, req);
 });
 
-console.log('WebSocket server running on ws://localhost:1234'); 
+if (process.env.NODE_ENV !== 'production') {
+  console.log('WebSocket server running on ws://localhost:1234');
+}   

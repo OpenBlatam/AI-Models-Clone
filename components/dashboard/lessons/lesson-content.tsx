@@ -56,7 +56,6 @@ export function LessonContent({ lesson, onComplete }: LessonContentProps) {
       router.refresh();
       onComplete();
     } catch (error) {
-      console.error('Error:', error);
       toast({
         title: "Error",
         description: "Hubo un problema al completar la lección. Por favor, intenta de nuevo.",
@@ -89,4 +88,4 @@ export function LessonContent({ lesson, onComplete }: LessonContentProps) {
       onStartExercises={handleStartExercises}
     />
   );
-} 
+}  

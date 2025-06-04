@@ -326,7 +326,6 @@ async function LessonsData() {
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.id) {
-      console.error("No valid session or user ID found");
       return redirect("/login");
     }
 
@@ -339,7 +338,6 @@ async function LessonsData() {
 
     // If user doesn't exist, create them
     if (!user) {
-      console.log("Creating new user in database");
       user = await prisma.user.create({
         data: {
           id: userId,
@@ -365,7 +363,6 @@ async function LessonsData() {
         update: {},
       });
     } catch (error) {
-      console.error("Error fetching user progress:", error);
       return redirect("/login");
     }
 
@@ -399,7 +396,7 @@ async function LessonsData() {
             };
           }
         } catch (error) {
-          console.error('Error parsing lesson content:', error);
+          // Skip invalid lesson content
         }
       }
 
@@ -421,7 +418,6 @@ async function LessonsData() {
       </div>
     );
   } catch (error) {
-    console.error("Error in LessonsData:", error);
     return redirect("/login");
   }
 }
@@ -432,4 +428,4 @@ export default function LessonsPage() {
       <LessonsData />
     </Suspense>
   );
-} 
+}  

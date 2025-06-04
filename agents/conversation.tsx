@@ -5,10 +5,10 @@ import { useCallback } from 'react';
 
 export function Conversation() {
   const conversation = useConversation({
-    onConnect: () => console.log('Connected'),
-    onDisconnect: () => console.log('Disconnected'),
-    onMessage: (message) => console.log('Message:', message),
-    onError: (error) => console.error('Error:', error),
+    onConnect: () => {},
+    onDisconnect: () => {},
+    onMessage: (message) => {},
+    onError: (error) => console.error('Conversation error:', error),
   });
 
 

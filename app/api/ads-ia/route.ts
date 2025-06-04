@@ -7,7 +7,6 @@ export const runtime = "edge";
 
 // Validate OpenAI configuration
 if (!process.env.OPENAI_API_KEY) {
-  console.error("OPENAI_API_KEY is not configured");
 }
 
 const DUMMY_BRAND_KIT = `1. PALETA DE COLORES:
@@ -61,15 +60,12 @@ export async function POST(req: NextRequest) {
     let scrapingOk = false;
 
     try {
-      console.log('Fetching URL:', url);
       const { data } = await axios.get(url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         },
         timeout: 10000 // 10 second timeout
       });
-      
-      console.log('Parsing HTML with cheerio');
       const $ = cheerio.load(data);
       
       // Extract brand elements
@@ -106,13 +102,7 @@ export async function POST(req: NextRequest) {
         .filter(Boolean)
         .join(' | ');
 
-      console.log('Extracted content length:', extracted.length);
-      console.log('Found brand elements:', {
-        colors: brandElements.colors.length,
-        fonts: brandElements.fonts.length,
-        logos: brandElements.logos.length,
-        taglines: brandElements.taglines.length
-      });
+
 
       scrapingOk = !!extracted && extracted.length > 10;
 
@@ -129,10 +119,6 @@ export async function POST(req: NextRequest) {
         prompt = `No se pudo extraer contenido de la web (${url}). Genera un brand kit genérico para una marca tecnológica moderna.`;
       }
       try {
-        console.log('Sending request to OpenAI for brand kit');
-        console.log('Content length:', extracted.length);
-        console.log('First 100 chars:', extracted.slice(0, 100));
-
         const completion = await openai.chat.completions.create({
           model: "gpt-3.5-turbo",
           messages: [
@@ -143,11 +129,7 @@ export async function POST(req: NextRequest) {
           temperature: 0.7,
         });
 
-        console.log('Received response from OpenAI');
-        console.log('Response status:', completion.choices[0]?.finish_reason);
-        
         const brandKit = completion.choices[0]?.message?.content || "";
-        console.log('Raw response length:', brandKit.length);
         
         if (!brandKit || brandKit.length < 30) {
           // fallback dummy
@@ -164,10 +146,6 @@ export async function POST(req: NextRequest) {
       const prompt = `Eres un experto en marketing digital. A partir del siguiente contenido extraído de una web, genera 3 anuncios atractivos para redes sociales (Facebook, Instagram, Google Ads). Los anuncios deben ser concisos, persuasivos y adaptados a cada plataforma. Devuelve solo los textos de los anuncios, separados por saltos de línea.\n\nContenido extraído:\n${extracted}`;
 
       try {
-        console.log('Sending request to OpenAI for ads');
-        console.log('Content length:', extracted.length);
-        console.log('First 100 chars:', extracted.slice(0, 100));
-
         const completion = await openai.chat.completions.create({
           model: "gpt-3.5-turbo",
           messages: [
@@ -181,18 +159,13 @@ export async function POST(req: NextRequest) {
           temperature: 0.8,
         });
 
-        console.log('Received response from OpenAI');
-        console.log('Response status:', completion.choices[0]?.finish_reason);
-        
         const adsRaw = completion.choices[0]?.message?.content || "";
-        console.log('Raw response:', adsRaw);
         
         if (!adsRaw) {
           throw new Error("No se pudo generar ningún anuncio");
         }
 
         const ads = adsRaw.split(/\n+/).filter(Boolean);
-        console.log('Processed ads:', ads);
 
         if (!ads.length) {
           throw new Error("No se pudieron generar anuncios válidos");
@@ -200,13 +173,6 @@ export async function POST(req: NextRequest) {
 
         return NextResponse.json({ ads });
       } catch (openaiError: any) {
-        console.error('Error con OpenAI:', openaiError);
-        console.error('Error details:', {
-          message: openaiError.message,
-          code: openaiError.code,
-          type: openaiError.type,
-          status: openaiError.status
-        });
         
         return NextResponse.json(
           { 
@@ -222,4 +188,4 @@ export async function POST(req: NextRequest) {
     console.error('Error stack:', e.stack);
     return NextResponse.json({ brandKit: DUMMY_BRAND_KIT, fallback: true, error: "Error general", details: e.message }, { status: 200 });
   }
-} 
+}  

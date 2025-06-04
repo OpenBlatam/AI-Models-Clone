@@ -698,8 +698,6 @@ def validate_persona_tools(tools: list[Tool]) -> None:
             )
 
 
-# TODO: since this gets called with every chat message, could it be more efficient to pregenerate
-# a direct mapping indicating whether a user has access to a specific persona?
 def get_persona_by_id(
     persona_id: int,
     # if user is `None` assume the user is an admin or auth is disabled

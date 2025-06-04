@@ -43,7 +43,7 @@ export function Chat() {
       const data = await response.json();
       setMessages((prev) => [...prev, data]);
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Chat API error:", error);
       // You might want to show an error message to the user here
     } finally {
       setIsLoading(false);
@@ -94,4 +94,4 @@ export function Chat() {
       </form>
     </Card>
   );
-} 
+}  

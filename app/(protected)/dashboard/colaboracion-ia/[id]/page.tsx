@@ -113,7 +113,6 @@ export default function EditorPage({ params }: EditorPageProps) {
         yDoc.destroy();
       };
     } catch (error) {
-      console.error('Error initializing editor:', error);
       toast.error('Error al inicializar el editor');
     }
   }, [resolvedParams.id, autoSave]);
@@ -143,7 +142,6 @@ export default function EditorPage({ params }: EditorPageProps) {
         });
         toast.success(`Plantilla "${template.name}" aplicada correctamente`);
       } catch (error) {
-        console.error('Error applying template:', error);
         toast.error('Error al aplicar la plantilla');
       }
     }
@@ -174,7 +172,6 @@ export default function EditorPage({ params }: EditorPageProps) {
                 setEditor(editor);
                 editor.updateInstanceState({ isGridMode: showGrid });
               } catch (error) {
-                console.error('Error mounting editor:', error);
                 toast.error('Error al inicializar el editor');
               }
             }}
@@ -188,4 +185,4 @@ export default function EditorPage({ params }: EditorPageProps) {
       </div>
     </div>
   );
-} 
+}  

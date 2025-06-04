@@ -21,12 +21,6 @@ export const s3Client = new S3Client({
 // Helper function to create safe video URLs
 export const createVideoUrl = (filename: string): string => {
   try {
-    console.log("Creating video URL for filename:", filename);
-    console.log("AWS Configuration:", {
-      region: AWS_REGION,
-      bucketName: S3_VIDEO_BUCKET_NAME,
-    });
-
     // Clean and format the filename to match bucket format
     const cleanFilename = filename
       .trim()
@@ -37,23 +31,9 @@ export const createVideoUrl = (filename: string): string => {
     // Construct the video URL
     const videoUrl = `https://${S3_VIDEO_BUCKET_NAME}.s3.${AWS_REGION}.amazonaws.com/${cleanFilename}.mp4`;
     
-    console.log("Generated video URL:", videoUrl);
     return videoUrl;
   } catch (error) {
     console.error("Error creating video URL:", error);
     return "";
   }
-};
-
-// Log configuration for debugging (client-side only)
-if (typeof window !== 'undefined') {
-  console.log('AWS Client Configuration:', {
-    bucketName: S3_VIDEO_BUCKET_NAME,
-    region: AWS_REGION,
-    bucketUrl: S3_VIDEO_BUCKET_URL,
-    env: {
-      NEXT_PUBLIC_AWS_S3_VIDEO_BUCKET_NAME: process.env.NEXT_PUBLIC_AWS_S3_VIDEO_BUCKET_NAME,
-      NEXT_PUBLIC_AWS_REGION: process.env.NEXT_PUBLIC_AWS_REGION
-    }
-  });
-} 
+}; 

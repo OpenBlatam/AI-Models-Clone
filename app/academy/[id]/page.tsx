@@ -29,7 +29,6 @@ export default function AcademyPage({ params }: AcademyPageProps) {
 
   const handleClassComplete = () => {
     // Aquí implementaremos la lógica para marcar la clase como completada
-    console.log("Clase completada:", selectedClassId);
   };
 
   return (
@@ -100,4 +99,4 @@ export default function AcademyPage({ params }: AcademyPageProps) {
       </div>
     </div>
   );
-} 
+}  

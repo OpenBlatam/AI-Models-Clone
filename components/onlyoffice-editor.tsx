@@ -127,10 +127,8 @@ export default function OnlyOfficeEditor({
         },
         events: {
           onAppReady: () => {
-            console.log("Editor is ready");
           },
           onDocumentStateChange: (event: any) => {
-            console.log("Document state changed:", event);
           },
           onError: (event: any) => {
             console.error("Editor error:", event);
@@ -469,4 +467,4 @@ export default function OnlyOfficeEditor({
       </div>
     </div>
   );
-} 
+}  

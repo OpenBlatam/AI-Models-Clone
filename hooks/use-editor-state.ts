@@ -88,7 +88,6 @@ export function useEditorState(editor: any) {
         toast.success('Diseño guardado correctamente');
       }
     } catch (error) {
-      console.error('Error saving:', error);
       toast.error('Error al guardar el diseño');
     } finally {
       setIsSaving(false);
@@ -164,4 +163,4 @@ export function useEditorState(editor: any) {
       redo: () => editor?.redo(),
     },
   };
-} 
+}  

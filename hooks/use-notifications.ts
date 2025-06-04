@@ -33,7 +33,6 @@ export function useNotifications() {
     } catch (error: any) {
       setNotifications([]);
       setError(error?.message || "Error de red al obtener notificaciones");
-      console.error("Error fetching notifications:", error);
     } finally {
       setIsLoading(false);
     }
@@ -59,7 +58,6 @@ export function useNotifications() {
         );
       }
     } catch (error) {
-      console.error("Error marking notification as read:", error);
     }
   };
 
@@ -70,4 +68,4 @@ export function useNotifications() {
     markAsRead,
     refetch: fetchNotifications,
   };
-} 
+}  

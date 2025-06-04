@@ -131,7 +131,6 @@ export function AudienceModal({
           onClose();
         }}
         onGenerate={(templateId, caption) => {
-          console.log("Template ID:", templateId, "Caption:", caption);
           setShowRefineModal(false);
         }}
         initialCaption=""

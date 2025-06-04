@@ -70,7 +70,7 @@ async function main() {
     }
   });
 
-  console.log("Created lesson:", marketingLesson);
+
 
   // Create 10 basic marketing lessons for the "Principiante" path
   const basicMarketingLessons = [
@@ -325,7 +325,7 @@ async function main() {
     });
   }
 
-  console.log("Created 10 basic marketing lessons");
+
 }
 
 main()
@@ -335,4 +335,4 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
-  }); 
+  });  

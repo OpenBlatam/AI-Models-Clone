@@ -15,13 +15,4 @@ export const S3_CLIENT_BUCKET_NAME = process.env.AWS_S3_CLIENT_BUCKET_NAME!;
 
 // S3 URLs
 export const S3_BUCKET_URL = `https://${S3_BUCKET_NAME}.s3.amazonaws.com`;
-export const S3_CLIENT_BUCKET_URL = `https://${S3_CLIENT_BUCKET_NAME}.s3.amazonaws.com`;
-
-// Log configuration for debugging (client-side only)
-if (typeof window !== 'undefined') {
-  console.log('AWS Client Configuration:', {
-    region: process.env.NEXT_PUBLIC_AWS_REGION,
-    bucketName: process.env.NEXT_PUBLIC_AWS_S3_VIDEO_BUCKET_NAME,
-    bucketUrl: `https://${process.env.NEXT_PUBLIC_AWS_S3_VIDEO_BUCKET_NAME}.s3.amazonaws.com`,
-  });
-} 
+export const S3_CLIENT_BUCKET_URL = `https://${S3_CLIENT_BUCKET_NAME}.s3.amazonaws.com`; 

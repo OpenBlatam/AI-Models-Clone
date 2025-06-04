@@ -34,7 +34,6 @@ export function BlatamAssistant() {
       })
       setApiStatus(result.error ? "error" : "connected")
     } catch (error) {
-      console.error("API Error:", error)
       setApiStatus("error")
     }
   }
@@ -64,7 +63,6 @@ export function BlatamAssistant() {
         toast.error(result.error)
       }
     } catch (error) {
-      console.error("Error getting response:", error)
       toast.error("Error al obtener respuesta")
     } finally {
       setLoading(false)
@@ -184,4 +182,4 @@ export function BlatamAssistant() {
       </Card>
     </>
   );
-} 
+}  

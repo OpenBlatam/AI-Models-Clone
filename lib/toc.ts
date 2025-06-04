@@ -1,15 +1,12 @@
-// @ts-nocheck
-// TODO: Fix this when we turn strict mode on.
-
 import { toc } from "mdast-util-toc"
 import { remark } from "remark"
 import { visit } from "unist-util-visit"
 
 const textTypes = ["text", "emphasis", "strong", "inlineCode"]
 
-function flattenNode(node) {
-  const p = []
-  visit(node, (node) => {
+function flattenNode(node: any): string {
+  const p: string[] = []
+  visit(node, (node: any) => {
     if (!textTypes.includes(node.type)) return
     p.push(node.value)
   })
@@ -26,7 +23,7 @@ interface Items {
   items?: Item[]
 }
 
-function getItems(node, current): Items {
+function getItems(node: any, current: any): Items {
   if (!node) {
     return {}
   }
@@ -63,10 +60,10 @@ function getItems(node, current): Items {
   return {}
 }
 
-const getToc = () => (node, file) => {
+const getToc = () => (node: any, file: any) => {
   const table = toc(node)
   file.data = getItems(table.map, {})
-}
+}</str_str>
 
 export type TableOfContents = Items
 

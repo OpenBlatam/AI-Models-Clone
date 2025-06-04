@@ -51,7 +51,6 @@ export const MetaMaskProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           setIsConnected(true);
         }
       } catch (error) {
-        console.error('Error al verificar la conexión:', error);
       }
     };
 
@@ -112,7 +111,6 @@ export const MetaMaskProvider: React.FC<{ children: React.ReactNode }> = ({ chil
           });
         }
       }
-      console.error('Error al conectar con MetaMask:', error);
     }
   };
 
@@ -152,4 +150,4 @@ export const ConnectWalletButton: React.FC = () => {
       )}
     </Button>
   );
-}; 
+};  

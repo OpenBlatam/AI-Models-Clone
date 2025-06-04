@@ -207,7 +207,6 @@ export function MarketingSimulator() {
         }
       })
     } catch (error) {
-      console.error("Error generating decision:", error)
       toast.error("Error al generar la decisión. Inténtalo de nuevo.")
     }
   }
@@ -391,4 +390,4 @@ export function MarketingSimulator() {
       </div>
     </Card>
   )
-} 
+}  

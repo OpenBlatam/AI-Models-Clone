@@ -29,7 +29,6 @@ export async function generateGameContent(
 ): Promise<GameContent> {
   try {
     if (!process.env.OPENAI_API_KEY || !openai) {
-      console.warn("OpenAI API key not found or OpenAI client not initialized, using fallback content")
       return getFallbackContent(type)
     }
 
@@ -100,7 +99,6 @@ export async function generateGameContent(
           content: parsedResponse
         }
       } catch (error) {
-        console.error("Error parsing AI response:", error)
         return {
           type,
           content: response,
@@ -110,7 +108,6 @@ export async function generateGameContent(
     } catch (error: any) {
       // Handle quota exceeded error
       if (error.code === 'insufficient_quota' || error.type === 'insufficient_quota') {
-        console.warn("OpenAI quota exceeded, using fallback content")
         return {
           type,
           content: getFallbackContent(type).content,
@@ -120,7 +117,6 @@ export async function generateGameContent(
 
       // Handle rate limiting
       if (error.status === 429) {
-        console.warn("OpenAI rate limit exceeded, using fallback content")
         return {
           type,
           content: getFallbackContent(type).content,
@@ -129,7 +125,6 @@ export async function generateGameContent(
       }
 
       // Handle other API errors
-      console.error("OpenAI API error:", error)
       return {
         type,
         content: getFallbackContent(type).content,
@@ -137,7 +132,6 @@ export async function generateGameContent(
       }
     }
   } catch (error) {
-    console.error("Unexpected error in AI service:", error)
     return {
       type,
       content: getFallbackContent(type).content,
@@ -255,4 +249,4 @@ function getFallbackContent(type: GameContentType): GameContent {
         }
       }
   }
-} 
+}  

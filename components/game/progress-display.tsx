@@ -28,7 +28,7 @@ export function ProgressDisplay() {
         const data = await response.json();
         setProgress(data);
       } catch (error) {
-        console.error("Error fetching progress:", error);
+        console.error("Failed to fetch user progress data");
       } finally {
         setLoading(false);
       }
@@ -133,4 +133,4 @@ export function ProgressDisplay() {
       </div>
     </div>
   );
-} 
+}  

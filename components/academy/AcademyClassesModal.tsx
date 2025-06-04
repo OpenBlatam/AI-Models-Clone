@@ -41,7 +41,6 @@ export default function AcademyClassesModal({
         const data = await response.json();
         setClasses(data);
       } catch (error) {
-        console.error("Error fetching classes:", error);
         setError(error instanceof Error ? error.message : "Error al cargar las clases");
       } finally {
         setIsLoading(false);
@@ -167,4 +166,4 @@ export default function AcademyClassesModal({
       </DialogContent>
     </Dialog>
   );
-} 
+}  
