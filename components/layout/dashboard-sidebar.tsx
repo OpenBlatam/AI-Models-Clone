@@ -242,17 +242,6 @@ export function DashboardSidebar({ links }: DashboardSidebarProps) {
                     })}
                   </section>
                 ))}
-
-                {/* Add Collaboration Section */}
-                <section className="flex flex-col gap-0.5">
-                  {isSidebarExpanded ? (
-                    <p className="text-xs text-muted-foreground">
-                      Collaboration
-                    </p>
-                  ) : (
-                    <div className="h-4" />
-                  )}
-                </section>
               </nav>
 
               <div className="mt-auto xl:p-4">

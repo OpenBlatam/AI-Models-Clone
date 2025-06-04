@@ -8,6 +8,7 @@ import {
   MobileSheetSidebar,
 } from "@/components/layout/dashboard-sidebar";
 import { ModeToggle } from "@/components/layout/mode-toggle";
+import { NotificationBell } from "@/components/layout/notification-bell";
 import { UserAccountNav } from "@/components/layout/user-account-nav";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 
@@ -41,6 +42,7 @@ export default async function Dashboard({ children }: ProtectedLayoutProps) {
             </div>
 
             <div className="flex items-center gap-2">
+              <NotificationBell />
               <ModeToggle />
               <UserAccountNav />
             </div>
