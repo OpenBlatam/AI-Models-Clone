@@ -46,7 +46,7 @@ export function VideoUploadModal({ open, onClose, recording, videoURL, videoRef,
       onUploadComplete(videoUrl);
       onClose();
     } catch (error) {
-      console.error('Error uploading video:', error);
+
       toast.error('Error al subir el video');
     } finally {
       setIsUploading(false);
@@ -79,4 +79,4 @@ export function VideoUploadModal({ open, onClose, recording, videoURL, videoRef,
       </DialogContent>
     </Dialog>
   );
-} 
+}   

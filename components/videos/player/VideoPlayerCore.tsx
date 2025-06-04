@@ -58,7 +58,6 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
 
   useEffect(() => {
     if (videoRef.current) {
-      console.log("Loading new video URL:", videoUrl);
       setIsLoading(true);
       setError(null);
       videoRef.current.load();
@@ -69,15 +68,11 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
     const video = videoRef.current;
     if (!video) return;
 
-    console.log("Setting up video event listeners");
-
     const handleLoadStart = () => {
-      console.log("Video load started");
       setIsLoading(true);
     };
 
     const handleLoadedData = () => {
-      console.log("Video data loaded");
       setIsLoading(false);
     };
 
@@ -88,12 +83,10 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
     };
 
     const handleDurationChange = () => {
-      console.log("Duration changed:", video.duration);
       setDuration(video.duration);
     };
 
     const handleEnded = () => {
-      console.log("Video ended");
       setIsPlaying(false);
       isPlayRequestedRef.current = false;
       onEnded?.();
@@ -103,7 +96,7 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
       const videoElement = e.target as HTMLVideoElement;
       const error = videoElement.error;
       
-      console.error("Video error:", error);
+
       
       let errorMessage = "Error al cargar el video. Por favor, intenta de nuevo.";
       
@@ -134,17 +127,14 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
     };
 
     const handleCanPlay = async () => {
-      console.log("Video can play");
       setIsLoading(false);
       if (autoPlay && !isPlayRequestedRef.current) {
         try {
-          console.log("Attempting autoplay");
           isPlayRequestedRef.current = true;
           await video.play();
           setIsPlaying(true);
-          console.log("Autoplay successful");
         } catch (error) {
-          console.error("Error playing video:", error);
+
           setError("Error al iniciar la reproducción. Por favor, intenta de nuevo.");
           setIsPlaying(false);
         } finally {
@@ -154,12 +144,10 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
     };
 
     const handleWaiting = () => {
-      console.log("Video is waiting for data");
       setIsLoading(true);
     };
 
     const handlePlaying = () => {
-      console.log("Video is playing");
       setIsLoading(false);
     };
 
@@ -174,7 +162,6 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
     video.addEventListener("playing", handlePlaying);
 
     return () => {
-      console.log("Cleaning up video event listeners");
       video.removeEventListener("loadstart", handleLoadStart);
       video.removeEventListener("loadeddata", handleLoadedData);
       video.removeEventListener("timeupdate", handleTimeUpdate);
@@ -221,7 +208,6 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
         setIsPlaying(true);
       }
     } catch (error) {
-      console.error("Error toggling play state:", error);
       setIsPlaying(false);
     } finally {
       isPlayRequestedRef.current = false;
@@ -543,4 +529,4 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
   );
 };
 
-export default VideoPlayerCore; 
+export default VideoPlayerCore;     
