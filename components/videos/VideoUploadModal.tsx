@@ -78,4 +78,4 @@ export function VideoUploadModal({ open, onClose, recording, videoURL, videoRef,
       </DialogContent>
     </Dialog>
   );
-}  
+}

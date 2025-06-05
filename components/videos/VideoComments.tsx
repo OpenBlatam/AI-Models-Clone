@@ -297,4 +297,4 @@ export default function VideoComments({ videoId, courseId }: VideoCommentsProps)
       </div>
     </div>
   );
-}  
+}

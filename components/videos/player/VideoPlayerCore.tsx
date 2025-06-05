@@ -96,7 +96,7 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
       const videoElement = e.target as HTMLVideoElement;
       const error = videoElement.error;
       
-      console.error("Video error:", error);
+
       
       let errorMessage = "Error al cargar el video. Por favor, intenta de nuevo.";
       
@@ -134,7 +134,7 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
           await video.play();
           setIsPlaying(true);
         } catch (error) {
-          console.error("Error playing video:", error);
+
           setError("Error al iniciar la reproducción. Por favor, intenta de nuevo.");
           setIsPlaying(false);
         } finally {
@@ -162,7 +162,6 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
     video.addEventListener("playing", handlePlaying);
 
     return () => {
-      console.log("Cleaning up video event listeners");
       video.removeEventListener("loadstart", handleLoadStart);
       video.removeEventListener("loadeddata", handleLoadedData);
       video.removeEventListener("timeupdate", handleTimeUpdate);
@@ -209,7 +208,6 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
         setIsPlaying(true);
       }
     } catch (error) {
-      console.error("Error toggling play state:", error);
       setIsPlaying(false);
     } finally {
       isPlayRequestedRef.current = false;
@@ -531,4 +529,4 @@ const VideoPlayerCore: React.FC<VideoPlayerCoreProps> = ({
   );
 };
 
-export default VideoPlayerCore;  
+export default VideoPlayerCore;
