@@ -9,14 +9,14 @@ SERVICE_NAME="blatam-service"
 MIN_CAPACITY=2
 MAX_CAPACITY=20
 DESIRED_CAPACITY=2
-VPC_ID="vpc-xxxxx"  # Reemplazar con tu VPC ID
-SUBNET_IDS="subnet-xxxxx,subnet-yyyyy"  # Reemplazar con tus subnet IDs
+VPC_ID="vpc-03e5c5c0e0c917b81"
+SUBNET_IDS="subnet-03512b444b7165046,subnet-001b17eae6a6cd3fa"
 
 # Crear Application Load Balancer
 ALB_ARN=$(aws elbv2 create-load-balancer \
   --name blatam-alb \
-  --subnets ${SUBNET_IDS} \
-  --security-groups sg-xxxxx \
+  --subnets ${SUBNET_IDS//,/ } \
+  --security-groups sg-03cbfa32324f3766c \
   --scheme internet-facing \
   --type application \
   --query 'LoadBalancers[0].LoadBalancerArn' \
@@ -37,30 +37,13 @@ TARGET_GROUP_ARN=$(aws elbv2 create-target-group \
   --query 'TargetGroups[0].TargetGroupArn' \
   --output text)
 
-# Crear listener
+# Crear listener HTTP
 aws elbv2 create-listener \
   --load-balancer-arn ${ALB_ARN} \
-  --protocol HTTPS \
-  --port 443 \
-  --certificates CertificateArn=arn:aws:acm:${AWS_REGION}:${AWS_ACCOUNT_ID}:certificate/xxxxx \
+  --protocol HTTP \
+  --port 80 \
   --default-actions Type=forward,TargetGroupArn=${TARGET_GROUP_ARN}
 
-# Crear ElastiCache Redis
-REDIS_ENDPOINT=$(aws elasticache create-replication-group \
-  --replication-group-id blatam-redis \
-  --replication-group-description "Redis cache for Blatam Academy" \
-  --engine redis \
-  --cache-node-type cache.t3.micro \
-  --num-cache-clusters 2 \
-  --automatic-failover-enabled \
-  --query 'ReplicationGroup.PrimaryEndPoint.Address' \
-  --output text)
-
-# Crear CloudFront distribution
-CLOUDFRONT_DOMAIN=$(aws cloudfront create-distribution \
-  --cli-input-json file://cloudfront-config.json \
-  --query 'Distribution.DomainName' \
-  --output text)
 
 # Crear repositorio ECR
 aws ecr describe-repositories --repository-names ${ECR_REPOSITORY} || \
@@ -84,17 +67,11 @@ TASK_DEFINITION=$(aws ecs register-task-definition \
   --query 'taskDefinition.taskDefinitionArn' \
   --output text)
 
-# Crear servicio con auto-scaling
-aws ecs create-service \
+aws ecs update-service \
   --cluster ${CLUSTER_NAME} \
-  --service-name ${SERVICE_NAME} \
-  --task-definition ${TASK_DEFINITION} \
-  --desired-count ${DESIRED_CAPACITY} \
-  --launch-type FARGATE \
-  --network-configuration "awsvpcConfiguration={subnets=[${SUBNET_IDS}],securityGroups=[sg-xxxxx],assignPublicIp=ENABLED}" \
+  --service ${SERVICE_NAME} \
   --load-balancers "targetGroupArn=${TARGET_GROUP_ARN},containerName=blatam-academy,containerPort=3000" \
-  --deployment-configuration "maximumPercent=200,minimumHealthyPercent=100" \
-  --enable-execute-command
+  --network-configuration "awsvpcConfiguration={subnets=[${SUBNET_IDS}],securityGroups=[sg-03cbfa32324f3766c],assignPublicIp=ENABLED}"
 
 # Configurar auto-scaling
 aws application-autoscaling register-scalable-target \
@@ -150,5 +127,11 @@ aws application-autoscaling put-scaling-policy \
     "ScaleOutCooldown": 300
   }'
 
+ALB_DNS=$(aws elbv2 describe-load-balancers --load-balancer-arns ${ALB_ARN} --query 'LoadBalancers[0].DNSName' --output text)
+
 echo "Despliegue completado. La aplicación estará disponible en:"
-echo "https://${CLOUDFRONT_DOMAIN}" 
+echo "http://${ALB_DNS}"
+echo ""
+echo "Para HostGator, crear registro CNAME:"
+echo "  Nombre: blatam.org (o www.blatam.org)"
+echo "  Valor: ${ALB_DNS}"       
