@@ -52,8 +52,8 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
-# Install runtime dependencies for Prisma
-RUN apk add --no-cache openssl
+# Install runtime dependencies for Prisma and health checks
+RUN apk add --no-cache openssl curl
 
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/node_modules ./node_modules
@@ -62,4 +62,4 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3000
-CMD ["npm", "start"]          
+CMD ["npm", "start"]            
