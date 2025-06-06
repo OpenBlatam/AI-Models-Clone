@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Configuración
-AWS_REGION="us-east-1"  # Cambia esto a tu región preferida
+AWS_REGION="us-east-1"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ECR_REPOSITORY="blatam-academy"
 CLUSTER_NAME="blatam-cluster"
@@ -31,9 +31,11 @@ docker push ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITO
 aws ecs describe-clusters --clusters ${CLUSTER_NAME} || \
 aws ecs create-cluster --cluster-name ${CLUSTER_NAME}
 
+./update-task-definition.sh
+
 # Registrar la definición de tarea
 TASK_DEFINITION=$(aws ecs register-task-definition \
-  --cli-input-json file://aws-task-definition.json \
+  --cli-input-json file://aws-task-definition-updated.json \
   --query 'taskDefinition.taskDefinitionArn' \
   --output text)
 
@@ -45,7 +47,7 @@ aws ecs create-service \
   --task-definition ${TASK_DEFINITION} \
   --desired-count ${DESIRED_CAPACITY} \
   --launch-type FARGATE \
-  --network-configuration "awsvpcConfiguration={subnets=[subnet-xxxxx],securityGroups=[sg-xxxxx],assignPublicIp=ENABLED}" \
+  --network-configuration "awsvpcConfiguration={subnets=[subnet-03512b444b7165046,subnet-001b17eae6a6cd3fa],securityGroups=[sg-03cbfa32324f3766c],assignPublicIp=ENABLED}" \
   --deployment-configuration "maximumPercent=200,minimumHealthyPercent=100" \
   --enable-execute-command
 
@@ -95,4 +97,4 @@ echo "https://blatam-academy.${AWS_REGION}.elasticbeanstalk.com"
 EC2_USER=ec2-user
 EC2_HOST=ec2-18-206-225-74.compute-1.amazonaws.com
 KEY_PATH=/Users/adan/blatam.pem   # <-- Cambia esto si tu llave está en otra ruta
-PROJECT_DIR=next-saas-stripe-starter 
+PROJECT_DIR=next-saas-stripe-starter    
