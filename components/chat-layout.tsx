@@ -79,7 +79,7 @@ const HeaderText = () => {
       style={textAnimation}
       className="header-text"
     >
-      Blatam
+      iAcademy
       <animated.span style={heartAnimation} className="heart-icon">
         🤍
       </animated.span>
@@ -506,6 +506,8 @@ export function ChatLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-screen">
       <style>{waveStyles}</style>
+      {/* Header global IAcademy */}
+      {/* Header eliminado, solo queda el de la página principal */}
       {children}
       
       {/* Botón de Chat */}

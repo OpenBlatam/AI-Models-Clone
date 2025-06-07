@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { fontGeist, fontHeading, fontSans, fontUrban } from "@/assets/fonts";
 import { cn, constructMetadata } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -12,8 +11,6 @@ import { AuthProvider } from "@/components/auth-provider";
 import { ThemeProvider } from "next-themes";
 import { MetaMaskProvider } from "@/components/web3/MetaMaskProvider";
 import { AblySpacesProvider } from "@/components/providers/ably-provider";
-
-const inter = Inter({ subsets: ["latin"] });
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -30,12 +27,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-screen bg-white font-sans antialiased",
           fontSans.variable,
           fontUrban.variable,
           fontHeading.variable,
-          fontGeist.variable,
-          inter.className,
+          fontGeist.variable
         )}
         suppressHydrationWarning
       >
