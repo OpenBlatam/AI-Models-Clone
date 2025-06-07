@@ -13,6 +13,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSpring, animated } from "@react-spring/web";
 import { useInView } from "react-intersection-observer";
+import Link from "next/link";
 
 interface Message {
   role: "user" | "assistant";

@@ -21,6 +21,8 @@ const companyLogos = [
 ];
 
 export default function HomePage() {
+  const [isProfileOpen, setIsProfileOpen] = React.useState(false);
+
   return (
     <>
       {/* Modern Navbar Header SOLO en la página principal */}
@@ -30,36 +32,86 @@ export default function HomePage() {
         </Link>
         <nav className="hidden md:flex gap-10 mx-auto">
           {[
-            { href: "/pricing", label: "Pricing" },
-            { href: "/features", label: "Features" },
-            { href: "/enterprise", label: "Enterprise" },
-            { href: "/blog", label: "Blog" },
-            { href: "/forum", label: "Forum" },
-            { href: "/careers", label: "Careers" },
+            { href: "/juegos", label: "Juegos" },
+            { href: "/mkt-ia", label: "MKT IA" },
+            { href: "/colab-ia", label: "Colab IA" },
+            { href: "/ads-ia", label: "ADS IA" },
+            { href: "/logros", label: "Logros" },
           ].map(link => (
             <Link
               key={link.href}
               href={link.href}
-              className="relative text-gray-700 font-semibold hover:text-[#FFD700] transition-colors px-2 py-1 border-b-2 border-transparent hover:border-[#FFD700]"
+              className="text-black hover:text-[#A259FF] transition-colors font-medium"
             >
               {link.label}
             </Link>
           ))}
         </nav>
-        <div className="hidden md:block h-8 w-px bg-[#E3D6FF] mx-4" />
-        <div className="flex gap-2">
-          <button
-            className="px-6 py-2 rounded-full border-2 border-[#E3D6FF] bg-white text-black font-bold uppercase tracking-widest hover:bg-[#F3F7FF] hover:text-[#A259FF] transition"
-            onClick={() => window.location.href = "/login"}
+        <div className="flex items-center gap-6">
+          <Link
+            href="/login"
+            className="hidden md:block text-black hover:text-[#A259FF] transition-colors font-medium"
           >
-            Sign in
-          </button>
-          <button
-            className="px-6 py-2 rounded-full border-2 border-black bg-white text-black font-bold uppercase tracking-widest hover:bg-black hover:text-white transition"
-            onClick={() => signIn("google")}
+            Iniciar Sesión
+          </Link>
+          <Link
+            href="/register"
+            className="hidden md:block px-6 py-2 bg-black text-white rounded-full hover:bg-[#A259FF] transition-colors font-medium"
           >
-            Sign up
-          </button>
+            Registrarse
+          </Link>
+
+          <div className="relative">
+            <button
+              onClick={() => setIsProfileOpen(!isProfileOpen)}
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-[#FFD6E3] to-[#E3D6FF] flex items-center justify-center">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <path d="M20 21V19C20 17.9391 19.5786 16.9217 18.8284 16.1716C18.0783 15.4214 17.0609 15 16 15H8C6.93913 15 5.92172 15.4214 5.17157 16.1716C4.42143 16.9217 4 17.9391 4 19V21"/>
+                  <path d="M12 11C14.2091 11 16 9.20914 16 7C16 4.79086 14.2091 3 12 3C9.79086 3 8 4.79086 8 7C8 9.20914 9.79086 11 12 11Z"/>
+                </svg>
+              </div>
+            </button>
+            {isProfileOpen && (
+              <div className="absolute right-0 mt-4 w-80 bg-white text-black rounded-2xl shadow-2xl border-4 border-[#E3D6FF] py-6 z-50" style={{boxShadow: '0 8px 40px 0 #E3D6FF66'}}>
+                <div className="px-8 py-5 border-b-2 border-[#E3D6FF]">
+                  <p className="text-base text-[#6B6B8D]">Bienvenido a</p>
+                  <p className="font-bold text-2xl text-black">Tu Cuenta</p>
+                </div>
+                <nav className="px-4 py-4">
+                  {[
+                    { href: "/dashboard", label: "Dashboard", icon: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" },
+                    { href: "/settings", label: "Configuración", icon: "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" },
+                    { href: "/billing", label: "Facturación", icon: "M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" },
+                  ].map(link => (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      className="flex items-center gap-4 px-5 py-4 text-black hover:bg-[#FFD6E3] rounded-xl transition-colors duration-200 mb-2 font-semibold text-lg"
+                    >
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#A259FF" strokeWidth="2">
+                        <path d={link.icon}/>
+                      </svg>
+                      {link.label}
+                    </Link>
+                  ))}
+                </nav>
+                <div className="border-t-2 border-[#E3D6FF] mx-4 my-2"></div>
+                <div className="px-4 py-4">
+                  <button
+                    onClick={() => {/* Add sign out logic */}}
+                    className="w-full flex items-center justify-center gap-3 px-5 py-4 text-red-600 hover:bg-[#FFD6E3] rounded-xl transition-colors duration-200 font-semibold text-lg"
+                  >
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#A259FF" strokeWidth="2">
+                      <path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                    </svg>
+                    Cerrar Sesión
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </header>
       <main className="min-h-screen flex flex-col items-center justify-center px-4 py-20 w-full" style={{background: 'linear-gradient(135deg, #F3F7FF 0%, #E3D6FF 100%)'}}>
@@ -121,10 +173,42 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Sección editorial Vogue */}
-        <section className="w-full bg-black text-white py-24 px-8 text-center my-24 rounded-3xl">
-          <h2 className="text-7xl font-serif italic font-extrabold mb-8 tracking-tight">Unleash Your Creativity</h2>
-          <p className="text-2xl font-light max-w-3xl mx-auto">Vogue-level marketing for brands that want to stand out. <span className="text-[#FFD700] font-bold">Luxury. Editorial. Impact.</span></p>
+        {/* Sección de Logros */}
+        <section className="w-full bg-white py-24 px-8 text-center my-24 rounded-3xl border-2 border-[#E3D6FF]" style={{ boxShadow: '0 2px 8px 0 #FFD70011' }}>
+          <h2 className="text-7xl font-serif italic font-extrabold mb-16 tracking-tight text-black">Nuestros Logros</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto">
+            <div className="flex flex-col items-center">
+              <div className="w-20 h-20 rounded-full bg-[#F3F7FF] flex items-center justify-center mb-6">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 12.91L18.18 21L12 17.27L5.82 21L7 12.91L2 9.27L8.91 8.26L12 2Z"/>
+                </svg>
+              </div>
+              <h3 className="text-3xl font-bold mb-4 text-black">10K+</h3>
+              <p className="text-xl text-neutral-700 font-light">Estudiantes formados en IA</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-20 h-20 rounded-full bg-[#F3F7FF] flex items-center justify-center mb-6">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2">
+                  <path d="M17 21V19C17 17.9391 16.5786 16.9217 15.8284 16.1716C15.0783 15.4214 14.0609 15 13 15H5C3.93913 15 2.92172 15.4214 2.17157 16.1716C1.42143 16.9217 1 17.9391 1 19V21"/>
+                  <path d="M9 11C11.2091 11 13 9.20914 13 7C13 4.79086 11.2091 3 9 3C6.79086 3 5 4.79086 5 7C5 9.20914 6.79086 11 9 11Z"/>
+                  <path d="M23 21V19C22.9993 18.1137 22.7044 17.2528 22.1614 16.5523C21.6184 15.8519 20.8581 15.3516 20 15.13"/>
+                  <path d="M16 3.13C16.8604 3.35031 17.623 3.85071 18.1676 4.55232C18.7122 5.25392 19.0078 6.11683 19.0078 7.005C19.0078 7.89318 18.7122 8.75608 18.1676 9.45769C17.623 10.1593 16.8604 10.6597 16 10.88"/>
+                </svg>
+              </div>
+              <h3 className="text-3xl font-bold mb-4 text-black">3K+</h3>
+              <p className="text-xl text-neutral-700 font-light">Empresas confían en nosotros</p>
+            </div>
+            <div className="flex flex-col items-center">
+              <div className="w-20 h-20 rounded-full bg-[#F3F7FF] flex items-center justify-center mb-6">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#FFD700" strokeWidth="2">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z"/>
+                  <path d="M12 6V12L16 14"/>
+                </svg>
+              </div>
+              <h3 className="text-3xl font-bold mb-4 text-black">98%</h3>
+              <p className="text-xl text-neutral-700 font-light">Tasa de satisfacción</p>
+            </div>
+          </div>
         </section>
 
         {/* Cursos destacados */}
