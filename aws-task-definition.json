@@ -44,7 +44,10 @@
           "name": "NEXT_TELEMETRY_DISABLED",
           "value": "1"
         },
-
+        {
+          "name": "REDIS_URL",
+          "value": "redis://localhost:6379"
+        },
         {
           "name": "NEXT_PUBLIC_CDN_URL",
           "value": "https://d1xxxxxxxx.cloudfront.net"
@@ -89,4 +92,4 @@
       ]
     }
   ]
-}                          
+}    

@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { Metadata } from "next";
-import { Mdx } from "@/components/content/mdx-components";
+import { Mdx } from "@/components/mdx-components";
 
 interface Page {
   slug: string;
@@ -99,7 +99,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const resolvedParams = await params;
   const page = pages.find((page) => page.slug === resolvedParams.slug);
-
   if (!page) {
     return {};
   }
@@ -136,9 +135,7 @@ export default async function PagePage({
           </p>
         )}
       </div>
-      <div className="prose prose-lg max-w-none">
-        <div dangerouslySetInnerHTML={{ __html: page.content.replace(/\n/g, '<br />') }} />
-      </div>
+      <Mdx code={page.content} />
     </article>
   );
 }

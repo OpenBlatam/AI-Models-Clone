@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react"
-import { motion } from "framer-motion"
-import { useScroll, useTransform } from "framer-motion"
+import { motion, useScroll, useTransform } from "framer-motion"
 
 interface ParallaxScrollProps {
   children: React.ReactNode
@@ -31,4 +30,4 @@ export function ParallaxScroll({
       </motion.div>
     </div>
   )
-}    
+}   

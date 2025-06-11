@@ -42,6 +42,22 @@ ENV NEXT_PUBLIC_APP_URL="https://blatam-academy.us-east-1.elasticbeanstalk.com"
 # Generate Prisma client for Alpine Linux
 RUN npx prisma generate
 
+# Set environment variables for build (these will be overridden at runtime)
+ENV NODE_ENV=production
+ENV SKIP_ENV_VALIDATION=true
+ENV DATABASE_URL="postgresql://placeholder"
+ENV AUTH_SECRET="placeholder"
+ENV GOOGLE_CLIENT_ID="placeholder"
+ENV GOOGLE_CLIENT_SECRET="placeholder"
+ENV AWS_ACCESS_KEY_ID="placeholder"
+ENV AWS_SECRET_ACCESS_KEY="placeholder"
+ENV NEXT_PUBLIC_SITE_URL="https://blatam-academy.us-east-1.elasticbeanstalk.com"
+ENV NEXT_PUBLIC_CDN_URL="https://d1xxxxxxxx.cloudfront.net"
+ENV NEXT_PUBLIC_APP_URL="https://blatam-academy.us-east-1.elasticbeanstalk.com"
+
+# Generate Prisma client for Alpine Linux
+RUN npx prisma generate
+
 # Construye la aplicación
 RUN npm run build
 
@@ -59,4 +75,4 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 3000
-CMD ["npm", "start"]                        
+CMD ["npm", "start"]   

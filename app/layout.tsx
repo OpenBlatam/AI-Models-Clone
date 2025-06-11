@@ -14,7 +14,6 @@ import { AblySpacesProvider } from "@/components/providers/ably-provider";
 import { StabilityProvider } from "@/components/providers/stability-provider";
 import { PerformanceProvider } from "@/components/providers/performance-provider";
 import { QueryProvider } from "@/components/providers/query-provider";
-
 interface RootLayoutProps {
   children: React.ReactNode;
 }
