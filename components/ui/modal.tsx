@@ -7,6 +7,10 @@ import { Drawer } from "vaul";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useMediaQuery } from "@/hooks/use-media-query";
 import { cn } from "@/lib/utils";
+import { LiquidGlass } from "@/components/ui/liquid-glass";
+import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 interface ModalProps {
   children: React.ReactNode;
@@ -16,6 +20,14 @@ interface ModalProps {
   onClose?: () => void;
   desktopOnly?: boolean;
   preventDefaultClose?: boolean;
+  variant?: 'default' | 'button' | 'dock' | 'menu';
+  intensity?: number;
+  blur?: number;
+  shine?: boolean;
+  interactive?: boolean;
+  title?: string;
+  description?: string;
+  showClose?: boolean;
 }
 
 export function Modal({
@@ -26,6 +38,14 @@ export function Modal({
   onClose,
   desktopOnly,
   preventDefaultClose,
+  variant = 'default',
+  intensity = 2,
+  blur = 6,
+  shine = true,
+  interactive = true,
+  title,
+  description,
+  showClose = true,
 }: ModalProps) {
   // const router = useRouter();
 
@@ -61,14 +81,39 @@ export function Modal({
         <Drawer.Portal>
           <Drawer.Content
             className={cn(
-              "fixed inset-x-0 bottom-0 z-50 mt-24 overflow-hidden rounded-t-[10px] border bg-background",
+              "fixed inset-x-0 bottom-0 z-50 mt-24 overflow-hidden",
               className,
             )}
           >
-            <div className="sticky top-0 z-20 flex w-full items-center justify-center bg-inherit">
-              <div className="my-3 h-1.5 w-16 rounded-full bg-muted-foreground/20" />
-            </div>
-            {children}
+            <LiquidGlass 
+              variant={variant}
+              intensity={intensity}
+              blur={blur}
+              shine={shine}
+              interactive={interactive}
+              className="h-full"
+            >
+              <div className="sticky top-0 z-20 flex w-full items-center justify-center">
+                <div className="my-3 h-1.5 w-16 rounded-full bg-muted-foreground/20" />
+              </div>
+              <div className="flex flex-col gap-4">
+                {(title || description) && (
+                  <div className="flex flex-col gap-2">
+                    {title && (
+                      <h2 className="text-xl font-semibold text-foreground">
+                        {title}
+                      </h2>
+                    )}
+                    {description && (
+                      <p className="text-sm text-muted-foreground">
+                        {description}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {children}
+              </div>
+            </LiquidGlass>
           </Drawer.Content>
           <Drawer.Overlay />
         </Drawer.Portal>
@@ -76,24 +121,67 @@ export function Modal({
     );
   }
   return (
-    <Dialog
-      open={setShowModal ? showModal : true}
-      onOpenChange={(open) => {
-        if (!open) {
-          closeModal();
-        }
-      }}
-    >
-      <DialogContent
-        onOpenAutoFocus={(e) => e.preventDefault()}
-        onCloseAutoFocus={(e) => e.preventDefault()}
-        className={cn(
-          "overflow-hidden p-0 md:max-w-md md:rounded-2xl md:border",
-          className,
-        )}
-      >
-        {children}
-      </DialogContent>
-    </Dialog>
+    <AnimatePresence>
+      {showModal && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md"
+          onClick={() => closeModal()}
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            transition={{
+              duration: 0.4,
+              ease: [0.16, 1, 0.3, 1],
+              scale: { duration: 0.3 }
+            }}
+            className="relative w-full max-w-lg p-6"
+          >
+            <LiquidGlass
+              variant={variant}
+              intensity={intensity}
+              blur={blur}
+              shine={shine}
+              interactive={interactive}
+              className="relative w-full"
+            >
+              <div className="flex flex-col gap-4">
+                {(title || description) && (
+                  <div className="flex flex-col gap-2">
+                    {title && (
+                      <h2 className="text-xl font-semibold text-foreground">
+                        {title}
+                      </h2>
+                    )}
+                    {description && (
+                      <p className="text-sm text-muted-foreground">
+                        {description}
+                      </p>
+                    )}
+                  </div>
+                )}
+                {children}
+              </div>
+              {showClose && (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="absolute right-4 top-4 h-8 w-8 rounded-full hover:bg-white/20"
+                  onClick={onClose}
+                >
+                  <X className="h-4 w-4" />
+                  <span className="sr-only">Close</span>
+                </Button>
+              )}
+            </LiquidGlass>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
