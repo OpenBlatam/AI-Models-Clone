@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 export async function POST(req: Request) {
   try {
@@ -20,7 +20,7 @@ export async function POST(req: Request) {
           id: key,
         },
         data: {
-          url: url,
+          content: url,
         },
       });
       
@@ -32,4 +32,4 @@ export async function POST(req: Request) {
     console.error("[ONLYOFFICE_CALLBACK]", error);
     return new NextResponse("Internal Error", { status: 500 });
   }
-} 
+}     

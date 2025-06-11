@@ -152,4 +152,4 @@ export function AchievementsContent({
       </motion.div>
     </motion.div>
   );
-} 
+}    

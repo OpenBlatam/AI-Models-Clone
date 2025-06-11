@@ -117,4 +117,4 @@ export function GameProgress() {
       </Card>
     </div>
   );
-} 
+}    

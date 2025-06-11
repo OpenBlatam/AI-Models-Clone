@@ -266,7 +266,8 @@ const VideoPlayer = ({
           isLocked: false,
           isCompleted: c.isCompleted,
           progress: c.progress,
-          experience: c.experience
+          experience: c.experience,
+          academyId: courseId
         }))}
         currentClassId={classId || ""}
         onSelectClass={(classId) => {
@@ -292,4 +293,4 @@ const VideoPlayer = ({
   );
 };
 
-export default VideoPlayer; 
+export default VideoPlayer;       

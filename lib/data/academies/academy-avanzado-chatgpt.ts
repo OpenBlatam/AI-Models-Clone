@@ -12,6 +12,8 @@ export const avanzadoChatGPTAcademy: Academy = {
   totalDuration: "52min",
   experience: 1200,
   rating: 4.8,
+  difficulty: "advanced",
+  tags: ["ChatGPT", "IA Generativa", "Análisis de Datos", "Marketing", "Prompts"],
   s3Config: {
     bucketName: "blatamcursos",
     clientKey: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID!,
@@ -213,4 +215,4 @@ export const avanzadoChatGPTAcademy: Academy = {
   ],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-}; 
+};   

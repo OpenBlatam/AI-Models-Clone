@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Sparkles, ArrowRight, Zap, Star, CheckCircle } from "lucide-react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
+import { useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 
 export function AnimatedCTA() {
@@ -93,4 +94,4 @@ export function AnimatedCTA() {
       </motion.div>
     </section>
   );
-} 
+}    

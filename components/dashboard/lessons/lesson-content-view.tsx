@@ -443,4 +443,4 @@ export function LessonContentView({
       </Card>
     </motion.div>
   );
-} 
+}    

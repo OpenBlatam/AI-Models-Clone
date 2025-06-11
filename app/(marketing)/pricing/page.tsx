@@ -6,7 +6,7 @@ import { getUserSubscriptionPlan } from "@/lib/subscription";
 import { constructMetadata } from "@/lib/utils";
 import { ComparePlans } from "@/components/pricing/compare-plans";
 import { PricingCards } from "@/components/pricing/pricing-cards";
-import { PricingFaq } from "@/components/pricing/pricing-faq";
+import { PricingFaqClient } from "@/components/pricing/pricing-faq-client";
 
 export const metadata = constructMetadata({
   title: "Pricing – SaaS Starter",
@@ -51,7 +51,7 @@ export default async function PricingPage() {
       <PricingCards userId={user?.id} subscriptionPlan={subscriptionPlan} />
       <hr className="container" />
       <ComparePlans />
-      <PricingFaq />
+      <PricingFaqClient />
     </div>
   );
 }

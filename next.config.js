@@ -1,61 +1,90 @@
-const { withContentlayer } = require("next-contentlayer2");
-
 import("./env.mjs");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
   reactStrictMode: true,
+
+  
   images: {
     remotePatterns: [
       {
-        protocol: "https",
-        hostname: "avatars.githubusercontent.com",
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+        port: '',
+        pathname: '/**',
       },
       {
-        protocol: "https",
-        hostname: "lh3.googleusercontent.com",
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        port: '',
+        pathname: '/**',
       },
       {
-        protocol: "https",
-        hostname: "randomuser.me",
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+        port: '',
+        pathname: '/**',
       },
       {
-        protocol: "https",
-        hostname: "images.unsplash.com",
-      },
-      {
-        protocol: "https",
-        hostname: "example.com",
-      },
-      {
-        protocol: "https",
-        hostname: "blatamcursos.s3.amazonaws.com",
+        protocol: 'https',
+        hostname: 'blatamcursos.s3.amazonaws.com',
+        port: '',
+        pathname: '/**',
       },
     ],
-    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com', 'images.unsplash.com', 'example.com', 'blatamcursos.s3.amazonaws.com'],
+    domains: ['avatars.githubusercontent.com', 'lh3.googleusercontent.com', 'images.unsplash.com', 'blatamcursos.s3.amazonaws.com'],
   },
+  
+  serverExternalPackages: [
+    '@prisma/client',
+    'ioredis',
+    'konva', 
+    'react-konva', 
+    'howler', 
+    'tsparticles', 
+    'react-particles',
+    'three',
+    'cannon'
+  ],
+  
   experimental: {
-    // serverActions está habilitado por defecto en Next.js 14
+    optimizePackageImports: ['framer-motion'],
   },
+  
   webpack: (config, { isServer }) => {
     if (!isServer) {
-      // Don't resolve 'canvas' package on the client to prevent this error on build --> Error: Can't resolve 'canvas'
       config.resolve.fallback = {
         ...config.resolve.fallback,
         canvas: false,
+        fs: false,
+        path: false,
+        crypto: false,
       };
     }
 
-    // Add specific handling for react-konva
-    config.resolve.alias = {
-      ...config.resolve.alias,
-      'react-konva': 'react-konva/lib/ReactKonva',
-      'konva': 'konva/lib/index-umd',
-    };
+    if (isServer) {
+      config.externals = config.externals || [];
+      config.externals.push(
+        'konva',
+        'react-konva', 
+        'howler',
+        'tsparticles',
+        'react-particles',
+        'recharts',
+        'framer-motion',
+        'three',
+        'cannon'
+      );
+      
+      config.resolve.alias = {
+        ...config.resolve.alias,
+        'framer-motion': false,
+      };
+    }
 
     return config;
   },
 };
 
-module.exports = withContentlayer(nextConfig);
+module.exports = nextConfig;

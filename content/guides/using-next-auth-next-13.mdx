@@ -285,64 +285,10 @@ const analytics = new GoogleAnalytics({
         </div>
         <div className="space-y-4">
           <div className="bg-gray-900/80 rounded-lg p-4 group-hover:shadow-lg group-hover:shadow-blue-500/10 transition-all duration-300">
-            <pre className="text-sm text-gray-300 overflow-x-auto">
-              <code className="language-javascript">{`// Ejemplo de análisis predictivo para campaña de marketing
-import { analyzeCampaign } from '@marketing-ai/sdk';
-import { GoogleAnalytics } from '@analytics/google';
-
-const campaign = {
-  name: 'Summer Sale 2024',
-  budget: 50000,
-  channels: ['social', 'email', 'search'],
-  targetAudience: {
-    ageRange: [25, 45],
-    interests: ['tech', 'fashion'],
-    locations: ['ES', 'MX', 'AR']
-  }
-};
-
-// Configuración del análisis
-const analytics = new GoogleAnalytics({
-  propertyId: process.env.GA_PROPERTY_ID,
-  apiKey: process.env.GA_API_KEY
-});
-
-// Análisis predictivo de la campaña
-async function predictCampaignPerformance() {
-  const predictions = await analyzeCampaign({
-    campaign,
-    analytics,
-    metrics: [
-      'conversion_rate',
-      'roi',
-      'customer_acquisition_cost'
-    ],
-    timeframe: '30d'
-  });
-
-  return {
-    expectedROI: predictions.roi,
-    predictedConversions: predictions.conversions,
-    recommendedBudget: predictions.optimalBudget
-  };
-}
-
-// Optimización en tiempo real
-const optimizer = new CampaignOptimizer({
-  minBudget: 1000,
-  maxBudget: 100000,
-  targetMetrics: {
-    conversionRate: 0.05,
-    cpa: 50
-  }
-});
-
-// Ejecutar optimización
-optimizer.optimize(campaign)
-  .then(results => {
-    console.log('Campaña optimizada:', results);
-  });`}</code>
-            </pre>
+            <div className="text-sm text-gray-300">
+              <p className="mb-2 text-blue-400 font-semibold">Ejemplo de análisis predictivo para campaña de marketing</p>
+              <p className="text-gray-400">Configuración de análisis con Google Analytics y optimización automática de campañas.</p>
+            </div>
           </div>
         </div>
       </div>

@@ -26,4 +26,9 @@ export const BLOG_AUTHORS = {
     image: "/_static/avatars/shadcn.jpeg",
     twitter: "shadcn",
   },
+  Admin: {
+    name: "Blatam Academy",
+    image: "/_static/avatars/admin.png",
+    twitter: "blatamacademy",
+  },
 };

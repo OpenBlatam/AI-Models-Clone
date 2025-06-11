@@ -108,4 +108,4 @@ export function VideoResources({ videoId, courseId }: VideoResourcesProps) {
       )}
     </div>
   );
-} 
+}    

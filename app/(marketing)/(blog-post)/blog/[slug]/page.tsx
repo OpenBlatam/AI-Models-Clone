@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { allPosts } from "contentlayer/generated";
 
 import { Mdx } from "@/components/content/mdx-components";
 
@@ -24,17 +23,40 @@ import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 import { DashboardTableOfContents } from "@/components/shared/toc";
 
 export async function generateStaticParams() {
-  return allPosts.map((post) => ({
-    slug: post.slugAsParams,
-  }));
+  return [
+    { slug: "server-client-components" },
+    { slug: "dynamic-routing-static-regeneration" },
+    { slug: "preview-mode-headless-cms" }
+  ];
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }): Promise<Metadata | undefined> {
-  const post = allPosts.find((post) => post.slugAsParams === params.slug);
+  const resolvedParams = await params;
+  
+  const posts = {
+    "server-client-components": {
+      title: "Understanding Server and Client Components",
+      description: "Learn the differences between server and client components in Next.js 13+",
+      image: "/blog/server-client-components.jpg"
+    },
+    "dynamic-routing-static-regeneration": {
+      title: "Dynamic Routing and Static Regeneration",
+      description: "Master dynamic routing and ISR in Next.js applications",
+      image: "/blog/dynamic-routing.jpg"
+    },
+    "preview-mode-headless-cms": {
+      title: "Preview Mode for Headless CMS",
+      description: "Implement preview mode for your headless CMS content",
+      image: "/blog/preview-mode.jpg"
+    }
+  };
+
+  const post = posts[resolvedParams.slug as keyof typeof posts];
+
   if (!post) {
     return;
   }
@@ -51,11 +73,52 @@ export async function generateMetadata({
 export default async function PostPage({
   params,
 }: {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }) {
-  const post = allPosts.find((post) => post.slugAsParams === params.slug);
+  const resolvedParams = await params;
+  
+  const posts = {
+    "server-client-components": {
+      _id: "1",
+      slug: "/blog/server-client-components",
+      title: "Understanding Server and Client Components",
+      description: "Learn the differences between server and client components in Next.js 13+",
+      image: "/blog/server-client-components.jpg",
+      date: "2024-03-20",
+      authors: ["Admin"],
+      categories: ["nextjs"],
+      body: { raw: "# Understanding Server and Client Components\n\nNext.js 13 introduced a new paradigm..." },
+      images: []
+    },
+    "dynamic-routing-static-regeneration": {
+      _id: "2", 
+      slug: "/blog/dynamic-routing-static-regeneration",
+      title: "Dynamic Routing and Static Regeneration",
+      description: "Master dynamic routing and ISR in Next.js applications",
+      image: "/blog/dynamic-routing.jpg",
+      date: "2024-03-15",
+      authors: ["Admin"],
+      categories: ["nextjs"],
+      body: { raw: "# Dynamic Routing and Static Regeneration\n\nLearn how to implement dynamic routes..." },
+      images: []
+    },
+    "preview-mode-headless-cms": {
+      _id: "3",
+      slug: "/blog/preview-mode-headless-cms",
+      title: "Preview Mode for Headless CMS", 
+      description: "Implement preview mode for your headless CMS content",
+      image: "/blog/preview-mode.jpg",
+      date: "2024-03-10",
+      authors: ["Admin"],
+      categories: ["cms"],
+      body: { raw: "# Preview Mode for Headless CMS\n\nEnable content preview for your headless CMS..." },
+      images: []
+    }
+  };
+
+  const post = posts[resolvedParams.slug as keyof typeof posts];
 
   if (!post) {
     notFound();
@@ -63,25 +126,18 @@ export default async function PostPage({
 
   const category = BLOG_CATEGORIES.find(
     (category) => category.slug === post.categories[0],
-  )!;
+  ) || BLOG_CATEGORIES[0];
 
-  const relatedArticles =
-    (post.related &&
-      post.related.map(
-        (slug) => allPosts.find((post) => post.slugAsParams === slug)!,
-      )) ||
-    [];
+  const relatedArticles = Object.values(posts)
+    .filter((p) => p._id !== post._id)
+    .filter((p) => p.categories && post.categories && p.categories.some((c) => post.categories.includes(c)))
+    .slice(0, 2);
 
   const toc = await getTableOfContents(post.body.raw);
 
   const [thumbnailBlurhash, images] = await Promise.all([
     getBlurDataURL(post.image),
-    await Promise.all(
-      post.images.map(async (src: string) => ({
-        src,
-        blurDataURL: await getBlurDataURL(src),
-      })),
-    ),
+    Promise.resolve([])
   ]);
 
   return (
@@ -95,9 +151,8 @@ export default async function PostPage({
                 buttonVariants({
                   variant: "outline",
                   size: "sm",
-                  rounded: "lg",
                 }),
-                "h-8",
+                "h-8 rounded-lg",
               )}
             >
               {category.title}
@@ -140,7 +195,9 @@ export default async function PostPage({
               sizes="(max-width: 768px) 770px, 1000px"
             />
             <div className="px-[.8rem] pb-10 md:px-8">
-              <Mdx code={post.body.code} images={images} />
+              <div className="prose prose-lg max-w-none">
+                <div dangerouslySetInnerHTML={{ __html: post.body.raw.replace(/\n/g, '<br />') }} />
+              </div>
             </div>
           </div>
 
@@ -158,20 +215,20 @@ export default async function PostPage({
             </p>
 
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:gap-6">
-              {relatedArticles.map((post) => (
+              {relatedArticles.map((relatedPost) => (
                 <Link
-                  key={post.slug}
-                  href={post.slug}
+                  key={relatedPost.slug}
+                  href={relatedPost.slug}
                   className="flex flex-col space-y-2 rounded-xl border p-5 transition-colors duration-300 hover:bg-muted/80"
                 >
                   <h3 className="font-heading text-xl text-foreground">
-                    {post.title}
+                    {relatedPost.title}
                   </h3>
                   <p className="line-clamp-2 text-[15px] text-muted-foreground">
-                    {post.description}
+                    {relatedPost.description}
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    {formatDate(post.date)}
+                    {formatDate(relatedPost.date)}
                   </p>
                 </Link>
               ))}

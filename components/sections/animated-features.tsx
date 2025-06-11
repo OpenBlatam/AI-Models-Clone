@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useScroll, useTransform } from "framer-motion";
 import { GraduationCap, BookOpen, Users, Trophy, ArrowRight, Sparkles, Code2, Brain, Zap, Terminal, Crown, Star, Diamond } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import * as HoverCard from "@radix-ui/react-hover-card";
@@ -336,4 +337,4 @@ export function AnimatedFeatures() {
       </motion.div>
     </section>
   );
-} 
+}    

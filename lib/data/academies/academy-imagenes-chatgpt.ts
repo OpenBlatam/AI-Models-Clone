@@ -12,6 +12,8 @@ export const imagenesChatGPTAcademy: Academy = {
   totalDuration: "26min",
   experience: 700,
   rating: 4.8,
+  difficulty: "intermediate",
+  tags: ["ChatGPT", "Imágenes", "Diseño", "Marketing"],
   s3Config: {
     bucketName: "blatamcursos",
     clientKey: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID!,
@@ -133,4 +135,4 @@ export const imagenesChatGPTAcademy: Academy = {
   ],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-}; 
+};   

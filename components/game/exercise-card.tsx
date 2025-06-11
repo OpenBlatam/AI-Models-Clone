@@ -133,4 +133,4 @@ export function ExerciseCard({
       </button>
     </motion.div>
   );
-} 
+}    

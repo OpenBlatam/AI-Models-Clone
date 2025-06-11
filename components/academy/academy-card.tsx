@@ -84,4 +84,4 @@ export function AcademyCard({ academy, onSelect, variant = "grid" }: AcademyCard
       <div className="text-base text-[#b3b3b3] font-medium">Por {academy.instructor}</div>
     </motion.div>
   );
-} 
+}    

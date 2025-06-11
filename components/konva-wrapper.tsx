@@ -1,58 +1,38 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-import type { ComponentType } from 'react';
-import type { Stage, Layer, Image, Group, Rect, Circle, Line, Text } from 'react-konva';
+import { ReactNode } from 'react';
 
-const withNoSSR = (Component: any) => {
-  return dynamic(() => Promise.resolve(Component), {
-    ssr: false,
-  });
-};
+export const DynamicKonva = ({ children, ...props }: { children?: ReactNode; [key: string]: any }) => (
+  <div className="konva-stage-placeholder border border-gray-300 bg-gray-50 flex items-center justify-center" {...props}>
+    <p className="text-gray-500">Canvas functionality temporarily disabled</p>
+    {children}
+  </div>
+);
 
-// Dynamically import react-konva components with no SSR
-export const DynamicKonva = dynamic(() => import('react-konva').then((mod) => mod.Stage), {
-  ssr: false,
-});
+export const DynamicLayer = ({ children, ...props }: { children?: ReactNode; [key: string]: any }) => (
+  <div className="konva-layer-placeholder" {...props}>{children}</div>
+);
 
-export const DynamicLayer = dynamic(() => import('react-konva').then((mod) => mod.Layer), {
-  ssr: false,
-});
+export const DynamicRect = (props: any) => (
+  <div className="w-4 h-4 bg-blue-500 inline-block" {...props} />
+);
 
-export const DynamicRect = dynamic(() => import('react-konva').then((mod) => mod.Rect), {
-  ssr: false,
-});
+export const DynamicCircle = (props: any) => (
+  <div className="w-4 h-4 bg-red-500 rounded-full inline-block" {...props} />
+);
 
-export const DynamicCircle = dynamic(() => import('react-konva').then((mod) => mod.Circle), {
-  ssr: false,
-});
+export const DynamicLine = (props: any) => (
+  <div className="w-8 h-0.5 bg-gray-500 inline-block" {...props} />
+);
 
-export const DynamicLine = dynamic(() => import('react-konva').then((mod) => mod.Line), {
-  ssr: false,
-});
+export const DynamicText = ({ text, ...props }: { text?: string; [key: string]: any }) => (
+  <span className="text-sm" {...props}>{text || 'Text'}</span>
+);
 
-export const DynamicText = dynamic(() => import('react-konva').then((mod) => mod.Text), {
-  ssr: false,
-});
+export const DynamicImage = (props: any) => (
+  <div className="w-8 h-8 bg-gray-300 inline-block" {...props} />
+);
 
-export const DynamicImage = dynamic(() => import('react-konva').then((mod) => mod.Image), {
-  ssr: false,
-});
-
-export const DynamicGroup = dynamic(() => import('react-konva').then((mod) => mod.Group), {
-  ssr: false,
-});
-
-// Generic dynamic import for any other Konva components
-export function dynamicKonvaComponent<T extends object>(componentName: string): ComponentType<T> {
-  return dynamic<T>(
-    () => import('react-konva').then((mod) => {
-      const Component = mod[componentName];
-      if (!Component) {
-        throw new Error(`Component ${componentName} not found in react-konva`);
-      }
-      return Component;
-    }),
-    { ssr: false }
-  );
-} 
+export const DynamicGroup = ({ children, ...props }: { children?: ReactNode; [key: string]: any }) => (
+  <div className="konva-group-placeholder inline-block" {...props}>{children}</div>
+);    

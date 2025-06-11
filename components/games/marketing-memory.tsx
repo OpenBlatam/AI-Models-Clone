@@ -232,4 +232,4 @@ export function MarketingMemory() {
       </div>
     </Card>
   )
-} 
+}    

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import { getAcademyById } from '@/lib/academies';
-import { S3_VIDEO_BUCKET_URL } from '@/lib/aws-config';
 
 interface VideoData {
   video: {
@@ -162,4 +161,4 @@ export function useVideoData(videoId: string, courseId: string) {
     addComment,
     addResource,
   };
-}  
+}      

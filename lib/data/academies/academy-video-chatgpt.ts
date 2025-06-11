@@ -12,6 +12,8 @@ export const videoChatGPTAcademy: Academy = {
   totalDuration: "24min",
   experience: 800,
   rating: 4.8,
+  difficulty: "intermediate",
+  tags: ["ChatGPT", "Video", "Contenido", "Marketing"],
   s3Config: {
     bucketName: "blatamcursos",
     clientKey: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID!,
@@ -149,4 +151,4 @@ export const videoChatGPTAcademy: Academy = {
   ],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-}; 
+};   

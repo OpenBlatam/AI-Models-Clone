@@ -40,4 +40,4 @@ export function Thumbnail({ src, alt, duration, className }: ThumbnailProps) {
       </div>
     </motion.div>
   );
-} 
+}    

@@ -48,7 +48,7 @@ export default function OnlyOfficeEditor({
   const [activeTab, setActiveTab] = useState("home");
 
   useEffect(() => {
-    if (!editorRef.current) return;
+    if (!editorRef.current || typeof window === 'undefined') return;
 
     const script = document.createElement("script");
     script.src = "https://documentserver.your-domain.com/web-apps/apps/api/documents/api.js";
@@ -140,7 +140,9 @@ export default function OnlyOfficeEditor({
     };
 
     return () => {
-      document.body.removeChild(script);
+      if (typeof document !== 'undefined' && document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, [documentUrl, documentTitle, documentType]);
 
@@ -166,7 +168,7 @@ export default function OnlyOfficeEditor({
   };
 
   const handleCopy = async () => {
-    if (aiText) {
+    if (aiText && typeof navigator !== 'undefined' && navigator.clipboard) {
       await navigator.clipboard.writeText(aiText);
     }
   };
@@ -467,4 +469,4 @@ export default function OnlyOfficeEditor({
       </div>
     </div>
   );
-}  
+}            

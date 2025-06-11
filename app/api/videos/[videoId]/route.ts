@@ -5,10 +5,11 @@ import { getCurrentUser } from "@/lib/session";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { videoId: string } }
+  { params }: { params: Promise<{ videoId: string }> }
 ) {
   try {
-    const videoId = params.videoId;
+    const resolvedParams = await params;
+    const videoId = resolvedParams.videoId;
     const { searchParams } = new URL(req.url);
     const courseId = searchParams.get("courseId");
 
@@ -60,7 +61,7 @@ export async function GET(
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { videoId: string } }
+  { params }: { params: Promise<{ videoId: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -71,7 +72,8 @@ export async function PUT(
       );
     }
 
-    const videoId = params.videoId;
+    const resolvedParams = await params;
+    const videoId = resolvedParams.videoId;
     const { progress } = await req.json();
 
     if (typeof progress !== "number" || progress < 0 || progress > 100) {
@@ -81,10 +83,17 @@ export async function PUT(
       );
     }
 
-    const video = await prisma.video.update({
+    const video = await prisma.video.findUnique({
       where: { id: videoId },
-      data: { progress },
+      include: { course: true }
     });
+
+    if (!video) {
+      return NextResponse.json(
+        { error: "Video not found" },
+        { status: 404 }
+      );
+    }
 
     // Invalidate cache
     await redis.del(`video:${videoId}:${video.courseId}`);
@@ -97,4 +106,4 @@ export async function PUT(
       { status: 500 }
     );
   }
-} 
+}     

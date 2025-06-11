@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useRef, useState } from 'react';
 import { Room, RoomEvent, RemoteParticipant, RemoteTrackPublication, RemoteAudioTrack, LocalAudioTrack, createLocalAudioTrack, LocalTrack } from 'livekit-client';
 import { Button } from '@/components/ui/button';
@@ -101,4 +103,4 @@ export default function MarketingAgentPage() {
       </Button>
     </div>
   );
-} 
+}   

@@ -13,6 +13,7 @@ import { ToastAction } from "@/components/ui/toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSpring, animated } from "@react-spring/web";
 import { useInView } from "react-intersection-observer";
+import Link from "next/link";
 
 interface Message {
   role: "user" | "assistant";
@@ -79,7 +80,7 @@ const HeaderText = () => {
       style={textAnimation}
       className="header-text"
     >
-      Blatam
+      iAcademy
       <animated.span style={heartAnimation} className="heart-icon">
         🤍
       </animated.span>
@@ -457,7 +458,7 @@ export function ChatLayout({ children }: { children: React.ReactNode }) {
         title: "¡Bienvenido a Blatam Academy!",
         description: "Tu asistente IA está listo para ayudarte.",
         action: (
-          <ToastAction altText="Cerrar" onClick={() => toast.dismiss()}>
+          <ToastAction altText="Cerrar" onClick={() => window.location.reload()}>
             Cerrar
           </ToastAction>
         ),
@@ -506,6 +507,8 @@ export function ChatLayout({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-screen">
       <style>{waveStyles}</style>
+      {/* Header global IAcademy */}
+      {/* Header eliminado, solo queda el de la página principal */}
       {children}
       
       {/* Botón de Chat */}

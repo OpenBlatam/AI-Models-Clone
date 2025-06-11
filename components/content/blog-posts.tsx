@@ -1,4 +1,12 @@
-import { Post } from "@/.contentlayer/generated";
+interface Post {
+  _id: string;
+  title: string;
+  description?: string;
+  image?: string;
+  authors: string[];
+  date?: string;
+  slug: string;
+}
 
 import { BlogCard } from "./blog-card";
 

@@ -1,6 +1,5 @@
 import "@/styles/globals.css";
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
 import { fontGeist, fontHeading, fontSans, fontUrban } from "@/assets/fonts";
 import { cn, constructMetadata } from "@/lib/utils";
 import { Toaster } from "@/components/ui/sonner";
@@ -12,8 +11,9 @@ import { AuthProvider } from "@/components/auth-provider";
 import { ThemeProvider } from "next-themes";
 import { MetaMaskProvider } from "@/components/web3/MetaMaskProvider";
 import { AblySpacesProvider } from "@/components/providers/ably-provider";
-
-const inter = Inter({ subsets: ["latin"] });
+import { StabilityProvider } from "@/components/providers/stability-provider";
+import { PerformanceProvider } from "@/components/providers/performance-provider";
+import { QueryProvider } from "@/components/providers/query-provider";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -30,12 +30,11 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body
         className={cn(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-screen bg-white font-sans antialiased",
           fontSans.variable,
           fontUrban.variable,
           fontHeading.variable,
-          fontGeist.variable,
-          inter.className,
+          fontGeist.variable
         )}
         suppressHydrationWarning
       >
@@ -45,9 +44,12 @@ export default function RootLayout({ children }: RootLayoutProps) {
           enableSystem
           disableTransitionOnChange
         >
-          <AblySpacesProvider>
-            <MetaMaskProvider>
-              <AuthProvider>
+          <StabilityProvider>
+            <PerformanceProvider>
+              <QueryProvider>
+                <AblySpacesProvider>
+                  <MetaMaskProvider>
+                    <AuthProvider>
                 {/* Custom widgets as raw HTML to avoid React/JSX errors */}
                 <div
                   suppressHydrationWarning
@@ -68,12 +70,15 @@ export default function RootLayout({ children }: RootLayoutProps) {
                 <ChatLayout>
                   <ModalProvider>{children}</ModalProvider>
                 </ChatLayout>
-                <Analytics />
-                <Toaster richColors closeButton />
-                <TailwindIndicator />
-              </AuthProvider>
-            </MetaMaskProvider>
-          </AblySpacesProvider>
+                    <Analytics />
+                    <Toaster richColors closeButton />
+                    <TailwindIndicator />
+                    </AuthProvider>
+                  </MetaMaskProvider>
+                </AblySpacesProvider>
+              </QueryProvider>
+            </PerformanceProvider>
+          </StabilityProvider>
         </ThemeProvider>
       </body>
     </html>

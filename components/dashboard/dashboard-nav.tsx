@@ -68,18 +68,30 @@ const NavItem = memo(function NavItem({
     <Link
       href={item.href}
       className={cn(
-        "flex items-center text-sm font-medium transition-colors hover:text-primary",
-        isActive ? "text-primary" : "text-muted-foreground"
+        "group relative flex items-center text-sm font-medium transition-all duration-300",
+        isActive 
+          ? "text-primary" 
+          : "text-muted-foreground hover:text-primary"
       )}
     >
       <motion.div
-        className="flex items-center gap-2"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
+        className="flex items-center gap-2 px-3 py-2"
+        whileHover={{ scale: 1.02 }}
+        whileTap={{ scale: 0.98 }}
         layout
       >
-        <Icon className="h-4 w-4" />
-        <span>{item.title}</span>
+        <Icon className={cn(
+          "h-4 w-4 transition-colors duration-300",
+          isActive ? "text-primary" : "text-muted-foreground group-hover:text-primary"
+        )} />
+        <span className="tracking-wide">{item.title}</span>
+        {isActive && (
+          <motion.div
+            className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary"
+            layoutId="activeNav"
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          />
+        )}
       </motion.div>
     </Link>
   );
@@ -92,10 +104,10 @@ export const DashboardNav = memo(function DashboardNav() {
     <>
       {/* Mobile: show logo/title only */}
       <div className="flex items-center sm:hidden">
-        <span className="text-xl font-bold text-primary">SaaS</span>
+        <span className="text-xl font-bold tracking-wider text-primary">SaaS</span>
       </div>
       {/* Desktop: show nav */}
-      <nav className="hidden sm:flex items-center space-x-4 lg:space-x-6">
+      <nav className="hidden sm:flex items-center space-x-1">
         {navItems.map((item) => (
           <NavItem
             key={item.href}
@@ -106,4 +118,4 @@ export const DashboardNav = memo(function DashboardNav() {
       </nav>
     </>
   );
-}); 
+});     

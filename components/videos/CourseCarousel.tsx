@@ -97,4 +97,4 @@ const CourseCarousel: React.FC<CourseCarouselProps> = ({
   );
 };
 
-export default CourseCarousel; 
+export default CourseCarousel;    

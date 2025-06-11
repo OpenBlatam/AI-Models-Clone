@@ -80,7 +80,20 @@ export function LessonContent({ lesson, onComplete }: LessonContentProps) {
   return (
     <LessonContentView
       lesson={lesson}
-      currentContent={lesson.content || { title: lesson.title, description: lesson.description, sections: [] }}
+      currentContent={lesson.content ? {
+        title: lesson.content.sections?.[0]?.title || lesson.title,
+        description: lesson.content.sections?.[0]?.content || lesson.description,
+        sections: lesson.content.sections?.map(section => ({
+          title: section.title,
+          description: section.content,
+          icon: 'globe' as const,
+          example: section.content
+        })) || []
+      } : { 
+        title: lesson.title, 
+        description: lesson.description, 
+        sections: [] 
+      }}
       currentTheme={themes[theme]}
       theme={theme}
       onComplete={onComplete}
@@ -88,4 +101,4 @@ export function LessonContent({ lesson, onComplete }: LessonContentProps) {
       onStartExercises={handleStartExercises}
     />
   );
-}  
+}      

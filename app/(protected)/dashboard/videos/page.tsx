@@ -1,5 +1,6 @@
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import { cn } from "@/lib/utils";
 import { Flag, Languages, PlayCircle, ChevronDown, ChevronUp, Download, Link2, X, Video as VideoIcon, UploadCloud, Camera, ArrowLeft } from "lucide-react";
 import Image from "next/image";
@@ -317,16 +318,15 @@ const videos: Video[] = [
 ];
 
 // Import VideoPlayer with no SSR
-const VideoPlayerComponent = dynamic(() => import("@/components/videos/VideoPlayer"), {
-  ssr: false,
-  loading: () => (
-    <div className="w-full max-w-5xl aspect-video rounded-2xl overflow-hidden bg-zinc-900 shadow-xl border border-zinc-800 animate-fade-in">
-      <div className="w-full h-full flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
-      </div>
+const VideoPlayerComponent = React.lazy(() => import("@/components/videos/VideoPlayer"));
+
+const VideoPlayerFallback = () => (
+  <div className="w-full max-w-5xl aspect-video rounded-2xl overflow-hidden bg-zinc-900 shadow-xl border border-zinc-800 animate-fade-in">
+    <div className="w-full h-full flex items-center justify-center">
+      <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin" />
     </div>
-  ),
-});
+  </div>
+);
 
 interface VideosPageProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -395,12 +395,14 @@ export default function VideosPage() {
                 animate={{ opacity: 1, y: 0 }}
                 className="space-y-6"
               >
-                <VideoPlayer
-                  courseId={selectedAcademy.id}
-                  classId={selectedClassId}
-                  onSelectClass={handleClassSelect}
-                  autoPlay={true}
-                />
+                <Suspense fallback={<VideoPlayerFallback />}>
+                  <VideoPlayerComponent
+                    courseId={selectedAcademy.id}
+                    classId={selectedClassId}
+                    onSelectClass={handleClassSelect}
+                    autoPlay={true}
+                  />
+                </Suspense>
               </motion.div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -460,4 +462,4 @@ export default function VideosPage() {
       </div>
     </ThemeProvider>
   );
-} 
+}        

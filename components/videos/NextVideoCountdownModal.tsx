@@ -119,4 +119,4 @@ const NextVideoCountdownModal: React.FC<NextVideoCountdownModalProps> = ({
   );
 };
 
-export default NextVideoCountdownModal; 
+export default NextVideoCountdownModal;    

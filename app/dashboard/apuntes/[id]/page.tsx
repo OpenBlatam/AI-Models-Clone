@@ -16,7 +16,7 @@ interface Note {
   updatedAt: string;
 }
 
-export default function EditNotePage({ params }: { params: { id: string } }) {
+export default function EditNotePage({ params }: { params: Promise<{ id: string }> }) {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [note, setNote] = useState<Note | null>(null);
@@ -24,11 +24,20 @@ export default function EditNotePage({ params }: { params: { id: string } }) {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [noteId, setNoteId] = useState<string>("");
+
+  useEffect(() => {
+    params.then((resolvedParams) => {
+      setNoteId(resolvedParams.id);
+    });
+  }, [params]);
 
   useEffect(() => {
     const fetchNote = async () => {
+      if (!noteId) return;
+      
       try {
-        const response = await fetch(`/api/notes/${params.id}`);
+        const response = await fetch(`/api/notes/${noteId}`);
         if (!response.ok) throw new Error("Error al cargar el apunte");
         const data = await response.json();
         setNote(data);
@@ -41,17 +50,17 @@ export default function EditNotePage({ params }: { params: { id: string } }) {
       }
     };
 
-    if (status === "authenticated") {
+    if (status === "authenticated" && noteId) {
       fetchNote();
     }
-  }, [params.id, status, router]);
+  }, [noteId, status, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
 
     try {
-      const response = await fetch(`/api/notes/${params.id}`, {
+      const response = await fetch(`/api/notes/${noteId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -138,4 +147,4 @@ export default function EditNotePage({ params }: { params: { id: string } }) {
       </div>
     </div>
   );
-}  
+}      

@@ -554,7 +554,7 @@ export function MarketingFlappy() {
       move: {
         enable: true,
         speed: 1,
-        direction: "none",
+        direction: "none" as const,
         random: true,
         outModes: {
           default: "out"
@@ -569,7 +569,7 @@ export function MarketingFlappy() {
         }
       }
     }
-  }
+  } as const
 
   if (gameState.gameOver) {
     return (
@@ -845,4 +845,4 @@ export function MarketingFlappy() {
       </div>
     </Card>
   )
-} 
+}                                                                                                                         

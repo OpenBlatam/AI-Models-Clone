@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Accordion,
   AccordionContent,
@@ -42,25 +44,24 @@ const pricingFaqData = [
 
 export function PricingFaq() {
   return (
-    <section className="container max-w-4xl py-2">
+    <section className="container max-w-4xl py-8 rounded-2xl" style={{ background: 'var(--color-bg)' }}>
       <HeaderSection
         label="FAQ"
         title="Frequently Asked Questions"
-        subtitle="Explore our comprehensive FAQ to find quick answers to common
-          inquiries. If you need further assistance, don't hesitate to
-          contact us for personalized help."
+        subtitle="Explore our comprehensive FAQ to find quick answers to common inquiries. If you need further assistance, don't hesitate to contact us for personalized help."
       />
 
-      <Accordion type="single" collapsible className="my-12 w-full">
+      <div className="my-12 w-full space-y-4">
         {pricingFaqData.map((faqItem) => (
-          <AccordionItem key={faqItem.id} value={faqItem.id}>
-            <AccordionTrigger>{faqItem.question}</AccordionTrigger>
-            <AccordionContent className="text-sm text-muted-foreground sm:text-[15px]">
-              {faqItem.answer}
-            </AccordionContent>
-          </AccordionItem>
+          <div key={faqItem.id} className="faq-card">
+            <span className="faq-icon">+</span>
+            <div>
+              <div className="font-semibold mb-1">{faqItem.question}</div>
+              <div className="text-secondary text-sm">{faqItem.answer}</div>
+            </div>
+          </div>
         ))}
-      </Accordion>
+      </div>
     </section>
   );
 }

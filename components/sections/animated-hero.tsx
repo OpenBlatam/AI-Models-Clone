@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Star, Zap, ChevronDown, Code2, Brain, Terminal, Rocket, Target, Trophy, Flame, Gem } from "lucide-react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useScroll, useTransform } from "framer-motion";
 import { useRef, useState, useEffect } from "react";
 
 export function AnimatedHero() {
@@ -219,4 +220,4 @@ export function AnimatedHero() {
       </motion.div>
     </section>
   );
-} 
+}    

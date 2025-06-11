@@ -4,10 +4,11 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "1024",
   "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::670683041397:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "blatam-academy",
-      "image": "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/blatam-academy:latest",
+      "image": "670683041397.dkr.ecr.us-east-1.amazonaws.com/blatam-academy:latest",
       "portMappings": [
         {
           "containerPort": 3000,
@@ -33,7 +34,7 @@
         },
         {
           "name": "NEXT_PUBLIC_SITE_URL",
-          "value": "https://blatam-academy.${AWS_REGION}.elasticbeanstalk.com"
+          "value": "https://blatam-academy.us-east-1.elasticbeanstalk.com"
         },
         {
           "name": "NODE_ENV",
@@ -43,29 +44,41 @@
           "name": "NEXT_TELEMETRY_DISABLED",
           "value": "1"
         },
-        {
-          "name": "REDIS_URL",
-          "value": "redis://${REDIS_ENDPOINT}:6379"
-        },
+
         {
           "name": "NEXT_PUBLIC_CDN_URL",
-          "value": "https://${CLOUDFRONT_DOMAIN}"
+          "value": "https://d1xxxxxxxx.cloudfront.net"
+        },
+        {
+          "name": "AWS_ACCESS_KEY_ID",
+          "value": "AKIAZYJ6TBZ2WLU7GARQ"
+        },
+        {
+          "name": "AWS_SECRET_ACCESS_KEY",
+          "value": "cDcuyG/RiVaEdV5387y8+VEx6TZhPoW8eMOdTC6Z"
+        },
+        {
+          "name": "REDIS_DISABLED",
+          "value": "true"
         }
       ],
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:3000/api/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 10,
+        "retries": 5,
+        "startPeriod": 120
+      },
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
           "awslogs-group": "/ecs/blatam-academy",
-          "awslogs-region": "${AWS_REGION}",
+          "awslogs-region": "us-east-1",
           "awslogs-stream-prefix": "ecs"
         }
-      },
-      "healthCheck": {
-        "command": ["CMD-SHELL", "curl -f http://localhost:3000/api/health || exit 1"],
-        "interval": 30,
-        "timeout": 5,
-        "retries": 3,
-        "startPeriod": 60
       },
       "ulimits": [
         {
@@ -76,4 +89,4 @@
       ]
     }
   ]
-} 
+}                          

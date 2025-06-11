@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { VideoPlayer } from "@/components/videos/VideoPlayer";
-import { VideoHeader } from "@/components/videos/VideoHeader";
-import { VideoResumen } from "@/components/videos/VideoResumen";
+import VideoPlayer from "@/components/videos/VideoPlayer";
+import VideoHeader from "@/components/videos/VideoHeader";
+import VideoResumen from "@/components/videos/VideoResumen";
 import { VideoResources } from "@/components/videos/VideoResources";
-import { VideoComments } from "@/components/videos/VideoComments";
+import VideoComments from "@/components/videos/VideoComments";
 import { VideoQuestionBar } from "@/components/videos/VideoQuestionBar";
-import { VideoSidebar } from "@/components/videos/VideoSidebar";
+import VideoSidebar from "@/components/videos/VideoSidebar";
 import { Button } from "@/components/ui/button";
 import { Video } from "lucide-react";
 
@@ -103,12 +103,28 @@ function ScalableVideosPageInner() {
   return (
     <div className="flex min-h-screen bg-zinc-950 text-white">
       <VideoSidebar
-        videos={mockVideos}
-        currentVideoId={currentVideo.id}
-        onSelectVideo={(id) => {
-          const idx = mockVideos.findIndex((v) => v.id === id);
-          if (idx !== -1) setCurrentVideoIndex(idx);
+        open={true}
+        onClose={() => {}}
+        currentIndex={currentVideoIndex}
+        onSelect={(index) => {
+          setCurrentVideoIndex(index);
         }}
+        classes={mockVideos.map((video, index) => ({
+          id: video.id,
+          title: video.title,
+          description: video.description,
+          duration: video.duration,
+          thumbnail: "/placeholder-video.jpg",
+          videoUrl: video.url,
+          academyId: "scalable-videos",
+          order: index,
+          isLocked: false,
+          isCompleted: false,
+          experience: 10,
+          progress: 0,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        }))}
       />
       <main className="flex-1 flex flex-col items-center p-4 md:p-8">
         <div className="w-full max-w-7xl">
@@ -121,19 +137,34 @@ function ScalableVideosPageInner() {
           </div>
           <section className="bg-zinc-900 rounded-2xl shadow-lg p-0 md:p-8 flex flex-col gap-6 w-full max-w-5xl mx-auto mb-8">
             <VideoHeader
-              video={currentVideo}
-              currentTab={currentTab}
-              onTabChange={setCurrentTab}
+              title={currentVideo.title}
+              instructor="Instructor"
+              progress={0}
+              experience={10}
+              currentClass={currentVideoIndex + 1}
+              totalClasses={mockVideos.length}
+              duration={currentVideo.duration}
+              onToggleContent={() => {}}
+              isContentVisible={true}
             />
             <VideoPlayer
-              src={currentVideo.url}
+              courseId="scalable-videos"
+              classId={currentVideo.id}
               onTimeUpdate={(time) => {}}
               onEnded={() => {}}
+              onSelectClass={(classId) => {
+                const idx = mockVideos.findIndex((v) => v.id === classId);
+                if (idx !== -1) setCurrentVideoIndex(idx);
+              }}
             />
-            {currentTab === "resumen" && <VideoResumen resumen={currentVideo.resumen} />}
-            {currentTab === "recursos" && <VideoResources files={currentVideo.files} readings={currentVideo.readings} />}
+            {currentTab === "resumen" && <VideoResumen resumen={{
+              titulo: currentVideo.title,
+              descripcion: currentVideo.resumen,
+              puntos: ["Conceptos clave del video", "Técnicas principales", "Aplicaciones prácticas"]
+            }} />}
+            {currentTab === "recursos" && <VideoResources videoId={currentVideo.id} courseId="scalable-videos" />}
             {currentTab === "comentarios" && (
-              <VideoComments comments={comments} onAddComment={handleAddComment} />
+              <VideoComments videoId={currentVideo.id} courseId="scalable-videos" />
             )}
             <VideoQuestionBar onAsk={handleAddComment} />
           </section>
@@ -149,4 +180,4 @@ export default function ScalableVideosPage() {
       <ScalableVideosPageInner />
     </ApolloProvider>
   );
-} 
+}                           

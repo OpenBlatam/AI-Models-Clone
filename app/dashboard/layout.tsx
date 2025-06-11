@@ -4,6 +4,11 @@ import { DashboardNav } from "@/components/dashboard/dashboard-nav";
 import dynamic from 'next/dynamic';
 import React from "react";
 import FloatingStatusWidget from "@/components/FloatingStatusWidget";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { UserNav } from "@/components/user-nav";
+import { EB_Garamond } from "next/font/google";
+
+const ebGaramond = EB_Garamond({ subsets: ['latin'] });
 
 const InteractiveTTSPanel = dynamic(() => import("@/agents/InteractiveTTSPanel"), {
   ssr: false
@@ -26,10 +31,16 @@ export default function DashboardLayout({
   }, []);
 
   return (
-    <div className="relative min-h-screen">
-      <header className="sticky top-0 z-40 border-b bg-background">
+    <div className={`relative min-h-screen bg-background ${ebGaramond.className}`}>
+      <header className="sticky top-0 z-40 border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-16 items-center justify-between py-4">
-          <DashboardNav />
+          <div className="flex items-center gap-6">
+            <DashboardNav />
+          </div>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+            <UserNav />
+          </div>
         </div>
       </header>
       <div className="container py-6">
@@ -45,7 +56,11 @@ export default function DashboardLayout({
         </main>
       </div>
       {/* ElevenLabs Convai Widget */}
-      <elevenlabs-convai agent-id="agent_01jw2hqjcmf5js8yr208bavbaq"></elevenlabs-convai>
+      <div 
+        dangerouslySetInnerHTML={{
+          __html: '<elevenlabs-convai agent-id="agent_01jw2hqjcmf5js8yr208bavbaq"></elevenlabs-convai>'
+        }}
+      />
     </div>
   );
-} 
+}   

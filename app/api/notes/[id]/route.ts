@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/auth";
-import prisma from "@/lib/prisma";
+import { prisma } from "@/lib/prisma";
 
 // GET /api/notes/[id] - Obtener un apunte específico
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -15,9 +15,10 @@ export async function GET(
       return new NextResponse("No autorizado", { status: 401 });
     }
 
+    const resolvedParams = await params;
     const note = await prisma.note.findUnique({
       where: {
-        id: params.id,
+        id: resolvedParams.id,
         userId: session.user.id,
       },
     });
@@ -36,7 +37,7 @@ export async function GET(
 // PUT /api/notes/[id] - Actualizar un apunte
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -52,9 +53,10 @@ export async function PUT(
       return new NextResponse("Faltan campos requeridos", { status: 400 });
     }
 
+    const resolvedParams = await params;
     const note = await prisma.note.update({
       where: {
-        id: params.id,
+        id: resolvedParams.id,
         userId: session.user.id,
       },
       data: {
@@ -73,7 +75,7 @@ export async function PUT(
 // DELETE /api/notes/[id] - Eliminar un apunte
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions);
@@ -82,9 +84,10 @@ export async function DELETE(
       return new NextResponse("No autorizado", { status: 401 });
     }
 
+    const resolvedParams = await params;
     await prisma.note.delete({
       where: {
-        id: params.id,
+        id: resolvedParams.id,
         userId: session.user.id,
       },
     });
@@ -94,4 +97,4 @@ export async function DELETE(
     console.error("[NOTE_DELETE]", error);
     return new NextResponse("Error interno", { status: 500 });
   }
-} 
+}     

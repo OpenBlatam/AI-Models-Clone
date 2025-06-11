@@ -313,4 +313,4 @@ export function ExercisesView({
       </Card>
     </motion.div>
   );
-} 
+}    

@@ -126,4 +126,4 @@ export function ExercisesContent({ exercises, userLevel }: ExercisesContentProps
       </motion.div>
     </motion.div>
   );
-} 
+}    

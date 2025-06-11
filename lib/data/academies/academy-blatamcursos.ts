@@ -12,6 +12,8 @@ export const blatamcursosAcademy: Academy = {
   totalDuration: "-",
   experience: 1200,
   rating: 4.8,
+  difficulty: "intermediate",
+  tags: ["IA Generativa", "Contenido", "Marketing", "Creatividad"],
   s3Config: {
     bucketName: "blatamcursos",
     clientKey: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID!,
@@ -213,4 +215,4 @@ export const blatamcursosAcademy: Academy = {
   ],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-}; 
+};   
