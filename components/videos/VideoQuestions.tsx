@@ -172,4 +172,4 @@ export function VideoQuestions({ videoId, courseId }: VideoQuestionsProps) {
       </div>
     </div>
   );
-} 
+}    

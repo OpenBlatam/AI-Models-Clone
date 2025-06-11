@@ -5,7 +5,7 @@ import GoogleProvider from "next-auth/providers/google";
 import { env } from "@/env.mjs";
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+  adapter: PrismaAdapter(prisma) as any,
   secret: env.AUTH_SECRET,
   session: {
     strategy: "jwt",
@@ -57,4 +57,4 @@ export const authOptions: NextAuthOptions = {
       };
     },
   },
-}; 
+};   

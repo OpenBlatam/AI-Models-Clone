@@ -250,4 +250,4 @@ export function EventModal({ isOpen, onClose, event, onSave }: EventModalProps) 
       </DialogContent>
     </Dialog>
   );
-} 
+}    

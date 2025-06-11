@@ -54,4 +54,4 @@ export default function VideoResumen({ resumen }: VideoResumenProps) {
       </div>
     </motion.div>
   );
-} 
+}    

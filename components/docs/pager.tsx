@@ -1,5 +1,8 @@
 import Link from "next/link"
-import { Doc } from "contentlayer/generated"
+interface Doc {
+  slug: string;
+  title: string;
+}
 
 import { docsConfig } from "@/config/docs"
 import { cn } from "@/lib/utils"

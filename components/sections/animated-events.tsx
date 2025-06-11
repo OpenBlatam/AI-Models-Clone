@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useScroll, useTransform } from "framer-motion";
 import { Calendar, Clock, MapPin, Users, ArrowRight, Sparkles, Code2, Brain, Zap, Terminal, Rocket, Crown, Star, Trophy } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import * as HoverCard from "@radix-ui/react-hover-card";
@@ -344,4 +345,4 @@ export function AnimatedEvents() {
       </motion.div>
     </section>
   );
-} 
+}    

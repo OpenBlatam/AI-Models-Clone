@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
     if (!userProgress) {
       // Create new user progress if it doesn't exist
-      return prisma.userProgress.create({
+      const newProgress = await prisma.userProgress.create({
         data: {
           userId: session.user.id,
           experience: points,
@@ -62,6 +62,7 @@ export async function POST(req: Request) {
           lastActive: new Date(),
         },
       });
+      return NextResponse.json(newProgress);
     }
 
     // Calculate new experience and level
@@ -103,7 +104,7 @@ export async function POST(req: Request) {
 }
 
 async function checkAchievements(userId: string, progress: any) {
-  const newAchievements = [];
+  const newAchievements: any[] = [];
 
   // Level achievements
   if (progress.level >= 5) {
@@ -121,6 +122,8 @@ async function checkAchievements(userId: string, progress: any) {
             title: "Level 5",
             description: "¡Has alcanzado el nivel 5!",
             icon: "trophy",
+            unlockedAt: new Date(),
+            updatedAt: new Date(),
             userProgressId: progress.id,
           },
         })
@@ -144,6 +147,8 @@ async function checkAchievements(userId: string, progress: any) {
             title: "7 Day Streak",
             description: "¡Has mantenido una racha de 7 días!",
             icon: "trophy",
+            unlockedAt: new Date(),
+            updatedAt: new Date(),
             userProgressId: progress.id,
           },
         })
@@ -152,4 +157,4 @@ async function checkAchievements(userId: string, progress: any) {
   }
 
   return newAchievements;
-} 
+}       

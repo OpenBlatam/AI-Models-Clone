@@ -226,4 +226,4 @@ export default function ClassesModal({ open, onClose, classes, currentClassId, o
       )}
     </AnimatePresence>
   );
-} 
+}    

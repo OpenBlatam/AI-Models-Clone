@@ -83,4 +83,4 @@ export default function VideoContent({
       </motion.div>
     </div>
   );
-} 
+}    

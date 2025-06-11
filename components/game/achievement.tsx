@@ -78,4 +78,4 @@ export function AchievementList({ achievements, className }: AchievementListProp
       </div>
     </div>
   );
-} 
+}    

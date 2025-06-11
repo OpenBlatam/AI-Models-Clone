@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { allGuides } from "contentlayer/generated";
 import { compareDesc } from "date-fns";
 
 import { formatDate } from "@/lib/utils";
@@ -13,11 +12,26 @@ export const metadata = {
 };
 
 export default function GuidesPage() {
-  const guides = allGuides
-    .filter((guide) => guide.published)
-    .sort((a, b) => {
-      return compareDesc(new Date(a.date), new Date(b.date));
-    });
+  const guides = [
+    {
+      _id: "1",
+      title: "Getting Started with Next.js 15",
+      description: "Learn the fundamentals of Next.js 15 and build your first application.",
+      date: "2024-03-20",
+      slug: "/guides/getting-started",
+      published: true,
+      featured: true
+    },
+    {
+      _id: "2", 
+      title: "Authentication with NextAuth.js",
+      description: "Implement secure authentication in your Next.js application.",
+      date: "2024-03-15",
+      slug: "/guides/nextauth",
+      published: true,
+      featured: false
+    }
+  ];
 
   return (
     <MaxWidthWrapper className="py-6 lg:py-10">

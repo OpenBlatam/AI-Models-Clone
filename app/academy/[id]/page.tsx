@@ -7,13 +7,14 @@ import { notFound } from "next/navigation";
 import { useState } from "react";
 
 interface AcademyPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default function AcademyPage({ params }: AcademyPageProps) {
-  const academy = getAcademyById(params.id);
+export default async function AcademyPage({ params }: AcademyPageProps) {
+  const resolvedParams = await params;
+  const academy = getAcademyById(resolvedParams.id);
 
   if (!academy) {
     notFound();
@@ -99,4 +100,4 @@ export default function AcademyPage({ params }: AcademyPageProps) {
       </div>
     </div>
   );
-}  
+}      

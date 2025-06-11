@@ -17,7 +17,7 @@ export async function updateProgress(exerciseId: string, points: number) {
     let userProgress = await prisma.userProgress.findUnique({
       where: { userId: session.user.id },
       include: {
-        completedLessons: true
+        Lesson: true
       }
     });
 
@@ -31,7 +31,7 @@ export async function updateProgress(exerciseId: string, points: number) {
           lastActive: new Date(),
         },
         include: {
-          completedLessons: true
+          Lesson: true
         }
       });
     }
@@ -47,7 +47,7 @@ export async function updateProgress(exerciseId: string, points: number) {
     }
 
     // Check if the lesson is already completed
-    const isLessonCompleted = userProgress.completedLessons.some(
+    const isLessonCompleted = userProgress.Lesson.some(
       lesson => lesson.id === exercise.lessonId
     );
 
@@ -74,23 +74,23 @@ export async function updateProgress(exerciseId: string, points: number) {
         streak: newStreak,
         lastActive: today,
         ...(isLessonCompleted ? {} : {
-          completedLessons: {
+          Lesson: {
             connect: { id: exercise.lessonId }
           }
         })
       },
       include: {
-        completedLessons: true
+        Lesson: true
       }
     });
 
     revalidatePath("/dashboard");
     return { 
       success: true,
-      completedLessons: updatedProgress.completedLessons.length
+      completedLessons: updatedProgress.Lesson.length
     };
   } catch (error) {
     console.error("[PROGRESS_UPDATE]", error);
     throw error;
   }
-} 
+}   

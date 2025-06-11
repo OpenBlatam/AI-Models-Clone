@@ -12,7 +12,7 @@ export async function getUserSubscriptionPlan(
       stripeCustomerId: null,
       stripeSubscriptionId: null,
       stripePriceId: null,
-      stripeCurrentPeriodEnd: null,
+      stripeCurrentPeriodEnd: 0,
       isPaid: false,
       interval: null,
       isCanceled: false
@@ -37,7 +37,7 @@ export async function getUserSubscriptionPlan(
       stripeCustomerId: null,
       stripeSubscriptionId: null,
       stripePriceId: null,
-      stripeCurrentPeriodEnd: null,
+      stripeCurrentPeriodEnd: 0,
       isPaid: false,
       interval: null,
       isCanceled: false
@@ -47,7 +47,8 @@ export async function getUserSubscriptionPlan(
   // Check if user is on a paid plan.
   const isPaid =
     user.stripePriceId &&
-    user.stripeCurrentPeriodEnd?.getTime() + 86_400_000 > Date.now() ? true : false;
+    user.stripeCurrentPeriodEnd &&
+    user.stripeCurrentPeriodEnd.getTime() + 86_400_000 > Date.now() ? true : false;
 
   // Find the pricing data corresponding to the user's plan
   const userPlan =
@@ -75,7 +76,7 @@ export async function getUserSubscriptionPlan(
   return {
     ...plan,
     ...user,
-    stripeCurrentPeriodEnd: user.stripeCurrentPeriodEnd?.getTime(),
+    stripeCurrentPeriodEnd: user.stripeCurrentPeriodEnd?.getTime() || 0,
     isPaid,
     interval,
     isCanceled,

@@ -458,7 +458,7 @@ export function ChatLayout({ children }: { children: React.ReactNode }) {
         title: "¡Bienvenido a Blatam Academy!",
         description: "Tu asistente IA está listo para ayudarte.",
         action: (
-          <ToastAction altText="Cerrar" onClick={() => toast.dismiss()}>
+          <ToastAction altText="Cerrar" onClick={() => window.location.reload()}>
             Cerrar
           </ToastAction>
         ),

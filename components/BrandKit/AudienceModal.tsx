@@ -96,7 +96,7 @@ export function AudienceModal({
             className="mt-4 border border-gray-200 text-gray-900 font-semibold py-3 px-6 rounded-xl bg-white hover:bg-gray-50 w-fit"
             onClick={() => setManual(true)}
           >
-            I'll write my own
+            I&apos;ll write my own
           </Button>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-2 bg-[#F6F7F9] rounded-xl px-4 py-3">

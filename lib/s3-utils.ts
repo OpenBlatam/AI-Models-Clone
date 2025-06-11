@@ -1,5 +1,5 @@
 import { PutObjectCommand, GetObjectCommand, DeleteObjectCommand, S3Client } from '@aws-sdk/client-s3';
-import { s3Client, S3_BUCKET_NAME, S3_VIDEO_BUCKET_NAME, S3_VIDEO_BUCKET_URL } from './aws-config';
+import { s3Client, S3_BUCKET_NAME, S3_CLIENT_BUCKET_NAME, S3_BUCKET_URL, S3_CLIENT_BUCKET_URL } from './aws-config';
 
 // General file upload
 export async function uploadFileToS3(file: File, key: string) {
@@ -27,7 +27,7 @@ export async function uploadVideoToS3(file: File, key: string) {
     const formattedKey = key.startsWith('Cursos/') ? key : `Cursos/${key}`;
     
     const command = new PutObjectCommand({
-      Bucket: S3_VIDEO_BUCKET_NAME,
+      Bucket: S3_CLIENT_BUCKET_NAME,
       Key: formattedKey,
       Body: file,
       ContentType: 'video/mp4',
@@ -61,7 +61,7 @@ export async function deleteFileFromS3(key: string) {
 export async function deleteVideoFromS3(key: string) {
   try {
     const command = new DeleteObjectCommand({
-      Bucket: S3_VIDEO_BUCKET_NAME,
+      Bucket: S3_CLIENT_BUCKET_NAME,
       Key: key,
     });
 
@@ -81,11 +81,11 @@ export function getFileUrl(key: string) {
 export function getVideoUrl(key: string) {
   // Ensure the key starts with 'Cursos/'
   const formattedKey = key.startsWith('Cursos/') ? key : `Cursos/${key}`;
-  return `${S3_VIDEO_BUCKET_URL}/${formattedKey}`;
+  return `${S3_CLIENT_BUCKET_URL}/${formattedKey}`;
 }
 
 // Get video thumbnail URL
 export function getVideoThumbnailUrl(key: string) {
   const thumbnailKey = key.replace(/\.[^/.]+$/, '-thumbnail.jpg');
-  return `${S3_VIDEO_BUCKET_URL}/${thumbnailKey}`;
-} 
+  return `${S3_CLIENT_BUCKET_URL}/${thumbnailKey}`;
+}    

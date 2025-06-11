@@ -308,4 +308,4 @@ export function AcademyContent({ learningPaths }: AcademyContentProps) {
       </motion.div>
     </motion.div>
   );
-} 
+}    

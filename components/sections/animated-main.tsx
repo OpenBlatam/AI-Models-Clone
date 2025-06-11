@@ -1,6 +1,7 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
+import { useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import { AnimatedHero } from "./animated-hero";
 import { AnimatedFeatures } from "./animated-features";
@@ -77,4 +78,4 @@ export function AnimatedMain() {
       />
     </motion.main>
   );
-} 
+}    

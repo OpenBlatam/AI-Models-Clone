@@ -11,6 +11,7 @@ export interface Academy {
   totalClasses: number;
   totalDuration: string;
   experience: number;
+  totalProgress?: number;
   s3Config: {
     bucketName: string;
     clientKey: string;
@@ -60,4 +61,4 @@ export interface AcademyProgress {
   lastAccessed: string;
   createdAt: string;
   updatedAt: string;
-} 
+}  

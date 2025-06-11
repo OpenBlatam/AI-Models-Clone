@@ -1,7 +1,6 @@
 import * as React from "react";
 import NextImage, { ImageProps } from "next/image";
 import Link from "next/link";
-import { useMDXComponent } from "next-contentlayer2/hooks";
 import "@/styles/animations.css";
 
 import { cn } from "@/lib/utils";
@@ -201,13 +200,12 @@ const components = {
 };
 
 interface MdxProps {
-  code: string;
+  code?: string;
+  content?: string;
   images?: { alt: string; src: string; blurDataURL: string }[];
 }
 
-export function Mdx({ code, images }: MdxProps) {
-  const Component = useMDXComponent(code);
-
+export function Mdx({ code, content, images }: MdxProps) {
   const MDXImage = (props: any) => {
     if (!images) return null;
     const blurDataURL = images.find(
@@ -225,14 +223,13 @@ export function Mdx({ code, images }: MdxProps) {
     );
   };
 
+  const htmlContent = content || code || '';
+  
   return (
-    <div className="mdx">
-      <Component
-        components={{
-          ...components,
-          Image: MDXImage,
-        }}
-      />
+    <div className="mdx prose prose-lg max-w-none">
+      <div dangerouslySetInnerHTML={{ 
+        __html: htmlContent.replace(/\n/g, '<br />') 
+      }} />
     </div>
   );
 }

@@ -32,7 +32,7 @@ export default async function AchievementsPage() {
       title: "Primera Lección",
       description: "Completa tu primera lección en la plataforma.",
       icon: "star",
-      progress: userProgress?.level > 0 ? 100 : 0,
+      progress: (userProgress?.level ?? 0) > 0 ? 100 : 0,
     },
     {
       id: "streak-3",
@@ -88,4 +88,4 @@ export default async function AchievementsPage() {
       />
     </div>
   );
-} 
+}   

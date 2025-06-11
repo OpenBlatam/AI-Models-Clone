@@ -212,4 +212,4 @@ const VideoSidebar: React.FC<VideoSidebarProps> = ({
   );
 };
 
-export default VideoSidebar; 
+export default VideoSidebar;    

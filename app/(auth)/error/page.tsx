@@ -4,10 +4,11 @@ import { useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { AlertCircle } from "lucide-react";
+import { Suspense } from "react";
 
-export default function AuthErrorPage() {
+function ErrorContent() {
   const searchParams = useSearchParams();
-  const error = searchParams.get("error");
+  const error = searchParams?.get("error");
 
   const errorMessages: Record<string, string> = {
     Configuration: "Hay un problema con la configuración del servidor. Por favor, contacta al administrador.",
@@ -43,4 +44,23 @@ export default function AuthErrorPage() {
       </div>
     </div>
   );
-} 
+}
+
+export default function AuthErrorPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md space-y-8 rounded-lg border bg-card p-8 shadow-lg">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="rounded-full bg-destructive/10 p-3">
+              <AlertCircle className="h-6 w-6 text-destructive" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight">Cargando...</h1>
+          </div>
+        </div>
+      </div>
+    }>
+      <ErrorContent />
+    </Suspense>
+  );
+}      

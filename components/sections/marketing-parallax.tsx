@@ -121,4 +121,4 @@ export function MarketingParallax() {
       </div>
     </div>
   )
-} 
+}   

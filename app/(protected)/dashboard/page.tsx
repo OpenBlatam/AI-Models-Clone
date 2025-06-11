@@ -76,7 +76,10 @@ async function UserProgress({ userId }: { userId: string }) {
   return (
     <DashboardContent 
       gameStats={gameStats}
-      achievements={userProgress?.achievements || []}
+      achievements={userProgress?.achievements?.map(achievement => ({
+        ...achievement,
+        unlockedAt: achievement.unlockedAt?.toISOString() || null
+      })) || []}
     />
   );
 }
