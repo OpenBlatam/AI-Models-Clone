@@ -12,6 +12,8 @@ export const fundamentosChatGPTAcademy: Academy = {
   totalDuration: "32min",
   experience: 1300,
   rating: 4.8,
+  difficulty: "beginner",
+  tags: ["ChatGPT", "Fundamentos", "IA", "Principiantes"],
   s3Config: {
     bucketName: "blatamcursos",
     clientKey: process.env.NEXT_PUBLIC_AWS_ACCESS_KEY_ID!,
@@ -229,4 +231,4 @@ export const fundamentosChatGPTAcademy: Academy = {
   ],
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
-}; 
+};   

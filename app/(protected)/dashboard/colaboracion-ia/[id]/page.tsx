@@ -35,7 +35,6 @@ export default function EditorPage({ params }: EditorPageProps) {
     selectedShapes,
     history,
     handleSave,
-    handleZoom,
     handleGridToggle,
     handleAutoSaveToggle,
     handleUndo,
@@ -185,4 +184,4 @@ export default function EditorPage({ params }: EditorPageProps) {
       </div>
     </div>
   );
-}  
+}          

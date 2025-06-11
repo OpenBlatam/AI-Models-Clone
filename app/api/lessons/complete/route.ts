@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     const userProgress = await prisma.userProgress.findUnique({
       where: { userId: session.user.id },
       include: {
-        completedLessons: true
+        Lesson: true
       }
     });
 
@@ -26,8 +26,8 @@ export async function POST(req: Request) {
     }
 
     // Verificar si la lección ya fue completada
-    const lessonAlreadyCompleted = userProgress.completedLessons.some(
-      cl => cl.lessonId === lessonId
+    const lessonAlreadyCompleted = userProgress.Lesson.some(
+      lesson => lesson.id === lessonId
     );
 
     if (lessonAlreadyCompleted) {
@@ -48,16 +48,14 @@ export async function POST(req: Request) {
       data: {
         experience: newExperience,
         level: newLevel,
-        completedLessons: {
-          create: {
-            lessonId: lessonId,
-            completedAt: new Date(),
-            score: score
+        Lesson: {
+          connect: {
+            id: lessonId
           }
         }
       },
       include: {
-        completedLessons: true
+        Lesson: true
       }
     });
 
@@ -66,11 +64,11 @@ export async function POST(req: Request) {
       levelUp,
       newLevel,
       newExperience,
-      completedLessons: updatedProgress.completedLessons.length
+      completedLessons: updatedProgress.Lesson.length
     });
 
   } catch (error) {
     console.error('Error completing lesson:', error);
     return new NextResponse("Error interno del servidor", { status: 500 });
   }
-}  
+}      

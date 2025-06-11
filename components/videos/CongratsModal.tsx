@@ -95,4 +95,4 @@ const CongratsModal: React.FC<CongratsModalProps> = ({
   );
 };
 
-export default CongratsModal; 
+export default CongratsModal;    

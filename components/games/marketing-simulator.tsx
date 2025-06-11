@@ -390,4 +390,4 @@ export function MarketingSimulator() {
       </div>
     </Card>
   )
-}  
+}        

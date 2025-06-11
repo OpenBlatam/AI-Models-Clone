@@ -63,7 +63,7 @@ function getItems(node: any, current: any): Items {
 const getToc = () => (node: any, file: any) => {
   const table = toc(node)
   file.data = getItems(table.map, {})
-}</str_str>
+}
 
 export type TableOfContents = Items
 
@@ -72,5 +72,5 @@ export async function getTableOfContents(
 ): Promise<TableOfContents> {
   const result = await remark().use(getToc).process(content)
 
-  return result.data
+  return result.data as TableOfContents
 }

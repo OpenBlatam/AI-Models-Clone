@@ -161,10 +161,10 @@ export default function ContinueLearningCarousel({ userName = "Raul", onCourseCl
             >
               <X className="w-6 h-6" />
             </button>
-            <VideoPlayer src={selectedCourse.videoUrl || ""} autoPlay />
+            <VideoPlayer courseId={selectedCourse.id} autoPlay />
           </div>
         </div>
       )}
     </section>
   );
-} 
+}   

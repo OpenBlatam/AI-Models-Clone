@@ -18,9 +18,10 @@ export default async function MatchPage() {
         text="Empareja conceptos relacionados con marketing digital."
       />
       <div className="grid gap-8">
-        {/* Aquí irá el contenido del juego de emparejamiento */}
-        <MarketingMatch />
+        <div className="p-8 border border-gray-200 rounded-lg bg-white">
+          <p className="text-gray-500 text-center">Juego de emparejamiento en desarrollo</p>
+        </div>
       </div>
     </div>
   );
-} 
+}   

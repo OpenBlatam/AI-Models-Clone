@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Icons } from "@/components/shared/icons";
@@ -133,4 +135,4 @@ export function ProgressDisplay() {
       </div>
     </div>
   );
-}  
+}              

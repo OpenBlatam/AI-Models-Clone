@@ -139,22 +139,22 @@ export default function AcademyClassesModal({
                       </p>
                       <div className="flex items-center gap-2">
                         {classItem.isCompleted ? (
-                          <Badge variant="success">
+                          <Badge variant="secondary" className="bg-green-100 text-green-800 border-green-200">
                             <CheckCircle2 className="w-4 h-4 mr-1" />
                             Completado
                           </Badge>
                         ) : (
                           <Badge variant="secondary">
                             <Lock className="w-4 h-4 mr-1" />
-                            {classItem.progress}% Completado
+                            {classItem.progress ?? 0}% Completado
                           </Badge>
                         )}
                         <Badge variant="outline">
                           {classItem.experience} XP
                         </Badge>
                       </div>
-                      {classItem.progress > 0 && !classItem.isCompleted && (
-                        <Progress value={classItem.progress} className="h-1" />
+                      {(classItem.progress ?? 0) > 0 && !classItem.isCompleted && (
+                        <Progress value={classItem.progress ?? 0} className="h-1" />
                       )}
                     </div>
                   </div>
@@ -166,4 +166,4 @@ export default function AcademyClassesModal({
       </DialogContent>
     </Dialog>
   );
-}  
+}      

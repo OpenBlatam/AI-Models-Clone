@@ -56,7 +56,11 @@ export default function DashboardLayout({
         </main>
       </div>
       {/* ElevenLabs Convai Widget */}
-      <elevenlabs-convai agent-id="agent_01jw2hqjcmf5js8yr208bavbaq"></elevenlabs-convai>
+      <div 
+        dangerouslySetInnerHTML={{
+          __html: '<elevenlabs-convai agent-id="agent_01jw2hqjcmf5js8yr208bavbaq"></elevenlabs-convai>'
+        }}
+      />
     </div>
   );
-} 
+}   

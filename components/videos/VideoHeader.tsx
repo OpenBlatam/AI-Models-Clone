@@ -70,4 +70,4 @@ export default function VideoHeader({
       </div>
     </div>
   );
-} 
+}    

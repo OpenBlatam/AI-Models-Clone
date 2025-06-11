@@ -14,7 +14,7 @@ import {
   Type,
   Image as ImageIcon,
   ArrowRight,
-  Line,
+  Minus,
   Star,
   Hexagon,
   Eraser,
@@ -55,7 +55,7 @@ export function DrawingTools({
     { id: 'text', icon: Type, label: 'Texto' },
     { id: 'image', icon: ImageIcon, label: 'Imagen' },
     { id: 'arrow', icon: ArrowRight, label: 'Flecha' },
-    { id: 'line', icon: Line, label: 'Línea' },
+    { id: 'line', icon: Minus, label: 'Línea' },
     { id: 'star', icon: Star, label: 'Estrella' },
     { id: 'polygon', icon: Hexagon, label: 'Polígono' },
     { id: 'eraser', icon: Eraser, label: 'Borrador' },
@@ -175,4 +175,4 @@ export function DrawingTools({
       </div>
     </div>
   );
-} 
+}     

@@ -139,6 +139,22 @@ export function useEditorState(editor: any) {
     }
   }, [editor]);
 
+  const handleGridToggle = useCallback(() => {
+    setShowGrid(!showGrid);
+  }, [showGrid]);
+
+  const handleAutoSaveToggle = useCallback(() => {
+    setAutoSave(!autoSave);
+  }, [autoSave]);
+
+  const handleUndo = useCallback(() => {
+    if (editor) editor.undo();
+  }, [editor]);
+
+  const handleRedo = useCallback(() => {
+    if (editor) editor.redo();
+  }, [editor]);
+
   return {
     title,
     setTitle,
@@ -151,6 +167,10 @@ export function useEditorState(editor: any) {
     zoom,
     selectedShapes,
     handleSave,
+    handleGridToggle,
+    handleAutoSaveToggle,
+    handleUndo,
+    handleRedo,
     handleZoomIn,
     handleZoomOut,
     handleResetZoom,
@@ -163,4 +183,4 @@ export function useEditorState(editor: any) {
       redo: () => editor?.redo(),
     },
   };
-}  
+}    

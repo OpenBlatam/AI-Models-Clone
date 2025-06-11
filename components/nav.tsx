@@ -47,7 +47,7 @@ export function Nav() {
             {isLoading ? (
               <div className="h-8 w-8 animate-pulse rounded-full bg-gray-200 dark:bg-gray-800" />
             ) : user ? (
-              <UserNav user={user} />
+              <UserNav />
             ) : (
               <Button asChild>
                 <Link href="/login">Iniciar Sesión</Link>
@@ -97,4 +97,4 @@ export function Nav() {
       )}
     </header>
   );
-} 
+}  

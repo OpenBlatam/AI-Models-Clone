@@ -1,5 +1,13 @@
 import Link from "next/link";
-import { Post } from "contentlayer/generated";
+interface Post {
+  _id: string;
+  title: string;
+  description?: string;
+  image?: string;
+  authors: string[];
+  date?: string;
+  slug: string;
+}
 
 import { cn, formatDate, placeholderBlurhash } from "@/lib/utils";
 import BlurImage from "@/components/shared/blur-image";

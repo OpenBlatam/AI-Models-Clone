@@ -115,4 +115,4 @@ export function Notifications({ notifications, onMarkAsRead }: NotificationsProp
       </AnimatePresence>
     </div>
   );
-} 
+}    

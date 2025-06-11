@@ -6,14 +6,12 @@ import {
   Textarea,
   Button,
   Avatar,
-  useToast,
   Spinner,
   chakra,
   VisuallyHidden,
-  useColorModeValue,
   Text,
 } from "@chakra-ui/react";
-import { ArrowUpIcon } from "@chakra-ui/icons";
+import { ArrowUpIcon } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
@@ -43,7 +41,7 @@ export default function ChatPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
-  const toast = useToast();
+  // const toast = useToast(); // Removed due to compatibility issues
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto scroll to bottom
@@ -93,13 +91,7 @@ export default function ChatPage() {
         if (data?.url) {
           addMessage({ type: "bot", image: data.url });
         } else {
-          toast({
-            title: "Error",
-            description: "No se pudo generar la imagen.",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-          });
+          console.error("No se pudo generar la imagen.");
           addMessage({ type: "bot", text: "❌ No se pudo generar la imagen." });
         }
       } else {
@@ -114,24 +106,12 @@ export default function ChatPage() {
         if (data?.text) {
           addMessage({ type: "bot", text: data.text });
         } else {
-          toast({
-            title: "Error",
-            description: "No se pudo obtener respuesta del modelo.",
-            status: "error",
-            duration: 5000,
-            isClosable: true,
-          });
+          console.error("No se pudo obtener respuesta del modelo.");
           addMessage({ type: "bot", text: "❌ No se pudo obtener respuesta." });
         }
       }
     } catch (error) {
-      toast({
-        title: "Error",
-        description: "Ocurrió un error inesperado.",
-        status: "error",
-        duration: 5000,
-        isClosable: true,
-      });
+      console.error("Ocurrió un error inesperado.");
       addMessage({ type: "bot", text: "❌ Error en la petición." });
     } finally {
       setLoading(false);
@@ -243,50 +223,51 @@ export default function ChatPage() {
                   p={4}
                   borderRadius="2xl"
                   position="relative"
-                  sx={{
-                    "&::after": {
-                      content: '""',
-                      position: "absolute",
-                      bottom: 0,
-                      width: 8,
-                      height: 8,
-                      backgroundColor: isUser ? "blue.600" : "gray.700",
-                      transform: isUser ? "translateX(50%) rotate(45deg)" : "translateX(-50%) rotate(45deg)",
-                      left: isUser ? "100%" : "0",
-                      borderBottomRightRadius: 2,
-                    },
+                  _after={{
+                    content: '""',
+                    position: "absolute",
+                    bottom: 0,
+                    width: 8,
+                    height: 8,
+                    backgroundColor: isUser ? "blue.600" : "gray.700",
+                    transform: isUser ? "translateX(50%) rotate(45deg)" : "translateX(-50%) rotate(45deg)",
+                    left: isUser ? "100%" : "0",
+                    borderBottomRightRadius: 2,
                   }}
                 >
                   {image ? (
-                    <Box
-                      as="img"
+                    <img
                       src={image}
                       alt="Imagen generada"
-                      borderRadius="lg"
-                      maxW="100%"
-                      maxH="400px"
-                      objectFit="contain"
+                      style={{
+                        borderRadius: "8px",
+                        maxWidth: "100%",
+                        maxHeight: "400px",
+                        objectFit: "contain"
+                      }}
                       loading="lazy"
                     />
                   ) : (
-                    <ReactMarkdown
-                      children={text || ""}
-                      remarkPlugins={[remarkGfm]}
-                      rehypePlugins={[rehypeHighlight]}
-                      className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap"
-                      components={{
-                        p: (props) => <Text mb={2} {...props} />,
-                        a: (props) => (
-                          <chakra.a
-                            {...props}
-                            color="blue.300"
-                            isExternal
-                            textDecoration="underline"
-                            _hover={{ color: "blue.400" }}
-                          />
-                        ),
-                      }}
-                    />
+                    <div className="prose prose-invert prose-sm max-w-none whitespace-pre-wrap">
+                      <ReactMarkdown
+                        components={{
+                          p: (props) => <Text mb={2} {...props} />,
+                          a: (props) => (
+                            <a
+                              {...props}
+                              style={{
+                                color: "#63b3ed",
+                                textDecoration: "underline"
+                              }}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            />
+                          ),
+                        }}
+                      >
+                        {text || ""}
+                      </ReactMarkdown>
+                    </div>
                   )}
                 </Box>
               </MotionBox>
@@ -318,19 +299,18 @@ export default function ChatPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Escribe 'imagen un dragón' o hazme una pregunta..."
-            isDisabled={loading}
+            disabled={loading}
             aria-label="Entrada de texto"
             flex="1"
           />
           <Button
             colorScheme="blue"
             type="submit"
-            isLoading={loading}
+            loading={loading}
             loadingText="Enviando"
             aria-label="Enviar mensaje"
-            rightIcon={<ArrowUpIcon />}
           >
-            Enviar
+            Enviar <ArrowUpIcon style={{ marginLeft: '8px', width: '16px', height: '16px' }} />
           </Button>
         </Flex>
       </form>

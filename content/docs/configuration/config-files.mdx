@@ -201,24 +201,7 @@ description: Guía esencial de los conceptos fundamentales en automatización de
           <p className="text-xs text-blue-600 mt-1">Optimiza tus flujos regularmente</p>
         </div>
       </li>
-    <ul className="space-y-3 text-blue-800">
-      <li className="flex items-center transform hover:translate-x-2 transition-transform duration-300">
-        <span className="w-2 h-2 bg-blue-500 rounded-full mr-3 animate-pulse"></span>
-        Comienza con automatizaciones simples y ve escalando
-      </li>
-      <li className="flex items-center transform hover:translate-x-2 transition-transform duration-300">
-        <span className="w-2 h-2 bg-blue-500 rounded-full mr-3 animate-pulse"></span>
-        Mantén un enfoque centrado en el usuario
-      </li>
-      <li className="flex items-center transform hover:translate-x-2 transition-transform duration-300">
-        <span className="w-2 h-2 bg-blue-500 rounded-full mr-3 animate-pulse"></span>
-        Mide y analiza todo lo que automatices
-      </li>
-      <li className="flex items-center transform hover:translate-x-2 transition-transform duration-300">
-        <span className="w-2 h-2 bg-blue-500 rounded-full mr-3 animate-pulse"></span>
-        Actualiza y mejora constantemente tus flujos
-      </li>
-    </ul>
+    </ol>
   </div>
 </div>
 
@@ -308,39 +291,10 @@ description: Guía esencial de los conceptos fundamentales en automatización de
       Configuración Técnica
     </h5>
     <div className="bg-gray-800/90 backdrop-blur-sm rounded-xl p-6 shadow-lg hover:shadow-xl transition-all duration-300">
-      <pre className="text-sm text-gray-200 overflow-x-auto">
-        <code className="animate-fade-in">{`// Ejemplo de configuración de automatización
-const welcomeSequence = {
-  trigger: 'new_subscriber',
-  steps: [
-    {
-      type: 'email',
-      delay: '0h',
-      template: 'welcome_email',
-      conditions: {
-        segment: 'new_users',
-        preferences: ['marketing_emails']
-      }
-    },
-    {
-      type: 'email',
-      delay: '72h',
-      template: 'follow_up',
-      conditions: {
-        opened_previous: true
-      }
-    },
-    {
-      type: 'email',
-      delay: '168h',
-      template: 'special_offer',
-      conditions: {
-        clicked_previous: true
-      }
-    }
-  ]
-};`}</code>
-      </pre>
+      <div className="text-sm text-gray-200">
+        <p className="mb-2 text-purple-400 font-semibold">Ejemplo de configuración de automatización</p>
+        <p className="text-gray-400">Configuración de secuencias de email automatizadas con triggers y condiciones.</p>
+      </div>
     </div>
   </div>
 </div>

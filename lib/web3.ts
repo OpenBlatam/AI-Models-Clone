@@ -15,6 +15,10 @@ export const getProvider = () => {
 };
 
 export const connectWallet = async () => {
+  if (typeof window === 'undefined') {
+    throw new Error('MetaMask only available in browser environment');
+  }
+  
   try {
     if (!window.ethereum) {
       throw new Error('MetaMask no está instalado. Por favor, instala MetaMask para continuar.');
@@ -54,4 +58,4 @@ declare global {
   interface Window {
     ethereum?: any;
   }
-}  
+}    

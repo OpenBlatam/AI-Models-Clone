@@ -91,4 +91,4 @@ const NextClassModal: React.FC<NextClassModalProps> = ({
   );
 };
 
-export default NextClassModal; 
+export default NextClassModal;    

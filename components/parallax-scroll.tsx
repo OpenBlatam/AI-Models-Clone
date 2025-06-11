@@ -30,4 +30,4 @@ export function ParallaxScroll({
       </motion.div>
     </div>
   )
-} 
+}   

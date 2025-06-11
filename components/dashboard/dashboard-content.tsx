@@ -304,4 +304,4 @@ export function DashboardContent({ gameStats, achievements }: DashboardContentPr
       </Card>
     </motion.div>
   );
-} 
+}    

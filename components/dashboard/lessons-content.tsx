@@ -125,4 +125,4 @@ export function LessonsContent({ lessons, userLevel }: LessonsContentProps) {
       </div>
     </motion.div>
   );
-} 
+}    

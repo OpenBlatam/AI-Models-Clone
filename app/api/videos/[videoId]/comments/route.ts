@@ -5,10 +5,11 @@ import { getCurrentUser } from "@/lib/session";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { videoId: string } }
+  { params }: { params: Promise<{ videoId: string }> }
 ) {
   try {
-    const videoId = await params.videoId;
+    const resolvedParams = await params;
+    const videoId = resolvedParams.videoId;
     const cacheKey = `video:${videoId}:comments`;
 
     // Try Redis first
@@ -39,7 +40,7 @@ export async function GET(
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { videoId: string } }
+  { params }: { params: Promise<{ videoId: string }> }
 ) {
   try {
     const user = await getCurrentUser();
@@ -50,7 +51,8 @@ export async function POST(
       );
     }
 
-    const videoId = await params.videoId;
+    const resolvedParams = await params;
+    const videoId = resolvedParams.videoId;
     const { content } = await req.json();
 
     if (!content) {
@@ -82,4 +84,4 @@ export async function POST(
       { status: 500 }
     );
   }
-} 
+}   

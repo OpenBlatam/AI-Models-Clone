@@ -16,7 +16,7 @@ interface UseAblyCursorOptions {
 export function useAblyCursor({ ablyApiKey, channelName, userId }: UseAblyCursorOptions) {
   const [remoteCursors, setRemoteCursors] = useState<Record<string, CursorPosition>>({});
   const ablyRef = useRef<Ably.Realtime | null>(null);
-  const channelRef = useRef<Ably.Types.RealtimeChannelCallbacks | null>(null);
+  const channelRef = useRef<Ably.RealtimeChannel | null>(null);
 
   // Inicializar Ably y canal
   useEffect(() => {
@@ -47,4 +47,4 @@ export function useAblyCursor({ ablyApiKey, channelName, userId }: UseAblyCursor
     remoteCursors, // { [userId]: { x, y, userId } }
     sendCursor,
   };
-} 
+}   

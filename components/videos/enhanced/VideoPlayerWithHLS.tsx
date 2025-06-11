@@ -133,7 +133,6 @@ const VideoPlayerWithHLS = memo(function VideoPlayerWithHLS({
         if (enableAnalytics && videoId) {
           trackVideoEvent('hls_manifest_parsed', {
             levels: data.levels.length,
-            duration: data.totalduration,
           });
         }
       });

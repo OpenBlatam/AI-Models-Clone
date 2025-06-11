@@ -153,4 +153,4 @@ export default function CollaborationSidebar() {
       </div>
     </motion.div>
   );
-} 
+}    

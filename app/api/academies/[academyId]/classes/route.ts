@@ -5,10 +5,11 @@ import { getCurrentUser } from "@/lib/session";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { academyId: string } }
+  { params }: { params: Promise<{ academyId: string }> }
 ) {
   try {
-    const academyId = params.academyId;
+    const resolvedParams = await params;
+    const academyId = resolvedParams.academyId;
     const user = await getCurrentUser();
     const cacheKey = `academy:${academyId}:classes`;
 
@@ -65,4 +66,4 @@ export async function GET(
       { status: 500 }
     );
   }
-} 
+}   

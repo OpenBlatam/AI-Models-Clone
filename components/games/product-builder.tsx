@@ -136,59 +136,9 @@ export function ProductBuilder({ initialCategory = "bebida" }: ProductBuilderPro
   return (
     <div className="space-y-6">
       <div className="flex justify-center">
-        <Stage
-          width={400}
-          height={500}
-          ref={stageRef}
-          className="border border-gray-200 rounded-lg bg-white"
-        >
-          <Layer>
-            {/* Base del producto */}
-            <Image
-              image={baseImage}
-              x={100}
-              y={200}
-              width={200}
-              height={250}
-              fill={customizations.color}
-            />
-            
-            {/* Elemento secundario */}
-            <Image
-              image={lidImage}
-              x={120}
-              y={180}
-              width={160}
-              height={40}
-              draggable
-              onDragEnd={handleDragEnd}
-            />
-            
-            {/* Accesorios */}
-            <Image
-              image={strawImage}
-              x={250}
-              y={150}
-              width={20}
-              height={100}
-              draggable
-              onDragEnd={handleDragEnd}
-            />
-
-            {/* AI Generated Image */}
-            {aiImage && (
-              <Image
-                image={aiImage}
-                x={50}
-                y={50}
-                width={300}
-                height={300}
-                draggable
-                onDragEnd={handleDragEnd}
-              />
-            )}
-          </Layer>
-        </Stage>
+        <div className="w-96 h-96 border border-gray-200 rounded-lg bg-white flex items-center justify-center">
+          <p className="text-gray-500">Product Builder (Canvas disabled)</p>
+        </div>
       </div>
 
       <Card className="p-4">
@@ -268,4 +218,4 @@ export function ProductBuilder({ initialCategory = "bebida" }: ProductBuilderPro
       </div>
     </div>
   )
-} 
+}   
