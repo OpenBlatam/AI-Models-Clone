@@ -27,6 +27,7 @@ export const env = createEnv({
     NEXT_PUBLIC_APP_URL: z.string().url().default("http://localhost:3000"),
     NEXT_PUBLIC_AWS_REGION: z.string().default("us-east-1"),
     NEXT_PUBLIC_AWS_S3_VIDEO_BUCKET_NAME: z.string().default("blatamcursos"),
+    NEXT_PUBLIC_API_URL: z.string().url().default("http://localhost:8001"),
   },
   runtimeEnv: {
     AUTH_SECRET: process.env.AUTH_SECRET,
@@ -41,6 +42,7 @@ export const env = createEnv({
     AWS_S3_VIDEO_BUCKET_NAME: process.env.AWS_S3_VIDEO_BUCKET_NAME,
     NEXT_PUBLIC_AWS_REGION: process.env.AWS_REGION,
     NEXT_PUBLIC_AWS_S3_VIDEO_BUCKET_NAME: process.env.AWS_S3_VIDEO_BUCKET_NAME,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 });

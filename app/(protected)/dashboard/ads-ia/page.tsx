@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle, BookOpen } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BrandKitWizardModal } from "@/components/BrandKit/BrandKitWizardModal";
 import { parseBrandKit } from "@/utils/parseBrandKit";
@@ -20,6 +20,8 @@ import { Badge } from "@/components/ui/badge";
 import BrandKitDisplay from "@/components/BrandKit/BrandKitDisplay";
 import HeroSection from "@/components/ui/HeroSection";
 import UrlInputBox from "@/components/ui/UrlInputBox";
+import { FacebookPostGenerator } from "@/components/FacebookPost/FacebookPostGenerator";
+import { BlogPostGenerator } from "@/components/BlogPost/BlogPostGenerator";
 
 function mapBrandKitDataToDisplay(data) {
   return {
@@ -54,6 +56,7 @@ export default function AdsIaPage() {
   const [generatedContent, setGeneratedContent] = useState("");
   const [selectedTemplateDetail, setSelectedTemplateDetail] = useState(null);
   const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [customText, setCustomText] = useState("");
 
   const handleExtract = async (type: "ads" | "brand-kit") => {
     setLoading(true);
@@ -62,18 +65,31 @@ export default function AdsIaPage() {
     setBrandKit("");
     
     try {
+      console.log('Making request to /api/ads-ia with:', { url, type });
       const res = await fetch("/api/ads-ia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url, type }),
       });
+      
+      console.log('Response status:', res.status);
+      const contentType = res.headers.get('content-type');
+      console.log('Response content type:', contentType);
+      
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await res.text();
+        console.error('Non-JSON response:', text);
+        throw new Error('Invalid response format from server');
+      }
+      
       const data = await res.json();
+      console.log('Response data:', data);
       
       if (!res.ok) {
         throw new Error(data.error || "Error al procesar la solicitud");
       }
       
-      if (data.error) {
+      if (data.error && !data.fallback) {
         throw new Error(data.error);
       }
       
@@ -81,13 +97,54 @@ export default function AdsIaPage() {
         setAds(data.ads || []);
       } else {
         setBrandKit(data.brandKit || "");
-        setWizardOpen(true);
+        if (data.brandKit) {
+          setWizardOpen(true);
+        }
       }
     } catch (e: any) {
+      console.error('Error in handleExtract:', e);
       setError({
         message: e.message || "Error al procesar la solicitud",
         details: e.details || e.message
       });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Streaming handler for ads
+  const handleExtractStream = async () => {
+    setLoading(true);
+    setError(null);
+    setAds([]);
+    try {
+      const payload: any = { url, type: "ads" };
+      if (customText.trim()) {
+        payload.website_content = customText;
+      }
+      const res = await fetch("/api/ads-ia/stream", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (!res.body) throw new Error("No stream body");
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let done = false;
+      let buffer = '';
+      while (!done) {
+        const { value, done: doneReading } = await reader.read();
+        done = doneReading;
+        buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+        let lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          if (line.trim()) setAds(prev => [...prev, line]);
+        }
+      }
+      if (buffer.trim()) setAds(prev => [...prev, buffer]);
+    } catch (e: any) {
+      setError({ message: e.message || "Error al procesar la solicitud" });
     } finally {
       setLoading(false);
     }
@@ -107,14 +164,67 @@ export default function AdsIaPage() {
       const res = await fetch("/api/ads-ia", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url, type: "ads", prompt }),
+        body: JSON.stringify({ 
+          url, 
+          type: "ads", 
+          prompt,
+          brandKit: brandKitData // Pass brand kit data for better context
+        }),
       });
       const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || "Error al generar contenido");
+      }
+      
       setGeneratedContent(data.ads?.join("\n\n") || "No se pudo generar contenido.");
-    } catch (e) {
-      setGeneratedContent("Error al generar contenido.");
+    } catch (e: any) {
+      setGeneratedContent("Error al generar contenido: " + (e.message || "Error desconocido"));
     } finally {
       setAudienceLoading(false);
+    }
+  };
+
+  const handleGenerateFacebookPost = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const prompt = `Genera un post para Facebook con el siguiente formato:
+      - Título atractivo
+      - Contenido principal (2-3 párrafos)
+      - URL de imagen sugerida
+      - Call to action
+      - Hashtags relevantes
+      
+      Usando el brand kit: ${JSON.stringify(brandKitData)}`;
+
+      const res = await fetch("/api/ads-ia", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+          url, 
+          type: "facebook-post", 
+          prompt,
+          brandKit: brandKitData
+        }),
+      });
+      
+      const data = await res.json();
+      
+      if (!res.ok) {
+        throw new Error(data.error || "Error al generar el post de Facebook");
+      }
+      
+      // Parse the response and update the Facebook post state
+      const postData = data.facebookPost || {};
+      setGeneratedContent(postData.content || "");
+    } catch (e: any) {
+      setError({
+        message: e.message || "Error al generar el post de Facebook",
+        details: e.details || e.message
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -144,7 +254,7 @@ export default function AdsIaPage() {
             </motion.span>
           </span>
         }
-        subtitle="Genera anuncios y brand kits automáticamente a partir de cualquier URL."
+        subtitle="Genera anuncios y brand kits automáticamente a partir de cualquier URL o texto."
         backgroundClass="bg-black"
         textClass="text-white"
         linearGradientBackground={true}
@@ -155,10 +265,20 @@ export default function AdsIaPage() {
           onChange={setUrl}
           loading={loading}
           onGenerate={() => handleExtract(activeTab as "ads" | "brand-kit")}
-          onTryExample={() => setUrl("https://ejemplo.com")}
+          onTryExample={() => setUrl("https://www.apple.com")}
           onUseText={() => setUrl("Ejemplo de texto para anuncio")}
           extraClass=""
         />
+        <textarea
+          placeholder="Pega aquí tu texto para generar anuncios (opcional)"
+          value={customText}
+          onChange={e => setCustomText(e.target.value)}
+          className="w-full mt-2 p-2 rounded border border-gray-300 text-black"
+          rows={3}
+        />
+        <Button onClick={handleExtractStream} disabled={loading} className="ml-4 mt-2">
+          Generar anuncios (stream)
+        </Button>
       </HeroSection>
 
       <motion.div 
@@ -179,24 +299,36 @@ export default function AdsIaPage() {
         </motion.div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 p-1 bg-muted/50 rounded-xl backdrop-blur-sm border border-border/50">
-            <TabsTrigger 
-              value="ads"
-              className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 flex items-center gap-2"
-            >
-              <Rocket className="w-4 h-4" />
-              Generar Anuncios
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="ads">
+              <div className="flex items-center gap-2">
+                <Rocket className="w-4 h-4" />
+                Anuncios
+              </div>
             </TabsTrigger>
-            <TabsTrigger 
-              value="brand-kit"
-              className="rounded-lg data-[state=active]:bg-background data-[state=active]:shadow-sm transition-all duration-200 flex items-center gap-2"
-            >
-              <Palette className="w-4 h-4" />
-              Generar Brand Kit
+            <TabsTrigger value="brand-kit">
+              <div className="flex items-center gap-2">
+                <Palette className="w-4 h-4" />
+                Brand Kit
+              </div>
+            </TabsTrigger>
+            <TabsTrigger value="facebook">
+              <div className="flex items-center gap-2">
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                Facebook
+              </div>
+            </TabsTrigger>
+            <TabsTrigger value="blog">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />
+                Blog
+              </div>
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="ads">
+          <TabsContent value="ads" className="space-y-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -266,7 +398,7 @@ export default function AdsIaPage() {
             </motion.div>
           </TabsContent>
 
-          <TabsContent value="brand-kit">
+          <TabsContent value="brand-kit" className="space-y-4">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -375,6 +507,22 @@ export default function AdsIaPage() {
                 </CardContent>
               </Card>
             </motion.div>
+          </TabsContent>
+
+          <TabsContent value="facebook" className="space-y-4">
+            <FacebookPostGenerator
+              url={url || ""}
+              brandKitData={brandKitData}
+              onError={setError}
+            />
+          </TabsContent>
+
+          <TabsContent value="blog" className="space-y-4">
+            <BlogPostGenerator
+              url={url || ""}
+              brandKitData={brandKitData}
+              onError={setError}
+            />
           </TabsContent>
         </Tabs>
       </motion.div>

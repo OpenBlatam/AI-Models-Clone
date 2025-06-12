@@ -8,6 +8,7 @@ interface LiquidGlassProps extends React.HTMLAttributes<HTMLDivElement> {
   intensity?: number;
   blur?: number;
   shine?: boolean;
+  interactive?: boolean;
 }
 
 export function LiquidGlass({ 
@@ -15,8 +16,9 @@ export function LiquidGlass({
   className, 
   variant = 'default',
   intensity = 1,
-  blur = 4,
+  blur = 6,
   shine = true,
+  interactive = true,
   ...props 
 }: LiquidGlassProps) {
   const baseStyles = "relative flex font-semibold overflow-hidden text-black cursor-pointer transition-all duration-400 ease-[cubic-bezier(0.175,0.885,0.32,2.2)]";
@@ -42,43 +44,43 @@ export function LiquidGlass({
         variantStyles[variant],
         variantHoverStyles[variant],
         "shadow-[0_8px_32px_0_rgba(31,38,135,0.15)]",
-        "before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/50 before:to-white/20",
-        "after:absolute after:inset-0 after:bg-gradient-to-b after:from-white/20 after:to-transparent",
-        "border border-white/30",
+        "before:absolute before:inset-0 before:bg-gradient-to-b before:from-white/40 before:to-white/15",
+        "after:absolute after:inset-0 after:bg-gradient-to-b after:from-white/15 after:to-transparent",
+        "border border-white/20",
         className
       )}
       {...props}
     >
       {/* Effect Layer */}
-      <div className="absolute inset-0 z-0 overflow-hidden isolation-auto backdrop-blur-[4px]">
+      <div className="absolute inset-0 z-0 overflow-hidden isolation-auto backdrop-blur-[6px]">
         <svg className="absolute inset-0 w-full h-full pointer-events-none">
           <defs>
             <filter id="glass-distortion">
               <feTurbulence
                 type="fractalNoise"
-                baseFrequency={0.008 * intensity}
-                numOctaves="4"
+                baseFrequency={0.006 * intensity}
+                numOctaves="3"
                 result="noise"
               />
               <feDisplacementMap
                 in="SourceGraphic"
                 in2="noise"
-                scale={15 * intensity}
+                scale={12 * intensity}
                 xChannelSelector="R"
                 yChannelSelector="G"
               />
             </filter>
             <filter id="glass-blur">
-              <feGaussianBlur stdDeviation="0.8" />
+              <feGaussianBlur stdDeviation="0.6" />
             </filter>
             <filter id="glass-highlight">
-              <feGaussianBlur stdDeviation="0.3" />
+              <feGaussianBlur stdDeviation="0.2" />
               <feColorMatrix
                 type="matrix"
                 values="1 0 0 0 1
                         0 1 0 0 1
                         0 0 1 0 1
-                        0 0 0 15 -5"
+                        0 0 0 12 -4"
               />
             </filter>
           </defs>
@@ -86,12 +88,12 @@ export function LiquidGlass({
       </div>
 
       {/* Tint Layer */}
-      <div className="absolute inset-0 z-1 bg-gradient-to-b from-white/30 to-white/10" />
+      <div className="absolute inset-0 z-1 bg-gradient-to-b from-white/20 to-white/5" />
 
       {/* Shine Layer */}
       {shine && (
         <div className="absolute inset-0 z-2 overflow-hidden">
-          <div className="absolute inset-0 shadow-[inset_1px_1px_1px_0_rgba(255,255,255,0.6),inset_-1px_-1px_1px_0_rgba(255,255,255,0.3)]" />
+          <div className="absolute inset-0 shadow-[inset_1px_1px_1px_0_rgba(255,255,255,0.4),inset_-1px_-1px_1px_0_rgba(255,255,255,0.2)]" />
         </div>
       )}
 

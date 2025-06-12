@@ -7,6 +7,7 @@ import FloatingStatusWidget from "@/components/FloatingStatusWidget";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { UserNav } from "@/components/user-nav";
 import { EB_Garamond } from "next/font/google";
+import { usePathname } from "next/navigation";
 
 const ebGaramond = EB_Garamond({ subsets: ['latin'] });
 
@@ -19,6 +20,8 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
+
   React.useEffect(() => {
     const script = document.createElement('script');
     script.src = "https://elevenlabs.io/convai-widget/index.js";
@@ -44,13 +47,18 @@ export default function DashboardLayout({
         </div>
       </header>
       <div className="container py-6">
-        <InteractiveTTSPanel />
-        <FloatingStatusWidget
-          message="Llamando a IA"
-          color="purple"
-          visible={true}
-          onCancel={() => {}}
-        />
+        {/* Only show TTS widgets if not on background-remover */}
+        {pathname !== "/dashboard/mkt-ia/background-remover" && (
+          <>
+            <InteractiveTTSPanel />
+            <FloatingStatusWidget
+              message="Llamando a IA"
+              color="purple"
+              visible={true}
+              onCancel={() => {}}
+            />
+          </>
+        )}
         <main className="mt-6">
           {children}
         </main>

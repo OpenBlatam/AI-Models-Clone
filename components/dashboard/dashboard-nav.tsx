@@ -9,6 +9,11 @@ import { memo } from "react";
 
 const navItems = [
   {
+    title: "MKT IA",
+    href: "/dashboard/mkt-ia",
+    icon: Megaphone,
+  },
+  {
     title: "Dashboard",
     href: "/dashboard",
     icon: Home,

@@ -24,7 +24,6 @@ interface ModalProps {
   intensity?: number;
   blur?: number;
   shine?: boolean;
-  interactive?: boolean;
   title?: string;
   description?: string;
   showClose?: boolean;
@@ -42,7 +41,6 @@ export function Modal({
   intensity = 2,
   blur = 6,
   shine = true,
-  interactive = true,
   title,
   description,
   showClose = true,
@@ -90,7 +88,6 @@ export function Modal({
               intensity={intensity}
               blur={blur}
               shine={shine}
-              interactive={interactive}
               className="h-full"
             >
               <div className="sticky top-0 z-20 flex w-full items-center justify-center">
@@ -147,7 +144,6 @@ export function Modal({
               intensity={intensity}
               blur={blur}
               shine={shine}
-              interactive={interactive}
               className="relative w-full"
             >
               <div className="flex flex-col gap-4">

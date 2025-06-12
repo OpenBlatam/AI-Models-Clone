@@ -17,5 +17,18 @@ export function parseBrandKit(brandKit: string) {
     };
   }
 
+  // Si todo está vacío, rellena con valores por defecto
+  const isEmpty = (!colors.length) && (!fonts.title && !fonts.subtitle && !fonts.body);
+  if (isEmpty) {
+    return {
+      colors: ['#7b61ff', '#fbbf24', '#22c55e'],
+      fonts: {
+        title: 'Montserrat',
+        subtitle: 'Roboto',
+        body: 'Open Sans'
+      }
+    };
+  }
+
   return { colors, fonts };
 } 

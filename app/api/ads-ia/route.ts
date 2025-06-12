@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
-import { openai } from "@/lib/openai";
 import axios from "axios";
 import * as cheerio from "cheerio";
+import { extractColors, extractFonts } from "@/lib/utils";
 
-export const runtime = "edge";
+// Remove edge runtime
+// export const runtime = "edge";
 
-// Validate OpenAI configuration
-if (!process.env.OPENAI_API_KEY) {
-}
+// Validate DeepSeek configuration
+const DEEPSEEK_API_KEY = process.env.DEEPSEEK_API_KEY;
 
 const DUMMY_BRAND_KIT = `1. PALETA DE COLORES:
 - #FAF3F3, #FF6FA5, #FFD6E0, #B2F0F0, #F39AC1
@@ -24,29 +24,459 @@ const DUMMY_BRAND_KIT = `1. PALETA DE COLORES:
 5. ELEMENTOS VISUALES:
 - Imágenes limpias, iconos modernos, estilo minimalista`;
 
+const BLOG_TEMPLATES = {
+  guide: {
+    sections: [
+      {
+        title: "Introducción",
+        type: "intro",
+        content: "Introduce el tema y su importancia en el contexto actual. Explica por qué es relevante para la audiencia objetivo."
+      },
+      {
+        title: "¿Qué es {topic}?",
+        type: "definition",
+        content: "Define el concepto de manera clara y concisa. Incluye ejemplos prácticos y casos de uso."
+      },
+      {
+        title: "Beneficios de {topic}",
+        type: "benefits",
+        content: "Lista los principales beneficios y ventajas. Apoya cada punto con datos o ejemplos concretos."
+      },
+      {
+        title: "Cómo implementar {topic}",
+        type: "how-to",
+        content: "Proporciona pasos detallados y accionables. Incluye consejos prácticos y mejores prácticas."
+      },
+      {
+        title: "Mejores prácticas",
+        type: "best-practices",
+        content: "Comparte recomendaciones basadas en experiencia. Evita errores comunes y optimiza resultados."
+      },
+      {
+        title: "Conclusión",
+        type: "conclusion",
+        content: "Resume los puntos clave y proporciona un llamado a la acción claro."
+      }
+    ],
+    metadata: {
+      keywords: ["guía", "tutorial", "aprender", "implementar"],
+      readingTime: "15-20 min",
+      category: "Tutoriales"
+    }
+  },
+  analysis: {
+    sections: [
+      {
+        title: "Contexto",
+        type: "context",
+        content: "Establece el marco de referencia y la situación actual del tema a analizar."
+      },
+      {
+        title: "Análisis del mercado",
+        type: "market-analysis",
+        content: "Examina las tendencias, competidores y oportunidades en el mercado."
+      },
+      {
+        title: "Tendencias actuales",
+        type: "trends",
+        content: "Identifica y analiza las tendencias más relevantes del momento."
+      },
+      {
+        title: "Casos de estudio",
+        type: "case-studies",
+        content: "Presenta ejemplos reales y sus resultados. Extrae lecciones aprendidas."
+      },
+      {
+        title: "Recomendaciones",
+        type: "recommendations",
+        content: "Ofrece sugerencias prácticas basadas en el análisis realizado."
+      },
+      {
+        title: "Perspectivas futuras",
+        type: "future",
+        content: "Proyecta escenarios futuros y oportunidades de crecimiento."
+      }
+    ],
+    metadata: {
+      keywords: ["análisis", "mercado", "tendencias", "estudio"],
+      readingTime: "20-25 min",
+      category: "Análisis"
+    }
+  },
+  tips: {
+    sections: [
+      {
+        title: "Introducción",
+        type: "intro",
+        content: "Presenta el tema y la importancia de los tips que se compartirán."
+      },
+      {
+        title: "Tip #1: {tip1}",
+        type: "tip",
+        content: "Explica el primer tip con ejemplos prácticos y casos de uso."
+      },
+      {
+        title: "Tip #2: {tip2}",
+        type: "tip",
+        content: "Detalla el segundo tip con pasos específicos y resultados esperados."
+      },
+      {
+        title: "Tip #3: {tip3}",
+        type: "tip",
+        content: "Describe el tercer tip con consejos adicionales y mejores prácticas."
+      },
+      {
+        title: "Consejos adicionales",
+        type: "additional",
+        content: "Comparte recomendaciones extra y trucos avanzados."
+      },
+      {
+        title: "Resumen",
+        type: "summary",
+        content: "Recapitula los tips principales y su aplicación práctica."
+      }
+    ],
+    metadata: {
+      keywords: ["tips", "trucos", "consejos", "mejores prácticas"],
+      readingTime: "10-15 min",
+      category: "Consejos"
+    }
+  },
+  trends: {
+    sections: [
+      {
+        title: "Panorama actual",
+        type: "overview",
+        content: "Describe el estado actual del sector y las fuerzas que lo moldean."
+      },
+      {
+        title: "Tendencia #1: {trend1}",
+        type: "trend",
+        content: "Analiza la primera tendencia, su impacto y casos de éxito."
+      },
+      {
+        title: "Tendencia #2: {trend2}",
+        type: "trend",
+        content: "Examina la segunda tendencia, oportunidades y desafíos."
+      },
+      {
+        title: "Tendencia #3: {trend3}",
+        type: "trend",
+        content: "Explora la tercera tendencia, innovaciones y aplicaciones prácticas."
+      },
+      {
+        title: "Impacto en la industria",
+        type: "impact",
+        content: "Evalúa el impacto de las tendencias en diferentes sectores."
+      },
+      {
+        title: "Conclusión",
+        type: "conclusion",
+        content: "Sintetiza las tendencias clave y su relevancia futura."
+      }
+    ],
+    metadata: {
+      keywords: ["tendencias", "innovación", "futuro", "tecnología"],
+      readingTime: "12-18 min",
+      category: "Tendencias"
+    }
+  }
+};
+
 export async function POST(req: NextRequest) {
   try {
-    // Check OpenAI configuration
-    if (!process.env.OPENAI_API_KEY) {
+    const body = await req.json();
+    const { type, template, topic, audience, brandKit, structure } = body;
+
+    if (!DEEPSEEK_API_KEY) {
       return NextResponse.json(
-        { 
-          error: "Error de configuración",
-          details: "La API key de OpenAI no está configurada"
-        },
+        { error: "DeepSeek API key not configured" },
         { status: 500 }
       );
     }
 
-    const { url, type = "ads" } = await req.json();
-    if (!url) {
-      return NextResponse.json({ error: "URL requerida" }, { status: 400 });
+    if (type === "blog") {
+      const selectedTemplate = BLOG_TEMPLATES[template as keyof typeof BLOG_TEMPLATES];
+      if (!selectedTemplate) {
+        return NextResponse.json(
+          { error: "Template not found" },
+          { status: 400 }
+        );
+      }
+
+      // Personalizar el template con el tema y la audiencia
+      const customizedSections = selectedTemplate.sections.map(section => ({
+        ...section,
+        title: section.title.replace(/{topic}/g, topic),
+        content: section.content.replace(/{topic}/g, topic)
+      }));
+
+      // Generar el contenido usando DeepSeek
+      const promptText = `Genera un post de blog optimizado para SEO con el siguiente formato:
+      - Título atractivo y optimizado para SEO (máximo 60 caracteres)
+      - Extracto conciso (máximo 160 caracteres)
+      - Contenido estructurado en secciones: ${customizedSections.map(s => s.title).join(", ")}
+      - Palabras clave relevantes (máximo 5)
+      - Tiempo de lectura estimado
+      - Meta descripción para SEO
+      
+      Tema: ${topic}
+      Audiencia objetivo: ${audience}
+      Brand Kit: ${JSON.stringify(brandKit)}
+      
+      El post debe ser:
+      - Bien estructurado y fácil de leer
+      - Optimizado para SEO
+      - Con ejemplos prácticos
+      - Con datos y estadísticas relevantes
+      - Adaptado al tono de la marca`;
+
+      const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: [
+            {
+              role: "system",
+              content: "Eres un experto en marketing digital y creación de contenido optimizado para SEO."
+            },
+            {
+              role: "user",
+              content: promptText
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 2000
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al generar el contenido");
+      }
+
+      const data = await response.json();
+      const generatedContent = data.choices[0].message.content;
+
+      // Procesar y estructurar el contenido generado
+      const sections = customizedSections.map(section => ({
+        title: section.title,
+        content: generatedContent
+      }));
+
+      return NextResponse.json({
+        title: `Guía completa sobre ${topic}`,
+        excerpt: `Aprende todo lo que necesitas saber sobre ${topic} en esta guía detallada.`,
+        content: {
+          sections
+        },
+        metadata: {
+          ...selectedTemplate.metadata,
+          keywords: [...selectedTemplate.metadata.keywords, topic.toLowerCase()],
+          seoDescription: `Descubre todo sobre ${topic} en esta guía completa. Aprende las mejores prácticas y consejos expertos.`
+        }
+      });
+    }
+
+    if (type === "facebook-post") {
+      // Generate Facebook post content based on template
+      const templates = {
+        "Producto Nuevo": {
+          title: "¡Novedad Exclusiva! 🎉",
+          content: `¡Estamos emocionados de presentar nuestro último lanzamiento! ✨
+
+Este producto revolucionario cambiará la forma en que [beneficio principal]. Diseñado con pasión y atención al detalle, cada característica ha sido pensada para mejorar tu experiencia.`,
+          imageUrl: "https://images.unsplash.com/photo-1493612276216-ee3925520721",
+          callToAction: "¡Sé de los primeros en probarlo!",
+          hashtags: ["#NuevoLanzamiento", "#Innovación", "#Exclusivo", "#Tendencias", "#Calidad"]
+        },
+        "Oferta Especial": {
+          title: "🔥 ¡Oferta Relámpago! ⚡",
+          content: `¡No dejes pasar esta oportunidad única! 💰
+
+Por tiempo limitado, disfruta de un [descuento] en todos nuestros productos. Esta oferta especial es tu chance de obtener lo mejor a un precio increíble.`,
+          imageUrl: "https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da",
+          callToAction: "¡Aprovecha ahora!",
+          hashtags: ["#OfertaEspecial", "#Descuento", "#Oportunidad", "#Ahorra", "#LimitedTime"]
+        },
+        "Contenido Educativo": {
+          title: "📚 Tips Pro: [Tema]",
+          content: `¿Sabías que [dato interesante]? 💡
+
+En este post te compartimos los mejores consejos para [beneficio]. Aplica estos tips y verás resultados inmediatos.`,
+          imageUrl: "https://images.unsplash.com/photo-1501504905252-473c47e087f8",
+          callToAction: "¡Comparte si te ayudó!",
+          hashtags: ["#TipsPro", "#Aprende", "#Consejos", "#Educación", "#Desarrollo"]
+        },
+        "Historia de Éxito": {
+          title: "🌟 Historia Inspiradora: [Nombre]",
+          content: `Conoce la increíble historia de [nombre] y cómo [producto/servicio] transformó su vida. 💪
+
+De [situación inicial] a [resultado final], este es un testimonio real de superación y éxito.`,
+          imageUrl: "https://images.unsplash.com/photo-1551836022-d5d88e9218df",
+          callToAction: "¡Cuéntanos tu historia!",
+          hashtags: ["#HistoriaDeÉxito", "#Inspiración", "#Testimonio", "#Superación", "#Éxito"]
+        }
+      };
+
+      const template = templates[template as keyof typeof templates] || templates["Producto Nuevo"];
+      
+      // Customize template with brand kit data if available
+      if (brandKit) {
+        template.title = template.title.replace("[Tema]", brandKit.title || "Nuestro Producto");
+        template.content = template.content
+          .replace("[beneficio principal]", brandKit.description || "usar nuestro producto")
+          .replace("[descuento]", "20%")
+          .replace("[dato interesante]", "nuestros clientes aumentan su productividad en un 50%")
+          .replace("[beneficio]", "optimizar tu trabajo")
+          .replace("[nombre]", brandKit.title || "Nuestro Cliente")
+          .replace("[producto/servicio]", brandKit.title || "nuestro servicio")
+          .replace("[situación inicial]", "comenzar desde cero")
+          .replace("[resultado final]", "alcanzar el éxito");
+      }
+
+      return NextResponse.json({ facebookPost: template });
+    }
+
+    if (type === "blog-post") {
+      const selectedTemplate = BLOG_TEMPLATES[template as keyof typeof BLOG_TEMPLATES];
+      if (!selectedTemplate) {
+        return NextResponse.json(
+          { error: "Template not found" },
+          { status: 400 }
+        );
+      }
+
+      // Personalizar el template con el tema y la audiencia
+      const customizedSections = selectedTemplate.sections.map(section => ({
+        ...section,
+        title: section.title.replace(/{topic}/g, topic),
+        content: section.content.replace(/{topic}/g, topic)
+      }));
+
+      // Generar el contenido usando DeepSeek
+      const promptText = `Genera un post de blog optimizado para SEO con el siguiente formato:
+      - Título atractivo y optimizado para SEO (máximo 60 caracteres)
+      - Extracto conciso (máximo 160 caracteres)
+      - Contenido estructurado en secciones: ${customizedSections.map(s => s.title).join(", ")}
+      - Palabras clave relevantes (máximo 5)
+      - Tiempo de lectura estimado
+      - Meta descripción para SEO
+      
+      Tema: ${topic}
+      Audiencia objetivo: ${audience}
+      Brand Kit: ${JSON.stringify(brandKit)}
+      
+      El post debe ser:
+      - Bien estructurado y fácil de leer
+      - Optimizado para SEO
+      - Con ejemplos prácticos
+      - Con datos y estadísticas relevantes
+      - Adaptado al tono de la marca`;
+
+      const response = await fetch("https://api.deepseek.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${DEEPSEEK_API_KEY}`
+        },
+        body: JSON.stringify({
+          model: "deepseek-chat",
+          messages: [
+            {
+              role: "system",
+              content: "Eres un experto en marketing digital y creación de contenido optimizado para SEO."
+            },
+            {
+              role: "user",
+              content: promptText
+            }
+          ],
+          temperature: 0.7,
+          max_tokens: 2000
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al generar el contenido");
+      }
+
+      const data = await response.json();
+      const generatedContent = data.choices[0].message.content;
+
+      // Procesar y estructurar el contenido generado
+      const sections = customizedSections.map(section => ({
+        title: section.title,
+        content: generatedContent
+      }));
+
+      return NextResponse.json({
+        title: `Guía completa sobre ${topic}`,
+        excerpt: `Aprende todo lo que necesitas saber sobre ${topic} en esta guía detallada.`,
+        content: {
+          sections
+        },
+        metadata: {
+          ...selectedTemplate.metadata,
+          keywords: [...selectedTemplate.metadata.keywords, topic.toLowerCase()],
+          seoDescription: `Descubre todo sobre ${topic} en esta guía completa. Aprende las mejores prácticas y consejos expertos.`
+        }
+      });
+    }
+
+    // Check DeepSeek configuration
+    if (!DEEPSEEK_API_KEY) {
+      return NextResponse.json(
+        { 
+          error: "Error de configuración",
+          details: "La API key de DeepSeek no está configurada"
+        },
+        { 
+          status: 500,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+          }
+        }
+      );
+    }
+
+    if (!topic) {
+      return NextResponse.json(
+        { error: "Topic required" }, 
+        { 
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+          }
+        }
+      );
     }
 
     // Validate URL format
     try {
-      new URL(url);
+      new URL(topic);
     } catch (e) {
-      return NextResponse.json({ error: "URL inválida" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Invalid URL" }, 
+        { 
+          status: 400,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+          }
+        }
+      );
     }
 
     // 1. Scraping con axios y cheerio
@@ -60,7 +490,7 @@ export async function POST(req: NextRequest) {
     let scrapingOk = false;
 
     try {
-      const { data } = await axios.get(url, {
+      const { data } = await axios.get(topic, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         },
@@ -102,8 +532,6 @@ export async function POST(req: NextRequest) {
         .filter(Boolean)
         .join(' | ');
 
-
-
       scrapingOk = !!extracted && extracted.length > 10;
 
     } catch (scrapeError) {
@@ -111,81 +539,96 @@ export async function POST(req: NextRequest) {
       // No return, fallback to generic prompt
     }
 
-    if (type === "brand-kit") {
-      let prompt = "";
-      if (scrapingOk) {
-        prompt = `Analiza el siguiente contenido de una web y genera un brand kit completo y detallado. El brand kit debe incluir:\n\n1. PALETA DE COLORES:\n- Colores principales encontrados: ${brandElements.colors.join(', ')}\n- Sugiere una paleta complementaria de 5 colores\n- Incluye códigos hexadecimales\n\n2. TIPOGRAFÍA:\n- Fuentes encontradas: ${brandElements.fonts.join(', ')}\n- Sugiere una combinación de fuentes para títulos y texto\n- Incluye fuentes de Google Fonts o similares\n\n3. TONO DE VOZ:\n- Analiza el contenido y describe el tono de comunicación\n- Sugiere 3-5 adjetivos que definan la personalidad de la marca\n- Incluye ejemplos de cómo comunicar\n\n4. VALORES DE MARCA:\n- Extrae los valores principales del contenido\n- Sugiere 3-5 valores clave\n- Incluye una breve descripción de cada valor\n\n5. ELEMENTOS VISUALES:\n- Sugiere estilos de imágenes e iconos\n- Recomienda un estilo de fotografía\n- Incluye guías para el uso de elementos visuales\n\nContenido extraído:\n${extracted}\n\nTaglines encontrados: ${brandElements.taglines.join(', ')}\n\nPor favor, estructura tu respuesta en estas 5 secciones, siendo específico y práctico en tus recomendaciones.`;
+    // Call our DeepSeek backend
+    try {
+      const apiUrl = (process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8001').replace(/\/$/, '');
+      const fullUrl = `${apiUrl}/api/ads-ia`;
+      console.log('Calling backend at:', fullUrl);
+      
+      const response = await axios.post(
+        fullUrl,
+        {
+          url: topic,
+          type,
+          prompt: extracted,
+          website_content: extracted,
+          brand_elements: brandElements
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          timeout: 30000, // 30 second timeout
+          family: 4 // Force IPv4
+        }
+      );
+
+      return NextResponse.json(
+        response.data,
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods': 'POST, OPTIONS',
+            'Access-Control-Allow-Headers': 'Content-Type',
+          }
+        }
+      );
+    } catch (apiError: any) {
+      console.error('Error calling DeepSeek API:', apiError);
+      console.error('Error details:', {
+        message: apiError.message,
+        code: apiError.code,
+        address: apiError.address,
+        port: apiError.port,
+        config: apiError.config
+      });
+      
+      if (type === "brand-kit") {
+        return NextResponse.json(
+          { brandKit: DUMMY_BRAND_KIT, fallback: true, error: "API error", details: apiError.message },
+          { 
+            status: 200,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'POST, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type',
+            }
+          }
+        );
       } else {
-        prompt = `No se pudo extraer contenido de la web (${url}). Genera un brand kit genérico para una marca tecnológica moderna.`;
-      }
-      try {
-        const completion = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: "Eres un experto en branding y diseño de identidad visual. Tu tarea es analizar el contenido de una web y generar un brand kit completo y detallado. Sé específico, práctico y estructurado en tus recomendaciones." },
-            { role: "user", content: prompt },
-          ],
-          max_tokens: 1500,
-          temperature: 0.7,
-        });
-
-        const brandKit = completion.choices[0]?.message?.content || "";
-        
-        if (!brandKit || brandKit.length < 30) {
-          // fallback dummy
-          return NextResponse.json({ brandKit: DUMMY_BRAND_KIT, fallback: true });
-        }
-
-        return NextResponse.json({ brandKit });
-      } catch (openaiError: any) {
-        console.error('Error con OpenAI:', openaiError);
-        return NextResponse.json({ brandKit: DUMMY_BRAND_KIT, fallback: true, error: "OpenAI error", details: openaiError.message }, { status: 200 });
-      }
-    } else {
-      // Original ads generation logic
-      const prompt = `Eres un experto en marketing digital. A partir del siguiente contenido extraído de una web, genera 3 anuncios atractivos para redes sociales (Facebook, Instagram, Google Ads). Los anuncios deben ser concisos, persuasivos y adaptados a cada plataforma. Devuelve solo los textos de los anuncios, separados por saltos de línea.\n\nContenido extraído:\n${extracted}`;
-
-      try {
-        const completion = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo",
-          messages: [
-            { 
-              role: "system", 
-              content: "Eres un experto en marketing digital y copywriting. Tu tarea es crear anuncios persuasivos y efectivos para redes sociales." 
-            },
-            { role: "user", content: prompt },
-          ],
-          max_tokens: 400,
-          temperature: 0.8,
-        });
-
-        const adsRaw = completion.choices[0]?.message?.content || "";
-        
-        if (!adsRaw) {
-          throw new Error("No se pudo generar ningún anuncio");
-        }
-
-        const ads = adsRaw.split(/\n+/).filter(Boolean);
-
-        if (!ads.length) {
-          throw new Error("No se pudieron generar anuncios válidos");
-        }
-
-        return NextResponse.json({ ads });
-      } catch (openaiError: any) {
-        
         return NextResponse.json(
           { 
-            error: "Error al generar los anuncios",
-            details: openaiError.message || "Error desconocido"
+            error: "Error al generar el contenido",
+            details: apiError.message || "Error desconocido"
           },
-          { status: 500 }
+          { 
+            status: 500,
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Access-Control-Allow-Methods': 'POST, OPTIONS',
+              'Access-Control-Allow-Headers': 'Content-Type',
+            }
+          }
         );
       }
     }
   } catch (e: any) {
     console.error('Error general:', e);
     console.error('Error stack:', e.stack);
-    return NextResponse.json({ brandKit: DUMMY_BRAND_KIT, fallback: true, error: "Error general", details: e.message }, { status: 200 });
+    return NextResponse.json(
+      { brandKit: DUMMY_BRAND_KIT, fallback: true, error: "Error general", details: e.message },
+      { 
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST, OPTIONS',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        }
+      }
+    );
   }
 }  
