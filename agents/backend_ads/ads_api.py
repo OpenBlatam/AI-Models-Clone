@@ -1,15 +1,23 @@
 from fastapi import APIRouter, HTTPException, Body, Request as FastAPIRequest
 from fastapi.responses import JSONResponse, StreamingResponse
+from pydantic import BaseModel
+from typing import List, Optional
 from models import AdsIaRequest, AdsResponse, BrandKitResponse, ErrorResponse
 from scraper import get_website_text
 from llm_interface import (
     generate_ads_lcel,
     generate_brand_kit_lcel,
     generate_custom_content_lcel,
+    generate_ads_lcel_streaming,
     generate_ads_lcel_streaming_parallel,
     DEEPSEEK_API_KEY
 )
 from config import settings
+import logging
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 

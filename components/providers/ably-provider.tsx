@@ -4,7 +4,7 @@ import { AblyProvider } from "ably/react";
 import * as Ably from "ably";
 
 const client = new Ably.Realtime({
-  authUrl: "api/ably-token",
+  authUrl: "/api/ably-token",
   authMethod: "POST",
   clientId: "anonymous",
   recover: (lastConnectionDetails, cb) => {

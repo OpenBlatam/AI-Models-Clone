@@ -19,6 +19,11 @@ try:
     from PIL import Image
 except ImportError:
     import pillow_simd as Image
+import logging
+
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 rembg_session_fast = new_session("u2netp")

@@ -2,7 +2,7 @@ import { Metadata } from "next";
 import { type ClassValue, clsx } from "clsx";
 import ms from "ms";
 import { twMerge } from "tailwind-merge";
-import cheerio from "cheerio";
+import * as cheerio from "cheerio";
 
 import { env } from "@/env.mjs";
 import { siteConfig } from "@/config/site";
@@ -174,24 +174,21 @@ export const placeholderBlurhash =
 
 export function slugify(text: string): string {
   return text
-    .toString()
     .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^\w\s-]/g, "")
     .replace(/\s+/g, "-")
-    .replace(/[^\w-]+/g, "")
-    .replace(/--+/g, "-")
-    .replace(/^-+/, "")
-    .replace(/-+$/, "");
+    .replace(/-+/g, "-")
+    .trim();
 }
 
 export function truncateText(text: string, maxLength: number): string {
   if (text.length <= maxLength) return text;
-  return text.slice(0, maxLength) + "...";
+  return text.slice(0, maxLength).trim() + "...";
 }
 
-export function generateMetaDescription(text: string): string {
-  return truncateText(text, 160);
+export function generateMetaDescription(text: string, maxLength: number = 160): string {
+  const cleanText = text.replace(/<[^>]*>/g, "").trim();
+  return truncateText(cleanText, maxLength);
 }
 
 export function extractKeywords(text: string, maxKeywords: number = 5): string[] {
@@ -218,20 +215,16 @@ export function estimateReadingTime(text: string): string {
 }
 
 export function sanitizeHtml(html: string): string {
-  return html
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
+  const $ = cheerio.load(html);
+  return $.html();
 }
 
 export function generateSeoTitle(text: string, maxLength: number = 60): string {
   return truncateText(text, maxLength);
 }
 
-export function formatNumber(num: number): string {
-  return new Intl.NumberFormat("es-ES").format(num);
+export function formatNumber(num: number, locale: string = "es-ES"): string {
+  return new Intl.NumberFormat(locale).format(num);
 }
 
 export function getRandomColor(): string {
@@ -247,13 +240,11 @@ export function debounce<T extends (...args: any[]) => any>(
   wait: number
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
-  
   return function executedFunction(...args: Parameters<T>) {
     const later = () => {
       clearTimeout(timeout);
       func(...args);
     };
-    
     clearTimeout(timeout);
     timeout = setTimeout(later, wait);
   };
@@ -264,7 +255,6 @@ export function throttle<T extends (...args: any[]) => any>(
   limit: number
 ): (...args: Parameters<T>) => void {
   let inThrottle: boolean;
-  
   return function executedFunction(...args: Parameters<T>) {
     if (!inThrottle) {
       func(...args);
@@ -289,27 +279,22 @@ export function isValidUrl(url: string): boolean {
 }
 
 export function generateId(): string {
-  return Math.random().toString(36).substring(2) + Date.now().toString(36);
+  return Math.random().toString(36).substring(2, 15);
 }
 
-export function groupBy<T>(
-  array: T[],
-  key: keyof T
-): { [key: string]: T[] } {
+export function groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
   return array.reduce((result, item) => {
     const groupKey = String(item[key]);
     result[groupKey] = result[groupKey] || [];
     result[groupKey].push(item);
     return result;
-  }, {} as { [key: string]: T[] });
+  }, {} as Record<string, T[]>);
 }
 
 export function chunk<T>(array: T[], size: number): T[][] {
-  const chunks: T[][] = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunks.push(array.slice(i, i + size));
-  }
-  return chunks;
+  return Array.from({ length: Math.ceil(array.length / size) }, (_, i) =>
+    array.slice(i * size, i * size + size)
+  );
 }
 
 export function sleep(ms: number): Promise<void> {
@@ -322,76 +307,61 @@ export function retry<T>(
   delay: number = 1000
 ): Promise<T> {
   return new Promise((resolve, reject) => {
-    const attempt = async (attempts: number) => {
-      try {
-        const result = await fn();
-        resolve(result);
-      } catch (error) {
-        if (attempts === retries) {
+    fn()
+      .then(resolve)
+      .catch(error => {
+        if (retries === 0) {
           reject(error);
-        } else {
-          setTimeout(() => attempt(attempts + 1), delay);
+          return;
         }
+        setTimeout(() => {
+          retry(fn, retries - 1, delay)
+            .then(resolve)
+            .catch(reject);
+        }, delay);
+      });
+  });
+}
+
+export function extractColors(html: string): string[] {
+  const $ = cheerio.load(html);
+  const colors = new Set<string>();
+
+  // Extraer colores de estilos CSS
+  $("[style]").each((_, element) => {
+    const style = $(element).attr("style");
+    if (style) {
+      const colorMatches = style.match(/#[0-9a-fA-F]{6}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/g);
+      if (colorMatches) {
+        colorMatches.forEach(color => colors.add(color));
       }
-    };
-    attempt(1);
-  });
-}
-
-export function extractColors($: cheerio.CheerioAPI): string[] {
-  const colors: string[] = [];
-  
-  // Extract colors from CSS
-  $('style').each((_, element) => {
-    const css = $(element).html() || '';
-    const colorMatches = css.match(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/g) || [];
-    colors.push(...colorMatches);
-  });
-
-  // Extract colors from inline styles
-  $('[style]').each((_, element) => {
-    const style = $(element).attr('style') || '';
-    const colorMatches = style.match(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}|rgb\(\s*\d+\s*,\s*\d+\s*,\s*\d+\s*\)/g) || [];
-    colors.push(...colorMatches);
-  });
-
-  // Remove duplicates and normalize
-  return [...new Set(colors)].map(color => {
-    if (color.startsWith('rgb')) {
-      const [r, g, b] = color.match(/\d+/g) || [];
-      return `#${Number(r).toString(16).padStart(2, '0')}${Number(g).toString(16).padStart(2, '0')}${Number(b).toString(16).padStart(2, '0')}`;
     }
-    return color.toLowerCase();
   });
+
+  return Array.from(colors);
 }
 
-export function extractFonts($: cheerio.CheerioAPI): { title: string; subtitle: string } {
+export function extractFonts(html: string): { title: string; subtitle: string } {
+  const $ = cheerio.load(html);
   const fonts = new Set<string>();
-  
-  // Extract fonts from CSS
-  $('style').each((_, element) => {
-    const css = $(element).html() || '';
-    const fontMatches = css.match(/font-family:\s*([^;]+)/g) || [];
-    fontMatches.forEach(match => {
-      const font = match.split(':')[1].trim().replace(/['"]/g, '');
-      fonts.add(font);
-    });
+
+  // Extraer fuentes de estilos CSS
+  $("[style]").each((_, element) => {
+    const style = $(element).attr("style");
+    if (style) {
+      const fontMatches = style.match(/font-family:\s*([^;]+)/g);
+      if (fontMatches) {
+        fontMatches.forEach(font => {
+          const fontFamily = font.split(":")[1].trim().replace(/['"]/g, "");
+          fonts.add(fontFamily);
+        });
+      }
+    }
   });
 
-  // Extract fonts from inline styles
-  $('[style]').each((_, element) => {
-    const style = $(element).attr('style') || '';
-    const fontMatches = style.match(/font-family:\s*([^;]+)/g) || [];
-    fontMatches.forEach(match => {
-      const font = match.split(':')[1].trim().replace(/['"]/g, '');
-      fonts.add(font);
-    });
-  });
-
-  // Get the most common fonts
   const fontArray = Array.from(fonts);
   return {
-    title: fontArray[0] || 'Arial',
-    subtitle: fontArray[1] || 'Helvetica'
+    title: fontArray[0] || "Inter",
+    subtitle: fontArray[1] || "Inter"
   };
 }

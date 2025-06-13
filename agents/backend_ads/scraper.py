@@ -5,9 +5,10 @@ from tenacity import retry, stop_after_attempt, wait_exponential, RetryError
 from cachetools import cached, TTLCache
 import logging
 from functools import lru_cache
-
 from config import settings # Importar la configuración
 
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Crear un caché TTL (Time To Live)

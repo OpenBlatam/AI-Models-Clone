@@ -14,6 +14,9 @@ from loguru import logger
 from fastapi import FastAPI, HTTPException, Body, Request as FastAPIRequest, UploadFile, File, Form
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from pydantic import BaseModel
+from typing import List, Optional
 
 from models import AdsIaRequest, AdsResponse, BrandKitResponse, ErrorResponse, RemoveBackgroundRequest
 from scraper import get_website_text
@@ -36,6 +39,9 @@ except ImportError:
     remove = None
 from remove_bg_api import router as remove_bg_router
 from ads_api import router as ads_router
+from key_messages.api import router as key_messages_router
+from key_messages.llm_service import LLMKeyMessageService
+from key_messages.models import MessageType, MessageTone
 
 # Configurar logging básico
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -87,12 +93,14 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["POST", "OPTIONS"],
+    allow_methods=["POST", "OPTIONS", "GET", "DELETE"],
     allow_headers=["Content-Type", "Authorization"],
 )
+app.add_middleware(GZipMiddleware, minimum_size=100)
 
 app.include_router(remove_bg_router)
 app.include_router(ads_router)
+app.include_router(key_messages_router)
 
 @app.post("/api/remove-background")
 async def remove_background_endpoint(
@@ -175,6 +183,32 @@ async def remove_background_endpoint(
     except Exception as e:
         logger.exception(f"Failed to process image: {e}")
         return {"error": f"Failed to process image: {e}"}
+
+class KeyMessageRequest(BaseModel):
+    message: str
+    message_type: MessageType
+    tone: MessageTone
+    target_audience: Optional[str] = None
+    context: Optional[str] = None
+    keywords: Optional[List[str]] = None
+    max_length: Optional[int] = 10000
+
+@app.post("/api/key-messages/generate")
+async def generate_key_message(request: KeyMessageRequest):
+    try:
+        llm_service = LLMKeyMessageService()
+        response = await llm_service.generate_message(
+            message=request.message,
+            message_type=request.message_type,
+            tone=request.tone,
+            target_audience=request.target_audience,
+            context=request.context,
+            keywords=request.keywords,
+            max_length=request.max_length
+        )
+        return response
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Para ejecutar localmente (desde la carpeta `ads-ia-backend`):
 # pip install -r requirements.txt
