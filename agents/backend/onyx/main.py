@@ -3,18 +3,17 @@ import sys
 import traceback
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
-from typing import Any
-from typing import cast
+from typing import Any, List, Dict
 
 import sentry_sdk
 import uvicorn
-from fastapi import APIRouter
-from fastapi import FastAPI
+from fastapi import APIRouter, FastAPI
 from fastapi import HTTPException
 from fastapi import Request
 from fastapi import status
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.routing import APIRoute
 from httpx_oauth.clients.google import GoogleOAuth2
@@ -120,6 +119,28 @@ from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 from shared_configs.configs import SENTRY_DSN
 from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
 
+# Import the ads router
+from onyx.server.features.ads import ads_router, ai_router, integrated_router
+from onyx.server.features.ads.api import router as ads_router
+from onyx.server.features.ads.advanced_api import router as advanced_ads_router
+from onyx.server.features.ads.langchain_api import router as langchain_router
+from onyx.server.features.ads.api.ai_api import router as ai_router
+from onyx.server.features.ads.api.integrated_api import router as integrated_ads_router
+
+# Import the integrated router
+from onyx.server.features.integrated import integrated_router
+from onyx.server.features.integrated.api import router as integrated_router
+
+from onyx.core.config import settings
+from onyx.core.functions import format_response, handle_error
+
+# Configure logging
+logging.basicConfig(
+    level=getattr(logging, settings.LOG_LEVEL),
+    format=settings.LOG_FORMAT
+)
+logger = logging.getLogger(__name__)
+
 logger = setup_logger()
 
 file_handlers = [
@@ -210,61 +231,33 @@ def include_auth_router_with_prefix(
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    # Set recursion limit
-    if SYSTEM_RECURSION_LIMIT is not None:
-        sys.setrecursionlimit(SYSTEM_RECURSION_LIMIT)
-        logger.notice(f"System recursion limit set to {SYSTEM_RECURSION_LIMIT}")
-
-    SqlEngine.set_app_name(POSTGRES_WEB_APP_NAME)
-
-    SqlEngine.init_engine(
-        pool_size=POSTGRES_API_SERVER_POOL_SIZE,
-        max_overflow=POSTGRES_API_SERVER_POOL_OVERFLOW,
-    )
-    SqlEngine.get_engine()
-
-    verify_auth = fetch_versioned_implementation(
-        "onyx.auth.users", "verify_auth_setting"
-    )
-
-    # Will throw exception if an issue is found
-    verify_auth()
-
-    if OAUTH_CLIENT_ID and OAUTH_CLIENT_SECRET:
-        logger.notice("Both OAuth Client ID and Secret are configured.")
-
-    if DISABLE_GENERATIVE_AI:
-        logger.notice("Generative AI Q&A disabled")
-
-    # fill up Postgres connection pools
-    await warm_up_connections()
-
-    if not MULTI_TENANT:
-        # We cache this at the beginning so there is no delay in the first telemetry
-        CURRENT_TENANT_ID_CONTEXTVAR.set(POSTGRES_DEFAULT_SCHEMA)
-        get_or_generate_uuid()
-
-        # If we are multi-tenant, we need to only set up initial public tables
-        with get_session_context_manager() as db_session:
-            setup_onyx(db_session, POSTGRES_DEFAULT_SCHEMA)
+    """Initialize and cleanup application resources."""
+    logger.info("Initializing application and HTTPX client...")
+    app.state.httpx_client = httpx.AsyncClient(timeout=120.0)
+    
+    # Verify Onyx API connection
+    if not settings.ONYX_API_KEY:
+        logger.critical("ONYX_API_KEY not configured. Advanced features will not work.")
     else:
-        setup_multitenant_onyx()
-
-    if not MULTI_TENANT:
-        # don't emit a metric for every pod rollover/restart
-        optional_telemetry(
-            record_type=RecordType.VERSION, data={"version": __version__}
-        )
-
-    if AUTH_RATE_LIMITING_ENABLED:
-        await setup_auth_limiter()
-
+        logger.info(f"Configured to use Onyx API at: {settings.ONYX_API_URL}")
+        try:
+            headers = {"Authorization": f"Bearer {settings.ONYX_API_KEY}"}
+            response = await app.state.httpx_client.get(
+                f"{settings.ONYX_API_URL}/health",
+                headers=headers,
+                timeout=5.0
+            )
+            if response.status_code == 200:
+                logger.info("Successfully connected to Onyx API.")
+            else:
+                logger.warning(f"Could not confirm Onyx connection (status: {response.status_code}).")
+        except Exception as e:
+            logger.error(f"CRITICAL: Could not connect to Onyx API. Error: {e}")
+    
     yield
-
-    SqlEngine.reset_engine()
-
-    if AUTH_RATE_LIMITING_ENABLED:
-        await close_auth_limiter()
+    
+    logger.info("Closing HTTPX client and finalizing application...")
+    await app.state.httpx_client.aclose()
 
 
 def log_http_error(request: Request, exc: Exception) -> JSONResponse:
@@ -357,6 +350,12 @@ def get_application(lifespan_override: Lifespan | None = None) -> FastAPI:
     include_router_with_global_prefix_prepended(application, long_term_logs_router)
     include_router_with_global_prefix_prepended(application, api_key_router)
     include_router_with_global_prefix_prepended(application, standard_oauth_router)
+    include_router_with_global_prefix_prepended(application, ads_router)
+    include_router_with_global_prefix_prepended(application, advanced_ads_router)
+    include_router_with_global_prefix_prepended(application, langchain_router)
+    include_router_with_global_prefix_prepended(application, ai_router)
+    include_router_with_global_prefix_prepended(application, integrated_router)
+    include_router_with_global_prefix_prepended(application, integrated_ads_router)
 
     if AUTH_TYPE == AuthType.DISABLED:
         # Server logs this during auth setup verification step
@@ -447,6 +446,7 @@ def get_application(lifespan_override: Lifespan | None = None) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    application.add_middleware(GZipMiddleware, minimum_size=100)
     if LOG_ENDPOINT_LATENCY:
         add_latency_logging_middleware(application, logger)
 

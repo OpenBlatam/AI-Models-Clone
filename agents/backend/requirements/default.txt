@@ -100,3 +100,12 @@ prometheus_client==0.21.0
 fastapi-limiter==0.1.6
 prometheus_fastapi_instrumentator==7.1.0
 sendgrid==6.11.0
+
+# Ads generation dependencies
+rembg>=2.0.50
+pillow>=10.0.0
+pillow-simd>=7.0.0
+pyvips>=2.2.1
+opencv-python-headless>=4.8.0
+numpy>=1.24.0
+httpx>=0.24.0

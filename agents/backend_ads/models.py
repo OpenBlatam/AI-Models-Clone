@@ -11,6 +11,10 @@ class AdsRequest(AdsIaBaseRequest):
 
 class BrandKitRequest(AdsIaBaseRequest):
     type: Literal["brand-kit"]
+    brand_voice: Optional[BrandVoice] = None
+    audience_profile: Optional[AudienceProfile] = None
+    project_context: Optional[ProjectContext] = None
+    content_sources: Optional[List[ContentSource]] = None
 
 class ContentGenerationRequest(AdsIaBaseRequest): # No se usa directamente, AdsIaRequest cubre esto
     type: Literal["ads"]
@@ -26,6 +30,10 @@ class AdsResponse(BaseModel):
 
 class BrandKitResponse(BaseModel):
     brandKit: str
+    brand_voice: Optional[BrandVoice] = None
+    audience_profile: Optional[AudienceProfile] = None
+    project_context: Optional[ProjectContext] = None
+    content_sources: Optional[List[ContentSource]] = None
 
 class ErrorResponse(BaseModel):
     error: str

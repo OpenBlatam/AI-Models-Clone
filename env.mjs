@@ -5,7 +5,7 @@ const isDevelopment = process.env.NODE_ENV === "development";
 
 export const env = createEnv({
   server: {
-    AUTH_SECRET: isDevelopment 
+    AUTH_SECRET: isDevelopment
       ? z.string().default("development-secret")
       : z.string().min(1, "AUTH_SECRET is required"),
     GOOGLE_CLIENT_ID: isDevelopment

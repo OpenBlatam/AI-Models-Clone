@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from typing import List, Dict
 from onyx.utils.langchain import LangchainField
 from onyx.utils.logger import setup_logger
+from agents.backend_ads.models import BrandVoice, AudienceProfile, ProjectContext, ContentSource
 
 logger = setup_logger()
 
@@ -40,6 +41,10 @@ class BrandKit(BaseModel):
     mission_vision_summary: str = LangchainField(
         description="Misión o visión resumida si se infiere"
     )
+    brand_voice: BrandVoice = LangchainField(description="Configuración de voz de marca Onyx")
+    audience_profile: AudienceProfile = LangchainField(description="Perfil de audiencia Onyx")
+    project_context: ProjectContext = LangchainField(description="Contexto de proyecto Onyx")
+    content_sources: list[ContentSource] = LangchainField(description="Fuentes de contenido Onyx")
 
     class Config:
         arbitrary_types_allowed = True
