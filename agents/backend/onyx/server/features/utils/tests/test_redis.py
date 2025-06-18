@@ -13,6 +13,8 @@ from ..redis_middleware import RedisMiddleware
 from ..redis_decorators import RedisDecorators
 from fastapi import FastAPI, Request, Response
 from starlette.testclient import TestClient
+import redis
+from ..redis_manager import RedisManager
 
 # Test models
 class UserModel(BaseModel):
@@ -22,19 +24,41 @@ class UserModel(BaseModel):
     email: str
     created_at: datetime = datetime.utcnow()
 
+class TestModel(BaseModel):
+    id: str
+    name: str
+    value: int
+
+@pytest.fixture
+def redis_config():
+    """Create a test Redis configuration."""
+    return RedisConfig(
+        host="localhost",
+        port=6379,
+        db=15,  # Use a different DB for testing
+        default_expire=300,
+        log_level="DEBUG"
+    )
+
+@pytest.fixture
+def redis_manager(redis_config):
+    """Create a Redis manager instance for testing."""
+    manager = RedisManager(
+        host=redis_config.host,
+        port=redis_config.port,
+        db=redis_config.db
+    )
+    yield manager
+    # Cleanup after tests
+    manager.clear_prefix("test")
+
 class TestRedisUtils:
     """Tests for Redis utilities."""
     
     @pytest.fixture
-    def redis_utils(self):
+    def redis_utils(self, redis_config):
         """Create Redis utilities instance."""
-        config = RedisConfig(
-            host="localhost",
-            port=6379,
-            db=15,  # Use a separate database for testing
-            default_expire=3600
-        )
-        return RedisUtils(config)
+        return RedisUtils(redis_config)
     
     @pytest.fixture
     def test_data(self):
@@ -216,15 +240,9 @@ class TestRedisDecorators:
     """Tests for Redis decorators."""
     
     @pytest.fixture
-    def redis_decorators(self):
+    def redis_decorators(self, redis_config):
         """Create Redis decorators instance."""
-        config = RedisConfig(
-            host="localhost",
-            port=6379,
-            db=15,  # Use a separate database for testing
-            default_ttl=3600
-        )
-        return RedisDecorators({"default_ttl": 3600})
+        return RedisDecorators(redis_config)
     
     @pytest.fixture
     def test_data(self):
@@ -245,7 +263,6 @@ class TestRedisDecorators:
     @pytest.mark.asyncio
     async def test_cache_decorator(self, redis_decorators, test_data):
         """Test cache decorator."""
-        # Define test function
         @redis_decorators.cache(
             prefix="test",
             ttl=3600
@@ -254,17 +271,16 @@ class TestRedisDecorators:
             return test_data[user_id].model_dump()
         
         # First call
-        result1 = await get_user_data("user_1")
-        assert result1["id"] == test_data["user_1"].id
+        data1 = await get_user_data("user_1")
+        assert data1["id"] == test_data["user_1"].id
         
         # Second call (should be cached)
-        result2 = await get_user_data("user_1")
-        assert result2["id"] == test_data["user_1"].id
+        data2 = await get_user_data("user_1")
+        assert data2["id"] == test_data["user_1"].id
     
     @pytest.mark.asyncio
     async def test_cache_model_decorator(self, redis_decorators, test_data):
         """Test cache model decorator."""
-        # Define test function
         @redis_decorators.cache_model(
             prefix="test",
             ttl=3600
@@ -273,17 +289,16 @@ class TestRedisDecorators:
             return test_data[user_id]
         
         # First call
-        result1 = await get_user_model("user_1")
-        assert result1.id == test_data["user_1"].id
+        model1 = await get_user_model("user_1")
+        assert model1.id == test_data["user_1"].id
         
         # Second call (should be cached)
-        result2 = await get_user_model("user_1")
-        assert result2.id == test_data["user_1"].id
+        model2 = await get_user_model("user_1")
+        assert model2.id == test_data["user_1"].id
     
     @pytest.mark.asyncio
     async def test_cache_batch_decorator(self, redis_decorators, test_data):
         """Test cache batch decorator."""
-        # Define test function
         @redis_decorators.cache_batch(
             prefix="test",
             ttl=3600
@@ -292,19 +307,18 @@ class TestRedisDecorators:
             return {user_id: test_data[user_id] for user_id in user_ids}
         
         # First call
-        result1 = await get_batch_data(["user_1", "user_2"])
-        assert len(result1) == 2
-        assert result1["user_1"].id == test_data["user_1"].id
+        batch1 = await get_batch_data(["user_1", "user_2"])
+        assert len(batch1) == 2
+        assert batch1["user_1"].id == test_data["user_1"].id
         
         # Second call (should be cached)
-        result2 = await get_batch_data(["user_1", "user_2"])
-        assert len(result2) == 2
-        assert result2["user_1"].id == test_data["user_1"].id
+        batch2 = await get_batch_data(["user_1", "user_2"])
+        assert len(batch2) == 2
+        assert batch2["user_1"].id == test_data["user_1"].id
     
     @pytest.mark.asyncio
     async def test_invalidate_decorator(self, redis_decorators, test_data):
         """Test invalidate decorator."""
-        # Define test functions
         @redis_decorators.cache(
             prefix="test",
             ttl=3600
@@ -319,12 +333,228 @@ class TestRedisDecorators:
             return data
         
         # Cache data
-        result1 = await get_user_data("user_1")
-        assert result1["id"] == test_data["user_1"].id
+        await get_user_data("user_1")
         
-        # Invalidate cache
-        await update_user_data("user_1", {"id": "1", "name": "Updated"})
+        # Update data
+        updated_data = {"name": "Updated Name"}
+        await update_user_data("user_1", updated_data)
         
-        # Get fresh data
-        result2 = await get_user_data("user_1")
-        assert result2["id"] == test_data["user_1"].id 
+        # Get updated data
+        data = await get_user_data("user_1")
+        assert data["name"] == "Updated Name"
+
+# Test Redis Configuration
+def test_redis_config_defaults():
+    """Test default Redis configuration values."""
+    config = RedisConfig()
+    assert config.host == "localhost"
+    assert config.port == 6379
+    assert config.db == 0
+    assert config.password == ""
+    assert config.max_connections == 10
+    assert config.default_expire == 3600
+
+def test_redis_config_custom():
+    """Test custom Redis configuration values."""
+    config = RedisConfig(
+        host="test-host",
+        port=6380,
+        db=1,
+        password="test-password",
+        max_connections=20,
+        default_expire=1800
+    )
+    assert config.host == "test-host"
+    assert config.port == 6380
+    assert config.db == 1
+    assert config.password == "test-password"
+    assert config.max_connections == 20
+    assert config.default_expire == 1800
+
+def test_get_config():
+    """Test getting configuration for different environments."""
+    dev_config = get_config("development")
+    assert dev_config.host == "localhost"
+    assert dev_config.port == 6379
+    
+    test_config = get_config("testing")
+    assert test_config.db == 15
+    assert test_config.default_expire == 300
+    
+    prod_config = get_config("production")
+    assert prod_config.host == "redis.production"
+    assert prod_config.max_connections == 50
+
+# Test Redis Manager
+def test_cache_model(redis_manager):
+    """Test caching and retrieving a model."""
+    model = TestModel(id="1", name="Test", value=42)
+    
+    # Cache the model
+    redis_manager.cache_model(
+        model=model,
+        prefix="test",
+        identifier="model_1",
+        expire=300
+    )
+    
+    # Retrieve the model
+    cached_model = redis_manager.get_cached_model(
+        model_class=TestModel,
+        prefix="test",
+        identifier="model_1"
+    )
+    
+    assert cached_model is not None
+    assert cached_model.id == model.id
+    assert cached_model.name == model.name
+    assert cached_model.value == model.value
+
+def test_cache_context(redis_manager):
+    """Test caching and retrieving context data."""
+    context = {"user_id": "123", "action": "test"}
+    
+    # Cache the context
+    redis_manager.cache_context(
+        context=context,
+        prefix="test",
+        identifier="context_1",
+        expire=300
+    )
+    
+    # Retrieve the context
+    cached_context = redis_manager.get_cached_context(
+        prefix="test",
+        identifier="context_1"
+    )
+    
+    assert cached_context is not None
+    assert cached_context["user_id"] == context["user_id"]
+    assert cached_context["action"] == context["action"]
+
+def test_cache_prompt(redis_manager):
+    """Test caching and retrieving a prompt."""
+    prompt = "Test prompt"
+    
+    # Cache the prompt
+    redis_manager.cache_prompt(
+        prompt=prompt,
+        prefix="test",
+        identifier="prompt_1",
+        expire=300
+    )
+    
+    # Retrieve the prompt
+    cached_prompt = redis_manager.get_cached_prompt(
+        prefix="test",
+        identifier="prompt_1"
+    )
+    
+    assert cached_prompt == prompt
+
+def test_cache_metrics(redis_manager):
+    """Test caching and retrieving metrics."""
+    metrics = {"clicks": 100, "views": 1000}
+    
+    # Cache the metrics
+    redis_manager.cache_metrics(
+        metrics=metrics,
+        prefix="test",
+        identifier="metrics_1",
+        expire=300
+    )
+    
+    # Retrieve the metrics
+    cached_metrics = redis_manager.get_cached_metrics(
+        prefix="test",
+        identifier="metrics_1"
+    )
+    
+    assert cached_metrics is not None
+    assert cached_metrics["clicks"] == metrics["clicks"]
+    assert cached_metrics["views"] == metrics["views"]
+
+def test_increment_counter(redis_manager):
+    """Test counter operations."""
+    # Increment counter
+    value = redis_manager.increment_counter(
+        prefix="test",
+        identifier="counter_1",
+        amount=1
+    )
+    assert value == 1
+    
+    # Get counter value
+    counter_value = redis_manager.get_counter(
+        prefix="test",
+        identifier="counter_1"
+    )
+    assert counter_value == 1
+
+def test_set_operations(redis_manager):
+    """Test set operations."""
+    # Add to set
+    redis_manager.add_to_set(
+        prefix="test",
+        identifier="set_1",
+        value="value1"
+    )
+    
+    # Get set members
+    members = redis_manager.get_set_members(
+        prefix="test",
+        identifier="set_1"
+    )
+    assert "value1" in members
+
+def test_delete_key(redis_manager):
+    """Test key deletion."""
+    # Cache something
+    redis_manager.cache_model(
+        model=TestModel(id="1", name="Test", value=42),
+        prefix="test",
+        identifier="model_1"
+    )
+    
+    # Delete the key
+    redis_manager.delete_key(
+        prefix="test",
+        identifier="model_1"
+    )
+    
+    # Try to retrieve the deleted key
+    cached_model = redis_manager.get_cached_model(
+        model_class=TestModel,
+        prefix="test",
+        identifier="model_1"
+    )
+    assert cached_model is None
+
+def test_clear_prefix(redis_manager):
+    """Test clearing all keys with a prefix."""
+    # Cache multiple items
+    redis_manager.cache_model(
+        model=TestModel(id="1", name="Test1", value=42),
+        prefix="test",
+        identifier="model_1"
+    )
+    redis_manager.cache_model(
+        model=TestModel(id="2", name="Test2", value=43),
+        prefix="test",
+        identifier="model_2"
+    )
+    
+    # Clear all test keys
+    redis_manager.clear_prefix("test")
+    
+    # Verify keys are deleted
+    assert redis_manager.get_cached_model(
+        model_class=TestModel,
+        prefix="test",
+        identifier="model_1"
+    ) is None
+    assert redis_manager.get_cached_model(
+        model_class=TestModel,
+        prefix="test",
+        identifier="model_2"
+    ) is None 

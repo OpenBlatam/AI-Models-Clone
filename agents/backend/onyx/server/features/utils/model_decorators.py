@@ -8,12 +8,12 @@ import time
 import logging
 from datetime import datetime
 from .base_model import OnyxBaseModel
-from .model_utils import ModelCache, ModelRegistry, ModelValidator
 
 T = TypeVar('T', bound=OnyxBaseModel)
 
 def register_model(model_class: Type[T]) -> Type[T]:
     """Decorator to register a model class."""
+    from .model_utils import ModelRegistry
     ModelRegistry.register(model_class)
     return model_class
 
@@ -27,6 +27,7 @@ def cache_model(key_field: str):
             
             # Cache the model if it's an instance of OnyxBaseModel
             if isinstance(result, OnyxBaseModel):
+                from .model_utils import ModelCache
                 key = getattr(result, key_field)
                 ModelCache.set(result, str(key))
             
@@ -44,6 +45,7 @@ def validate_model(validate_types: bool = True, validate_custom: bool = True):
             
             # Validate the model if it's an instance of OnyxBaseModel
             if isinstance(result, OnyxBaseModel):
+                from .model_utils import ModelValidator
                 validator = ModelValidator()
                 
                 # Validate required fields

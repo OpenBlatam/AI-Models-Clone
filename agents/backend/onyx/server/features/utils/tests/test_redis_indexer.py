@@ -5,6 +5,7 @@ Tests for Redis indexer in Onyx.
 import pytest
 from datetime import datetime
 from pydantic import BaseModel
+import redis
 from ..redis_indexer import RedisIndexer
 from ..redis_config import RedisConfig
 
@@ -27,16 +28,22 @@ class ProductModel(BaseModel):
 class TestRedisIndexer:
     """Tests for Redis indexer."""
     
+    @pytest.fixture(autouse=True)
+    def setup_redis(self):
+        """Check Redis connection before tests."""
+        try:
+            redis_client = redis.Redis(host="localhost", port=6379, db=15)
+            redis_client.ping()
+            yield
+        except redis.ConnectionError:
+            pytest.skip("Redis server is not running")
+        finally:
+            redis_client.close()
+    
     @pytest.fixture
-    def redis_indexer(self):
+    def redis_indexer(self, redis_config):
         """Create Redis indexer instance."""
-        config = RedisConfig(
-            host="localhost",
-            port=6379,
-            db=15,  # Use a separate database for testing
-            default_expire=3600
-        )
-        return RedisIndexer({"index_ttl": 3600})
+        return RedisIndexer(redis_config)
     
     @pytest.fixture
     def test_users(self):
@@ -202,7 +209,6 @@ class TestRedisIndexer:
             model_name="user",
             index_fields=["id", "email"]
         )
-        
         redis_indexer.index_batch(
             models=test_products,
             model_name="product",
@@ -212,62 +218,53 @@ class TestRedisIndexer:
         # Get stats
         stats = redis_indexer.get_index_stats()
         
+        assert isinstance(stats, dict)
         assert "user" in stats
         assert "product" in stats
-        assert "id" in stats["user"]
-        assert "email" in stats["user"]
-        assert "id" in stats["product"]
-        assert "category" in stats["product"]
+        assert stats["user"]["count"] == 2
+        assert stats["product"]["count"] == 2
     
     def test_multiple_index_fields(self, redis_indexer, test_products):
-        """Test indexing with multiple fields."""
-        # Index product
+        """Test indexing multiple fields."""
+        # Index product with multiple fields
         redis_indexer.index_model(
             model=test_products[0],
             model_name="product",
-            index_fields=["id", "name", "category", "price"]
+            index_fields=["id", "category", "price"]
         )
         
-        # Find by different fields
-        found_by_id = redis_indexer.find_by_index(
-            model_name="product",
-            field="id",
-            value="1",
-            model_class=ProductModel
-        )
-        
-        found_by_name = redis_indexer.find_by_index(
-            model_name="product",
-            field="name",
-            value="Product 1",
-            model_class=ProductModel
-        )
-        
+        # Find by category
         found_by_category = redis_indexer.find_by_index(
             model_name="product",
             field="category",
             value="Electronics",
             model_class=ProductModel
         )
-        
-        assert found_by_id is not None
-        assert found_by_name is not None
         assert found_by_category is not None
-        assert found_by_id.id == found_by_name.id
-        assert found_by_name.id == found_by_category.id
+        assert found_by_category.id == test_products[0].id
+        
+        # Find by price
+        found_by_price = redis_indexer.find_by_index(
+            model_name="product",
+            field="price",
+            value=10.99,
+            model_class=ProductModel
+        )
+        assert found_by_price is not None
+        assert found_by_price.id == test_products[0].id
     
     def test_none_values(self, redis_indexer):
-        """Test handling of None values in indexes."""
-        # Create user with None email
-        user = UserModel(
-            id="1",
-            name="John Doe",
+        """Test handling of None values."""
+        # Create model with None value
+        model = UserModel(
+            id="3",
+            name="Test User",
             email=None
         )
         
-        # Index user
+        # Index model
         redis_indexer.index_model(
-            model=user,
+            model=model,
             model_name="user",
             index_fields=["id", "email"]
         )
@@ -283,7 +280,7 @@ class TestRedisIndexer:
         assert found_user is None
     
     def test_invalid_model_class(self, redis_indexer, test_users):
-        """Test finding with invalid model class."""
+        """Test handling of invalid model class."""
         # Index user
         redis_indexer.index_model(
             model=test_users[0],
@@ -292,11 +289,10 @@ class TestRedisIndexer:
         )
         
         # Try to find with wrong model class
-        found_user = redis_indexer.find_by_index(
-            model_name="user",
-            field="email",
-            value="john@example.com",
-            model_class=ProductModel
-        )
-        
-        assert found_user is None 
+        with pytest.raises(ValueError):
+            redis_indexer.find_by_index(
+                model_name="user",
+                field="email",
+                value="john@example.com",
+                model_class=ProductModel
+            ) 

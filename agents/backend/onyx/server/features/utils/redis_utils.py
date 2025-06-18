@@ -10,12 +10,19 @@ import redis
 from functools import wraps
 import logging
 from pydantic import BaseModel
-import asyncio
+import time
 from .redis_config import RedisConfig, get_config
 
 logger = logging.getLogger(__name__)
 
 T = TypeVar('T', bound=BaseModel)
+
+class DateTimeEncoder(json.JSONEncoder):
+    """Custom JSON encoder for datetime objects."""
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            return obj.isoformat()
+        return super().default(obj)
 
 class RedisUtils:
     """Utility functions for Redis operations."""
@@ -44,13 +51,13 @@ class RedisUtils:
                     raise
                 delay = self.config.retry_delay * (2 ** attempt)
                 logger.warning(f"Redis operation failed, retrying in {delay}s: {e}")
-                asyncio.sleep(delay)
+                time.sleep(delay)
     
     def _serialize(self, data: Any) -> str:
         """Serialize data for Redis storage."""
         if isinstance(data, BaseModel):
             return data.model_dump_json()
-        return json.dumps(data)
+        return json.dumps(data, cls=DateTimeEncoder)
     
     def _deserialize(self, data: str, model_class: Optional[type[T]] = None) -> Any:
         """Deserialize data from Redis storage."""
@@ -189,6 +196,16 @@ class RedisUtils:
         except Exception as e:
             logger.error(f"Error getting Redis stats: {e}")
             return {}
+    
+    def delete_key(self, prefix: str, identifier: str) -> None:
+        """Delete a single key from Redis."""
+        key = self._generate_key(prefix, identifier)
+        try:
+            self._retry_operation(self.redis.delete, key)
+            logger.debug(f"Deleted key {prefix}:{identifier}")
+        except Exception as e:
+            logger.error(f"Error deleting key: {e}")
+            raise
 
 # Global Redis utilities instance
 redis_utils = RedisUtils()

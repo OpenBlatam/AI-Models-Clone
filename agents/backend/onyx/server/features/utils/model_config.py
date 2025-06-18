@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Model Configuration - Onyx Integration
 Configuration settings for model operations.
@@ -20,7 +21,7 @@ from .model_types import (
     ModelCache, ModelIndex, ModelEvent, ModelValidation, ModelFactory
 )
 
-T = TypeVar('T', bound=OnyxBaseModel)
+T = TypeVar('T', bound="OnyxBaseModel")
 
 class ModelConfig:
     """Model configuration settings."""

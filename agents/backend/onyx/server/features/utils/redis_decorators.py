@@ -20,11 +20,15 @@ F = TypeVar('F', bound=Callable[..., Any])
 class RedisDecorators:
     """Decorators for Redis caching in Onyx."""
     
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: Any = None):
         """Initialize Redis decorators."""
         self.config = config or {}
         self.redis_utils = RedisUtils(get_config())
-        self.default_ttl = self.config.get("default_ttl", 3600)  # 1 hour default
+        # Support both dict and Pydantic model
+        if isinstance(self.config, dict):
+            self.default_ttl = self.config.get("default_ttl", 3600)
+        else:
+            self.default_ttl = getattr(self.config, "default_ttl", 3600)
     
     def cache(
         self,

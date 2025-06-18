@@ -21,16 +21,23 @@ class RedisMiddleware(BaseHTTPMiddleware):
     def __init__(
         self,
         app: ASGIApp,
-        config: Optional[Dict[str, Any]] = None
+        config: Any = None
     ):
         """Initialize Redis middleware."""
         super().__init__(app)
         self.config = config or {}
         self.redis_utils = RedisUtils(get_config())
-        self.cache_ttl = self.config.get("cache_ttl", 3600)  # 1 hour default
-        self.exclude_paths = self.config.get("exclude_paths", [])
-        self.include_paths = self.config.get("include_paths", [])
-        self.cache_headers = self.config.get("cache_headers", True)
+        # Support both dict and Pydantic model
+        if isinstance(self.config, dict):
+            self.cache_ttl = self.config.get("cache_ttl", 3600)
+            self.exclude_paths = self.config.get("exclude_paths", [])
+            self.include_paths = self.config.get("include_paths", [])
+            self.cache_headers = self.config.get("cache_headers", True)
+        else:
+            self.cache_ttl = getattr(self.config, "cache_ttl", 3600)
+            self.exclude_paths = getattr(self.config, "exclude_paths", [])
+            self.include_paths = getattr(self.config, "include_paths", [])
+            self.cache_headers = getattr(self.config, "cache_headers", True)
     
     async def dispatch(
         self,

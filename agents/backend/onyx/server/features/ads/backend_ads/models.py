@@ -1,326 +1,276 @@
 """
-Ads Models - Onyx Integration
-Enhanced models for ads with advanced features.
+Ads Models - Enterprise Production Grade
+Enterprise-grade models for ads with advanced features, monitoring, and reliability.
 """
-from typing import Dict, List, Optional, Union, Any
-from datetime import datetime
-from pydantic import Field, validator, root_validator
+from typing import Dict, List, Optional, Union, Any, Tuple, ClassVar, Set, Protocol, runtime_checkable, TypeVar, Generic, Type
+from datetime import datetime, timedelta
+from pydantic import Field, validator, root_validator, BaseModel, create_model
 from ...utils.base_model import OnyxBaseModel
+from ...utils.brand_kit.model import BrandKit
+import orjson as json
+import msgpack
+import mmh3
+import zstd
+import prometheus_client as prom
+import structlog
+import tenacity
+import backoff
+import circuitbreaker
+import redis
+import aioredis
+from dataclasses import dataclass, field
+from enum import Enum
+from uuid import UUID, uuid4
+from threading import Lock
+from multiprocessing import Pool, cpu_count
+from abc import ABC, abstractmethod
+from contextlib import asynccontextmanager
+from functools import lru_cache, cached_property
 
+# Type Variables
+T = TypeVar('T')
+AdModelT = TypeVar('AdModelT', bound='AdModel')
+
+# Enums
+class AdStatus(str, Enum):
+    DRAFT = "draft"
+    REVIEW = "review"
+    APPROVED = "approved"
+    REJECTED = "rejected"
+    ACTIVE = "active"
+    PAUSED = "paused"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+class AdPlatform(str, Enum):
+    FACEBOOK = "facebook"
+    INSTAGRAM = "instagram"
+    TWITTER = "twitter"
+    LINKEDIN = "linkedin"
+    GOOGLE = "google"
+    TIKTOK = "tiktok"
+    PINTEREST = "pinterest"
+    SNAPCHAT = "snapchat"
+
+class AdType(str, Enum):
+    DISPLAY = "display"
+    VIDEO = "video"
+    CAROUSEL = "carousel"
+    STORY = "story"
+    COLLECTION = "collection"
+    DYNAMIC = "dynamic"
+    RESPONSIVE = "responsive"
+
+# Protocols
+@runtime_checkable
+class CacheProtocol(Protocol[T]):
+    def get(self, key: str) -> Optional[T]: ...
+    def set(self, key: str, value: T): ...
+    def clear(self): ...
+
+@runtime_checkable
+class MetricsProtocol(Protocol):
+    def record_operation(self, operation: str, status: str, component: str, platform: str): ...
+    def record_latency(self, operation: str, component: str, platform: str, duration: float): ...
+    def record_error(self, error_type: str, component: str, severity: str): ...
+
+# Base Classes
+class BaseMetrics(MetricsProtocol):
+    """Base metrics implementation"""
+    def __init__(self):
+        self.operations = prom.Counter(
+            'ad_operations_total',
+            'Total number of ad operations',
+            ['operation', 'status', 'component', 'platform']
+        )
+        self.latency = prom.Histogram(
+            'ad_operation_latency_seconds',
+            'Latency of ad operations',
+            ['operation', 'component', 'platform'],
+            buckets=(0.001, 0.005, 0.01, 0.05, 0.1, 0.5)
+        )
+        self.errors = prom.Counter(
+            'ad_errors_total',
+            'Total number of errors',
+            ['error_type', 'component', 'severity']
+        )
+
+    def record_operation(self, operation: str, status: str, component: str, platform: str):
+        self.operations.labels(
+            operation=operation,
+            status=status,
+            component=component,
+            platform=platform
+        ).inc()
+
+    def record_latency(self, operation: str, component: str, platform: str, duration: float):
+        self.latency.labels(
+            operation=operation,
+            component=component,
+            platform=platform
+        ).observe(duration)
+
+    def record_error(self, error_type: str, component: str, severity: str):
+        self.errors.labels(
+            error_type=error_type,
+            component=component,
+            severity=severity
+        ).inc()
+
+class BaseCache(CacheProtocol[T]):
+    """Base cache implementation"""
+    def __init__(self, ttl: int = 60, max_size: int = 1000):
+        self.cache = {}
+        self.ttl = ttl
+        self.max_size = max_size
+        self._pool = Pool(processes=cpu_count())
+        self._metrics = BaseMetrics()
+
+    def get(self, key: str) -> Optional[T]:
+        try:
+            value = self.cache.get(key)
+            if value is not None:
+                self._metrics.record_operation('cache_get', 'hit', 'cache', 'memory')
+                return self._decompress(value)
+            self._metrics.record_operation('cache_get', 'miss', 'cache', 'memory')
+            return None
+        except Exception as e:
+            self._metrics.record_error('cache_get', 'cache', 'error')
+            return None
+
+    def set(self, key: str, value: T):
+        try:
+            if len(self.cache) >= self.max_size:
+                self.cache.clear()
+            self.cache[key] = self._compress(value)
+            self._metrics.record_operation('cache_set', 'success', 'cache', 'memory')
+        except Exception as e:
+            self._metrics.record_error('cache_set', 'cache', 'error')
+
+    def clear(self):
+        try:
+            self.cache.clear()
+            self._metrics.record_operation('cache_clear', 'success', 'cache', 'memory')
+        except Exception as e:
+            self._metrics.record_error('cache_clear', 'cache', 'error')
+
+    def _compress(self, value: T) -> bytes:
+        return self._pool.apply_async(
+            zstd.compress,
+            (msgpack.packb(value),),
+            {'level': 3}
+        ).get()
+
+    def _decompress(self, value: bytes) -> T:
+        return msgpack.unpackb(
+            self._pool.apply_async(
+                zstd.decompress,
+                (value,)
+            ).get()
+        )
+
+# Enterprise Model Configuration
+@dataclass(slots=True, frozen=True)
 class ModelConfig(OnyxBaseModel):
-    """Enhanced model configuration for ads generation."""
+    """Enterprise model configuration for ads generation"""
     
+    id: UUID = field(default_factory=uuid4)
     model_name: str = Field(..., description="Name of the model to use")
     temperature: float = Field(default=0.7, ge=0.0, le=1.0)
     top_p: float = Field(default=1.0, ge=0.0, le=1.0)
-    frequency_penalty: float = Field(default=0.0, ge=-2.0, le=2.0)
-    presence_penalty: float = Field(default=0.0, ge=-2.0, le=2.0)
     max_tokens: int = Field(default=1000, gt=0)
-    stop_sequences: List[str] = Field(default_factory=list)
+    stop_sequences: Tuple[str, ...] = Field(default_factory=tuple)
     custom_parameters: Dict[str, Any] = Field(default_factory=dict)
+    brand_kit: Optional[BrandKit] = None
+    ad_type: AdType = Field(default=AdType.DISPLAY)
+    platform: AdPlatform = Field(default=AdPlatform.FACEBOOK)
     
-    # Configure indexing
-    index_fields = ["model_name"]
-    search_fields = ["model_name", "custom_parameters"]
+    # Class-level caches
+    _cache: ClassVar[BaseCache] = BaseCache(ttl=60, max_size=1000)
+    _metrics: ClassVar[BaseMetrics] = BaseMetrics()
+    _pool: ClassVar[Pool] = Pool(processes=cpu_count())
     
-    @validator("temperature", "top_p", "frequency_penalty", "presence_penalty")
+    @validator("temperature", "top_p")
     def validate_float_range(cls, v: float, field: Field) -> float:
-        """Validate float fields are within their ranges."""
-        if field.name == "temperature" and not 0 <= v <= 1:
-            raise ValueError("Temperature must be between 0 and 1")
-        if field.name == "top_p" and not 0 <= v <= 1:
-            raise ValueError("Top P must be between 0 and 1")
-        if field.name in ["frequency_penalty", "presence_penalty"] and not -2 <= v <= 2:
-            raise ValueError(f"{field.name} must be between -2 and 2")
-        return v
+        try:
+            if not 0 <= v <= 1:
+                raise ValueError(f"{field.name} must be between 0 and 1")
+            return v
+        except Exception as e:
+            cls._metrics.record_error('validation', 'model_config', 'error')
+            raise
     
     @validator("max_tokens")
     def validate_max_tokens(cls, v: int) -> int:
-        """Validate max tokens is positive."""
-        if v <= 0:
-            raise ValueError("Max tokens must be positive")
-        return v
+        try:
+            if v <= 0:
+                raise ValueError("Max tokens must be positive")
+            return v
+        except Exception as e:
+            cls._metrics.record_error('validation', 'model_config', 'error')
+            raise
     
-    def get_model_parameters(self) -> Dict[str, Any]:
-        """Get model parameters for API calls."""
-        return {
-            "model": self.model_name,
-            "temperature": self.temperature,
-            "top_p": self.top_p,
-            "frequency_penalty": self.frequency_penalty,
-            "presence_penalty": self.presence_penalty,
-            "max_tokens": self.max_tokens,
-            "stop": self.stop_sequences,
-            **self.custom_parameters
-        }
-
-class BrandVoice(OnyxBaseModel):
-    """Enhanced brand voice configuration."""
-    
-    brand_name: str
-    tone: str
-    personality: Dict[str, float] = Field(
-        default_factory=lambda: {
-            "professional": 0.8,
-            "friendly": 0.6,
-            "creative": 0.7
-        }
-    )
-    keywords: List[str] = Field(default_factory=list)
-    style_guide: Dict[str, Any] = Field(default_factory=dict)
-    examples: List[str] = Field(default_factory=list)
-    
-    # Configure indexing
-    index_fields = ["brand_name"]
-    search_fields = ["tone", "keywords"]
-    
-    @validator("personality")
-    def validate_personality(cls, v: Dict[str, float]) -> Dict[str, float]:
-        """Validate personality scores are between 0 and 1."""
-        for key, value in v.items():
-            if not 0 <= value <= 1:
-                raise ValueError(f"Personality score for {key} must be between 0 and 1")
-        return v
-    
-    @validator("keywords")
-    def validate_keywords(cls, v: List[str]) -> List[str]:
-        """Validate keywords are non-empty."""
-        return [k.strip() for k in v if k.strip()]
-    
-    def get_personality_vector(self) -> List[float]:
-        """Get personality vector for similarity calculations."""
-        return list(self.personality.values())
-    
-    def get_keyword_set(self) -> set:
-        """Get set of keywords for matching."""
-        return set(self.keywords)
-
-class AudienceProfile(OnyxBaseModel):
-    """Enhanced audience profile configuration."""
-    
-    name: str
-    demographics: Dict[str, Any] = Field(
-        default_factory=lambda: {
-            "age_range": [18, 65],
-            "gender": "all",
-            "location": "global",
-            "interests": [],
-            "behaviors": []
-        }
-    )
-    preferences: Dict[str, Any] = Field(default_factory=dict)
-    pain_points: List[str] = Field(default_factory=list)
-    goals: List[str] = Field(default_factory=list)
-    
-    # Configure indexing
-    index_fields = ["name"]
-    search_fields = ["demographics", "preferences", "pain_points", "goals"]
-    
-    @validator("demographics")
-    def validate_demographics(cls, v: Dict[str, Any]) -> Dict[str, Any]:
-        """Validate demographics data."""
-        required_fields = ["age_range", "gender", "location"]
-        for field in required_fields:
-            if field not in v:
-                raise ValueError(f"Missing required demographics field: {field}")
-        
-        if not isinstance(v["age_range"], list) or len(v["age_range"]) != 2:
-            raise ValueError("Age range must be a list of two numbers")
-        
-        if v["age_range"][0] > v["age_range"][1]:
-            raise ValueError("Invalid age range")
-        
-        return v
-    
-    @validator("pain_points", "goals")
-    def validate_lists(cls, v: List[str]) -> List[str]:
-        """Validate list fields are non-empty."""
-        return [item.strip() for item in v if item.strip()]
-    
-    def get_age_range(self) -> tuple:
-        """Get age range as tuple."""
-        return tuple(self.demographics["age_range"])
-    
-    def get_interests(self) -> set:
-        """Get set of interests."""
-        return set(self.demographics.get("interests", []))
-    
-    def get_behaviors(self) -> set:
-        """Get set of behaviors."""
-        return set(self.demographics.get("behaviors", []))
-
-class AdContent(OnyxBaseModel):
-    """Enhanced ad content model."""
-    
-    title: str
-    description: str
-    call_to_action: str
-    media_urls: List[str] = Field(default_factory=list)
-    target_audience: str
-    platform: str
-    metrics: Dict[str, float] = Field(default_factory=dict)
-    status: str = Field(default="draft")
-    
-    # Configure indexing
-    index_fields = ["id", "target_audience", "platform", "status"]
-    search_fields = ["title", "description", "call_to_action"]
-    
-    @validator("status")
-    def validate_status(cls, v: str) -> str:
-        """Validate status is one of allowed values."""
-        allowed_statuses = ["draft", "review", "approved", "rejected", "active", "paused"]
-        if v not in allowed_statuses:
-            raise ValueError(f"Status must be one of: {', '.join(allowed_statuses)}")
-        return v
-    
-    @validator("media_urls")
-    def validate_media_urls(cls, v: List[str]) -> List[str]:
-        """Validate media URLs."""
-        return [url.strip() for url in v if url.strip()]
-    
-    def is_approved(self) -> bool:
-        """Check if ad is approved."""
-        return self.status == "approved"
-    
-    def is_active(self) -> bool:
-        """Check if ad is active."""
-        return self.status == "active"
-    
-    def get_metrics_summary(self) -> Dict[str, float]:
-        """Get summary of ad metrics."""
-        return {
-            "impressions": self.metrics.get("impressions", 0),
-            "clicks": self.metrics.get("clicks", 0),
-            "ctr": self.metrics.get("ctr", 0),
-            "conversions": self.metrics.get("conversions", 0)
-        }
-
-class AdCampaign(OnyxBaseModel):
-    """Enhanced ad campaign model."""
-    
-    name: str
-    description: str
-    start_date: datetime
-    end_date: datetime
-    budget: float
-    target_audience: str
-    platforms: List[str]
-    ads: List[AdContent] = Field(default_factory=list)
-    status: str = Field(default="draft")
-    
-    # Configure indexing
-    index_fields = ["id", "name", "status"]
-    search_fields = ["description", "target_audience", "platforms"]
-    
-    @validator("end_date")
-    def validate_dates(cls, v: datetime, values: Dict[str, Any]) -> datetime:
-        """Validate campaign dates."""
-        if "start_date" in values and v <= values["start_date"]:
-            raise ValueError("End date must be after start date")
-        return v
-    
-    @validator("budget")
-    def validate_budget(cls, v: float) -> float:
-        """Validate budget is positive."""
-        if v <= 0:
-            raise ValueError("Budget must be positive")
-        return v
-    
-    @validator("platforms")
-    def validate_platforms(cls, v: List[str]) -> List[str]:
-        """Validate platforms."""
-        allowed_platforms = ["facebook", "instagram", "twitter", "linkedin", "google"]
-        return [p.lower() for p in v if p.lower() in allowed_platforms]
-    
-    def is_active(self) -> bool:
-        """Check if campaign is active."""
-        now = datetime.utcnow()
-        return (
-            self.status == "active" and
-            self.start_date <= now <= self.end_date
+    @cached_property
+    def _hash(self) -> int:
+        return mmh3.hash(
+            f"{self.id}:{self.model_name}:{self.temperature}:{self.top_p}:{self.ad_type}:{self.platform}",
+            signed=False
         )
     
-    def get_budget_usage(self) -> float:
-        """Calculate budget usage."""
-        return sum(ad.metrics.get("spend", 0) for ad in self.ads)
-    
-    def get_performance_metrics(self) -> Dict[str, float]:
-        """Get campaign performance metrics."""
-        total_impressions = sum(ad.metrics.get("impressions", 0) for ad in self.ads)
-        total_clicks = sum(ad.metrics.get("clicks", 0) for ad in self.ads)
-        total_conversions = sum(ad.metrics.get("conversions", 0) for ad in self.ads)
-        
-        return {
-            "total_impressions": total_impressions,
-            "total_clicks": total_clicks,
-            "total_conversions": total_conversions,
-            "ctr": total_clicks / total_impressions if total_impressions > 0 else 0,
-            "conversion_rate": total_conversions / total_clicks if total_clicks > 0 else 0
-        }
+    @backoff.on_exception(
+        backoff.expo,
+        (Exception,),
+        max_tries=3,
+        max_time=30
+    )
+    def get_model_parameters(self) -> Dict[str, Any]:
+        """Get model parameters with retry logic and metrics"""
+        try:
+            cache_key = self._hash
+            cached_data = self._cache.get(cache_key)
+            
+            if cached_data:
+                return cached_data
+            
+            params = {
+                "model": self.model_name,
+                "temperature": self.temperature,
+                "top_p": self.top_p,
+                "max_tokens": self.max_tokens,
+                "stop": self.stop_sequences,
+                "ad_type": self.ad_type,
+                "platform": self.platform,
+                **self.custom_parameters
+            }
+            
+            if self.brand_kit:
+                params.update({
+                    "brand_voice": self.brand_kit.voice[0].get_data() if self.brand_kit.voice else None,
+                    "brand_colors": [color.get_data() for color in self.brand_kit.colors],
+                    "brand_typography": [typo.get_data() for typo in self.brand_kit.typography],
+                    "brand_values": self.brand_kit.values,
+                    "brand_audience": self.brand_kit.target_audience
+                })
+            
+            self._cache.set(cache_key, params)
+            self._metrics.record_operation('get_parameters', 'success', 'model_config', self.platform)
+            return params
+        except Exception as e:
+            self._metrics.record_error('get_parameters', 'model_config', 'error')
+            raise
 
 # Example usage:
 """
-# Create model configuration
+# Create model configuration with enterprise features
 model_config = ModelConfig(
     model_name="gpt-4",
     temperature=0.7,
     top_p=0.9,
-    max_tokens=500
+    max_tokens=500,
+    ad_type=AdType.VIDEO,
+    platform=AdPlatform.FACEBOOK
 )
 
-# Create brand voice
-brand_voice = BrandVoice(
-    brand_name="TechCorp",
-    tone="professional",
-    personality={
-        "professional": 0.9,
-        "friendly": 0.5,
-        "creative": 0.7
-    },
-    keywords=["technology", "innovation", "solutions"]
-)
-
-# Create audience profile
-audience = AudienceProfile(
-    name="Tech Professionals",
-    demographics={
-        "age_range": [25, 45],
-        "gender": "all",
-        "location": "global",
-        "interests": ["technology", "programming", "AI"]
-    }
-)
-
-# Create ad content
-ad = AdContent(
-    title="Revolutionary AI Solution",
-    description="Transform your business with our AI platform",
-    call_to_action="Learn More",
-    target_audience="Tech Professionals",
-    platform="linkedin",
-    status="approved"
-)
-
-# Create campaign
-campaign = AdCampaign(
-    name="Q2 Tech Campaign",
-    description="Promoting our AI solutions",
-    start_date=datetime.utcnow(),
-    end_date=datetime.utcnow() + timedelta(days=30),
-    budget=10000.0,
-    target_audience="Tech Professionals",
-    platforms=["linkedin", "twitter"],
-    ads=[ad]
-)
-
-# Index models
-redis_indexer = RedisIndexer()
-model_config.index(redis_indexer)
-brand_voice.index(redis_indexer)
-audience.index(redis_indexer)
-ad.index(redis_indexer)
-campaign.index(redis_indexer)
-
-# Get performance metrics
-metrics = campaign.get_performance_metrics()
+# Get parameters with retry logic and metrics
+params = model_config.get_model_parameters()
 """ 

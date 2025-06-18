@@ -1,193 +1,120 @@
 """
 Base Model - Onyx Integration
-Enhanced modular base model with mixins and utilities.
+Base model with validation, caching, events, and permissions.
 """
-from typing import Any, Dict, List, Optional, Union, TypeVar, Generic, ClassVar
+from __future__ import annotations
+from typing import Any, Dict, List, Optional, Type, TypeVar, Union
+from dataclasses import dataclass, field
 from datetime import datetime
-import uuid
-from pydantic import BaseModel, Field, ConfigDict, validator, root_validator
-from pydantic.generics import GenericModel
-import json
-import hashlib
-from .redis_indexer import RedisIndexer
+from functools import lru_cache
+import time
+from .base_types import CACHE_TTL, VALIDATION_TIMEOUT
+from .validation_mixin import ValidationMixin
+from .cache_mixin import CacheMixin
+from .event_mixin import EventMixin
+from .index_mixin import IndexMixin
+from .permission_mixin import PermissionMixin
+from .status_mixin import StatusMixin
+from .model_field import ModelField, FieldConfig
+from .model_schema import ModelSchema, SchemaConfig
 
 T = TypeVar('T')
 
-# Mixins for common functionality
-class TimestampMixin:
-    """Mixin for timestamp fields."""
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+class OnyxBaseModel(ValidationMixin, CacheMixin, EventMixin, IndexMixin, PermissionMixin, StatusMixin):
+    """Base model with validation, caching, events, and permissions."""
     
-    @validator("updated_at", pre=True, always=True)
-    def update_timestamp(cls, v: datetime) -> datetime:
-        """Update timestamp on model changes."""
-        return datetime.utcnow()
-
-class IdentifierMixin:
-    """Mixin for identifier fields."""
-    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    version: int = Field(default=1)
+    def __init__(
+        self,
+        schema: ModelSchema,
+        data: Optional[Dict[str, Any]] = None,
+        id: Optional[str] = None
+    ):
+        """Initialize model."""
+        self.schema = schema
+        self.id = id
+        self._data = data or schema.get_defaults()
+        self._cache = {}
+        self._cache_timestamps = {}
     
-    def increment_version(self) -> None:
-        """Increment the model version."""
-        self.version += 1
-
-class StatusMixin:
-    """Mixin for status fields."""
-    is_active: bool = Field(default=True)
-    status: str = Field(default="active")
+    def validate(self) -> List[str]:
+        """Validate model data."""
+        return self.schema.validate(self._data)
     
-    def activate(self) -> None:
-        """Activate the model."""
-        self.is_active = True
-        self.status = "active"
+    def get_field(self, field_name: str) -> Optional[Any]:
+        """Get field value."""
+        return self._data.get(field_name)
     
-    def deactivate(self) -> None:
-        """Deactivate the model."""
-        self.is_active = False
-        self.status = "inactive"
-
-class IndexingMixin:
-    """Mixin for indexing functionality."""
-    index_fields: ClassVar[List[str]] = ["id"]
-    search_fields: ClassVar[List[str]] = []
-    cache_ttl: ClassVar[int] = 3600  # 1 hour default
+    def set_field(self, field_name: str, value: Any) -> None:
+        """Set field value."""
+        if field_name not in self.schema.fields:
+            raise ValueError(f"Unknown field: {field_name}")
+        
+        field = self.schema.fields[field_name]
+        errors = field.validate(value)
+        
+        if errors:
+            raise ValueError(f"Invalid value for {field_name}: {', '.join(errors)}")
+        
+        self._data[field_name] = value
+        self.clear_cache()
     
-    def get_index_data(self) -> Dict[str, Any]:
-        """Get data for indexing."""
-        return {
-            field: getattr(self, field)
-            for field in self.index_fields
-            if hasattr(self, field)
-        }
+    def get_data(self) -> Dict[str, Any]:
+        """Get all data."""
+        return self._data.copy()
     
-    def get_search_data(self) -> Dict[str, Any]:
-        """Get data for searching."""
-        return {
-            field: getattr(self, field)
-            for field in self.search_fields
-            if hasattr(self, field)
-        }
+    def set_data(self, data: Dict[str, Any]) -> None:
+        """Set all data."""
+        errors = self.schema.validate(data)
+        
+        if errors:
+            raise ValueError(f"Invalid data: {', '.join(errors)}")
+        
+        self._data = data.copy()
+        self.clear_cache()
     
-    def index(self, indexer: RedisIndexer) -> None:
-        """Index the model."""
-        indexer.index_model(
-            model=self,
-            model_name=self.__class__.__name__,
-            index_fields=self.index_fields
-        )
-    
-    def remove_index(self, indexer: RedisIndexer) -> None:
-        """Remove model from index."""
-        indexer.remove_model(
-            model_name=self.__class__.__name__,
-            model_id=self.id
-        )
-    
-    def update_index(self, indexer: RedisIndexer) -> None:
-        """Update model in index."""
-        indexer.update_index(
-            model=self,
-            model_name=self.__class__.__name__,
-            index_fields=self.index_fields
-        )
-
-class ValidationMixin:
-    """Mixin for validation functionality."""
-    def validate_fields(self) -> List[str]:
-        """Validate model fields and return list of errors."""
-        errors = []
-        for field_name, field in self.model_fields.items():
-            try:
-                value = getattr(self, field_name)
-                if field.is_required() and value is None:
-                    errors.append(f"{field_name} is required")
-            except Exception as e:
-                errors.append(f"Error validating {field_name}: {str(e)}")
-        return errors
-    
-    def is_valid(self) -> bool:
-        """Check if the model is valid."""
-        return len(self.validate_fields()) == 0
-
-class SerializationMixin:
-    """Mixin for serialization functionality."""
+    @lru_cache(maxsize=128)
     def to_dict(self) -> Dict[str, Any]:
-        """Convert model to dictionary with metadata."""
-        return {
-            "id": self.id,
-            "data": self.model_dump(),
-            "metadata": {
-                "created_at": self.created_at,
-                "updated_at": self.updated_at,
-                "version": self.version,
-                "is_active": self.is_active,
-                "hash": self.generate_hash()
-            }
-        }
+        """Convert model to dictionary."""
+        result = self.schema.to_dict(self._data)
+        if self.id:
+            result['id'] = self.id
+        return result
     
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "OnyxBaseModel":
-        """Create model from dictionary with metadata."""
-        model_data = data["data"]
-        metadata = data["metadata"]
-        
-        model = cls(**model_data)
-        model.created_at = metadata["created_at"]
-        model.updated_at = metadata["updated_at"]
-        model.version = metadata["version"]
-        model.is_active = metadata["is_active"]
-        
-        return model
+    def from_dict(cls, data: Dict[str, Any], schema: ModelSchema) -> OnyxBaseModel:
+        """Create model from dictionary."""
+        id = data.pop('id', None)
+        model_data = schema.from_dict(data)
+        return cls(schema=schema, data=model_data, id=id)
     
-    def to_json(self) -> str:
-        """Convert model to JSON string."""
-        return json.dumps(self.to_dict())
+    def clear_cache(self) -> None:
+        """Clear model cache."""
+        self._cache.clear()
+        self._cache_timestamps.clear()
+        self.to_dict.cache_clear()
     
-    @classmethod
-    def from_json(cls, json_str: str) -> "OnyxBaseModel":
-        """Create model from JSON string."""
-        data = json.loads(json_str)
-        return cls.from_dict(data)
+    def __getattr__(self, name: str) -> Any:
+        """Get attribute."""
+        if name in self.schema.fields:
+            return self.get_field(name)
+        raise AttributeError(f"'{self.__class__.__name__}' has no attribute '{name}'")
     
-    def generate_hash(self) -> str:
-        """Generate a unique hash for the model."""
-        data = self.model_dump(exclude={"created_at", "updated_at"})
-        return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
-
-# Base model with all mixins
-class OnyxBaseModel(
-    BaseModel,
-    TimestampMixin,
-    IdentifierMixin,
-    StatusMixin,
-    IndexingMixin,
-    ValidationMixin,
-    SerializationMixin
-):
-    """Enhanced base model for Onyx with all mixins."""
+    def __setattr__(self, name: str, value: Any) -> None:
+        """Set attribute."""
+        if name in self.schema.fields:
+            self.set_field(name, value)
+        else:
+            super().__setattr__(name, value)
     
-    model_config = ConfigDict(
-        arbitrary_types_allowed=True,
-        json_encoders={
-            datetime: lambda v: v.isoformat(),
-            uuid.UUID: str
-        },
-        validate_assignment=True,
-        extra="forbid"
-    )
+    def __eq__(self, other: Any) -> bool:
+        """Check equality."""
+        if not isinstance(other, OnyxBaseModel):
+            return False
+        return self.id == other.id and self._data == other._data
     
-    @root_validator(pre=True)
-    def set_defaults(cls, values: Dict[str, Any]) -> Dict[str, Any]:
-        """Set default values for model fields."""
-        if "id" not in values:
-            values["id"] = str(uuid.uuid4())
-        if "created_at" not in values:
-            values["created_at"] = datetime.utcnow()
-        if "updated_at" not in values:
-            values["updated_at"] = datetime.utcnow()
-        return values
+    def __hash__(self) -> int:
+        """Get hash."""
+        return hash((self.id, tuple(sorted(self._data.items()))))
 
 # Generic model with type parameter
 class OnyxGenericModel(GenericModel, Generic[T]):

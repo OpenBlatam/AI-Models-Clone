@@ -6,8 +6,8 @@ from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from datetime import datetime
 import json
 import logging
-from .base_model import OnyxBaseModel
-from .model_utils import ModelCache, ModelRegistry, ModelValidator
+from pydantic import BaseModel, ValidationError
+from .model_types import OnyxBaseModel, ModelCache, ModelIndex
 
 T = TypeVar('T', bound=OnyxBaseModel)
 
@@ -60,21 +60,11 @@ class ValidationMixin:
     """Mixin for validation methods."""
     def validate(self) -> List[str]:
         """Validate the model."""
-        validator = ModelValidator()
         errors = []
-        
-        # Validate required fields
-        required_errors = validator.validate_required_fields(self)
-        errors.extend(required_errors)
-        
-        # Validate field types
-        type_errors = validator.validate_field_types(self)
-        errors.extend(type_errors)
-        
-        # Validate custom rules
-        custom_errors = validator.validate_custom_rules(self)
-        errors.extend(custom_errors)
-        
+        try:
+            self.model_validate(self.model_dump())
+        except ValidationError as e:
+            errors.extend([f"{field}: {error}" for field, error in e.errors()])
         return errors
     
     def is_valid(self) -> bool:
@@ -86,12 +76,20 @@ class CacheMixin:
     def cache(self, key_field: str) -> None:
         """Cache the model."""
         key = getattr(self, key_field)
-        ModelCache.set(self, str(key))
+        cache = ModelCache(
+            key=str(key),
+            value=self.model_dump(),
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        # Store cache in Redis or other storage
+        # This is a placeholder - implement actual storage logic
     
     def uncache(self, key_field: str) -> None:
         """Remove the model from cache."""
         key = getattr(self, key_field)
-        ModelCache.remove(str(key))
+        # Remove from Redis or other storage
+        # This is a placeholder - implement actual removal logic
 
 class SerializationMixin:
     """Mixin for serialization methods."""
@@ -101,7 +99,7 @@ class SerializationMixin:
     
     def to_json(self) -> str:
         """Convert model to JSON string."""
-        return json.dumps(self.to_dict())
+        return self.model_dump_json()
     
     @classmethod
     def from_dict(cls: Type[T], data: Dict[str, Any]) -> T:
@@ -111,8 +109,7 @@ class SerializationMixin:
     @classmethod
     def from_json(cls: Type[T], json_str: str) -> T:
         """Create model from JSON string."""
-        data = json.loads(json_str)
-        return cls.from_dict(data)
+        return cls.model_validate_json(json_str)
 
 class IndexingMixin:
     """Mixin for indexing methods."""
@@ -122,7 +119,15 @@ class IndexingMixin:
             for field in self.index_fields:
                 value = getattr(self, field)
                 if value is not None:
-                    indexer.index_model(self, field, value)
+                    index = ModelIndex(
+                        field=field,
+                        value=value,
+                        model_id=self.id,
+                        created_at=datetime.utcnow(),
+                        updated_at=datetime.utcnow()
+                    )
+                    # Store index in Redis or other storage
+                    # This is a placeholder - implement actual storage logic
     
     def unindex(self, indexer: Any) -> None:
         """Remove model from index."""
@@ -130,13 +135,20 @@ class IndexingMixin:
             for field in self.index_fields:
                 value = getattr(self, field)
                 if value is not None:
-                    indexer.remove_index(self.__class__, field, value)
+                    # Remove from Redis or other storage
+                    # This is a placeholder - implement actual removal logic
+                    pass
 
 class LoggingMixin:
     """Mixin for logging methods."""
     def __init__(self, **data):
         super().__init__(**data)
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self._logger = logging.getLogger(self.__class__.__name__)
+    
+    @property
+    def logger(self) -> logging.Logger:
+        """Get logger instance."""
+        return self._logger
     
     def log_info(self, message: str) -> None:
         """Log info message."""

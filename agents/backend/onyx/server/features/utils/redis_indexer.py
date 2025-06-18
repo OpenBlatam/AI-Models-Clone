@@ -9,6 +9,7 @@ import hashlib
 from pydantic import BaseModel
 from .redis_utils import RedisUtils
 from .redis_config import get_config
+import logging
 
 logger = logging.getLogger(__name__)
 
@@ -17,12 +18,17 @@ T = TypeVar('T', bound=BaseModel)
 class RedisIndexer:
     """Indexer for Onyx models using Redis."""
     
-    def __init__(self, config: Optional[Dict[str, Any]] = None):
+    def __init__(self, config: Any = None):
         """Initialize Redis indexer."""
         self.config = config or {}
         self.redis_utils = RedisUtils(get_config())
-        self.index_prefix = self.config.get("index_prefix", "index")
-        self.index_ttl = self.config.get("index_ttl", 86400)  # 24 hours default
+        # Support both dict and Pydantic model
+        if isinstance(self.config, dict):
+            self.index_prefix = self.config.get("index_prefix", "index")
+            self.index_ttl = self.config.get("index_ttl", 86400)
+        else:
+            self.index_prefix = getattr(self.config, "index_prefix", "index")
+            self.index_ttl = getattr(self.config, "index_ttl", 86400)
     
     def _generate_index_key(self, model_name: str, field: str, value: Any) -> str:
         """Generate a Redis key for an index."""

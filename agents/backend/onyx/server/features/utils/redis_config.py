@@ -62,7 +62,7 @@ configurations: Dict[str, RedisConfig] = {
     "testing": RedisConfig(
         host="localhost",
         port=6379,
-        db=1,
+        db=15,
         default_expire=300,
         log_level="DEBUG"
     ),

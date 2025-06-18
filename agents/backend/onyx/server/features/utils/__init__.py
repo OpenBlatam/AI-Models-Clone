@@ -1,3 +1,4 @@
+from __future__ import annotations
 """
 Model Initialization - Onyx Integration
 Initialize model operations and configurations.
@@ -41,7 +42,7 @@ from .model_exceptions import (
     TimestampError, RegistryError, FactoryError
 )
 
-T = TypeVar('T', bound=OnyxBaseModel)
+T = TypeVar('T', bound="OnyxBaseModel")
 
 def initialize_models() -> None:
     """Initialize model operations and configurations."""
