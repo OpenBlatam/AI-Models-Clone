@@ -1,8 +1,11 @@
 from datetime import datetime
-from uuid import UUID
+from uuid import UUID, uuid4
+from typing import Dict, List, Optional, Any
+import logging
+import structlog
+import orjson
 
-from pydantic import BaseModel
-from pydantic import Field
+from pydantic import BaseModel, Field, validator, field_validator, ConfigDict
 
 from onyx.context.search.enums import RecencyBiasSetting
 from onyx.db.models import Persona
@@ -13,9 +16,11 @@ from onyx.server.features.document_set.models import DocumentSet
 from onyx.server.features.tool.models import ToolSnapshot
 from onyx.server.models import MinimalUserSnapshot
 from onyx.utils.logger import setup_logger
+from onyx.core.models import OnyxBaseModel
+from uuid6 import uuid7
 
 
-logger = setup_logger()
+logger = structlog.get_logger()
 
 
 class PromptSnapshot(BaseModel):
@@ -251,3 +256,35 @@ class PersonaLabelSnapshot(BaseModel):
             id=label.id,
             name=label.name,
         )
+
+
+class ORJSONModel(OnyxBaseModel):
+    model_config = ConfigDict(json_loads=orjson.loads, json_dumps=orjson.dumps)
+
+
+class Persona(ORJSONModel):
+    id: UUID = Field(default_factory=uuid7)
+    name: str = Field(..., min_length=2, max_length=128)
+    description: str | None = None
+    attributes: dict = Field(default_factory=dict)
+
+    @field_validator('name')
+    def name_not_empty(cls, v):
+        if not v or not v.strip():
+            logger.error("Persona name validation failed", value=v)
+            raise ValueError("Name must not be empty")
+        return v
+
+    @field_validator('attributes')
+    def attributes_is_dict(cls, v):
+        if not isinstance(v, dict):
+            logger.error("Persona attributes validation failed", value=v)
+            raise ValueError("Attributes must be a dict")
+        return v
+
+    def __post_init_post_parse__(self):
+        logger.info("Persona instantiated", id=str(self.id), name=self.name)
+
+    class Config:
+        frozen = True
+        validate_assignment = True

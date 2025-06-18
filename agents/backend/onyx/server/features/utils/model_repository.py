@@ -11,7 +11,7 @@ import os
 from .base_types import CACHE_TTL, VALIDATION_TIMEOUT
 from .model_field import ModelField, FieldConfig
 from .model_schema import ModelSchema, SchemaConfig
-from .base_model import OnyxBaseModel
+# from .base_model import OnyxBaseModel  # REMOVED to break circular import
 from .model_factory import ModelFactory
 from .model_registry import ModelRegistry
 from .model_manager import ModelManager
@@ -65,123 +65,98 @@ class ModelRepository:
         """Register a schema."""
         self._service.register_schema(name, schema)
     
-    def register_model(self, name: str, model_class: Type[OnyxBaseModel]) -> None:
-        """Register a model class."""
+    def register_model(self, name: str, model_class: "OnyxBaseModel") -> None:
+        from .base_model import OnyxBaseModel
         self._service.register_model(name, model_class)
-        
         # Load existing models
         models_data = self._load_models(name)
         for id, data in models_data.items():
             self._service.create_model(name, data, id)
     
-    def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional[OnyxBaseModel]:
-        """Create a model."""
+    def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional["OnyxBaseModel"]:
+        from .base_model import OnyxBaseModel
         model = self._service.create_model(name, data, id)
-        
         if model and model.id:
             # Save to file
             models_data = self._load_models(name)
             models_data[model.id] = model.get_data()
             self._save_models(name, models_data)
-        
         return model
     
-    def get_model(self, name: str, id: str) -> Optional[OnyxBaseModel]:
-        """Get a model by ID."""
+    def get_model(self, name: str, id: str) -> Optional["OnyxBaseModel"]:
+        from .base_model import OnyxBaseModel
         return self._service.get_model(name, id)
     
-    def get_models(self, name: str) -> Dict[str, OnyxBaseModel]:
-        """Get all models of a type."""
+    def get_models(self, name: str) -> Dict[str, "OnyxBaseModel"]:
+        from .base_model import OnyxBaseModel
         return self._service.get_models(name)
     
-    def update_model(self, name: str, id: str, data: Dict[str, Any]) -> Optional[OnyxBaseModel]:
-        """Update a model."""
+    def update_model(self, name: str, id: str, data: Dict[str, Any]) -> Optional["OnyxBaseModel"]:
+        from .base_model import OnyxBaseModel
         model = self._service.update_model(name, id, data)
-        
         if model:
             # Save to file
             models_data = self._load_models(name)
             models_data[model.id] = model.get_data()
             self._save_models(name, models_data)
-        
         return model
     
     def delete_model(self, name: str, id: str) -> None:
-        """Delete a model."""
         self._service.delete_model(name, id)
-        
         # Update file
         models_data = self._load_models(name)
         models_data.pop(id, None)
         self._save_models(name, models_data)
     
     def clear_models(self, name: str) -> None:
-        """Clear all models of a type."""
         self._service.clear_models(name)
-        
         # Clear file
         self._save_models(name, {})
     
     def clear_all_models(self) -> None:
-        """Clear all models."""
         self._service.clear_all_models()
-        
         # Clear all files
         for name in self._service.get_all_model_ids().keys():
             self._save_models(name, {})
     
     def get_model_count(self, name: str) -> int:
-        """Get count of models of a type."""
         return self._service.get_model_count(name)
     
     def get_total_model_count(self) -> int:
-        """Get total count of all models."""
         return self._service.get_total_model_count()
     
     def get_model_ids(self, name: str) -> List[str]:
-        """Get IDs of all models of a type."""
         return self._service.get_model_ids(name)
     
     def get_all_model_ids(self) -> Dict[str, List[str]]:
-        """Get IDs of all models."""
         return self._service.get_all_model_ids()
     
     def get_model_data(self, name: str, id: str) -> Optional[Dict[str, Any]]:
-        """Get data of a model."""
         return self._service.get_model_data(name, id)
     
     def get_models_data(self, name: str) -> Dict[str, Dict[str, Any]]:
-        """Get data of all models of a type."""
         return self._service.get_models_data(name)
     
     def get_all_models_data(self) -> Dict[str, Dict[str, Dict[str, Any]]]:
-        """Get data of all models."""
         return self._service.get_all_models_data()
     
     def clear_cache(self, name: Optional[str] = None) -> None:
-        """Clear cache."""
         self._service.clear_cache(name)
     
     def get_cache_size(self, name: Optional[str] = None) -> int:
-        """Get cache size."""
         return self._service.get_cache_size(name)
     
     def get_validation_cache_size(self, name: Optional[str] = None) -> int:
-        """Get validation cache size."""
         return self._service.get_validation_cache_size(name)
     
     def get_cache_hits(self, name: Optional[str] = None) -> int:
-        """Get cache hits."""
         return self._service.get_cache_hits(name)
     
     def get_cache_misses(self, name: Optional[str] = None) -> int:
-        """Get cache misses."""
         return self._service.get_cache_misses(name)
     
     def get_validation_hits(self, name: Optional[str] = None) -> int:
-        """Get validation hits."""
         return self._service.get_validation_hits(name)
     
     def get_validation_misses(self, name: Optional[str] = None) -> int:
-        """Get validation misses."""
         return self._service.get_validation_misses(name) 

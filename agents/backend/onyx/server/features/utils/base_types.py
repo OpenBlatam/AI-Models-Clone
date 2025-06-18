@@ -44,6 +44,18 @@ CacheData = Dict[CacheKey, CacheValue]
 CacheList = List[CacheData]
 CacheDict = Dict[CacheKey, CacheData]
 
+class CacheType(str, Enum):
+    """Cache type constants."""
+    MEMORY = "memory"
+    REDIS = "redis"
+    FILE = "file"
+    DATABASE = "database"
+    DISTRIBUTED = "distributed"
+    LOCAL = "local"
+    REMOTE = "remote"
+    TEMPORARY = "temporary"
+    PERMANENT = "permanent"
+
 # Validation types
 ValidationRule = Dict[str, Any]
 ValidationRules = Dict[str, ValidationRule]
@@ -55,6 +67,31 @@ EventName = str
 EventData = Dict[str, Any]
 EventHandler = Any
 EventHandlers = Dict[EventName, List[EventHandler]]
+
+class EventType(str, Enum):
+    """Event type constants."""
+    CREATE = "create"
+    UPDATE = "update"
+    DELETE = "delete"
+    VALIDATE = "validate"
+    PROCESS = "process"
+    COMPLETE = "complete"
+    FAIL = "fail"
+    ERROR = "error"
+    WARNING = "warning"
+    INFO = "info"
+    DEBUG = "debug"
+
+class EventStatus(str, Enum):
+    """Event status constants."""
+    PENDING = "pending"
+    PROCESSING = "processing"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    ERROR = "error"
+    WARNING = "warning"
+    INFO = "info"
+    DEBUG = "debug"
 
 # Status types
 class ModelStatus(str, Enum):
@@ -68,6 +105,44 @@ class ModelStatus(str, Enum):
     PENDING = "pending"
     REJECTED = "rejected"
     APPROVED = "approved"
+
+class StatusType(str, Enum):
+    """Status type constants."""
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    DELETED = "deleted"
+    ARCHIVED = "archived"
+    DRAFT = "draft"
+    PUBLISHED = "published"
+    PENDING = "pending"
+    REJECTED = "rejected"
+    APPROVED = "approved"
+
+class StatusCategory(str, Enum):
+    """Status category constants."""
+    USER = "user"
+    PRODUCT = "product"
+    ORDER = "order"
+    CUSTOMER = "customer"
+    INVENTORY = "inventory"
+    PAYMENT = "payment"
+    SHIPPING = "shipping"
+    MARKETING = "marketing"
+    ANALYTICS = "analytics"
+    SYSTEM = "system"
+
+class CategoryType(str, Enum):
+    """Category type constants."""
+    USER = "user"
+    PRODUCT = "product"
+    ORDER = "order"
+    CUSTOMER = "customer"
+    INVENTORY = "inventory"
+    PAYMENT = "payment"
+    SHIPPING = "shipping"
+    MARKETING = "marketing"
+    ANALYTICS = "analytics"
+    SYSTEM = "system"
 
 # Category types
 class ModelCategory(str, Enum):
@@ -94,6 +169,25 @@ class ModelPermission(str, Enum):
     VIEWER = "viewer"
     EDITOR = "editor"
     MANAGER = "manager"
+
+class PermissionType(str, Enum):
+    """Permission type constants."""
+    READ = "read"
+    WRITE = "write"
+    DELETE = "delete"
+    ADMIN = "admin"
+    OWNER = "owner"
+    VIEWER = "viewer"
+    EDITOR = "editor"
+    MANAGER = "manager"
+
+class PermissionStatus(str, Enum):
+    """Permission status constants."""
+    ACTIVE = "active"
+    GRANTED = "granted"
+    DENIED = "denied"
+    PENDING = "pending"
+    REVOKED = "revoked"
 
 # Validation types
 class ValidationType(str, Enum):
@@ -127,6 +221,18 @@ class IndexType(str, Enum):
     LIST = "list"
     SET = "set"
     SORTED_SET = "sorted_set"
+
+class IndexStatus(str, Enum):
+    """Index status constants."""
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    DELETED = "deleted"
+    ARCHIVED = "archived"
+    DRAFT = "draft"
+    PUBLISHED = "published"
+    PENDING = "pending"
+    REJECTED = "rejected"
+    APPROVED = "approved"
 
 # Cache configuration
 CACHE_TTL = 2  # seconds

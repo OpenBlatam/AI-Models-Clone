@@ -39,7 +39,8 @@ from ..model_decorators import (
 from ..model_exceptions import (
     OnyxModelError, ValidationError, IndexingError, CacheError,
     SerializationError, VersionError, AuditError, SoftDeleteError,
-    TimestampError, RegistryError, FactoryError
+    TimestampError, RegistryError, FactoryError, DeserializationError,
+    PermissionError, StatusError
 )
 
 T = TypeVar('T', bound=OnyxBaseModel)
@@ -49,108 +50,230 @@ T = TypeVar('T', bound=OnyxBaseModel)
 def test_model_data():
     """Test model data fixture."""
     return {
-        "name": "Test User",
+        "name": "Test Model",
         "email": "test@example.com",
         "age": 30,
-        "created_at": datetime.utcnow(),
-        "updated_at": datetime.utcnow(),
-        "version": "1.0.0",
-        "is_deleted": False,
-        "deleted_at": None
+        "tags": ["test", "model"]
     }
 
 @pytest.fixture
-def test_model(test_model_data):
-    """Test model fixture."""
-    return TestModel(**test_model_data)
-
-# Test model
-class TestModel(
-    OnyxBaseModel,
-    TimestampMixin,
-    SoftDeleteMixin,
-    VersionMixin,
-    AuditMixin,
-    ValidationMixin,
-    CacheMixin,
-    SerializationMixin,
-    IndexingMixin,
-    LoggingMixin
-):
-    name: str
-    email: str
-    age: Optional[int] = None
-    
-    # Define schema
-    schema: ClassVar[ModelSchema] = ModelSchema(
-        name="test",
+def test_schema():
+    """Test schema."""
+    return ModelSchema(
         fields={
             "name": ModelField(
                 name="name",
                 type="string",
                 required=True,
-                description="Test name"
+                description="Model name"
             ),
             "email": ModelField(
                 name="email",
                 type="string",
                 required=True,
-                unique=True,
-                description="Test email"
+                description="Email address",
+                validation={"pattern": r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"}
             ),
             "age": ModelField(
                 name="age",
                 type="integer",
+                required=True,
+                description="Age",
+                validation={"min": 0, "max": 150}
+            ),
+            "tags": ModelField(
+                name="tags",
+                type="array",
                 required=False,
-                description="Test age"
+                description="Tags",
+                validation={"min_items": 0}
             )
-        },
-        indexes=["email"],
-        cache=["id", "email"],
-        validation={
-            "email": {
-                "type": "string",
-                "format": "email",
-                "required": True
-            },
-            "age": {
-                "type": "integer",
-                "minimum": 0,
-                "maximum": 150
-            }
         }
     )
 
+@pytest.fixture
+def test_model(test_schema: ModelSchema, test_model_data: Dict[str, Any]):
+    """Test model instance."""
+    return OnyxBaseModel(schema=test_schema, data=test_model_data)
+
 # Test model creation
-def test_create_model(test_model_data):
+def test_create_model(test_schema: ModelSchema, test_model_data: Dict[str, Any]):
     """Test model creation."""
-    model = TestModel(**test_model_data)
+    model = OnyxBaseModel(schema=test_schema, data=test_model_data)
     assert model.name == test_model_data["name"]
     assert model.email == test_model_data["email"]
     assert model.age == test_model_data["age"]
+    assert model.tags == test_model_data["tags"]
     assert model.created_at is not None
     assert model.updated_at is not None
     assert model.version == "1.0.0"
     assert model.is_deleted is False
     assert model.deleted_at is None
+    assert len(model.audit_log) == 1  # Initial creation
+
+def test_create_model_with_id(test_schema: ModelSchema, test_model_data: Dict[str, Any]):
+    """Test model creation with ID."""
+    model_id = "test-123"
+    model = OnyxBaseModel(schema=test_schema, data=test_model_data, id=model_id)
+    assert model.id == model_id
+
+def test_create_model_with_version(test_schema: ModelSchema, test_model_data: Dict[str, Any]):
+    """Test model creation with version."""
+    version = "2.0.0"
+    model = OnyxBaseModel(schema=test_schema, data=test_model_data, version=version)
+    assert model.version == version
 
 # Test model validation
-def test_validate_model_fields(test_model):
-    """Test model fields validation."""
-    validation = test_model.validate()
-    assert len(validation) == 0
+def test_validate_model(test_model: OnyxBaseModel):
+    """Test model validation."""
+    assert test_model.is_valid() is True
+    assert len(test_model.validate()) == 0
+
+def test_validate_invalid_email(test_schema: ModelSchema, test_model_data: Dict[str, Any]):
+    """Test invalid email validation."""
+    test_model_data["email"] = "invalid-email"
+    model = OnyxBaseModel(schema=test_schema, data=test_model_data)
+    assert model.is_valid() is False
+    assert len(model.validate()) > 0
+
+def test_validate_invalid_age(test_schema: ModelSchema, test_model_data: Dict[str, Any]):
+    """Test invalid age validation."""
+    test_model_data["age"] = 200
+    model = OnyxBaseModel(schema=test_schema, data=test_model_data)
+    assert model.is_valid() is False
+    assert len(model.validate()) > 0
+
+# Test model data operations
+def test_set_data(test_model: OnyxBaseModel):
+    """Test setting model data."""
+    new_data = {
+        "name": "Updated Model",
+        "email": "updated@example.com",
+        "age": 35,
+        "tags": ["updated", "model"]
+    }
+    test_model.set_data(new_data)
+    assert test_model.name == new_data["name"]
+    assert test_model.email == new_data["email"]
+    assert test_model.age == new_data["age"]
+    assert test_model.tags == new_data["tags"]
+    assert len(test_model.audit_log) == 2  # Creation + update
+
+def test_get_data(test_model: OnyxBaseModel, test_model_data: Dict[str, Any]):
+    """Test getting model data."""
+    data = test_model.get_data()
+    assert data["name"] == test_model_data["name"]
+    assert data["email"] == test_model_data["email"]
+    assert data["age"] == test_model_data["age"]
+    assert data["tags"] == test_model_data["tags"]
+
+# Test model serialization
+def test_to_dict(test_model: OnyxBaseModel, test_model_data: Dict[str, Any]):
+    """Test model serialization."""
+    data = test_model.to_dict()
+    assert data["id"] == test_model.id
+    assert data["version"] == test_model.version
+    assert data["name"] == test_model_data["name"]
+    assert data["email"] == test_model_data["email"]
+    assert data["age"] == test_model_data["age"]
+    assert data["tags"] == test_model_data["tags"]
+    assert "created_at" in data
+    assert "updated_at" in data
+    assert "is_deleted" in data
+    assert "deleted_at" in data
+    assert "audit_log" in data
+
+def test_from_dict(test_schema: ModelSchema, test_model_data: Dict[str, Any]):
+    """Test model deserialization."""
+    model = OnyxBaseModel(schema=test_schema, data=test_model_data)
+    data = model.to_dict()
+    new_model = OnyxBaseModel.from_dict(data)
+    assert new_model.id == model.id
+    assert new_model.version == model.version
+    assert new_model.name == model.name
+    assert new_model.email == model.email
+    assert new_model.age == model.age
+    assert new_model.tags == model.tags
+    assert new_model.created_at == model.created_at
+    assert new_model.updated_at == model.updated_at
+    assert new_model.is_deleted == model.is_deleted
+    assert new_model.deleted_at == model.deleted_at
+    assert len(new_model.audit_log) == len(model.audit_log)
+
+# Test model deletion
+def test_delete_model(test_model: OnyxBaseModel):
+    """Test model deletion."""
+    assert test_model.is_deleted is False
+    test_model.delete()
+    assert test_model.is_deleted is True
+    assert test_model.deleted_at is not None
+    assert len(test_model.audit_log) == 2  # Creation + delete
+
+def test_restore_model(test_model: OnyxBaseModel):
+    """Test model restoration."""
+    test_model.delete()
+    assert test_model.is_deleted is True
+    test_model.restore()
+    assert test_model.is_deleted is False
+    assert test_model.deleted_at is None
+    assert len(test_model.audit_log) == 3  # Creation + delete + restore
+
+# Test model versioning
+def test_update_version(test_model: OnyxBaseModel):
+    """Test version update."""
+    assert test_model.version == "1.0.0"
+    test_model.update_version("2.0.0")
+    assert test_model.version == "2.0.0"
+    assert len(test_model.audit_log) == 2  # Creation + version update
+
+def test_update_same_version(test_model: OnyxBaseModel):
+    """Test updating to same version."""
+    original_version = test_model.version
+    test_model.update_version(original_version)
+    assert test_model.version == original_version
+    assert len(test_model.audit_log) == 1  # Only creation
+
+# Test audit logging
+def test_audit_log(test_model: OnyxBaseModel):
+    """Test audit logging."""
+    assert len(test_model.audit_log) == 1  # Initial creation
+    assert test_model.audit_log[0]["action"] == "update"
+    assert "data" in test_model.audit_log[0]
+
+def test_audit_log_after_operations(test_model: OnyxBaseModel):
+    """Test audit log after multiple operations."""
+    test_model.set_data({"name": "Updated"})
+    test_model.delete()
+    test_model.restore()
+    test_model.update_version("2.0.0")
     
-    # Test invalid email
-    test_model.email = "invalid-email"
-    validation = test_model.validate()
-    assert len(validation) > 0
-    assert any("email" in error for error in validation)
-    
-    # Test invalid age
-    test_model.age = 200
-    validation = test_model.validate()
-    assert len(validation) > 0
-    assert any("age" in error for error in validation)
+    assert len(test_model.audit_log) == 5  # Creation + update + delete + restore + version update
+    assert test_model.audit_log[1]["action"] == "update"
+    assert test_model.audit_log[2]["action"] == "delete"
+    assert test_model.audit_log[3]["action"] == "restore"
+    assert test_model.audit_log[4]["action"] == "version_update"
+
+# Test error handling
+def test_validation_error(test_schema: ModelSchema):
+    """Test validation error."""
+    with pytest.raises(ValidationError):
+        OnyxBaseModel(schema=test_schema, data={"email": "invalid-email"})
+
+def test_version_error(test_model: OnyxBaseModel):
+    """Test version error."""
+    with pytest.raises(VersionError):
+        test_model.update_version("invalid-version")
+
+def test_serialization_error(test_model: OnyxBaseModel):
+    """Test serialization error."""
+    test_model._created_at = "invalid-date"  # Make created_at invalid
+    with pytest.raises(SerializationError):
+        test_model.to_dict()
+
+def test_deserialization_error():
+    """Test deserialization error."""
+    with pytest.raises(DeserializationError):
+        OnyxBaseModel.from_dict({"created_at": "invalid-date"})
 
 # Test model operations
 def test_model_operations(test_model):

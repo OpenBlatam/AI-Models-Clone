@@ -1,7 +1,7 @@
 """
 Service for handling ads-related business logic.
 """
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import httpx
 import base64
 import io
@@ -10,6 +10,7 @@ from PIL import Image
 import pyvips
 import cv2
 from rembg import remove, new_session
+from uuid import UUID
 
 from onyx.llm.interface import (
     generate_ads_lcel,
@@ -19,6 +20,8 @@ from onyx.llm.interface import (
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.storage import StorageService
 from onyx.server.features.ads.config import settings
+from .models import Ad
+from .schemas import AdCreate
 
 logger = setup_logger()
 
@@ -164,4 +167,32 @@ class AdsService:
             }
         except Exception as e:
             logger.exception("Error removing background")
-            raise 
+            raise
+
+class AdService:
+    """Service layer for Ad business logic and persistence."""
+
+    async def create_ad(self, data: AdCreate) -> Ad:
+        """Create a new Ad."""
+        # TODO: Implement DB insert
+        raise NotImplementedError
+
+    async def get_ad(self, ad_id: UUID) -> Optional[Ad]:
+        """Retrieve an Ad by ID."""
+        # TODO: Implement DB fetch
+        raise NotImplementedError
+
+    async def list_ads(self, skip: int = 0, limit: int = 100) -> List[Ad]:
+        """List Ads with pagination."""
+        # TODO: Implement DB query
+        raise NotImplementedError
+
+    async def update_ad(self, ad_id: UUID, data: AdCreate) -> Optional[Ad]:
+        """Update an existing Ad."""
+        # TODO: Implement DB update
+        raise NotImplementedError
+
+    async def delete_ad(self, ad_id: UUID) -> bool:
+        """Delete an Ad by ID (soft delete if supported)."""
+        # TODO: Implement DB delete
+        raise NotImplementedError 

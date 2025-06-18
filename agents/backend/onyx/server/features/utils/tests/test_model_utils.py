@@ -1,69 +1,88 @@
+"""
+Test Model Utils - Onyx Integration
+Tests for model utilities.
+"""
 import pytest
 from datetime import datetime
-from typing import Dict, Any, List, Optional
-
+from typing import Dict, Any, List
 from ..base_model import OnyxBaseModel
+from ..model_schema import ModelSchema
+from ..model_field import ModelField
 from ..model_utils import (
     get_model_class,
-    get_model_schema,
-    get_model_indexes,
-    get_model_cache,
-    get_model_events,
     create_model_instance,
     validate_model_instance,
-    index_model_instance,
-    cache_model_instance,
     get_model_events_for_instance,
-    update_model_instance,
-    delete_model_instance,
-    restore_model_instance,
-    get_model_instances,
-    count_model_instances,
-    search_model_instances,
-    batch_create_model_instances,
-    batch_update_model_instances,
-    batch_delete_model_instances,
-    batch_restore_model_instances,
-    get_model_statistics,
-    get_model_audit_log,
-    get_model_versions,
-    get_model_relationships,
-    get_model_dependencies,
-    get_model_references
+    get_model_cache_for_instance,
+    get_model_index_for_instance,
+    get_model_permission_for_instance,
+    get_model_status_for_instance,
+    get_model_version_for_instance,
+    get_model_audit_for_instance,
+    get_model_validation_for_instance,
+    get_model_serialization_for_instance,
+    get_model_deserialization_for_instance
 )
 from ..model_exceptions import (
-    RegistryError,
     ValidationError,
-    IndexingError,
+    RegistryError,
+    FactoryError,
     CacheError,
-    SoftDeleteError
+    SerializationError,
+    DeserializationError
 )
 
-# Test model classes
-class TestModel(OnyxBaseModel):
-    """Test model for utility functionality."""
-    name: str
-    email: str
-    age: Optional[int] = None
-    tags: List[str] = []
-    
-    index_fields = ["id", "name", "email"]
-    search_fields = ["name", "email", "tags"]
-
+# Test data
 @pytest.fixture
-def test_model_data():
-    """Create test model data."""
+def test_model_data() -> Dict[str, Any]:
+    """Test model data."""
     return {
-        "name": "Test User",
+        "name": "Test Model",
         "email": "test@example.com",
         "age": 30,
-        "tags": ["test", "example"]
+        "tags": ["test", "model"]
     }
 
 @pytest.fixture
-def test_model(test_model_data):
-    """Create a test model instance."""
-    return TestModel(**test_model_data)
+def test_schema() -> ModelSchema:
+    """Test schema."""
+    return ModelSchema(
+        fields={
+            "name": ModelField(
+                name="name",
+                type="string",
+                required=True,
+                description="Model name"
+            ),
+            "email": ModelField(
+                name="email",
+                type="string",
+                required=True,
+                description="Email address",
+                validation={"pattern": r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"}
+            ),
+            "age": ModelField(
+                name="age",
+                type="integer",
+                required=True,
+                description="Age",
+                validation={"min": 0, "max": 150}
+            ),
+            "tags": ModelField(
+                name="tags",
+                type="array",
+                required=False,
+                description="Tags",
+                validation={"min_items": 0}
+            )
+        }
+    )
+
+# Test model class
+class TestModel(OnyxBaseModel):
+    """Test model class."""
+    def __init__(self, **data: Any):
+        super().__init__(schema=test_schema(), data=data)
 
 # Test model registry functions
 def test_get_model_class():
@@ -74,45 +93,8 @@ def test_get_model_class():
     with pytest.raises(RegistryError):
         get_model_class("NonExistentModel")
 
-def test_get_model_schema():
-    """Test getting model schema by name."""
-    schema = get_model_schema("TestModel")
-    assert "name" in schema
-    assert "email" in schema
-    assert "age" in schema
-    assert "tags" in schema
-    
-    with pytest.raises(RegistryError):
-        get_model_schema("NonExistentModel")
-
-def test_get_model_indexes():
-    """Test getting model indexes by name."""
-    indexes = get_model_indexes("TestModel")
-    assert "id" in indexes
-    assert "name" in indexes
-    assert "email" in indexes
-    
-    with pytest.raises(RegistryError):
-        get_model_indexes("NonExistentModel")
-
-def test_get_model_cache():
-    """Test getting model cache by name."""
-    cache = get_model_cache("TestModel")
-    assert isinstance(cache, list)
-    
-    with pytest.raises(RegistryError):
-        get_model_cache("NonExistentModel")
-
-def test_get_model_events():
-    """Test getting model events by name."""
-    events = get_model_events("TestModel")
-    assert isinstance(events, dict)
-    
-    with pytest.raises(RegistryError):
-        get_model_events("NonExistentModel")
-
 # Test model instance functions
-def test_create_model_instance(test_model_data):
+def test_create_model_instance(test_model_data: Dict[str, Any]):
     """Test creating model instance."""
     model = create_model_instance("TestModel", test_model_data)
     assert isinstance(model, TestModel)
@@ -121,7 +103,7 @@ def test_create_model_instance(test_model_data):
     assert model.age == test_model_data["age"]
     assert model.tags == test_model_data["tags"]
 
-def test_validate_model_instance(test_model):
+def test_validate_model_instance(test_model: TestModel):
     """Test validating model instance."""
     validation = validate_model_instance(test_model)
     assert validation.is_valid is True
@@ -130,115 +112,131 @@ def test_validate_model_instance(test_model):
     test_model.email = "invalid-email"
     validation = validate_model_instance(test_model)
     assert validation.is_valid is False
+    assert len(validation.errors) > 0
 
-def test_index_model_instance(test_model):
-    """Test indexing model instance."""
-    indexes = index_model_instance(test_model)
-    assert len(indexes) > 0
-    assert any(index.field == "id" for index in indexes)
-    assert any(index.field == "name" for index in indexes)
-    assert any(index.field == "email" for index in indexes)
-
-def test_cache_model_instance(test_model):
-    """Test caching model instance."""
-    cache = cache_model_instance(test_model)
-    assert len(cache) > 0
-
-def test_get_model_events_for_instance(test_model):
+# Test model events
+def test_get_model_events_for_instance(test_model: TestModel):
     """Test getting model events for instance."""
     events = get_model_events_for_instance(test_model, "created")
     assert isinstance(events, list)
+    assert len(events) > 0
+    assert events[0]["action"] == "update"
 
-def test_update_model_instance(test_model):
-    """Test updating model instance."""
-    update_data = {
-        "name": "Updated Name",
-        "age": 31
-    }
-    update_model_instance(test_model, update_data)
-    assert test_model.name == update_data["name"]
-    assert test_model.age == update_data["age"]
-    assert test_model.updated_at > test_model.created_at
+# Test model cache
+def test_get_model_cache_for_instance(test_model: TestModel):
+    """Test getting model cache for instance."""
+    cache = get_model_cache_for_instance(test_model)
+    assert isinstance(cache, dict)
+    assert "id" in cache
+    assert "version" in cache
+    assert "created_at" in cache
+    assert "updated_at" in cache
 
-def test_delete_model_instance(test_model):
-    """Test deleting model instance."""
-    delete_model_instance(test_model)
-    assert test_model.is_deleted is True
-    assert test_model.deleted_at is not None
+# Test model index
+def test_get_model_index_for_instance(test_model: TestModel):
+    """Test getting model index for instance."""
+    index = get_model_index_for_instance(test_model)
+    assert isinstance(index, dict)
+    assert "id" in index
+    assert "name" in index
+    assert "email" in index
 
-def test_restore_model_instance(test_model):
-    """Test restoring model instance."""
-    test_model.soft_delete()
-    restore_model_instance(test_model)
-    assert test_model.is_deleted is False
-    assert test_model.deleted_at is None
+# Test model permission
+def test_get_model_permission_for_instance(test_model: TestModel):
+    """Test getting model permission for instance."""
+    permission = get_model_permission_for_instance(test_model)
+    assert isinstance(permission, str)
+    assert permission in ["read", "write", "delete", "admin", "owner", "viewer", "editor", "manager"]
 
-# Test batch operations
-def test_batch_create_model_instances():
-    """Test batch creating model instances."""
-    data_list = [
-        {
-            "name": "User 1",
-            "email": "user1@example.com",
-            "age": 25
-        },
-        {
-            "name": "User 2",
-            "email": "user2@example.com",
-            "age": 30
-        }
-    ]
-    models = batch_create_model_instances("TestModel", data_list)
-    assert len(models) == 2
-    assert models[0].name == data_list[0]["name"]
-    assert models[1].name == data_list[1]["name"]
+# Test model status
+def test_get_model_status_for_instance(test_model: TestModel):
+    """Test getting model status for instance."""
+    status = get_model_status_for_instance(test_model)
+    assert isinstance(status, str)
+    assert status in ["active", "inactive", "deleted", "archived", "draft", "published", "pending", "rejected", "approved"]
 
-def test_batch_update_model_instances(test_model):
-    """Test batch updating model instances."""
-    data_list = [
-        {
-            "id": test_model.id,
-            "name": "Updated User 1",
-            "age": 26
-        }
-    ]
-    models = batch_update_model_instances("TestModel", data_list)
-    assert len(models) == 1
-    assert models[0].name == data_list[0]["name"]
-    assert models[0].age == data_list[0]["age"]
+# Test model version
+def test_get_model_version_for_instance(test_model: TestModel):
+    """Test getting model version for instance."""
+    version = get_model_version_for_instance(test_model)
+    assert isinstance(version, str)
+    assert version == "1.0.0"
 
-# Test model statistics and metadata
-def test_get_model_statistics():
-    """Test getting model statistics."""
-    stats = get_model_statistics("TestModel")
-    assert isinstance(stats, dict)
-    assert "total" in stats
-    assert "active" in stats
-    assert "deleted" in stats
-    assert "created_today" in stats
-    assert "updated_today" in stats
+# Test model audit
+def test_get_model_audit_for_instance(test_model: TestModel):
+    """Test getting model audit for instance."""
+    audit = get_model_audit_for_instance(test_model)
+    assert isinstance(audit, list)
+    assert len(audit) > 0
+    assert "timestamp" in audit[0]
+    assert "action" in audit[0]
+    assert "data" in audit[0]
 
-def test_get_model_audit_log(test_model):
-    """Test getting model audit log."""
-    log = get_model_audit_log("TestModel", test_model.id)
-    assert isinstance(log, list)
+# Test model validation
+def test_get_model_validation_for_instance(test_model: TestModel):
+    """Test getting model validation for instance."""
+    validation = get_model_validation_for_instance(test_model)
+    assert isinstance(validation, dict)
+    assert "is_valid" in validation
+    assert "errors" in validation
+    assert validation["is_valid"] is True
+    assert len(validation["errors"]) == 0
 
-def test_get_model_versions(test_model):
-    """Test getting model versions."""
-    versions = get_model_versions("TestModel", test_model.id)
-    assert isinstance(versions, list)
+# Test model serialization
+def test_get_model_serialization_for_instance(test_model: TestModel):
+    """Test getting model serialization for instance."""
+    serialization = get_model_serialization_for_instance(test_model)
+    assert isinstance(serialization, dict)
+    assert "id" in serialization
+    assert "version" in serialization
+    assert "name" in serialization
+    assert "email" in serialization
+    assert "age" in serialization
+    assert "tags" in serialization
+    assert "created_at" in serialization
+    assert "updated_at" in serialization
+    assert "is_deleted" in serialization
+    assert "deleted_at" in serialization
+    assert "audit_log" in serialization
 
-def test_get_model_relationships(test_model):
-    """Test getting model relationships."""
-    relationships = get_model_relationships("TestModel", test_model.id)
-    assert isinstance(relationships, dict)
+# Test model deserialization
+def test_get_model_deserialization_for_instance(test_model: TestModel):
+    """Test getting model deserialization for instance."""
+    serialization = get_model_serialization_for_instance(test_model)
+    deserialization = get_model_deserialization_for_instance(TestModel, serialization)
+    assert isinstance(deserialization, TestModel)
+    assert deserialization.id == test_model.id
+    assert deserialization.version == test_model.version
+    assert deserialization.name == test_model.name
+    assert deserialization.email == test_model.email
+    assert deserialization.age == test_model.age
+    assert deserialization.tags == test_model.tags
+    assert deserialization.created_at == test_model.created_at
+    assert deserialization.updated_at == test_model.updated_at
+    assert deserialization.is_deleted == test_model.is_deleted
+    assert deserialization.deleted_at == test_model.deleted_at
+    assert len(deserialization.audit_log) == len(test_model.audit_log)
 
-def test_get_model_dependencies(test_model):
-    """Test getting model dependencies."""
-    dependencies = get_model_dependencies("TestModel", test_model.id)
-    assert isinstance(dependencies, list)
+# Test error handling
+def test_validation_error(test_model: TestModel):
+    """Test validation error."""
+    test_model.email = "invalid-email"
+    with pytest.raises(ValidationError):
+        validate_model_instance(test_model)
 
-def test_get_model_references(test_model):
-    """Test getting model references."""
-    references = get_model_references("TestModel", test_model.id)
-    assert isinstance(references, list) 
+def test_cache_error(test_model: TestModel):
+    """Test cache error."""
+    test_model._created_at = "invalid-date"
+    with pytest.raises(CacheError):
+        get_model_cache_for_instance(test_model)
+
+def test_serialization_error(test_model: TestModel):
+    """Test serialization error."""
+    test_model._created_at = "invalid-date"
+    with pytest.raises(SerializationError):
+        get_model_serialization_for_instance(test_model)
+
+def test_deserialization_error():
+    """Test deserialization error."""
+    with pytest.raises(DeserializationError):
+        get_model_deserialization_for_instance(TestModel, {"created_at": "invalid-date"}) 

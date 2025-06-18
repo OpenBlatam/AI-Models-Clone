@@ -6,14 +6,16 @@ from typing import Any, Dict, List, Optional, Type, Union
 
 class OnyxModelError(Exception):
     """Base exception for Onyx model errors."""
-    pass
+    def __init__(self, message: str, model_id: Optional[str] = None):
+        self.message = message
+        self.model_id = model_id
+        super().__init__(f"{message} (Model ID: {model_id})" if model_id else message)
 
 class ValidationError(OnyxModelError):
-    """Exception raised for validation errors."""
-    def __init__(self, message: str, errors: Optional[List[str]] = None):
-        self.message = message
+    """Exception for validation errors."""
+    def __init__(self, message: str, errors: Optional[List[str]] = None, model_id: Optional[str] = None):
         self.errors = errors or []
-        super().__init__(self.message)
+        super().__init__(message, model_id)
 
 class IndexingError(OnyxModelError):
     """Exception raised for indexing errors."""
@@ -24,33 +26,29 @@ class IndexingError(OnyxModelError):
         super().__init__(self.message)
 
 class CacheError(OnyxModelError):
-    """Exception raised for caching errors."""
-    def __init__(self, message: str, key: Optional[str] = None):
-        self.message = message
-        self.key = key
-        super().__init__(self.message)
+    """Exception for cache errors."""
+    def __init__(self, message: str, cache_key: str, model_id: Optional[str] = None):
+        self.cache_key = cache_key
+        super().__init__(message, model_id)
 
 class SerializationError(OnyxModelError):
-    """Exception raised for serialization errors."""
-    def __init__(self, message: str, data: Optional[Dict[str, Any]] = None):
-        self.message = message
+    """Exception for serialization errors."""
+    def __init__(self, message: str, data: Any, model_id: Optional[str] = None):
         self.data = data
-        super().__init__(self.message)
+        super().__init__(message, model_id)
 
 class VersionError(OnyxModelError):
-    """Exception raised for version errors."""
-    def __init__(self, message: str, current_version: Optional[str] = None, required_version: Optional[str] = None):
-        self.message = message
+    """Exception for version errors."""
+    def __init__(self, message: str, current_version: str, required_version: str, model_id: Optional[str] = None):
         self.current_version = current_version
         self.required_version = required_version
-        super().__init__(self.message)
+        super().__init__(message, model_id)
 
 class AuditError(OnyxModelError):
-    """Exception raised for audit errors."""
-    def __init__(self, message: str, user_id: Optional[str] = None):
-        self.message = message
-        self.user_id = user_id
-        super().__init__(self.message)
+    """Exception for audit errors."""
+    def __init__(self, message: str, action: str, model_id: Optional[str] = None):
+        self.action = action
+        super().__init__(message, model_id)
 
 class SoftDeleteError(OnyxModelError):
     """Exception raised for soft delete errors."""
@@ -67,18 +65,35 @@ class TimestampError(OnyxModelError):
         super().__init__(self.message)
 
 class RegistryError(OnyxModelError):
-    """Exception raised for registry errors."""
-    def __init__(self, message: str, model_name: Optional[str] = None):
-        self.message = message
+    """Exception for registry errors."""
+    def __init__(self, message: str, model_name: str):
         self.model_name = model_name
-        super().__init__(self.message)
+        super().__init__(message)
 
 class FactoryError(OnyxModelError):
-    """Exception raised for factory errors."""
-    def __init__(self, message: str, model_type: Optional[Type] = None):
-        self.message = message
+    """Exception for factory errors."""
+    def __init__(self, message: str, model_type: Type):
         self.model_type = model_type
-        super().__init__(self.message)
+        super().__init__(message)
+
+class DeserializationError(OnyxModelError):
+    """Exception for deserialization errors."""
+    def __init__(self, message: str, data: Any, model_id: Optional[str] = None):
+        self.data = data
+        super().__init__(message, model_id)
+
+class PermissionError(OnyxModelError):
+    """Exception for permission errors."""
+    def __init__(self, message: str, permission: str, model_id: Optional[str] = None):
+        self.permission = permission
+        super().__init__(message, model_id)
+
+class StatusError(OnyxModelError):
+    """Exception for status errors."""
+    def __init__(self, message: str, current_status: str, required_status: str, model_id: Optional[str] = None):
+        self.current_status = current_status
+        self.required_status = required_status
+        super().__init__(message, model_id)
 
 # Example usage:
 """
@@ -159,7 +174,7 @@ except ValidationError as e:
     logger.error(f"Errors: {e.errors}")
 except CacheError as e:
     logger.error(f"Cache error: {e.message}")
-    logger.error(f"Key: {e.key}")
+    logger.error(f"Key: {e.cache_key}")
 except IndexingError as e:
     logger.error(f"Indexing error: {e.message}")
     logger.error(f"Field: {e.field}, Value: {e.value}")

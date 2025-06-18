@@ -1,13 +1,20 @@
-from uuid import UUID
-
-from pydantic import BaseModel
-from pydantic import Field
+from uuid import UUID, uuid4
+from pydantic import BaseModel, Field, validator, field_validator, ConfigDict
+from typing import Dict, List, Optional, Any
+from datetime import datetime
+import structlog
+import orjson
 
 from onyx.db.models import DocumentSet as DocumentSetDBModel
 from onyx.server.documents.models import ConnectorCredentialPairDescriptor
 from onyx.server.documents.models import ConnectorSnapshot
 from onyx.server.documents.models import CredentialSnapshot
+from onyx.core.models import OnyxBaseModel
 
+logger = structlog.get_logger()
+
+class ORJSONModel(OnyxBaseModel):
+    model_config = ConfigDict(json_loads=orjson.loads, json_dumps=orjson.dumps)
 
 class DocumentSetCreationRequest(BaseModel):
     name: str
@@ -41,16 +48,48 @@ class CheckDocSetPublicResponse(BaseModel):
     is_public: bool
 
 
-class DocumentSet(BaseModel):
-    id: int
-    name: str
-    description: str | None
-    cc_pair_descriptors: list[ConnectorCredentialPairDescriptor]
-    is_up_to_date: bool
-    is_public: bool
-    # For Private Document Sets, who should be able to access these
-    users: list[UUID]
-    groups: list[int]
+class DocumentSet(ORJSONModel):
+    """DocumentSet domain model."""
+    id: UUID = Field(default_factory=uuid7)
+    name: str = Field(..., min_length=2, max_length=128)
+    documents: List[str] = Field(default_factory=list)
+    metadata: Dict = Field(default_factory=dict)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    @field_validator('name')
+    def name_not_empty(cls, v):
+        if not v or not v.strip():
+            logger.error("DocumentSet name validation failed", value=v)
+            raise ValueError("Name must not be empty")
+        return v
+
+    @field_validator('documents')
+    def documents_is_list(cls, v):
+        if not isinstance(v, list):
+            logger.error("DocumentSet documents validation failed", value=v)
+            raise ValueError("Documents must be a list")
+        return v
+
+    @field_validator('metadata')
+    def metadata_is_dict(cls, v):
+        if not isinstance(v, dict):
+            logger.error("DocumentSet metadata validation failed", value=v)
+            raise ValueError("Metadata must be a dict")
+        return v
+
+    def __post_init_post_parse__(self):
+        logger.info("DocumentSet instantiated", id=str(self.id), name=self.name)
+
+    @field_validator("documents", mode="before")
+    @classmethod
+    def list_or_empty(cls, v):
+        return v or []
+
+    @field_validator("metadata", mode="before")
+    @classmethod
+    def dict_or_empty(cls, v):
+        return v or {}
 
     @classmethod
     def from_model(cls, document_set_model: DocumentSetDBModel) -> "DocumentSet":
@@ -77,3 +116,7 @@ class DocumentSet(BaseModel):
             users=[user.id for user in document_set_model.users],
             groups=[group.id for group in document_set_model.groups],
         )
+
+    class Config:
+        frozen = True
+        validate_assignment = True

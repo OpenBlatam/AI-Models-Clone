@@ -1,47 +1,79 @@
+"""
+Test Model Types - Onyx Integration
+Tests for model types and registry.
+"""
 import pytest
 from datetime import datetime
-from typing import Dict, Any, List, Optional
-from uuid import UUID
-
+from typing import Dict, Any, List
+from ..base_model import OnyxBaseModel
+from ..model_schema import ModelSchema
+from ..model_field import ModelField
 from ..model_types import (
-    ModelStatus,
-    ModelCategory,
-    ModelPermission,
     ModelRegistry,
-    OnyxBaseModel,
-    ModelField,
-    ModelSchema,
-    ModelCache,
-    ModelIndex,
-    ModelEvent,
+    ModelFactory,
     ModelValidation,
-    ModelFactory
+    ModelStatus,
+    ModelPermission
+)
+from ..model_exceptions import (
+    ValidationError,
+    RegistryError,
+    FactoryError
 )
 
-# Test model classes
-class TestModel(OnyxBaseModel):
-    """Test model for type functionality."""
-    name: str
-    email: str
-    age: Optional[int] = None
-    tags: List[str] = []
-
+# Test data
 @pytest.fixture
-def test_model_data():
-    """Create test model data."""
+def test_model_data() -> Dict[str, Any]:
+    """Test model data."""
     return {
-        "name": "Test User",
+        "name": "Test Model",
         "email": "test@example.com",
         "age": 30,
-        "tags": ["test", "example"]
+        "tags": ["test", "model"]
     }
 
 @pytest.fixture
-def test_model(test_model_data):
-    """Create a test model instance."""
-    return TestModel(**test_model_data)
+def test_schema() -> ModelSchema:
+    """Test schema."""
+    return ModelSchema(
+        fields={
+            "name": ModelField(
+                name="name",
+                type="string",
+                required=True,
+                description="Model name"
+            ),
+            "email": ModelField(
+                name="email",
+                type="string",
+                required=True,
+                description="Email address",
+                validation={"pattern": r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"}
+            ),
+            "age": ModelField(
+                name="age",
+                type="integer",
+                required=True,
+                description="Age",
+                validation={"min": 0, "max": 150}
+            ),
+            "tags": ModelField(
+                name="tags",
+                type="array",
+                required=False,
+                description="Tags",
+                validation={"min_items": 0}
+            )
+        }
+    )
 
-# Test enums
+# Test model class
+class TestModel(OnyxBaseModel):
+    """Test model class."""
+    def __init__(self, **data: Any):
+        super().__init__(schema=test_schema(), data=data)
+
+# Test model status
 def test_model_status():
     """Test model status enum."""
     assert ModelStatus.ACTIVE == "active"
@@ -54,19 +86,7 @@ def test_model_status():
     assert ModelStatus.REJECTED == "rejected"
     assert ModelStatus.APPROVED == "approved"
 
-def test_model_category():
-    """Test model category enum."""
-    assert ModelCategory.USER == "user"
-    assert ModelCategory.PRODUCT == "product"
-    assert ModelCategory.ORDER == "order"
-    assert ModelCategory.CUSTOMER == "customer"
-    assert ModelCategory.INVENTORY == "inventory"
-    assert ModelCategory.PAYMENT == "payment"
-    assert ModelCategory.SHIPPING == "shipping"
-    assert ModelCategory.MARKETING == "marketing"
-    assert ModelCategory.ANALYTICS == "analytics"
-    assert ModelCategory.SYSTEM == "system"
-
+# Test model permission
 def test_model_permission():
     """Test model permission enum."""
     assert ModelPermission.READ == "read"
@@ -81,149 +101,114 @@ def test_model_permission():
 # Test model registry
 def test_model_registry():
     """Test model registry."""
+    registry = ModelRegistry()
+    
     # Register model
-    ModelRegistry.register(TestModel)
+    registry.register_model("testmodel", TestModel)
     
     # Get model
-    model_class = ModelRegistry.get_model("testmodel")
+    model_class = registry.get_model_class("testmodel")
     assert model_class == TestModel
     
     # List models
-    models = ModelRegistry.list_models()
+    models = registry.list_models()
     assert "testmodel" in models
+    
+    # Test duplicate registration
+    with pytest.raises(RegistryError):
+        registry.register_model("testmodel", TestModel)
+    
+    # Test non-existent model
+    with pytest.raises(RegistryError):
+        registry.get_model_class("nonexistent")
 
-# Test base model
-def test_onyx_base_model(test_model):
-    """Test OnyxBaseModel functionality."""
-    # Test default values
-    assert isinstance(test_model.id, str)
-    assert isinstance(test_model.created_at, datetime)
-    assert isinstance(test_model.updated_at, datetime)
-    assert test_model.status == ModelStatus.ACTIVE
-    assert test_model.category == ModelCategory.SYSTEM
-    assert test_model.permission == ModelPermission.VIEWER
-    assert test_model.version == "1.0.0"
-    assert test_model.is_deleted is False
-    assert test_model.deleted_at is None
+def test_model_registry_operations(test_schema: ModelSchema, test_model_data: Dict[str, Any]):
+    """Test model registry operations."""
+    registry = ModelRegistry()
+    registry.register_model("testmodel", TestModel)
     
-    # Test is_active property
-    assert test_model.is_active is True
+    # Create model
+    model = registry.create_model("testmodel", test_model_data)
+    assert isinstance(model, TestModel)
+    assert model.name == test_model_data["name"]
+    assert model.email == test_model_data["email"]
+    assert model.age == test_model_data["age"]
+    assert model.tags == test_model_data["tags"]
     
-    # Test validation
-    assert test_model.is_valid() is True
+    # Get model
+    retrieved_model = registry.get_model("testmodel", model.id)
+    assert retrieved_model == model
     
-    # Test status change
-    test_model.status = ModelStatus.INACTIVE
-    assert test_model.is_active is False
+    # Update model
+    updated_data = {"name": "Updated Model"}
+    updated_model = registry.update_model("testmodel", model.id, updated_data)
+    assert updated_model.name == "Updated Model"
     
-    # Test soft delete
-    test_model.is_deleted = True
-    test_model.deleted_at = datetime.utcnow()
-    assert test_model.is_active is False
+    # Delete model
+    registry.delete_model("testmodel", model.id)
+    assert registry.get_model("testmodel", model.id) is None
+    
+    # Clear models
+    registry.clear_models("testmodel")
+    assert len(registry.get_models("testmodel")) == 0
 
-# Test model field
-def test_model_field():
-    """Test ModelField functionality."""
-    field = ModelField(
-        name="test_field",
-        type="string",
-        required=True,
-        unique=True,
-        description="Test field",
-        default="default",
-        validation={"min_length": 2}
-    )
+# Test model factory
+def test_model_factory():
+    """Test model factory."""
+    factory = ModelFactory()
     
-    assert field.name == "test_field"
-    assert field.type == "string"
-    assert field.required is True
-    assert field.unique is True
-    assert field.description == "Test field"
-    assert field.default == "default"
-    assert field.validation == {"min_length": 2}
+    # Register model
+    factory.register_model("testmodel", TestModel)
+    
+    # Create model
+    model = factory.create_model("testmodel", test_model_data())
+    assert isinstance(model, TestModel)
+    assert model.name == test_model_data()["name"]
+    assert model.email == test_model_data()["email"]
+    assert model.age == test_model_data()["age"]
+    assert model.tags == test_model_data()["tags"]
+    
+    # Validate model
+    validation = factory.validate("testmodel", test_model_data())
+    assert validation.is_valid is True
+    assert len(validation.errors) == 0
+    
+    # Test invalid data
+    invalid_data = {"email": "invalid-email"}
+    validation = factory.validate("testmodel", invalid_data)
+    assert validation.is_valid is False
+    assert len(validation.errors) > 0
+    
+    # Test non-existent model
+    with pytest.raises(FactoryError):
+        factory.create_model("nonexistent", test_model_data())
+    
+    with pytest.raises(FactoryError):
+        factory.validate("nonexistent", test_model_data())
 
-# Test model schema
-def test_model_schema():
-    """Test ModelSchema functionality."""
-    schema = ModelSchema(
-        name="test_schema",
-        fields={
-            "name": ModelField(name="name", type="string", required=True),
-            "email": ModelField(name="email", type="string", required=True)
-        },
-        indexes=["name", "email"],
-        cache=["id", "email"],
-        validation={
-            "name": {"min_length": 2},
-            "email": {"pattern": r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"}
-        }
-    )
+def test_model_factory_with_schema(test_schema: ModelSchema):
+    """Test model factory with schema."""
+    factory = ModelFactory()
     
-    assert schema.name == "test_schema"
-    assert "name" in schema.fields
-    assert "email" in schema.fields
-    assert "name" in schema.indexes
-    assert "email" in schema.indexes
-    assert "id" in schema.cache
-    assert "email" in schema.cache
-    assert "name" in schema.validation
-    assert "email" in schema.validation
-
-# Test model cache
-def test_model_cache():
-    """Test ModelCache functionality."""
-    cache = ModelCache(
-        key="test_key",
-        value={"name": "Test", "value": 42},
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
-    )
+    # Register schema
+    factory.register_schema("testschema", test_schema)
     
-    assert cache.key == "test_key"
-    assert cache.value["name"] == "Test"
-    assert cache.value["value"] == 42
-    assert isinstance(cache.created_at, datetime)
-    assert isinstance(cache.updated_at, datetime)
-
-# Test model index
-def test_model_index():
-    """Test ModelIndex functionality."""
-    index = ModelIndex(
-        field="name",
-        value="Test",
-        model_id="123",
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow()
-    )
+    # Register model with schema
+    factory.register_model("testmodel", TestModel)
     
-    assert index.field == "name"
-    assert index.value == "Test"
-    assert index.model_id == "123"
-    assert isinstance(index.created_at, datetime)
-    assert isinstance(index.updated_at, datetime)
-
-# Test model event
-def test_model_event():
-    """Test ModelEvent functionality."""
-    event = ModelEvent(
-        name="created",
-        data={"action": "create"},
-        model_id="123"
-    )
+    # Create model with schema
+    model = factory.create_model("testmodel", test_model_data())
+    assert model._schema == test_schema
     
-    assert event.name == "created"
-    assert event.data["action"] == "create"
-    assert event.model_id == "123"
-    assert isinstance(event.created_at, datetime)
+    # Validate with schema
+    validation = factory.validate("testmodel", test_model_data())
+    assert validation.is_valid is True
+    assert len(validation.errors) == 0
 
 # Test model validation
 def test_model_validation():
-    """Test ModelValidation functionality."""
-    validation = ModelValidation(
-        is_valid=True,
-        errors=[]
-    )
-    
+    """Test model validation."""
+    validation = ModelValidation(is_valid=True, errors=[])
     assert validation.is_valid is True
     assert len(validation.errors) == 0
     
@@ -231,25 +216,42 @@ def test_model_validation():
         is_valid=False,
         errors=["Invalid email", "Invalid age"]
     )
-    
     assert validation.is_valid is False
     assert len(validation.errors) == 2
     assert "Invalid email" in validation.errors
     assert "Invalid age" in validation.errors
 
-# Test model factory
-def test_model_factory():
-    """Test ModelFactory functionality."""
-    # Register model
-    ModelRegistry.register(TestModel)
+def test_model_validation_with_schema(test_schema: ModelSchema):
+    """Test model validation with schema."""
+    factory = ModelFactory()
+    factory.register_schema("testschema", test_schema)
+    factory.register_model("testmodel", TestModel)
     
-    # Create model
-    model = ModelFactory.create("testmodel", name="Test", email="test@example.com")
-    assert isinstance(model, TestModel)
-    assert model.name == "Test"
-    assert model.email == "test@example.com"
+    # Test valid data
+    validation = factory.validate("testmodel", test_model_data())
+    assert validation.is_valid is True
+    assert len(validation.errors) == 0
     
-    # Validate model
-    validation = ModelFactory.validate("testmodel", name="Test", email="invalid-email")
+    # Test invalid email
+    invalid_email_data = test_model_data().copy()
+    invalid_email_data["email"] = "invalid-email"
+    validation = factory.validate("testmodel", invalid_email_data)
     assert validation.is_valid is False
-    assert len(validation.errors) > 0 
+    assert len(validation.errors) > 0
+    assert any("email" in error.lower() for error in validation.errors)
+    
+    # Test invalid age
+    invalid_age_data = test_model_data().copy()
+    invalid_age_data["age"] = 200
+    validation = factory.validate("testmodel", invalid_age_data)
+    assert validation.is_valid is False
+    assert len(validation.errors) > 0
+    assert any("age" in error.lower() for error in validation.errors)
+    
+    # Test missing required field
+    missing_field_data = test_model_data().copy()
+    del missing_field_data["name"]
+    validation = factory.validate("testmodel", missing_field_data)
+    assert validation.is_valid is False
+    assert len(validation.errors) > 0
+    assert any("name" in error.lower() for error in validation.errors) 

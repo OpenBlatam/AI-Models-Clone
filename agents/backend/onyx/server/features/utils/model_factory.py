@@ -9,7 +9,7 @@ from datetime import datetime
 from .base_types import CACHE_TTL, VALIDATION_TIMEOUT
 from .model_field import ModelField, FieldConfig
 from .model_schema import ModelSchema, SchemaConfig
-from .base_model import OnyxBaseModel
+# from .base_model import OnyxBaseModel  # REMOVED to break circular import
 
 T = TypeVar('T')
 
@@ -19,7 +19,7 @@ class ModelFactory:
     def __init__(self):
         """Initialize factory."""
         self._schemas: Dict[str, ModelSchema] = {}
-        self._models: Dict[str, Type[OnyxBaseModel]] = {}
+        self._models: Dict[str, Type["OnyxBaseModel"]] = {}
     
     def register_schema(self, name: str, schema: ModelSchema) -> None:
         """Register a schema."""
@@ -28,7 +28,8 @@ class ModelFactory:
         
         self._schemas[name] = schema
     
-    def register_model(self, name: str, model_class: Type[OnyxBaseModel]) -> None:
+    def register_model(self, name: str, model_class: Type["OnyxBaseModel"]) -> None:
+        from .base_model import OnyxBaseModel
         """Register a model class."""
         if name in self._models:
             raise ValueError(f"Model {name} already exists")
@@ -39,11 +40,11 @@ class ModelFactory:
         """Get a schema."""
         return self._schemas.get(name)
     
-    def get_model_class(self, name: str) -> Optional[Type[OnyxBaseModel]]:
-        """Get a model class."""
+    def get_model_class(self, name: str) -> Optional[Type["OnyxBaseModel"]]:
         return self._models.get(name)
     
-    def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional[OnyxBaseModel]:
+    def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional["OnyxBaseModel"]:
+        from .base_model import OnyxBaseModel
         """Create a model."""
         schema = self.get_schema(name)
         model_class = self.get_model_class(name)

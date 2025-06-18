@@ -2,126 +2,149 @@
 Tool Models - Onyx Integration
 Enhanced models for tools with advanced features.
 """
-from typing import Dict, List, Optional, Union, Any, TypeVar, Generic
+from typing import Dict, List, Optional, Any
 from datetime import datetime
-from pydantic import Field, validator, root_validator
+from pydantic import Field, field_validator, root_validator, ConfigDict
 from ...utils.base_model import OnyxBaseModel
-from uuid import uuid4
+from uuid import UUID, uuid4
+from ...utils.model_repository import ModelRepository
+from ...utils.model_service import ModelService
+from ...utils.model_decorators import validate_model, cache_model, log_operations
+import logging
+import structlog
+import orjson
 
-T = TypeVar('T')
+_repository = ModelRepository()
+_service = ModelService()
+
+logger = structlog.get_logger()
+
+class ORJSONModel(OnyxBaseModel):
+    model_config = ConfigDict(json_loads=orjson.loads, json_dumps=orjson.dumps)
 
 class Header(OnyxBaseModel):
-    """Enhanced header model."""
-    
-    key: str
-    value: str
+    """HTTP header definition for tool integrations."""
+    id: UUID = Field(default_factory=uuid4)
+    key: str = Field(..., min_length=1, max_length=128)
+    value: str = Field(..., min_length=1, max_length=512)
     description: Optional[str] = None
-    is_required: bool = Field(default=False)
-    is_secret: bool = Field(default=False)
-    
-    # Configure indexing
-    index_fields = ["key"]
-    search_fields = ["description"]
-    
-    @validator("key")
-    def validate_key(cls, v: str) -> str:
-        """Validate header key."""
+    is_required: bool = False
+    is_secret: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    @field_validator("key", "value")
+    @classmethod
+    def not_empty(cls, v: str) -> str:
         if not v.strip():
-            raise ValueError("Header key cannot be empty")
-        return v.strip()
-    
-    @validator("value")
-    def validate_value(cls, v: str) -> str:
-        """Validate header value."""
-        if not v.strip():
-            raise ValueError("Header value cannot be empty")
+            raise ValueError("Field cannot be empty")
         return v.strip()
 
+    @validate_model(validate_types=True, validate_custom=True)
+    @cache_model(key_field="key")
+    @log_operations(logging.getLogger(__name__))
+    def save(self, user_context: Optional[Dict[str, Any]] = None) -> None:
+        _service.create_model(self.__class__.__name__, self.to_dict(), self.id)
+        _repository._service = _service
+        _repository._service.register_model(self.__class__.__name__, self.__class__)
+        _repository._service.register_schema(self.__class__.__name__, self._schema)
+        _repository._service.create_model(self.__class__.__name__, self.to_dict(), self.id)
+
 class ToolDefinition(OnyxBaseModel):
-    """Enhanced tool definition model."""
-    
-    name: str
+    """Definition of a tool, including schemas and metadata."""
+    id: UUID = Field(default_factory=uuid4)
+    name: str = Field(..., min_length=2, max_length=128)
     version: str
     description: str
     category: str
-    input_schema: Dict[str, Any]
-    output_schema: Dict[str, Any]
+    input_schema: Dict[str, Any] = Field(default_factory=dict)
+    output_schema: Dict[str, Any] = Field(default_factory=dict)
     headers: List[Header] = Field(default_factory=list)
     parameters: Dict[str, Any] = Field(default_factory=dict)
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    
-    # Configure indexing
-    index_fields = ["name", "version", "category"]
-    search_fields = ["description", "input_schema", "output_schema"]
-    
-    @validator("name")
-    def validate_name(cls, v: str) -> str:
-        """Validate tool name."""
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    @field_validator("name")
+    @classmethod
+    def name_not_empty(cls, v: str) -> str:
         if not v.strip():
             raise ValueError("Tool name cannot be empty")
         return v.strip()
-    
-    @validator("version")
-    def validate_version(cls, v: str) -> str:
-        """Validate version format."""
+
+    @field_validator("version")
+    def check_version(cls, v):
         parts = v.split(".")
-        if len(parts) != 3:
-            raise ValueError("Version must be in format: major.minor.patch")
-        try:
-            [int(p) for p in parts]
-        except ValueError:
-            raise ValueError("Version parts must be integers")
+        if len(parts) != 3 or not all(p.isdigit() for p in parts):
+            raise ValueError("Version must be in format X.Y.Z")
         return v
-    
-    @validator("category")
-    def validate_category(cls, v: str) -> str:
-        """Validate category."""
-        allowed_categories = ["api", "utility", "integration", "custom"]
-        if v not in allowed_categories:
-            raise ValueError(f"Category must be one of: {', '.join(allowed_categories)}")
+
+    @field_validator("category")
+    def check_category(cls, v):
+        allowed = ["api", "utility", "integration", "custom"]
+        if v not in allowed:
+            raise ValueError(f"Category must be one of: {', '.join(allowed)}")
         return v
-    
+
+    @field_validator("headers", mode="before")
+    @classmethod
+    def list_or_empty(cls, v):
+        return v or []
+
+    @field_validator("input_schema", "output_schema", "parameters", "metadata", mode="before")
+    @classmethod
+    def dict_or_empty(cls, v):
+        return v or {}
+
     def get_required_headers(self) -> List[Header]:
-        """Get required headers."""
         return [h for h in self.headers if h.is_required]
-    
+
     def get_secret_headers(self) -> List[Header]:
-        """Get secret headers."""
         return [h for h in self.headers if h.is_secret]
-    
+
     def validate_input(self, input_data: Dict[str, Any]) -> bool:
-        """Validate input data against schema."""
         # TODO: Implement schema validation
         return True
-    
+
     def validate_output(self, output_data: Dict[str, Any]) -> bool:
-        """Validate output data against schema."""
         # TODO: Implement schema validation
         return True
 
 class ToolSnapshot(OnyxBaseModel):
-    """Enhanced tool snapshot model."""
-    
-    id: str
-    name: str
+    """Snapshot of a tool definition at a point in time."""
+    id: UUID = Field(default_factory=uuid4)
+    name: str = Field(..., min_length=2, max_length=128)
     version: str
     description: str
     category: str
-    input_schema: Dict[str, Any]
-    output_schema: Dict[str, Any]
-    headers: List[Header]
-    parameters: Dict[str, Any]
-    metadata: Dict[str, Any]
-    created_at: datetime
-    updated_at: datetime
-    
-    # Configure indexing
-    index_fields = ["id", "name", "version", "category"]
-    search_fields = ["description"]
-    
+    input_schema: Dict[str, Any] = Field(default_factory=dict)
+    output_schema: Dict[str, Any] = Field(default_factory=dict)
+    headers: List[Header] = Field(default_factory=list)
+    parameters: Dict[str, Any] = Field(default_factory=dict)
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    @field_validator("name")
+    @classmethod
+    def name_not_empty(cls, v: str) -> str:
+        if not v.strip():
+            raise ValueError("Tool name cannot be empty")
+        return v.strip()
+
+    @field_validator("headers", mode="before")
+    @classmethod
+    def list_or_empty(cls, v):
+        return v or []
+
+    @field_validator("input_schema", "output_schema", "parameters", "metadata", mode="before")
+    @classmethod
+    def dict_or_empty(cls, v):
+        return v or {}
+
     @classmethod
     def from_definition(cls, definition: ToolDefinition) -> "ToolSnapshot":
-        """Create snapshot from definition."""
+        now = datetime.utcnow().isoformat()
         return cls(
             id=str(uuid4()),
             name=definition.name,
@@ -133,12 +156,11 @@ class ToolSnapshot(OnyxBaseModel):
             headers=definition.headers,
             parameters=definition.parameters,
             metadata=definition.metadata,
-            created_at=datetime.utcnow(),
-            updated_at=datetime.utcnow()
+            created_at=now,
+            updated_at=now
         )
-    
+
     def to_definition(self) -> ToolDefinition:
-        """Convert snapshot to definition."""
         return ToolDefinition(
             name=self.name,
             version=self.version,
@@ -152,27 +174,23 @@ class ToolSnapshot(OnyxBaseModel):
         )
 
 class CustomToolCreate(OnyxBaseModel):
-    """Enhanced custom tool creation model."""
-    
+    """Request model for creating a custom tool."""
+    id: UUID = Field(default_factory=uuid4)
     definition: ToolDefinition
-    is_public: bool = Field(default=False)
-    owner_id: Optional[str] = None
+    is_public: bool = False
+    owner_id: Optional[UUID] = None
     metadata: Dict[str, Any] = Field(default_factory=dict)
-    
-    # Configure indexing
-    index_fields = ["owner_id"]
-    search_fields = ["definition"]
-    
-    @validator("definition")
-    def validate_definition(cls, v: ToolDefinition) -> ToolDefinition:
-        """Validate tool definition."""
-        if not v.name or not v.version:
-            raise ValueError("Tool definition must have name and version")
-        return v
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    @field_validator("metadata", mode="before")
+    @classmethod
+    def dict_or_empty(cls, v):
+        return v or {}
 
 class ToolUpdate(OnyxBaseModel):
-    """Enhanced tool update model."""
-    
+    """Request model for updating a tool definition."""
+    id: UUID = Field(default_factory=uuid4)
     name: Optional[str] = None
     version: Optional[str] = None
     description: Optional[str] = None
@@ -182,39 +200,51 @@ class ToolUpdate(OnyxBaseModel):
     headers: Optional[List[Header]] = None
     parameters: Optional[Dict[str, Any]] = None
     metadata: Optional[Dict[str, Any]] = None
-    
-    # Configure indexing
-    index_fields = ["name", "version", "category"]
-    search_fields = ["description"]
-    
-    @validator("name")
-    def validate_name(cls, v: Optional[str]) -> Optional[str]:
-        """Validate tool name."""
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+    @field_validator("name")
+    @classmethod
+    def name_not_empty(cls, v: Optional[str]) -> Optional[str]:
         if v is not None and not v.strip():
             raise ValueError("Tool name cannot be empty")
         return v.strip() if v else v
-    
-    @validator("version")
-    def validate_version(cls, v: Optional[str]) -> Optional[str]:
-        """Validate version format."""
-        if v is not None:
-            parts = v.split(".")
-            if len(parts) != 3:
-                raise ValueError("Version must be in format: major.minor.patch")
-            try:
-                [int(p) for p in parts]
-            except ValueError:
-                raise ValueError("Version parts must be integers")
+
+    @field_validator("headers", mode="before")
+    @classmethod
+    def list_or_empty(cls, v):
+        return v or []
+
+    @field_validator("input_schema", "output_schema", "parameters", "metadata", mode="before")
+    @classmethod
+    def dict_or_empty(cls, v):
+        return v or {}
+
+class Tool(ORJSONModel):
+    """Tool domain model."""
+    id: UUID = Field(default_factory=uuid7)
+    name: str = Field(..., min_length=2, max_length=128)
+    config: dict | None = Field(default_factory=dict)
+
+    @field_validator('name')
+    def name_not_empty(cls, v):
+        if not v or not v.strip():
+            logger.error("Tool name validation failed", value=v)
+            raise ValueError("Name must not be empty")
         return v
-    
-    @validator("category")
-    def validate_category(cls, v: Optional[str]) -> Optional[str]:
-        """Validate category."""
-        if v is not None:
-            allowed_categories = ["api", "utility", "integration", "custom"]
-            if v not in allowed_categories:
-                raise ValueError(f"Category must be one of: {', '.join(allowed_categories)}")
+
+    @field_validator('config')
+    def config_is_dict(cls, v):
+        if not isinstance(v, dict):
+            logger.error("Tool config validation failed", value=v)
+            raise ValueError("Config must be a dict")
         return v
+
+    def __post_init_post_parse__(self):
+        logger.info("Tool instantiated", id=str(self.id), name=self.name)
+
+    class Config:
+        frozen = True
+        validate_assignment = True
 
 # Example usage:
 """
