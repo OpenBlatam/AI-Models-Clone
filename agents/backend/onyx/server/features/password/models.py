@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, validator
 from typing import Optional
 from ...utils.base_model import OnyxBaseModel
-from pydantic import field_validator
+from pydantic import field_validator, ConfigDict, model_validator
 from uuid import UUID, uuid4
 from datetime import datetime
 import logging
@@ -47,10 +47,17 @@ class ORJSONModel(OnyxBaseModel):
 
 
 class Password(ORJSONModel):
-    """Production-grade Password domain model with strong validation and logging."""
+    """
+    Modelo robusto de Password para producción.
+    """
     id: UUID = Field(default_factory=uuid7)
-    value: str = Field(..., min_length=8, max_length=128)
-    description: str | None = None
+    value: str = Field(..., min_length=8, max_length=128, description="Contraseña segura")
+    description: str | None = Field(default=None, description="Descripción opcional")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_by: str | None = Field(default=None, description="Usuario que creó el registro")
+    updated_by: str | None = Field(default=None, description="Último usuario que modificó el registro")
+    source: str | None = Field(default=None, description="Origen del dato (api, import, etc)")
 
     def __repr__(self) -> str:
         return f"<Password id={self.id} description={self.description!r}>"
@@ -70,8 +77,34 @@ class Password(ORJSONModel):
             raise ValueError("Password must be at least 8 characters")
         return v
 
+    @model_validator(mode="after")
+    def check_value_and_description(self):
+        if self.value and self.description and self.value in (self.description or ""):
+            logger.warning("Description should not contain the password value", value=self.value)
+        return self
+
     def __post_init_post_parse__(self):
         logger.info("Password instantiated", id=str(self.id), description=self.description)
+
+    def audit_log(self):
+        return {
+            "id": str(self.id),
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+            "created_by": self.created_by,
+            "updated_by": self.updated_by,
+            "source": self.source,
+        }
+
+    def to_dict(self):
+        return self.model_dump()
+
+    def to_json(self):
+        return self.model_dump_json()
+
+    @classmethod
+    def from_json(cls, data: str):
+        return cls.model_validate_json(data)
 
     class Config:
         frozen = True

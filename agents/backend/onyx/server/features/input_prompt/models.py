@@ -1,5 +1,5 @@
 from uuid import UUID, uuid4
-from pydantic import BaseModel, Field, validator, field_validator, ConfigDict
+from pydantic import BaseModel, Field, validator, field_validator, ConfigDict, model_validator
 from typing import Dict, Optional, Any
 from datetime import datetime
 import logging
@@ -58,10 +58,17 @@ class ORJSONModel(OnyxBaseModel):
 
 
 class InputPrompt(ORJSONModel):
-    """InputPrompt domain model."""
+    """
+    Modelo robusto de InputPrompt para producción.
+    """
     id: UUID = Field(default_factory=uuid7)
-    prompt: str = Field(..., min_length=1)
-    metadata: dict | None = Field(default_factory=dict)
+    prompt: str = Field(..., min_length=1, description="Texto del prompt")
+    metadata: dict | None = Field(default_factory=dict, description="Metadatos adicionales")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_by: str | None = Field(default=None, description="Usuario que creó el registro")
+    updated_by: str | None = Field(default=None, description="Último usuario que modificó el registro")
+    source: str | None = Field(default=None, description="Origen del dato (api, import, etc)")
 
     @field_validator('prompt')
     def prompt_not_empty(cls, v):
@@ -76,6 +83,32 @@ class InputPrompt(ORJSONModel):
             logger.error("InputPrompt metadata validation failed", value=v)
             raise ValueError("Metadata must be a dict")
         return v
+
+    @model_validator(mode="after")
+    def check_prompt_and_metadata(self):
+        if self.prompt and self.metadata and "lang" in self.metadata and not self.metadata["lang"]:
+            logger.warning("Prompt metadata 'lang' should not be empty", prompt=self.prompt)
+        return self
+
+    def audit_log(self):
+        return {
+            "id": str(self.id),
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+            "created_by": self.created_by,
+            "updated_by": self.updated_by,
+            "source": self.source,
+        }
+
+    def to_dict(self):
+        return self.model_dump()
+
+    def to_json(self):
+        return self.model_dump_json()
+
+    @classmethod
+    def from_json(cls, data: str):
+        return cls.model_validate_json(data)
 
     def __post_init_post_parse__(self):
         logger.info("InputPrompt instantiated", id=str(self.id), prompt=self.prompt)

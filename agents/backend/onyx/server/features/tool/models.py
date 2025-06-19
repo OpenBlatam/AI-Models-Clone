@@ -4,7 +4,7 @@ Enhanced models for tools with advanced features.
 """
 from typing import Dict, List, Optional, Any
 from datetime import datetime
-from pydantic import Field, field_validator, root_validator, ConfigDict
+from pydantic import Field, field_validator, root_validator, ConfigDict, model_validator
 from ...utils.base_model import OnyxBaseModel
 from uuid import UUID, uuid4
 from ...utils.model_repository import ModelRepository
@@ -13,6 +13,7 @@ from ...utils.model_decorators import validate_model, cache_model, log_operation
 import logging
 import structlog
 import orjson
+from uuid6 import uuid7
 
 _repository = ModelRepository()
 _service = ModelService()
@@ -220,10 +221,17 @@ class ToolUpdate(OnyxBaseModel):
         return v or {}
 
 class Tool(ORJSONModel):
-    """Tool domain model."""
+    """
+    Modelo robusto de Tool para producción.
+    """
     id: UUID = Field(default_factory=uuid7)
-    name: str = Field(..., min_length=2, max_length=128)
-    config: dict | None = Field(default_factory=dict)
+    name: str = Field(..., min_length=2, max_length=128, description="Nombre de la herramienta")
+    config: dict | None = Field(default_factory=dict, description="Configuración de la herramienta")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_by: str | None = Field(default=None, description="Usuario que creó el registro")
+    updated_by: str | None = Field(default=None, description="Último usuario que modificó el registro")
+    source: str | None = Field(default=None, description="Origen del dato (api, import, etc)")
 
     @field_validator('name')
     def name_not_empty(cls, v):
@@ -239,8 +247,31 @@ class Tool(ORJSONModel):
             raise ValueError("Config must be a dict")
         return v
 
-    def __post_init_post_parse__(self):
-        logger.info("Tool instantiated", id=str(self.id), name=self.name)
+    @model_validator(mode="after")
+    def check_name_and_config(self):
+        if self.name and self.config and "type" in self.config and not self.config["type"]:
+            logger.warning("Tool config 'type' should not be empty", name=self.name)
+        return self
+
+    def audit_log(self):
+        return {
+            "id": str(self.id),
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+            "created_by": self.created_by,
+            "updated_by": self.updated_by,
+            "source": self.source,
+        }
+
+    def to_dict(self):
+        return self.model_dump()
+
+    def to_json(self):
+        return self.model_dump_json()
+
+    @classmethod
+    def from_json(cls, data: str):
+        return cls.model_validate_json(data)
 
     class Config:
         frozen = True

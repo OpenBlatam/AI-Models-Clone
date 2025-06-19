@@ -5,7 +5,7 @@ import logging
 import structlog
 import orjson
 
-from pydantic import BaseModel, Field, validator, field_validator, ConfigDict
+from pydantic import BaseModel, Field, validator, field_validator, ConfigDict, model_validator
 
 from onyx.context.search.enums import RecencyBiasSetting
 from onyx.db.models import Persona
@@ -263,10 +263,18 @@ class ORJSONModel(OnyxBaseModel):
 
 
 class Persona(ORJSONModel):
+    """
+    Modelo robusto de Persona para producción.
+    """
     id: UUID = Field(default_factory=uuid7)
-    name: str = Field(..., min_length=2, max_length=128)
-    description: str | None = None
-    attributes: dict = Field(default_factory=dict)
+    name: str = Field(..., min_length=2, max_length=128, description="Nombre completo de la persona")
+    description: str | None = Field(default=None, description="Descripción opcional")
+    attributes: dict = Field(default_factory=dict, description="Atributos adicionales")
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_by: str | None = Field(default=None, description="Usuario que creó el registro")
+    updated_by: str | None = Field(default=None, description="Último usuario que modificó el registro")
+    source: str | None = Field(default=None, description="Origen del dato (api, import, etc)")
 
     @field_validator('name')
     def name_not_empty(cls, v):
@@ -281,6 +289,32 @@ class Persona(ORJSONModel):
             logger.error("Persona attributes validation failed", value=v)
             raise ValueError("Attributes must be a dict")
         return v
+
+    @model_validator(mode="after")
+    def check_name_and_description(self):
+        if self.name and self.description and self.name in self.description:
+            logger.warning("Description should not repeat the name", name=self.name)
+        return self
+
+    def audit_log(self):
+        return {
+            "id": str(self.id),
+            "created_at": self.created_at.isoformat(),
+            "updated_at": self.updated_at.isoformat(),
+            "created_by": self.created_by,
+            "updated_by": self.updated_by,
+            "source": self.source,
+        }
+
+    def to_dict(self):
+        return self.model_dump()
+
+    def to_json(self):
+        return self.model_dump_json()
+
+    @classmethod
+    def from_json(cls, data: str):
+        return cls.model_validate_json(data)
 
     def __post_init_post_parse__(self):
         logger.info("Persona instantiated", id=str(self.id), name=self.name)
