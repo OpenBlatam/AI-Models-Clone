@@ -14,6 +14,7 @@ import logging
 import structlog
 import orjson
 from uuid6 import uuid7
+from agents.backend.onyx.server.features.utils.ml_data_pipeline import send_training_example_kafka
 
 _repository = ModelRepository()
 _service = ModelService()
@@ -221,17 +222,21 @@ class ToolUpdate(OnyxBaseModel):
         return v or {}
 
 class Tool(ORJSONModel):
-    """
-    Modelo robusto de Tool para producción.
-    """
+    __slots__ = (
+        'id', 'name', 'config', 'created_at', 'updated_at', 'created_by', 'updated_by',
+        'source', 'version', 'trace_id', 'is_deleted'
+    )
     id: UUID = Field(default_factory=uuid7)
     name: str = Field(..., min_length=2, max_length=128, description="Nombre de la herramienta")
-    config: dict | None = Field(default_factory=dict, description="Configuración de la herramienta")
+    config: dict = Field(default_factory=dict, description="Configuración de la herramienta")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    created_by: str | None = Field(default=None, description="Usuario que creó el registro")
-    updated_by: str | None = Field(default=None, description="Último usuario que modificó el registro")
-    source: str | None = Field(default=None, description="Origen del dato (api, import, etc)")
+    created_by: str | None = None
+    updated_by: str | None = None
+    source: str | None = None
+    version: int = 1
+    trace_id: str | None = None
+    is_deleted: bool = False
 
     @field_validator('name')
     def name_not_empty(cls, v):
@@ -240,17 +245,15 @@ class Tool(ORJSONModel):
             raise ValueError("Name must not be empty")
         return v
 
-    @field_validator('config')
-    def config_is_dict(cls, v):
-        if not isinstance(v, dict):
-            logger.error("Tool config validation failed", value=v)
-            raise ValueError("Config must be a dict")
-        return v
+    @field_validator('config', mode="before")
+    @classmethod
+    def dict_or_empty(cls, v):
+        return v or {}
 
     @model_validator(mode="after")
-    def check_name_and_config(self):
-        if self.name and self.config and "type" in self.config and not self.config["type"]:
-            logger.warning("Tool config 'type' should not be empty", name=self.name)
+    def check_timestamps(self):
+        if self.created_at > self.updated_at:
+            logger.warning("created_at is after updated_at", id=str(self.id))
         return self
 
     def audit_log(self):
@@ -261,7 +264,27 @@ class Tool(ORJSONModel):
             "created_by": self.created_by,
             "updated_by": self.updated_by,
             "source": self.source,
+            "version": self.version,
+            "trace_id": self.trace_id,
+            "is_deleted": self.is_deleted,
         }
+
+    def update(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+        self.updated_at = datetime.utcnow()
+        self.version += 1
+        logger.info("Tool updated", id=str(self.id), version=self.version, trace_id=self.trace_id)
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.update()
+        logger.info("Tool soft deleted", id=str(self.id), trace_id=self.trace_id)
+
+    def restore(self):
+        self.is_deleted = False
+        self.update()
+        logger.info("Tool restored", id=str(self.id), trace_id=self.trace_id)
 
     def to_dict(self):
         return self.model_dump()
@@ -272,6 +295,22 @@ class Tool(ORJSONModel):
     @classmethod
     def from_json(cls, data: str):
         return cls.model_validate_json(data)
+
+    def to_training_example(self):
+        return {
+            "input": self.name,
+            "metadata": self.config,
+        }
+
+    @classmethod
+    def from_training_example(cls, example: dict):
+        return cls(name=example["input"], config=example.get("metadata", {}))
+
+    def send_to_kafka(self, topic="ml_training_examples", bootstrap_servers=None):
+        """
+        Envía este ejemplo a un topic de Kafka para el pipeline ML/LLM automatizado.
+        """
+        send_training_example_kafka(self, topic=topic, bootstrap_servers=bootstrap_servers)
 
     class Config:
         frozen = True

@@ -8,6 +8,7 @@ import logging
 import structlog
 import orjson
 from uuid6 import uuid7
+from agents.backend.onyx.server.features.utils.ml_data_pipeline import send_training_example_kafka
 
 logger = structlog.get_logger()
 
@@ -47,17 +48,21 @@ class ORJSONModel(OnyxBaseModel):
 
 
 class Password(ORJSONModel):
-    """
-    Modelo robusto de Password para producción.
-    """
+    __slots__ = (
+        'id', 'value', 'description', 'created_at', 'updated_at', 'created_by', 'updated_by',
+        'source', 'version', 'trace_id', 'is_deleted'
+    )
     id: UUID = Field(default_factory=uuid7)
     value: str = Field(..., min_length=8, max_length=128, description="Contraseña segura")
-    description: str | None = Field(default=None, description="Descripción opcional")
+    description: str | None = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    created_by: str | None = Field(default=None, description="Usuario que creó el registro")
-    updated_by: str | None = Field(default=None, description="Último usuario que modificó el registro")
-    source: str | None = Field(default=None, description="Origen del dato (api, import, etc)")
+    created_by: str | None = None
+    updated_by: str | None = None
+    source: str | None = None
+    version: int = 1
+    trace_id: str | None = None
+    is_deleted: bool = False
 
     def __repr__(self) -> str:
         return f"<Password id={self.id} description={self.description!r}>"
@@ -81,6 +86,8 @@ class Password(ORJSONModel):
     def check_value_and_description(self):
         if self.value and self.description and self.value in (self.description or ""):
             logger.warning("Description should not contain the password value", value=self.value)
+        if self.created_at > self.updated_at:
+            logger.warning("created_at is after updated_at", id=str(self.id))
         return self
 
     def __post_init_post_parse__(self):
@@ -94,7 +101,27 @@ class Password(ORJSONModel):
             "created_by": self.created_by,
             "updated_by": self.updated_by,
             "source": self.source,
+            "version": self.version,
+            "trace_id": self.trace_id,
+            "is_deleted": self.is_deleted,
         }
+
+    def update(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+        self.updated_at = datetime.utcnow()
+        self.version += 1
+        logger.info("Password updated", id=str(self.id), version=self.version, trace_id=self.trace_id)
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.update()
+        logger.info("Password soft deleted", id=str(self.id), trace_id=self.trace_id)
+
+    def restore(self):
+        self.is_deleted = False
+        self.update()
+        logger.info("Password restored", id=str(self.id), trace_id=self.trace_id)
 
     def to_dict(self):
         return self.model_dump()
@@ -105,6 +132,26 @@ class Password(ORJSONModel):
     @classmethod
     def from_json(cls, data: str):
         return cls.model_validate_json(data)
+
+    def to_training_example(self):
+        return {
+            "input": self.value,
+            "metadata": {"description": self.description},
+        }
+
+    @classmethod
+    def from_training_example(cls, example: dict):
+        return cls(value=example["input"], description=example["metadata"].get("description"))
+
+    def send_to_kafka(self, topic="ml_training_examples", bootstrap_servers=None):
+        """
+        Envía este ejemplo a un topic de Kafka para el pipeline ML/LLM automatizado.
+        """
+        send_training_example_kafka(self, topic=topic, bootstrap_servers=bootstrap_servers)
+
+    # Ejemplo de uso:
+    # pwd = Password(value="supersegura123")
+    # pwd.send_to_kafka(topic="ml_training_examples", bootstrap_servers=["localhost:9092"])
 
     class Config:
         frozen = True

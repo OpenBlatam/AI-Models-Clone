@@ -10,6 +10,7 @@ from onyx.server.documents.models import ConnectorCredentialPairDescriptor
 from onyx.server.documents.models import ConnectorSnapshot
 from onyx.server.documents.models import CredentialSnapshot
 from onyx.core.models import OnyxBaseModel
+from agents.backend.onyx.server.features.utils.ml_data_pipeline import send_training_example_kafka
 
 logger = structlog.get_logger()
 
@@ -49,18 +50,22 @@ class CheckDocSetPublicResponse(BaseModel):
 
 
 class DocumentSet(ORJSONModel):
-    """
-    Modelo robusto de DocumentSet para producción.
-    """
+    __slots__ = (
+        'id', 'name', 'documents', 'metadata', 'created_at', 'updated_at', 'created_by', 'updated_by',
+        'source', 'version', 'trace_id', 'is_deleted'
+    )
     id: UUID = Field(default_factory=uuid7)
     name: str = Field(..., min_length=2, max_length=128, description="Nombre del set de documentos")
     documents: list[str] = Field(default_factory=list, description="Lista de documentos")
     metadata: dict = Field(default_factory=dict, description="Metadatos adicionales")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    created_by: str | None = Field(default=None, description="Usuario que creó el registro")
-    updated_by: str | None = Field(default=None, description="Último usuario que modificó el registro")
-    source: str | None = Field(default=None, description="Origen del dato (api, import, etc)")
+    created_by: str | None = None
+    updated_by: str | None = None
+    source: str | None = None
+    version: int = 1
+    trace_id: str | None = None
+    is_deleted: bool = False
 
     @field_validator('name')
     def name_not_empty(cls, v):
@@ -69,24 +74,22 @@ class DocumentSet(ORJSONModel):
             raise ValueError("Name must not be empty")
         return v
 
-    @field_validator('documents')
-    def documents_is_list(cls, v):
-        if not isinstance(v, list):
-            logger.error("DocumentSet documents validation failed", value=v)
-            raise ValueError("Documents must be a list")
-        return v
+    @field_validator('documents', mode="before")
+    @classmethod
+    def list_or_empty(cls, v):
+        return v or []
 
-    @field_validator('metadata')
-    def metadata_is_dict(cls, v):
-        if not isinstance(v, dict):
-            logger.error("DocumentSet metadata validation failed", value=v)
-            raise ValueError("Metadata must be a dict")
-        return v
+    @field_validator('metadata', mode="before")
+    @classmethod
+    def dict_or_empty(cls, v):
+        return v or {}
 
     @model_validator(mode="after")
     def check_documents_and_metadata(self):
         if self.documents and not isinstance(self.metadata, dict):
             logger.warning("Metadata should be a dict if documents exist", documents=self.documents)
+        if self.created_at > self.updated_at:
+            logger.warning("created_at is after updated_at", id=str(self.id))
         return self
 
     def audit_log(self):
@@ -97,7 +100,27 @@ class DocumentSet(ORJSONModel):
             "created_by": self.created_by,
             "updated_by": self.updated_by,
             "source": self.source,
+            "version": self.version,
+            "trace_id": self.trace_id,
+            "is_deleted": self.is_deleted,
         }
+
+    def update(self, **kwargs):
+        for k, v in kwargs.items():
+            setattr(self, k, v)
+        self.updated_at = datetime.utcnow()
+        self.version += 1
+        logger.info("DocumentSet updated", id=str(self.id), version=self.version, trace_id=self.trace_id)
+
+    def soft_delete(self):
+        self.is_deleted = True
+        self.update()
+        logger.info("DocumentSet soft deleted", id=str(self.id), trace_id=self.trace_id)
+
+    def restore(self):
+        self.is_deleted = False
+        self.update()
+        logger.info("DocumentSet restored", id=str(self.id), trace_id=self.trace_id)
 
     def to_dict(self):
         return self.model_dump()
@@ -109,18 +132,16 @@ class DocumentSet(ORJSONModel):
     def from_json(cls, data: str):
         return cls.model_validate_json(data)
 
-    def __post_init_post_parse__(self):
-        logger.info("DocumentSet instantiated", id=str(self.id), name=self.name)
+    def to_training_example(self):
+        return {
+            "input": self.name,
+            "output": self.documents,
+            "metadata": self.metadata,
+        }
 
-    @field_validator("documents", mode="before")
     @classmethod
-    def list_or_empty(cls, v):
-        return v or []
-
-    @field_validator("metadata", mode="before")
-    @classmethod
-    def dict_or_empty(cls, v):
-        return v or {}
+    def from_training_example(cls, example: dict):
+        return cls(name=example["input"], documents=example.get("output", []), metadata=example.get("metadata", {}))
 
     @classmethod
     def from_model(cls, document_set_model: DocumentSetDBModel) -> "DocumentSet":
@@ -147,6 +168,16 @@ class DocumentSet(ORJSONModel):
             users=[user.id for user in document_set_model.users],
             groups=[group.id for group in document_set_model.groups],
         )
+
+    def send_to_kafka(self, topic="ml_training_examples", bootstrap_servers=None):
+        """
+        Envía este ejemplo a un topic de Kafka para el pipeline ML/LLM automatizado.
+        """
+        send_training_example_kafka(self, topic=topic, bootstrap_servers=bootstrap_servers)
+
+    # Ejemplo de uso:
+    # ds = DocumentSet(name="Set 1", documents=["doc1", "doc2"])
+    # ds.send_to_kafka(topic="ml_training_examples", bootstrap_servers=["localhost:9092"])
 
     class Config:
         frozen = True
