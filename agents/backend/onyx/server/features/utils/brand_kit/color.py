@@ -296,4 +296,89 @@ class BrandKitColor:
     @classmethod
     def from_data(cls, data: Dict[str, Any]) -> 'BrandKitColor':
         """Create color from data"""
-        return cls(**data) 
+        return cls(**data)
+
+    # --- Batch Methods & ML/LLM Ready Mejorados ---
+    @classmethod
+    def batch_to_dicts(cls, objs: List["BrandKitColor"]) -> List[dict]:
+        """Convierte una lista de BrandKitColor a lista de dicts, con métricas y logging."""
+        from prometheus_client import Counter
+        import structlog
+        logger = structlog.get_logger()
+        metric = Counter('brandkitcolor_batch_to_dicts_total', 'Total batch_to_dicts calls')
+        metric.inc()
+        try:
+            dicts = [obj.get_data() for obj in objs]
+            return dicts
+        except Exception as e:
+            logger.error("batch_to_dicts_error", error=str(e))
+            raise
+
+    @classmethod
+    def batch_from_dicts(cls, dicts: List[dict]) -> List["BrandKitColor"]:
+        """Convierte una lista de dicts a BrandKitColor, con métricas y logging."""
+        from prometheus_client import Counter
+        import structlog
+        logger = structlog.get_logger()
+        metric = Counter('brandkitcolor_batch_from_dicts_total', 'Total batch_from_dicts calls')
+        metric.inc()
+        try:
+            return [cls.from_data(d) for d in dicts]
+        except Exception as e:
+            logger.error("batch_from_dicts_error", error=str(e))
+            raise
+
+    @classmethod
+    def batch_to_numpy(cls, objs: List["BrandKitColor"]):
+        """Convierte una lista de BrandKitColor a un array numpy."""
+        import numpy as np
+        dicts = cls.batch_to_dicts(objs)
+        return np.array(dicts)
+
+    @classmethod
+    def batch_to_pandas(cls, objs: List["BrandKitColor"]):
+        """Convierte una lista de BrandKitColor a un DataFrame pandas."""
+        import pandas as pd
+        dicts = cls.batch_to_dicts(objs)
+        return pd.DataFrame(dicts)
+
+    @classmethod
+    def batch_deduplicate(cls, objs: List["BrandKitColor"], key="name") -> List["BrandKitColor"]:
+        """Elimina duplicados por key, validando unicidad y tipos."""
+        from prometheus_client import Counter
+        import structlog
+        logger = structlog.get_logger()
+        metric = Counter('brandkitcolor_batch_deduplicate_total', 'Total batch_deduplicate calls')
+        metric.inc()
+        seen = set()
+        result = []
+        for obj in objs:
+            k = getattr(obj, key, None)
+            if not isinstance(k, str):
+                logger.warning("batch_deduplicate_nonstring_key", key=key, value=k)
+                continue
+            if k not in seen:
+                seen.add(k)
+                result.append(obj)
+        return result
+
+    @classmethod
+    def to_training_example(cls, obj: "BrandKitColor") -> dict:
+        """Convierte un BrandKitColor a ejemplo de entrenamiento ML/LLM."""
+        import orjson
+        return orjson.loads(orjson.dumps(obj.get_data()))
+
+    @classmethod
+    def from_training_example(cls, data: dict) -> "BrandKitColor":
+        """Crea BrandKitColor desde ejemplo de entrenamiento."""
+        return cls.from_data(data)
+
+    @classmethod
+    def batch_to_training_examples(cls, objs: List["BrandKitColor"]) -> List[dict]:
+        """Batch a ejemplos de entrenamiento."""
+        return [cls.to_training_example(obj) for obj in objs]
+
+    @classmethod
+    def batch_from_training_examples(cls, dicts: List[dict]) -> List["BrandKitColor"]:
+        """Batch desde ejemplos de entrenamiento."""
+        return [cls.from_training_example(d) for d in dicts] 

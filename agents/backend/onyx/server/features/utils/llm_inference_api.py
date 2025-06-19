@@ -1,107 +1,113 @@
 """
-API de inferencia LLM con recarga automática del modelo fine-tuneado
-- FastAPI + Transformers
-- Soporte batch y control de parámetros de generación
-- Validación de entrada/salida con Pydantic
-- Endpoints /health y /version
-- Recarga en background cada 10 segundos
-- Uso de GPU si está disponible
+API de inferencia LLM enterprise, modular, instrumentada y lista para producción.
+- FastAPI + Transformers + structlog + Sentry + Prometheus + orjson
+- Seguridad, observabilidad, recarga automática, middlewares y mejores prácticas
 """
-from fastapi import FastAPI, Request
-from pydantic import BaseModel, Field
-from typing import List
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
+from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi.openapi.docs import get_swagger_ui_html
+from fastapi.responses import Response, ORJSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from starlette.status import HTTP_503_SERVICE_UNAVAILABLE
+from starlette.exceptions import HTTPException as StarletteHTTPException
+import sentry_sdk
 import os
-import time
-import threading
-import logging
+from .auth import check_auth, require_scope, login_for_access_token, refresh_token_endpoint
+from .model_loader import maybe_reload_model, load_model, device, model, tokenizer, last_loaded, background_reloader, startup_event
+from .logging_utils import logger
+from .metrics import REQUESTS, ERRORS, LATENCY, instrumentator
+from .schemas import GenerationRequest, BatchGenerationRequest, GenerationResponse, BatchGenerationResponse, TokenResponse, RefreshTokenRequest
 
-MODEL_PATH = './fine_tuned_model'
-CHECK_INTERVAL = 10  # segundos
+app = FastAPI(
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
+    default_response_class=ORJSONResponse,
+    title="LLM Inference API",
+    description="API de inferencia LLM lista para producción, modular y segura.",
+    version="1.0.0"
+)
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-app = FastAPI()
-model = None
-tokenizer = None
-last_loaded = 0
+# --- Middlewares producción ---
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+if os.getenv("TRUSTED_HOSTS"):
+    app.add_middleware(TrustedHostMiddleware, allowed_hosts=os.getenv("TRUSTED_HOSTS").split(","))
+if os.getenv("FORCE_HTTPS") == "1":
+    app.add_middleware(HTTPSRedirectMiddleware)
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
-
-class GenerationRequest(BaseModel):
-    prompt: str = Field(..., description="Prompt de entrada")
-    max_new_tokens: int = Field(32, ge=1, le=512)
-    temperature: float = Field(1.0, ge=0.0, le=2.0)
-    top_p: float = Field(1.0, ge=0.0, le=1.0)
-
-class BatchGenerationRequest(BaseModel):
-    prompts: List[str]
-    max_new_tokens: int = 32
-    temperature: float = 1.0
-    top_p: float = 1.0
-
-class GenerationResponse(BaseModel):
-    result: str
-
-class BatchGenerationResponse(BaseModel):
-    results: List[str]
-
-def get_model_mtime():
-    try:
-        return max(
-            os.path.getmtime(os.path.join(MODEL_PATH, f))
-            for f in os.listdir(MODEL_PATH)
-            if f.endswith('.bin') or f.endswith('.json') or f.endswith('.txt')
-        )
-    except Exception:
-        return 0
-
-def load_model():
-    global model, tokenizer, last_loaded
-    logging.info("Cargando modelo...")
-    model_ = AutoModelForCausalLM.from_pretrained(MODEL_PATH)
-    tokenizer_ = AutoTokenizer.from_pretrained(MODEL_PATH)
-    model_.to(device)
-    model_.eval()
-    last_loaded = get_model_mtime()
-    logging.info("Modelo cargado.")
-    return model_, tokenizer_
-
-def maybe_reload_model():
-    global model, tokenizer, last_loaded
-    try:
-        mtime = get_model_mtime()
-        if mtime > last_loaded or model is None or tokenizer is None:
-            m, t = load_model()
-            model, tokenizer = m, t
-            last_loaded = mtime
-    except Exception as e:
-        logging.error(f"Error comprobando recarga de modelo: {e}")
-
-def background_reloader():
-    while True:
-        maybe_reload_model()
-        time.sleep(CHECK_INTERVAL)
-
+# --- Instrumentación Prometheus ---
 @app.on_event("startup")
-def startup_event():
-    global model, tokenizer
-    model, tokenizer = load_model()
-    threading.Thread(target=background_reloader, daemon=True).start()
+def on_startup():
+    startup_event()
+    instrumentator.instrument(app).expose(app, include_in_schema=False, should_gzip=True)
 
-@app.get("/health")
+# --- Error handling global ---
+@app.exception_handler(Exception)
+def global_exception_handler(request: Request, exc: Exception):
+    logger.error({"event": "unhandled_exception", "error": str(exc)})
+    sentry_sdk.capture_exception(exc)
+    return ORJSONResponse(status_code=500, content={"detail": "Internal server error"})
+
+@app.exception_handler(StarletteHTTPException)
+def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    logger.warning({"event": "http_exception", "status_code": exc.status_code, "detail": exc.detail})
+    return ORJSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
+# --- Endpoints auth ---
+app.post("/token", response_model=TokenResponse)(login_for_access_token)
+app.post("/token/refresh", response_model=TokenResponse)(refresh_token_endpoint)
+
+# --- Endpoints health/readiness para K8s ---
+@app.get("/health", tags=["infra"])
 def health():
+    REQUESTS.labels(endpoint="health").inc()
     return {"status": "ok"}
 
-@app.get("/version")
-def version():
-    return {"model_path": MODEL_PATH, "last_loaded": last_loaded}
+@app.get("/readiness", tags=["infra"])
+def readiness():
+    # Puedes agregar lógica para readiness real (ej: modelo cargado, DB, etc)
+    if model is None or tokenizer is None:
+        raise HTTPException(status_code=HTTP_503_SERVICE_UNAVAILABLE, detail="Model not loaded")
+    return {"ready": True}
 
+@app.get("/version", tags=["infra"])
+def version():
+    REQUESTS.labels(endpoint="version").inc()
+    return {"model_path": getattr(model, 'model_path', None), "last_loaded": last_loaded}
+
+@app.get("/metrics", include_in_schema=False)
+def metrics():
+    from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+    return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
+@app.get("/docs")
+def custom_docs(auth=Depends(check_auth)):
+    return get_swagger_ui_html(openapi_url="/openapi.json", title="LLM Inference API Docs")
+
+@app.get("/openapi.json")
+def openapi(auth=Depends(check_auth)):
+    return app.openapi()
+
+# --- Endpoints de inferencia ---
 @app.post("/predict", response_model=GenerationResponse)
-async def predict(req: GenerationRequest):
+async def predict(
+    req: GenerationRequest,
+    request: Request,
+    auth=Depends(require_scope("llm:predict"))
+):
+    endpoint = "predict"
+    REQUESTS.labels(endpoint=endpoint).inc()
+    import time, uuid
+    start = time.time()
+    request_id = str(uuid.uuid4())
+    user = auth.get("user")
     try:
         maybe_reload_model()
         inputs = tokenizer(req.prompt, return_tensors="pt").to(device)
+        import torch
         with torch.no_grad():
             outputs = model.generate(
                 **inputs,
@@ -111,13 +117,28 @@ async def predict(req: GenerationRequest):
                 do_sample=True
             )
         result = tokenizer.decode(outputs[0], skip_special_tokens=True)
+        LATENCY.labels(endpoint=endpoint).observe(time.time() - start)
+        logger.info({"event": "predict", "request_id": request_id, "user": user})
         return {"result": result}
     except Exception as e:
-        logging.error(f"Error en inferencia: {e}")
-        return {"result": f"Error: {str(e)}"}
+        ERRORS.labels(endpoint=endpoint).inc()
+        LATENCY.labels(endpoint=endpoint).observe(time.time() - start)
+        logger.error({"event": "predict_error", "request_id": request_id, "user": user, "error": str(e)})
+        sentry_sdk.capture_exception(e)
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 @app.post("/batch_predict", response_model=BatchGenerationResponse)
-async def batch_predict(req: BatchGenerationRequest):
+async def batch_predict(
+    req: BatchGenerationRequest,
+    request: Request,
+    auth=Depends(require_scope("llm:predict"))
+):
+    endpoint = "batch_predict"
+    REQUESTS.labels(endpoint=endpoint).inc()
+    import time, uuid, torch
+    start = time.time()
+    request_id = str(uuid.uuid4())
+    user = auth.get("user")
     try:
         maybe_reload_model()
         results = []
@@ -133,14 +154,24 @@ async def batch_predict(req: BatchGenerationRequest):
                 )
             result = tokenizer.decode(outputs[0], skip_special_tokens=True)
             results.append(result)
+        LATENCY.labels(endpoint=endpoint).observe(time.time() - start)
+        logger.info({"event": "batch_predict", "request_id": request_id, "user": user})
         return {"results": results}
     except Exception as e:
-        logging.error(f"Error en batch inferencia: {e}")
-        return {"results": [f"Error: {str(e)}"]}
+        ERRORS.labels(endpoint=endpoint).inc()
+        LATENCY.labels(endpoint=endpoint).observe(time.time() - start)
+        logger.error({"event": "batch_predict_error", "request_id": request_id, "user": user, "error": str(e)})
+        sentry_sdk.capture_exception(e)
+        raise HTTPException(status_code=500, detail=f"Error: {str(e)}")
 
 """
-# Ejemplo de uso:
-# uvicorn agents.backend.onyx.server.features.utils.llm_inference_api:app --host 0.0.0.0 --port 8000
-# POST /predict {"prompt": "¿Cuál es la capital de Francia?", "max_new_tokens": 32}
-# POST /batch_predict {"prompts": ["Hola", "Adiós"]}
+# Ejemplo de healthcheck para K8s:
+# livenessProbe:
+#   httpGet:
+#     path: /health
+#     port: 8000
+# readinessProbe:
+#   httpGet:
+#     path: /readiness
+#     port: 8000
 """ 

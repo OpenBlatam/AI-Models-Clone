@@ -3,19 +3,148 @@ Permission Mixin - Onyx Integration
 Permission handling functionality for models.
 """
 from __future__ import annotations
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional, Set, Callable, TypeVar
 from dataclasses import dataclass, field
 from datetime import datetime
 from .base_types import PermissionType, PermissionStatus
+import msgspec
+import numpy as np
+import time
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+try:
+    from datadog import api as dd_api
+except ImportError:
+    dd_api = None
+try:
+    import sentry_sdk
+except ImportError:
+    sentry_sdk = None
 
-@dataclass
-class Permission:
-    """Permission data class."""
-    type: PermissionType
-    status: PermissionStatus = PermissionStatus.ACTIVE
-    granted_at: datetime = field(default_factory=datetime.utcnow)
-    expires_at: Optional[datetime] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+T = TypeVar("T")
+
+class Permission(msgspec.Struct, frozen=True, slots=True):
+    id: str
+    type: str
+    status: str
+    granted_at: str = msgspec.field(default_factory=lambda: datetime.utcnow().isoformat())
+    expires_at: str | None = None
+    metadata: dict = msgspec.field(default_factory=dict)
+
+    def as_tuple(self) -> tuple:
+        return (self.id, self.type, self.status, self.granted_at, self.expires_at, self.metadata)
+
+    @staticmethod
+    def batch_encode(items: List["Permission"]) -> bytes:
+        start = time.time()
+        out = msgspec.json.encode(items)
+        Permission._log_metric("batch_encode", len(items), time.time() - start)
+        return out
+
+    @staticmethod
+    def batch_decode(data: bytes) -> List["Permission"]:
+        start = time.time()
+        out = msgspec.json.decode(data, type=List[Permission])
+        Permission._log_metric("batch_decode", len(out), time.time() - start)
+        return out
+
+    @staticmethod
+    def batch_deduplicate(items: List["Permission"], key: Callable[[Any], Any] = lambda x: x.id) -> List["Permission"]:
+        start = time.time()
+        seen = set()
+        out = []
+        for item in items:
+            k = key(item)
+            if k not in seen:
+                seen.add(k)
+                out.append(item)
+        Permission._log_metric("batch_deduplicate", len(items), time.time() - start)
+        return out
+
+    @staticmethod
+    def batch_validate_unique(items: List["Permission"], key: Callable[[Any], Any] = lambda x: x.id) -> None:
+        seen = set()
+        for item in items:
+            k = key(item)
+            if k in seen:
+                Permission._log_error("duplicate_key", k)
+                raise ValueError(f"Duplicate key found: {k}")
+            seen.add(k)
+
+    @staticmethod
+    def batch_filter(items: List["Permission"], predicate: Callable[["Permission"], bool]) -> List["Permission"]:
+        return [item for item in items if predicate(item)]
+
+    @staticmethod
+    def batch_map(items: List["Permission"], func: Callable[["Permission"], T]) -> List[T]:
+        return [func(item) for item in items]
+
+    @staticmethod
+    def batch_groupby(items: List["Permission"], key: Callable[["Permission"], Any]) -> Dict[Any, List["Permission"]]:
+        groups = {}
+        for item in items:
+            k = key(item)
+            groups.setdefault(k, []).append(item)
+        return groups
+
+    @staticmethod
+    def batch_sort(items: List["Permission"], key: Callable[["Permission"], Any], reverse: bool = False) -> List["Permission"]:
+        return sorted(items, key=key, reverse=reverse)
+
+    @staticmethod
+    def batch_to_dicts(items: List["Permission"]) -> List[dict]:
+        return [item.__dict__ for item in items]
+
+    @staticmethod
+    def batch_from_dicts(dicts: List[dict]) -> List["Permission"]:
+        return [Permission(**d) for d in dicts]
+
+    @staticmethod
+    def batch_to_numpy(items: List["Permission"]):
+        arr = np.array([item.as_tuple() for item in items], dtype=object)
+        return arr
+
+    @staticmethod
+    def batch_to_pandas(items: List["Permission"]):
+        if pd is None:
+            raise ImportError("pandas is not installed")
+        return pd.DataFrame(Permission.batch_to_dicts(items))
+
+    @staticmethod
+    def batch_to_parquet(items: List["Permission"], path: str):
+        if pd is None:
+            raise ImportError("pandas is not installed")
+        Permission.batch_to_pandas(items).to_parquet(path)
+
+    @staticmethod
+    def batch_from_parquet(path: str) -> List["Permission"]:
+        if pd is None:
+            raise ImportError("pandas is not installed")
+        df = pd.read_parquet(path)
+        return Permission.batch_from_dicts(df.to_dict(orient="records"))
+
+    @staticmethod
+    def validate_batch(items: List["Permission"]) -> None:
+        for item in items:
+            if not item.id or not item.type or not item.status:
+                Permission._log_error("invalid_permission", item.id)
+                raise ValueError(f"Invalid Permission: {item}")
+
+    @staticmethod
+    def _log_metric(operation: str, count: int, duration: float):
+        if dd_api:
+            dd_api.Metric.send(
+                metric=f"permission.{operation}.duration",
+                points=duration,
+                tags=[f"count:{count}"]
+            )
+
+    @staticmethod
+    def _log_error(error_type: str, value: Any):
+        if sentry_sdk:
+            sentry_sdk.capture_message(f"Permission error: {error_type} - {value}")
 
 class PermissionMixin:
     """Mixin for permission handling functionality."""

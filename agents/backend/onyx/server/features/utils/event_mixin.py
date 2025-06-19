@@ -3,19 +3,148 @@ Event Mixin - Onyx Integration
 Event handling functionality for models.
 """
 from __future__ import annotations
-from typing import Any, Callable, Dict, List, Optional, Set
+from typing import Any, Callable, Dict, List, Optional, Set, TypeVar
 from dataclasses import dataclass, field
 from datetime import datetime
 from .base_types import EventType, EventStatus
+import msgspec
+import numpy as np
+import time
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
+try:
+    from datadog import api as dd_api
+except ImportError:
+    dd_api = None
+try:
+    import sentry_sdk
+except ImportError:
+    sentry_sdk = None
 
-@dataclass
-class Event:
-    """Event data class."""
-    type: EventType
-    status: EventStatus
-    timestamp: datetime = field(default_factory=datetime.utcnow)
-    data: Dict[str, Any] = field(default_factory=dict)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+T = TypeVar("T")
+
+class Event(msgspec.Struct, frozen=True, slots=True):
+    id: str
+    type: str
+    status: str
+    timestamp: str = msgspec.field(default_factory=lambda: datetime.utcnow().isoformat())
+    data: dict = msgspec.field(default_factory=dict)
+    metadata: dict = msgspec.field(default_factory=dict)
+
+    def as_tuple(self) -> tuple:
+        return (self.id, self.type, self.status, self.timestamp, self.data, self.metadata)
+
+    @staticmethod
+    def batch_encode(items: List["Event"]) -> bytes:
+        start = time.time()
+        out = msgspec.json.encode(items)
+        Event._log_metric("batch_encode", len(items), time.time() - start)
+        return out
+
+    @staticmethod
+    def batch_decode(data: bytes) -> List["Event"]:
+        start = time.time()
+        out = msgspec.json.decode(data, type=List[Event])
+        Event._log_metric("batch_decode", len(out), time.time() - start)
+        return out
+
+    @staticmethod
+    def batch_deduplicate(items: List["Event"], key: Callable[[Any], Any] = lambda x: x.id) -> List["Event"]:
+        start = time.time()
+        seen = set()
+        out = []
+        for item in items:
+            k = key(item)
+            if k not in seen:
+                seen.add(k)
+                out.append(item)
+        Event._log_metric("batch_deduplicate", len(items), time.time() - start)
+        return out
+
+    @staticmethod
+    def batch_validate_unique(items: List["Event"], key: Callable[[Any], Any] = lambda x: x.id) -> None:
+        seen = set()
+        for item in items:
+            k = key(item)
+            if k in seen:
+                Event._log_error("duplicate_key", k)
+                raise ValueError(f"Duplicate key found: {k}")
+            seen.add(k)
+
+    @staticmethod
+    def batch_filter(items: List["Event"], predicate: Callable[["Event"], bool]) -> List["Event"]:
+        return [item for item in items if predicate(item)]
+
+    @staticmethod
+    def batch_map(items: List["Event"], func: Callable[["Event"], T]) -> List[T]:
+        return [func(item) for item in items]
+
+    @staticmethod
+    def batch_groupby(items: List["Event"], key: Callable[["Event"], Any]) -> Dict[Any, List["Event"]]:
+        groups = {}
+        for item in items:
+            k = key(item)
+            groups.setdefault(k, []).append(item)
+        return groups
+
+    @staticmethod
+    def batch_sort(items: List["Event"], key: Callable[["Event"], Any], reverse: bool = False) -> List["Event"]:
+        return sorted(items, key=key, reverse=reverse)
+
+    @staticmethod
+    def batch_to_dicts(items: List["Event"]) -> List[dict]:
+        return [item.__dict__ for item in items]
+
+    @staticmethod
+    def batch_from_dicts(dicts: List[dict]) -> List["Event"]:
+        return [Event(**d) for d in dicts]
+
+    @staticmethod
+    def batch_to_numpy(items: List["Event"]):
+        arr = np.array([item.as_tuple() for item in items], dtype=object)
+        return arr
+
+    @staticmethod
+    def batch_to_pandas(items: List["Event"]):
+        if pd is None:
+            raise ImportError("pandas is not installed")
+        return pd.DataFrame(Event.batch_to_dicts(items))
+
+    @staticmethod
+    def batch_to_parquet(items: List["Event"], path: str):
+        if pd is None:
+            raise ImportError("pandas is not installed")
+        Event.batch_to_pandas(items).to_parquet(path)
+
+    @staticmethod
+    def batch_from_parquet(path: str) -> List["Event"]:
+        if pd is None:
+            raise ImportError("pandas is not installed")
+        df = pd.read_parquet(path)
+        return Event.batch_from_dicts(df.to_dict(orient="records"))
+
+    @staticmethod
+    def validate_batch(items: List["Event"]) -> None:
+        for item in items:
+            if not item.id or not item.type or not item.status:
+                Event._log_error("invalid_event", item.id)
+                raise ValueError(f"Invalid Event: {item}")
+
+    @staticmethod
+    def _log_metric(operation: str, count: int, duration: float):
+        if dd_api:
+            dd_api.Metric.send(
+                metric=f"event.{operation}.duration",
+                points=duration,
+                tags=[f"count:{count}"]
+            )
+
+    @staticmethod
+    def _log_error(error_type: str, value: Any):
+        if sentry_sdk:
+            sentry_sdk.capture_message(f"Event error: {error_type} - {value}")
 
 class EventMixin:
     """Mixin for event handling functionality."""

@@ -1,28 +1,21 @@
-from onyx.core.models import OnyxBaseModel
-from pydantic import field_validator, Field, ConfigDict, model_validator
-from uuid import UUID
+import msgspec
 from uuid6 import uuid7
 from datetime import datetime
-import structlog
-import orjson
-from agents.backend.onyx.server.features.utils.ml_data_pipeline import send_training_example_kafka
+from typing import List
+import numpy as np
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 
-logger = structlog.get_logger()
-
-class ORJSONModel(OnyxBaseModel):
-    model_config = ConfigDict(json_loads=orjson.loads, json_dumps=orjson.dumps)
-
-class Ad(ORJSONModel):
-    __slots__ = (
-        'id', 'title', 'content', 'metadata', 'created_at', 'updated_at', 'created_by', 'updated_by',
-        'source', 'version', 'trace_id', 'is_deleted'
-    )
-    id: UUID = Field(default_factory=uuid7)
-    title: str = Field(..., min_length=2, max_length=128, description="Título del anuncio")
-    content: str = Field(..., min_length=1, description="Contenido del anuncio")
-    metadata: dict = Field(default_factory=dict, description="Metadatos adicionales")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+class Ad(msgspec.Struct, frozen=True, slots=True):
+    __match_args__ = ("id", "title", "content", "metadata")
+    id: str = msgspec.field(default_factory=lambda: str(uuid7()))
+    title: str
+    content: str
+    metadata: dict = msgspec.field(default_factory=dict)
+    created_at: str = msgspec.field(default_factory=lambda: datetime.utcnow().isoformat())
+    updated_at: str = msgspec.field(default_factory=lambda: datetime.utcnow().isoformat())
     created_by: str | None = None
     updated_by: str | None = None
     source: str | None = None
@@ -30,103 +23,61 @@ class Ad(ORJSONModel):
     trace_id: str | None = None
     is_deleted: bool = False
 
-    @field_validator('title')
-    def title_not_empty(cls, v):
-        if not v or not v.strip():
-            logger.error("Ad title validation failed", value=v)
-            raise ValueError("Title must not be empty")
-        return v
+    def as_tuple(self) -> tuple:
+        return (self.id, self.title, self.content, self.metadata)
 
-    @field_validator('content')
-    def content_not_empty(cls, v):
-        if not v or not v.strip():
-            logger.error("Ad content validation failed", value=v)
-            raise ValueError("Content must not be empty")
-        return v
-
-    @field_validator('metadata', mode="before")
-    @classmethod
-    def dict_or_empty(cls, v):
-        return v or {}
-
-    @model_validator(mode="after")
-    def check_timestamps(self):
-        if self.created_at > self.updated_at:
-            logger.warning("created_at is after updated_at", id=str(self.id))
-        return self
-
-    def audit_log(self):
-        return {
-            "id": str(self.id),
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
-            "created_by": self.created_by,
-            "updated_by": self.updated_by,
-            "source": self.source,
-            "version": self.version,
-            "trace_id": self.trace_id,
-            "is_deleted": self.is_deleted,
-        }
-
-    def update(self, **kwargs):
-        for k, v in kwargs.items():
-            setattr(self, k, v)
-        self.updated_at = datetime.utcnow()
-        self.version += 1
-        logger.info("Ad updated", id=str(self.id), version=self.version, trace_id=self.trace_id)
-
-    def soft_delete(self):
-        self.is_deleted = True
-        self.update()
-        logger.info("Ad soft deleted", id=str(self.id), trace_id=self.trace_id)
-
-    def restore(self):
-        self.is_deleted = False
-        self.update()
-        logger.info("Ad restored", id=str(self.id), trace_id=self.trace_id)
-
-    def to_dict(self):
-        return self.model_dump()
-
-    def to_json(self):
-        return self.model_dump_json()
+    def to_training_example(self) -> dict:
+        return {"input": self.title, "output": self.content, "metadata": self.metadata}
 
     @classmethod
-    def from_json(cls, data: str):
-        return cls.model_validate_json(data)
-
-    def to_training_example(self):
-        return {
-            "input": self.title,
-            "output": self.content,
-            "metadata": self.metadata,
-        }
-
-    @classmethod
-    def from_training_example(cls, example: dict):
+    def from_training_example(cls, example: dict) -> "Ad":
         return cls(title=example["input"], content=example["output"], metadata=example.get("metadata", {}))
 
-    def send_to_kafka(self, topic="ml_training_examples", bootstrap_servers=None):
-        """
-        Envía este ejemplo a un topic de Kafka para el pipeline ML/LLM automatizado.
-        """
-        send_training_example_kafka(self, topic=topic, bootstrap_servers=bootstrap_servers)
+    @staticmethod
+    def batch_encode(ads: List["Ad"]) -> bytes:
+        return msgspec.json.encode(ads)
 
-    # Ejemplo de uso:
-    # ad = Ad(title="Oferta", content="Descuento especial")
-    # ad.send_to_kafka(topic="ml_training_examples", bootstrap_servers=["localhost:9092"])
+    @staticmethod
+    def batch_decode(data: bytes) -> List["Ad"]:
+        return msgspec.json.decode(data, type=List[Ad])
 
-    class Config:
-        frozen = True
-        validate_assignment = True
+    @staticmethod
+    def batch_deduplicate(ads: List["Ad"]) -> List["Ad"]:
+        seen = set()
+        out = []
+        for ad in ads:
+            if ad.id not in seen:
+                seen.add(ad.id)
+                out.append(ad)
+        return out
 
-    @field_validator('title')
-    def title_must_not_be_empty(cls, v):
-        if not v or not v.strip():
-            raise ValueError('Title must not be empty')
-        return v
-    @field_validator('content')
-    def content_must_not_be_empty(cls, v):
-        if not v or not v.strip():
-            raise ValueError('Content must not be empty')
-        return v 
+    @staticmethod
+    def batch_to_training_examples(ads: List["Ad"]) -> List[dict]:
+        return [{"input": ad.title, "output": ad.content, "metadata": ad.metadata} for ad in ads]
+
+    @staticmethod
+    def batch_from_training_examples(examples: List[dict]) -> List["Ad"]:
+        return [Ad.from_training_example(ex) for ex in examples]
+
+    @staticmethod
+    def batch_as_tuples(ads: List["Ad"]) -> List[tuple]:
+        return [ad.as_tuple() for ad in ads]
+
+    @staticmethod
+    def batch_to_dicts(ads: List["Ad"]) -> List[dict]:
+        return [ad.__dict__ for ad in ads]
+
+    @staticmethod
+    def batch_from_dicts(dicts: List[dict]) -> List["Ad"]:
+        return [Ad(**d) for d in dicts]
+
+    @staticmethod
+    def batch_to_numpy(ads: List["Ad"]):
+        arr = np.array([(d["id"], d["title"], d["content"], d["metadata"]) for d in Ad.batch_to_dicts(ads)], dtype=object)
+        return arr
+
+    @staticmethod
+    def batch_to_pandas(ads: List["Ad"]):
+        if pd is None:
+            raise ImportError("pandas is not installed")
+        return pd.DataFrame(Ad.batch_to_dicts(ads)) 

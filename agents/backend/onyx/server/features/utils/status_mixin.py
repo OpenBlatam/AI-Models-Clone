@@ -3,18 +3,83 @@ Status Mixin - Onyx Integration
 Status handling functionality for models.
 """
 from __future__ import annotations
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from .base_types import StatusType, StatusCategory
+import msgspec
+import numpy as np
+try:
+    import pandas as pd
+except ImportError:
+    pd = None
 
-@dataclass
-class Status:
-    """Status data class."""
-    type: StatusType
-    category: StatusCategory
-    timestamp: datetime = field(default_factory=datetime.utcnow)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+class Status(msgspec.Struct, frozen=True, slots=True):
+    id: str
+    type: str
+    category: str
+    timestamp: str = msgspec.field(default_factory=lambda: datetime.utcnow().isoformat())
+    metadata: dict = msgspec.field(default_factory=dict)
+
+    def as_tuple(self) -> tuple:
+        return (self.id, self.type, self.category, self.timestamp, self.metadata)
+
+    @staticmethod
+    def batch_encode(items: List["Status"]) -> bytes:
+        return msgspec.json.encode(items)
+
+    @staticmethod
+    def batch_decode(data: bytes) -> List["Status"]:
+        return msgspec.json.decode(data, type=List[Status])
+
+    @staticmethod
+    def batch_deduplicate(items: List["Status"], key: Callable[[Any], Any] = lambda x: x.id) -> List["Status"]:
+        seen = set()
+        out = []
+        for item in items:
+            k = key(item)
+            if k not in seen:
+                seen.add(k)
+                out.append(item)
+        return out
+
+    @staticmethod
+    def batch_to_dicts(items: List["Status"]) -> List[dict]:
+        return [item.__dict__ for item in items]
+
+    @staticmethod
+    def batch_from_dicts(dicts: List[dict]) -> List["Status"]:
+        return [Status(**d) for d in dicts]
+
+    @staticmethod
+    def batch_to_numpy(items: List["Status"]):
+        arr = np.array([item.as_tuple() for item in items], dtype=object)
+        return arr
+
+    @staticmethod
+    def batch_to_pandas(items: List["Status"]):
+        if pd is None:
+            raise ImportError("pandas is not installed")
+        return pd.DataFrame(Status.batch_to_dicts(items))
+
+    @staticmethod
+    def batch_to_parquet(items: List["Status"], path: str):
+        if pd is None:
+            raise ImportError("pandas is not installed")
+        Status.batch_to_pandas(items).to_parquet(path)
+
+    @staticmethod
+    def batch_from_parquet(path: str) -> List["Status"]:
+        if pd is None:
+            raise ImportError("pandas is not installed")
+        df = pd.read_parquet(path)
+        return Status.batch_from_dicts(df.to_dict(orient="records"))
+
+    @staticmethod
+    def validate_batch(items: List["Status"]) -> None:
+        for item in items:
+            if not item.id or not item.type or not item.category:
+                raise ValueError(f"Invalid Status: {item}")
 
 class StatusMixin:
     """Mixin for status handling functionality."""

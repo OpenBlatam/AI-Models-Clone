@@ -1154,6 +1154,66 @@ class BrandKit(OnyxBaseModel):
         data = await cls._scraper.scrape_website(url)
         return cls(**data)
 
+    # --- Batch Methods & ML/LLM Ready ---
+    @classmethod
+    def batch_to_dicts(cls, objs: List["BrandKit"]) -> List[dict]:
+        cls._metrics.operations.labels(operation='batch_to_dicts', status='start', component='model').inc()
+        dicts = [obj.get_data() for obj in objs]
+        cls._metrics.operations.labels(operation='batch_to_dicts', status='success', component='model').inc()
+        return dicts
+
+    @classmethod
+    def batch_from_dicts(cls, dicts: List[dict]) -> List["BrandKit"]:
+        cls._metrics.operations.labels(operation='batch_from_dicts', status='start', component='model').inc()
+        objs = [cls(**d) for d in dicts]
+        cls._metrics.operations.labels(operation='batch_from_dicts', status='success', component='model').inc()
+        return objs
+
+    @classmethod
+    def batch_to_numpy(cls, objs: List["BrandKit"]):
+        import numpy as np
+        dicts = cls.batch_to_dicts(objs)
+        arr = np.array(dicts)
+        cls._metrics.operations.labels(operation='batch_to_numpy', status='success', component='model').inc()
+        return arr
+
+    @classmethod
+    def batch_to_pandas(cls, objs: List["BrandKit"]):
+        import pandas as pd
+        dicts = cls.batch_to_dicts(objs)
+        df = pd.DataFrame(dicts)
+        cls._metrics.operations.labels(operation='batch_to_pandas', status='success', component='model').inc()
+        return df
+
+    @classmethod
+    def batch_deduplicate(cls, objs: List["BrandKit"], key="id") -> List["BrandKit"]:
+        seen = set()
+        result = []
+        for obj in objs:
+            k = getattr(obj, key, None)
+            if k not in seen:
+                seen.add(k)
+                result.append(obj)
+        cls._metrics.operations.labels(operation='batch_deduplicate', status='success', component='model').inc()
+        return result
+
+    @classmethod
+    def to_training_example(cls, obj: "BrandKit") -> dict:
+        # Minimal example for ML/LLM
+        return obj.get_data()
+
+    @classmethod
+    def from_training_example(cls, data: dict) -> "BrandKit":
+        return cls(**data)
+
+    @classmethod
+    def batch_to_training_examples(cls, objs: List["BrandKit"]) -> List[dict]:
+        return [cls.to_training_example(obj) for obj in objs]
+
+    @classmethod
+    def batch_from_training_examples(cls, dicts: List[dict]) -> List["BrandKit"]:
+        return [cls.from_training_example(d) for d in dicts]
+
 # Example usage:
 """
 # Create brand kit from website
