@@ -14,6 +14,7 @@ from .analytics import AnalyticsInfo
 from .multimedia import MultimediaInfo
 from .review import ReviewInfo
 from .langchain_models import LangChainAnalysis, ContentOptimization, ShortVideoOptimization
+from .suggestions import suggest_music, suggest_visual_styles, suggest_sound_effects, suggest_transitions
 
 try:
     import pandas as pd
@@ -338,14 +339,21 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
         gender: str = None,
         voice_name: str = None,
         emotion: str = None,
+        background_music: str = None,
+        visual_style: str = None,
+        music_selector: callable = None,
+        visual_selector: callable = None,
+        sound_selector: callable = None,
+        transition_selector: callable = None,
         **kwargs
     ) -> "AIVideo":
         """
         Genera un voiceover (voz en off) a partir del guion del video usando TTS.
-        Selecciona automáticamente el motor óptimo según idioma, tono/emoción y credenciales si tts_engine es None.
+        Selecciona automáticamente el motor óptimo según idioma, tono/emoción (usando modelo NLP si está disponible) y credenciales si tts_engine es None.
+        Sugiere música de fondo, estilo visual, efectos de sonido y transiciones según la emoción detectada (puedes override manual o pasar funciones de selección personalizadas).
         Si se usa ElevenLabs y no se pasa voice_id, selecciona automáticamente la mejor voz según idioma, género, nombre y tono/emoción inferido del texto.
         Si falla un motor y fallback=True, prueba otros motores compatibles.
-        Registra en metadata el motor, voz, emoción y cualquier error.
+        Registra en metadata el motor, voz, emoción, música, estilo visual, efectos, transiciones y cualquier error.
         Args:
             tts_engine: "gtts", "pyttsx3", "google", "azure", "elevenlabs" o None (auto)
             lang: idioma del TTS (por defecto 'es')
@@ -356,11 +364,24 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
             gender: "male", "female" o None (auto)
             voice_name: nombre preferido de la voz (opcional)
             emotion: tono/emoción preferido ("alegre", "serio", "juvenil", etc; si None, se infiere del texto)
+            background_music: override manual de música sugerida
+            visual_style: override manual de estilo visual sugerido
+            music_selector: función personalizada para elegir música (recibe lista de sugerencias y metadata)
+            visual_selector: función personalizada para elegir estilo visual (recibe lista de sugerencias y metadata)
+            sound_selector: función personalizada para elegir efectos de sonido (recibe lista y metadata)
+            transition_selector: función personalizada para elegir transiciones (recibe lista y metadata)
             kwargs: credenciales/config extra para motores cloud
         Returns:
             Nueva instancia de AIVideo con el audio generado en multimedia y metadata.
+        Notas:
+            Si tienes transformers instalado, se usará un modelo de clasificación de emociones (ej: "j-hartmann/emotion-english-distilroberta-base" o "mrm8488/t5-base-finetuned-emotion-spanish") para inferir la emoción del texto.
+            Instala con: pip install transformers torch
+            Puedes pasar funciones selectoras para música, visual, efectos y transiciones:
+                def my_selector(options, meta):
+                    return options[0]
+                video.generate_voiceover(music_selector=my_selector, sound_selector=my_selector)
         Ejemplo:
-            video.generate_voiceover(lang="es", api_key="...", emotion="alegre", log=True)
+            video.generate_voiceover(lang="es", api_key="...", log=True)
         """
         import os
         import logging
@@ -378,21 +399,70 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
         selected_engine = tts_engine
         selected_voice = None
         detected_emotion = emotion
+        emotion_confidence = None
         # Inferir emoción/tono si no se pasa
         if not detected_emotion:
-            # Simple análisis de palabras clave (puedes mejorar con modelos NLP)
-            cheerful = ["feliz", "alegre", "divertido", "entusiasta", "positivo", "optimista", "energía", "sonríe"]
-            serious = ["serio", "profundo", "formal", "importante", "reflexivo", "profesional", "tranquilo"]
-            youth = ["joven", "juvenil", "dinámico", "moderno", "fresco", "nuevo"]
-            s = script.lower()
-            if any(w in s for w in cheerful):
-                detected_emotion = "alegre"
-            elif any(w in s for w in serious):
-                detected_emotion = "serio"
-            elif any(w in s for w in youth):
-                detected_emotion = "juvenil"
-            else:
-                detected_emotion = "neutral"
+            try:
+                from transformers import pipeline
+                # Selección de modelo según idioma
+                if lang.startswith("es"):
+                    model_name = "mrm8488/t5-base-finetuned-emotion-spanish"
+                    nlp = pipeline("text2text-generation", model=model_name)
+                    result = nlp(script)
+                    detected_emotion = result[0]["generated_text"].strip().lower()
+                    emotion_confidence = 1.0  # T5 no da score, asumimos 1.0
+                else:
+                    model_name = "j-hartmann/emotion-english-distilroberta-base"
+                    nlp = pipeline("text-classification", model=model_name, top_k=1)
+                    result = nlp(script)
+                    detected_emotion = result[0]["label"].lower()
+                    emotion_confidence = float(result[0]["score"])
+                if log:
+                    logger.info(f"Emoción detectada por modelo NLP: {detected_emotion} (confianza={emotion_confidence})")
+            except Exception as e:
+                if log:
+                    logger.warning(f"No se pudo usar modelo NLP para emoción: {e}. Usando palabras clave.")
+                # Fallback palabras clave
+                cheerful = ["feliz", "alegre", "divertido", "entusiasta", "positivo", "optimista", "energía", "sonríe"]
+                serious = ["serio", "profundo", "formal", "importante", "reflexivo", "profesional", "tranquilo"]
+                youth = ["joven", "juvenil", "dinámico", "moderno", "fresco", "nuevo"]
+                s = script.lower()
+                if any(w in s for w in cheerful):
+                    detected_emotion = "alegre"
+                elif any(w in s for w in serious):
+                    detected_emotion = "serio"
+                elif any(w in s for w in youth):
+                    detected_emotion = "juvenil"
+                else:
+                    detected_emotion = "neutral"
+                emotion_confidence = None
+        # Sugerir música, estilo visual, efectos y transiciones según emoción (override manual si se pasa)
+        music_options = suggest_music(detected_emotion)
+        visual_options = suggest_visual_styles(detected_emotion)
+        sound_options = suggest_sound_effects(detected_emotion)
+        transition_options = suggest_transitions(detected_emotion)
+        # Permitir función personalizada
+        if music_selector:
+            suggested_music = music_selector(music_options, self.metadata)
+        else:
+            suggested_music = background_music or music_options[0]
+        if visual_selector:
+            suggested_visual = visual_selector(visual_options, self.metadata)
+        else:
+            suggested_visual = visual_style or visual_options[0]
+        if sound_selector:
+            suggested_sound = sound_selector(sound_options, self.metadata)
+        else:
+            suggested_sound = sound_options[0]
+        if transition_selector:
+            suggested_transition = transition_selector(transition_options, self.metadata)
+        else:
+            suggested_transition = transition_options[0]
+        if log:
+            logger.info(f"Opciones de música: {music_options}, sugerida: {suggested_music}")
+            logger.info(f"Opciones de visual: {visual_options}, sugerido: {suggested_visual}")
+            logger.info(f"Opciones de efectos: {sound_options}, sugerido: {suggested_sound}")
+            logger.info(f"Opciones de transiciones: {transition_options}, sugerida: {suggested_transition}")
         # Prioridad: ElevenLabs > Google > Azure > gTTS > pyttsx3
         if not selected_engine:
             if "api_key" in kwargs:
@@ -542,6 +612,16 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
         if selected_voice:
             new_metadata["voiceover_voice"] = selected_voice
         new_metadata["voiceover_emotion"] = detected_emotion
+        if emotion_confidence is not None:
+            new_metadata["voiceover_emotion_confidence"] = emotion_confidence
+        new_metadata["background_music"] = suggested_music
+        new_metadata["background_music_options"] = music_options
+        new_metadata["visual_style"] = suggested_visual
+        new_metadata["visual_style_options"] = visual_options
+        new_metadata["sound_effects"] = suggested_sound
+        new_metadata["sound_effects_options"] = sound_options
+        new_metadata["transitions"] = suggested_transition
+        new_metadata["transitions_options"] = transition_options
         if errors:
             new_metadata["voiceover_errors"] = errors
         return self.update(multimedia=new_multimedia, metadata=new_metadata) 
