@@ -1,13 +1,15 @@
 """
-Enhanced Viral Video Processor
+Viral Video Processor
 
-Advanced processor for viral video content generation with sophisticated video editing capabilities.
+Advanced processor for generating viral video variants with enhanced editing capabilities.
+Enhanced with LangChain integration for intelligent content analysis and optimization.
 """
 
 from __future__ import annotations
-from typing import List, Dict, Optional, Union, Tuple
+from typing import List, Dict, Optional, Union, Any, Tuple
 import asyncio
 import time
+import uuid
 import structlog
 from dataclasses import dataclass
 
@@ -20,13 +22,20 @@ from ..models.viral_models import (
     ScreenDivision,
     Transition,
     VideoEffect,
+    LangChainAnalysis,
+    ContentOptimization,
+    ShortVideoOptimization,
+    ContentType,
+    EngagementType,
     TransitionType,
     ScreenDivisionType,
     CaptionStyle,
     VideoEffect as VideoEffectEnum,
     create_default_caption_config,
     create_split_screen_layout,
-    create_viral_transition
+    create_viral_transition,
+    serializer,
+    batch_serializer
 )
 from ..utils.parallel_utils import (
     HybridParallelProcessor,
@@ -34,204 +43,398 @@ from ..utils.parallel_utils import (
     ParallelConfig,
     parallel_map
 )
-from ..utils.batch_utils import batch_process_with_validation
+from .langchain_processor import LangChainVideoProcessor, LangChainConfig
 
 logger = structlog.get_logger()
 
 # =============================================================================
-# ENHANCED VIRAL PROCESSOR
+# CONFIGURATION
 # =============================================================================
 
 @dataclass(slots=True)
-class ViralProcessingConfig:
+class ViralProcessorConfig:
     """Configuration for viral video processing."""
-    # Caption generation
-    max_captions_per_video: int = 5
-    caption_style_variations: int = 3
-    use_ai_caption_generation: bool = True
+    # Processing settings
+    max_variants: int = 10
+    min_viral_score: float = 0.3
+    max_processing_time: float = 300.0  # 5 minutes
     
-    # Video editing
+    # Quality settings
+    min_caption_length: int = 10
+    max_caption_length: int = 200
+    min_caption_duration: float = 2.0
+    max_caption_duration: float = 8.0
+    
+    # Editing settings
     enable_screen_division: bool = True
     enable_transitions: bool = True
     enable_effects: bool = True
     enable_animations: bool = True
     
-    # Viral optimization
-    viral_keywords: List[str] = None
-    trending_topics: List[str] = None
-    audience_profiles: List[Dict] = None
+    # LangChain integration
+    enable_langchain: bool = True
+    langchain_api_key: Optional[str] = None
+    langchain_model: str = "gpt-4"
     
-    # Performance
-    parallel_workers: int = 8
-    batch_size: int = 100
-    timeout_seconds: float = 300.0
+    # Performance settings
+    batch_size: int = 5
+    max_workers: int = 4
+    timeout: float = 60.0
     
-    def __post_init__(self):
-        if self.viral_keywords is None:
-            self.viral_keywords = [
-                "viral", "trending", "must_see", "incredible", "amazing",
-                "unbelievable", "shocking", "mind_blowing", "epic", "legendary"
-            ]
-        if self.trending_topics is None:
-            self.trending_topics = [
-                "tech", "entertainment", "news", "sports", "lifestyle",
-                "food", "travel", "fitness", "fashion", "gaming"
-            ]
-        if self.audience_profiles is None:
-            self.audience_profiles = [
-                {"age": "18-25", "interests": ["social_media", "entertainment"]},
-                {"age": "26-35", "interests": ["tech", "lifestyle"]},
-                {"age": "36-50", "interests": ["news", "education"]}
-            ]
+    # Advanced settings
+    enable_audit_logging: bool = True
+    enable_performance_tracking: bool = True
+    enable_error_recovery: bool = True
 
-class EnhancedViralVideoProcessor:
-    """Enhanced viral video processor with advanced editing capabilities."""
+# =============================================================================
+# VIRAL PROCESSOR
+# =============================================================================
+
+class ViralVideoProcessor:
+    """Advanced processor for generating viral video variants with LangChain optimization."""
     
-    def __init__(self, config: Optional[ViralProcessingConfig] = None):
-        self.config = config or ViralProcessingConfig()
+    def __init__(self, config: Optional[ViralProcessorConfig] = None):
+        self.config = config or ViralProcessorConfig()
+        
+        # Initialize parallel processor
         self.parallel_processor = HybridParallelProcessor(
             ParallelConfig(
-                max_workers=self.config.parallel_workers,
+                max_workers=self.config.max_workers,
                 chunk_size=self.config.batch_size,
-                timeout=self.config.timeout_seconds
+                timeout=self.config.timeout
             )
         )
-        self.caption_generator = ViralCaptionGenerator()
-        self.video_editor = ViralVideoEditor()
-        self.viral_optimizer = ViralOptimizer()
         
-    def process_viral(
+        # Initialize LangChain processor if enabled
+        self.langchain_processor = None
+        if self.config.enable_langchain:
+            try:
+                langchain_config = LangChainConfig(
+                    openai_api_key=self.config.langchain_api_key,
+                    model_name=self.config.langchain_model,
+                    batch_size=self.config.batch_size,
+                    enable_content_analysis=True,
+                    enable_engagement_analysis=True,
+                    enable_viral_analysis=True,
+                    enable_title_optimization=True,
+                    enable_caption_optimization=True,
+                    enable_timing_optimization=True
+                )
+                self.langchain_processor = LangChainVideoProcessor(langchain_config)
+                logger.info("LangChain processor initialized successfully")
+            except Exception as e:
+                logger.warning("Failed to initialize LangChain processor", error=str(e))
+                self.langchain_processor = None
+    
+    def process_viral_variants(
         self,
         request: VideoClipRequest,
-        n_variants: int = 5,
+        n_variants: Optional[int] = None,
         audience_profile: Optional[Dict] = None,
-        experiment_id: Optional[str] = None
+        use_langchain: Optional[bool] = None
     ) -> ViralVideoBatchResponse:
-        """Process a single video request into viral variants."""
+        """Process video to generate viral variants with LangChain optimization."""
         start_time = time.perf_counter()
         
         try:
-            # Generate viral captions
-            captions = self.caption_generator.generate_captions(
-                request, n_variants, audience_profile
-            )
+            # Determine if LangChain should be used
+            use_langchain = use_langchain if use_langchain is not None else self.config.enable_langchain
             
-            # Create video variants with advanced editing
-            variants = []
-            for i, caption_config in enumerate(captions):
-                variant = self._create_viral_variant(
-                    request, caption_config, i, audience_profile
-                )
-                variants.append(variant)
-            
-            # Optimize variants for viral potential
-            optimized_variants = self.viral_optimizer.optimize_variants(variants)
-            
-            processing_time = time.perf_counter() - start_time
-            
-            return ViralVideoBatchResponse(
-                success=True,
-                original_clip_id=request.youtube_url,
-                variants=optimized_variants,
-                processing_time=processing_time,
-                total_variants_generated=len(optimized_variants),
-                successful_variants=len(optimized_variants),
-                average_viral_score=sum(v.viral_score for v in optimized_variants) / len(optimized_variants),
-                best_viral_score=max(v.viral_score for v in optimized_variants),
-                batch_id=experiment_id
-            )
-            
+            # Use LangChain if available and enabled
+            if use_langchain and self.langchain_processor:
+                logger.info("Processing with LangChain optimization")
+                return self._process_with_langchain(request, n_variants, audience_profile)
+            else:
+                logger.info("Processing with standard optimization")
+                return self._process_standard(request, n_variants, audience_profile)
+                
         except Exception as e:
-            logger.error("Viral processing failed", error=str(e), request=request.youtube_url)
+            logger.error("Viral processing failed", error=str(e))
             return ViralVideoBatchResponse(
                 success=False,
                 original_clip_id=request.youtube_url,
                 errors=[str(e)]
             )
     
-    def process_batch_parallel(
-        self,
-        requests: List[VideoClipRequest],
-        n_variants: int = 5,
-        audience_profile: Optional[Dict] = None,
-        experiment_id: Optional[str] = None
-    ) -> List[ViralVideoBatchResponse]:
-        """Process multiple video requests in parallel."""
-        def process_single(request):
-            return self.process_viral(request, n_variants, audience_profile, experiment_id)
-        
-        return self.parallel_processor.map(process_single, requests)
-    
-    async def process_batch_async(
-        self,
-        requests: List[VideoClipRequest],
-        n_variants: int = 5,
-        audience_profile: Optional[Dict] = None,
-        experiment_id: Optional[str] = None
-    ) -> List[ViralVideoBatchResponse]:
-        """Process multiple video requests asynchronously."""
-        async def process_single_async(request):
-            return await asyncio.to_thread(
-                self.process_viral, request, n_variants, audience_profile, experiment_id
-            )
-        
-        tasks = [process_single_async(request) for request in requests]
-        return await asyncio.gather(*tasks)
-    
-    def _create_viral_variant(
+    def _process_with_langchain(
         self,
         request: VideoClipRequest,
-        caption_config: ViralCaptionConfig,
+        n_variants: Optional[int],
+        audience_profile: Optional[Dict]
+    ) -> ViralVideoBatchResponse:
+        """Process with LangChain optimization."""
+        try:
+            n_variants = n_variants or self.config.max_variants
+            
+            # Use LangChain processor
+            response = self.langchain_processor.process_video_with_langchain(
+                request=request,
+                n_variants=n_variants,
+                audience_profile=audience_profile
+            )
+            
+            # Enhance with additional viral features
+            enhanced_variants = self._enhance_variants_with_viral_features(
+                response.variants, request, audience_profile
+            )
+            
+            # Update response with enhanced variants
+            response.variants = enhanced_variants
+            response.successful_variants = len(enhanced_variants)
+            response.average_viral_score = sum(v.viral_score for v in enhanced_variants) / len(enhanced_variants)
+            response.best_viral_score = max(v.viral_score for v in enhanced_variants)
+            
+            return response
+            
+        except Exception as e:
+            logger.error("LangChain processing failed, falling back to standard", error=str(e))
+            return self._process_standard(request, n_variants, audience_profile)
+    
+    def _process_standard(
+        self,
+        request: VideoClipRequest,
+        n_variants: Optional[int],
+        audience_profile: Optional[Dict]
+    ) -> ViralVideoBatchResponse:
+        """Process with standard optimization."""
+        try:
+            n_variants = n_variants or self.config.max_variants
+            
+            # Generate variants in parallel
+            variant_tasks = []
+            for i in range(n_variants):
+                task = self._generate_viral_variant_async(
+                    request, i, audience_profile
+                )
+                variant_tasks.append(task)
+            
+            # Execute tasks
+            variants = asyncio.run(self._execute_variant_tasks(variant_tasks))
+            
+            # Filter and optimize variants
+            filtered_variants = self._filter_and_optimize_variants(variants)
+            
+            processing_time = time.perf_counter() - start_time
+            
+            return ViralVideoBatchResponse(
+                success=True,
+                original_clip_id=request.youtube_url,
+                variants=filtered_variants,
+                processing_time=processing_time,
+                total_variants_generated=len(variants),
+                successful_variants=len(filtered_variants),
+                average_viral_score=sum(v.viral_score for v in filtered_variants) / len(filtered_variants) if filtered_variants else 0.0,
+                best_viral_score=max(v.viral_score for v in filtered_variants) if filtered_variants else 0.0
+            )
+            
+        except Exception as e:
+            logger.error("Standard processing failed", error=str(e))
+            return ViralVideoBatchResponse(
+                success=False,
+                original_clip_id=request.youtube_url,
+                errors=[str(e)]
+            )
+    
+    async def _execute_variant_tasks(self, tasks: List) -> List[ViralVideoVariant]:
+        """Execute variant generation tasks."""
+        try:
+            results = await asyncio.gather(*tasks, return_exceptions=True)
+            
+            variants = []
+            for result in results:
+                if isinstance(result, Exception):
+                    logger.error("Variant generation failed", error=str(result))
+                elif result is not None:
+                    variants.append(result)
+            
+            return variants
+            
+        except Exception as e:
+            logger.error("Task execution failed", error=str(e))
+            return []
+    
+    async def _generate_viral_variant_async(
+        self,
+        request: VideoClipRequest,
         variant_index: int,
         audience_profile: Optional[Dict]
-    ) -> ViralVideoVariant:
-        """Create a single viral variant with advanced editing."""
-        # Generate captions
-        captions = self.caption_generator.generate_caption_segments(caption_config)
-        
-        # Create screen division if enabled
-        screen_division = None
-        if self.config.enable_screen_division and variant_index % 2 == 0:
-            screen_division = self._create_screen_division(variant_index)
-        
-        # Create transitions
-        transitions = []
-        if self.config.enable_transitions:
-            transitions = self._create_transitions(variant_index)
-        
-        # Create video effects
-        effects = []
-        if self.config.enable_effects:
-            effects = self._create_video_effects(variant_index)
-        
-        # Calculate viral metrics
-        viral_score = self.viral_optimizer.calculate_viral_score(
-            captions, screen_division, transitions, effects, audience_profile
-        )
-        
-        return ViralVideoVariant(
-            variant_id=f"viral_{request.youtube_url}_{variant_index}",
-            title=self._generate_viral_title(caption_config),
-            description=self._generate_viral_description(caption_config),
-            viral_score=viral_score,
-            engagement_prediction=viral_score * 0.8,
-            captions=captions,
-            screen_division=screen_division,
-            transitions=transitions,
-            effects=effects,
-            total_duration=request.max_clip_length,
-            estimated_views=int(viral_score * 10000),
-            estimated_likes=int(viral_score * 5000),
-            estimated_shares=int(viral_score * 2000),
-            estimated_comments=int(viral_score * 1000),
-            tags=self._generate_tags(caption_config),
-            hashtags=self._generate_hashtags(caption_config),
-            target_audience=self._get_target_audience(audience_profile),
-            generation_time=time.perf_counter()
-        )
+    ) -> Optional[ViralVideoVariant]:
+        """Generate a viral variant asynchronously."""
+        try:
+            # Create base configuration
+            config = create_default_caption_config()
+            
+            # Generate captions
+            captions = await self._generate_viral_captions_async(
+                request, config, variant_index, audience_profile
+            )
+            
+            # Generate screen division
+            screen_division = self._generate_screen_division(variant_index)
+            
+            # Generate transitions
+            transitions = self._generate_transitions(variant_index)
+            
+            # Generate effects
+            effects = self._generate_effects(variant_index)
+            
+            # Calculate viral score
+            viral_score = self._calculate_viral_score(
+                captions, screen_division, transitions, effects, audience_profile
+            )
+            
+            # Create variant
+            variant = ViralVideoVariant(
+                variant_id=f"viral_variant_{request.youtube_url}_{variant_index}_{uuid.uuid4().hex[:8]}",
+                title=self._generate_viral_title(request, variant_index),
+                description=self._generate_viral_description(request, variant_index),
+                viral_score=viral_score,
+                engagement_prediction=viral_score * 0.9,
+                captions=captions,
+                screen_division=screen_division,
+                transitions=transitions,
+                effects=effects,
+                total_duration=request.max_clip_length,
+                estimated_views=int(viral_score * 10000),
+                estimated_likes=int(viral_score * 5000),
+                estimated_shares=int(viral_score * 2000),
+                estimated_comments=int(viral_score * 1000),
+                tags=self._generate_viral_tags(request, variant_index),
+                hashtags=self._generate_viral_hashtags(request, variant_index),
+                target_audience=self._get_target_audience(audience_profile),
+                created_at=time.time(),
+                generation_time=time.perf_counter(),
+                model_version="v3.0"
+            )
+            
+            return variant
+            
+        except Exception as e:
+            logger.error(f"Variant {variant_index} generation failed", error=str(e))
+            return None
     
-    def _create_screen_division(self, variant_index: int) -> ScreenDivision:
-        """Create screen division based on variant index."""
+    async def _generate_viral_captions_async(
+        self,
+        request: VideoClipRequest,
+        config: ViralCaptionConfig,
+        variant_index: int,
+        audience_profile: Optional[Dict]
+    ) -> List[CaptionSegment]:
+        """Generate viral captions asynchronously."""
+        try:
+            captions = []
+            
+            # Generate hook caption
+            hook_caption = CaptionSegment(
+                text=self._generate_hook_text(variant_index),
+                start_time=0.5,
+                end_time=3.5,
+                font_size=28,
+                font_color="#FF6B6B",
+                styles=[CaptionStyle.BOLD, CaptionStyle.SHADOW],
+                animation="fade_in",
+                engagement_score=0.9,
+                viral_potential=0.8,
+                audience_relevance=0.85
+            )
+            captions.append(hook_caption)
+            
+            # Generate main captions
+            main_captions = self._generate_main_captions(variant_index, config)
+            captions.extend(main_captions)
+            
+            # Generate CTA caption
+            cta_caption = CaptionSegment(
+                text=self._generate_cta_text(variant_index),
+                start_time=request.max_clip_length - 3.0,
+                end_time=request.max_clip_length - 0.5,
+                font_size=24,
+                font_color="#4ECDC4",
+                styles=[CaptionStyle.BOLD],
+                animation="slide_up",
+                engagement_score=0.7,
+                viral_potential=0.6,
+                audience_relevance=0.75
+            )
+            captions.append(cta_caption)
+            
+            return captions
+            
+        except Exception as e:
+            logger.error("Caption generation failed", error=str(e))
+            return self._create_fallback_captions(variant_index)
+    
+    def _generate_hook_text(self, variant_index: int) -> str:
+        """Generate hook text for captions."""
+        hooks = [
+            "🔥 This is going VIRAL! 🔥",
+            "🚨 You won't BELIEVE this! 🚨",
+            "💥 This just BROKE the internet! 💥",
+            "👀 Wait for it... 👀",
+            "🎯 This is INSANE! 🎯",
+            "⚡ This is the FUTURE! ⚡",
+            "🌟 This will BLOW your mind! 🌟",
+            "🔥 The internet is OBSESSED! 🔥",
+            "🚀 This is NEXT LEVEL! 🚀",
+            "💯 This is PURE GOLD! 💯"
+        ]
+        return hooks[variant_index % len(hooks)]
+    
+    def _generate_main_captions(self, variant_index: int, config: ViralCaptionConfig) -> List[CaptionSegment]:
+        """Generate main captions."""
+        captions = []
+        
+        main_texts = [
+            "This content is absolutely AMAZING! 🤯",
+            "You need to see this RIGHT NOW! 👀",
+            "This is what everyone is talking about! 🗣️",
+            "This will change everything! 🔄",
+            "The best thing you'll see today! 🏆",
+            "This is pure GENIUS! 🧠",
+            "You won't regret watching this! ✅",
+            "This is the content we all need! ❤️",
+            "This is absolutely INCREDIBLE! 😱",
+            "This is what viral looks like! 📈"
+        ]
+        
+        for i, text in enumerate(main_texts[:3]):  # Limit to 3 main captions
+            caption = CaptionSegment(
+                text=text,
+                start_time=4.0 + (i * 3.0),
+                end_time=7.0 + (i * 3.0),
+                font_size=24,
+                font_color="#FFFFFF",
+                styles=[CaptionStyle.ITALIC],
+                animation="slide_in",
+                engagement_score=0.7 + (i * 0.1),
+                viral_potential=0.6 + (i * 0.1),
+                audience_relevance=0.75 + (i * 0.05)
+            )
+            captions.append(caption)
+        
+        return captions
+    
+    def _generate_cta_text(self, variant_index: int) -> str:
+        """Generate call-to-action text."""
+        ctas = [
+            "🔥 FOLLOW for more! 🔥",
+            "💯 LIKE & SHARE! 💯",
+            "🚀 SUBSCRIBE NOW! 🚀",
+            "👀 COMMENT below! 👀",
+            "🔥 SAVE this video! 🔥",
+            "💯 TAG your friends! 💯",
+            "🚀 TURN ON notifications! 🚀",
+            "👀 SHARE with everyone! 👀",
+            "🔥 FOLLOW for daily content! 🔥",
+            "💯 LIKE if you agree! 💯"
+        ]
+        return ctas[variant_index % len(ctas)]
+    
+    def _generate_screen_division(self, variant_index: int) -> Optional[ScreenDivision]:
+        """Generate screen division layout."""
+        if not self.config.enable_screen_division:
+            return None
+        
         division_types = [
             ScreenDivisionType.SPLIT_HORIZONTAL,
             ScreenDivisionType.SPLIT_VERTICAL,
@@ -242,8 +445,11 @@ class EnhancedViralVideoProcessor:
         division_type = division_types[variant_index % len(division_types)]
         return create_split_screen_layout(division_type)
     
-    def _create_transitions(self, variant_index: int) -> List[Transition]:
-        """Create transitions based on variant index."""
+    def _generate_transitions(self, variant_index: int) -> List[Transition]:
+        """Generate transitions."""
+        if not self.config.enable_transitions:
+            return []
+        
         transition_types = [
             TransitionType.FADE,
             TransitionType.SLIDE,
@@ -253,265 +459,41 @@ class EnhancedViralVideoProcessor:
         ]
         
         transitions = []
-        for i in range(3):  # Create 3 transitions per variant
+        for i in range(2):  # Generate 2 transitions
             transition_type = transition_types[(variant_index + i) % len(transition_types)]
             transition = create_viral_transition(transition_type)
-            transition.start_time = i * 2.0  # Stagger transitions
             transitions.append(transition)
         
         return transitions
     
-    def _create_video_effects(self, variant_index: int) -> List[VideoEffect]:
-        """Create video effects based on variant index."""
+    def _generate_effects(self, variant_index: int) -> List[VideoEffect]:
+        """Generate video effects."""
+        if not self.config.enable_effects:
+            return []
+        
         effect_types = [
+            VideoEffectEnum.NEON,
+            VideoEffectEnum.GLITCH,
             VideoEffectEnum.SLOW_MOTION,
             VideoEffectEnum.MIRROR,
-            VideoEffectEnum.SEPIA,
-            VideoEffectEnum.GLITCH,
-            VideoEffectEnum.NEON
+            VideoEffectEnum.SEPIA
         ]
         
         effects = []
-        for i in range(2):  # Create 2 effects per variant
+        for i in range(2):  # Generate 2 effects
             effect_type = effect_types[(variant_index + i) % len(effect_types)]
             effect = VideoEffect(
                 effect_type=effect_type,
-                intensity=0.5 + (variant_index * 0.1),
-                start_time=i * 5.0,
-                duration=3.0
+                intensity=0.7,
+                duration=3.0,
+                viral_impact=0.8,
+                audience_appeal=0.7
             )
             effects.append(effect)
         
         return effects
     
-    def _generate_viral_title(self, caption_config: ViralCaptionConfig) -> str:
-        """Generate a viral title."""
-        keywords = caption_config.viral_keywords[:3]
-        topics = caption_config.trending_topics[:2]
-        
-        templates = [
-            f"🔥 {keywords[0].title()} {topics[0]} Video You Need to See!",
-            f"😱 {keywords[1].title()} {topics[1]} That Will Blow Your Mind!",
-            f"⚡ {keywords[2].title()} {topics[0]} That's Going Viral!",
-            f"🎯 {keywords[0].title()} {topics[1]} You Won't Believe!",
-            f"🚀 {keywords[1].title()} {topics[0]} That's Trending Now!"
-        ]
-        
-        return templates[len(caption_config.viral_keywords) % len(templates)]
-    
-    def _generate_viral_description(self, caption_config: ViralCaptionConfig) -> str:
-        """Generate a viral description."""
-        return f"🔥 {caption_config.trending_topics[0].title()} content that's going viral! " \
-               f"Don't miss this {caption_config.viral_keywords[0]} video! " \
-               f"#viral #{caption_config.trending_topics[0]} #{caption_config.viral_keywords[0]}"
-    
-    def _generate_tags(self, caption_config: ViralCaptionConfig) -> List[str]:
-        """Generate tags for the video."""
-        return [
-            caption_config.trending_topics[0],
-            caption_config.viral_keywords[0],
-            caption_config.language,
-            "viral",
-            "trending"
-        ]
-    
-    def _generate_hashtags(self, caption_config: ViralCaptionConfig) -> List[str]:
-        """Generate hashtags for the video."""
-        return [
-            f"#{caption_config.trending_topics[0]}",
-            f"#{caption_config.viral_keywords[0]}",
-            "#viral",
-            "#trending",
-            "#mustsee"
-        ]
-    
-    def _get_target_audience(self, audience_profile: Optional[Dict]) -> List[str]:
-        """Get target audience based on profile."""
-        if audience_profile:
-            return [audience_profile.get("age", "general"), "social_media_users"]
-        return ["young_adults", "social_media_users"]
-
-# =============================================================================
-# CAPTION GENERATOR
-# =============================================================================
-
-class ViralCaptionGenerator:
-    """Advanced caption generator for viral content."""
-    
-    def __init__(self):
-        self.caption_templates = self._load_caption_templates()
-        self.viral_phrases = self._load_viral_phrases()
-    
-    def generate_captions(
-        self,
-        request: VideoClipRequest,
-        n_variants: int,
-        audience_profile: Optional[Dict]
-    ) -> List[ViralCaptionConfig]:
-        """Generate multiple caption configurations."""
-        captions = []
-        
-        for i in range(n_variants):
-            config = create_default_caption_config()
-            
-            # Customize based on variant index
-            config.max_caption_length = 80 + (i * 10)
-            config.caption_duration = 2.5 + (i * 0.5)
-            config.base_font_size = 20 + (i * 2)
-            
-            # Add variant-specific styling
-            if i % 3 == 0:
-                config.use_animations = True
-                config.use_effects = True
-            elif i % 3 == 1:
-                config.use_screen_division = True
-                config.use_transitions = True
-            else:
-                config.use_animations = True
-                config.use_transitions = True
-                config.use_screen_division = True
-            
-            # Customize for audience
-            if audience_profile:
-                config.audience_interests = audience_profile.get("interests", [])
-                config.language = audience_profile.get("language", "en")
-            
-            captions.append(config)
-        
-        return captions
-    
-    def generate_caption_segments(self, config: ViralCaptionConfig) -> List[CaptionSegment]:
-        """Generate caption segments with timing and styling."""
-        segments = []
-        
-        # Generate main caption
-        main_text = self._generate_viral_text(config)
-        main_segment = CaptionSegment(
-            text=main_text,
-            start_time=0.5,
-            end_time=0.5 + config.caption_duration,
-            font_size=config.base_font_size,
-            font_color="#FFFFFF",
-            background_color="#000000",
-            position=config.caption_position,
-            styles=[CaptionStyle.BOLD, CaptionStyle.SHADOW],
-            animation="fade_in" if config.use_animations else None,
-            opacity=0.9
-        )
-        segments.append(main_segment)
-        
-        # Generate secondary captions
-        if config.use_effects:
-            secondary_text = self._generate_secondary_text(config)
-            secondary_segment = CaptionSegment(
-                text=secondary_text,
-                start_time=2.0,
-                end_time=4.0,
-                font_size=config.base_font_size - 4,
-                font_color="#FFD700",
-                position="top",
-                styles=[CaptionStyle.ITALIC],
-                animation="slide_in" if config.use_animations else None,
-                opacity=0.8
-            )
-            segments.append(secondary_segment)
-        
-        return segments
-    
-    def _generate_viral_text(self, config: ViralCaptionConfig) -> str:
-        """Generate viral caption text."""
-        templates = [
-            f"🔥 {config.viral_keywords[0].title()} {config.trending_topics[0]}!",
-            f"😱 {config.viral_keywords[1].title()} moment!",
-            f"⚡ {config.trending_topics[1].title()} that will blow your mind!",
-            f"🎯 {config.viral_keywords[2].title()} content right here!",
-            f"🚀 {config.trending_topics[0].title()} you need to see!"
-        ]
-        
-        return templates[len(config.viral_keywords) % len(templates)]
-    
-    def _generate_secondary_text(self, config: ViralCaptionConfig) -> str:
-        """Generate secondary caption text."""
-        return f"Don't miss this {config.viral_keywords[0]} content! 👀"
-    
-    def _load_caption_templates(self) -> List[str]:
-        """Load caption templates."""
-        return [
-            "🔥 {keyword} {topic} that's going viral!",
-            "😱 {keyword} moment you won't believe!",
-            "⚡ {topic} that will blow your mind!",
-            "🎯 {keyword} content you need to see!",
-            "🚀 {topic} that's trending now!"
-        ]
-    
-    def _load_viral_phrases(self) -> List[str]:
-        """Load viral phrases."""
-        return [
-            "going viral", "must see", "incredible", "amazing", "unbelievable",
-            "mind blowing", "epic", "legendary", "trending", "viral moment"
-        ]
-
-# =============================================================================
-# VIDEO EDITOR
-# =============================================================================
-
-class ViralVideoEditor:
-    """Advanced video editor for viral content."""
-    
-    def __init__(self):
-        self.transition_effects = self._load_transition_effects()
-        self.video_effects = self._load_video_effects()
-    
-    def apply_screen_division(self, video_path: str, division: ScreenDivision) -> str:
-        """Apply screen division to video."""
-        # Implementation would use video editing library like FFmpeg
-        logger.info("Applying screen division", division_type=division.division_type.value)
-        return f"{video_path}_divided"
-    
-    def apply_transitions(self, video_path: str, transitions: List[Transition]) -> str:
-        """Apply transitions to video."""
-        # Implementation would use video editing library
-        logger.info("Applying transitions", count=len(transitions))
-        return f"{video_path}_transitions"
-    
-    def apply_effects(self, video_path: str, effects: List[VideoEffect]) -> str:
-        """Apply video effects."""
-        # Implementation would use video editing library
-        logger.info("Applying effects", count=len(effects))
-        return f"{video_path}_effects"
-    
-    def _load_transition_effects(self) -> Dict[str, Dict]:
-        """Load transition effect configurations."""
-        return {
-            "fade": {"duration": 1.0, "easing": "ease_in_out"},
-            "slide": {"duration": 1.5, "direction": "left_to_right"},
-            "zoom": {"duration": 1.2, "scale": 1.5},
-            "flip": {"duration": 1.0, "axis": "horizontal"},
-            "glitch": {"duration": 0.8, "intensity": 0.7}
-        }
-    
-    def _load_video_effects(self) -> Dict[str, Dict]:
-        """Load video effect configurations."""
-        return {
-            "slow_motion": {"speed": 0.5, "smooth": True},
-            "mirror": {"axis": "horizontal", "intensity": 1.0},
-            "sepia": {"intensity": 0.8, "preserve_highlights": True},
-            "glitch": {"intensity": 0.6, "frequency": 0.1},
-            "neon": {"color": "#00FFFF", "intensity": 0.7}
-        }
-
-# =============================================================================
-# VIRAL OPTIMIZER
-# =============================================================================
-
-class ViralOptimizer:
-    """Optimizer for viral content potential."""
-    
-    def __init__(self):
-        self.viral_factors = self._load_viral_factors()
-        self.engagement_metrics = self._load_engagement_metrics()
-    
-    def calculate_viral_score(
+    def _calculate_viral_score(
         self,
         captions: List[CaptionSegment],
         screen_division: Optional[ScreenDivision],
@@ -519,179 +501,272 @@ class ViralOptimizer:
         effects: List[VideoEffect],
         audience_profile: Optional[Dict]
     ) -> float:
-        """Calculate viral score for content."""
-        score = 0.0
+        """Calculate viral score for the variant."""
+        base_score = 0.5
         
-        # Caption quality
-        caption_score = self._calculate_caption_score(captions)
-        score += caption_score * 0.3
+        # Caption scoring
+        if captions:
+            caption_scores = [c.engagement_score for c in captions]
+            base_score += sum(caption_scores) / len(caption_scores) * 0.2
         
-        # Visual appeal
-        visual_score = self._calculate_visual_score(screen_division, transitions, effects)
-        score += visual_score * 0.4
+        # Screen division scoring
+        if screen_division and screen_division.engagement_optimized:
+            base_score += 0.1
         
-        # Audience match
-        audience_score = self._calculate_audience_score(audience_profile)
-        score += audience_score * 0.2
-        
-        # Trend alignment
-        trend_score = self._calculate_trend_score()
-        score += trend_score * 0.1
-        
-        return min(score, 1.0)  # Normalize to 0-1
-    
-    def optimize_variants(self, variants: List[ViralVideoVariant]) -> List[ViralVideoVariant]:
-        """Optimize variants for maximum viral potential."""
-        # Sort by viral score
-        sorted_variants = sorted(variants, key=lambda v: v.viral_score, reverse=True)
-        
-        # Apply additional optimizations to top variants
-        for variant in sorted_variants[:3]:
-            variant.viral_score = min(variant.viral_score * 1.1, 1.0)
-            variant.engagement_prediction = min(variant.engagement_prediction * 1.1, 1.0)
-        
-        return sorted_variants
-    
-    def _calculate_caption_score(self, captions: List[CaptionSegment]) -> float:
-        """Calculate caption quality score."""
-        if not captions:
-            return 0.0
-        
-        score = 0.0
-        
-        for caption in captions:
-            # Text length optimization
-            if 20 <= len(caption.text) <= 100:
-                score += 0.3
-            elif 10 <= len(caption.text) <= 150:
-                score += 0.2
-            
-            # Styling bonus
-            if CaptionStyle.BOLD in caption.styles:
-                score += 0.1
-            if CaptionStyle.SHADOW in caption.styles:
-                score += 0.1
-            if caption.animation:
-                score += 0.1
-        
-        return min(score / len(captions), 1.0)
-    
-    def _calculate_visual_score(
-        self,
-        screen_division: Optional[ScreenDivision],
-        transitions: List[Transition],
-        effects: List[VideoEffect]
-    ) -> float:
-        """Calculate visual appeal score."""
-        score = 0.5  # Base score
-        
-        # Screen division bonus
-        if screen_division:
-            score += 0.2
-        
-        # Transitions bonus
+        # Transition scoring
         if transitions:
-            score += min(len(transitions) * 0.1, 0.3)
+            transition_scores = [t.engagement_impact for t in transitions]
+            base_score += sum(transition_scores) / len(transition_scores) * 0.1
         
-        # Effects bonus
+        # Effect scoring
         if effects:
-            score += min(len(effects) * 0.1, 0.2)
+            effect_scores = [e.viral_impact for e in effects]
+            base_score += sum(effect_scores) / len(effect_scores) * 0.1
         
-        return min(score, 1.0)
+        # Audience fit scoring
+        if audience_profile:
+            base_score += 0.05
+        
+        return min(base_score, 1.0)
     
-    def _calculate_audience_score(self, audience_profile: Optional[Dict]) -> float:
-        """Calculate audience match score."""
-        if not audience_profile:
-            return 0.5  # Neutral score
-        
-        score = 0.5
-        
-        # Age targeting
-        age = audience_profile.get("age")
-        if age in ["18-25", "26-35"]:
-            score += 0.3  # High engagement age groups
-        
-        # Interest targeting
-        interests = audience_profile.get("interests", [])
-        if "social_media" in interests:
-            score += 0.2
-        
-        return min(score, 1.0)
+    def _generate_viral_title(self, request: VideoClipRequest, variant_index: int) -> str:
+        """Generate viral title."""
+        titles = [
+            "🔥 This is GOING VIRAL! 🔥",
+            "🚨 You won't BELIEVE this! 🚨",
+            "💥 This just BROKE the internet! 💥",
+            "👀 Wait for it... 👀",
+            "🎯 This is INSANE! 🎯",
+            "⚡ This is the FUTURE! ⚡",
+            "🌟 This will BLOW your mind! 🌟",
+            "🔥 The internet is OBSESSED! 🔥",
+            "🚀 This is NEXT LEVEL! 🚀",
+            "💯 This is PURE GOLD! 💯"
+        ]
+        return titles[variant_index % len(titles)]
     
-    def _calculate_trend_score(self) -> float:
-        """Calculate trend alignment score."""
-        # This would integrate with trend analysis APIs
-        return 0.7  # Base trend score
+    def _generate_viral_description(self, request: VideoClipRequest, variant_index: int) -> str:
+        """Generate viral description."""
+        descriptions = [
+            "🔥 This content is absolutely AMAZING! Don't miss this viral moment! 🔥",
+            "🚨 You need to see this RIGHT NOW! This is going viral! 🚨",
+            "💥 This just BROKE the internet! Share with everyone! 💥",
+            "👀 Wait for it... This is INSANE! 👀",
+            "🎯 This is what everyone is talking about! Pure GOLD! 🎯",
+            "⚡ This is the FUTURE! You won't believe your eyes! ⚡",
+            "🌟 This will BLOW your mind! Must watch! 🌟",
+            "🔥 The internet is OBSESSED! This is NEXT LEVEL! 🔥",
+            "🚀 This is what viral looks like! Absolutely INCREDIBLE! 🚀",
+            "💯 This is PURE GOLD! The best content you'll see today! 💯"
+        ]
+        return descriptions[variant_index % len(descriptions)]
     
-    def _load_viral_factors(self) -> Dict[str, float]:
-        """Load viral factor weights."""
-        return {
-            "caption_quality": 0.3,
-            "visual_appeal": 0.4,
-            "audience_match": 0.2,
-            "trend_alignment": 0.1
-        }
+    def _generate_viral_tags(self, request: VideoClipRequest, variant_index: int) -> List[str]:
+        """Generate viral tags."""
+        base_tags = ["viral", "trending", "amazing", "incredible", "mindblowing"]
+        variant_tags = [
+            ["fire", "hot", "lit"],
+            ["crazy", "insane", "wild"],
+            ["epic", "legendary", "iconic"],
+            ["mindblowing", "jawdropping", "stunning"],
+            ["viral", "trending", "popular"],
+            ["amazing", "incredible", "fantastic"],
+            ["awesome", "brilliant", "genius"],
+            ["perfect", "flawless", "excellent"],
+            ["outstanding", "remarkable", "extraordinary"],
+            ["phenomenal", "spectacular", "magnificent"]
+        ]
+        
+        tags = base_tags + variant_tags[variant_index % len(variant_tags)]
+        return tags[:10]  # Limit to 10 tags
     
-    def _load_engagement_metrics(self) -> Dict[str, float]:
-        """Load engagement metric weights."""
-        return {
-            "views": 0.4,
-            "likes": 0.3,
-            "shares": 0.2,
-            "comments": 0.1
-        }
+    def _generate_viral_hashtags(self, request: VideoClipRequest, variant_index: int) -> List[str]:
+        """Generate viral hashtags."""
+        base_hashtags = ["#viral", "#trending", "#amazing"]
+        variant_hashtags = [
+            ["#fire", "#hot", "#lit"],
+            ["#crazy", "#insane", "#wild"],
+            ["#epic", "#legendary", "#iconic"],
+            ["#mindblowing", "#jawdropping", "#stunning"],
+            ["#viral", "#trending", "#popular"],
+            ["#amazing", "#incredible", "#fantastic"],
+            ["#awesome", "#brilliant", "#genius"],
+            ["#perfect", "#flawless", "#excellent"],
+            ["#outstanding", "#remarkable", "#extraordinary"],
+            ["#phenomenal", "#spectacular", "#magnificent"]
+        ]
+        
+        hashtags = base_hashtags + variant_hashtags[variant_index % len(variant_hashtags)]
+        return hashtags[:15]  # Limit to 15 hashtags
+    
+    def _get_target_audience(self, audience_profile: Optional[Dict]) -> List[str]:
+        """Get target audience from profile."""
+        if audience_profile:
+            return audience_profile.get("interests", ["general"])
+        return ["general", "social_media_users", "young_adults"]
+    
+    def _enhance_variants_with_viral_features(
+        self,
+        variants: List[ViralVideoVariant],
+        request: VideoClipRequest,
+        audience_profile: Optional[Dict]
+    ) -> List[ViralVideoVariant]:
+        """Enhance variants with additional viral features."""
+        try:
+            enhanced_variants = []
+            
+            for variant in variants:
+                # Enhance viral score
+                variant.viral_score = min(variant.viral_score * 1.1, 1.0)
+                
+                # Add viral elements
+                variant.ai_viral_elements.extend([
+                    "emotional_triggers",
+                    "trending_topics",
+                    "shareable_content",
+                    "engagement_hooks"
+                ])
+                
+                # Enhance captions with viral elements
+                for caption in variant.captions:
+                    if caption.text and "🔥" in caption.text:
+                        caption.viral_potential = min(caption.viral_potential * 1.2, 1.0)
+                
+                enhanced_variants.append(variant)
+            
+            return enhanced_variants
+            
+        except Exception as e:
+            logger.error("Variant enhancement failed", error=str(e))
+            return variants
+    
+    def _filter_and_optimize_variants(self, variants: List[ViralVideoVariant]) -> List[ViralVideoVariant]:
+        """Filter and optimize variants."""
+        try:
+            # Filter by minimum viral score
+            filtered_variants = [
+                v for v in variants 
+                if v.viral_score >= self.config.min_viral_score
+            ]
+            
+            # Sort by viral score
+            filtered_variants.sort(key=lambda v: v.viral_score, reverse=True)
+            
+            # Limit to max variants
+            if len(filtered_variants) > self.config.max_variants:
+                filtered_variants = filtered_variants[:self.config.max_variants]
+            
+            return filtered_variants
+            
+        except Exception as e:
+            logger.error("Variant filtering failed", error=str(e))
+            return variants
+    
+    def _create_fallback_captions(self, variant_index: int) -> List[CaptionSegment]:
+        """Create fallback captions."""
+        return [
+            CaptionSegment(
+                text=f"🔥 Viral Content {variant_index + 1}! 🔥",
+                start_time=1.0,
+                end_time=4.0,
+                font_size=24,
+                styles=[CaptionStyle.BOLD],
+                engagement_score=0.6,
+                viral_potential=0.5,
+                audience_relevance=0.6
+            )
+        ]
+    
+    # =============================================================================
+    # BATCH PROCESSING
+    # =============================================================================
+    
+    def process_batch(
+        self,
+        requests: List[VideoClipRequest],
+        n_variants_per_request: int = 5,
+        audience_profiles: Optional[List[Dict]] = None
+    ) -> List[ViralVideoBatchResponse]:
+        """Process multiple requests in batch."""
+        try:
+            # Prepare batch tasks
+            batch_tasks = []
+            for i, request in enumerate(requests):
+                audience_profile = audience_profiles[i] if audience_profiles and i < len(audience_profiles) else None
+                task = self.process_viral_variants(
+                    request=request,
+                    n_variants=n_variants_per_request,
+                    audience_profile=audience_profile
+                )
+                batch_tasks.append(task)
+            
+            # Execute batch processing
+            results = self.parallel_processor.process_batch(
+                batch_tasks,
+                backend=BackendType.ASYNCIO
+            )
+            
+            return results
+            
+        except Exception as e:
+            logger.error("Batch processing failed", error=str(e))
+            return [
+                ViralVideoBatchResponse(
+                    success=False,
+                    original_clip_id=req.youtube_url,
+                    errors=[str(e)]
+                )
+                for req in requests
+            ]
 
 # =============================================================================
 # FACTORY FUNCTIONS
 # =============================================================================
 
-def create_high_performance_viral_processor(
-    config: Optional[ViralProcessingConfig] = None
-) -> EnhancedViralVideoProcessor:
-    """Create a high-performance viral video processor."""
-    if config is None:
-        config = ViralProcessingConfig(
-            max_captions_per_video=5,
-            caption_style_variations=3,
-            use_ai_caption_generation=True,
-            enable_screen_division=True,
-            enable_transitions=True,
-            enable_effects=True,
-            enable_animations=True,
-            parallel_workers=8,
-            batch_size=100,
-            timeout_seconds=300.0
-        )
-    
-    return EnhancedViralVideoProcessor(config)
-
-def create_viral_processor_with_custom_config(
-    max_captions: int = 5,
-    enable_editing: bool = True,
-    workers: int = 8
-) -> EnhancedViralVideoProcessor:
-    """Create viral processor with custom configuration."""
-    config = ViralProcessingConfig(
-        max_captions_per_video=max_captions,
-        enable_screen_division=enable_editing,
-        enable_transitions=enable_editing,
-        enable_effects=enable_editing,
-        enable_animations=enable_editing,
-        parallel_workers=workers
+def create_viral_processor(
+    enable_langchain: bool = True,
+    api_key: Optional[str] = None,
+    max_variants: int = 10
+) -> ViralVideoProcessor:
+    """Create a viral video processor."""
+    config = ViralProcessorConfig(
+        enable_langchain=enable_langchain,
+        langchain_api_key=api_key,
+        max_variants=max_variants,
+        enable_screen_division=True,
+        enable_transitions=True,
+        enable_effects=True,
+        enable_animations=True
     )
     
-    return EnhancedViralVideoProcessor(config)
+    return ViralVideoProcessor(config)
+
+def create_optimized_viral_processor(
+    api_key: Optional[str] = None,
+    batch_size: int = 5,
+    max_workers: int = 4
+) -> ViralVideoProcessor:
+    """Create an optimized viral processor for production use."""
+    config = ViralProcessorConfig(
+        enable_langchain=True,
+        langchain_api_key=api_key,
+        max_variants=10,
+        batch_size=batch_size,
+        max_workers=max_workers,
+        enable_audit_logging=True,
+        enable_performance_tracking=True,
+        enable_error_recovery=True
+    )
+    
+    return ViralVideoProcessor(config)
 
 # =============================================================================
 # EXPORTS
 # =============================================================================
 
 __all__ = [
-    'EnhancedViralVideoProcessor',
-    'ViralProcessingConfig',
-    'ViralCaptionGenerator',
-    'ViralVideoEditor',
-    'ViralOptimizer',
-    'create_high_performance_viral_processor',
-    'create_viral_processor_with_custom_config'
+    'ViralVideoProcessor',
+    'ViralProcessorConfig',
+    'create_viral_processor',
+    'create_optimized_viral_processor'
 ] 
