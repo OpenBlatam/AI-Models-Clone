@@ -51,6 +51,16 @@ class PluginError(AIVideoError):
             self.details["plugin_name"] = plugin_name
 
 
+class DependencyError(AIVideoError):
+    """Dependency-related errors."""
+    
+    def __init__(self, message: str, dependency_name: Optional[str] = None, **kwargs):
+        super().__init__(message, error_code="DEPENDENCY_ERROR", **kwargs)
+        self.dependency_name = dependency_name
+        if dependency_name:
+            self.details["dependency_name"] = dependency_name
+
+
 class WorkflowError(AIVideoError):
     """Workflow execution errors."""
     

@@ -9,6 +9,7 @@ existing components.
 import os
 import json
 import yaml
+import logging
 from pathlib import Path
 from typing import Dict, Any, Optional, List, Union
 from dataclasses import dataclass, field
@@ -475,6 +476,10 @@ def load_config(config_file: Optional[str] = None) -> AIVideoConfig:
     """
     manager = ConfigManager(config_file)
     return manager.get_config()
+
+
+# Alias for backward compatibility
+load_configuration = load_config
 
 
 def create_default_config(file_path: str = "ai_video_config.json") -> bool:

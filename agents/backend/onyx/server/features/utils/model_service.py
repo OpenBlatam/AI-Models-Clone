@@ -9,7 +9,6 @@ from datetime import datetime
 from .base_types import CACHE_TTL, VALIDATION_TIMEOUT
 from .model_field import ModelField, FieldConfig
 from .model_schema import ModelSchema, SchemaConfig
-from .base_model import OnyxBaseModel
 from .model_factory import ModelFactory
 from .model_registry import ModelRegistry
 from .model_manager import ModelManager
@@ -31,12 +30,14 @@ class ModelService:
         self._validation_cache[name] = {}
         self._validation_timestamps[name] = {}
     
-    def register_model(self, name: str, model_class: Type[OnyxBaseModel]) -> None:
+    def register_model(self, name: str, model_class: Type['OnyxBaseModel']) -> None:
         """Register a model class."""
+        from .base_model import OnyxBaseModel
         self._manager.register_model(name, model_class)
     
-    def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional[OnyxBaseModel]:
+    def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional['OnyxBaseModel']:
         """Create a model."""
+        from .base_model import OnyxBaseModel
         # Validate data
         schema = self._manager.get_schema(name)
         if schema:
@@ -53,8 +54,9 @@ class ModelService:
         
         return model
     
-    def get_model(self, name: str, id: str) -> Optional[OnyxBaseModel]:
+    def get_model(self, name: str, id: str) -> Optional['OnyxBaseModel']:
         """Get a model by ID."""
+        from .base_model import OnyxBaseModel
         # Check validation cache
         if name in self._validation_cache and id in self._validation_cache[name]:
             timestamp = self._validation_timestamps[name][id]
@@ -77,8 +79,9 @@ class ModelService:
         
         return model
     
-    def get_models(self, name: str) -> Dict[str, OnyxBaseModel]:
+    def get_models(self, name: str) -> Dict[str, 'OnyxBaseModel']:
         """Get all models of a type."""
+        from .base_model import OnyxBaseModel
         models = self._manager.get_models(name)
         
         # Validate models
@@ -94,8 +97,9 @@ class ModelService:
         
         return models
     
-    def update_model(self, name: str, id: str, data: Dict[str, Any]) -> Optional[OnyxBaseModel]:
+    def update_model(self, name: str, id: str, data: Dict[str, Any]) -> Optional['OnyxBaseModel']:
         """Update a model."""
+        from .base_model import OnyxBaseModel
         # Validate data
         schema = self._manager.get_schema(name)
         if schema:

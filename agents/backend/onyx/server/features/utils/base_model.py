@@ -13,8 +13,6 @@ from .model_exceptions import OnyxModelError, ValidationError, VersionError
 from .model_mixins import (
     TimestampMixin, SoftDeleteMixin, VersionMixin, AuditMixin, ValidationMixin, LoggingMixin
 )
-from .model_repository import ModelRepository
-from .model_service import ModelService
 from .model_decorators import validate_model, cache_model, log_operations
 from pydantic import BaseModel, ConfigDict
 import orjson
@@ -41,8 +39,6 @@ class OnyxBaseModel(
         json_loads=orjson.loads,
         json_dumps=lambda v, *, default: orjson.dumps(v, default=default).decode()
     )
-    _repository: ModelRepository = ModelRepository()
-    _service: ModelService = ModelService()
     _pre_hooks: Dict[str, List[Callable]] = {"create": [], "update": [], "delete": [], "restore": []}
     _post_hooks: Dict[str, List[Callable]] = {"create": [], "update": [], "delete": [], "restore": []}
 
@@ -290,6 +286,20 @@ class OnyxBaseModel(
         }
         self._audit_log.append(entry)
         self.log_info(f"Audit log: {entry}")
+
+    @property
+    def _repository(self):
+        from .model_repository import ModelRepository
+        if not hasattr(self, '__repository'):
+            self.__repository = ModelRepository()
+        return self.__repository
+
+    @property
+    def _service(self):
+        from .model_service import ModelService
+        if not hasattr(self, '__service'):
+            self.__service = ModelService()
+        return self.__service
 
 # Generic model with type parameter
 class OnyxGenericModel(GenericModel, Generic[T]):

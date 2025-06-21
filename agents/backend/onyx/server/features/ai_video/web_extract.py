@@ -8,6 +8,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import os
 import json
 from .extractor_stats import ExtractorStats
+from dataclasses import dataclass, field
+from typing import Optional, List
 
 # --- Logging Setup ---
 logger = logging.getLogger("web_extract")
@@ -274,85 +276,85 @@ def _absolutize_urls(urls: t.List[str], base_url: str) -> t.List[str]:
 
 # --- Patch extractors to use normalization ---
 # (Example for Selectolax, repeat for others as needed)
-SelectolaxExtractor._old_extract_with_html = SelectolaxExtractor.extract_with_html
+# SelectolaxExtractor._old_extract_with_html = SelectolaxExtractor.extract_with_html
 
-def selectolax_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10):
-    meta_used = {}
-    if not _is_valid_html(html):
-        meta_used['html_valid'] = False
-        return None
-    result = self._old_extract_with_html(url, html, debug, headers, proxies, timeout)
-    if not result:
-        return None
-    # Normalize images and links
-    result['images'] = _absolutize_urls(_normalize_str_list(result.get('images')), url)
-    # Clean text
-    if result.get('text'):
-        result['text'] = ' '.join(str(result['text']).split())
-    # Clean keywords
-    result['keywords'] = _normalize_str_list(result.get('keywords'))
-    # Add warnings if no images
-    if not result['images']:
-        warnings = result.get('meta_used', {}).get('warnings', [])
-        warnings = warnings if isinstance(warnings, list) else []
-        warnings.append('No images found by selectolax')
-        result.setdefault('meta_used', {})['warnings'] = warnings
-    return result
-SelectolaxExtractor.extract_with_html = selectolax_extract_with_html_patched
+# def selectolax_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10):
+#     meta_used = {}
+#     if not _is_valid_html(html):
+#         meta_used['html_valid'] = False
+#         return None
+#     result = self._old_extract_with_html(url, html, debug, headers, proxies, timeout)
+#     if not result:
+#         return None
+#     # Normalize images and links
+#     result['images'] = _absolutize_urls(_normalize_str_list(result.get('images')), url)
+#     # Clean text
+#     if result.get('text'):
+#         result['text'] = ' '.join(str(result['text']).split())
+#     # Clean keywords
+#     result['keywords'] = _normalize_str_list(result.get('keywords'))
+#     # Add warnings if no images
+#     if not result['images']:
+#         warnings = result.get('meta_used', {}).get('warnings', [])
+#         warnings = warnings if isinstance(warnings, list) else []
+#         warnings.append('No images found by selectolax')
+#         result.setdefault('meta_used', {})['warnings'] = warnings
+#     return result
+# SelectolaxExtractor.extract_with_html = selectolax_extract_with_html_patched
 
 # --- Patch ParselExtractor to use normalization ---
-ParselExtractor._old_extract_with_html = ParselExtractor.extract_with_html
+# ParselExtractor._old_extract_with_html = ParselExtractor.extract_with_html
 
-def parsel_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10):
-    meta_used = {}
-    if not _is_valid_html(html):
-        meta_used['html_valid'] = False
-        return None
-    result = self._old_extract_with_html(url, html, debug, headers, proxies, timeout)
-    if not result:
-        return None
-    # Normalize images and links
-    result['images'] = _absolutize_urls(_normalize_str_list(result.get('images')), url)
-    # Clean text
-    if result.get('text'):
-        result['text'] = ' '.join(str(result['text']).split())
-    # Clean keywords
-    result['keywords'] = _normalize_str_list(result.get('keywords'))
-    # Add warnings if no images
-    if not result['images']:
-        warnings = result.get('meta_used', {}).get('warnings', [])
-        warnings = warnings if isinstance(warnings, list) else []
-        warnings.append('No images found by parsel')
-        result.setdefault('meta_used', {})['warnings'] = warnings
-    return result
-ParselExtractor.extract_with_html = parsel_extract_with_html_patched
+# def parsel_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10):
+#     meta_used = {}
+#     if not _is_valid_html(html):
+#         meta_used['html_valid'] = False
+#         return None
+#     result = self._old_extract_with_html(url, html, debug, headers, proxies, timeout)
+#     if not result:
+#         return None
+#     # Normalize images and links
+#     result['images'] = _absolutize_urls(_normalize_str_list(result.get('images')), url)
+#     # Clean text
+#     if result.get('text'):
+#         result['text'] = ' '.join(str(result['text']).split())
+#     # Clean keywords
+#     result['keywords'] = _normalize_str_list(result.get('keywords'))
+#     # Add warnings if no images
+#     if not result['images']:
+#         warnings = result.get('meta_used', {}).get('warnings', [])
+#         warnings = warnings if isinstance(warnings, list) else []
+#         warnings.append('No images found by parsel')
+#         result.setdefault('meta_used', {})['warnings'] = warnings
+#     return result
+# ParselExtractor.extract_with_html = parsel_extract_with_html_patched
 
 # --- Patch BS4Extractor to use normalization ---
-BS4Extractor._old_extract_with_html = BS4Extractor.extract_with_html
+# BS4Extractor._old_extract_with_html = BS4Extractor.extract_with_html
 
-def bs4_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10):
-    meta_used = {}
-    if not _is_valid_html(html):
-        meta_used['html_valid'] = False
-        return None
-    result = self._old_extract_with_html(url, html, debug, headers, proxies, timeout)
-    if not result:
-        return None
-    # Normalize images and links
-    result['images'] = _absolutize_urls(_normalize_str_list(result.get('images')), url)
-    # Clean text
-    if result.get('text'):
-        result['text'] = ' '.join(str(result['text']).split())
-    # Clean keywords
-    result['keywords'] = _normalize_str_list(result.get('keywords'))
-    # Add warnings if no images
-    if not result['images']:
-        warnings = result.get('meta_used', {}).get('warnings', [])
-        warnings = warnings if isinstance(warnings, list) else []
-        warnings.append('No images found by bs4')
-        result.setdefault('meta_used', {})['warnings'] = warnings
-    return result
-BS4Extractor.extract_with_html = bs4_extract_with_html_patched
+# def bs4_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10):
+#     meta_used = {}
+#     if not _is_valid_html(html):
+#         meta_used['html_valid'] = False
+#         return None
+#     result = self._old_extract_with_html(url, html, debug, headers, proxies, timeout)
+#     if not result:
+#         return None
+#     # Normalize images and links
+#     result['images'] = _absolutize_urls(_normalize_str_list(result.get('images')), url)
+#     # Clean text
+#     if result.get('text'):
+#         result['text'] = ' '.join(str(result['text']).split())
+#     # Clean keywords
+#     result['keywords'] = _normalize_str_list(result.get('keywords'))
+#     # Add warnings if no images
+#     if not result['images']:
+#         warnings = result.get('meta_used', {}).get('warnings', [])
+#         warnings = warnings if isinstance(warnings, list) else []
+#         warnings.append('No images found by bs4')
+#         result.setdefault('meta_used', {})['warnings'] = warnings
+#     return result
+# BS4Extractor.extract_with_html = bs4_extract_with_html_patched
 
 # --- Patch main extraction to fallback for images if missing ---
 _old_extract_web_content_ext = extract_web_content_ext
@@ -445,4 +447,56 @@ def extract_web_content_ext_learn(
     # (Reuse the patched fallback for images, etc.)
     return extract_web_content_ext_patched(url, debug, headers, proxies, timeout, plugins, fields, fast)
 
-globals()['extract_web_content_ext'] = extract_web_content_ext_learn 
+globals()['extract_web_content_ext'] = extract_web_content_ext_learn
+
+# --- Web Content Extractor Classes ---
+
+@dataclass
+class ExtractedContent:
+    """Container for extracted web content."""
+    title: Optional[str] = None
+    description: Optional[str] = None
+    text: Optional[str] = None
+    images: List[str] = field(default_factory=list)
+    favicon: Optional[str] = None
+    og_image: Optional[str] = None
+    keywords: Optional[List[str]] = None
+    author: Optional[str] = None
+    publish_date: Optional[str] = None
+    main_video: Optional[str] = None
+    language: Optional[str] = None
+    summary: Optional[str] = None
+    tables: Optional[List[dict]] = None
+    links: Optional[List[str]] = None
+    social_meta: Optional[dict] = None
+    meta: Optional[dict] = None
+    raw: Optional[dict] = None
+
+
+class WebContentExtractor:
+    """Main web content extraction class."""
+    
+    def __init__(self, config: Optional[dict] = None):
+        self.config = config or {}
+        self.extractors = EXTRACTOR_REGISTRY.get_plugins()
+    
+    def extract(self, url: str, **kwargs) -> ExtractedContent:
+        """Extract content from a URL."""
+        try:
+            result = extract_web_content_ext(url, **kwargs)
+            return ExtractedContent(**result)
+        except Exception as e:
+            logger.error(f"Failed to extract content from {url}: {e}")
+            raise ExtractionError(f"Extraction failed for {url}: {e}")
+    
+    def extract_batch(self, urls: List[str], **kwargs) -> List[ExtractedContent]:
+        """Extract content from multiple URLs."""
+        results = []
+        for url in urls:
+            try:
+                content = self.extract(url, **kwargs)
+                results.append(content)
+            except Exception as e:
+                logger.error(f"Failed to extract from {url}: {e}")
+                results.append(None)
+        return results 

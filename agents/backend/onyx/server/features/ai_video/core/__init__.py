@@ -14,7 +14,8 @@ from .exceptions import (
     ValidationError,
     WorkflowError,
     SecurityError,
-    PerformanceError
+    PerformanceError,
+    DependencyError
 )
 
 from .constants import (
@@ -131,6 +132,9 @@ from .performance import (
     cache_result,
     rate_limit,
     
+    # Cleanup
+    cleanup_performance_resources,
+    
     # Global instances
     monitor as performance_monitor
 )
@@ -161,6 +165,9 @@ from .security import (
     sanitize_filename,
     validate_ip_address,
     is_suspicious_request,
+    
+    # Cleanup
+    cleanup_security_resources,
     
     # Global instances
     security_config,
@@ -203,6 +210,9 @@ from .async_utils import (
     wait_for_first,
     run_in_executor,
     
+    # Cleanup
+    cleanup_async_resources,
+    
     # Global instances
     task_manager,
     default_cache
@@ -232,6 +242,10 @@ from .monitoring import (
     # Monitoring decorators
     monitor_operation,
     alert_on_error,
+    
+    # Start and cleanup
+    start_monitoring,
+    cleanup_monitoring_resources,
     
     # Global instances
     metrics_collector,
@@ -294,6 +308,9 @@ from .logging_config import (
     get_logger,
     get_performance_logger,
     get_security_logger,
+    
+    # Cleanup
+    cleanup_logging_resources,
     
     # Global instances
     log_config,

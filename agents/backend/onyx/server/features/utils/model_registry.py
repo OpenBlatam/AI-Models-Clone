@@ -9,7 +9,6 @@ from datetime import datetime
 from .base_types import CACHE_TTL, VALIDATION_TIMEOUT
 from .model_field import ModelField, FieldConfig
 from .model_schema import ModelSchema, SchemaConfig
-from .base_model import OnyxBaseModel
 from .model_factory import ModelFactory
 
 T = TypeVar('T')
@@ -20,14 +19,14 @@ class ModelRegistry:
     def __init__(self):
         """Initialize registry."""
         self._factory = ModelFactory()
-        self._instances: Dict[str, Dict[str, OnyxBaseModel]] = {}
+        self._instances: Dict[str, Dict[str, 'OnyxBaseModel']] = {}
     
     def register_schema(self, name: str, schema: ModelSchema) -> None:
         """Register a schema."""
         self._factory.register_schema(name, schema)
     
-    def register_model(self, name: str, model_class: Type[OnyxBaseModel]) -> None:
-        """Register a model class."""
+    def register_model(self, name: str, model_class: 'OnyxBaseModel') -> None:
+        from .base_model import OnyxBaseModel
         self._factory.register_model(name, model_class)
         self._instances[name] = {}
     
@@ -35,12 +34,12 @@ class ModelRegistry:
         """Get a schema."""
         return self._factory.get_schema(name)
     
-    def get_model_class(self, name: str) -> Optional[Type[OnyxBaseModel]]:
-        """Get a model class."""
+    def get_model_class(self, name: str) -> Optional[Type['OnyxBaseModel']]:
+        from .base_model import OnyxBaseModel
         return self._factory.get_model_class(name)
     
-    def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional[OnyxBaseModel]:
-        """Create a model."""
+    def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional['OnyxBaseModel']:
+        from .base_model import OnyxBaseModel
         model = self._factory.create_model(name, data, id)
         
         if model and model.id:
@@ -48,16 +47,16 @@ class ModelRegistry:
         
         return model
     
-    def get_model(self, name: str, id: str) -> Optional[OnyxBaseModel]:
-        """Get a model by ID."""
+    def get_model(self, name: str, id: str) -> Optional['OnyxBaseModel']:
+        from .base_model import OnyxBaseModel
         return self._instances.get(name, {}).get(id)
     
-    def get_models(self, name: str) -> Dict[str, OnyxBaseModel]:
-        """Get all models of a type."""
+    def get_models(self, name: str) -> Dict[str, 'OnyxBaseModel']:
+        from .base_model import OnyxBaseModel
         return self._instances.get(name, {}).copy()
     
-    def update_model(self, name: str, id: str, data: Dict[str, Any]) -> Optional[OnyxBaseModel]:
-        """Update a model."""
+    def update_model(self, name: str, id: str, data: Dict[str, Any]) -> Optional['OnyxBaseModel']:
+        from .base_model import OnyxBaseModel
         model = self.get_model(name, id)
         
         if model:

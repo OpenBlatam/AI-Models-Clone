@@ -45,4 +45,60 @@ def suggest_transitions(emotion: str) -> List[str]:
         "neutral": ["cut", "fade"],
         "triste": ["blur", "slow_fade"],
         "emocionante": ["flash", "quick_cut"]
-    }.get(emotion, ["cut"]) 
+    }.get(emotion, ["cut"])
+
+
+# --- Content Suggestions Classes ---
+
+class ContentSuggestions:
+    """Container for content suggestions."""
+    
+    def __init__(self, emotion: str = "neutral"):
+        self.emotion = emotion
+        self.music = suggest_music(emotion)
+        self.visual_styles = suggest_visual_styles(emotion)
+        self.sound_effects = suggest_sound_effects(emotion)
+        self.transitions = suggest_transitions(emotion)
+    
+    def to_dict(self) -> dict:
+        """Convert suggestions to dictionary."""
+        return {
+            "emotion": self.emotion,
+            "music": self.music,
+            "visual_styles": self.visual_styles,
+            "sound_effects": self.sound_effects,
+            "transitions": self.transitions
+        }
+
+
+class SuggestionEngine:
+    """Engine for generating content suggestions."""
+    
+    def __init__(self):
+        self.emotions = ["alegre", "serio", "juvenil", "neutral", "triste", "emocionante"]
+    
+    def get_suggestions(self, emotion: str) -> ContentSuggestions:
+        """Get suggestions for a specific emotion."""
+        return ContentSuggestions(emotion)
+    
+    def get_all_suggestions(self) -> List[ContentSuggestions]:
+        """Get suggestions for all emotions."""
+        return [ContentSuggestions(emotion) for emotion in self.emotions]
+    
+    def analyze_content(self, text: str) -> str:
+        """Analyze content and suggest emotion."""
+        # Simple keyword-based analysis
+        text_lower = text.lower()
+        
+        if any(word in text_lower for word in ["feliz", "alegre", "diversión", "éxito"]):
+            return "alegre"
+        elif any(word in text_lower for word in ["serio", "importante", "profesional"]):
+            return "serio"
+        elif any(word in text_lower for word in ["joven", "moderno", "trendy"]):
+            return "juvenil"
+        elif any(word in text_lower for word in ["triste", "melancolía", "nostalgia"]):
+            return "triste"
+        elif any(word in text_lower for word in ["emocionante", "acción", "aventura"]):
+            return "emocionante"
+        else:
+            return "neutral" 

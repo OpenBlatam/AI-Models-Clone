@@ -1,7 +1,7 @@
 import asyncio
 from abc import ABC, abstractmethod
 from typing import List, Optional
-from pydantic import HttpUrl
+from pydantic import HttpUrl, BaseModel
 import logging
 
 logger = logging.getLogger(__name__)
@@ -9,6 +9,17 @@ logger = logging.getLogger(__name__)
 class GenerationError(Exception):
     """Custom exception for video generation failures."""
     pass
+
+
+class VideoGenerationResult(BaseModel):
+    """Result of video generation."""
+    video_url: HttpUrl
+    duration: Optional[float] = None
+    file_size: Optional[int] = None
+    quality: Optional[str] = None
+    metadata: Optional[dict] = None
+    success: bool = True
+    error_message: Optional[str] = None
 
 class VideoGenerator(ABC):
     """Abstract base class for video generators."""
