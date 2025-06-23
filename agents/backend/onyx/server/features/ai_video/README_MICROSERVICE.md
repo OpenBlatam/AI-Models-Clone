@@ -91,3 +91,89 @@ curl -X POST "http://localhost:8000/api/v1/video" \
 - Si envías `webhook_url`, recibirás notificación al finalizar el procesamiento.
 - Métricas Prometheus expuestas en `/metrics`.
 - Tracing OpenTelemetry ya instrumentado.
+
+# Recomendaciones de Despliegue y Performance para AI Video Microservice
+
+## 1. Servidor ASGI (Uvicorn/Gunicorn)
+- Usa Uvicorn con `--loop uvloop` para máxima velocidad:
+  ```bash
+  uvicorn fastapi_microservice:app --host 0.0.0.0 --port 8000 --workers 4 --loop uvloop
+  ```
+- O Gunicorn con múltiples workers:
+  ```bash
+  gunicorn -k uvicorn.workers.UvicornWorker fastapi_microservice:app --workers 4 --bind 0.0.0.0:8000
+  ```
+- Ajusta el número de workers según núcleos de CPU y carga esperada.
+
+## 2. Cache asíncrono para batch
+- Si despliegas en varios procesos/nodos, usa un cache asíncrono compartido (ej: Redis con `aiocache` o `async_lru`).
+- Ajusta el TTL del cache para jobs completados/fallidos según el patrón de uso.
+
+## 3. Pools asíncronos para HTTP y DB
+- Usa `httpx.AsyncClient` con pool para llamadas a Onyx u otros servicios externos.
+- Usa `asyncpg.Pool` o similar para base de datos asíncrona.
+
+## 4. Serialización rápida
+- Si usas Pydantic v2, usa `.model_dump(exclude_unset=True)` en vez de `.dict()`.
+- Configura FastAPI para usar `orjson` como backend de serialización JSON:
+  ```python
+  from fastapi import FastAPI
+  import orjson
+  app = FastAPI(default_response_class=ORJSONResponse)
+  ```
+
+## 5. Ajuste de max_concurrency
+- El parámetro `max_concurrency` en endpoints batch controla el paralelismo real (default 10, máximo 50).
+- Ajusta según el hardware, la carga y los límites de APIs externas.
+
+## 6. Logging eficiente
+- Usa logging asíncrono o bufferizado para no bloquear el event loop.
+- Loggea solo eventos críticos en el hot path.
+
+## 7. Monitoreo y métricas
+- Expón métricas Prometheus (latencia, errores, recuento de peticiones) para todos los endpoints.
+- Usa tracing distribuido (OpenTelemetry) para correlacionar logs y traces entre servicios.
+
+## 8. Ejemplo de comando de despliegue óptimo
+```bash
+uvicorn fastapi_microservice:app --host 0.0.0.0 --port 8000 --workers 4 --loop uvloop --log-level info
+```
+
+---
+
+**Sigue estas recomendaciones para máxima velocidad, robustez y observabilidad en producción.**
+
+# Troubleshooting y Tuning Avanzado
+
+## 1. Identificación de cuellos de botella
+- **CPU:** Usa `htop`, `top` o dashboards de cloud para ver saturación de workers.
+- **IO/Red:** Monitorea latencia de disco y red, especialmente si usas almacenamiento externo o APIs remotas.
+- **Onyx API:** Si la latencia de Onyx es alta, ajusta `max_concurrency` y usa timeouts/retries.
+- **Base de datos:** Usa EXPLAIN y métricas de slow queries para optimizar índices y consultas.
+
+## 2. Herramientas de profiling y benchmarking
+- **Carga:** Usa [locust](https://locust.io/) o [wrk](https://github.com/wg/wrk) para simular usuarios concurrentes y medir throughput/latencia.
+- **Profiling Python:** Usa [py-spy](https://github.com/benfred/py-spy) para identificar funciones lentas o bloqueantes.
+- **Prometheus:** Exporta métricas y crea alertas para latencia, errores y saturación de recursos.
+
+## 3. Tuning de max_concurrency y cache
+- Comienza con `max_concurrency=10` y aumenta gradualmente mientras monitoreas CPU, latencia y errores.
+- Si ves saturación de CPU o timeouts, reduce `max_concurrency`.
+- Ajusta el tamaño y TTL del cache según el patrón de acceso y la memoria disponible.
+
+## 4. Escalado horizontal y coherencia de cache
+- Usa un cache compartido (ej: Redis) si corres varios pods/nodos.
+- Considera invalidar el cache globalmente cuando un job cambia de estado.
+- Usa un balanceador de carga con sticky sessions si es necesario.
+
+## 5. Dashboard Prometheus/Grafana recomendado
+- Métricas clave: latencia p95/p99, throughput, errores 5xx/4xx, uso de CPU/memoria, jobs en batch, tiempo de respuesta de Onyx.
+- Ejemplo de panel: "Batch Job Latency", "Onyx API Response Time", "Cache Hit Ratio".
+
+## 6. Logging distribuido y correlación de trace_id
+- Asegúrate de propagar `trace_id` en todos los logs y llamadas entre servicios.
+- Usa una solución de logging centralizado (ELK, Loki, Datadog) para buscar por `trace_id` y reconstruir flujos de usuario.
+
+---
+
+**Con estas prácticas, podrás identificar, diagnosticar y resolver cuellos de botella en producción, y ajustar el microservicio para máxima performance real.**

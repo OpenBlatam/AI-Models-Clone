@@ -243,13 +243,14 @@ class BatchService:
         self.logger = logger
         self.on_batch_completed = on_batch_completed
 
-    async def batch_status(self, ids: List[str], use_onyx: bool, trace_id: Optional[str] = None) -> dict:
+    async def batch_status(self, ids: List[str], use_onyx: bool, trace_id: Optional[str] = None, max_concurrency: int = 10) -> dict:
         """
         Batch status de múltiples jobs.
         Args:
             ids: lista de request_id (máx 50).
             use_onyx: bool, si True usa Onyx, si False local.
             trace_id: opcional para tracing/logging.
+            max_concurrency: máximo de tareas concurrentes (default 10).
         Returns:
             dict envelope con statuses.
         Edge cases:
@@ -260,14 +261,14 @@ class BatchService:
             raise ServiceError("ids debe ser lista de str")
         try:
             if self.logger:
-                self.logger.info({"action": "batch_status", "ids": ids, "use_onyx": use_onyx, "trace_id": trace_id})
+                self.logger.info({"action": "batch_status", "ids": ids, "use_onyx": use_onyx, "trace_id": trace_id, "max_concurrency": max_concurrency})
             cached, uncached, cache_key = self.batch_get_status(ids, use_onyx, self.cache_status)
             if not uncached:
                 statuses = self.batch_serialize_status(cached, {})
                 if self.on_batch_completed:
                     self.on_batch_completed(ids, statuses)
                 return self.envelope(True, data={"statuses": statuses}, mode="onyx" if use_onyx else "local", trace_id=trace_id)
-            fetched = await self.batch_fetch_status(uncached, use_onyx, self.get_system, self.video_status, self.cache_status, cache_key)
+            fetched = await self.batch_fetch_status(uncached, use_onyx, self.get_system, self.video_status, self.cache_status, cache_key, max_concurrency=max_concurrency)
             statuses = self.batch_serialize_status(cached, fetched)
             if self.on_batch_completed:
                 self.on_batch_completed(ids, statuses)
@@ -277,13 +278,14 @@ class BatchService:
                 self.logger.error({"action": "batch_status_error", "error": str(e), "trace_id": trace_id})
             return self.envelope(False, error={"message": str(e)}, mode="onyx" if use_onyx else "local", trace_id=trace_id)
 
-    async def batch_logs(self, ids: List[str], use_onyx: bool, trace_id: Optional[str] = None) -> dict:
+    async def batch_logs(self, ids: List[str], use_onyx: bool, trace_id: Optional[str] = None, max_concurrency: int = 10) -> dict:
         """
         Batch logs de múltiples jobs.
         Args:
             ids: lista de request_id (máx 50).
             use_onyx: bool, si True usa Onyx, si False local.
             trace_id: opcional para tracing/logging.
+            max_concurrency: máximo de tareas concurrentes (default 10).
         Returns:
             dict envelope con logs.
         Edge cases:
@@ -294,14 +296,14 @@ class BatchService:
             raise ServiceError("ids debe ser lista de str")
         try:
             if self.logger:
-                self.logger.info({"action": "batch_logs", "ids": ids, "use_onyx": use_onyx, "trace_id": trace_id})
+                self.logger.info({"action": "batch_logs", "ids": ids, "use_onyx": use_onyx, "trace_id": trace_id, "max_concurrency": max_concurrency})
             cached, uncached, cache_key = self.batch_get_logs(ids, use_onyx, self.cache_logs)
             if not uncached:
                 logs_dict = self.batch_serialize_logs(cached, {})
                 if self.on_batch_completed:
                     self.on_batch_completed(ids, logs_dict)
                 return self.envelope(True, data={"logs": logs_dict}, mode="onyx" if use_onyx else "local", trace_id=trace_id)
-            fetched = await self.batch_fetch_logs(uncached, use_onyx, self.get_system, self.video_logs, self.cache_logs, cache_key)
+            fetched = await self.batch_fetch_logs(uncached, use_onyx, self.get_system, self.video_logs, self.cache_logs, cache_key, max_concurrency=max_concurrency)
             logs_dict = self.batch_serialize_logs(cached, fetched)
             if self.on_batch_completed:
                 self.on_batch_completed(ids, logs_dict)

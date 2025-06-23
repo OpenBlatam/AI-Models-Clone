@@ -142,15 +142,16 @@ async def retry_video(
 @endpoint_protected("/video/status/batch", logger, EnvelopeResponse)
 async def batch_status(
     request_ids: List[str] = Body(..., embed=True, description="Lista de request_ids a consultar"),
+    max_concurrency: int = Query(10, ge=1, le=50, description="Máximo de tareas concurrentes para el batch (default 10, máximo 50)"),
     x_trace_id: Optional[str] = Header(None, description="ID de trazabilidad distribuida"),
     user=Depends(get_current_user)
 ) -> EnvelopeResponse:
     """
-    Consulta el estado de múltiples videos AI por batch.
+    Consulta el estado de múltiples videos AI por batch, procesando en paralelo hasta max_concurrency tareas.
     - Devuelve lista de estados y trace_id.
     - Errores: lista vacía, error interno.
     """
-    return await batch_service.status(request_ids, user, x_trace_id)
+    return await batch_service.status(request_ids, user, x_trace_id, max_concurrency=max_concurrency)
 
 @video_router.post("/logs/batch",
     response_model=EnvelopeResponse,
@@ -164,12 +165,13 @@ async def batch_status(
 @endpoint_protected("/video/logs/batch", logger, EnvelopeResponse)
 async def batch_logs(
     request_ids: List[str] = Body(..., embed=True, description="Lista de request_ids a consultar"),
+    max_concurrency: int = Query(10, ge=1, le=50, description="Máximo de tareas concurrentes para el batch (default 10, máximo 50)"),
     x_trace_id: Optional[str] = Header(None, description="ID de trazabilidad distribuida"),
     user=Depends(get_current_user)
 ) -> EnvelopeResponse:
     """
-    Obtiene los logs de múltiples videos AI por batch.
+    Obtiene los logs de múltiples videos AI por batch, procesando en paralelo hasta max_concurrency tareas.
     - Devuelve lista de logs y trace_id.
     - Errores: lista vacía, error interno.
     """
-    return await batch_service.logs(request_ids, user, x_trace_id) 
+    return await batch_service.logs(request_ids, user, x_trace_id, max_concurrency=max_concurrency) 

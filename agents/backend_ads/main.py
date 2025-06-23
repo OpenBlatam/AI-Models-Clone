@@ -11,12 +11,15 @@ import pyvips
 import psutil
 from loguru import logger
 
-from fastapi import FastAPI, HTTPException, Body, Request as FastAPIRequest, UploadFile, File, Form
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi import FastAPI, HTTPException, Body, Request as FastAPIRequest, UploadFile, File, Form, Request
+from fastapi.responses import JSONResponse, StreamingResponse, ORJSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel
 from typing import List, Optional
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+import uuid
 
 from models import AdsIaRequest, AdsResponse, BrandKitResponse, ErrorResponse, RemoveBackgroundRequest
 from scraper import get_website_text
@@ -42,6 +45,12 @@ from ads_api import router as ads_router
 from key_messages.api import router as key_messages_router
 from key_messages.llm_service import LLMKeyMessageService
 from key_messages.models import MessageType, MessageTone
+from prometheus_fastapi_instrumentator import Instrumentator
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
+from aiocache import caches
 
 # Configurar logging básico
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -87,7 +96,30 @@ async def lifespan(app_instance: FastAPI):
     logger.info("Cerrando cliente HTTPX y finalizando aplicación...")
     await app_instance.state.httpx_client.aclose()
 
-app = FastAPI(title="Ads IA API - DeepSeek Integration", version="1.2.0", lifespan=lifespan)
+# Configuración de orjson como backend de serialización
+app = FastAPI(title="Ads IA API - DeepSeek Integration", version="1.2.0", lifespan=lifespan, default_response_class=ORJSONResponse)
+
+# Configuración de Prometheus para métricas
+Instrumentator().instrument(app).expose(app)
+
+# Configuración de slowapi para rate limiting
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Configuración de tracing OpenTelemetry
+FastAPIInstrumentor.instrument_app(app)
+
+# Configuración de cache Redis con aiocache (opcional, requiere Redis corriendo)
+caches.set_config({
+    "default": {
+        "cache": "aiocache.RedisCache",
+        "endpoint": getattr(settings, "REDIS_HOST", "localhost"),
+        "port": int(getattr(settings, "REDIS_PORT", 6379)),
+        "timeout": 1,
+        "serializer": {"class": "aiocache.serializers.PickleSerializer"},
+    }
+})
 
 app.add_middleware(
     CORSMiddleware,
@@ -209,6 +241,45 @@ async def generate_key_message(request: KeyMessageRequest):
         return response
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.exception_handler(StarletteHTTPException)
+async def http_exception_handler(request: Request, exc: StarletteHTTPException):
+    trace_id = request.headers.get("x-trace-id") or str(uuid.uuid4())
+    logger.error({"event": "http-exception", "trace_id": trace_id, "path": request.url.path, "status": exc.status_code, "detail": exc.detail})
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "success": False,
+            "error": {"message": exc.detail},
+            "trace_id": trace_id
+        },
+    )
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    trace_id = request.headers.get("x-trace-id") or str(uuid.uuid4())
+    logger.error({"event": "validation-error", "trace_id": trace_id, "path": request.url.path, "errors": exc.errors()})
+    return JSONResponse(
+        status_code=422,
+        content={
+            "success": False,
+            "error": {"message": "Validation error", "details": exc.errors()},
+            "trace_id": trace_id
+        },
+    )
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    trace_id = request.headers.get("x-trace-id") or str(uuid.uuid4())
+    logger.error({"event": "unhandled-exception", "trace_id": trace_id, "path": request.url.path, "error": str(exc)})
+    return JSONResponse(
+        status_code=500,
+        content={
+            "success": False,
+            "error": {"message": "Internal server error"},
+            "trace_id": trace_id
+        },
+    )
 
 # Para ejecutar localmente (desde la carpeta `ads-ia-backend`):
 # pip install -r requirements.txt
