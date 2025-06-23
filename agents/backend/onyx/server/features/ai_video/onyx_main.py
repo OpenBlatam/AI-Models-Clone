@@ -528,13 +528,33 @@ async def api_generate_video(request_data: Dict[str, Any]) -> Dict[str, Any]:
         # Generate video
         response = await system.generate_video(request)
         
-        # Format response using Onyx utilities
-        return await format_response({
+        # Exponer todos los campos relevantes del modelo mejorado
+        response_dict = {
             "request_id": response.request_id,
             "status": response.status,
             "output_url": response.output_url,
-            "metadata": response.metadata
-        })
+            "output_path": response.output_path,
+            "thumbnail_url": response.thumbnail_url,
+            "duration": response.duration,
+            "file_size": response.file_size,
+            "resolution": response.resolution,
+            "fps": response.fps,
+            "processing_time": response.processing_time,
+            "steps_completed": response.steps_completed,
+            "error_message": response.error_message,
+            "plugin_results": response.plugin_results,
+            "metadata": response.metadata,
+            "created_at": response.created_at,
+            "updated_at": response.updated_at,
+            # Mejoras
+            "processing_history": getattr(response, "processing_history", None),
+            "outputs": getattr(response, "outputs", None),
+            "quality_score": getattr(response, "quality_score", None),
+            "user_rating": getattr(response, "user_rating", None)
+        }
+        # Eliminar claves None para respuesta limpia
+        response_dict = {k: v for k, v in response_dict.items() if v is not None}
+        return await format_response(response_dict)
         
     except Exception as e:
         return await handle_error(e, {"endpoint": "generate_video"})

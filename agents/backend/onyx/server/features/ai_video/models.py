@@ -61,6 +61,21 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
     content_optimization: Optional[ContentOptimization] = None
     short_video_optimization: Optional[ShortVideoOptimization] = None
     langchain_config: Optional[dict] = None
+    # --- Mejoras sugeridas ---
+    explanation: Optional[str] = None  # Explicabilidad del modelo
+    decision_trace: Optional[list] = None  # Trazabilidad de decisiones
+    history: Optional[list] = msgspec.field(default_factory=list)  # Historial de cambios
+    user_feedback: Optional[list] = msgspec.field(default_factory=list)  # Feedback de usuario
+    images: Optional[list] = msgspec.field(default_factory=list)  # Soporte multimodal: imágenes
+    audios: Optional[list] = msgspec.field(default_factory=list)  # Soporte multimodal: audios
+    transcripts: Optional[list] = msgspec.field(default_factory=list)  # Soporte multimodal: transcripciones
+    engagement_metrics: Optional[dict] = None  # Métricas de engagement
+    # Versiones de submodelos
+    collaboration_version: Optional[str] = None
+    analytics_version: Optional[str] = None
+    multimedia_version: Optional[str] = None
+    review_version: Optional[str] = None
+    compliance_version: Optional[str] = None
 
     def as_tuple(self) -> tuple:
         """Devuelve el video como tupla."""

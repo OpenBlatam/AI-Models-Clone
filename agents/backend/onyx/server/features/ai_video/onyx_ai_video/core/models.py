@@ -94,6 +94,12 @@ class VideoRequest(BaseModel):
     created_at: datetime = Field(default_factory=datetime.now, description="Request creation timestamp")
     expires_at: Optional[datetime] = Field(default=None, description="Request expiration timestamp")
     
+    # Mejoras sugeridas
+    attachments: Optional[List[str]] = Field(default_factory=list, description="Archivos multimedia adicionales")
+    background_music: Optional[str] = Field(default=None, description="Música de fondo personalizada")
+    transition_style: Optional[str] = Field(default=None, description="Estilo de transición personalizado")
+    subtitle_language: Optional[str] = Field(default=None, description="Idioma de subtítulos")
+    
     @validator('input_text')
     def validate_input_text(cls, v):
         """Validate input text."""
@@ -114,6 +120,17 @@ class VideoRequest(BaseModel):
         if v and not v.strip():
             raise ValueError("Request ID cannot be empty")
         return v.strip() if v else str(uuid.uuid4())
+    
+    @validator('plugins')
+    def validate_plugin_conflicts(cls, v, values):
+        # Validar conflictos si hay plugins y plugin_config
+        plugin_config = values.get('plugin_config', {})
+        if v and plugin_config:
+            for plugin in v:
+                conflicts = plugin_config.get(plugin, {}).get('conflicts', [])
+                if any(conflict in v for conflict in conflicts):
+                    raise ValueError(f"Conflicto detectado entre plugins: {plugin} y {conflicts}")
+        return v
     
     class Config:
         """Pydantic configuration."""
@@ -157,6 +174,12 @@ class VideoResponse(BaseModel):
     created_at: datetime = Field(default_factory=datetime.now, description="Response creation timestamp")
     updated_at: datetime = Field(default_factory=datetime.now, description="Last update timestamp")
     
+    # Mejoras sugeridas
+    processing_history: Optional[List[dict]] = Field(default_factory=list, description="Historial de procesamiento")
+    outputs: Optional[List[dict]] = Field(default_factory=list, description="Múltiples salidas de video")
+    quality_score: Optional[float] = Field(default=None, description="Puntaje de calidad del video")
+    user_rating: Optional[float] = Field(default=None, description="Calificación del usuario")
+    
     class Config:
         """Pydantic configuration."""
         use_enum_values = True
@@ -194,6 +217,12 @@ class PluginConfig(BaseModel):
     description: Optional[str] = Field(default=None, description="Plugin description")
     author: Optional[str] = Field(default=None, description="Plugin author")
     category: PluginCategory = Field(default=PluginCategory.CUSTOM, description="Plugin category")
+    
+    # Mejoras sugeridas
+    dynamic_parameters: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Parámetros dinámicos del plugin")
+    sandboxed: bool = Field(default=False, description="Si el plugin corre en sandbox")
+    allowed_operations: Optional[List[str]] = Field(default_factory=list, description="Operaciones permitidas")
+    supported_languages: Optional[List[str]] = Field(default_factory=list, description="Idiomas soportados")
     
     class Config:
         """Pydantic configuration."""
@@ -233,6 +262,12 @@ class PluginInfo(BaseModel):
     # Timestamps
     loaded_at: Optional[datetime] = Field(default=None, description="When plugin was loaded")
     last_executed: Optional[datetime] = Field(default=None, description="Last execution time")
+    
+    # Mejoras sugeridas
+    dynamic_parameters: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Parámetros dinámicos del plugin")
+    sandboxed: bool = Field(default=False, description="Si el plugin corre en sandbox")
+    allowed_operations: Optional[List[str]] = Field(default_factory=list, description="Operaciones permitidas")
+    supported_languages: Optional[List[str]] = Field(default_factory=list, description="Idiomas soportados")
     
     class Config:
         """Pydantic configuration."""
