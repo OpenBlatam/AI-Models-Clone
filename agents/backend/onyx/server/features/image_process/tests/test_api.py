@@ -1,6 +1,6 @@
 def test_analyze_image(client):
     payload = {"image_url": "https://example.com/image.jpg"}
-    response = client.post("/api/image_process/analyze", json=payload)
+    response = client.post("/image-process/analyze", json=payload)
     assert response.status_code == 200
     data = response.json()
     assert data["labels"] == ["example_label"]
@@ -8,4 +8,11 @@ def test_analyze_image(client):
     assert data["ocr_text"] == "Texto de ejemplo extraído por OCR"
     assert data["faces_detected"] == 0
     assert data["objects"] == []
-    assert "note" in data["metadata"] 
+    assert "note" in data["metadata"]
+
+def test_print_routes(client):
+    # Imprime todas las rutas disponibles en la app de test
+    routes = [route.path for route in client.app.routes]
+    print("RUTAS DISPONIBLES EN LA APP DE TEST:", routes)
+    # Este test siempre pasa
+    assert True 

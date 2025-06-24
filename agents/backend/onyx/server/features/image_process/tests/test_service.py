@@ -6,6 +6,7 @@ from agents.backend.onyx.server.features.image_process.models import (
     ImageExtractRequest, ImageSummaryRequest, ImageValidationRequest
 )
 from agents.backend.onyx.server.features.image_process.service import ImageProcessService
+from pydantic import ValidationError
 
 class TestImageProcessService:
     def setup_method(self):
@@ -24,10 +25,8 @@ class TestImageProcessService:
         assert "base64" in resp.extracted_text
 
     def test_extract_text_no_image(self):
-        req = ImageExtractRequest()
-        resp = self.service.extract_text(req)
-        assert not resp.success
-        assert resp.error
+        with pytest.raises(ValidationError):
+            req = ImageExtractRequest()
 
     def test_summarize_url(self):
         req = ImageSummaryRequest(image_url="https://test.com/img.jpg", summary_type="simple")
@@ -42,10 +41,8 @@ class TestImageProcessService:
         assert "base64" in resp.summary
 
     def test_summarize_no_image(self):
-        req = ImageSummaryRequest()
-        resp = self.service.summarize(req)
-        assert not resp.success
-        assert resp.error
+        with pytest.raises(ValidationError):
+            req = ImageSummaryRequest()
 
     def test_validate_url(self):
         req = ImageValidationRequest(image_url="https://test.com/img.jpg", validation_type="default")
@@ -62,7 +59,5 @@ class TestImageProcessService:
         assert resp.details["source"] == "base64"
 
     def test_validate_no_image(self):
-        req = ImageValidationRequest()
-        resp = self.service.validate(req)
-        assert not resp.success
-        assert resp.error 
+        with pytest.raises(ValidationError):
+            req = ImageValidationRequest() 

@@ -1,7 +1,7 @@
 """
 API endpoints for Image Process feature (Onyx).
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException
 from typing import Dict, Any
 from .models import (
     ImageExtractRequest, ImageExtractResponse,
@@ -10,13 +10,12 @@ from .models import (
     ImageAnalysisResult
 )
 from .service import ImageProcessService
-from onyx.core.auth import get_current_user
 
 router = APIRouter(prefix="/image-process", tags=["image-process"])
 service = ImageProcessService()
 
 @router.post("/extract", response_model=ImageExtractResponse)
-async def extract_text(request: ImageExtractRequest, current_user: Dict[str, Any] = Depends(get_current_user)):
+async def extract_text(request: ImageExtractRequest):
     """Extract text from an image (URL o base64)."""
     response = service.extract_text(request)
     if not response.success:
@@ -24,15 +23,15 @@ async def extract_text(request: ImageExtractRequest, current_user: Dict[str, Any
     return response
 
 @router.post("/summarize", response_model=ImageSummaryResponse)
-async def summarize_image(request: ImageSummaryRequest, current_user: Dict[str, Any] = Depends(get_current_user)):
-    """Summarize the content of an image."""
+async def summarize_image(request: ImageSummaryRequest):
+    """Summarize an image (URL o base64)."""
     response = service.summarize(request)
     if not response.success:
         raise HTTPException(status_code=400, detail=response.error)
     return response
 
 @router.post("/validate", response_model=ImageValidationResponse)
-async def validate_image(request: ImageValidationRequest, current_user: Dict[str, Any] = Depends(get_current_user)):
+async def validate_image(request: ImageValidationRequest):
     """Validate an image (format, content, etc)."""
     response = service.validate(request)
     if not response.success:

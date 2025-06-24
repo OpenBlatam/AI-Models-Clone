@@ -273,13 +273,22 @@ class DemoPluginManager:
         print("\n8️⃣ Health Reporting")
         print("-" * 20)
         
-        # Get health report
+        # Get comprehensive health report
         health = self.manager.get_health_report()
-        print("Plugin health report:")
-        print(f"  - Overall status: {health['overall_status']}")
-        print(f"  - Total plugins: {health['total_plugins']}")
-        print(f"  - Healthy plugins: {health['healthy_plugins']}")
-        print(f"  - Unhealthy plugins: {health['unhealthy_plugins']}")
+        
+        # Display overall health status with emojis
+        status_emoji = "🟢" if health['overall_status'] == 'healthy' else "🔴"
+        print(f"Plugin Health Report {status_emoji}")
+        print("=" * 40)
+        print(f"📊 Overall Status: {health['overall_status'].upper()}")
+        print(f"📈 Total Plugins: {health['total_plugins']}")
+        print(f"✅ Healthy Plugins: {health['healthy_plugins']}")
+        print(f"❌ Unhealthy Plugins: {health['unhealthy_plugins']}")
+        
+        # Calculate health percentage
+        if health['total_plugins'] > 0:
+            health_percentage = (health['healthy_plugins'] / health['total_plugins']) * 100
+            print(f"📊 Health Score: {health_percentage:.1f}%")
         
         # Show detailed plugin health
         print("\nPlugin details:")
