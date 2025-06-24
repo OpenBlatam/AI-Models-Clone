@@ -32,14 +32,11 @@ async def get_email_sequence(sequence_id: str):
     """
     Get details of a specific email sequence
     """
-    try:
-        service = EmailSequenceService()
-        sequence = await service.get_sequence(sequence_id)
-        if not sequence:
-            raise HTTPException(status_code=404, detail="Sequence not found")
-        return sequence
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    service = EmailSequenceService()
+    sequence = await service.get_sequence(sequence_id)
+    if not sequence:
+        raise HTTPException(status_code=404, detail="Sequence not found")
+    return sequence
 
 @router.get("/{sequence_id}/metrics", response_model=EmailSequenceMetrics)
 async def get_sequence_metrics(sequence_id: str):
@@ -93,26 +90,20 @@ async def list_sequences(
     """
     List all email sequences with optional filtering
     """
-    try:
-        service = EmailSequenceService()
-        sequences = await service.list_sequences(status, sequence_type, limit, offset)
-        return sequences
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    service = EmailSequenceService()
+    sequences = await service.list_sequences(status, sequence_type, limit, offset)
+    return sequences
 
 @router.delete("/{sequence_id}")
 async def delete_sequence(sequence_id: str):
     """
     Delete an email sequence
     """
-    try:
-        service = EmailSequenceService()
-        success = await service.delete_sequence(sequence_id)
-        if not success:
-            raise HTTPException(status_code=404, detail="Sequence not found")
-        return {"message": "Sequence deleted successfully"}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+    service = EmailSequenceService()
+    success = await service.delete_sequence(sequence_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Sequence not found")
+    return {"message": "Sequence deleted successfully"}
 
 @router.post("/{sequence_id}/duplicate")
 async def duplicate_sequence(sequence_id: str):

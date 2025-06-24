@@ -10,13 +10,16 @@ import aiohttp
 # Add the parent directory to the Python path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from key_messages.api import router
-from key_messages.models import KeyMessageRequest, MessageType, MessageTone
+from agents.backend_ads.key_messages.api import router
+from agents.backend_ads.key_messages.models import KeyMessageRequest, MessageType, MessageTone
 
 # Create test app
 app = FastAPI()
 app.include_router(router)
-client = TestClient(app)
+
+@pytest.fixture
+def client():
+    return TestClient(app)
 
 def test_generate_response(client: TestClient):
     """Test message generation endpoint."""

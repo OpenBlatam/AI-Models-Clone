@@ -7,9 +7,7 @@ from functools import wraps
 import time
 import logging
 from datetime import datetime
-from .base_model import OnyxBaseModel
-
-T = TypeVar('T', bound=OnyxBaseModel)
+T = TypeVar('T', bound="OnyxBaseModel")
 
 def register_model(model_class: Type[T]) -> Type[T]:
     """Decorator to register a model class."""

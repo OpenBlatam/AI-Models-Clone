@@ -3,7 +3,7 @@ from fastapi.testclient import TestClient
 from unittest.mock import Mock, patch, AsyncMock
 from typing import Dict, Any, List
 
-from ..advanced_api import (
+from agents.backend.onyx.server.features.ads.advanced_api import (
     router,
     TrainingDataRequest,
     ContentOptimizationRequest,

@@ -1,6 +1,6 @@
 import logging
 from typing import Dict, Any, Optional
-from llm_interface import call_deepseek_api
+from agents.backend_ads.llm_interface import call_deepseek_api
 from .models import MessageType, MessageTone
 
 # Configurar logging

@@ -1,8 +1,14 @@
 import pytest
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
-from ..api import router
-from ..services import EmailSequenceService
+from agents.backend_ads.email_sequence.api import router
+from agents.backend_ads.email_sequence.services import EmailSequenceService
+
+@pytest.fixture(autouse=True)
+def clean_email_sequence_service():
+    EmailSequenceService.sequences.clear()
+    EmailSequenceService.metrics.clear()
+from unittest.mock import patch
 
 @pytest.fixture
 def app():
@@ -71,4 +77,13 @@ def sample_sequence_request(sample_brand_voice, sample_audience_profile, sample_
         "number_of_emails": 5,
         "language": "en-US",
         "timezone": "UTC"
-    } 
+    }
+
+@pytest.fixture(autouse=True)
+def patch_email_sequence_service_singleton(monkeypatch):
+    # Singleton instance for all tests
+    singleton = EmailSequenceService()
+    singleton.sequences.clear()
+    singleton.metrics.clear()
+    monkeypatch.setattr('agents.backend_ads.email_sequence.api.EmailSequenceService', lambda: singleton)
+    yield 

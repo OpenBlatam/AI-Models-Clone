@@ -12,10 +12,10 @@ from .models import (
 )
 
 class EmailSequenceService:
+    sequences: Dict[str, EmailSequenceResponse] = {}
+    metrics: Dict[str, EmailSequenceMetrics] = {}
     def __init__(self):
-        # In a real implementation, this would be a database connection
-        self.sequences: Dict[str, EmailSequenceResponse] = {}
-        self.metrics: Dict[str, EmailSequenceMetrics] = {}
+        pass
 
     async def create_sequence(self, request: EmailSequenceRequest) -> EmailSequenceResponse:
         """

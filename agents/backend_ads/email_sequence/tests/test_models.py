@@ -1,6 +1,6 @@
 import pytest
 from datetime import datetime
-from ..models import (
+from agents.backend_ads.email_sequence.models import (
     BrandVoice,
     AudienceProfile,
     ContentSource,
@@ -103,17 +103,18 @@ def test_email_sequence_response_creation():
 
 def test_email_sequence_metrics_creation():
     metrics = EmailSequenceMetrics(
-        sequence_id="test-id",
-        total_sent=100,
-        opens=50,
-        clicks=25,
-        conversions=10,
-        bounces=2,
-        unsubscribes=1,
-        revenue=1000.0,
-        last_updated=datetime.utcnow().isoformat(),
-        engagement_score=0.5,
-        delivery_rate=0.98
+    sequence_id="test-id",
+    total_sent=100,
+    opens=50,
+    clicks=25,
+    conversions=10,
+    bounces=2,
+    unsubscribes=1,
+    revenue=1000.0,
+    last_updated=datetime.utcnow().isoformat(),
+    engagement_score=0.5,
+    delivery_rate=0.98,
+    spam_complaints=0
     )
     assert metrics.total_sent == 100
     assert metrics.engagement_score == 0.5

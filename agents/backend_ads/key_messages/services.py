@@ -6,7 +6,7 @@ import json
 import asyncio
 from datetime import datetime
 import uuid
-from llm_interface import call_deepseek_api
+from agents.backend_ads.llm_interface import call_deepseek_api
 import hashlib
 from functools import lru_cache
 import mmh3
@@ -83,27 +83,21 @@ class KeyMessageService:
         
         # Thread pool for parallel processing
         self.executor = ThreadPoolExecutor(max_workers=4)
-        
-        # Pre-generate common responses
-        self._pre_generate_common_responses()
-    
-    def _pre_generate_common_responses(self):
+        # Nota: Ya no se llama a la pre-generación automática aquí
+
+    async def pre_generate_common_responses(self):
         """Pre-generate common responses for faster retrieval."""
-        async def pre_generate():
-            for message_type, tones in COMMON_RESPONSES.items():
-                for msg_type, tone_responses in tones.items():
-                    for tone, response in tone_responses.items():
-                        request = KeyMessageRequest(
-                            message=message_type,
-                            message_type=MessageType(msg_type),
-                            tone=MessageTone(tone),
-                            keywords=[]
-                        )
-                        cache_key = self._generate_cache_key(request.model_dump())
-                        await self._redis_cache.set(cache_key, response)
-        
-        # Run pre-generation in background
-        asyncio.create_task(pre_generate())
+        for message_type, tones in COMMON_RESPONSES.items():
+            for msg_type, tone_responses in tones.items():
+                for tone, response in tone_responses.items():
+                    request = KeyMessageRequest(
+                        message=message_type,
+                        message_type=MessageType(msg_type),
+                        tone=MessageTone(tone),
+                        keywords=[]
+                    )
+                    cache_key = self._generate_cache_key(request.model_dump())
+                    await self._redis_cache.set(cache_key, response)
     
     def _generate_cache_key(self, data: Dict) -> str:
         """Generate a fast hash key for caching."""

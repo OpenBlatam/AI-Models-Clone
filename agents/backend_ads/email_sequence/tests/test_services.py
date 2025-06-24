@@ -1,7 +1,7 @@
 import pytest
 from datetime import datetime
-from ..services import EmailSequenceService
-from ..models import (
+from agents.backend_ads.email_sequence.services import EmailSequenceService
+from agents.backend_ads.email_sequence.models import (
     EmailSequenceRequest,
     EmailTemplate,
     BrandVoice,

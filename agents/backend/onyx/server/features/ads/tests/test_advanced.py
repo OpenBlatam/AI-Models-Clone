@@ -4,7 +4,7 @@ from typing import Dict, Any, List
 import httpx
 from fastapi import HTTPException
 
-from ..advanced import (
+from agents.backend.onyx.server.features.ads.advanced import (
     AdvancedAdsService,
     AITrainingData,
     ContentOptimization,

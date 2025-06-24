@@ -18,7 +18,7 @@ from .models import (
 )
 from .services import KeyMessageService
 
-router = APIRouter(prefix="/api/key-messages", tags=["key-messages"])
+router = APIRouter(prefix="/key-messages", tags=["key-messages"])
 
 # Inicializar el servicio
 service = KeyMessageService()

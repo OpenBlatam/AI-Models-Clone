@@ -127,9 +127,15 @@ from onyx.server.features.ads.langchain_api import router as langchain_router
 from onyx.server.features.ads.api.ai_api import router as ai_router
 from onyx.server.features.ads.api.integrated_api import router as integrated_ads_router
 
+# Import the key_messages router
+from onyx.server.features.key_messages import key_messages_router
+
 # Import the integrated router
 from onyx.server.features.integrated import integrated_router
 from onyx.server.features.integrated.api import router as integrated_router
+
+# Import the image_process router
+from onyx.server.features.image_process import image_process_router
 
 from onyx.core.config import settings
 from onyx.core.functions import format_response, handle_error
@@ -356,6 +362,8 @@ def get_application(lifespan_override: Lifespan | None = None) -> FastAPI:
     include_router_with_global_prefix_prepended(application, ai_router)
     include_router_with_global_prefix_prepended(application, integrated_router)
     include_router_with_global_prefix_prepended(application, integrated_ads_router)
+    include_router_with_global_prefix_prepended(application, key_messages_router)
+    include_router_with_global_prefix_prepended(application, image_process_router)
 
     if AUTH_TYPE == AuthType.DISABLED:
         # Server logs this during auth setup verification step

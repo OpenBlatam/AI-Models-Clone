@@ -6,7 +6,7 @@ from langchain.vectorstores import FAISS
 from langchain.agents import AgentExecutor
 from langchain.tools import Tool
 
-from ..langchain_service import LangChainService
+from agents.backend.onyx.server.features.ads.langchain_service import LangChainService
 
 # Mock LLM and embeddings
 @pytest.fixture

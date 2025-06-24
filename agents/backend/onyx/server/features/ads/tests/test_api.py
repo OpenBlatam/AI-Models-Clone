@@ -5,7 +5,7 @@ from typing import Dict, Any, List
 import httpx
 from datetime import datetime
 
-from ..api import (
+from agents.backend.onyx.server.features.ads.api import (
     router,
     AdsGenerationRequest,
     BackgroundRemovalRequest,
