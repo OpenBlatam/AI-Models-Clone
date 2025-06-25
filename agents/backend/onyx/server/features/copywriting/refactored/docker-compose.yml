@@ -1,0 +1,359 @@
+# Production Docker Compose Configuration
+# ========================================
+# Complete production stack with optimization and monitoring
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # Main Copywriting Service
+  # ============================================================================
+  copywriting-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: copywriting-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    environment:
+      # Application Settings
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - HOST=0.0.0.0
+      - PORT=8000
+      - LOG_LEVEL=INFO
+      
+      # AI Provider Settings (Set these in .env file)
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      
+      # Database Configuration
+      - DATABASE_URL=postgresql://copywriting:copywriting_password@postgres:5432/copywriting
+      
+      # Redis Configuration
+      - REDIS_URL=redis://redis:6379/0
+      - REDIS_MAX_CONNECTIONS=100
+      - REDIS_CACHE_TTL=86400
+      
+      # Performance Optimization
+      - ENABLE_JIT=true
+      - MAX_WORKERS=2
+      - MEMORY_LIMIT_MB=1024
+      - CACHE_COMPRESSION=true
+      - MEMORY_CACHE_SIZE=1000
+      
+      # Security
+      - VALID_API_KEYS=${VALID_API_KEYS:-}
+      - RATE_LIMIT_PER_MINUTE=100
+      - CORS_ORIGINS=*
+      
+      # Monitoring
+      - ENABLE_METRICS=true
+      - METRICS_PORT=8001
+      - HEALTH_CHECK_INTERVAL=30
+    
+    volumes:
+      - ./logs:/app/logs
+      - ./cache:/app/cache
+    
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    
+    networks:
+      - copywriting-network
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '1.0'
+        reservations:
+          memory: 512M
+          cpus: '0.5'
+
+  # ============================================================================
+  # PostgreSQL Database
+  # ============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: copywriting-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=copywriting
+      - POSTGRES_USER=copywriting
+      - POSTGRES_PASSWORD=copywriting_password
+      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256
+    
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    
+    ports:
+      - "5432:5432"
+    
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U copywriting -d copywriting"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    
+    networks:
+      - copywriting-network
+    
+    # PostgreSQL optimization
+    command: >
+      postgres
+      -c shared_preload_libraries=pg_stat_statements
+      -c pg_stat_statements.max=10000
+      -c pg_stat_statements.track=all
+      -c max_connections=200
+      -c shared_buffers=256MB
+      -c effective_cache_size=1GB
+      -c maintenance_work_mem=64MB
+      -c checkpoint_completion_target=0.9
+      -c wal_buffers=16MB
+      -c default_statistics_target=100
+      -c random_page_cost=1.1
+      -c effective_io_concurrency=200
+
+  # ============================================================================
+  # Redis Cache
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: copywriting-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    
+    volumes:
+      - redis_data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf:ro
+    
+    command: redis-server /usr/local/etc/redis/redis.conf
+    
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+      start_period: 30s
+    
+    networks:
+      - copywriting-network
+    
+    # Redis optimization
+    sysctls:
+      - net.core.somaxconn=65535
+
+  # ============================================================================
+  # Nginx Reverse Proxy
+  # ============================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: copywriting-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    
+    depends_on:
+      - copywriting-service
+    
+    networks:
+      - copywriting-network
+    
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================================================
+  # Prometheus Monitoring
+  # ============================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: copywriting-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    
+    networks:
+      - copywriting-network
+
+  # ============================================================================
+  # Grafana Dashboard
+  # ============================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: copywriting-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    
+    networks:
+      - copywriting-network
+
+  # ============================================================================
+  # Log Aggregation (Optional)
+  # ============================================================================
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: copywriting-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    
+    ports:
+      - "9200:9200"
+    
+    networks:
+      - copywriting-network
+    
+    profiles:
+      - logging
+
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.11.0
+    container_name: copywriting-logstash
+    restart: unless-stopped
+    volumes:
+      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
+      - ./logs:/app/logs:ro
+    
+    depends_on:
+      - elasticsearch
+    
+    networks:
+      - copywriting-network
+    
+    profiles:
+      - logging
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: copywriting-kibana
+    restart: unless-stopped
+    ports:
+      - "5601:5601"
+    
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    
+    depends_on:
+      - elasticsearch
+    
+    networks:
+      - copywriting-network
+    
+    profiles:
+      - logging
+
+# ============================================================================
+# Networks
+# ============================================================================
+networks:
+  copywriting-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ============================================================================
+# Volumes
+# ============================================================================
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  elasticsearch_data:
+    driver: local
+  nginx_logs:
+    driver: local
+
+# ============================================================================
+# Usage Instructions
+# ============================================================================
+
+# Basic production deployment:
+# docker-compose up -d
+
+# With monitoring:
+# docker-compose --profile monitoring up -d
+
+# With logging:
+# docker-compose --profile logging up -d
+
+# Full stack:
+# docker-compose --profile monitoring --profile logging up -d
+
+# Scale the main service:
+# docker-compose up -d --scale copywriting-service=3
+
+# View logs:
+# docker-compose logs -f copywriting-service
+
+# Health check:
+# curl http://localhost/health
+
+# Metrics:
+# curl http://localhost/metrics
+
+# Stop all services:
+# docker-compose down
+
+# Remove all data:
+# docker-compose down -v 

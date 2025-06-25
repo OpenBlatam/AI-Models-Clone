@@ -290,6 +290,27 @@ def log_http_error(request: Request, exc: Exception) -> JSONResponse:
     )
 
 
+# --- Observability & Monitoring ---
+# Sentry is already integrated above.
+
+# --- Security: CORS Middleware ---
+from fastapi.middleware.cors import CORSMiddleware
+
+# --- Rate Limiting ---
+# pip install fastapi-limiter aioredis
+from fastapi_limiter import FastAPILimiter
+from fastapi_limiter.depends import RateLimiter
+import aioredis
+
+# --- Caching ---
+# pip install fastapi-cache2 aioredis
+from fastapi_cache2 import FastAPICache
+from fastapi_cache2.backends.redis import RedisBackend
+
+# --- Health Check ---
+# pip install fastapi-health
+from fastapi_health import health
+
 def get_application(lifespan_override: Lifespan | None = None) -> FastAPI:
     application = FastAPI(
         title="Onyx Backend",
@@ -447,13 +468,56 @@ def get_application(lifespan_override: Lifespan | None = None) -> FastAPI:
 
     application.add_exception_handler(ValueError, value_error_handler)
 
+    # --- CORS Middleware ---
     application.add_middleware(
         CORSMiddleware,
-        allow_origins=CORS_ALLOWED_ORIGIN,  # Configurable via environment variable
+        allow_origins=["*"],  # TODO: Replace with allowed origins from config
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+    # --- Rate Limiter Startup ---
+    @application.on_event("startup")
+    async def startup_event():
+        redis = await aioredis.create_redis_pool("redis://localhost")  # TODO: Use config/env var
+        await FastAPILimiter.init(redis)
+        FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
+
+    # --- Health Check Endpoint ---
+    application.add_api_route("/health", health([lambda: True]), tags=["health"])
+
+    # --- Example: Add rate limiting to a route ---
+    # from fastapi import Depends
+    # @application.get("/limited-endpoint", dependencies=[Depends(RateLimiter(times=5, seconds=60))])
+    # async def limited_endpoint():
+    #     return {"message": "Rate limited!"}
+
+    # --- Example: Add cache to a route ---
+    # from fastapi_cache2.decorator import cache
+    # @application.get("/cached-endpoint")
+    # @cache(expire=60)
+    # async def cached_endpoint():
+    #     return {"message": "Cached!"}
+
+    # --- TODO: Integrate MLflow for experiment tracking in service layer
+    # import mlflow
+    # mlflow.start_run(), mlflow.log_param(), mlflow.log_metric(), etc.
+
+    # --- TODO: Integrate Dask for distributed batch jobs in tasks.py
+    # from dask.distributed import Client
+    # client = Client("tcp://scheduler:8786")
+
+    # --- TODO: Run Flower for Celery monitoring: `celery -A your_app flower`
+
+    # --- TODO: Use Pydantic Settings for robust config management
+    # from pydantic_settings import BaseSettings
+    # class Settings(BaseSettings): ...
+
+    # --- TODO: Use FastAPI-Filter for advanced filtering in feedback endpoints
+    # from fastapi_filter import FilterDepends, with_prefix
+    # class FeedbackFilter(Filter): ...
+
     application.add_middleware(GZipMiddleware, minimum_size=100)
     if LOG_ENDPOINT_LATENCY:
         add_latency_logging_middleware(application, logger)

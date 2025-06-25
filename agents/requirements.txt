@@ -2,4 +2,6 @@ openai-whisper
 elevenlabs
 soundfile
 numpy
-requests 
+continua
+clean up
+refactory

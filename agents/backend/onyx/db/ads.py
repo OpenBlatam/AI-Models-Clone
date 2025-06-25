@@ -106,29 +106,35 @@ from datetime import datetime
 from typing import Optional, Dict, Any, List
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, JSON, Text
 from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declared_attr
 
 from onyx.db.base import Base
 from onyx.db.users import User
 
-class AdsGeneration(Base):
-    """Model for storing ads generation results."""
+class BaseModelMixin:
+    """Mixin for shared model fields."""
+    @declared_attr
+    def user_id(cls):
+        return Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    is_deleted = Column(Boolean, default=False)
+
+class AdsGeneration(Base, BaseModelMixin):
+    """Model for storing ads generation results, including advanced/EE fields and content variations."""
     __tablename__ = "ads_generations"
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     url = Column(String(255), nullable=True)
     type = Column(String(50), nullable=False)  # ads, brand-kit, custom
     prompt = Column(Text, nullable=True)
     content = Column(JSON, nullable=False)
     metadata = Column(JSON, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    is_deleted = Column(Boolean, default=False)
 
-    # Brand voice settings
+    # Advanced/EE fields
     brand_voice = Column(JSON, nullable=True)  # Stores BrandVoice schema
     audience_profile = Column(JSON, nullable=True)  # Stores AudienceProfile schema
     project_context = Column(JSON, nullable=True)  # Stores ProjectContext schema
+    content_variations = Column(JSON, nullable=True)  # Stores list of ad variations
 
     # Relationships
     user = relationship("User", back_populates="ads_generations")
@@ -147,24 +153,18 @@ class AdsGeneration(Base):
             "brand_voice": self.brand_voice,
             "audience_profile": self.audience_profile,
             "project_context": self.project_context,
+            "content_variations": self.content_variations,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat()
         }
 
-class BackgroundRemoval(Base):
-    """Model for storing background removal results."""
+class BackgroundRemoval(Base, BaseModelMixin):
+    """Model for storing background removal results, including advanced image processing settings."""
     __tablename__ = "background_removals"
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     original_image_url = Column(String(255), nullable=True)
     processed_image_url = Column(String(255), nullable=False)
     metadata = Column(JSON, nullable=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    is_deleted = Column(Boolean, default=False)
-
-    # Image processing settings
     image_settings = Column(JSON, nullable=True)  # Stores image processing settings
     content_sources = Column(JSON, nullable=True)  # Stores ContentSource schema
 
@@ -185,18 +185,12 @@ class BackgroundRemoval(Base):
             "updated_at": self.updated_at.isoformat()
         }
 
-class AdsAnalytics(Base):
-    """Model for storing ads analytics data."""
+class AdsAnalytics(Base, BaseModelMixin):
+    """Model for storing ads analytics data, including email sequence metrics/settings."""
     __tablename__ = "ads_analytics"
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     ads_generation_id = Column(Integer, ForeignKey("ads_generations.id"), nullable=False)
     metrics = Column(JSON, nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-
-    # Email sequence metrics
     email_metrics = Column(JSON, nullable=True)  # Stores EmailSequenceMetrics schema
     email_settings = Column(JSON, nullable=True)  # Stores EmailSequenceSettings schema
 
