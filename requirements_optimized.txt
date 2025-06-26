@@ -1,0 +1,63 @@
+# Dependencias Ultra-Optimizadas para Sistema de Blogs de Producción
+# =====================================================================
+
+# Core Framework - FastAPI con todas las optimizaciones
+fastapi[all]>=0.104.0
+
+# Servidor ASGI ultra-optimizado
+uvicorn[standard]>=0.24.0
+
+# HTTP Cliente moderno con HTTP/2
+httpx>=0.25.0
+
+# JSON ultra-rápido (2-3x más rápido que json estándar)
+orjson>=3.9.0
+
+# Validaciones ultra-rápidas (5-10x más rápido que Pydantic V1)
+pydantic>=2.4.0
+
+# Event loop optimizado (2x más rápido que asyncio)
+uvloop>=0.19.0
+
+# Cache distribuido
+redis>=5.0.0
+
+# Métricas de producción
+prometheus-client>=0.19.0
+
+# Logging estructurado
+structlog>=23.2.0
+
+# Retry y fault tolerance
+tenacity>=8.2.0
+
+# Variables de entorno
+python-dotenv>=1.0.0
+
+# Monitoreo y observabilidad
+opentelemetry-api>=1.21.0
+opentelemetry-sdk>=1.21.0
+
+# Compresión avanzada
+lz4>=4.3.0
+zstandard>=0.22.0
+
+# Criptografía optimizada
+cryptography>=41.0.0
+
+# Base de datos async (opcional)
+asyncpg>=0.29.0
+sqlalchemy[asyncio]>=2.0.0
+
+# Testing optimizado
+pytest-asyncio>=0.21.0
+pytest-benchmark>=4.0.0
+
+# Profiling y debugging
+py-spy>=0.3.14
+memory-profiler>=0.61.0
+
+# Desarrollo
+black>=23.0.0
+isort>=5.12.0
+mypy>=1.7.0 

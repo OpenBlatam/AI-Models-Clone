@@ -1,0 +1,67 @@
+# Advanced NLP Libraries for Ultra High-Quality Blog Content
+# Best-in-class NLP tools for 2024-2025
+
+# Core NLP Processing
+spacy>=3.7.0
+nltk>=3.8.1
+transformers>=4.35.0
+sentence-transformers>=2.2.2
+
+# Text Analysis & Quality Metrics
+textstat>=0.7.3
+textblob>=0.17.1
+yake>=0.4.8
+keybert>=0.8.1
+
+# Language Detection & Grammar
+langdetect>=1.0.9
+language-tool-python>=2.7.1
+
+# Topic Modeling & Embeddings
+gensim>=4.3.2
+umap-learn>=0.5.4
+
+# Summarization
+sumy>=0.11.0
+
+# Advanced Text Processing
+unstructured>=0.10.30
+markdownify>=0.11.6
+
+# Grammar & Style Checking
+grammarbot>=0.2.0
+
+# Text Similarity & Semantic Analysis
+scikit-learn>=1.3.0
+numpy>=1.24.0
+scipy>=1.11.0
+
+# Visualization (for analysis)
+wordcloud>=1.9.2
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Performance Optimization
+torch>=2.0.0
+accelerate>=0.23.0
+
+# Utility
+tqdm>=4.66.0
+regex>=2023.8.8
+beautifulsoup4>=4.12.0
+
+# Spanish Language Models (for spaCy)
+# Run: python -m spacy download es_core_news_sm
+# Run: python -m spacy download es_core_news_md
+# Run: python -m spacy download es_core_news_lg
+
+# English Language Models (for spaCy)  
+# Run: python -m spacy download en_core_web_sm
+# Run: python -m spacy download en_core_web_md
+# Run: python -m spacy download en_core_web_lg
+
+# NLTK Data Downloads (run after installation)
+# python -c "import nltk; nltk.download('punkt')"
+# python -c "import nltk; nltk.download('stopwords')"
+# python -c "import nltk; nltk.download('vader_lexicon')"
+# python -c "import nltk; nltk.download('wordnet')" 

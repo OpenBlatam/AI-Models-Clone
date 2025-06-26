@@ -1,0 +1,182 @@
+# ============================================
+# ONYX BLOG POST SYSTEM - Requirements
+# ============================================
+# Sistema modular de generación de blog posts
+# Compatible con OpenRouter, LangChain y Onyx
+
+# Core dependencies (REQUIRED)
+# ============================================
+aiohttp==3.9.1                    # HTTP client async
+asyncio-throttle==1.0.2            # Rate limiting for API calls
+async-timeout==4.0.3              # Timeout handling for async operations
+dataclasses>=0.6                  # Data structures (Python 3.7+)
+typing-extensions>=4.8.0          # Extended typing support
+python-dateutil==2.8.2            # Date utilities
+uuid>=1.30                        # UUID generation
+
+# OpenRouter API integration
+# ============================================
+httpx>=0.24.0                     # Modern HTTP client
+requests==2.31.0                  # HTTP requests fallback
+urllib3>=1.26.0                   # URL handling
+
+# LangChain integration (RECOMMENDED)
+# ============================================
+langchain>=0.1.0                  # LangChain core
+langchain-community>=0.0.10       # LangChain community features
+langchain-core>=0.1.0             # LangChain core components
+
+# Text processing and validation
+# ============================================
+textstat==0.7.3                   # Text readability metrics
+nltk==3.8.1                         # Natural language processing
+spacy==3.7.2                      # Advanced NLP (optional)
+unicodedata2>=15.0.0              # Unicode normalization
+
+# Configuration and serialization
+# ============================================
+pydantic==2.5.3                   # Data validation
+pyyaml==6.0.1                       # YAML configuration
+toml>=0.10.0                      # TOML configuration
+configparser==6.0.0               # INI configuration
+
+# Performance optimization (RECOMMENDED)
+# ============================================
+orjson==3.9.12                     # Ultra-fast JSON
+ujson>=5.6.0                      # Fast JSON fallback
+blake3>=0.3.0                     # Fast hashing
+lz4>=4.0.0                        # Fast compression
+zstandard>=0.19.0                 # Compression alternative
+
+# Caching and storage
+# ============================================
+redis>=4.5.0                      # Redis cache (optional)
+python-memcached>=1.59            # Memcached support
+diskcache==5.6.3                  # Disk-based cache
+
+# Database integration (for Onyx)
+# ============================================
+sqlalchemy==2.0.25                # Database ORM
+psycopg2-binary>=2.9.0           # PostgreSQL driver
+asyncpg>=0.29.0                  # Async PostgreSQL
+
+# Monitoring and logging
+# ============================================
+structlog==23.2.0                # Structured logging
+prometheus-client==0.19.0        # Metrics collection
+opentelemetry-api>=1.17.0        # Telemetry (optional)
+
+# Development and testing (DEV ONLY)
+# ============================================
+pytest==7.4.4                    # Testing framework
+pytest-asyncio==0.23.2           # Async testing
+pytest-cov==4.1.0                # Coverage reporting
+black==23.12.1                    # Code formatting
+isort==5.13.2                    # Import sorting
+mypy==1.8.0                      # Type checking
+flake8==7.0.0                    # Linting
+pre-commit==3.6.0                # Git hooks
+
+# Documentation (DEV ONLY)
+# ============================================
+sphinx==7.2.6                    # Documentation generator
+sphinx-rtd-theme>=1.2.0          # Read the Docs theme
+myst-parser==2.0.0               # Markdown support
+
+# Optional ML/AI enhancements
+# ============================================
+transformers>=4.25.0             # Hugging Face transformers
+torch>=2.0.0                     # PyTorch (for local models)
+sentence-transformers>=2.2.0     # Sentence embeddings
+openai>=1.0.0                    # OpenAI API (alternative)
+anthropic>=0.5.0                 # Anthropic API (alternative)
+
+# Utility libraries
+# ============================================
+click==8.1.7                     # CLI interface
+tqdm>=4.64.0                     # Progress bars
+rich==13.7.0                     # Rich terminal output
+colorama>=0.4.6                  # Cross-platform colors
+
+# Security and validation
+# ============================================
+cryptography==41.0.8             # Cryptographic recipes
+pycryptodome>=3.17.0             # Crypto algorithms
+validators>=0.20.0               # Input validation
+bleach>=6.0.0                    # HTML sanitization
+
+# Environment and deployment
+# ============================================
+python-decouple==3.8             # Environment variables
+gunicorn>=20.1.0                 # WSGI server
+uvicorn>=0.20.0                  # ASGI server
+fastapi>=0.95.0                  # API framework (if needed)
+
+# Monitoring and health checks
+# ============================================
+psutil==5.9.7                    # System monitoring
+memory-profiler>=0.61.0          # Memory profiling
+line-profiler==4.1.1             # Line profiling
+
+# ============================================
+# INSTALLATION NOTES
+# ============================================
+
+# Minimal installation (core functionality):
+# pip install aiohttp asyncio-throttle async-timeout dataclasses typing-extensions httpx
+
+# Recommended installation (full features):
+# pip install -r requirements.txt
+
+# Development installation:
+# pip install -r requirements.txt -r requirements-dev.txt
+
+# Docker installation:
+# FROM python:3.11-slim
+# COPY requirements.txt .
+# RUN pip install -r requirements.txt
+
+# ============================================
+# COMPATIBILITY
+# ============================================
+# Python: >=3.8 (recommended 3.11+)
+# OS: Linux, macOS, Windows
+# Memory: 512MB minimum, 2GB recommended
+# Disk: 100MB for code + cache space
+
+# ============================================
+# OPTIONAL SYSTEM DEPENDENCIES
+# ============================================
+# For full NLP features:
+# - spacy models: python -m spacy download en_core_web_sm
+# - NLTK data: python -m nltk.downloader punkt stopwords
+
+# For Redis cache:
+# - Redis server: apt-get install redis-server (Ubuntu)
+# - Redis server: brew install redis (macOS)
+
+# For PostgreSQL:
+# - PostgreSQL: apt-get install postgresql-client (Ubuntu)
+# - PostgreSQL: brew install postgresql (macOS)
+
+# ============================================
+# ENVIRONMENT VARIABLES
+# ============================================
+# Required:
+# OPENROUTER_API_KEY=your_openrouter_api_key
+
+# Optional:
+# ONYX_API_KEY=your_onyx_api_key
+# ONYX_BASE_URL=http://localhost:8080
+# REDIS_URL=redis://localhost:6379
+# DATABASE_URL=postgresql://user:pass@localhost/db
+# LOG_LEVEL=INFO
+# ENVIRONMENT=development
+
+# ============================================
+# VERSION CONSTRAINTS EXPLAINED
+# ============================================
+# - Core deps use >= for maximum compatibility
+# - Performance deps pinned for stability
+# - Dev tools use >= for latest features
+# - Security deps use >= for latest patches 

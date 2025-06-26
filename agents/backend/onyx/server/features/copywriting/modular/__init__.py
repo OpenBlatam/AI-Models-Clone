@@ -1,11 +1,17 @@
+# -*- coding: utf-8 -*-
 """
-Modular Copywriting Service Package.
+Modular Copywriting System
+=========================
 
-Clean, modular architecture for production copywriting service:
-- Separated concerns (config, service, cache, models)
-- Easy to test and maintain
-- Optimized for performance
-- Production-ready
+Sistema de copywriting modular y escalable para producción.
+
+Architecture:
+- optimization/ - Motor de optimización
+- cache/ - Sistema de cache multi-nivel  
+- models/ - Modelos de datos
+- services/ - Servicios principales
+- config/ - Configuración
+- utils/ - Utilidades
 """
 
 from .config import ModularConfig, get_config
@@ -15,6 +21,7 @@ from .optimization import OptimizationDetector, get_optimization_level
 from .api import create_api_router
 
 __version__ = "1.0.0"
+__author__ = "Production Team"
 __all__ = [
     "ModularConfig",
     "ModularCopywritingService", 
