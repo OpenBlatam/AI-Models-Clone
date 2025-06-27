@@ -1,1 +1,0 @@
-# Sistema Ultra Optimizado

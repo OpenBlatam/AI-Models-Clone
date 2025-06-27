@@ -14,10 +14,10 @@ class CursorChatAutomator:
         
         # Comandos a ejecutar en secuencia
         self.commands = [
-            {"text": "optimiza", "wait": 200},
-            {"text": "optimiza con librerias", "wait": 200}, 
-            {"text": "refactor", "wait": 200},
-            {"text": "codigo de produccion", "wait": 100}
+            {"text": "optimiza", "wait": 300},
+            {"text": "optimiza con librerias", "wait": 300}, 
+            {"text": "refactor", "wait": 300},
+            {"text": "codigo de produccion", "wait": 300}
         ]
         
         self.running = True
