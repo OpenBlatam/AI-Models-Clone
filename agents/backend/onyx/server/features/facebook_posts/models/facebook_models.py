@@ -1,9 +1,9 @@
 """
-🎯 Facebook Posts Models
-========================
+🎯 Facebook Posts Models - Onyx Integration
+==========================================
 
-Modelos de datos para el sistema de Facebook posts integrado con Onyx.
-Compatibles con LangChain y optimizados para performance.
+Modelos avanzados para el sistema de Facebook posts integrado con Onyx.
+Clean Architecture + LangChain + Performance Optimizations.
 """
 
 from typing import Optional, List, Dict, Any, Union
@@ -11,13 +11,16 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 import uuid
-from pydantic import BaseModel, Field, validator
+import hashlib
+from pydantic import BaseModel, Field, validator, root_validator
 
 
-class FacebookPostType(str, Enum):
+# ===== ENUMS =====
+
+class PostType(str, Enum):
     """Tipos de posts de Facebook."""
     TEXT = "text"
-    IMAGE = "image"
+    IMAGE = "image" 
     VIDEO = "video"
     LINK = "link"
     CAROUSEL = "carousel"
@@ -26,8 +29,8 @@ class FacebookPostType(str, Enum):
     STORY = "story"
 
 
-class FacebookTone(str, Enum):
-    """Tonos de comunicación para Facebook."""
+class ContentTone(str, Enum):
+    """Tonos de comunicación."""
     PROFESSIONAL = "professional"
     CASUAL = "casual"
     FRIENDLY = "friendly"
@@ -38,8 +41,8 @@ class FacebookTone(str, Enum):
     CONTROVERSIAL = "controversial"
 
 
-class FacebookAudience(str, Enum):
-    """Audiencias objetivo para Facebook."""
+class TargetAudience(str, Enum):
+    """Audiencias objetivo."""
     GENERAL = "general"
     YOUNG_ADULTS = "young_adults"
     PROFESSIONALS = "professionals"
@@ -50,246 +53,605 @@ class FacebookAudience(str, Enum):
     CUSTOM = "custom"
 
 
-class EngagementLevel(str, Enum):
-    """Niveles de engagement."""
+class ContentStatus(str, Enum):
+    """Estados del contenido."""
+    DRAFT = "draft"
+    UNDER_REVIEW = "under_review"
+    APPROVED = "approved"
+    SCHEDULED = "scheduled"
+    PUBLISHED = "published"
+    ARCHIVED = "archived"
+    REJECTED = "rejected"
+
+
+class EngagementTier(str, Enum):
+    """Niveles de engagement objetivo."""
     LOW = "low"
     MEDIUM = "medium"
     HIGH = "high"
     VIRAL = "viral"
 
 
-@dataclass
-class FacebookFingerprint:
-    """Identificador único para posts de Facebook."""
-    post_id: str
+class QualityTier(str, Enum):
+    """Niveles de calidad."""
+    POOR = "poor"
+    FAIR = "fair"
+    GOOD = "good"
+    EXCELLENT = "excellent"
+    PREMIUM = "premium"
+
+
+# ===== CORE VALUE OBJECTS =====
+
+@dataclass(frozen=True)
+class ContentIdentifier:
+    """Identificador único e inmutable del contenido."""
+    content_id: str
     content_hash: str
-    timestamp: datetime
-    platform_version: str = "facebook_v1.0"
+    created_at: datetime
+    fingerprint: str
     
     @classmethod
-    def create(cls, content: str, post_type: FacebookPostType = FacebookPostType.TEXT) -> 'FacebookFingerprint':
-        """Crear fingerprint para contenido."""
-        import hashlib
+    def generate(cls, content_text: str, metadata: Optional[Dict[str, Any]] = None) -> 'ContentIdentifier':
+        """Generar identificador único."""
+        content_id = str(uuid.uuid4())
+        content_hash = hashlib.sha256(content_text.encode()).hexdigest()[:16]
+        created_at = datetime.now()
         
-        content_hash = hashlib.md5(content.encode()).hexdigest()
-        post_id = str(uuid.uuid4())
+        # Create fingerprint with metadata
+        fingerprint_data = f"{content_text}{metadata or {}}{created_at.isoformat()}"
+        fingerprint = hashlib.md5(fingerprint_data.encode()).hexdigest()[:12]
         
         return cls(
-            post_id=post_id,
+            content_id=content_id,
             content_hash=content_hash,
-            timestamp=datetime.now(),
-            platform_version="facebook_v1.0"
+            created_at=created_at,
+            fingerprint=fingerprint
         )
-
-
-class FacebookRequest(BaseModel):
-    """Request para generar Facebook post."""
-    content_topic: str = Field(..., description="Tema principal del post")
-    post_type: FacebookPostType = Field(FacebookPostType.TEXT, description="Tipo de post")
-    tone: FacebookTone = Field(FacebookTone.CASUAL, description="Tono del post")
-    target_audience: FacebookAudience = Field(FacebookAudience.GENERAL, description="Audiencia objetivo")
-    
-    # Configuración de contenido
-    max_length: int = Field(280, description="Longitud máxima del texto")
-    include_hashtags: bool = Field(True, description="Incluir hashtags")
-    include_emoji: bool = Field(True, description="Incluir emojis")
-    include_call_to_action: bool = Field(True, description="Incluir call to action")
-    
-    # Configuración avanzada
-    keywords: List[str] = Field(default_factory=list, description="Keywords clave")
-    brand_voice: Optional[str] = Field(None, description="Voz de marca específica")
-    campaign_context: Optional[str] = Field(None, description="Contexto de campaña")
-    target_engagement: EngagementLevel = Field(EngagementLevel.HIGH, description="Nivel de engagement objetivo")
-    
-    # Configuración multimedia
-    include_image: bool = Field(False, description="Incluir imagen")
-    image_description: Optional[str] = Field(None, description="Descripción de imagen deseada")
-    include_video: bool = Field(False, description="Incluir video")
-    video_concept: Optional[str] = Field(None, description="Concepto de video")
-    
-    @validator('max_length')
-    def validate_max_length(cls, v):
-        if v < 50:
-            raise ValueError('max_length debe ser al menos 50 caracteres')
-        if v > 2000:
-            raise ValueError('max_length no puede exceder 2000 caracteres')
-        return v
 
 
 @dataclass
-class FacebookAnalysis:
-    """Análisis de un Facebook post."""
-    engagement_prediction: float  # 0.0 - 1.0
-    virality_score: float  # 0.0 - 1.0
-    sentiment_score: float  # 0.0 - 1.0
-    readability_score: float  # 0.0 - 1.0
-    brand_alignment: float  # 0.0 - 1.0
+class PostSpecification:
+    """Especificación para generación de post."""
+    topic: str
+    post_type: PostType
+    tone: ContentTone
+    target_audience: TargetAudience
+    keywords: List[str]
+    target_engagement: EngagementTier = EngagementTier.HIGH
     
-    # Métricas detalladas
-    predicted_likes: int
-    predicted_shares: int
-    predicted_comments: int
-    predicted_reach: int
-    optimal_posting_time: Optional[datetime] = None
-    
-    # Insights y recomendaciones
-    strengths: List[str] = field(default_factory=list)
-    improvements: List[str] = field(default_factory=list)
-    hashtag_suggestions: List[str] = field(default_factory=list)
-    similar_successful_posts: List[str] = field(default_factory=list)
-    
-    def overall_score(self) -> float:
-        """Calcular score general del post."""
-        return (
-            self.engagement_prediction * 0.3 +
-            self.virality_score * 0.25 +
-            self.sentiment_score * 0.2 +
-            self.readability_score * 0.15 +
-            self.brand_alignment * 0.1
-        )
+    def __post_init__(self):
+        if not self.topic.strip():
+            raise ValueError("Topic cannot be empty")
+        if len(self.topic) > 200:
+            raise ValueError("Topic too long (max 200 chars)")
 
 
-class FacebookPost(BaseModel):
-    """Modelo principal de Facebook post."""
+@dataclass
+class GenerationConfig:
+    """Configuración de generación."""
+    max_length: int = 280
+    include_hashtags: bool = True
+    include_emojis: bool = True
+    include_call_to_action: bool = True
+    brand_voice: Optional[str] = None
+    campaign_context: Optional[str] = None
+    custom_instructions: Optional[str] = None
     
-    # Identificación
-    fingerprint: FacebookFingerprint = Field(..., description="Identificador único")
-    post_type: FacebookPostType = Field(..., description="Tipo de post")
+    def __post_init__(self):
+        if self.max_length < 50 or self.max_length > 2000:
+            raise ValueError("max_length must be between 50 and 2000")
+
+
+# ===== CONTENT MODELS =====
+
+class FacebookPostContent(BaseModel):
+    """Contenido del post."""
+    text: str = Field(..., min_length=10, max_length=2000)
+    hashtags: List[str] = Field(default_factory=list, max_items=30)
+    mentions: List[str] = Field(default_factory=list, max_items=10)
+    media_urls: List[str] = Field(default_factory=list, max_items=10)
+    link_url: Optional[str] = None
+    call_to_action: Optional[str] = None
     
-    # Contenido principal
-    text_content: str = Field(..., description="Contenido de texto")
-    hashtags: List[str] = Field(default_factory=list, description="Hashtags del post")
-    mentions: List[str] = Field(default_factory=list, description="Menciones (@)")
+    @validator('hashtags', each_item=True)
+    def validate_hashtags(cls, v):
+        if not v.replace('_', '').replace('-', '').isalnum():
+            raise ValueError(f"Invalid hashtag format: {v}")
+        return v.lower()
     
-    # Multimedia
-    image_urls: List[str] = Field(default_factory=list, description="URLs de imágenes")
-    video_url: Optional[str] = Field(None, description="URL de video")
-    link_url: Optional[str] = Field(None, description="URL de enlace")
-    link_preview: Optional[Dict[str, Any]] = Field(None, description="Preview del enlace")
-    
-    # Metadatos
-    tone: FacebookTone = Field(..., description="Tono del post")
-    target_audience: FacebookAudience = Field(..., description="Audiencia objetivo")
-    campaign_id: Optional[str] = Field(None, description="ID de campaña")
-    
-    # Análisis
-    analysis: Optional[FacebookAnalysis] = Field(None, description="Análisis del post")
-    
-    # Configuración de publicación
-    scheduled_time: Optional[datetime] = Field(None, description="Hora programada")
-    auto_publish: bool = Field(False, description="Publicación automática")
-    
-    # Tracking
-    created_at: datetime = Field(default_factory=datetime.now)
-    updated_at: datetime = Field(default_factory=datetime.now)
-    version: str = Field("1.0", description="Versión del post")
-    
-    # LangChain metadata
-    langchain_metadata: Dict[str, Any] = Field(default_factory=dict, description="Metadata de LangChain")
-    generation_metrics: Dict[str, Any] = Field(default_factory=dict, description="Métricas de generación")
-    
-    class Config:
-        json_encoders = {
-            datetime: lambda v: v.isoformat()
-        }
+    @validator('text')
+    def validate_text(cls, v):
+        if not v.strip():
+            raise ValueError("Text content cannot be empty")
+        return v.strip()
     
     def get_display_text(self) -> str:
-        """Obtener texto para mostrar (con hashtags)."""
-        text = self.text_content
+        """Obtener texto completo para mostrar."""
+        text = self.text
         if self.hashtags:
             text += "\n\n" + " ".join(f"#{tag}" for tag in self.hashtags)
         return text
     
+    def get_word_count(self) -> int:
+        """Contar palabras."""
+        return len(self.text.split())
+    
     def get_character_count(self) -> int:
-        """Obtener conteo de caracteres del post completo."""
+        """Contar caracteres del contenido completo."""
         return len(self.get_display_text())
-    
-    def is_within_limits(self) -> bool:
-        """Verificar si el post está dentro de los límites de Facebook."""
-        return self.get_character_count() <= 2000
-    
-    def get_engagement_prediction(self) -> float:
-        """Obtener predicción de engagement."""
-        if self.analysis:
-            return self.analysis.engagement_prediction
-        return 0.5  # Default neutral
 
 
-class FacebookPostVariation(BaseModel):
-    """Variación de un Facebook post."""
-    base_post_id: str = Field(..., description="ID del post base")
-    variation_type: str = Field(..., description="Tipo de variación")
-    post: FacebookPost = Field(..., description="Post variado")
-    differences: List[str] = Field(default_factory=list, description="Diferencias con el original")
-    a_b_test_metrics: Dict[str, Any] = Field(default_factory=dict, description="Métricas de A/B testing")
+# ===== ANALYSIS MODELS =====
+
+class ContentMetrics(BaseModel):
+    """Métricas de contenido."""
+    character_count: int
+    word_count: int
+    hashtag_count: int
+    mention_count: int
+    emoji_count: int
+    readability_score: float = Field(ge=0.0, le=1.0)
+    sentiment_score: float = Field(ge=-1.0, le=1.0)
+    
+    
+class EngagementPrediction(BaseModel):
+    """Predicción de engagement."""
+    engagement_rate: float = Field(ge=0.0, le=1.0)
+    virality_score: float = Field(ge=0.0, le=1.0)
+    predicted_likes: int = Field(ge=0)
+    predicted_shares: int = Field(ge=0)
+    predicted_comments: int = Field(ge=0)
+    predicted_reach: int = Field(ge=0)
+    confidence_level: float = Field(ge=0.0, le=1.0, default=0.8)
 
 
-class FacebookCampaign(BaseModel):
-    """Campaña de Facebook posts."""
-    campaign_id: str = Field(..., description="ID de la campaña")
-    name: str = Field(..., description="Nombre de la campaña")
-    description: Optional[str] = Field(None, description="Descripción")
+class QualityAssessment(BaseModel):
+    """Evaluación de calidad."""
+    overall_score: float = Field(ge=0.0, le=1.0)
+    quality_tier: QualityTier
+    brand_alignment: float = Field(ge=0.0, le=1.0)
+    audience_relevance: float = Field(ge=0.0, le=1.0)
+    trend_alignment: float = Field(ge=0.0, le=1.0)
+    clarity_score: float = Field(ge=0.0, le=1.0)
     
-    posts: List[FacebookPost] = Field(default_factory=list, description="Posts de la campaña")
-    variations: List[FacebookPostVariation] = Field(default_factory=list, description="Variaciones A/B")
+    # Detailed insights
+    strengths: List[str] = Field(default_factory=list)
+    weaknesses: List[str] = Field(default_factory=list)
+    improvement_suggestions: List[str] = Field(default_factory=list)
+
+
+class FacebookPostAnalysis(BaseModel):
+    """Análisis comprehensivo del post."""
+    content_metrics: ContentMetrics
+    engagement_prediction: EngagementPrediction
+    quality_assessment: QualityAssessment
     
-    # Configuración
-    start_date: datetime = Field(..., description="Fecha de inicio")
-    end_date: Optional[datetime] = Field(None, description="Fecha de fin")
-    budget: Optional[float] = Field(None, description="Presupuesto")
+    # Analysis metadata
+    analysis_timestamp: datetime = Field(default_factory=datetime.now)
+    analysis_version: str = "3.0"
+    processing_time_ms: float = Field(default=0.0)
+    confidence_level: float = Field(ge=0.0, le=1.0, default=0.85)
     
-    # Métricas agregadas
-    total_engagement: int = Field(0, description="Engagement total")
-    total_reach: int = Field(0, description="Alcance total")
-    conversion_rate: float = Field(0.0, description="Tasa de conversión")
+    # Model information
+    analysis_models_used: List[str] = Field(default_factory=list)
+    onyx_model_id: Optional[str] = None
+    langchain_chain_id: Optional[str] = None
     
-    # LangChain workflow
-    workflow_config: Dict[str, Any] = Field(default_factory=dict, description="Configuración de workflow")
+    # Advanced insights
+    optimal_posting_time: Optional[datetime] = None
+    hashtag_suggestions: List[str] = Field(default_factory=list)
+    similar_successful_posts: List[str] = Field(default_factory=list)
+    competitive_analysis: Dict[str, Any] = Field(default_factory=dict)
+    
+    def get_overall_score(self) -> float:
+        """Score general ponderado optimizado."""
+        weights = {
+            'quality': 0.35,
+            'engagement': 0.30,
+            'virality': 0.20,
+            'audience_relevance': 0.10,
+            'trend_alignment': 0.05
+        }
+        
+        return (
+            self.quality_assessment.overall_score * weights['quality'] +
+            self.engagement_prediction.engagement_rate * weights['engagement'] +
+            self.engagement_prediction.virality_score * weights['virality'] +
+            self.quality_assessment.audience_relevance * weights['audience_relevance'] +
+            self.quality_assessment.trend_alignment * weights['trend_alignment']
+        )
+    
+    def get_actionable_recommendations(self) -> List[str]:
+        """Obtener recomendaciones accionables."""
+        recommendations = []
+        
+        # Quality-based recommendations
+        if self.quality_assessment.overall_score < 0.7:
+            recommendations.extend(self.quality_assessment.improvement_suggestions)
+        
+        # Engagement-based recommendations
+        if self.engagement_prediction.engagement_rate < 0.6:
+            recommendations.append("Consider adding more engaging elements like questions or polls")
+        
+        # Hashtag recommendations
+        if len(self.hashtag_suggestions) > 0:
+            recommendations.append(f"Consider using hashtags: {', '.join(self.hashtag_suggestions[:3])}")
+        
+        return recommendations[:5]  # Top 5 recommendations
+
+
+# ===== MAIN ENTITY =====
+
+class FacebookPostEntity(BaseModel):
+    """Entidad principal refactorizada para Onyx (Aggregate Root)."""
+    
+    # Core identity
+    identifier: ContentIdentifier
+    specification: PostSpecification
+    generation_config: GenerationConfig
+    content: FacebookPostContent
+    
+    # State management
+    status: ContentStatus = ContentStatus.DRAFT
+    analysis: Optional[FacebookPostAnalysis] = None
+    
+    # Timestamps
+    created_at: datetime = Field(default_factory=datetime.now)
+    updated_at: datetime = Field(default_factory=datetime.now)
+    published_at: Optional[datetime] = None
+    
+    # Versioning and relationships
+    version: int = 1
+    parent_id: Optional[str] = None  # For variations/versions
+    child_ids: List[str] = Field(default_factory=list)  # Variations created from this
+    
+    # Metadata and tags
+    metadata: Dict[str, Any] = Field(default_factory=dict)
+    tags: List[str] = Field(default_factory=list)
+    custom_fields: Dict[str, Any] = Field(default_factory=dict)
+    
+    # Onyx integration
+    onyx_workspace_id: Optional[str] = None
+    onyx_user_id: Optional[str] = None
+    onyx_project_id: Optional[str] = None
+    
+    # LangChain integration
+    langchain_trace: List[Dict[str, Any]] = Field(default_factory=list)
+    langchain_session_id: Optional[str] = None
+    
+    # Performance tracking
+    actual_metrics: Optional[Dict[str, Any]] = None
+    ab_test_group: Optional[str] = None
     
     class Config:
+        arbitrary_types_allowed = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
+    
+    @root_validator
+    def validate_consistency(cls, values):
+        """Validar consistencia entre campos."""
+        content = values.get('content')
+        config = values.get('generation_config')
+        
+        if content and config:
+            if len(content.get_display_text()) > config.max_length:
+                raise ValueError("Content exceeds generation config max_length")
+        
+        return values
+    
+    # ===== BUSINESS METHODS =====
+    
+    def update_content(self, new_content: FacebookPostContent) -> None:
+        """Actualizar contenido con invalidación de análisis."""
+        self.content = new_content
+        self.analysis = None  # Invalidate analysis
+        self.status = ContentStatus.DRAFT  # Reset status
+        self.updated_at = datetime.now()
+        self.version += 1
+        
+        self.add_langchain_trace("content_updated", {
+            "new_content_length": len(new_content.text),
+            "hashtags_count": len(new_content.hashtags),
+            "version": self.version
+        })
+    
+    def set_analysis(self, analysis: FacebookPostAnalysis) -> None:
+        """Establecer análisis con trazabilidad."""
+        self.analysis = analysis
+        self.updated_at = datetime.now()
+        
+        self.add_langchain_trace("analysis_completed", {
+            "overall_score": analysis.get_overall_score(),
+            "quality_tier": analysis.quality_assessment.quality_tier.value,
+            "confidence": analysis.confidence_level,
+            "processing_time_ms": analysis.processing_time_ms
+        })
+        
+        # Auto-update status based on analysis
+        if analysis.get_overall_score() >= 0.8:
+            self.status = ContentStatus.APPROVED
+        elif analysis.get_overall_score() >= 0.6:
+            self.status = ContentStatus.UNDER_REVIEW
+    
+    def update_status(self, new_status: ContentStatus, user_id: Optional[str] = None) -> None:
+        """Actualizar estado con validación."""
+        old_status = self.status
+        self.status = new_status
+        self.updated_at = datetime.now()
+        
+        if new_status == ContentStatus.PUBLISHED:
+            self.published_at = datetime.now()
+        
+        self.add_langchain_trace("status_changed", {
+            "from": old_status.value,
+            "to": new_status.value,
+            "user_id": user_id,
+            "timestamp": self.updated_at.isoformat()
+        })
+    
+    def add_langchain_trace(self, step: str, data: Dict[str, Any]) -> None:
+        """Agregar trazabilidad LangChain detallada."""
+        self.langchain_trace.append({
+            "step": step,
+            "timestamp": datetime.now().isoformat(),
+            "session_id": self.langchain_session_id,
+            "data": data
+        })
+        
+        # Maintain trace size (keep last 50 entries)
+        if len(self.langchain_trace) > 50:
+            self.langchain_trace = self.langchain_trace[-50:]
+    
+    # ===== COMPUTED PROPERTIES =====
+    
+    def is_ready_for_publication(self) -> bool:
+        """Verificar si está listo para publicación."""
+        return (
+            self.status in [ContentStatus.APPROVED, ContentStatus.SCHEDULED] and
+            self.analysis is not None and
+            self.analysis.get_overall_score() >= 0.6 and
+            len(self.validate_for_publication()) == 0
+        )
+    
+    def get_engagement_score(self) -> float:
+        """Score de engagement (real o predicho)."""
+        if self.actual_metrics and 'engagement_rate' in self.actual_metrics:
+            return self.actual_metrics['engagement_rate']
+        elif self.analysis:
+            return self.analysis.engagement_prediction.engagement_rate
+        return 0.5
+    
+    def get_quality_tier(self) -> str:
+        """Tier de calidad del contenido."""
+        if self.analysis:
+            return self.analysis.quality_assessment.quality_tier.value
+        return "unassessed"
+    
+    def validate_for_publication(self) -> List[str]:
+        """Validaciones específicas para publicación."""
+        errors = []
+        
+        # Content validation
+        display_text = self.content.get_display_text()
+        if len(display_text) > 2000:
+            errors.append("Content exceeds Facebook's 2000 character limit")
+        
+        if len(self.content.text.strip()) < 10:
+            errors.append("Content is too short for meaningful engagement")
+        
+        # Quality thresholds
+        if self.analysis:
+            if self.analysis.get_overall_score() < 0.5:
+                errors.append("Content quality score is below minimum threshold")
+            
+            if self.analysis.confidence_level < 0.6:
+                errors.append("Analysis confidence is too low for publication")
+        else:
+            errors.append("Content must be analyzed before publication")
+        
+        # Status validation
+        if self.status not in [ContentStatus.APPROVED, ContentStatus.SCHEDULED]:
+            errors.append("Content must be approved before publication")
+        
+        return errors
+    
+    def get_display_preview(self) -> str:
+        """Preview optimizado del post."""
+        preview = self.content.text[:97]
+        if len(self.content.text) > 97:
+            preview += "..."
+        
+        additions = []
+        if self.content.hashtags:
+            additions.append(f"{len(self.content.hashtags)} hashtags")
+        if self.content.media_urls:
+            additions.append(f"{len(self.content.media_urls)} media")
+        if self.content.call_to_action:
+            additions.append("CTA")
+        
+        if additions:
+            preview += f" [{', '.join(additions)}]"
+        
+        return preview
+    
+    def get_performance_summary(self) -> Dict[str, Any]:
+        """Resumen de performance completo."""
+        summary = {
+            "post_id": self.identifier.content_id,
+            "status": self.status.value,
+            "quality_tier": self.get_quality_tier(),
+            "created_at": self.created_at.isoformat(),
+            "last_updated": self.updated_at.isoformat()
+        }
+        
+        if self.analysis:
+            summary.update({
+                "overall_score": self.analysis.get_overall_score(),
+                "engagement_prediction": self.analysis.engagement_prediction.engagement_rate,
+                "virality_score": self.analysis.engagement_prediction.virality_score,
+                "recommendations_count": len(self.analysis.get_actionable_recommendations())
+            })
+        
+        if self.actual_metrics:
+            summary.update({
+                "actual_performance": self.actual_metrics,
+                "prediction_accuracy": self.actual_metrics.get("prediction_accuracy", {})
+            })
+        
+        return summary
+    
+    # ===== COMPARISON & HASHING =====
+    
+    def __eq__(self, other) -> bool:
+        if not isinstance(other, FacebookPostEntity):
+            return False
+        return self.identifier.content_id == other.identifier.content_id
+    
+    def __hash__(self) -> int:
+        return hash(self.identifier.content_id)
+    
+    def __str__(self) -> str:
+        return f"FacebookPost({self.identifier.content_id[:8]}...)"
+    
+    def __repr__(self) -> str:
+        return (
+            f"FacebookPostEntity("
+            f"id={self.identifier.content_id}, "
+            f"topic={self.specification.topic}, "
+            f"status={self.status.value}, "
+            f"quality={self.get_quality_tier()})"
+        )
 
 
-# Modelos de respuesta API
+# ===== FACTORY =====
+
+class FacebookPostFactory:
+    """Factory para crear posts optimizados."""
+    
+    @staticmethod
+    def create_from_specification(
+        specification: PostSpecification,
+        generation_config: GenerationConfig,
+        content_text: str,
+        hashtags: Optional[List[str]] = None,
+        **kwargs
+    ) -> FacebookPostEntity:
+        """Crear post completo desde especificación."""
+        
+        # Generate identifier
+        identifier = ContentIdentifier.generate(
+            content_text, 
+            {"spec": specification.topic, "config": generation_config.max_length}
+        )
+        
+        # Create content
+        content = FacebookPostContent(
+            text=content_text,
+            hashtags=hashtags or [],
+            mentions=kwargs.get('mentions', []),
+            media_urls=kwargs.get('media_urls', []),
+            link_url=kwargs.get('link_url'),
+            call_to_action=kwargs.get('call_to_action')
+        )
+        
+        return FacebookPostEntity(
+            identifier=identifier,
+            specification=specification,
+            generation_config=generation_config,
+            content=content,
+            onyx_workspace_id=kwargs.get('workspace_id'),
+            onyx_user_id=kwargs.get('user_id'),
+            onyx_project_id=kwargs.get('project_id')
+        )
+    
+    @staticmethod
+    def create_high_performance_post(
+        topic: str,
+        audience: TargetAudience = TargetAudience.GENERAL,
+        **kwargs
+    ) -> FacebookPostEntity:
+        """Crear post de alta performance."""
+        
+        spec = PostSpecification(
+            topic=topic,
+            post_type=PostType.TEXT,
+            tone=ContentTone.INSPIRING,
+            target_audience=audience,
+            keywords=[topic.lower()],
+            target_engagement=EngagementTier.HIGH
+        )
+        
+        config = GenerationConfig(
+            max_length=kwargs.get('max_length', 280),
+            include_hashtags=True,
+            include_emojis=True,
+            include_call_to_action=True
+        )
+        
+        content_text = f"✨ Discover amazing {topic} insights! Transform your approach today. What's your experience? 💭"
+        hashtags = [topic.lower().replace(' ', ''), 'success', 'growth', 'transformation']
+        
+        return FacebookPostFactory.create_from_specification(
+            specification=spec,
+            generation_config=config,
+            content_text=content_text,
+            hashtags=hashtags,
+            **kwargs
+        )
+
+
+# ===== REQUEST/RESPONSE MODELS =====
+
+class FacebookPostRequest(BaseModel):
+    """Request para generar Facebook post."""
+    topic: str = Field(..., min_length=3, max_length=200)
+    post_type: PostType = PostType.TEXT
+    tone: ContentTone = ContentTone.CASUAL
+    target_audience: TargetAudience = TargetAudience.GENERAL
+    target_engagement: EngagementTier = EngagementTier.HIGH
+    
+    # Generation config
+    max_length: int = Field(280, ge=50, le=2000)
+    include_hashtags: bool = True
+    include_emojis: bool = True
+    include_call_to_action: bool = True
+    
+    # Advanced options
+    keywords: List[str] = Field(default_factory=list, max_items=10)
+    brand_voice: Optional[str] = None
+    campaign_context: Optional[str] = None
+    custom_instructions: Optional[str] = None
+    
+    # Onyx context
+    workspace_id: Optional[str] = None
+    user_id: Optional[str] = None
+    project_id: Optional[str] = None
+
+
 class FacebookPostResponse(BaseModel):
     """Respuesta de generación de Facebook post."""
     success: bool = Field(..., description="Éxito de la operación")
-    post: Optional[FacebookPost] = Field(None, description="Post generado")
-    variations: List[FacebookPost] = Field(default_factory=list, description="Variaciones del post")
-    analysis: Optional[FacebookAnalysis] = Field(None, description="Análisis del post")
+    post: Optional[FacebookPostEntity] = Field(None, description="Post generado")
+    variations: List[FacebookPostEntity] = Field(default_factory=list, description="Variaciones")
+    analysis: Optional[FacebookPostAnalysis] = Field(None, description="Análisis del post")
     recommendations: List[str] = Field(default_factory=list, description="Recomendaciones")
     processing_time_ms: float = Field(..., description="Tiempo de procesamiento")
     error_message: Optional[str] = Field(None, description="Mensaje de error")
+    
+    # LangChain metadata
+    langchain_session_id: Optional[str] = None
+    generation_steps: List[Dict[str, Any]] = Field(default_factory=list)
 
 
-class FacebookAnalysisResponse(BaseModel):
-    """Respuesta de análisis de Facebook post."""
-    success: bool = Field(..., description="Éxito del análisis")
-    analysis: Optional[FacebookAnalysis] = Field(None, description="Análisis completo")
-    insights: List[str] = Field(default_factory=list, description="Insights clave")
-    optimization_suggestions: List[str] = Field(default_factory=list, description="Sugerencias de optimización")
-    competitive_analysis: Dict[str, Any] = Field(default_factory=dict, description="Análisis competitivo")
-    processing_time_ms: float = Field(..., description="Tiempo de procesamiento")
+# ===== LEGACY COMPATIBILITY =====
 
-
-# Modelos para LangChain
-class LangChainPromptTemplate(BaseModel):
-    """Template de prompt para LangChain."""
-    template_name: str = Field(..., description="Nombre del template")
-    template_content: str = Field(..., description="Contenido del template")
-    variables: List[str] = Field(default_factory=list, description="Variables del template")
-    post_type: FacebookPostType = Field(..., description="Tipo de post aplicable")
-    tone: Optional[FacebookTone] = Field(None, description="Tono específico")
-
-
-class LangChainChainConfig(BaseModel):
-    """Configuración de cadena LangChain."""
-    chain_type: str = Field(..., description="Tipo de cadena")
-    model_name: str = Field("gpt-3.5-turbo", description="Modelo LLM")
-    temperature: float = Field(0.7, description="Temperatura del modelo")
-    max_tokens: int = Field(500, description="Máximo tokens")
-    use_memory: bool = Field(True, description="Usar memoria conversacional")
-    enable_tools: bool = Field(False, description="Habilitar herramientas")
-    custom_prompts: List[LangChainPromptTemplate] = Field(default_factory=list, description="Prompts personalizados") 
+# Backwards compatibility aliases
+FacebookPost = FacebookPostEntity
+FacebookAnalysis = FacebookPostAnalysis
+FacebookRequest = FacebookPostRequest
+FacebookTone = ContentTone
+FacebookAudience = TargetAudience
+FacebookPostType = PostType 
