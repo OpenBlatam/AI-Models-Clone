@@ -6,6 +6,7 @@ Onyx server features initialization.
 from .image_process import image_process_router
 from .seo import seo_router
 from .copywriting import copywriting_router
+from .instagram_captions import instagram_captions_router
 
 __all__ = [
     # 'ads_router',
@@ -15,7 +16,8 @@ __all__ = [
     # 'key_messages_router',
     'image_process_router',
     'seo_router',
-    'copywriting_router'
+    'copywriting_router',
+    'instagram_captions_router'
 ]
 
 

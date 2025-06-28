@@ -1,0 +1,77 @@
+{
+  "single_tests": [
+    {
+      "test_type": "single_caption",
+      "processing_time_ms": 284.23,
+      "quality_score": 100.0,
+      "caption_length": 189,
+      "hashtag_count": 15,
+      "cache_hit": false,
+      "status": 200
+    }
+  ],
+  "batch_tests": [
+    {
+      "test_type": "batch_processing",
+      "batch_size": 10,
+      "total_processing_time_ms": 27.2,
+      "avg_time_per_caption_ms": 2.72,
+      "avg_quality_score": 100.0,
+      "total_processed": 10,
+      "captions_per_second": 367.6,
+      "status": 200
+    },
+    {
+      "test_type": "batch_processing",
+      "batch_size": 50,
+      "total_processing_time_ms": 31.73,
+      "avg_time_per_caption_ms": 0.63,
+      "avg_quality_score": 100.0,
+      "total_processed": 50,
+      "captions_per_second": 1575.87,
+      "status": 200
+    }
+  ],
+  "performance_metrics": {
+    "api_version": "5.0.0",
+    "timestamp": "2025-06-27T20:51:50.116934+00:00",
+    "performance": {
+      "performance": {
+        "requests_total": 19,
+        "requests_success": 19,
+        "batch_requests": 2,
+        "success_rate": 100.0,
+        "avg_response_time_ms": 8.14,
+        "requests_per_second": 0.24
+      },
+      "cache": {
+        "hits": 15,
+        "misses": 1,
+        "hit_rate": 93.75
+      },
+      "quality": {
+        "captions_generated": 121,
+        "avg_quality_score": 100.0,
+        "captions_per_second": 1.52
+      },
+      "system": {
+        "uptime_seconds": 79.5,
+        "api_version": "5.0.0"
+      }
+    },
+    "configuration": {
+      "max_batch_size": 100,
+      "ai_workers": 20,
+      "cache_capacity": 50000,
+      "rate_limit_hourly": 10000
+    },
+    "capabilities": {
+      "single_captions": "✅ Ultra-fast individual generation",
+      "batch_processing": "✅ Up to 100 captions/batch",
+      "parallel_workers": "✅ 20 concurrent processors",
+      "quality_threshold": "✅ 85.0+ target quality",
+      "caching": "✅ Smart LRU with 50k capacity",
+      "rate_limiting": "✅ 10k requests/hour enterprise"
+    }
+  }
+}
