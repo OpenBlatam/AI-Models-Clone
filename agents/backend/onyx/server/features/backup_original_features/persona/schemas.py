@@ -1,0 +1,34 @@
+import structlog
+from pydantic import Field, field_validator, ConfigDict, BaseModel
+from uuid6 import uuid7, UUID
+import orjson
+
+logger = structlog.get_logger()
+
+class ORJSONModel(BaseModel):
+    model_config = ConfigDict(json_loads=orjson.loads, json_dumps=orjson.dumps)
+
+class PersonaCreate(ORJSONModel):
+    """Schema for creating a Persona (input)."""
+    name: str = Field(..., min_length=2, max_length=128)
+    description: str | None = None
+
+    @field_validator('name')
+    def name_not_empty(cls, v):
+        if not v or not v.strip():
+            logger.error("PersonaCreate name validation failed", value=v)
+            raise ValueError("Name must not be empty")
+        return v
+
+    def __post_init_post_parse__(self):
+        logger.info("PersonaCreate instantiated", name=self.name)
+
+class PersonaRead(ORJSONModel):
+    """Schema for reading a Persona (output)."""
+    id: UUID
+    name: str
+    description: str | None
+    attributes: dict
+
+    def __post_init_post_parse__(self):
+        logger.info("PersonaRead instantiated", id=str(self.id), name=self.name) 

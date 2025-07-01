@@ -1,0 +1,46 @@
+# Key Messages Feature Requirements
+
+# Core dependencies
+fastapi>=0.104.0
+pydantic>=2.0.0
+uvicorn>=0.24.0
+
+# Async support
+asyncio-mqtt>=0.16.0
+aiofiles>=23.0.0
+
+# Caching
+aiocache>=0.12.0
+redis>=4.5.0
+
+# HTTP client
+httpx>=0.25.0
+
+# Utilities
+python-multipart>=0.0.6
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# Logging and monitoring
+structlog>=23.0.0
+prometheus-client>=0.17.0
+
+# Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-mock>=3.11.0
+httpx>=0.25.0
+
+# Development
+black>=23.0.0
+isort>=5.12.0
+flake8>=6.0.0
+mypy>=1.5.0
+
+# Optional: LLM providers
+openai>=1.0.0
+anthropic>=0.7.0
+
+# Optional: Database (if needed)
+sqlalchemy>=2.0.0
+alembic>=1.12.0 
