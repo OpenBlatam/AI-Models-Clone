@@ -1,42 +1,111 @@
 """
-Product Description Service
-===========================
+Enhanced Product API - Production Ready
+======================================
 
-REST API service for product description generation with FastAPI.
+High-performance, scalable API following FastAPI best practices:
+- Async/await optimization
+- Dependency injection
+- Error handling with early returns  
+- Performance monitoring
+- Comprehensive caching
+- Rate limiting
+- Type safety
 """
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends
+from contextlib import asynccontextmanager
+from typing import Annotated, Optional, List, Dict, Any, Union
+from fastapi import FastAPI, HTTPException, Depends, Query, Path, status, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, Field, validator
-from typing import Dict, List, Optional, Union, Any
 import asyncio
 import logging
 import time
 from datetime import datetime
 import uvicorn
+import redis.asyncio as redis
+from functools import wraps
+import hashlib
 
 from ..core.generator import ProductDescriptionGenerator
 from ..core.config import ProductDescriptionConfig
 
+# Configure structured logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
 logger = logging.getLogger(__name__)
+
+# Global state for metrics
+app_state = {
+    "startup_time": None,
+    "request_count": 0,
+    "cache_hits": 0,
+    "cache_misses": 0,
+    "error_count": 0
+}
 
 
 # Pydantic models for request/response
 class ProductRequest(BaseModel):
-    """Request model for single product description generation."""
+    """Enhanced request model for enterprise product management."""
     
+    # Basic Information
     product_name: str = Field(..., min_length=1, max_length=200, description="Product name")
-    features: List[str] = Field(..., min_items=1, max_items=20, description="Product features")
-    category: str = Field("general", max_length=50, description="Product category")
-    brand: str = Field("unknown", max_length=100, description="Brand name")
-    price_range: str = Field("medium", description="Price range")
+    description: str = Field("", max_length=5000, description="Product description")
+    short_description: str = Field("", max_length=500, description="Short product description")
+    sku: str = Field(..., min_length=1, max_length=100, description="Product SKU")
+    product_type: str = Field("physical", description="Product type")
+    brand_id: Optional[str] = Field(None, description="Brand ID")
+    category_id: Optional[str] = Field(None, description="Category ID")
+    
+    # Pricing
+    base_price_amount: Optional[float] = Field(None, gt=0, description="Base price amount")
+    base_price_currency: str = Field("USD", description="Price currency")
+    sale_price_amount: Optional[float] = Field(None, gt=0, description="Sale price amount")
+    cost_price_amount: Optional[float] = Field(None, gt=0, description="Cost price amount")
+    
+    # Inventory
+    inventory_quantity: int = Field(0, ge=0, description="Initial inventory quantity")
+    low_stock_threshold: int = Field(10, ge=0, description="Low stock threshold")
+    inventory_tracking: str = Field("track", description="Inventory tracking mode")
+    allow_backorder: bool = Field(False, description="Allow backorder")
+    
+    # Physical Properties
+    length: Optional[float] = Field(None, gt=0, description="Product length")
+    width: Optional[float] = Field(None, gt=0, description="Product width")
+    height: Optional[float] = Field(None, gt=0, description="Product height")
+    weight: Optional[float] = Field(None, gt=0, description="Product weight")
+    requires_shipping: bool = Field(True, description="Requires shipping")
+    
+    # Digital Properties
+    download_url: Optional[str] = Field(None, description="Download URL for digital products")
+    download_limit: Optional[int] = Field(None, gt=0, description="Download limit")
+    
+    # SEO and Marketing
+    seo_title: Optional[str] = Field(None, max_length=100, description="SEO title")
+    seo_description: Optional[str] = Field(None, max_length=300, description="SEO description")
+    seo_keywords: List[str] = Field(default_factory=list, description="SEO keywords")
+    slug: Optional[str] = Field(None, description="URL slug")
+    tags: List[str] = Field(default_factory=list, description="Product tags")
+    featured: bool = Field(False, description="Featured product")
+    
+    # Media
+    images: List[str] = Field(default_factory=list, description="Product images")
+    videos: List[str] = Field(default_factory=list, description="Product videos")
+    
+    # AI Generation (Legacy)
+    features: List[str] = Field(default_factory=list, min_items=0, max_items=20, description="Product features")
     style: str = Field("professional", description="Writing style")
     tone: str = Field("friendly", description="Writing tone")
     max_length: int = Field(300, ge=50, le=1000, description="Maximum description length")
     temperature: float = Field(0.7, ge=0.1, le=2.0, description="Generation temperature")
     num_variations: int = Field(1, ge=1, le=5, description="Number of variations")
     use_cache: bool = Field(True, description="Whether to use caching")
+    auto_generate_description: bool = Field(False, description="Auto-generate AI description")
     
     @validator('price_range')
     def validate_price_range(cls, v):

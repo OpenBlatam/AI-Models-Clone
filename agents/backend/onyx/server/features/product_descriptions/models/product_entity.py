@@ -1,34 +1,18 @@
 """
-Enhanced Product Model - Enterprise Architecture
-===============================================
+Product Entity - Enterprise Domain Model
+========================================
 
-Modelo empresarial mejorado para productos con Clean Architecture,
-funcionalidades avanzadas y optimizaciones de rendimiento.
+Entidad de dominio para productos con Clean Architecture y funcionalidades avanzadas.
 """
 
-import torch
-import torch.nn as nn
-from transformers import AutoTokenizer, AutoModelForCausalLM, AutoConfig
-import numpy as np
-from typing import Dict, List, Optional, Tuple, Any, Set
-import logging
-from pathlib import Path
-import json
+from __future__ import annotations
+from typing import Dict, List, Optional, Set, Any
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
 from uuid import uuid4
 from dataclasses import dataclass, field
-from abc import ABC, abstractmethod
 
-from .config import ModelConfig
-
-logger = logging.getLogger(__name__)
-
-
-# ============================================================================
-# ENHANCED DOMAIN MODELS
-# ============================================================================
 
 class ProductStatus(str, Enum):
     """Estados del producto"""
@@ -79,7 +63,7 @@ class Money:
         return {"amount": float(self.amount), "currency": self.currency}
     
     @classmethod
-    def from_dict(cls, data: Dict[str, Any]) -> "Money":
+    def from_dict(cls, data: Dict[str, Any]) -> Money:
         return cls(amount=Decimal(str(data["amount"])), currency=data["currency"])
 
 
@@ -129,17 +113,35 @@ class SEOData:
         }
 
 
-class EnhancedProductEntity:
-    """
-    Entidad de producto empresarial mejorada
+@dataclass
+class ProductVariant:
+    """Variante de producto"""
+    id: str = field(default_factory=lambda: str(uuid4()))
+    name: str = ""
+    sku: str = ""
+    price: Optional[Money] = None
+    inventory_quantity: int = 0
+    attributes: Dict[str, Any] = field(default_factory=dict)
+    is_active: bool = True
     
-    Funcionalidades empresariales:
-    - Gestión avanzada de inventario
-    - Variantes de producto
-    - Precios dinámicos y ofertas
-    - SEO optimizado
-    - Integración con IA
-    - Análisis de rentabilidad
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "id": self.id,
+            "name": self.name,
+            "sku": self.sku,
+            "price": self.price.to_dict() if self.price else None,
+            "inventory_quantity": self.inventory_quantity,
+            "attributes": self.attributes,
+            "is_active": self.is_active
+        }
+
+
+class ProductEntity:
+    """
+    Entidad de dominio para Producto - Core Business Logic
+    
+    Representa un producto en el sistema con todas sus propiedades,
+    comportamientos y reglas de negocio empresariales.
     """
     
     def __init__(
@@ -189,11 +191,18 @@ class EnhancedProductEntity:
         self.tags: Set[str] = set()
         self.featured: bool = False
         
-        # Attributes and Media
+        # Variants and Options
+        self.variants: List[ProductVariant] = []
+        self.has_variants: bool = False
+        
+        # Attributes and Custom Fields
         self.attributes: Dict[str, Any] = {}
         self.custom_fields: Dict[str, Any] = {}
+        
+        # Media
         self.images: List[str] = []
         self.videos: List[str] = []
+        self.documents: List[str] = []
         
         # Timestamps
         self.created_at: datetime = datetime.utcnow()
@@ -205,6 +214,10 @@ class EnhancedProductEntity:
         self.ai_confidence_score: Optional[float] = None
         self.ai_last_updated: Optional[datetime] = None
     
+    # ============================================================================
+    # BUSINESS LOGIC METHODS
+    # ============================================================================
+    
     def set_price(self, price: Money, price_type: PriceType = PriceType.FIXED) -> None:
         """Establece el precio base del producto"""
         if price.amount <= 0:
@@ -214,7 +227,7 @@ class EnhancedProductEntity:
         self.price_type = price_type
         self.updated_at = datetime.utcnow()
     
-    def set_sale_price(self, sale_price: Money) -> None:
+    def set_sale_price(self, sale_price: Money, end_date: Optional[datetime] = None) -> None:
         """Establece precio de oferta"""
         if self.base_price and sale_price.amount >= self.base_price.amount:
             raise ValueError("El precio de oferta debe ser menor al precio base")
@@ -270,12 +283,57 @@ class EnhancedProductEntity:
             return True
         return self.inventory_quantity > 0 or self.allow_backorder
     
+    def add_variant(self, variant: ProductVariant) -> None:
+        """Añade una variante al producto"""
+        if not self.has_variants:
+            self.has_variants = True
+        
+        self.variants.append(variant)
+        self.updated_at = datetime.utcnow()
+    
+    def remove_variant(self, variant_id: str) -> bool:
+        """Elimina una variante"""
+        for i, variant in enumerate(self.variants):
+            if variant.id == variant_id:
+                del self.variants[i]
+                self.updated_at = datetime.utcnow()
+                return True
+        return False
+    
+    def get_variant(self, variant_id: str) -> Optional[ProductVariant]:
+        """Obtiene una variante específica"""
+        for variant in self.variants:
+            if variant.id == variant_id:
+                return variant
+        return None
+    
+    def add_tag(self, tag: str) -> None:
+        """Añade una etiqueta"""
+        self.tags.add(tag.lower().strip())
+        self.updated_at = datetime.utcnow()
+    
+    def remove_tag(self, tag: str) -> None:
+        """Elimina una etiqueta"""
+        self.tags.discard(tag.lower().strip())
+        self.updated_at = datetime.utcnow()
+    
     def publish(self) -> None:
         """Publica el producto"""
         if self.status == ProductStatus.DRAFT:
             self.status = ProductStatus.ACTIVE
             self.published_at = datetime.utcnow()
             self.updated_at = datetime.utcnow()
+    
+    def unpublish(self) -> None:
+        """Despublica el producto"""
+        if self.status == ProductStatus.ACTIVE:
+            self.status = ProductStatus.INACTIVE
+            self.updated_at = datetime.utcnow()
+    
+    def discontinue(self) -> None:
+        """Descontinúa el producto"""
+        self.status = ProductStatus.DISCONTINUED
+        self.updated_at = datetime.utcnow()
     
     def set_ai_description(self, description: str, confidence: float = 0.0) -> None:
         """Establece descripción generada por IA"""
@@ -293,6 +351,19 @@ class EnhancedProductEntity:
         profit = effective_price.amount - self.cost_price.amount
         return float((profit / effective_price.amount) * 100)
     
+    def get_total_value(self) -> Optional[Money]:
+        """Calcula el valor total del inventario"""
+        effective_price = self.get_effective_price()
+        if not effective_price:
+            return None
+        
+        total = effective_price.amount * self.inventory_quantity
+        return Money(amount=total, currency=effective_price.currency)
+    
+    # ============================================================================
+    # VALIDATION METHODS
+    # ============================================================================
+    
     def validate(self) -> List[str]:
         """Valida la entidad y retorna lista de errores"""
         errors = []
@@ -302,6 +373,14 @@ class EnhancedProductEntity:
         
         if not self.sku or len(self.sku.strip()) < 1:
             errors.append("El SKU es requerido")
+        
+        if self.product_type == ProductType.PHYSICAL and not self.requires_shipping:
+            if not self.dimensions:
+                errors.append("Productos físicos requieren dimensiones")
+        
+        if self.product_type == ProductType.DIGITAL:
+            if not self.download_url and not self.description:
+                errors.append("Productos digitales requieren URL de descarga o descripción")
         
         if self.base_price and self.base_price.amount <= 0:
             errors.append("El precio base debe ser mayor a 0")
@@ -319,8 +398,12 @@ class EnhancedProductEntity:
         """Verifica si la entidad es válida"""
         return len(self.validate()) == 0
     
+    # ============================================================================
+    # SERIALIZATION
+    # ============================================================================
+    
     def to_dict(self) -> Dict[str, Any]:
-        """Convierte la entidad a diccionario con campos calculados"""
+        """Convierte la entidad a diccionario"""
         return {
             "id": self.id,
             "name": self.name,
@@ -334,16 +417,11 @@ class EnhancedProductEntity:
             "base_price": self.base_price.to_dict() if self.base_price else None,
             "sale_price": self.sale_price.to_dict() if self.sale_price else None,
             "cost_price": self.cost_price.to_dict() if self.cost_price else None,
-            "effective_price": self.get_effective_price().to_dict() if self.get_effective_price() else None,
             "price_type": self.price_type.value,
-            "is_on_sale": self.is_on_sale(),
-            "discount_percentage": self.calculate_discount_percentage(),
             "inventory_quantity": self.inventory_quantity,
             "low_stock_threshold": self.low_stock_threshold,
             "inventory_tracking": self.inventory_tracking.value,
             "allow_backorder": self.allow_backorder,
-            "is_low_stock": self.is_low_stock(),
-            "is_in_stock": self.is_in_stock(),
             "dimensions": self.dimensions.to_dict() if self.dimensions else None,
             "requires_shipping": self.requires_shipping,
             "download_url": self.download_url,
@@ -351,232 +429,24 @@ class EnhancedProductEntity:
             "seo_data": self.seo_data.to_dict(),
             "tags": list(self.tags),
             "featured": self.featured,
+            "variants": [v.to_dict() for v in self.variants],
+            "has_variants": self.has_variants,
             "attributes": self.attributes,
             "custom_fields": self.custom_fields,
             "images": self.images,
             "videos": self.videos,
+            "documents": self.documents,
             "created_at": self.created_at.isoformat(),
             "updated_at": self.updated_at.isoformat(),
             "published_at": self.published_at.isoformat() if self.published_at else None,
             "ai_generated_description": self.ai_generated_description,
             "ai_confidence_score": self.ai_confidence_score,
             "ai_last_updated": self.ai_last_updated.isoformat() if self.ai_last_updated else None,
-            "profit_margin": self.calculate_profit_margin()
-        }
-
-
-class ProductDescriptionModel(nn.Module):
-    """
-    Advanced Product Description Generation Model
-    
-    Features:
-    - Transformer-based architecture with product-specific enhancements
-    - Multi-head attention with context awareness
-    - Mixed precision training support
-    - Style and tone conditioning
-    - SEO optimization
-    """
-    
-    def __init__(self, config: ModelConfig):
-        super().__init__()
-        self.config = config
-        
-        # Load pre-trained model and tokenizer
-        self.model_config = AutoConfig.from_pretrained(config.model_name)
-        self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
-        self.base_model = AutoModelForCausalLM.from_pretrained(config.model_name)
-        
-        # Add special tokens
-        self._add_special_tokens()
-        
-        # Enhanced layers
-        self.product_context_encoder = nn.Linear(
-            self.model_config.hidden_size, 
-            self.model_config.hidden_size
-        )
-        
-        self.style_embeddings = nn.Embedding(10, self.model_config.hidden_size)
-        self.tone_embeddings = nn.Embedding(5, self.model_config.hidden_size)
-        
-        # Quality and SEO heads
-        self.quality_head = nn.Sequential(
-            nn.Linear(self.model_config.hidden_size, self.model_config.hidden_size // 2),
-            nn.ReLU(),
-            nn.Dropout(0.1),
-            nn.Linear(self.model_config.hidden_size // 2, 1),
-            nn.Sigmoid()
-        )
-        
-        self.seo_head = nn.Sequential(
-            nn.Linear(self.model_config.hidden_size, self.model_config.hidden_size // 2),
-            nn.ReLU(),
-            nn.Dropout(0.1),
-            nn.Linear(self.model_config.hidden_size // 2, 3),
-            nn.Softmax(dim=-1)
-        )
-        
-        self._init_weights()
-    
-    def _add_special_tokens(self):
-        """Add special tokens for product description generation."""
-        special_tokens = [
-            "[PRODUCT]", "[FEATURES]", "[PRICE]", "[BRAND]", 
-            "[CATEGORY]", "[DESCRIPTION]", "[LUXURY]", "[TECHNICAL]"
-        ]
-        
-        tokens_to_add = [token for token in special_tokens 
-                        if token not in self.tokenizer.get_vocab()]
-        
-        if tokens_to_add:
-            self.tokenizer.add_special_tokens({"additional_special_tokens": tokens_to_add})
-            self.base_model.resize_token_embeddings(len(self.tokenizer))
-    
-    def _init_weights(self):
-        """Initialize custom layer weights."""
-        for module in [self.product_context_encoder, self.quality_head, self.seo_head]:
-            for layer in module:
-                if isinstance(layer, nn.Linear):
-                    nn.init.xavier_uniform_(layer.weight)
-                    nn.init.zeros_(layer.bias)
-    
-    def generate_description(
-        self,
-        product_name: str,
-        features: List[str],
-        category: str = "general",
-        brand: str = "unknown",
-        style: str = "professional",
-        tone: str = "friendly",
-        max_length: int = 300,
-        temperature: float = 0.7,
-        num_return_sequences: int = 1
-    ) -> List[Dict]:
-        """Generate product description with enhanced features."""
-        
-        # Create input prompt
-        prompt = self._create_generation_prompt(
-            product_name, features, category, brand, style, tone
-        )
-        
-        # Tokenize input
-        input_tokens = self.tokenizer(
-            prompt,
-            return_tensors="pt",
-            max_length=self.config.max_length,
-            padding=True,
-            truncation=True
-        )
-        
-        # Generation parameters
-        generation_kwargs = {
-            "input_ids": input_tokens["input_ids"],
-            "attention_mask": input_tokens["attention_mask"],
-            "max_length": len(input_tokens["input_ids"][0]) + max_length,
-            "min_length": len(input_tokens["input_ids"][0]) + 50,
-            "temperature": temperature,
-            "top_p": self.config.top_p,
-            "top_k": self.config.top_k,
-            "num_return_sequences": num_return_sequences,
-            "do_sample": True,
-            "pad_token_id": self.tokenizer.pad_token_id,
-            "repetition_penalty": 1.1
-        }
-        
-        # Generate
-        with torch.no_grad():
-            generated_ids = self.base_model.generate(**generation_kwargs)
-        
-        # Process results
-        results = []
-        for i in range(num_return_sequences):
-            generated_text = self.tokenizer.decode(
-                generated_ids[i],
-                skip_special_tokens=True,
-                clean_up_tokenization_spaces=True
-            )
-            
-            description = self._extract_description(generated_text, prompt)
-            quality_score, seo_score = self._compute_scores(description)
-            
-            results.append({
-                "description": description,
-                "quality_score": quality_score,
-                "seo_score": seo_score,
-                "metadata": {
-                    "product_name": product_name,
-                    "category": category,
-                    "brand": brand,
-                    "style": style,
-                    "tone": tone,
-                    "word_count": len(description.split()),
-                    "char_count": len(description)
-                }
-            })
-        
-        return results
-    
-    def _create_generation_prompt(
-        self, product_name: str, features: List[str], 
-        category: str, brand: str, style: str, tone: str
-    ) -> str:
-        """Create structured prompt for generation."""
-        return f"[PRODUCT] {product_name} | [CATEGORY] {category} | [BRAND] {brand} | [FEATURES] {', '.join(features)} | Style: {style} | Tone: {tone} | [DESCRIPTION]"
-    
-    def _extract_description(self, generated_text: str, prompt: str) -> str:
-        """Extract description from generated text."""
-        if prompt in generated_text:
-            description = generated_text.replace(prompt, "").strip()
-        else:
-            parts = generated_text.split("[DESCRIPTION]")
-            description = parts[-1].strip() if len(parts) > 1 else generated_text.strip()
-        
-        return description.replace("[PAD]", "").replace("[SEP]", "").strip()
-    
-    def _compute_scores(self, description: str) -> Tuple[float, float]:
-        """Compute quality and SEO scores."""
-        word_count = len(description.split())
-        sentence_count = len([s for s in description.split('.') if s.strip()])
-        
-        quality_score = min(1.0, (
-            0.4 * min(1.0, word_count / 100) +
-            0.3 * min(1.0, sentence_count / 5) +
-            0.3 * (1 - min(1.0, description.count('!') / 3))
-        ))
-        
-        seo_score = min(1.0, (
-            0.5 * min(1.0, word_count / 80) +
-            0.3 * (1 if any(char.isupper() for char in description) else 0) +
-            0.2 * (1 if ',' in description else 0)
-        ))
-        
-        return quality_score, seo_score
-    
-    def save_model(self, path: str):
-        """Save model and tokenizer."""
-        save_path = Path(path)
-        save_path.mkdir(parents=True, exist_ok=True)
-        
-        torch.save(self.state_dict(), save_path / "model.pt")
-        self.tokenizer.save_pretrained(save_path / "tokenizer")
-        
-        with open(save_path / "config.json", "w") as f:
-            json.dump(self.config.__dict__, f, indent=2)
-        
-        logger.info(f"Model saved to {save_path}")
-    
-    @classmethod
-    def load_model(cls, path: str, config: Optional[ModelConfig] = None):
-        """Load model from saved state."""
-        load_path = Path(path)
-        
-        if config is None:
-            with open(load_path / "config.json", "r") as f:
-                config_dict = json.load(f)
-                config = ModelConfig(**config_dict)
-        
-        model = cls(config)
-        model.load_state_dict(torch.load(load_path / "model.pt", map_location=config.device))
-        model.tokenizer = AutoTokenizer.from_pretrained(load_path / "tokenizer")
-        
-        logger.info(f"Model loaded from {load_path}")
-        return model 
+            "effective_price": self.get_effective_price().to_dict() if self.get_effective_price() else None,
+            "is_on_sale": self.is_on_sale(),
+            "discount_percentage": self.calculate_discount_percentage(),
+            "is_low_stock": self.is_low_stock(),
+            "is_in_stock": self.is_in_stock(),
+            "profit_margin": self.calculate_profit_margin(),
+            "total_value": self.get_total_value().to_dict() if self.get_total_value() else None
+        } 
