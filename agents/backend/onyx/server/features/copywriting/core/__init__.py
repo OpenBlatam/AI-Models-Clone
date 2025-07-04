@@ -1,20 +1,24 @@
 """
-Optimized Copywriting Core Module.
+Core Copywriting System
+=======================
 
-High-performance copywriting service with advanced optimization libraries.
+This module contains the core components of the copywriting system:
+- Engine: Main processing engine
+- Models: Data models and schemas
+- Services: Business logic services
+- Utils: Utility functions
 """
 
-from .config import OptimizedCopywritingConfig
-from .service import OptimizedCopywritingService
-from .cache import CacheManager
-from .metrics import MetricsCollector
-from .validators import FastValidator
+from .engine import CopywritingEngine
+from .models import CopywritingRequest, CopywritingResponse, CopywritingVariant
+from .services import CopywritingService, OptimizationService, CacheService
 
-__version__ = "2.0.0"
 __all__ = [
-    "OptimizedCopywritingConfig",
-    "OptimizedCopywritingService", 
-    "CacheManager",
-    "MetricsCollector",
-    "FastValidator"
+    'CopywritingEngine',
+    'CopywritingRequest', 
+    'CopywritingResponse',
+    'CopywritingVariant',
+    'CopywritingService',
+    'OptimizationService',
+    'CacheService'
 ] 

@@ -1,0 +1,47 @@
+# NotebookLM AI - AI/ML Requirements
+# Machine learning and AI-specific dependencies
+
+# ===== CORE AI & ML =====
+torch==2.1.1                        # PyTorch core
+transformers==4.36.0                # Hugging Face Transformers
+diffusers==0.25.0                   # Diffusion models
+accelerate==0.25.0                  # Distributed training
+peft==0.7.1                         # Parameter efficient fine-tuning
+bitsandbytes==0.41.3                # Quantization
+flash-attn==2.5.0                   # Flash attention
+xformers==0.0.23.post1              # Memory efficient attention
+
+# ===== NLP & TEXT ANALYSIS =====
+spacy==3.7.2                        # Advanced NLP
+textstat==0.7.3                     # Text statistics
+vaderSentiment==3.3.2               # Sentiment analysis
+keybert==0.8.3                      # Keyword extraction
+sentence-transformers==2.2.2        # Sentence embeddings
+gensim==4.3.2                       # Topic modeling
+nltk==3.8.1                         # NLP toolkit
+language-tool-python==2.7.1         # Grammar checking
+
+# ===== VECTOR DATABASES & EMBEDDINGS =====
+chromadb==0.4.18                    # Vector database
+faiss-cpu==1.7.4                    # Vector similarity search
+
+# ===== AI FRAMEWORKS & APIs =====
+langchain==0.0.350                  # LangChain framework
+langchain-community==0.0.10         # LangChain community
+openai==1.3.7                       # OpenAI API
+anthropic==0.7.8                    # Anthropic API
+cohere==4.37                        # Cohere API
+huggingface-hub==0.19.4             # Hugging Face Hub
+datasets==2.15.0                    # Hugging Face datasets
+
+# ===== OPTIMIZATION & PERFORMANCE =====
+numba==0.58.1                       # JIT compilation
+cython==3.0.6                       # Performance optimization
+joblib==1.3.2                       # Parallel computing
+ray[tune]==2.7.1                    # Distributed computing
+
+# ===== EXPERIMENT TRACKING =====
+wandb==0.16.1                       # Weights & Biases
+mlflow==2.8.1                       # ML lifecycle
+tensorboard==2.15.0                 # Training visualization
+neptune==1.10.0                     # Experiment tracking 

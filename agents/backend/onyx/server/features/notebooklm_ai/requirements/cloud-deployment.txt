@@ -1,0 +1,16 @@
+# NotebookLM AI - Cloud & Deployment Requirements
+# Infrastructure, deployment, and cloud services
+
+# ===== CLOUD SERVICES =====
+boto3==1.34.0                       # AWS SDK
+google-cloud-storage==2.10.0        # Google Cloud
+azure-storage-blob==12.19.0         # Azure Storage
+
+# ===== CONTAINERIZATION & ORCHESTRATION =====
+docker==6.1.3                       # Docker SDK
+kubernetes==28.1.0                  # Kubernetes client
+
+# ===== MONITORING & OBSERVABILITY =====
+prometheus-client==0.19.0           # Metrics
+opentelemetry-api==1.21.0           # Tracing
+opentelemetry-sdk==1.21.0           # Tracing SDK 

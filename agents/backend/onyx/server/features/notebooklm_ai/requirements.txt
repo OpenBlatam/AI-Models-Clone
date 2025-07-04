@@ -1,0 +1,12 @@
+# NotebookLM AI - Complete Requirements
+# This file includes all dependencies for the full NotebookLM AI system
+# For modular installation, use the individual requirement files in the requirements/ directory
+
+# Include all requirement files
+-r requirements/base.txt
+-r requirements/ai-ml.txt
+-r requirements/document-processing.txt
+-r requirements/web-api.txt
+-r requirements/multimedia.txt
+-r requirements/cloud-deployment.txt
+-r requirements/development.txt 
