@@ -1,3 +1,0 @@
-"""
-Instagram Captions Tests Module.
-""" 
