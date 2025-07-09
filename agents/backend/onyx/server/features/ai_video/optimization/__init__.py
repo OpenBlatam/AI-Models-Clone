@@ -51,6 +51,7 @@ try:
     from . import mega_optimizer
     from . import speed_test
     from . import demo_optimizacion
+    from . import performance_optimizer
 except ImportError as e:
     import logging
     logging.warning(f"No se pudieron importar algunos módulos de optimization: {e}")
@@ -69,7 +70,7 @@ def get_available_optimizers():
             pass
     
     # Nuevos optimizadores ultra-avanzados
-    for module_name in ["mega_optimizer", "speed_test", "demo_optimizacion"]:
+    for module_name in ["mega_optimizer", "speed_test", "demo_optimizacion", "performance_optimizer"]:
         try:
             __import__(f".{module_name}", package=__name__)
             optimizers.append(module_name)

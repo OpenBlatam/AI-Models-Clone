@@ -67,6 +67,9 @@ from abc import ABC, abstractmethod
 from ..model_repository import ModelRepository
 from ..model_service import ModelService
 from ..model_decorators import validate_model, cache_model, log_operations
+from agents.backend.onyx.server.features.utils.value_objects import Money, Dimensions, SEOData
+from agents.backend.onyx.server.features.utils.enums import ProductStatus, ProductType, PriceType, InventoryTracking
+from agents.backend.onyx.server.features.utils.validators import not_empty_string, list_or_empty, dict_or_empty
 
 # Initialize NLP models
 try:
@@ -1046,35 +1049,33 @@ NEGATIVE_WORDS = {'poor', 'bad', 'worst', 'terrible', 'awful', 'horrible'}
 @dataclass(slots=True, frozen=True)
 class BrandKit(OnyxBaseModel):
     """Brand kit model with OnyxBaseModel, Pydantic v2, and orjson serialization."""
-    id: UUID = Field(default_factory=uuid4)
-    name: str = Field(..., min_length=2, max_length=128)
-    description: Optional[str] = Field(None, max_length=512)
-    colors: List[Dict[str, Any]] = Field(default_factory=list)
-    typography: List[Dict[str, Any]] = Field(default_factory=list)
-    voice: List[Dict[str, Any]] = Field(default_factory=list)
-    values: List[str] = Field(default_factory=list)
-    target_audience: Dict[str, Any] = Field(default_factory=dict)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
-    locale: Optional[str] = None
-    metadata: Dict[str, Any] = Field(default_factory=dict)
+    id: UUID = Field(default_factory=uuid4, description="Unique identifier for the brand kit")
+    name: str = Field(..., min_length=2, max_length=128, description="Brand name")
+    description: Optional[str] = Field(None, max_length=512, description="Brand description")
+    colors: List[Dict[str, Any]] = Field(default_factory=list, description="Brand colors")
+    typography: List[Dict[str, Any]] = Field(default_factory=list, description="Brand typography")
+    voice: List[Dict[str, Any]] = Field(default_factory=list, description="Brand voice")
+    values: List[str] = Field(default_factory=list, description="Brand values")
+    target_audience: Dict[str, Any] = Field(default_factory=dict, description="Target audience")
+    created_at: datetime = Field(default_factory=datetime.utcnow, description="Creation timestamp")
+    updated_at: datetime = Field(default_factory=datetime.utcnow, description="Last update timestamp")
+    locale: Optional[str] = Field(None, description="Brand locale")
+    metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
 
     @field_validator("name")
     @classmethod
     def name_not_empty(cls, v: str) -> str:
-        if not v.strip():
-            raise ValueError("Name cannot be empty")
-        return v.strip()
+        return not_empty_string(v)
 
     @field_validator("colors", "typography", "voice", "values", mode="before")
     @classmethod
-    def list_or_empty(cls, v):
-        return v or []
+    def list_or_empty_validator(cls, v):
+        return list_or_empty(v)
 
     @field_validator("target_audience", "metadata", mode="before")
     @classmethod
-    def dict_or_empty(cls, v):
-        return v or {}
+    def dict_or_empty_validator(cls, v):
+        return dict_or_empty(v)
 
     # Class-level caches and infrastructure
     _cache: ClassVar[UltraCache] = UltraCache(ttl=300, max_size=1000)

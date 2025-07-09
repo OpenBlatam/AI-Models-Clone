@@ -210,15 +210,41 @@ events = domain_post.clear_domain_events()
 
 # ===== UTILITIES =====
 def get_feature_info() -> dict:
-    """Get complete feature information."""
+    """Get complete feature information with early returns."""
+    # Early validation
+    if not FEATURE_INFO:
+        return {"error": "Feature info not available"}
+    
+    # Early return for specific info requests
+    if "migration_status" not in FEATURE_INFO:
+        return {"error": "Migration status not available"}
+    
     return FEATURE_INFO
 
 def get_quick_start_examples() -> dict:
-    """Get quick start code examples.""" 
+    """Get quick start code examples with early returns."""
+    # Early validation
+    if not QUICK_START_EXAMPLES:
+        return {"error": "Quick start examples not available"}
+    
+    # Early return for empty examples
+    if len(QUICK_START_EXAMPLES) == 0:
+        return {"error": "No examples available"}
+    
     return QUICK_START_EXAMPLES
 
 def verify_migration() -> bool:
-    """Verify that migration was completed successfully."""
+    """Verify that migration was completed successfully with early returns."""
+    # Early validation
+    if not __version__:
+        print("Version not available")
+        return False
+    
+    # Early return for version mismatch
+    if __version__ < "2.0.0":
+        print(f"Version {__version__} is too old, migration required")
+        return False
+    
     try:
         # Test imports
         from .models.facebook_models import FacebookPostEntity, ContentIdentifier
@@ -229,6 +255,9 @@ def verify_migration() -> bool:
         identifier = ContentIdentifier.generate("test content")
         
         return True
+    except ImportError as e:
+        print(f"Import error during migration verification: {e}")
+        return False
     except Exception as e:
         print(f"Migration verification failed: {e}")
         return False

@@ -101,19 +101,42 @@ async def run_demo():
 
 
 def run_cli():
-    """Run CLI mode for single generation."""
+    """Run CLI mode for single generation with guard clauses."""
     print("🛍️ Product Description Generator - CLI Mode")
     print("=" * 50)
     
     # Get user input
     product_name = input("Product Name: ")
+    
+    # Guard clause: Validate product name
+    if not product_name or not product_name.strip():
+        print("❌ Error: Product name cannot be empty")
+        return
+    
     features_input = input("Features (comma-separated): ")
     features = [f.strip() for f in features_input.split(',') if f.strip()]
+    
+    # Guard clause: Validate features
+    if not features:
+        print("❌ Error: At least one feature is required")
+        return
     
     category = input("Category (default: general): ") or "general"
     brand = input("Brand (default: unknown): ") or "unknown"
     style = input("Style [professional/casual/luxury/technical/creative] (default: professional): ") or "professional"
     tone = input("Tone [friendly/formal/enthusiastic/informative/persuasive] (default: friendly): ") or "friendly"
+    
+    # Guard clause: Validate style
+    valid_styles = ["professional", "casual", "luxury", "technical", "creative"]
+    if style not in valid_styles:
+        print(f"❌ Error: Invalid style. Must be one of: {', '.join(valid_styles)}")
+        return
+    
+    # Guard clause: Validate tone
+    valid_tones = ["friendly", "formal", "enthusiastic", "informative", "persuasive"]
+    if tone not in valid_tones:
+        print(f"❌ Error: Invalid tone. Must be one of: {', '.join(valid_tones)}")
+        return
     
     async def generate():
         # Initialize generator
@@ -152,7 +175,17 @@ def run_cli():
 
 
 def run_api(host="0.0.0.0", port=8000):
-    """Run API service."""
+    """Run API service with guard clauses."""
+    # Guard clause: Validate host
+    if not host or not host.strip():
+        print("❌ Error: Host cannot be empty")
+        return
+    
+    # Guard clause: Validate port range
+    if port < 1 or port > 65535:
+        print("❌ Error: Port must be between 1 and 65535")
+        return
+    
     print(f"🚀 Starting Product Description API on {host}:{port}")
     
     service = ProductDescriptionService()
@@ -160,7 +193,12 @@ def run_api(host="0.0.0.0", port=8000):
 
 
 def run_gradio(share=False, port=7860):
-    """Run Gradio interface."""
+    """Run Gradio interface with guard clauses."""
+    # Guard clause: Validate port range
+    if port < 1 or port > 65535:
+        print("❌ Error: Port must be between 1 and 65535")
+        return
+    
     print(f"🎮 Starting Gradio Interface on port {port}")
     
     app = create_gradio_app()
@@ -168,7 +206,7 @@ def run_gradio(share=False, port=7860):
 
 
 def main():
-    """Main entry point with argument parsing."""
+    """Main entry point with guard clauses."""
     parser = argparse.ArgumentParser(
         description="Product Description Generator - AI-powered product descriptions",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -215,6 +253,16 @@ Examples:
     )
     
     args = parser.parse_args()
+    
+    # Guard clause: Validate port range
+    if args.port < 1 or args.port > 65535:
+        print("❌ Error: Port must be between 1 and 65535")
+        return
+    
+    # Guard clause: Validate host
+    if not args.host or not args.host.strip():
+        print("❌ Error: Host cannot be empty")
+        return
     
     # Setup debug logging
     if args.debug:

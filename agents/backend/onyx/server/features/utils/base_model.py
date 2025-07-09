@@ -16,6 +16,10 @@ from .model_mixins import (
 from .model_decorators import validate_model, cache_model, log_operations
 from pydantic import BaseModel, ConfigDict
 import orjson
+from .batch_utils import BatchMethodsMixin
+from .value_objects import Money, Dimensions, SEOData
+from .enums import ProductStatus, ProductType, PriceType, InventoryTracking
+from .validators import not_empty_string, list_or_empty, dict_or_empty
 
 T = TypeVar('T', bound='OnyxBaseModel')
 
@@ -25,19 +29,25 @@ class OnyxBaseModel(
     VersionMixin,
     AuditMixin,
     ValidationMixin,
-    LoggingMixin
+    LoggingMixin,
+    BatchMethodsMixin
 ):
     """
-    Production-ready base model class with repository, audit context, hooks, and robust logging.
-    Inherits timestamp, soft delete, versioning, audit, validation, and logging behaviors.
+    Production-ready base model class with repository, audit context, hooks, robust logging, batch methods, and value object/enums integration.
+    Inherits timestamp, soft delete, versioning, audit, validation, logging, and batch behaviors.
     All persistence and business logic is delegated to ModelRepository and ModelService.
     Uses orjson for fastest serialization with Pydantic v2.
+    Strict field validation and OpenAPI documentation.
+    Value objects and enums centralizados para máxima reutilización.
     """
     model_config = ConfigDict(
         extra="forbid",
         validate_assignment=True,
         json_loads=orjson.loads,
-        json_dumps=lambda v, *, default: orjson.dumps(v, default=default).decode()
+        json_dumps=lambda v, *, default: orjson.dumps(v, default=default).decode(),
+        strict=True,
+        title="OnyxBaseModel",
+        description="Onyx base model with strict validation, audit, and repository integration."
     )
     _pre_hooks: Dict[str, List[Callable]] = {"create": [], "update": [], "delete": [], "restore": []}
     _post_hooks: Dict[str, List[Callable]] = {"create": [], "update": [], "delete": [], "restore": []}

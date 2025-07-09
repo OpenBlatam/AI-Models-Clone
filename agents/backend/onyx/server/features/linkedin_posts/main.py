@@ -194,7 +194,29 @@ class LinkedInPostsCLI:
         self.system = LinkedInPostsProductionSystem()
     
     async def create_post(self, content: str, post_type: str = "educational", tone: str = "professional"):
-        """Create a new LinkedIn post."""
+        """Create a new LinkedIn post with guard clauses."""
+        # Guard clause: Validate content
+        if not content or not content.strip():
+            print("❌ Error: Content cannot be empty")
+            return None
+        
+        # Guard clause: Validate content length
+        if len(content) < 10:
+            print("❌ Error: Content must be at least 10 characters long")
+            return None
+        
+        # Guard clause: Validate post type
+        valid_post_types = ["educational", "promotional", "thought-leadership", "news", "personal"]
+        if post_type not in valid_post_types:
+            print(f"❌ Error: Invalid post type. Must be one of: {', '.join(valid_post_types)}")
+            return None
+        
+        # Guard clause: Validate tone
+        valid_tones = ["professional", "casual", "authoritative", "friendly", "inspirational"]
+        if tone not in valid_tones:
+            print(f"❌ Error: Invalid tone. Must be one of: {', '.join(valid_tones)}")
+            return None
+        
         try:
             post_data = {
                 "content": content,
@@ -212,7 +234,17 @@ class LinkedInPostsCLI:
             return None
     
     async def list_posts(self, limit: int = 10):
-        """List LinkedIn posts."""
+        """List LinkedIn posts with guard clauses."""
+        # Guard clause: Validate limit
+        if limit <= 0:
+            print("❌ Error: Limit must be greater than 0")
+            return None
+        
+        # Guard clause: Validate maximum limit
+        if limit > 100:
+            print("❌ Error: Limit cannot exceed 100")
+            return None
+        
         try:
             result = await self.system.list_posts_uc.execute(limit=limit)
             print(f"📋 Found {len(result)} posts:")
@@ -224,7 +256,17 @@ class LinkedInPostsCLI:
             return None
     
     async def optimize_post(self, post_id: str):
-        """Optimize a LinkedIn post."""
+        """Optimize a LinkedIn post with guard clauses."""
+        # Guard clause: Validate post ID
+        if not post_id or not post_id.strip():
+            print("❌ Error: Post ID cannot be empty")
+            return None
+        
+        # Guard clause: Validate post ID format
+        if len(post_id) < 5:
+            print("❌ Error: Post ID appears to be invalid (too short)")
+            return None
+        
         try:
             result = await self.system.optimize_post_uc.execute(post_id)
             print(f"🚀 Post optimized successfully:")
@@ -236,7 +278,17 @@ class LinkedInPostsCLI:
             return None
     
     async def analyze_engagement(self, post_id: str):
-        """Analyze post engagement."""
+        """Analyze post engagement with guard clauses."""
+        # Guard clause: Validate post ID
+        if not post_id or not post_id.strip():
+            print("❌ Error: Post ID cannot be empty")
+            return None
+        
+        # Guard clause: Validate post ID format
+        if len(post_id) < 5:
+            print("❌ Error: Post ID appears to be invalid (too short)")
+            return None
+        
         try:
             result = await self.system.analyze_engagement_uc.execute(post_id)
             print(f"📊 Engagement analysis:")
@@ -250,7 +302,7 @@ class LinkedInPostsCLI:
 
 
 async def main():
-    """Main entry point."""
+    """Main entry point with guard clauses."""
     import argparse
     
     parser = argparse.ArgumentParser(description="LinkedIn Posts Production System")
@@ -264,18 +316,34 @@ async def main():
     
     args = parser.parse_args()
     
+    # Guard clause: Validate port range
+    if args.port < 1 or args.port > 65535:
+        print("❌ Error: Port must be between 1 and 65535")
+        return
+    
+    # Guard clause: Validate host format
+    if not args.host or args.host.strip() == "":
+        print("❌ Error: Host cannot be empty")
+        return
+    
     if args.mode == "server":
         # Run as server
         system = LinkedInPostsProductionSystem()
         await system.run_production_server(args.host, args.port)
     
     elif args.mode == "cli":
+        # Guard clause: Validate CLI action
+        if not args.action:
+            print("❌ Error: Action is required for CLI mode")
+            return
+        
         # Run as CLI
         cli = LinkedInPostsCLI()
         
         if args.action == "create":
+            # Guard clause: Validate content for create action
             if not args.content:
-                print("❌ Content is required for create action")
+                print("❌ Error: Content is required for create action")
                 return
             await cli.create_post(args.content)
         
@@ -283,19 +351,18 @@ async def main():
             await cli.list_posts(args.limit)
         
         elif args.action == "optimize":
+            # Guard clause: Validate post ID for optimize action
             if not args.post_id:
-                print("❌ Post ID is required for optimize action")
+                print("❌ Error: Post ID is required for optimize action")
                 return
             await cli.optimize_post(args.post_id)
         
         elif args.action == "analyze":
+            # Guard clause: Validate post ID for analyze action
             if not args.post_id:
-                print("❌ Post ID is required for analyze action")
+                print("❌ Error: Post ID is required for analyze action")
                 return
             await cli.analyze_engagement(args.post_id)
-        
-        else:
-            print("❌ Action is required for CLI mode")
 
 
 if __name__ == "__main__":

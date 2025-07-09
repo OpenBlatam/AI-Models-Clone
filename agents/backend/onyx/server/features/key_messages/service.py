@@ -64,14 +64,16 @@ class KeyMessageService:
         return hashlib.md5(data_str.encode()).hexdigest()
     
     def _get_cached_response(self, cache_key: str) -> Optional[str]:
-        """Get cached response if available and not expired."""
-        if cache_key in self.cache:
-            cached_data = self.cache[cache_key]
-            if datetime.now() - cached_data['timestamp'] < self.cache_ttl:
-                return cached_data['response']
-            else:
-                del self.cache[cache_key]
-        return None
+        """Get cached response if available and not expired using if-return pattern."""
+        if cache_key not in self.cache:
+            return None
+        
+        cached_data = self.cache[cache_key]
+        if datetime.now() - cached_data['timestamp'] >= self.cache_ttl:
+            del self.cache[cache_key]
+            return None
+        
+        return cached_data['response']
     
     def _cache_response(self, cache_key: str, response: str):
         """Cache a response with timestamp."""
@@ -186,10 +188,11 @@ class KeyMessageService:
                         processing_time=0.0
                     ))
                     failed_count += 1
-                else:
-                    results.append(response)
-                    if not response.success:
-                        failed_count += 1
+                    continue
+                
+                results.append(response)
+                if not response.success:
+                    failed_count += 1
             
             return BatchKeyMessageResponse(
                 success=failed_count == 0,

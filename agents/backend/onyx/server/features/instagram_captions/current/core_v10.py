@@ -236,12 +236,12 @@ class RefactoredAIEngine:
         self._models_initialized = False
     
     def _init_cache(self):
-        """Initialize intelligent caching."""
+        """Initialize intelligent caching using if-return pattern."""
         if ADVANCED_CACHE:
             return TTLCache(maxsize=config.CACHE_SIZE, ttl=config.CACHE_TTL)
-        else:
-            # Fallback simple cache
-            return {}
+        
+        # Fallback simple cache
+        return {}
     
     async def _init_models(self):
         """Initialize AI models based on available capabilities."""
@@ -594,13 +594,14 @@ class RefactoredUtils:
     
     @staticmethod
     def format_response_time(seconds: float) -> str:
-        """Format response time for display."""
+        """Format response time for display using if-return pattern."""
         if seconds < 0.001:
             return f"{seconds * 1000000:.0f}μs"
-        elif seconds < 1:
+        
+        if seconds < 1:
             return f"{seconds * 1000:.1f}ms"
-        else:
-            return f"{seconds:.2f}s"
+        
+        return f"{seconds:.2f}s"
     
     @staticmethod
     def validate_api_key(api_key: str) -> bool:
@@ -633,7 +634,7 @@ class RefactoredMetrics:
         self.cache_misses = 0
     
     def record_request(self, success: bool, response_time: float, quality_score: float = None, cache_hit: bool = False):
-        """Record request metrics."""
+        """Record request metrics using if-return pattern."""
         self.requests_total += 1
         
         if success:
@@ -653,25 +654,29 @@ class RefactoredMetrics:
         # Update cache metrics
         if cache_hit:
             self.cache_hits += 1
-        else:
-            self.cache_misses += 1
+            return
+        
+        self.cache_misses += 1
     
     def get_performance_grade(self) -> str:
-        """Calculate performance grade."""
+        """Calculate performance grade using if-return pattern."""
         success_rate = self.requests_success / max(self.requests_total, 1)
         response_time = self.avg_response_time
         quality_score = self.avg_quality_score
         
         if success_rate >= 0.99 and response_time <= 0.05 and quality_score >= 90:
             return "A+ ULTRA-FAST"
-        elif success_rate >= 0.95 and response_time <= 0.1 and quality_score >= 85:
+        
+        if success_rate >= 0.95 and response_time <= 0.1 and quality_score >= 85:
             return "A EXCELLENT"
-        elif success_rate >= 0.90 and response_time <= 0.2 and quality_score >= 80:
+        
+        if success_rate >= 0.90 and response_time <= 0.2 and quality_score >= 80:
             return "B GOOD"
-        elif success_rate >= 0.80 and response_time <= 0.5 and quality_score >= 70:
+        
+        if success_rate >= 0.80 and response_time <= 0.5 and quality_score >= 70:
             return "C FAIR"
-        else:
-            return "D NEEDS_IMPROVEMENT"
+        
+        return "D NEEDS_IMPROVEMENT"
     
     def get_metrics_summary(self) -> Dict[str, Any]:
         """Get comprehensive metrics summary."""

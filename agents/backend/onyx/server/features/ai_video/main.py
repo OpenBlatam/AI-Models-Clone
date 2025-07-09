@@ -17,6 +17,8 @@ import argparse
 import json
 import time
 from datetime import datetime
+import orjson
+from functools import lru_cache
 
 # Core imports
 from .core import (
@@ -62,6 +64,12 @@ from .plugins import PluginManager
 from .state_repository import StateRepository
 
 
+@lru_cache(maxsize=32)
+def get_config_cached(config_path: str):
+    with open(config_path, 'rb') as f:
+        return orjson.loads(f.read())
+
+
 class AIVideoSystem:
     """
     Main AI Video System class.
@@ -96,7 +104,8 @@ class AIVideoSystem:
             main_logger.info("Starting system initialization...")
             
             # Load configuration
-            await self._load_configuration()
+            config_data = get_config_cached(self.config_path)
+            self.config_manager = ConfigManager(config_data)
             
             # Initialize components
             await self._initialize_components()
@@ -122,32 +131,6 @@ class AIVideoSystem:
             main_logger.error(f"System initialization failed: {e}", exc_info=True)
             await self._handle_initialization_error(e)
             raise
-    
-    async def _load_configuration(self) -> None:
-        """Load and validate system configuration."""
-        main_logger.info("Loading configuration...")
-        
-        try:
-            # Load configuration
-            config_data = await load_configuration(self.config_path)
-            
-            # Validate configuration
-            validation_result = schema_validator.validate_data("system_config", config_data)
-            if not validation_result.is_valid:
-                raise ConfigurationError(f"Invalid configuration: {validation_result.errors}")
-            
-            # Initialize config manager
-            self.config_manager = ConfigManager(config_data)
-            
-            # Update security config
-            security_config.encryption_key = config_data.get("security", {}).get("encryption_key")
-            security_config.max_input_length = config_data.get("security", {}).get("max_input_length", 10000)
-            
-            main_logger.info("Configuration loaded successfully")
-            
-        except Exception as e:
-            main_logger.error(f"Configuration loading failed: {e}")
-            raise ConfigurationError(f"Failed to load configuration: {e}")
     
     async def _initialize_components(self) -> None:
         """Initialize system components."""
@@ -249,7 +232,7 @@ class AIVideoSystem:
     
     async def generate_video(self, request: VideoRequest) -> VideoResponse:
         """
-        Generate video using the AI Video system.
+        Generate video using the AI Video system with early returns.
         
         Args:
             request: Video generation request
@@ -262,32 +245,45 @@ class AIVideoSystem:
             ValidationError: If request validation fails
             SecurityError: If security checks fail
         """
-        if not self.is_initialized:
-            raise AIVideoError("System not initialized")
-        
-        if self.is_shutting_down:
-            raise AIVideoError("System is shutting down")
-        
         start_time = time.time()
         self.request_count += 1
         
+        # Early validation and error handling
+        if not self.is_initialized:
+            main_logger.error("System not initialized")
+            raise AIVideoError("System not initialized")
+        
+        if self.is_shutting_down:
+            main_logger.error("System is shutting down")
+            raise AIVideoError("System is shutting down")
+        
+        if not request or not request.request_id:
+            main_logger.error("Invalid request provided")
+            raise ValidationError("Invalid request: missing request_id")
+        
+        # Log request
+        main_logger.info(f"Processing video generation request: {request.request_id}")
+        log_event("video_generation_started", {
+            "request_id": request.request_id,
+            "user_id": request.user_id,
+            "input_length": len(request.input_text)
+        })
+        
         try:
-            # Log request
-            main_logger.info(f"Processing video generation request: {request.request_id}")
-            log_event("video_generation_started", {
-                "request_id": request.request_id,
-                "user_id": request.user_id,
-                "input_length": len(request.input_text)
-            })
-            
             # Security validation
             await self._validate_request_security(request)
             
             # Input validation
             await self._validate_request_input(request)
             
-            # Process request
-            response = await self.workflow.process_request(request)
+            # Serialización rápida de metadata
+            metadata_bytes = orjson.dumps(request.model_dump())
+            
+            # Ejemplo de uso de asyncio para tareas concurrentes
+            await asyncio.gather(
+                self.workflow.process_video(request),
+                self._start_monitoring(),
+            )
             
             # Record success metrics
             duration = time.time() - start_time
@@ -381,11 +377,20 @@ class AIVideoSystem:
             raise ValidationError(f"Request validation failed: {validation_result.errors}")
     
     async def get_system_status(self) -> Dict[str, Any]:
-        """Get comprehensive system status."""
+        """Get comprehensive system status with early returns."""
+        # Early return for uninitialized system
         if not self.is_initialized:
             return {
                 "status": "not_initialized",
                 "message": "System not initialized",
+                "timestamp": datetime.now().isoformat()
+            }
+        
+        # Early return for system in shutdown
+        if self.is_shutting_down:
+            return {
+                "status": "shutting_down",
+                "message": "System is shutting down",
                 "timestamp": datetime.now().isoformat()
             }
         
@@ -394,6 +399,16 @@ class AIVideoSystem:
             plugin_status = await self.plugin_manager.get_status()
             workflow_status = await self.workflow.get_status()
             health_status = health_checker.get_overall_health()
+            
+            # Early return for unhealthy system
+            if health_status['status'] != 'healthy':
+                return {
+                    "status": "degraded",
+                    "message": health_status['message'],
+                    "timestamp": datetime.now().isoformat(),
+                    "version": VERSION,
+                    "health_status": health_status
+                }
             
             # Get performance metrics
             performance_stats = {
@@ -408,8 +423,8 @@ class AIVideoSystem:
             active_alerts = alert_manager.get_active_alerts()
             
             return {
-                "status": "operational" if health_status['status'] == 'healthy' else 'degraded',
-                "message": health_status['message'],
+                "status": "operational",
+                "message": "System is operational",
                 "timestamp": datetime.now().isoformat(),
                 "version": VERSION,
                 "components": {

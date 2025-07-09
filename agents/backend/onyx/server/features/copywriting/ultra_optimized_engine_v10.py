@@ -634,19 +634,33 @@ class UltraOptimizedCopywritingEngine:
         length: int = 100,
         creativity: float = 0.7
     ) -> Dict[str, Any]:
-        """Generate copywriting with advanced features"""
+        """Generate copywriting with advanced features - happy path at the end"""
         
         start_time = time.time()
         REQUEST_COUNT.inc()
         
+        # Early validation and error handling
+        if not prompt or not prompt.strip():
+            logger.error("Empty or invalid prompt provided")
+            raise HTTPException(status_code=400, detail="Prompt cannot be empty")
+        
+        if length <= 0 or length > 2000:
+            logger.error(f"Invalid length parameter: {length}")
+            raise HTTPException(status_code=400, detail="Length must be between 1 and 2000")
+        
+        if creativity < 0.0 or creativity > 1.0:
+            logger.error(f"Invalid creativity parameter: {creativity}")
+            raise HTTPException(status_code=400, detail="Creativity must be between 0.0 and 1.0")
+        
+        # Check cache first - early return for cache hit
+        cache_key = self._generate_cache_key(prompt, style, tone, length, creativity)
+        cached_result = await self.cache.get(cache_key)
+        if cached_result:
+            logger.info("Cache hit for copywriting generation")
+            REQUEST_DURATION.observe(time.time() - start_time)
+            return cached_result
+        
         try:
-            # Check cache first
-            cache_key = self._generate_cache_key(prompt, style, tone, length, creativity)
-            cached_result = await self.cache.get(cache_key)
-            if cached_result:
-                logger.info("Cache hit for copywriting generation")
-                return cached_result
-            
             # Analyze input
             analysis = self.nlp_processor.analyze_text(prompt)
             
@@ -717,12 +731,22 @@ class UltraOptimizedCopywritingEngine:
         return enhanced
     
     async def _generate_text(self, prompt: str, length: int, creativity: float) -> str:
-        """Generate text using the model"""
+        """Generate text using the model with early returns"""
+        
+        # Early validation
+        if not prompt or not prompt.strip():
+            logger.error("Empty prompt provided to text generator")
+            raise ValueError("Prompt cannot be empty")
+        
+        if length <= 0:
+            logger.error(f"Invalid length: {length}")
+            raise ValueError("Length must be positive")
+        
+        # Adjust generation parameters based on creativity
+        temperature = 0.5 + (creativity * 0.5)  # 0.5 to 1.0
+        top_p = 0.9 if creativity > 0.7 else 0.95
+        
         try:
-            # Adjust generation parameters based on creativity
-            temperature = 0.5 + (creativity * 0.5)  # 0.5 to 1.0
-            top_p = 0.9 if creativity > 0.7 else 0.95
-            
             result = self.generator(
                 prompt,
                 max_length=length + len(prompt.split()),
@@ -732,23 +756,50 @@ class UltraOptimizedCopywritingEngine:
                 pad_token_id=self.tokenizer.eos_token_id
             )
             
-            return result[0]['generated_text']
+            generated_text = result[0]['generated_text']
+            
+            # Early return for empty or invalid result
+            if not generated_text or not generated_text.strip():
+                logger.warning("Generated text is empty")
+                return "Unable to generate text with current parameters."
+            
+            return generated_text
             
         except Exception as e:
             logger.error(f"Text generation failed: {e}")
             raise
     
     def _post_process_text(self, text: str, style: str, tone: str) -> str:
-        """Post-process generated text"""
+        """Post-process generated text with early returns"""
+        
+        # Early validation
+        if not text or not text.strip():
+            logger.warning("Empty text provided for post-processing")
+            return ""
+        
         # Clean up text
         text = text.strip()
         
+        # Early return for very short text
+        if len(text) < 10:
+            logger.warning("Text too short for meaningful post-processing")
+            return text
+        
         # Remove duplicate sentences
         sentences = sent_tokenize(text)
+        if not sentences:
+            logger.warning("No sentences found in text")
+            return text
+        
         unique_sentences = []
         for sentence in sentences:
             if sentence not in unique_sentences:
                 unique_sentences.append(sentence)
+        
+        # Early return if no unique sentences
+        if not unique_sentences:
+            logger.warning("No unique sentences after deduplication")
+            return text
         
         text = ' '.join(unique_sentences)
         
@@ -767,22 +818,37 @@ class UltraOptimizedCopywritingEngine:
         length: int = 100,
         creativity: float = 0.7
     ) -> List[Dict[str, Any]]:
-        """Generate copywriting for multiple prompts in batch"""
+        """Generate copywriting for multiple prompts in batch - happy path at the end"""
         
         start_time = time.time()
         
+        # Early validation and error handling
+        if not prompts:
+            logger.error("Empty prompts list provided")
+            raise HTTPException(status_code=400, detail="Prompts list cannot be empty")
+        
+        if len(prompts) > 100:
+            logger.error(f"Too many prompts: {len(prompts)}")
+            raise HTTPException(status_code=400, detail="Maximum 100 prompts allowed per batch")
+        
+        # Validate each prompt
+        for i, prompt in enumerate(prompts):
+            if not prompt or not prompt.strip():
+                logger.error(f"Empty prompt at index {i}")
+                raise HTTPException(status_code=400, detail=f"Prompt at index {i} cannot be empty")
+        
         # Use Ray for distributed processing
         if self.config.enable_distributed:
-            return await self._distributed_batch_generate(prompts, style, tone, length, creativity)
+            results = await self._distributed_batch_generate(prompts, style, tone, length, creativity)
         else:
             # Sequential processing
             results = []
             for prompt in prompts:
                 result = await self.generate_copywriting(prompt, style, tone, length, creativity)
                 results.append(result)
-            
-            logger.info(f"Batch generation completed in {time.time() - start_time:.2f}s")
-            return results
+        
+        logger.info(f"Batch generation completed in {time.time() - start_time:.2f}s")
+        return results
     
     async def _distributed_batch_generate(
         self,

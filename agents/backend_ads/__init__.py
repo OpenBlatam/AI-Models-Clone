@@ -1,3 +1,0 @@
-"""
-Ads IA Backend Package
-"""

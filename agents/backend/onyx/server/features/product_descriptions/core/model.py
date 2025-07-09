@@ -20,8 +20,13 @@ from enum import Enum
 from uuid import uuid4
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+from pydantic import BaseModel, Field, validator, root_validator
 
 from .config import ModelConfig
+from agents.backend.onyx.server.features.utils.base_model import OnyxBaseModel
+from agents.backend.onyx.server.features.utils.value_objects import Money, Dimensions, SEOData
+from agents.backend.onyx.server.features.utils.enums import ProductStatus, ProductType, PriceType, InventoryTracking
+from agents.backend.onyx.server.features.utils.validators import not_empty_string, list_or_empty, dict_or_empty
 
 logger = logging.getLogger(__name__)
 
@@ -63,18 +68,17 @@ class InventoryTracking(str, Enum):
     BACKORDER = "backorder"
 
 
-@dataclass
-class Money:
+class Money(BaseModel):
     """Value object para representar dinero"""
-    amount: Decimal
-    currency: str = "USD"
-    
-    def __post_init__(self):
-        if self.amount < 0:
-            raise ValueError("El monto no puede ser negativo")
-        if len(self.currency) != 3:
+    amount: Decimal = Field(..., gt=0, description="Monto positivo")
+    currency: str = Field("USD", min_length=3, max_length=3, description="Código de moneda ISO 4217")
+
+    @validator('currency')
+    def validate_currency(cls, v):
+        if len(v) != 3:
             raise ValueError("Código de moneda debe tener 3 caracteres")
-    
+        return v
+
     def to_dict(self) -> Dict[str, Any]:
         return {"amount": float(self.amount), "currency": self.currency}
     
@@ -83,15 +87,14 @@ class Money:
         return cls(amount=Decimal(str(data["amount"])), currency=data["currency"])
 
 
-@dataclass
-class Dimensions:
+class Dimensions(BaseModel):
     """Value object para dimensiones del producto"""
-    length: float
-    width: float
-    height: float
-    weight: float
-    unit: str = "cm"
-    weight_unit: str = "kg"
+    length: float = Field(..., gt=0)
+    width: float = Field(..., gt=0)
+    height: float = Field(..., gt=0)
+    weight: float = Field(..., gt=0)
+    unit: str = Field("cm")
+    weight_unit: str = Field("kg")
     
     def volume(self) -> float:
         return self.length * self.width * self.height
@@ -108,28 +111,20 @@ class Dimensions:
         }
 
 
-@dataclass
-class SEOData:
+class SEOData(BaseModel):
     """Value object para datos SEO"""
     title: Optional[str] = None
     description: Optional[str] = None
-    keywords: List[str] = field(default_factory=list)
+    keywords: List[str] = Field(default_factory=list)
     meta_title: Optional[str] = None
     meta_description: Optional[str] = None
     slug: Optional[str] = None
     
     def to_dict(self) -> Dict[str, Any]:
-        return {
-            "title": self.title,
-            "description": self.description,
-            "keywords": self.keywords,
-            "meta_title": self.meta_title,
-            "meta_description": self.meta_description,
-            "slug": self.slug
-        }
+        return self.dict()
 
 
-class EnhancedProductEntity:
+class EnhancedProductEntity(OnyxBaseModel):
     """
     Entidad de producto empresarial mejorada
     
@@ -142,69 +137,62 @@ class EnhancedProductEntity:
     - Análisis de rentabilidad
     """
     
-    def __init__(
-        self,
-        id: Optional[str] = None,
-        name: str = "",
-        description: str = "",
-        short_description: str = "",
-        sku: str = "",
-        product_type: ProductType = ProductType.PHYSICAL,
-        status: ProductStatus = ProductStatus.DRAFT,
-        brand_id: Optional[str] = None,
-        category_id: Optional[str] = None
-    ):
-        self.id = id or str(uuid4())
-        self.name = name
-        self.description = description
-        self.short_description = short_description
-        self.sku = sku
-        self.product_type = product_type
-        self.status = status
-        self.brand_id = brand_id
-        self.category_id = category_id
-        
-        # Pricing
-        self.base_price: Optional[Money] = None
-        self.sale_price: Optional[Money] = None
-        self.cost_price: Optional[Money] = None
-        self.price_type: PriceType = PriceType.FIXED
-        
-        # Inventory
-        self.inventory_quantity: int = 0
-        self.low_stock_threshold: int = 10
-        self.inventory_tracking: InventoryTracking = InventoryTracking.TRACK
-        self.allow_backorder: bool = False
-        
-        # Physical properties
-        self.dimensions: Optional[Dimensions] = None
-        self.requires_shipping: bool = True
-        
-        # Digital properties
-        self.download_url: Optional[str] = None
-        self.download_limit: Optional[int] = None
-        
-        # SEO and Marketing
-        self.seo_data: SEOData = SEOData()
-        self.tags: Set[str] = set()
-        self.featured: bool = False
-        
-        # Attributes and Media
-        self.attributes: Dict[str, Any] = {}
-        self.custom_fields: Dict[str, Any] = {}
-        self.images: List[str] = []
-        self.videos: List[str] = []
-        
-        # Timestamps
-        self.created_at: datetime = datetime.utcnow()
-        self.updated_at: datetime = datetime.utcnow()
-        self.published_at: Optional[datetime] = None
-        
-        # AI-Generated Content
-        self.ai_generated_description: Optional[str] = None
-        self.ai_confidence_score: Optional[float] = None
-        self.ai_last_updated: Optional[datetime] = None
-    
+    id: str = Field(default_factory=lambda: str(uuid4()))
+    name: str = Field(..., min_length=2, max_length=128, description="Product name")
+    description: str = Field(default="", description="Product description")
+    short_description: str = Field(default="", description="Short description")
+    sku: str = Field(default="", description="SKU")
+    product_type: ProductType = Field(default=ProductType.PHYSICAL)
+    status: ProductStatus = Field(default=ProductStatus.DRAFT)
+    brand_id: Optional[str] = None
+    category_id: Optional[str] = None
+    base_price: Optional[Money] = None
+    sale_price: Optional[Money] = None
+    cost_price: Optional[Money] = None
+    price_type: PriceType = Field(default=PriceType.FIXED)
+    inventory_quantity: int = Field(default=0, ge=0)
+    low_stock_threshold: int = Field(default=10, ge=0)
+    inventory_tracking: InventoryTracking = Field(default=InventoryTracking.TRACK)
+    allow_backorder: bool = Field(default=False)
+    dimensions: Optional[Dimensions] = None
+    requires_shipping: bool = Field(default=True)
+    download_url: Optional[str] = None
+    download_limit: Optional[int] = None
+    seo_data: SEOData = Field(default_factory=SEOData)
+    tags: set[str] = Field(default_factory=set)
+    featured: bool = Field(default=False)
+    attributes: dict[str, any] = Field(default_factory=dict)
+    custom_fields: dict[str, any] = Field(default_factory=dict)
+    images: list[str] = Field(default_factory=list)
+    videos: list[str] = Field(default_factory=list)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    published_at: Optional[datetime] = None
+    ai_generated_description: Optional[str] = None
+    ai_confidence_score: Optional[float] = None
+    ai_last_updated: Optional[datetime] = None
+
+    @field_validator('name')
+    @classmethod
+    def name_not_empty(cls, v):
+        return not_empty_string(v)
+
+    @field_validator('tags', 'images', 'videos', mode='before')
+    @classmethod
+    def list_or_empty_validator(cls, v):
+        return list_or_empty(v)
+
+    @field_validator('attributes', 'custom_fields', mode='before')
+    @classmethod
+    def dict_or_empty_validator(cls, v):
+        return dict_or_empty(v)
+
+    @validator('inventory_quantity', 'low_stock_threshold', pre=True, always=True)
+    def non_negative(cls, v):
+        if v < 0:
+            raise ValueError('Debe ser no negativo')
+        return v
+
     def set_price(self, price: Money, price_type: PriceType = PriceType.FIXED) -> None:
         """Establece el precio base del producto"""
         if price.amount <= 0:
@@ -321,48 +309,7 @@ class EnhancedProductEntity:
     
     def to_dict(self) -> Dict[str, Any]:
         """Convierte la entidad a diccionario con campos calculados"""
-        return {
-            "id": self.id,
-            "name": self.name,
-            "description": self.description,
-            "short_description": self.short_description,
-            "sku": self.sku,
-            "product_type": self.product_type.value,
-            "status": self.status.value,
-            "brand_id": self.brand_id,
-            "category_id": self.category_id,
-            "base_price": self.base_price.to_dict() if self.base_price else None,
-            "sale_price": self.sale_price.to_dict() if self.sale_price else None,
-            "cost_price": self.cost_price.to_dict() if self.cost_price else None,
-            "effective_price": self.get_effective_price().to_dict() if self.get_effective_price() else None,
-            "price_type": self.price_type.value,
-            "is_on_sale": self.is_on_sale(),
-            "discount_percentage": self.calculate_discount_percentage(),
-            "inventory_quantity": self.inventory_quantity,
-            "low_stock_threshold": self.low_stock_threshold,
-            "inventory_tracking": self.inventory_tracking.value,
-            "allow_backorder": self.allow_backorder,
-            "is_low_stock": self.is_low_stock(),
-            "is_in_stock": self.is_in_stock(),
-            "dimensions": self.dimensions.to_dict() if self.dimensions else None,
-            "requires_shipping": self.requires_shipping,
-            "download_url": self.download_url,
-            "download_limit": self.download_limit,
-            "seo_data": self.seo_data.to_dict(),
-            "tags": list(self.tags),
-            "featured": self.featured,
-            "attributes": self.attributes,
-            "custom_fields": self.custom_fields,
-            "images": self.images,
-            "videos": self.videos,
-            "created_at": self.created_at.isoformat(),
-            "updated_at": self.updated_at.isoformat(),
-            "published_at": self.published_at.isoformat() if self.published_at else None,
-            "ai_generated_description": self.ai_generated_description,
-            "ai_confidence_score": self.ai_confidence_score,
-            "ai_last_updated": self.ai_last_updated.isoformat() if self.ai_last_updated else None,
-            "profit_margin": self.calculate_profit_margin()
-        }
+        return self.dict()
 
 
 class ProductDescriptionModel(nn.Module):

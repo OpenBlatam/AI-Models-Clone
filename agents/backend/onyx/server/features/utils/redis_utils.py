@@ -1,6 +1,6 @@
 """
 Redis Utilities - Onyx Integration
-Utility functions for Redis operations in Onyx.
+Utility functions for Redis operations in Onyx with enhanced error handling.
 """
 from typing import Any, Dict, List, Optional, Union, TypeVar, Generic
 import json
@@ -12,6 +12,15 @@ import logging
 from pydantic import BaseModel
 import time
 from .redis_config import RedisConfig, get_config
+from .error_system import (
+    error_factory,
+    ErrorContext,
+    CacheError,
+    ValidationError,
+    SystemError,
+    handle_errors,
+    ErrorCategory
+)
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +34,7 @@ class DateTimeEncoder(json.JSONEncoder):
         return super().default(obj)
 
 class RedisUtils:
-    """Utility functions for Redis operations."""
+    """Utility functions for Redis operations with enhanced error handling."""
     
     def __init__(self, config: Optional[RedisConfig] = None):
         """Initialize Redis utilities with configuration."""
@@ -71,11 +80,36 @@ class RedisUtils:
         """Generate a Redis key with prefix and identifier."""
         return f"onyx:{prefix}:{identifier}"
     
+    @handle_errors(ErrorCategory.CACHE, operation="cache_data")
     def cache_data(self, data: Any, prefix: str, identifier: str, 
                   expire: Optional[int] = None) -> None:
-        """Cache data in Redis with retry mechanism."""
+        """Cache data in Redis with retry mechanism and enhanced error handling."""
+        # Guard clause: Validate input parameters
+        if not prefix or not prefix.strip():
+            context = ErrorContext(operation="cache_data", additional_data={"prefix": prefix})
+            raise error_factory.create_validation_error(
+                "Cache prefix cannot be empty",
+                field="prefix",
+                value=prefix,
+                context=context
+            )
+        
+        if not identifier or not identifier.strip():
+            context = ErrorContext(operation="cache_data", additional_data={"identifier": identifier})
+            raise error_factory.create_validation_error(
+                "Cache identifier cannot be empty",
+                field="identifier",
+                value=identifier,
+                context=context
+            )
+        
+        if data is None:
+            logger.warning(f"Attempting to cache None data for {prefix}:{identifier}")
+            return
+        
         key = self._generate_key(prefix, identifier)
         try:
+            logger.info(f"Caching data for key: {key}")
             serialized_data = self._serialize(data)
             self._retry_operation(
                 self.redis.set,
@@ -83,76 +117,283 @@ class RedisUtils:
                 serialized_data,
                 ex=expire or self.config.default_expire
             )
-            logger.debug(f"Cached data {prefix}:{identifier}")
+            logger.info(f"Successfully cached data for {prefix}:{identifier} (expires in {expire or self.config.default_expire}s)")
+        except redis.ConnectionError as e:
+            context = ErrorContext(
+                operation="cache_data",
+                additional_data={"key": key, "prefix": prefix, "identifier": identifier}
+            )
+            raise error_factory.create_cache_error(
+                f"Unable to connect to Redis cache: {str(e)}",
+                cache_key=key,
+                operation="set",
+                context=context,
+                original_exception=e
+            )
+        except redis.RedisError as e:
+            context = ErrorContext(
+                operation="cache_data",
+                additional_data={"key": key, "prefix": prefix, "identifier": identifier}
+            )
+            raise error_factory.create_cache_error(
+                f"Redis error during cache operation: {str(e)}",
+                cache_key=key,
+                operation="set",
+                context=context,
+                original_exception=e
+            )
         except Exception as e:
-            logger.error(f"Error caching data: {e}")
-            raise
+            context = ErrorContext(
+                operation="cache_data",
+                additional_data={"key": key, "prefix": prefix, "identifier": identifier}
+            )
+            raise error_factory.create_system_error(
+                f"Unexpected error during cache operation: {str(e)}",
+                component="redis_utils",
+                context=context,
+                original_exception=e
+            )
     
+    @handle_errors(ErrorCategory.CACHE, operation="get_cached_data")
     def get_cached_data(self, prefix: str, identifier: str, 
                        model_class: Optional[type[T]] = None) -> Optional[Any]:
-        """Retrieve cached data from Redis with retry mechanism."""
+        """Retrieve cached data from Redis with retry mechanism and enhanced error handling."""
+        # Guard clause: Validate input parameters
+        if not prefix or not prefix.strip():
+            context = ErrorContext(operation="get_cached_data", additional_data={"prefix": prefix})
+            logger.error("Cache retrieval failed: Prefix cannot be empty")
+            return None
+        
+        if not identifier or not identifier.strip():
+            context = ErrorContext(operation="get_cached_data", additional_data={"identifier": identifier})
+            logger.error("Cache retrieval failed: Identifier cannot be empty")
+            return None
+        
         key = self._generate_key(prefix, identifier)
         try:
+            logger.debug(f"Retrieving cached data for key: {key}")
             data = self._retry_operation(self.redis.get, key)
             if data:
-                return self._deserialize(data, model_class)
+                deserialized_data = self._deserialize(data, model_class)
+                logger.debug(f"Successfully retrieved cached data for {prefix}:{identifier}")
+                return deserialized_data
+            else:
+                logger.debug(f"No cached data found for {prefix}:{identifier}")
+                return None
+        except redis.ConnectionError as e:
+            context = ErrorContext(
+                operation="get_cached_data",
+                additional_data={"key": key, "prefix": prefix, "identifier": identifier}
+            )
+            logger.error(f"Redis connection error: {str(e)}")
+            logger.warning("Cache retrieval failed due to connection issues. Returning None.")
+            return None
+        except redis.RedisError as e:
+            context = ErrorContext(
+                operation="get_cached_data",
+                additional_data={"key": key, "prefix": prefix, "identifier": identifier}
+            )
+            logger.error(f"Redis error: {str(e)}")
+            logger.warning("Cache retrieval failed due to Redis error. Returning None.")
             return None
         except Exception as e:
-            logger.error(f"Error retrieving cached data: {e}")
+            context = ErrorContext(
+                operation="get_cached_data",
+                additional_data={"key": key, "prefix": prefix, "identifier": identifier}
+            )
+            logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+            logger.warning("Cache retrieval failed due to unexpected error. Returning None.")
             return None
     
+    @handle_errors(ErrorCategory.CACHE, operation="cache_batch")
     def cache_batch(self, data_dict: Dict[str, Any], prefix: str, 
                    expire: Optional[int] = None) -> None:
-        """Cache multiple data items in Redis with pipeline."""
+        """Cache multiple data items in Redis with pipeline and enhanced error handling."""
+        # Guard clause: Validate input parameters
+        if not prefix or not prefix.strip():
+            context = ErrorContext(operation="cache_batch", additional_data={"prefix": prefix})
+            raise error_factory.create_validation_error(
+                "Cache prefix cannot be empty",
+                field="prefix",
+                value=prefix,
+                context=context
+            )
+        
+        if not data_dict:
+            logger.warning("Batch cache operation: Empty data dictionary provided")
+            return
+        
         try:
+            logger.info(f"Caching batch data for {len(data_dict)} items with prefix: {prefix}")
             with self.redis.pipeline() as pipe:
                 for identifier, data in data_dict.items():
-                    key = self._generate_key(prefix, identifier)
-                    serialized_data = self._serialize(data)
-                    pipe.set(key, serialized_data)
-                    if expire:
-                        pipe.expire(key, expire)
+                    if data is not None:  # Skip None values
+                        key = self._generate_key(prefix, identifier)
+                        serialized_data = self._serialize(data)
+                        pipe.set(key, serialized_data)
+                        if expire:
+                            pipe.expire(key, expire)
                 pipe.execute()
-            logger.debug(f"Cached batch data for {prefix}")
+            logger.info(f"Successfully cached batch data for {len(data_dict)} items with prefix: {prefix}")
+        except redis.ConnectionError as e:
+            context = ErrorContext(
+                operation="cache_batch",
+                additional_data={"prefix": prefix, "item_count": len(data_dict)}
+            )
+            raise error_factory.create_cache_error(
+                f"Unable to connect to Redis cache during batch operation: {str(e)}",
+                operation="batch_set",
+                context=context,
+                original_exception=e
+            )
+        except redis.RedisError as e:
+            context = ErrorContext(
+                operation="cache_batch",
+                additional_data={"prefix": prefix, "item_count": len(data_dict)}
+            )
+            raise error_factory.create_cache_error(
+                f"Redis error during batch cache operation: {str(e)}",
+                operation="batch_set",
+                context=context,
+                original_exception=e
+            )
         except Exception as e:
-            logger.error(f"Error caching batch data: {e}")
-            raise
+            context = ErrorContext(
+                operation="cache_batch",
+                additional_data={"prefix": prefix, "item_count": len(data_dict)}
+            )
+            raise error_factory.create_system_error(
+                f"Unexpected error during batch cache operation: {str(e)}",
+                component="redis_utils",
+                context=context,
+                original_exception=e
+            )
     
+    @handle_errors(ErrorCategory.CACHE, operation="get_cached_batch")
     def get_cached_batch(self, prefix: str, identifiers: List[str], 
                         model_class: Optional[type[T]] = None) -> Dict[str, Any]:
-        """Retrieve multiple cached data items from Redis with pipeline."""
+        """Retrieve multiple cached data items from Redis with pipeline and enhanced error handling."""
+        # Guard clause: Validate input parameters
+        if not prefix or not prefix.strip():
+            context = ErrorContext(operation="get_cached_batch", additional_data={"prefix": prefix})
+            logger.error("Batch cache retrieval failed: Prefix cannot be empty")
+            return {}
+        
+        if not identifiers:
+            logger.warning("Batch cache retrieval: Empty identifiers list provided")
+            return {}
+        
         try:
+            logger.debug(f"Retrieving batch cached data for {len(identifiers)} items with prefix: {prefix}")
             with self.redis.pipeline() as pipe:
                 for identifier in identifiers:
                     key = self._generate_key(prefix, identifier)
                     pipe.get(key)
                 results = pipe.execute()
             
-            return {
+            cached_data = {
                 identifier: self._deserialize(data, model_class)
                 for identifier, data in zip(identifiers, results)
                 if data is not None
             }
+            
+            logger.debug(f"Successfully retrieved {len(cached_data)} items from batch cache for prefix: {prefix}")
+            return cached_data
+        except redis.ConnectionError as e:
+            context = ErrorContext(
+                operation="get_cached_batch",
+                additional_data={"prefix": prefix, "identifier_count": len(identifiers)}
+            )
+            logger.error(f"Redis connection error: {str(e)}")
+            logger.warning("Batch cache retrieval failed due to connection issues. Returning empty dict.")
+            return {}
+        except redis.RedisError as e:
+            context = ErrorContext(
+                operation="get_cached_batch",
+                additional_data={"prefix": prefix, "identifier_count": len(identifiers)}
+            )
+            logger.error(f"Redis error: {str(e)}")
+            logger.warning("Batch cache retrieval failed due to Redis error. Returning empty dict.")
+            return {}
         except Exception as e:
-            logger.error(f"Error retrieving batch data: {e}")
+            context = ErrorContext(
+                operation="get_cached_batch",
+                additional_data={"prefix": prefix, "identifier_count": len(identifiers)}
+            )
+            logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+            logger.warning("Batch cache retrieval failed due to unexpected error. Returning empty dict.")
             return {}
     
+    @handle_errors(ErrorCategory.CACHE, operation="delete_batch")
     def delete_batch(self, prefix: str, identifiers: List[str]) -> None:
-        """Delete multiple keys from Redis with pipeline."""
+        """Delete multiple keys from Redis with pipeline and enhanced error handling."""
+        # Guard clause: Validate input parameters
+        if not prefix or not prefix.strip():
+            context = ErrorContext(operation="delete_batch", additional_data={"prefix": prefix})
+            raise error_factory.create_validation_error(
+                "Cache prefix cannot be empty",
+                field="prefix",
+                value=prefix,
+                context=context
+            )
+        
+        if not identifiers:
+            logger.warning("Batch delete operation: Empty identifiers list provided")
+            return
+        
         try:
+            logger.info(f"Deleting batch keys for {len(identifiers)} items with prefix: {prefix}")
             with self.redis.pipeline() as pipe:
                 for identifier in identifiers:
                     key = self._generate_key(prefix, identifier)
                     pipe.delete(key)
                 pipe.execute()
-            logger.debug(f"Deleted batch keys for {prefix}")
+            logger.info(f"Successfully deleted batch keys for {len(identifiers)} items with prefix: {prefix}")
+        except redis.ConnectionError as e:
+            context = ErrorContext(
+                operation="delete_batch",
+                additional_data={"prefix": prefix, "identifier_count": len(identifiers)}
+            )
+            raise error_factory.create_cache_error(
+                f"Unable to connect to Redis cache during batch delete operation: {str(e)}",
+                operation="batch_delete",
+                context=context,
+                original_exception=e
+            )
+        except redis.RedisError as e:
+            context = ErrorContext(
+                operation="delete_batch",
+                additional_data={"prefix": prefix, "identifier_count": len(identifiers)}
+            )
+            raise error_factory.create_cache_error(
+                f"Redis error during batch delete operation: {str(e)}",
+                operation="batch_delete",
+                context=context,
+                original_exception=e
+            )
         except Exception as e:
-            logger.error(f"Error deleting batch keys: {e}")
-            raise
+            context = ErrorContext(
+                operation="delete_batch",
+                additional_data={"prefix": prefix, "identifier_count": len(identifiers)}
+            )
+            raise error_factory.create_system_error(
+                f"Unexpected error during batch delete operation: {str(e)}",
+                component="redis_utils",
+                context=context,
+                original_exception=e
+            )
     
+    @handle_errors(ErrorCategory.CACHE, operation="scan_keys")
     def scan_keys(self, prefix: str, pattern: str = "*") -> List[str]:
-        """Scan Redis keys with a specific prefix and pattern."""
+        """Scan Redis keys with a specific prefix and pattern with enhanced error handling."""
+        # Guard clause: Validate input parameters
+        if not prefix or not prefix.strip():
+            context = ErrorContext(operation="scan_keys", additional_data={"prefix": prefix})
+            logger.error("Key scan operation failed: Prefix cannot be empty")
+            return []
+        
         try:
+            logger.debug(f"Scanning keys with prefix: {prefix}, pattern: {pattern}")
             cursor = 0
             keys = []
             while True:
@@ -164,48 +405,156 @@ class RedisUtils:
                 keys.extend(found_keys)
                 if cursor == 0:
                     break
+            
+            logger.debug(f"Successfully scanned {len(keys)} keys with prefix: {prefix}")
             return keys
+        except redis.ConnectionError as e:
+            context = ErrorContext(
+                operation="scan_keys",
+                additional_data={"prefix": prefix, "pattern": pattern}
+            )
+            logger.error(f"Redis connection error: {str(e)}")
+            logger.warning("Key scan failed due to connection issues. Returning empty list.")
+            return []
+        except redis.RedisError as e:
+            context = ErrorContext(
+                operation="scan_keys",
+                additional_data={"prefix": prefix, "pattern": pattern}
+            )
+            logger.error(f"Redis error: {str(e)}")
+            logger.warning("Key scan failed due to Redis error. Returning empty list.")
+            return []
         except Exception as e:
-            logger.error(f"Error scanning keys: {e}")
+            context = ErrorContext(
+                operation="scan_keys",
+                additional_data={"prefix": prefix, "pattern": pattern}
+            )
+            logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+            logger.warning("Key scan failed due to unexpected error. Returning empty list.")
             return []
     
+    @handle_errors(ErrorCategory.CACHE, operation="get_memory_usage")
     def get_memory_usage(self) -> Dict[str, int]:
-        """Get memory usage statistics from Redis."""
+        """Get memory usage statistics from Redis with enhanced error handling."""
         try:
+            logger.debug("Retrieving Redis memory usage statistics")
             info = self._retry_operation(self.redis.info, "memory")
-            return {
+            memory_stats = {
                 "used_memory": info["used_memory"],
                 "used_memory_peak": info["used_memory_peak"],
                 "used_memory_lua": info["used_memory_lua"],
                 "used_memory_scripts": info["used_memory_scripts"]
             }
+            logger.debug("Successfully retrieved Redis memory usage statistics")
+            return memory_stats
+        except redis.ConnectionError as e:
+            context = ErrorContext(operation="get_memory_usage")
+            logger.error(f"Redis connection error: {str(e)}")
+            logger.warning("Memory usage retrieval failed due to connection issues. Returning empty dict.")
+            return {}
+        except redis.RedisError as e:
+            context = ErrorContext(operation="get_memory_usage")
+            logger.error(f"Redis error: {str(e)}")
+            logger.warning("Memory usage retrieval failed due to Redis error. Returning empty dict.")
+            return {}
         except Exception as e:
-            logger.error(f"Error getting memory usage: {e}")
+            context = ErrorContext(operation="get_memory_usage")
+            logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+            logger.warning("Memory usage retrieval failed due to unexpected error. Returning empty dict.")
             return {}
     
+    @handle_errors(ErrorCategory.CACHE, operation="get_stats")
     def get_stats(self) -> Dict[str, Any]:
-        """Get Redis statistics."""
+        """Get Redis statistics with enhanced error handling."""
         try:
+            logger.debug("Retrieving Redis statistics")
             info = self._retry_operation(self.redis.info)
-            return {
+            stats = {
                 "clients": info["clients"],
                 "memory": info["memory"],
                 "stats": info["stats"],
                 "replication": info["replication"]
             }
+            logger.debug("Successfully retrieved Redis statistics")
+            return stats
+        except redis.ConnectionError as e:
+            context = ErrorContext(operation="get_stats")
+            logger.error(f"Redis connection error: {str(e)}")
+            logger.warning("Stats retrieval failed due to connection issues. Returning empty dict.")
+            return {}
+        except redis.RedisError as e:
+            context = ErrorContext(operation="get_stats")
+            logger.error(f"Redis error: {str(e)}")
+            logger.warning("Stats retrieval failed due to Redis error. Returning empty dict.")
+            return {}
         except Exception as e:
-            logger.error(f"Error getting Redis stats: {e}")
+            context = ErrorContext(operation="get_stats")
+            logger.error(f"Unexpected error: {str(e)}", exc_info=True)
+            logger.warning("Stats retrieval failed due to unexpected error. Returning empty dict.")
             return {}
     
+    @handle_errors(ErrorCategory.CACHE, operation="delete_key")
     def delete_key(self, prefix: str, identifier: str) -> None:
-        """Delete a single key from Redis."""
+        """Delete a single key from Redis with enhanced error handling."""
+        # Guard clause: Validate input parameters
+        if not prefix or not prefix.strip():
+            context = ErrorContext(operation="delete_key", additional_data={"prefix": prefix})
+            raise error_factory.create_validation_error(
+                "Cache prefix cannot be empty",
+                field="prefix",
+                value=prefix,
+                context=context
+            )
+        
+        if not identifier or not identifier.strip():
+            context = ErrorContext(operation="delete_key", additional_data={"identifier": identifier})
+            raise error_factory.create_validation_error(
+                "Cache identifier cannot be empty",
+                field="identifier",
+                value=identifier,
+                context=context
+            )
+        
         key = self._generate_key(prefix, identifier)
         try:
+            logger.info(f"Deleting key: {key}")
             self._retry_operation(self.redis.delete, key)
-            logger.debug(f"Deleted key {prefix}:{identifier}")
+            logger.info(f"Successfully deleted key: {key}")
+        except redis.ConnectionError as e:
+            context = ErrorContext(
+                operation="delete_key",
+                additional_data={"key": key, "prefix": prefix, "identifier": identifier}
+            )
+            raise error_factory.create_cache_error(
+                f"Unable to connect to Redis cache during delete operation: {str(e)}",
+                cache_key=key,
+                operation="delete",
+                context=context,
+                original_exception=e
+            )
+        except redis.RedisError as e:
+            context = ErrorContext(
+                operation="delete_key",
+                additional_data={"key": key, "prefix": prefix, "identifier": identifier}
+            )
+            raise error_factory.create_cache_error(
+                f"Redis error during delete operation: {str(e)}",
+                cache_key=key,
+                operation="delete",
+                context=context,
+                original_exception=e
+            )
         except Exception as e:
-            logger.error(f"Error deleting key: {e}")
-            raise
+            context = ErrorContext(
+                operation="delete_key",
+                additional_data={"key": key, "prefix": prefix, "identifier": identifier}
+            )
+            raise error_factory.create_system_error(
+                f"Unexpected error during delete operation: {str(e)}",
+                component="redis_utils",
+                context=context,
+                original_exception=e
+            )
 
 # Global Redis utilities instance
 redis_utils = RedisUtils()

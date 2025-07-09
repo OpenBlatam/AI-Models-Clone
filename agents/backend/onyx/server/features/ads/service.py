@@ -39,7 +39,7 @@ class AdsService:
         type: str
     ) -> Dict[str, Any]:
         """
-        Generate ads based on prompt.
+        Generate ads based on prompt using if-return pattern.
         
         Args:
             prompt: The prompt to generate ads from
@@ -61,7 +61,8 @@ class AdsService:
                     "content": content,
                     "url": None  # TODO: Add URL generation
                 }
-            elif type == "brand-kit":
+            
+            if type == "brand-kit":
                 content = await generate_brand_kit_lcel(
                     prompt,
                     model=settings.LLM_MODEL,
@@ -73,7 +74,8 @@ class AdsService:
                     "content": content,
                     "url": None  # TODO: Add URL generation
                 }
-            elif type == "custom":
+            
+            if type == "custom":
                 content = await generate_custom_content_lcel(
                     prompt,
                     model=settings.LLM_MODEL,
@@ -85,8 +87,10 @@ class AdsService:
                     "content": content,
                     "url": None  # TODO: Add URL generation
                 }
-            else:
-                raise ValueError(f"Invalid content type: {type}")
+            
+            # Default case for invalid type
+            raise ValueError(f"Invalid content type: {type}")
+            
         except Exception as e:
             logger.exception("Error generating ads")
             raise
@@ -141,6 +145,7 @@ class AdsService:
             
             # Save processed image
             buffered = io.BytesIO()
+            
             if has_alpha:
                 output_image.save(buffered, format="PNG")
                 mime = "image/png"
