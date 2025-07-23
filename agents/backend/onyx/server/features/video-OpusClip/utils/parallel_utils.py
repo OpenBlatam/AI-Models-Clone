@@ -135,9 +135,7 @@ async def async_batch_process(
 
 def setup_async_loop() -> None:
     """Setup ultra-fast event loop with uvloop if available."""
-    if UVLOOP_AVAILABLE:
-        uvloop.install()
-        logger.info("Using uvloop for ultra-fast async processing")
+    if UVLOOP_AVAILABLE: uvloop.install(); logger.info("Using uvloop for ultra-fast async processing")
 
 # =============================================================================
 # MULTIPROCESSING WITH JOBLIB
@@ -165,8 +163,7 @@ def joblib_parallel_process(
     Returns:
         List of results
     """
-    if not JOBLIB_AVAILABLE:
-        raise ImportError("joblib is not installed")
+    if not JOBLIB_AVAILABLE: raise ImportError("joblib is not installed")
     
     return joblib.Parallel(
         n_jobs=n_jobs,
@@ -199,12 +196,10 @@ def ray_parallel_process(
     Returns:
         List of results
     """
-    if not RAY_AVAILABLE:
-        raise ImportError("ray is not installed")
+    if not RAY_AVAILABLE: raise ImportError("ray is not installed")
     
     # Initialize Ray if not already done
-    if not ray.is_initialized():
-        ray.init()
+    if not ray.is_initialized(): ray.init()
     
     # Remote function
     @ray.remote
@@ -241,8 +236,7 @@ def dask_parallel_process(
     Returns:
         List of results
     """
-    if not DASK_AVAILABLE:
-        raise ImportError("dask is not installed")
+    if not DASK_AVAILABLE: raise ImportError("dask is not installed")
     
     # Convert to dask array
     dask_array = da.from_array(items, chunks=len(items) // (npartitions or mp.cpu_count()))
@@ -289,8 +283,7 @@ def numba_parallel_process(
     Returns:
         List of results
     """
-    if not NUMBA_AVAILABLE:
-        raise ImportError("numba is not installed")
+    if not NUMBA_AVAILABLE: raise ImportError("numba is not installed")
     
     # Convert to numpy array for numba
     arr = np.array(items)
@@ -316,30 +309,24 @@ class HybridParallelProcessor:
         n_items = len(items)
         
         # Small datasets: use threading
-        if n_items < 100:
-            return BackendType.THREAD
+        if n_items < 100: return BackendType.THREAD
         
         # CPU-intensive tasks: use multiprocessing
         if self._is_cpu_intensive(func):
-            if JOBLIB_AVAILABLE:
-                return BackendType.JOBLIB
+            if JOBLIB_AVAILABLE: return BackendType.JOBLIB
             return BackendType.PROCESS
         
         # I/O-intensive tasks: use async
-        if self._is_io_intensive(func):
-            return BackendType.ASYNC
+        if self._is_io_intensive(func): return BackendType.ASYNC
         
         # Large datasets: use dask
-        if n_items > 10000 and DASK_AVAILABLE:
-            return BackendType.DASK
+        if n_items > 10000 and DASK_AVAILABLE: return BackendType.DASK
         
         # Distributed computing: use ray
-        if n_items > 50000 and RAY_AVAILABLE:
-            return BackendType.RAY
+        if n_items > 50000 and RAY_AVAILABLE: return BackendType.RAY
         
         # Default: use joblib
-        if JOBLIB_AVAILABLE:
-            return BackendType.JOBLIB
+        if JOBLIB_AVAILABLE: return BackendType.JOBLIB
         
         return BackendType.PROCESS
     
@@ -373,8 +360,7 @@ class HybridParallelProcessor:
         Returns:
             List of results
         """
-        if backend is None:
-            backend = self.choose_backend(items, func)
+        if backend is None: backend = self.choose_backend(items, func)
         
         start_time = time.perf_counter()
         
@@ -501,8 +487,7 @@ def estimate_processing_time(
     sample_size: int = 10
 ) -> float:
     """Estimate total processing time based on a sample."""
-    if len(items) <= sample_size:
-        return 0.0
+    if len(items) <= sample_size: return 0.0
     
     sample_items = items[:sample_size]
     start_time = time.perf_counter()

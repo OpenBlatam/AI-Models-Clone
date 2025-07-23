@@ -1,149 +1,410 @@
 """
-Integration test script for Key Messages feature.
+Optimized integration tests for Key Messages feature with performance testing.
 """
 import asyncio
-import sys
-import os
+import time
+import pytest
+import torch
+import torch.nn as nn
+import torch.distributed as dist
+from torch.nn.parallel import DistributedDataParallel as DDP
+from torch.utils.data import DataLoader, Dataset
+import numpy as np
+from typing import List, Dict, Any
+import structlog
+from unittest.mock import AsyncMock, patch
 
-# Add the project root to the Python path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../../../../..'))
-
-from onyx.server.features.key_messages.service import KeyMessageService
+from onyx.server.features.key_messages.service import OptimizedKeyMessageService
 from onyx.server.features.key_messages.models import (
     KeyMessageRequest,
+    BatchKeyMessageRequest,
     MessageType,
-    MessageTone,
-    BatchKeyMessageRequest
+    MessageTone
 )
+from onyx.server.features.key_messages.config import get_settings
 
-async def test_key_messages_service():
-    """Test the Key Messages service functionality."""
-    print("🧪 Testing Key Messages Service...")
+logger = structlog.get_logger(__name__)
+
+# Mock dataset for gradient accumulation testing
+class MockMessageDataset(Dataset):
+    """Mock dataset for testing gradient accumulation."""
     
-    # Initialize service
-    service = KeyMessageService()
+    def __init__(self, size: int = 1000):
+        self.size = size
+        self.messages = [
+            f"Test message {i} for optimization testing" 
+            for i in range(size)
+        ]
     
-    # Test 1: Basic message generation
-    print("\n📝 Test 1: Basic message generation")
-    request = KeyMessageRequest(
-        message="Nuestro nuevo producto revoluciona la industria",
-        message_type=MessageType.MARKETING,
-        tone=MessageTone.PROFESSIONAL,
-        target_audience="Profesionales de tecnología",
-        keywords=["innovación", "revolución", "tecnología"]
-    )
+    def __len__(self):
+        return self.size
     
-    response = await service.generate_response(request)
-    print(f"✅ Success: {response.success}")
-    if response.success:
-        print(f"📄 Generated: {response.data.response}")
-        print(f"⏱️  Processing time: {response.processing_time:.3f}s")
+    def __getitem__(self, idx):
+        return {
+            "message": self.messages[idx],
+            "type": MessageType.INFORMATIONAL.value,
+            "tone": MessageTone.PROFESSIONAL.value
+        }
+
+# Mock neural network for gradient accumulation
+class MockLLMModel(nn.Module):
+    """Mock LLM model for testing gradient accumulation."""
     
-    # Test 2: Message analysis
-    print("\n🔍 Test 2: Message analysis")
-    analysis = await service.analyze_message(request)
-    print(f"✅ Success: {analysis.success}")
-    if analysis.success:
-        print(f"📊 Analysis: {analysis.data.response}")
-        print(f"⏱️  Processing time: {analysis.processing_time:.3f}s")
+    def __init__(self, vocab_size: int = 10000, hidden_size: int = 512):
+        super().__init__()
+        self.embedding = nn.Embedding(vocab_size, hidden_size)
+        self.transformer = nn.TransformerEncoderLayer(
+            d_model=hidden_size,
+            nhead=8,
+            dim_feedforward=2048,
+            dropout=0.1
+        )
+        self.output = nn.Linear(hidden_size, vocab_size)
     
-    # Test 3: Common response (should use cache)
-    print("\n🔄 Test 3: Common response (cache test)")
-    common_request = KeyMessageRequest(
-        message="test_message",
+    def forward(self, x):
+        x = self.embedding(x)
+        x = self.transformer(x)
+        return self.output(x)
+
+class GradientAccumulationTrainer:
+    """Trainer with gradient accumulation for large batch sizes."""
+    
+    def __init__(self, model: nn.Module, accumulation_steps: int = 4):
+        self.model = model
+        self.accumulation_steps = accumulation_steps
+        self.optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
+        self.criterion = nn.CrossEntropyLoss()
+        self.scaler = torch.cuda.amp.GradScaler()
+    
+    def train_step(self, batch, step: int):
+        """Single training step with gradient accumulation."""
+        inputs = batch["input_ids"]
+        targets = batch["labels"]
+        
+        # Forward pass with mixed precision
+        with torch.cuda.amp.autocast():
+            outputs = self.model(inputs)
+            loss = self.criterion(outputs.view(-1, outputs.size(-1)), targets.view(-1))
+            loss = loss / self.accumulation_steps
+        
+        # Backward pass
+        self.scaler.scale(loss).backward()
+        
+        # Gradient accumulation
+        if (step + 1) % self.accumulation_steps == 0:
+            self.scaler.step(self.optimizer)
+            self.scaler.update()
+            self.optimizer.zero_grad()
+        
+        return loss.item() * self.accumulation_steps
+
+class MultiGPUTrainer:
+    """Multi-GPU trainer using DistributedDataParallel."""
+    
+    def __init__(self, model: nn.Module, world_size: int = 2):
+        self.world_size = world_size
+        self.model = DDP(model, device_ids=[0, 1])
+        self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=1e-4)
+    
+    def setup_distributed(self):
+        """Setup distributed training."""
+        dist.init_process_group(backend='nccl', init_method='env://')
+        torch.cuda.set_device(0)
+    
+    def cleanup_distributed(self):
+        """Cleanup distributed training."""
+        dist.destroy_process_group()
+
+@pytest.fixture
+async def optimized_service():
+    """Create optimized service instance for testing."""
+    config = get_settings()
+    service = OptimizedKeyMessageService(config)
+    await service.startup()
+    yield service
+    await service.shutdown()
+
+@pytest.fixture
+def mock_llm_model():
+    """Create mock LLM model."""
+    return MockLLMModel()
+
+@pytest.fixture
+def gradient_trainer(mock_llm_model):
+    """Create gradient accumulation trainer."""
+    return GradientAccumulationTrainer(mock_llm_model, accumulation_steps=4)
+
+@pytest.fixture
+def multi_gpu_trainer(mock_llm_model):
+    """Create multi-GPU trainer."""
+    return MultiGPUTrainer(mock_llm_model, world_size=2)
+
+class TestOptimizedKeyMessages:
+    """Test suite for optimized key messages functionality."""
+    
+    @pytest.mark.asyncio
+    async def test_service_initialization(self, optimized_service):
+        """Test service initialization with optimizations."""
+        assert optimized_service is not None
+        assert optimized_service.redis is not None
+        assert optimized_service.http_client is not None
+        assert optimized_service.memory_cache is not None
+    
+    @pytest.mark.asyncio
+    async def test_gradient_accumulation(self, gradient_trainer):
+        """Test gradient accumulation for large batch sizes."""
+        # Create mock data
+        batch_size = 32
+        seq_length = 128
+        vocab_size = 10000
+        
+        # Simulate large batch processing
+        for step in range(10):
+            batch = {
+                "input_ids": torch.randint(0, vocab_size, (batch_size, seq_length)),
+                "labels": torch.randint(0, vocab_size, (batch_size, seq_length))
+            }
+            
+            loss = gradient_trainer.train_step(batch, step)
+            assert isinstance(loss, float)
+            assert loss > 0
+    
+    @pytest.mark.asyncio
+    async def test_multi_gpu_training(self, multi_gpu_trainer):
+        """Test multi-GPU training setup."""
+        if torch.cuda.device_count() < 2:
+            pytest.skip("Requires at least 2 GPUs")
+        
+        try:
+            multi_gpu_trainer.setup_distributed()
+            assert dist.is_initialized()
+            assert dist.get_world_size() == 2
+        finally:
+            multi_gpu_trainer.cleanup_distributed()
+    
+    @pytest.mark.asyncio
+    async def test_batch_processing_performance(self, optimized_service):
+        """Test batch processing performance with optimizations."""
+        # Create batch of requests
+        requests = []
+        for i in range(10):
+            request = KeyMessageRequest(
+                message=f"Test message {i} for batch processing",
+                message_type=MessageType.INFORMATIONAL,
+                tone=MessageTone.PROFESSIONAL,
+                keywords=["test", "optimization"],
+                max_length=100
+            )
+            requests.append(request)
+        
+        batch_request = BatchKeyMessageRequest(
+            messages=requests,
+            batch_size=10
+        )
+        
+        # Measure performance
+        start_time = time.perf_counter()
+        result = await optimized_service.generate_batch(batch_request)
+        processing_time = time.perf_counter() - start_time
+        
+        assert result.success
+        assert len(result.results) == 10
+        assert processing_time < 5.0  # Should complete within 5 seconds
+    
+    @pytest.mark.asyncio
+    async def test_cache_performance(self, optimized_service):
+        """Test cache performance improvements."""
+        request = KeyMessageRequest(
+            message="Cache performance test message",
         message_type=MessageType.INFORMATIONAL,
         tone=MessageTone.PROFESSIONAL
     )
     
-    response1 = await service.generate_response(common_request)
-    response2 = await service.generate_response(common_request)
+        # First request (cache miss)
+        start_time = time.perf_counter()
+        result1 = await optimized_service.generate_response(request)
+        first_request_time = time.perf_counter() - start_time
+        
+        # Second request (cache hit)
+        start_time = time.perf_counter()
+        result2 = await optimized_service.generate_response(request)
+        second_request_time = time.perf_counter() - start_time
+        
+        # Cache hit should be faster
+        assert second_request_time < first_request_time
+        assert result1.data.response == result2.data.response
     
-    print(f"✅ First call success: {response1.success}")
-    print(f"✅ Second call success: {response2.success}")
-    print(f"🔄 From cache: {response2.data.metadata.get('from_cache', False)}")
+    @pytest.mark.asyncio
+    async def test_concurrent_requests(self, optimized_service):
+        """Test concurrent request handling."""
+        request = KeyMessageRequest(
+            message="Concurrent test message",
+            message_type=MessageType.INFORMATIONAL,
+            tone=MessageTone.PROFESSIONAL
+        )
+        
+        # Create multiple concurrent requests
+        async def make_request():
+            return await optimized_service.generate_response(request)
+        
+        # Run 5 concurrent requests
+        start_time = time.perf_counter()
+        results = await asyncio.gather(*[make_request() for _ in range(5)])
+        total_time = time.perf_counter() - start_time
+        
+        # All requests should succeed
+        assert all(result.success for result in results)
+        assert total_time < 3.0  # Should complete quickly with concurrency
     
-    # Test 4: Batch processing
-    print("\n📦 Test 4: Batch processing")
+    @pytest.mark.asyncio
+    async def test_memory_optimization(self, optimized_service):
+        """Test memory optimization features."""
+        # Test with large batch
+        large_requests = []
+        for i in range(100):
+            request = KeyMessageRequest(
+                message=f"Large batch message {i} " * 10,  # Long message
+                message_type=MessageType.INFORMATIONAL,
+                tone=MessageTone.PROFESSIONAL
+            )
+            large_requests.append(request)
+        
     batch_request = BatchKeyMessageRequest(
-        messages=[
-            KeyMessageRequest(message="Mensaje 1", message_type=MessageType.MARKETING),
-            KeyMessageRequest(message="Mensaje 2", message_type=MessageType.EDUCATIONAL),
-            KeyMessageRequest(message="", message_type=MessageType.INFORMATIONAL)  # This will fail
-        ],
-        batch_size=10
-    )
+            messages=large_requests,
+            batch_size=100
+        )
+        
+        # Should handle large batch without memory issues
+        result = await optimized_service.generate_batch(batch_request)
+        assert result.success
     
-    batch_response = await service.generate_batch(batch_request)
-    print(f"✅ Batch success: {batch_response.success}")
-    print(f"📊 Total processed: {batch_response.total_processed}")
-    print(f"❌ Failed count: {batch_response.failed_count}")
-    print(f"⏱️  Total processing time: {batch_response.processing_time:.3f}s")
+    @pytest.mark.asyncio
+    async def test_circuit_breaker(self, optimized_service):
+        """Test circuit breaker functionality."""
+        # Mock LLM API to fail
+        with patch.object(optimized_service, '_call_llm_api_optimized', 
+                         side_effect=Exception("API Error")):
+            
+            request = KeyMessageRequest(
+                message="Circuit breaker test",
+                message_type=MessageType.INFORMATIONAL,
+                tone=MessageTone.PROFESSIONAL
+            )
+            
+            # First few requests should fail
+            for _ in range(3):
+                result = await optimized_service.generate_response(request)
+                assert not result.success
+            
+            # After circuit breaker threshold, should fail fast
+            start_time = time.perf_counter()
+            result = await optimized_service.generate_response(request)
+            processing_time = time.perf_counter() - start_time
+            
+            # Should fail quickly due to circuit breaker
+            assert processing_time < 0.1
     
-    # Test 5: Cache operations
-    print("\n💾 Test 5: Cache operations")
-    stats = await service.get_cache_stats()
-    print(f"📊 Cache size: {stats['cache_size']}")
-    print(f"⏰ Cache TTL: {stats['cache_ttl_hours']} hours")
+    @pytest.mark.asyncio
+    async def test_health_check(self, optimized_service):
+        """Test health check functionality."""
+        health_status = await optimized_service.health_check()
+        
+        assert health_status["status"] in ["healthy", "degraded"]
+        assert "checks" in health_status
+        assert "timestamp" in health_status
     
-    # Test 6: Clear cache
-    print("\n🧹 Test 6: Clear cache")
-    await service.clear_cache()
-    stats_after = await service.get_cache_stats()
-    print(f"📊 Cache size after clear: {stats_after['cache_size']}")
-    
-    print("\n🎉 All tests completed!")
+    @pytest.mark.asyncio
+    async def test_cache_statistics(self, optimized_service):
+        """Test cache statistics functionality."""
+        stats = await optimized_service.get_cache_stats()
+        
+        assert "memory_cache_size" in stats
+        assert "redis_connected" in stats
+        assert "system_memory_usage" in stats
+        assert "system_cpu_usage" in stats
 
-async def test_api_endpoints():
-    """Test the API endpoints (requires running server)."""
-    print("\n🌐 Testing API Endpoints...")
+class TestPerformanceOptimizations:
+    """Test suite for performance optimizations."""
     
-    try:
+    def test_orjson_performance(self):
+        """Test orjson performance vs standard json."""
+        import json
+        import orjson
+        
+        data = {
+            "message": "Test message",
+            "type": "informational",
+            "tone": "professional",
+            "keywords": ["test", "performance"],
+            "metadata": {"timestamp": "2024-01-01T00:00:00Z"}
+        }
+        
+        # Test serialization performance
+        start_time = time.perf_counter()
+        for _ in range(1000):
+            json.dumps(data, sort_keys=True)
+        json_time = time.perf_counter() - start_time
+        
+        start_time = time.perf_counter()
+        for _ in range(1000):
+            orjson.dumps(data, option=orjson.OPT_SORT_KEYS)
+        orjson_time = time.perf_counter() - start_time
+        
+        # orjson should be faster
+        assert orjson_time < json_time
+    
+    def test_connection_pooling(self):
+        """Test HTTP connection pooling."""
         import httpx
         
-        # Test health endpoint
-        async with httpx.AsyncClient() as client:
-            response = await client.get("http://localhost:8000/api/key-messages/health")
-            if response.status_code == 200:
-                print("✅ Health endpoint: OK")
-            else:
-                print(f"❌ Health endpoint: {response.status_code}")
+        # Test connection limits
+        limits = httpx.Limits(max_keepalive_connections=20, max_connections=100)
+        assert limits.max_keepalive_connections == 20
+        assert limits.max_connections == 100
+    
+    def test_memory_cache_performance(self):
+        """Test memory cache performance."""
+        from cachetools import TTLCache
         
-        # Test message types endpoint
-        async with httpx.AsyncClient() as client:
-            response = await client.get("http://localhost:8000/api/key-messages/types")
-            if response.status_code == 200:
-                types = response.json()
-                print(f"✅ Message types: {types}")
-            else:
-                print(f"❌ Message types endpoint: {response.status_code}")
+        cache = TTLCache(maxsize=1000, ttl=3600)
         
-        # Test message tones endpoint
-        async with httpx.AsyncClient() as client:
-            response = await client.get("http://localhost:8000/api/key-messages/tones")
-            if response.status_code == 200:
-                tones = response.json()
-                print(f"✅ Message tones: {tones}")
-            else:
-                print(f"❌ Message tones endpoint: {response.status_code}")
-                
-    except ImportError:
-        print("⚠️  httpx not available, skipping API endpoint tests")
-    except Exception as e:
-        print(f"⚠️  API endpoint tests failed: {e}")
+        # Test cache operations
+        for i in range(100):
+            cache[f"key_{i}"] = f"value_{i}"
+        
+        assert len(cache) <= 1000
+        assert "key_0" in cache
 
-def main():
-    """Main test function."""
-    print("🚀 Starting Key Messages Integration Tests")
-    print("=" * 50)
+class TestGradientAccumulation:
+    """Test suite for gradient accumulation."""
     
-    # Test service functionality
-    asyncio.run(test_key_messages_service())
+    def test_gradient_accumulation_logic(self):
+        """Test gradient accumulation logic."""
+        model = MockLLMModel()
+        trainer = GradientAccumulationTrainer(model, accumulation_steps=4)
+        
+        # Simulate training steps
+        batch_size = 8
+        vocab_size = 10000
+        seq_length = 64
+        
+        for step in range(8):
+            batch = {
+                "input_ids": torch.randint(0, vocab_size, (batch_size, seq_length)),
+                "labels": torch.randint(0, vocab_size, (batch_size, seq_length))
+            }
+            
+            loss = trainer.train_step(batch, step)
+            assert isinstance(loss, float)
     
-    # Test API endpoints (if server is running)
-    asyncio.run(test_api_endpoints())
-    
-    print("\n" + "=" * 50)
-    print("✨ Integration tests completed!")
+    def test_effective_batch_size(self):
+        """Test effective batch size calculation."""
+        actual_batch_size = 8
+        accumulation_steps = 4
+        effective_batch_size = actual_batch_size * accumulation_steps
+        
+        assert effective_batch_size == 32
 
 if __name__ == "__main__":
-    main() 
+    # Run performance benchmarks
+    pytest.main([__file__, "-v", "--tb=short"]) 

@@ -24,8 +24,7 @@ class LLMStreamProcessor(OnyxBaseModel):
         full_answer = ""
         for message in messages:
             answer_piece = message.content
-            if not isinstance(answer_piece, str):
-                answer_piece = str(answer_piece)
+            if not isinstance(answer_piece, str): answer_piece = str(answer_piece)
             full_answer += answer_piece
             # ... (resto igual que original, puedes añadir hooks de logging/audit aquí)
         log.info("llm_stream_processed", answer=full_answer[:100])

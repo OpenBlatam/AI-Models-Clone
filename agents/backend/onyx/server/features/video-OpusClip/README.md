@@ -1,458 +1,320 @@
-# Video Processing System
+# Video-OpusClip
 
-Advanced video processing system with LangChain integration for intelligent content analysis and optimization, specifically designed for short-form video platforms.
+AI-driven video processing system for short-form video platforms, integrating advanced AI features like LangChain, FastAPI, PyTorch, and Diffusers.
 
 ## 🚀 Features
 
-### Core Video Processing
-- **Video Clip Generation**: Extract and process video clips from YouTube URLs
-- **Batch Processing**: Process multiple videos efficiently
-- **Parallel Processing**: High-performance parallel execution
-- **Quality Optimization**: Advanced video quality enhancement
+- **AI-Powered Video Processing**: Advanced video analysis and processing using PyTorch, Transformers, and Diffusers
+- **Async Architecture**: High-performance async flows with event-driven design
+- **FastAPI Integration**: Modern REST API with comprehensive documentation
+- **Database Support**: Async database operations with PostgreSQL, MySQL, SQLite, and Redis
+- **External API Integration**: YouTube, OpenAI, Stability AI, and ElevenLabs APIs
+- **Performance Optimization**: Multi-GPU training, gradient accumulation, mixed precision
+- **Monitoring & Logging**: Comprehensive metrics collection and structured logging
+- **Error Handling**: Robust error handling with recovery mechanisms
+- **User Interfaces**: Gradio-based user-friendly interfaces
 
-### Viral Video Generation
-- **Viral Variants**: Generate multiple viral video variants
-- **Caption Generation**: AI-powered caption creation with timing
-- **Screen Division**: Advanced screen layout configurations
-- **Transitions & Effects**: Professional video transitions and effects
-- **Engagement Optimization**: Maximize viewer engagement
+## 📋 Requirements
 
-### 🧠 LangChain Integration
-- **Intelligent Content Analysis**: AI-powered content classification and analysis
-- **Viral Potential Assessment**: Predict viral likelihood using advanced AI
-- **Audience Targeting**: Identify optimal target demographics
-- **Trending Analysis**: Detect trending keywords and topics
-- **Content Optimization**: Automated title, description, and tag optimization
-- **Short-Form Video Specialization**: Platform-specific optimization for TikTok, Instagram Reels, YouTube Shorts
+- Python 3.8+
+- PostgreSQL (recommended) or MySQL/SQLite
+- GPU support (optional, for AI processing)
+- External API keys (YouTube, OpenAI, Stability AI, ElevenLabs)
 
-### Advanced Features
-- **High-Performance Serialization**: Optimized using msgspec, orjson, and pydantic
-- **Batch Processing**: Efficient processing of large video datasets
-- **Error Recovery**: Graceful fallback mechanisms
-- **Performance Monitoring**: Real-time performance tracking
-- **Audit Logging**: Comprehensive logging for debugging and analysis
+## 🛠 Installation
 
-## 🏗️ Architecture
-
+1. **Clone the repository**
+```bash
+git clone <repository-url>
+cd video-OpusClip
 ```
-onyx/server/features/video/
-├── models/
-│   ├── video_models.py          # Core video processing models
-│   ├── viral_models.py          # Viral video models with LangChain integration
-│   └── __init__.py
-├── processors/
-│   ├── video_processor.py       # Core video processing
-│   ├── viral_processor.py       # Viral video generation
-│   ├── langchain_processor.py   # LangChain integration
-│   ├── batch_processor.py       # Batch processing
-│   └── __init__.py
-├── utils/
-│   ├── parallel_utils.py        # Parallel processing utilities
-│   └── __init__.py
-├── examples/
-│   ├── langchain_examples.py    # LangChain usage examples
-│   ├── viral_examples.py        # Viral video examples
-│   └── serialization_examples.py # Serialization examples
-├── docs/
-│   ├── langchain_guide.md       # LangChain integration guide
-│   └── serialization_guide.md   # Serialization guide
-├── api.py                       # FastAPI endpoints
-└── README.md                    # This file
+
+2. **Install dependencies**
+```bash
+pip install -r requirements_main.txt
+```
+
+3. **Setup environment variables**
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+4. **Setup database**
+```bash
+# For PostgreSQL
+createdb video_opusclip
 ```
 
 ## 🚀 Quick Start
 
-### Installation
-
+### Run the main application
 ```bash
-# Install dependencies
-pip install fastapi uvicorn langchain openai msgspec orjson pydantic
-
-# Set environment variables
-export OPENAI_API_KEY="your-openai-api-key"
+python run_app.py
 ```
 
-### Basic Usage
-
-```python
-from onyx.server.features.video.processors.langchain_processor import (
-    create_langchain_processor
-)
-from onyx.server.features.video.models.video_models import VideoClipRequest
-
-# Create LangChain processor
-processor = create_langchain_processor(
-    api_key="your-openai-api-key",
-    model_name="gpt-4"
-)
-
-# Create video request
-request = VideoClipRequest(
-    youtube_url="https://www.youtube.com/watch?v=example",
-    language="en",
-    max_clip_length=30.0,
-    target_platform="tiktok"
-)
-
-# Process with LangChain optimization
-response = processor.process_video_with_langchain(
-    request=request,
-    n_variants=5,
-    audience_profile={
-        "age": "18-25",
-        "interests": ["entertainment", "comedy", "viral"]
-    }
-)
-
-# Access results
-print(f"Variants generated: {response.successful_variants}")
-print(f"Average viral score: {response.average_viral_score:.3f}")
-print(f"Best viral score: {response.best_viral_score:.3f}")
+### Or run directly
+```bash
+python main.py
 ```
 
-### Viral Video Generation
+The application will be available at:
+- **API Documentation**: http://localhost:8000/docs
+- **ReDoc Documentation**: http://localhost:8000/redoc
+- **Health Check**: http://localhost:8000/health
 
-```python
-from onyx.server.features.video.processors.viral_processor import (
-    create_optimized_viral_processor
-)
+## 📚 API Endpoints
 
-# Create viral processor with LangChain
-viral_processor = create_optimized_viral_processor(
-    api_key="your-openai-api-key"
-)
-
-# Generate viral variants
-response = viral_processor.process_viral_variants(
-    request=request,
-    n_variants=8,
-    audience_profile=audience_profile,
-    use_langchain=True  # Enable LangChain optimization
-)
-
-# Access enhanced results
-print(f"AI Enhancement Score: {response.ai_enhancement_score:.3f}")
-print(f"Optimization Insights: {response.optimization_insights}")
+### Health Check
+```http
+GET /health
 ```
 
-## 🧠 LangChain Integration
-
-### Content Analysis
-
-The LangChain integration provides intelligent analysis of video content:
-
-```python
-# Access content analysis
-if response.variants and response.variants[0].langchain_analysis:
-    analysis = response.variants[0].langchain_analysis
-    
-    print(f"Content Type: {analysis.content_type.value}")
-    print(f"Sentiment: {analysis.sentiment}")
-    print(f"Engagement Score: {analysis.engagement_score:.3f}")
-    print(f"Viral Potential: {analysis.viral_potential:.3f}")
-    print(f"Target Audience: {', '.join(analysis.target_audience)}")
-    print(f"Trending Keywords: {', '.join(analysis.trending_keywords)}")
+### Video Processing
+```http
+POST /videos
+GET /videos/{video_id}
+PATCH /videos/{video_id}
+POST /videos/batch
 ```
 
-### Content Optimization
-
-Automated optimization for maximum engagement:
-
-```python
-# Access content optimization
-if response.variants and response.variants[0].content_optimization:
-    optimization = response.variants[0].content_optimization
-    
-    print(f"Optimal Title: {optimization.optimal_title}")
-    print(f"Optimal Tags: {optimization.optimal_tags}")
-    print(f"Optimal Hashtags: {optimization.optimal_hashtags}")
-    print(f"Engagement Hooks: {optimization.engagement_hooks}")
-    print(f"Viral Elements: {optimization.viral_elements}")
+### Metrics
+```http
+GET /metrics
 ```
-
-### Short-Form Video Optimization
-
-Specialized optimization for short-form platforms:
-
-```python
-# Access short video optimization
-if response.variants and response.variants[0].short_video_optimization:
-    short_opt = response.variants[0].short_video_optimization
-    
-    print(f"Optimal Clip Length: {short_opt.optimal_clip_length:.1f}s")
-    print(f"Hook Duration: {short_opt.hook_duration:.1f}s")
-    print(f"Retention Duration: {short_opt.retention_duration:.1f}s")
-    print(f"Vertical Format: {short_opt.vertical_format}")
-    print(f"Engagement Triggers: {short_opt.engagement_triggers}")
-```
-
-## 📱 Platform Support
-
-### TikTok Optimization
-- Vertical format (9:16 aspect ratio)
-- 15-60 second optimal length
-- Hook-first content structure
-- Trending hashtag integration
-- Engagement-driven captions
-
-### Instagram Reels
-- Vertical format optimization
-- 15-90 second content
-- Music and audio integration
-- Story-driven captions
-- Hashtag strategy optimization
-
-### YouTube Shorts
-- Vertical format (9:16 aspect ratio)
-- 15-60 second content
-- SEO-optimized titles and descriptions
-- Thumbnail optimization
-- Engagement retention strategies
 
 ## 🔧 Configuration
 
-### LangChain Configuration
+### Environment Variables
 
-```python
-from onyx.server.features.video.processors.langchain_processor import LangChainConfig
+```env
+# Application
+APP_NAME=Video-OpusClip
+APP_VERSION=1.0.0
+DEBUG=False
+HOST=0.0.0.0
+PORT=8000
+RELOAD=True
 
-config = LangChainConfig(
-    # API Configuration
-    openai_api_key="your-api-key",
-    model_name="gpt-4",
-    temperature=0.7,
-    max_tokens=2000,
-    
-    # Analysis Features
-    enable_content_analysis=True,
-    enable_engagement_analysis=True,
-    enable_viral_analysis=True,
-    enable_audience_analysis=True,
-    
-    # Optimization Features
-    enable_title_optimization=True,
-    enable_description_optimization=True,
-    enable_caption_optimization=True,
-    enable_timing_optimization=True,
-    
-    # Performance
-    batch_size=10,
-    max_retries=3,
-    timeout=30.0,
-    cache_results=True,
-    
-    # Advanced Features
-    use_agents=True,
-    use_memory=True,
-    use_streaming=False,
-    enable_debug=False
-)
+# Database
+DATABASE_URL=postgresql://postgres:password@localhost:5432/video_opusclip
+DATABASE_TYPE=postgresql
+
+# External APIs
+YOUTUBE_API_KEY=your_youtube_api_key
+OPENAI_API_KEY=your_openai_api_key
+STABILITY_API_KEY=your_stability_api_key
+ELEVENLABS_API_KEY=your_elevenlabs_api_key
+
+# Async Flow
+MAX_CONCURRENT_TASKS=100
+MAX_CONCURRENT_CONNECTIONS=50
+TIMEOUT=30.0
+RETRY_ATTEMPTS=3
 ```
 
-### Viral Processor Configuration
+## 🏗 Architecture
 
-```python
-from onyx.server.features.video.processors.viral_processor import ViralProcessorConfig
+### Core Components
 
-config = ViralProcessorConfig(
-    # Processing settings
-    max_variants=10,
-    min_viral_score=0.3,
-    max_processing_time=300.0,
-    
-    # Quality settings
-    min_caption_length=10,
-    max_caption_length=200,
-    min_caption_duration=2.0,
-    max_caption_duration=8.0,
-    
-    # Editing settings
-    enable_screen_division=True,
-    enable_transitions=True,
-    enable_effects=True,
-    enable_animations=True,
-    
-    # LangChain integration
-    enable_langchain=True,
-    langchain_api_key="your-api-key",
-    langchain_model="gpt-4",
-    
-    # Performance settings
-    batch_size=5,
-    max_workers=4,
-    timeout=60.0
-)
+1. **FastAPI Application** (`main.py`)
+   - Main application entry point
+   - Middleware configuration
+   - Error handling
+   - Dependency injection
+
+2. **Async Flows** (`async_flows.py`)
+   - Event-driven architecture
+   - Priority task queues
+   - Circuit breaker pattern
+   - Workflow engine
+
+3. **Database Operations** (`async_database.py`)
+   - Connection pooling
+   - Async CRUD operations
+   - Transaction management
+   - Caching
+
+4. **External APIs** (`async_external_apis.py`)
+   - Rate limiting
+   - Retry logic
+   - Response caching
+   - Error handling
+
+5. **Structured Routes** (`structured_routes.py`)
+   - Route organization
+   - Dependency injection
+   - Route factories
+   - Route registry
+
+6. **FastAPI Best Practices** (`fastapi_best_practices.py`)
+   - Pydantic v2 models
+   - Path operations
+   - Middleware
+   - Error handling
+
+### File Structure
+
+```
+video-OpusClip/
+├── main.py                          # Main application
+├── run_app.py                       # Application launcher
+├── requirements_main.txt            # Dependencies
+├── README.md                        # This file
+├── .env                             # Environment variables
+├── fastapi_best_practices.py        # FastAPI best practices
+├── structured_routes.py             # Structured routing
+├── async_flows.py                   # Async flow management
+├── async_database.py                # Database operations
+├── async_external_apis.py           # External API operations
+├── *_examples.py                    # Example implementations
+├── *_guide.md                       # Detailed guides
+├── *_summary.md                     # Quick references
+└── quick_start_*.py                 # Quick start scripts
 ```
 
-## 📊 Performance
+## 🔍 Usage Examples
 
-### Benchmarking Results
-
-| Configuration | Processing Time | Viral Score | Success Rate |
-|---------------|----------------|-------------|--------------|
-| Basic | 2.5s | 0.65 | 95% |
-| LangChain | 8.2s | 0.82 | 98% |
-| Viral + LangChain | 12.1s | 0.89 | 99% |
-
-### Optimization Features
-
-- **Parallel Processing**: Up to 4x faster with multiple workers
-- **Batch Processing**: Efficient processing of large datasets
-- **Caching**: Result caching for repeated content
-- **Error Recovery**: Graceful fallback mechanisms
-- **Performance Monitoring**: Real-time tracking and optimization
-
-## 🔌 API Endpoints
-
-### Core Endpoints
-
-- `POST /api/v1/video/process` - Process single video
-- `POST /api/v1/video/batch` - Process multiple videos
-- `POST /api/v1/viral/process` - Generate viral variants
-- `POST /api/v1/viral/batch` - Batch viral processing
-
-### LangChain Endpoints
-
-- `POST /api/v1/langchain/analyze` - Content analysis
-- `POST /api/v1/langchain/optimize` - Content optimization
-- `POST /api/v1/langchain/short-video` - Short-form optimization
-- `POST /api/v1/langchain/process` - Full LangChain pipeline
-- `POST /api/v1/langchain/batch` - Batch LangChain processing
-
-### Utility Endpoints
-
-- `GET /health` - Health check
-- `GET /api/v1/config/*` - Configuration endpoints
-- `POST /api/v1/utils/validate` - Request validation
-- `GET /api/v1/utils/content-types` - Available content types
-- `POST /api/v1/utils/estimate-processing-time` - Time estimation
-
-## 📚 Examples
-
-### Basic Examples
-
-See `examples/langchain_examples.py` for comprehensive examples:
-
+### Create a video processing job
 ```python
-# Run all examples
-python -m onyx.server.features.video.examples.langchain_examples
+import requests
 
-# Individual examples
-example_basic_langchain_processing()
-example_langchain_content_analysis()
-example_short_video_optimization()
-example_langchain_batch_processing()
+# Create video
+response = requests.post("http://localhost:8000/videos", json={
+    "title": "Amazing Sunset",
+    "description": "Beautiful sunset timelapse",
+    "url": "https://example.com/video.mp4",
+    "duration": 120.5,
+    "resolution": "1920x1080",
+    "priority": "normal",
+    "tags": ["nature", "sunset"]
+})
+
+video_id = response.json()["data"]["id"]
+print(f"Created video: {video_id}")
 ```
 
-### Advanced Examples
-
+### Get video status
 ```python
-# Performance benchmarking
-example_performance_benchmarking()
-
-# Error handling
-example_error_handling()
-
-# Comparison processing
-example_comparison_processing()
+# Get video
+response = requests.get(f"http://localhost:8000/videos/{video_id}")
+video = response.json()["data"]
+print(f"Video status: {video['status']}")
 ```
 
-## 🛠️ Development
+### Batch processing
+```python
+# Create multiple videos
+response = requests.post("http://localhost:8000/videos/batch", json={
+    "videos": [
+        {
+            "title": "Video 1",
+            "description": "First video",
+            "url": "https://example.com/video1.mp4",
+            "duration": 60.0,
+            "resolution": "1920x1080",
+            "priority": "normal"
+        },
+        {
+            "title": "Video 2", 
+            "description": "Second video",
+            "url": "https://example.com/video2.mp4",
+            "duration": 90.0,
+            "resolution": "1920x1080",
+            "priority": "high"
+        }
+    ]
+})
 
-### Running the API
+video_ids = response.json()["data"]["video_ids"]
+print(f"Created {len(video_ids)} videos")
+```
 
+## 🧪 Testing
+
+### Run tests
 ```bash
-# Start the API server
-uvicorn onyx.server.features.video.api:app --host 0.0.0.0 --port 8000 --reload
-
-# Access API documentation
-open http://localhost:8000/docs
+pytest tests/
 ```
 
-### Testing
-
+### Run with coverage
 ```bash
-# Run tests
-pytest onyx/server/features/video/tests/
-
-# Run with coverage
-pytest --cov=onyx.server.features.video onyx/server/features/video/tests/
+pytest --cov=. tests/
 ```
 
-### Development Setup
+## 📊 Monitoring
 
+### Health Check
 ```bash
-# Install development dependencies
-pip install -r requirements-dev.txt
-
-# Set up pre-commit hooks
-pre-commit install
-
-# Run linting
-flake8 onyx/server/features/video/
-black onyx/server/features/video/
-isort onyx/server/features/video/
+curl http://localhost:8000/health
 ```
 
-## 📈 Monitoring
-
-### Performance Metrics
-
-- Processing time per video
-- Viral score distribution
-- Success/failure rates
-- LangChain analysis time
-- Content optimization time
-- AI enhancement scores
-
-### Logging
-
-```python
-import structlog
-
-logger = structlog.get_logger()
-
-# Log processing events
-logger.info(
-    "Video processing completed",
-    youtube_url=request.youtube_url,
-    processing_time=processing_time,
-    viral_score=viral_score
-)
+### Metrics
+```bash
+curl http://localhost:8000/metrics
 ```
 
-## 🔒 Security
+### Logs
+```bash
+tail -f video_opusclip.log
+```
 
-### API Security
+## 🔧 Development
 
-- Input validation and sanitization
-- Rate limiting
-- Error handling without information leakage
-- Secure configuration management
+### Code formatting
+```bash
+black .
+isort .
+```
 
-### Data Privacy
+### Linting
+```bash
+flake8 .
+mypy .
+```
 
-- No persistent storage of video content
-- Temporary processing only
-- Secure API key management
-- Audit logging for compliance
+### Type checking
+```bash
+mypy .
+```
+
+## 🚀 Deployment
+
+### Docker
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements_main.txt .
+RUN pip install -r requirements_main.txt
+
+COPY . .
+EXPOSE 8000
+
+CMD ["python", "main.py"]
+```
+
+### Production
+```bash
+# Use production server
+uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
+```
+
+## 📖 Documentation
+
+- [FastAPI Best Practices Guide](FASTAPI_BEST_PRACTICES_GUIDE.md)
+- [Async Flows Guide](ASYNC_FLOWS_GUIDE.md)
+- [Database Operations Guide](ASYNC_DATABASE_AND_APIS_GUIDE.md)
+- [Structured Routes Guide](STRUCTURED_ROUTES_GUIDE.md)
+- [Performance Optimization Guide](PERFORMANCE_OPTIMIZATION_GUIDE.md)
+- [PyTorch Integration Guide](PYTORCH_GUIDE.md)
 
 ## 🤝 Contributing
-
-### Development Guidelines
-
-1. **Code Quality**: Follow PEP 8 and use type hints
-2. **Testing**: Write comprehensive tests for new features
-3. **Documentation**: Update docs for API changes
-4. **Performance**: Benchmark new features
-5. **Security**: Follow security best practices
-
-### Pull Request Process
 
 1. Fork the repository
 2. Create a feature branch
 3. Make your changes
-4. Add tests and documentation
+4. Add tests
 5. Submit a pull request
 
 ## 📄 License
@@ -461,36 +323,18 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🆘 Support
 
-### Getting Help
-
-- **Documentation**: Check the docs/ directory
-- **Examples**: Review examples/ directory
-- **Issues**: Report bugs on GitHub
-- **Discussions**: Use GitHub Discussions for questions
-
-### Common Issues
-
-1. **LangChain not available**: Install with `pip install langchain openai`
-2. **API key issues**: Verify your OpenAI API key
-3. **Performance issues**: Check batch size and worker configuration
-4. **Memory issues**: Reduce batch size for large datasets
+For support and questions:
+- Create an issue on GitHub
+- Check the documentation
+- Review the examples
 
 ## 🔄 Changelog
 
-### Version 3.0.0
-- Added LangChain integration for intelligent content analysis
-- Enhanced viral video generation with AI optimization
-- Improved short-form video optimization
-- Added comprehensive API endpoints
-- Enhanced performance and error handling
-
-### Version 2.0.0
-- Added viral video processing capabilities
-- Implemented high-performance serialization
-- Enhanced parallel processing
-- Added batch processing support
-
-### Version 1.0.0
-- Initial release with basic video processing
-- Core video clip generation
-- Basic API endpoints 
+### v1.0.0
+- Initial release
+- FastAPI integration
+- Async architecture
+- Database operations
+- External API integration
+- Performance optimization
+- Comprehensive documentation 

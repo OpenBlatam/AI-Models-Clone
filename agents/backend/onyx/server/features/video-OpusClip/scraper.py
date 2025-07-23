@@ -42,8 +42,7 @@ class VideoScraper(OnyxBaseModel):
         try:
             duration_str = soup.find('meta', property='video:duration')['content']
             return int(duration_str)
-        except:
-            return None
+        except: return None
 
     @classmethod
     def batch_scrape(cls, urls: List[str]) -> List[Dict[str, Any]]:

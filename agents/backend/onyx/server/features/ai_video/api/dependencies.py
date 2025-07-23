@@ -1,324 +1,211 @@
 """
-Dependencies for FastAPI Application
-===================================
+🚀 FASTAPI DEPENDENCIES - AI VIDEO SYSTEM
+=========================================
 
-Dependency injection system for the AI video generation API.
+Dependency injection functions for FastAPI endpoints.
 """
 
-from fastapi import Depends, HTTPException, status, Request
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from typing import Optional, Dict, Any
-import jwt
-import json
-from datetime import datetime, timedelta
-import logging
-from functools import lru_cache
-import asyncio
-from contextlib import asynccontextmanager
+from fastapi import Depends, Request, HTTPException, status
+from .video_service import video_service, VideoService
 
-# Configure logging
-logger = logging.getLogger(__name__)
+# ============================================================================
+# SERVICE DEPENDENCIES
+# ============================================================================
 
-# Security
-security = HTTPBearer()
+async def get_video_service() -> VideoService:
+    """
+    Dependency to get the video service instance.
+    
+    Returns:
+        VideoService: Video service instance
+    """
+    return video_service
 
-# Simplified storage (in production, use Redis)
-class SimpleStorage:
-    def __init__(self):
-        self.data = {}
-    
-    def get(self, key: str) -> Optional[str]:
-        return self.data.get(key)
-    
-    def set(self, key: str, value: str, ttl: int = 3600):
-        self.data[key] = value
-    
-    def incr(self, key: str, value: int = 1):
-        current = int(self.data.get(key, 0))
-        self.data[key] = str(current + value)
-    
-    def keys(self, pattern: str):
-        return [k for k in self.data.keys() if pattern.replace("*", "") in k]
+# ============================================================================
+# AUTHENTICATION DEPENDENCIES
+# ============================================================================
 
-# Initialize storage
-storage = SimpleStorage()
+async def get_current_user(request: Request):
+    """
+    Dependency to get the current authenticated user.
+    
+    This is a simplified authentication implementation.
+    In production, you would integrate with your authentication system.
+    
+    Args:
+        request: FastAPI request object
+        
+    Returns:
+        dict: User information
+        
+    Raises:
+        HTTPException: If authentication fails
+    """
+    # Simulate authentication
+    auth_header = request.headers.get("authorization")
+    if not auth_header:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Authorization header required"
+        )
+    
+    # In a real implementation, you would:
+    # 1. Validate the JWT token
+    # 2. Extract user information from the token
+    # 3. Check user permissions
+    # 4. Return user data
+    
+    return {"user_id": "user_123", "username": "test_user"}
+
+# ============================================================================
+# VALIDATION DEPENDENCIES
+# ============================================================================
+
+def validate_video_id(video_id: str) -> str:
+    """
+    Validate video ID format.
+    
+    Args:
+        video_id: Video identifier to validate
+        
+    Returns:
+        str: Validated video ID
+        
+    Raises:
+        HTTPException: If video ID is invalid
+    """
+    if not video_id or not video_id.strip():
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Video ID cannot be empty"
+        )
+    
+    if len(video_id) > 50:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Video ID too long"
+        )
+    
+    return video_id.strip()
+
+def validate_pagination_params(skip: int = 0, limit: int = 100) -> tuple[int, int]:
+    """
+    Validate pagination parameters.
+    
+    Args:
+        skip: Number of items to skip
+        limit: Maximum number of items to return
+        
+    Returns:
+        tuple: Validated skip and limit values
+        
+    Raises:
+        HTTPException: If parameters are invalid
+    """
+    if skip < 0:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Skip parameter cannot be negative"
+        )
+    
+    if limit < 1 or limit > 1000:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Limit must be between 1 and 1000"
+        )
+    
+    return skip, limit
+
+# ============================================================================
+# RATE LIMITING DEPENDENCIES
+# ============================================================================
 
 class RateLimiter:
-    """Rate limiting implementation."""
+    """Simple rate limiter for API endpoints."""
     
-    def __init__(self, storage):
-        self.storage = storage
+    def __init__(self, max_requests: int = 100, window_seconds: int = 3600):
+        self.max_requests = max_requests
+        self.window_seconds = window_seconds
+        self.requests = {}
     
-    async def check_rate_limit(self, user_id: str, limit: int = 100, window: int = 3600):
-        """Check if user has exceeded rate limit."""
-        key = f"rate_limit:{user_id}"
-        current = self.storage.get(key)
+    def is_allowed(self, user_id: str) -> bool:
+        """
+        Check if user is allowed to make a request.
         
-        if current is None:
-            self.storage.set(key, "1", window)
-            return True
+        Args:
+            user_id: User identifier
+            
+        Returns:
+            bool: True if request is allowed
+        """
+        import time
+        current_time = time.time()
         
-        current_count = int(current)
-        if current_count >= limit:
+        if user_id not in self.requests:
+            self.requests[user_id] = []
+        
+        # Remove old requests outside the window
+        self.requests[user_id] = [
+            req_time for req_time in self.requests[user_id]
+            if current_time - req_time < self.window_seconds
+        ]
+        
+        # Check if user has exceeded the limit
+        if len(self.requests[user_id]) >= self.max_requests:
             return False
         
-        self.storage.incr(key)
+        # Add current request
+        self.requests[user_id].append(current_time)
         return True
 
-class QuotaManager:
-    """User quota management."""
-    
-    def __init__(self, storage):
-        self.storage = storage
-    
-    async def check_quota(self, user_id: str) -> bool:
-        """Check if user has remaining quota."""
-        daily_key = f"quota:daily:{user_id}"
-        monthly_key = f"quota:monthly:{user_id}"
-        
-        # Get current usage
-        daily_used = int(self.storage.get(daily_key) or 0)
-        monthly_used = int(self.storage.get(monthly_key) or 0)
-        
-        # Check limits (example limits)
-        daily_limit = 50
-        monthly_limit = 1000
-        
-        return daily_used < daily_limit and monthly_used < monthly_limit
-    
-    async def increment_quota(self, user_id: str):
-        """Increment user quota usage."""
-        daily_key = f"quota:daily:{user_id}"
-        monthly_key = f"quota:monthly:{user_id}"
-        
-        # Increment daily usage
-        self.storage.incr(daily_key)
-        
-        # Increment monthly usage
-        self.storage.incr(monthly_key)
+# Global rate limiter instance
+rate_limiter = RateLimiter()
 
-class CacheManager:
-    """Cache management system."""
+async def check_rate_limit(request: Request, current_user: dict = Depends(get_current_user)):
+    """
+    Dependency to check rate limiting.
     
-    def __init__(self, storage):
-        self.storage = storage
-    
-    async def get_cached_result(self, cache_key: str) -> Optional[Dict[str, Any]]:
-        """Get cached result."""
-        try:
-            cached = self.storage.get(cache_key)
-            if cached:
-                return json.loads(cached)
-        except Exception as e:
-            logger.error(f"Error getting cached result: {str(e)}")
+    Args:
+        request: FastAPI request object
+        current_user: Current authenticated user
         
-        return None
+    Raises:
+        HTTPException: If rate limit is exceeded
+    """
+    user_id = current_user.get("user_id", "anonymous")
     
-    async def cache_result(self, cache_key: str, result: Dict[str, Any], ttl: int = 3600):
-        """Cache result with TTL."""
-        try:
-            self.storage.set(cache_key, json.dumps(result), ttl)
-        except Exception as e:
-            logger.error(f"Error caching result: {str(e)}")
-
-class AuthManager:
-    """Authentication and authorization management."""
-    
-    def __init__(self, secret_key: str = "your-secret-key"):
-        self.secret_key = secret_key
-    
-    async def verify_token(self, token: str) -> Dict[str, Any]:
-        """Verify JWT token (simplified)."""
-        try:
-            # Simplified token verification
-            return {"user_id": "user_123", "username": "test_user", "role": "user"}
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Invalid token"
-            )
-    
-    async def create_token(self, user_data: Dict[str, Any], expires_delta: timedelta = timedelta(hours=24)):
-        """Create JWT token (simplified)."""
-        return "simplified_token"
-
-# Initialize managers
-rate_limiter = RateLimiter(storage)
-quota_manager = QuotaManager(storage)
-cache_manager = CacheManager(storage)
-auth_manager = AuthManager()
-
-# Dependency functions
-async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> Dict[str, Any]:
-    """Get current authenticated user."""
-    try:
-        payload = await auth_manager.verify_token(credentials.credentials)
-        return payload
-    except HTTPException:
-        raise
-    except Exception as e:
-        logger.error(f"Authentication error: {str(e)}")
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Authentication failed"
-        )
-
-async def check_rate_limit(user_id: str = Depends(get_current_user)) -> bool:
-    """Check rate limit for user."""
-    user_id = user_id.get("user_id", "anonymous")
-    allowed = await rate_limiter.check_rate_limit(user_id)
-    
-    if not allowed:
+    if not rate_limiter.is_allowed(user_id):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Rate limit exceeded"
+            detail="Rate limit exceeded. Please try again later."
         )
+
+# ============================================================================
+# LOGGING DEPENDENCIES
+# ============================================================================
+
+async def log_request(request: Request, current_user: dict = Depends(get_current_user)):
+    """
+    Dependency to log incoming requests.
     
-    return True
-
-async def check_quota(user: Dict[str, Any] = Depends(get_current_user)) -> bool:
-    """Check user quota."""
-    user_id = user.get("user_id")
-    has_quota = await quota_manager.check_quota(user_id)
-    
-    if not has_quota:
-        raise HTTPException(
-            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
-            detail="Daily quota exceeded"
-        )
-    
-    return True
-
-async def get_cached_result(cache_key: str) -> Optional[Dict[str, Any]]:
-    """Get cached result dependency."""
-    return await cache_manager.get_cached_result(cache_key)
-
-async def increment_quota(user: Dict[str, Any] = Depends(get_current_user)):
-    """Increment user quota."""
-    user_id = user.get("user_id")
-    await quota_manager.increment_quota(user_id)
-
-# Request context manager
-@asynccontextmanager
-async def request_context(request: Request):
-    """Request context manager for logging and monitoring."""
-    start_time = datetime.now()
-    request_id = request.headers.get("X-Request-ID", "unknown")
-    
-    logger.info(f"Request started: {request_id} - {request.method} {request.url}")
-    
-    try:
-        yield
-    except Exception as e:
-        logger.error(f"Request failed: {request_id} - {str(e)}")
-        raise
-    finally:
-        duration = (datetime.now() - start_time).total_seconds()
-        logger.info(f"Request completed: {request_id} - Duration: {duration:.3f}s")
-
-# Database connection dependency
-@lru_cache()
-def get_database():
-    """Get database connection."""
-    # Implement your database connection here
-    return None
-
-# AI Model dependency
-@lru_cache()
-def get_ai_model():
-    """Get AI model instance."""
-    # This would return your initialized AI model
-    return None
-
-# Configuration dependency
-@lru_cache()
-def get_config():
-    """Get application configuration."""
-    return {
-        "max_batch_size": 10,
-        "default_quality": "medium",
-        "max_frames": 64,
-        "max_resolution": "1024x1024",
-        "rate_limit": 100,
-        "quota_daily": 50,
-        "quota_monthly": 1000
-    }
-
-# Health check dependency
-async def get_health_status() -> Dict[str, Any]:
-    """Get system health status."""
-    return {
-        "api": "healthy",
-        "storage": "healthy",
-        "timestamp": datetime.now().isoformat()
-    }
-
-# Metrics dependency
-async def get_metrics() -> Dict[str, Any]:
-    """Get system metrics."""
-    try:
-        # Get basic metrics from storage
-        total_jobs = len(storage.keys("job:"))
-        completed_jobs = 0
-        failed_jobs = 0
+    Args:
+        request: FastAPI request object
+        current_user: Current authenticated user
         
-        for key in storage.keys("job:"):
-            job_data = storage.get(key)
-            if job_data:
-                try:
-                    job = json.loads(job_data)
-                    if job["status"] == "completed":
-                        completed_jobs += 1
-                    elif job["status"] == "failed":
-                        failed_jobs += 1
-                except:
-                    pass
-        
-        return {
-            "total_jobs": total_jobs,
-            "completed_jobs": completed_jobs,
-            "failed_jobs": failed_jobs,
-            "success_rate": completed_jobs / total_jobs if total_jobs > 0 else 0,
-            "timestamp": datetime.now().isoformat()
-        }
-    except Exception as e:
-        logger.error(f"Error getting metrics: {str(e)}")
-        return {
-            "error": str(e),
-            "timestamp": datetime.now().isoformat()
-        }
-
-# Webhook dependency
-async def validate_webhook_signature(request: Request) -> bool:
-    """Validate webhook signature."""
-    signature = request.headers.get("X-Webhook-Signature")
-    if not signature:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Missing webhook signature"
-        )
+    Returns:
+        dict: Request logging information
+    """
+    import logging
     
-    # Implement your webhook signature validation here
-    return True
-
-# Background task dependency
-async def get_background_task_manager():
-    """Get background task manager."""
-    # This would return your background task manager
-    return None
-
-# Error handling dependency
-async def handle_errors(func):
-    """Error handling decorator."""
-    async def wrapper(*args, **kwargs):
-        try:
-            return await func(*args, **kwargs)
-        except HTTPException:
-            raise
-        except Exception as e:
-            logger.error(f"Unexpected error in {func.__name__}: {str(e)}")
-            raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                detail="Internal server error"
-            )
-    return wrapper 
+    logger = logging.getLogger(__name__)
+    
+    log_data = {
+        "method": request.method,
+        "url": str(request.url),
+        "user_id": current_user.get("user_id"),
+        "user_agent": request.headers.get("user-agent"),
+        "client_ip": request.client.host if request.client else "unknown"
+    }
+    
+    logger.info(f"Request: {log_data}")
+    return log_data 

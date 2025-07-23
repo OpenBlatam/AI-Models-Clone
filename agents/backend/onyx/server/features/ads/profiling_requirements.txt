@@ -1,0 +1,150 @@
+# Profiling and Optimization System Dependencies
+# Core profiling and optimization packages for Onyx Ads Backend
+
+# Core PyTorch ecosystem
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+torch-scatter>=2.1.0
+torch-sparse>=0.6.0
+torch-geometric>=2.3.0
+
+# Profiling and monitoring tools
+psutil>=5.9.0
+memory-profiler>=0.60.0
+line-profiler>=4.0.0
+pyinstrument>=5.0.0
+py-spy>=0.3.0
+scalene>=1.5.0
+
+# Data processing and optimization
+numpy>=1.24.0
+pandas>=2.0.0
+dask>=2023.0.0
+vaex>=4.15.0
+ray>=2.5.0
+modin>=0.20.0
+
+# I/O and storage optimization
+aiofiles>=23.0.0
+lz4>=4.0.0
+zstandard>=0.21.0
+snappy>=1.1.0
+h5py>=3.8.0
+tables>=3.8.0
+
+# Parallel processing and concurrency
+joblib>=1.3.0
+multiprocessing-logging>=0.3.0
+concurrent-futures>=3.1.0
+asyncio-mqtt>=0.13.0
+
+# System monitoring and metrics
+prometheus-client>=0.17.0
+datadog>=0.44.0
+statsd>=4.0.0
+psutil>=5.9.0
+GPUtil>=1.4.0
+
+# Visualization and reporting
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.15.0
+bokeh>=3.0.0
+dash>=2.10.0
+
+# Database and caching
+redis>=4.5.0
+aioredis>=2.0.0
+memcached>=1.59.0
+diskcache>=5.6.0
+
+# Configuration and logging
+pydantic>=2.0.0
+structlog>=23.1.0
+rich>=13.0.0
+colorama>=0.4.6
+
+# Testing and validation
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+pytest-cov>=4.1.0
+pytest-benchmark>=4.0.0
+hypothesis>=6.75.0
+
+# Development and debugging
+ipython>=8.14.0
+jupyter>=1.0.0
+notebook>=7.0.0
+debugpy>=1.6.0
+pdbpp>=0.10.0
+
+# Web framework integration
+fastapi>=0.100.0
+uvicorn>=0.23.0
+websockets>=11.0.0
+aiohttp>=3.8.0
+
+# Machine learning and AI
+transformers>=4.30.0
+diffusers>=0.20.0
+accelerate>=0.20.0
+peft>=0.4.0
+bitsandbytes>=0.41.0
+
+# Data validation and serialization
+marshmallow>=3.20.0
+cerberus>=1.3.0
+jsonschema>=4.17.0
+pydantic>=2.0.0
+
+# Security and authentication
+cryptography>=41.0.0
+bcrypt>=4.0.0
+passlib>=1.7.0
+
+# Network and communication
+requests>=2.31.0
+httpx>=0.24.0
+websocket-client>=1.6.0
+
+# File and data formats
+pyyaml>=6.0.0
+toml>=0.10.0
+configparser>=5.3.0
+python-dotenv>=1.0.0
+
+# Performance and optimization
+numba>=0.57.0
+cython>=3.0.0
+mypy>=1.5.0
+black>=23.7.0
+isort>=5.12.0
+flake8>=6.0.0
+
+# System utilities
+click>=8.1.0
+tqdm>=4.65.0
+tenacity>=8.2.0
+retry>=0.9.2
+
+# Monitoring and alerting
+sentry-sdk>=1.28.0
+loguru>=0.7.0
+structlog>=23.1.0
+
+# Optional: GPU monitoring (CUDA specific)
+# nvidia-ml-py>=12.535.0  # Uncomment if using NVIDIA GPUs
+
+# Optional: Advanced profiling
+# py-spy>=0.3.0  # Uncomment for advanced profiling
+# scalene>=1.5.0  # Uncomment for memory profiling
+
+# Optional: Distributed computing
+# dask[distributed]>=2023.0.0  # Uncomment for distributed processing
+# ray[default]>=2.5.0  # Uncomment for Ray integration
+
+# Optional: Cloud monitoring
+# google-cloud-monitoring>=2.15.0  # Uncomment for GCP
+# boto3>=1.28.0  # Uncomment for AWS
+# azure-monitor>=0.1.0  # Uncomment for Azure 

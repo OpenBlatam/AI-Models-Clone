@@ -8,7 +8,7 @@ class SimpleCursorAutomator:
     def __init__(self):
         # Configuración básica
         pyautogui.PAUSE = 0.1
-        pyautogui.FAILSAFE = True
+        pyautogui.FAILSAFE = Trueon for sha
         
         # Comandos simplificados
         self.commands = [

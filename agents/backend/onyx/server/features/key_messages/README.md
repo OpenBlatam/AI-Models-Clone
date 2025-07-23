@@ -1,267 +1,345 @@
-# Key Messages Feature
+# Key Messages Feature - Optimized Version
 
-Este módulo proporciona funcionalidades para generar y analizar mensajes clave utilizando inteligencia artificial.
+## Overview
 
-## Características
+The Key Messages feature has been completely optimized with modern libraries and best practices for high-performance AI-powered message generation and analysis.
 
-- **Generación de mensajes**: Crea mensajes optimizados basados en tipo, tono y contexto
-- **Análisis de mensajes**: Analiza mensajes existentes para obtener insights
-- **Procesamiento por lotes**: Procesa múltiples mensajes de forma eficiente
-- **Caché inteligente**: Almacena respuestas para mejorar el rendimiento
-- **Múltiples tipos de mensaje**: Marketing, educativo, promocional, informativo, etc.
-- **Variedad de tonos**: Profesional, casual, amigable, autoritario, conversacional
+## Key Conventions
 
-## Endpoints
+### 1. Code Style and Structure
+- **Type Hints**: All functions must include complete type annotations
+- **Async/Await**: Use async/await for all I/O operations
+- **Error Handling**: Use structured exception handling with specific error types
+- **Logging**: Use structured logging with `structlog` for better observability
+- **Documentation**: All public methods must have docstrings with examples
 
-### Generación de mensajes
+### 2. Performance Optimization
+- **Caching**: Multi-layer caching (Redis + Memory) with TTL
+- **Connection Pooling**: HTTP clients with connection pooling and limits
+- **Rate Limiting**: Implement rate limiting on all endpoints
+- **Circuit Breakers**: Use circuit breakers for external API calls
+- **Mixed Precision**: Enable mixed precision training when using GPU
 
-#### POST `/key-messages/generate`
-Genera un mensaje optimizado basado en los parámetros proporcionados.
+### 3. ML and Deep Learning
+- **Gradient Accumulation**: Use gradient accumulation for large batch sizes
+- **Distributed Training**: Support for DistributedDataParallel (DDP)
+- **Mixed Precision**: Automatic mixed precision with `torch.cuda.amp`
+- **Model Optimization**: Use optimized models from Hugging Face
+- **Experiment Tracking**: Integration with TensorBoard and Weights & Biases
 
-**Request Body:**
-```json
-{
-  "message": "Texto original del mensaje",
-  "message_type": "marketing",
-  "tone": "professional",
-  "target_audience": "Profesionales de marketing",
-  "context": "Campaña de lanzamiento de producto",
-  "keywords": ["innovación", "tecnología", "futuro"],
-  "max_length": 200,
-  "industry": "Tecnología",
-  "call_to_action": "Regístrate ahora"
-}
+### 4. Monitoring and Observability
+- **Prometheus Metrics**: Comprehensive metrics for all operations
+- **Health Checks**: Regular health checks for all components
+- **Profiling**: Code profiling with cProfile and py-spy
+- **Structured Logging**: JSON-formatted logs with correlation IDs
+
+### 5. Configuration Management
+- **Environment Variables**: Use pydantic-settings for configuration
+- **Validation**: Validate all configuration values at startup
+- **Defaults**: Provide sensible defaults for all settings
+- **Environment-Specific**: Different configs for dev/staging/prod
+
+### 6. Testing Conventions
+- **Async Testing**: Use pytest-asyncio for async test functions
+- **Fixtures**: Reusable test fixtures for common setup
+- **Mocking**: Mock external dependencies in tests
+- **Performance Testing**: Include performance benchmarks
+- **Coverage**: Maintain high test coverage (>90%)
+
+### 7. API Design
+- **RESTful**: Follow REST conventions for API endpoints
+- **Rate Limiting**: Implement rate limiting per endpoint
+- **Error Responses**: Consistent error response format
+- **Validation**: Use Pydantic for request/response validation
+- **Documentation**: Auto-generated API documentation with OpenAPI
+
+### 8. Database and Caching
+- **Redis**: Use Redis for distributed caching
+- **Connection Management**: Proper connection pooling and cleanup
+- **TTL**: Set appropriate TTL for cached data
+- **Fallbacks**: Graceful fallbacks when cache is unavailable
+
+### 9. Security
+- **Input Validation**: Validate all user inputs
+- **Rate Limiting**: Prevent abuse with rate limiting
+- **CORS**: Configure CORS appropriately
+- **API Keys**: Support for API key authentication
+- **HTTPS**: Use HTTPS in production
+
+### 10. Deployment
+- **Docker**: Containerized deployment
+- **Health Checks**: Kubernetes health checks
+- **Resource Limits**: Set appropriate resource limits
+- **Monitoring**: Prometheus and Grafana integration
+- **Logging**: Centralized logging with ELK stack
+
+## Architecture
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   FastAPI App   │    │  Redis Cache    │    │   LLM Service   │
+│                 │    │                 │    │                 │
+│ - Rate Limiting │◄──►│ - Distributed   │    │ - OpenAI        │
+│ - Validation    │    │ - TTL           │    │ - Anthropic     │
+│ - Metrics       │    │ - Persistence   │    │ - Local Models  │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
+         │                       │                       │
+         ▼                       ▼                       ▼
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│  Optimized      │    │  Background     │    │  Experiment     │
+│  Service        │    │  Tasks (ARQ)    │    │  Tracking       │
+│                 │    │                 │    │                 │
+│ - Mixed Prec.   │    │ - Async Queue   │    │ - TensorBoard   │
+│ - Circuit Br.   │    │ - Job Scheduler │    │ - Weights & Biases│
+│ - Profiling     │    │ - Retry Logic   │    │ - Metrics       │
+└─────────────────┘    └─────────────────┘    └─────────────────┘
 ```
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid",
-    "original_message": "Texto original",
-    "response": "Mensaje generado optimizado",
-    "message_type": "marketing",
-    "tone": "professional",
-    "created_at": "2024-01-01T00:00:00",
-    "word_count": 45,
-    "character_count": 250,
-    "keywords_used": ["innovación", "tecnología"],
-    "sentiment_score": 0.8,
-    "readability_score": 0.9,
-    "processing_time": 0.5,
-    "suggestions": []
-  },
-  "processing_time": 0.5
-}
-```
+## Performance Optimizations
 
-### Análisis de mensajes
+### 1. Caching Strategy
+- **L1 Cache**: In-memory cache for frequently accessed data
+- **L2 Cache**: Redis cache for distributed access
+- **Cache Keys**: MD5 hash of request parameters
+- **TTL**: Configurable TTL per cache level
 
-#### POST `/key-messages/analyze`
-Analiza un mensaje y proporciona insights sobre su efectividad.
+### 2. HTTP Client Optimization
+- **Connection Pooling**: Reuse connections with limits
+- **HTTP/2**: Enable HTTP/2 for better performance
+- **Timeouts**: Configurable timeouts per request type
+- **Retry Logic**: Exponential backoff with circuit breaker
 
-**Request Body:** (mismo formato que generate)
+### 3. ML Model Optimization
+- **Mixed Precision**: FP16 for faster inference
+- **Model Caching**: Cache loaded models in memory
+- **Batch Processing**: Efficient batch processing
+- **GPU Memory**: Optimize GPU memory usage
 
-**Response:**
-```json
-{
-  "success": true,
-  "data": {
-    "id": "uuid",
-    "original_message": "Mensaje original",
-    "response": "Análisis detallado del mensaje...",
-    "message_type": "marketing",
-    "tone": "professional",
-    "created_at": "2024-01-01T00:00:00",
-    "word_count": 25,
-    "character_count": 150,
-    "keywords_used": ["palabra1", "palabra2"],
-    "sentiment_score": 0.7,
-    "readability_score": 0.8,
-    "processing_time": 0.3,
-    "suggestions": ["Sugerencia 1", "Sugerencia 2"]
-  },
-  "processing_time": 0.3,
-  "metadata": {
-    "analysis": true
-  }
-}
-```
+### 4. Database Optimization
+- **Connection Pooling**: Efficient connection management
+- **Query Optimization**: Optimized queries with indexes
+- **Async Operations**: Non-blocking database operations
+- **Connection Limits**: Prevent connection exhaustion
 
-### Procesamiento por lotes
+## Monitoring and Metrics
 
-#### POST `/key-messages/batch`
-Procesa múltiples mensajes de forma eficiente.
+### Prometheus Metrics
+- `key_messages_requests_total`: Total request count
+- `key_messages_request_duration_seconds`: Request duration
+- `key_messages_cache_hit_ratio`: Cache hit ratio
+- `key_messages_active_connections`: Active connections
+- `key_messages_gpu_memory_usage_mb`: GPU memory usage
 
-**Request Body:**
-```json
-{
-  "messages": [
-    {
-      "message": "Mensaje 1",
-      "message_type": "marketing",
-      "tone": "professional"
-    },
-    {
-      "message": "Mensaje 2",
-      "message_type": "educational",
-      "tone": "friendly"
-    }
-  ],
-  "batch_size": 10
-}
-```
+### Health Checks
+- Redis connectivity
+- HTTP client status
+- System resources (CPU, Memory)
+- ML model availability
 
-**Response:**
-```json
-{
-  "success": true,
-  "results": [
-    {
-      "success": true,
-      "data": { /* GeneratedResponse */ },
-      "processing_time": 0.5
-    }
-  ],
-  "total_processed": 2,
-  "failed_count": 0,
-  "processing_time": 1.2
-}
-```
+### Logging
+- Structured JSON logs
+- Correlation IDs for request tracking
+- Performance metrics in logs
+- Error context and stack traces
 
-### Endpoints de utilidad
+## Configuration
 
-#### GET `/key-messages/types`
-Obtiene los tipos de mensaje disponibles.
-
-#### GET `/key-messages/tones`
-Obtiene los tonos disponibles.
-
-#### DELETE `/key-messages/cache`
-Limpia el caché de respuestas.
-
-#### GET `/key-messages/cache/stats`
-Obtiene estadísticas del caché.
-
-#### GET `/key-messages/health`
-Verifica el estado del servicio.
-
-## Tipos de mensaje
-
-- `marketing`: Mensajes promocionales y de marketing
-- `educational`: Contenido educativo e informativo
-- `promotional`: Promociones y ofertas especiales
-- `informational`: Información general y noticias
-- `call_to_action`: Llamadas a la acción
-- `social_media`: Contenido para redes sociales
-- `email`: Mensajes para correo electrónico
-- `website`: Contenido para sitios web
-
-## Tonos disponibles
-
-- `professional`: Formal y profesional
-- `casual`: Informal y relajado
-- `friendly`: Amigable y cercano
-- `authoritative`: Autoritario y confiable
-- `conversational`: Conversacional y natural
-- `enthusiastic`: Entusiasta y motivador
-- `urgent`: Urgente y apremiante
-- `calm`: Tranquilo y sereno
-
-## Configuración
-
-El módulo se puede configurar mediante variables de entorno:
-
+### Environment Variables
 ```bash
-# Configuración de caché
-KEY_MESSAGES_CACHE_TTL_HOURS=24
-KEY_MESSAGES_CACHE_MAX_SIZE=1000
+# Redis Configuration
+REDIS_URL=redis://localhost:6379
+REDIS_MAX_CONNECTIONS=20
 
-# Configuración de LLM
-KEY_MESSAGES_LLM_PROVIDER=deepseek
-KEY_MESSAGES_LLM_MODEL=deepseek-chat
-KEY_MESSAGES_LLM_MAX_TOKENS=2000
-KEY_MESSAGES_LLM_TEMPERATURE=0.7
+# HTTP Configuration
+HTTP_TIMEOUT_SECONDS=30
+HTTP_MAX_CONNECTIONS=100
 
-# Configuración de procesamiento por lotes
-KEY_MESSAGES_MAX_BATCH_SIZE=50
-KEY_MESSAGES_BATCH_TIMEOUT_SECONDS=300
+# Cache Configuration
+CACHE_TTL_SECONDS=86400
+CACHE_MEMORY_SIZE=1000
 
-# Límites de tasa
-KEY_MESSAGES_RATE_LIMIT_REQUESTS_PER_MINUTE=100
-KEY_MESSAGES_RATE_LIMIT_BURST_SIZE=20
+# Rate Limiting
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_DEFAULT=100/minute
 
-# Configuración de logging
-KEY_MESSAGES_LOG_LEVEL=INFO
+# ML Configuration
+LLM_PROVIDER=openai
+LLM_MODEL=gpt-3.5-turbo
+LLM_MAX_TOKENS=1000
 
-# Flags de características
-KEY_MESSAGES_ENABLE_CACHING=true
-KEY_MESSAGES_ENABLE_BATCH_PROCESSING=true
-KEY_MESSAGES_ENABLE_ANALYSIS=true
-KEY_MESSAGES_ENABLE_LEGACY_ENDPOINTS=true
+# Monitoring
+MONITORING_PROMETHEUS_ENABLED=true
+MONITORING_STRUCTURED_LOGGING=true
+
+# Performance
+PERFORMANCE_MAX_BATCH_SIZE=50
+PERFORMANCE_CONCURRENT_REQUESTS=10
 ```
 
-## Uso en el código
+## Usage Examples
 
+### Basic Message Generation
 ```python
-from onyx.server.features.key_messages.service import KeyMessageService
+from onyx.server.features.key_messages.service import OptimizedKeyMessageService
 from onyx.server.features.key_messages.models import KeyMessageRequest, MessageType, MessageTone
 
-# Inicializar servicio
-service = KeyMessageService()
-
-# Crear request
+# Initialize service
+async with OptimizedKeyMessageService() as service:
+    # Generate message
 request = KeyMessageRequest(
-    message="Nuestro nuevo producto revoluciona la industria",
+        message="Our new product revolutionizes the industry",
     message_type=MessageType.MARKETING,
     tone=MessageTone.PROFESSIONAL,
-    target_audience="Profesionales de tecnología",
-    keywords=["innovación", "revolución", "tecnología"]
+        keywords=["innovation", "revolution", "technology"]
 )
 
-# Generar respuesta
 response = await service.generate_response(request)
-
-# Analizar mensaje
-analysis = await service.analyze_message(request)
+    print(response.data.response)
 ```
 
-## Características avanzadas
+### Batch Processing
+```python
+# Batch processing with progress tracking
+requests = [KeyMessageRequest(...) for _ in range(100)]
+batch_request = BatchKeyMessageRequest(messages=requests, batch_size=50)
 
-### Caché inteligente
-- Almacena respuestas generadas para mejorar el rendimiento
-- TTL configurable (por defecto 24 horas)
-- Limpieza automática de entradas expiradas
+response = await service.generate_batch(batch_request)
+print(f"Processed: {response.total_processed}")
+print(f"Failed: {response.failed_count}")
+```
 
-### Procesamiento concurrente
-- Procesamiento asíncrono de múltiples mensajes
-- Control de concurrencia para evitar sobrecarga
-- Timeouts configurables
+### Health Monitoring
+```python
+# Check service health
+health = await service.health_check()
+print(f"Status: {health['status']}")
+print(f"Redis: {health['checks']['redis']}")
+print(f"System: {health['checks']['system']}")
+```
 
-### Análisis de sentimiento
-- Evaluación automática del sentimiento del mensaje
-- Puntuación de legibilidad
-- Sugerencias de mejora
+## Testing
 
-### Endpoints legacy
-- Compatibilidad con versiones anteriores
-- Autenticación básica para endpoints legacy
-- Migración gradual a nuevos endpoints
+### Run Tests
+```bash
+# Run all tests
+pytest tests/ -v
 
-## Monitoreo y métricas
+# Run with coverage
+pytest tests/ --cov=onyx.server.features.key_messages --cov-report=html
 
-El módulo incluye:
-- Logging detallado de todas las operaciones
-- Métricas de rendimiento y tiempo de respuesta
-- Estadísticas de caché
-- Endpoint de health check
-- Manejo de errores robusto
+# Run performance tests
+pytest tests/ -m "performance" --benchmark-only
 
-## Seguridad
+# Run profiling
+python -m cProfile -o profile.prof test_integration.py
+```
 
-- Autenticación de usuarios para endpoints principales
-- Validación de entrada en todos los endpoints
-- Límites de tasa para prevenir abuso
-- Sanitización de datos de entrada
-- Logging de auditoría para operaciones sensibles 
+### Performance Benchmarks
+```bash
+# Run benchmarks
+pytest test_integration.py::TestPerformanceOptimizations -v
+
+# Memory profiling
+python -m memory_profiler test_integration.py
+
+# Line profiling
+kernprof -l -v test_integration.py
+```
+
+## Deployment
+
+### Docker
+```dockerfile
+FROM python:3.11-slim
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+COPY . .
+CMD ["uvicorn", "onyx.server.features.key_messages.api:app", "--host", "0.0.0.0", "--port", "8000"]
+```
+
+### Kubernetes
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: key-messages
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: key-messages
+  template:
+    metadata:
+      labels:
+        app: key-messages
+    spec:
+      containers:
+      - name: key-messages
+        image: key-messages:latest
+        ports:
+        - containerPort: 8000
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Redis Connection Issues**
+   - Check Redis server status
+   - Verify connection URL
+   - Check network connectivity
+
+2. **High Memory Usage**
+   - Monitor cache size
+   - Check for memory leaks
+   - Adjust batch sizes
+
+3. **Slow Response Times**
+   - Check cache hit ratio
+   - Monitor external API latency
+   - Review rate limiting settings
+
+4. **GPU Memory Issues**
+   - Enable mixed precision
+   - Reduce batch sizes
+   - Monitor GPU memory usage
+
+### Debug Mode
+```bash
+# Enable debug logging
+export LOG_LEVEL=DEBUG
+
+# Enable profiling
+export KEY_MESSAGES_ENABLE_PROFILING=true
+
+# Enable detailed metrics
+export MONITORING_PROMETHEUS_ENABLED=true
+```
+
+## Contributing
+
+1. Follow the coding conventions
+2. Add tests for new features
+3. Update documentation
+4. Run performance benchmarks
+5. Check code coverage
+
+## License
+
+This project is licensed under the MIT License. 

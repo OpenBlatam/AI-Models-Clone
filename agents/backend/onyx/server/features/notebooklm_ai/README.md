@@ -1,458 +1,291 @@
-# NotebookLM AI - Advanced Document Intelligence System
+# NotebookLM AI - FastAPI Application
 
-Inspired by Google's NotebookLM, this system provides advanced document intelligence with AI-powered analysis, citation generation, and multi-modal processing.
+Production-ready FastAPI application with best practices for data models, path operations, and middleware.
 
-## 🚀 Features
+## Features
 
-### Core Capabilities
-- **Advanced Document Processing**: NLP analysis, entity extraction, sentiment analysis
-- **AI-Powered Response Generation**: Context-aware responses with citations
-- **Citation Generation**: Multiple formats (APA, MLA, Chicago, Harvard, IEEE)
-- **Multi-Modal Processing**: Text, image, and audio content analysis
-- **Notebook Workflow**: Complete document management and conversation tracking
-- **Performance Optimization**: GPU acceleration, quantization, and caching
+- ✅ **FastAPI Best Practices**: Following official documentation guidelines
+- ✅ **Pydantic v2**: Modern data validation and serialization
+- ✅ **Async Operations**: Non-blocking I/O throughout
+- ✅ **Security**: OWASP security headers and input validation
+- ✅ **Performance**: Connection pooling, caching, and monitoring
+- ✅ **Monitoring**: Prometheus metrics and health checks
+- ✅ **Docker**: Production-ready containerization
+- ✅ **Database**: PostgreSQL with proper schema
+- ✅ **Cache**: Redis for performance optimization
 
-### AI Engines
-- **Advanced LLM Engine**: Latest transformer models with optimizations
-- **Document Processor**: Comprehensive text analysis and insights
-- **Citation Generator**: Automated citation creation and bibliography
-- **Response Optimizer**: Quality assessment and improvement
-- **Multi-Modal Processor**: Cross-modal content understanding
+## Quick Start
 
-## 📁 Project Structure
+### Using Docker Compose (Recommended)
 
-```
-notebooklm_ai/
-├── core/                    # Domain entities and business logic
-│   ├── entities.py         # Core domain models
-│   ├── value_objects.py    # Value objects and identifiers
-│   └── repositories.py     # Repository interfaces
-├── application/            # Application use cases
-│   └── use_cases.py       # Business logic implementation
-├── infrastructure/         # External services and implementations
-│   ├── ai_engines.py      # AI engine implementations
-│   ├── database.py        # Database implementations
-│   └── external_apis.py   # External API integrations
-├── presentation/           # API and user interface
-│   ├── api.py             # FastAPI router
-│   └── schemas.py         # Pydantic schemas
-├── shared/                # Shared utilities and configuration
-│   ├── config.py          # Configuration management
-│   └── utils.py           # Utility functions
-├── tests/                 # Test suite
-│   ├── unit/              # Unit tests
-│   ├── integration/       # Integration tests
-│   └── fixtures.py        # Test fixtures
-├── docs/                  # Documentation
-├── requirements_notebooklm.txt  # Dependencies
-├── demo_notebooklm.py     # Comprehensive demo
-└── README.md              # This file
-```
-
-## 🛠️ Installation
-
-### Prerequisites
-- Python 3.9+
-- CUDA-compatible GPU (optional, for acceleration)
-- 8GB+ RAM recommended
-
-### Quick Start
-
-1. **Clone and navigate to the project:**
 ```bash
-cd agents/backend/onyx/server/features/notebooklm_ai
+# Clone the repository
+git clone <repository-url>
+cd notebooklm_ai
+
+# Start all services
+docker-compose up -d
+
+# Check services
+docker-compose ps
+
+# View logs
+docker-compose logs -f app
 ```
 
-2. **Install dependencies:**
+### Manual Setup
+
 ```bash
-pip install -r requirements_notebooklm.txt
+# Install dependencies
+pip install -r requirements.txt
+
+# Set environment variables
+export DATABASE_URL="postgresql://user:password@localhost:5432/notebooklm_ai"
+export REDIS_URL="redis://localhost:6379"
+
+# Run the application
+python run.py
 ```
 
-3. **Install spaCy model:**
+## API Endpoints
+
+### Health Check
 ```bash
-python -m spacy download en_core_web_sm
+GET /health
 ```
 
-4. **Run the demo:**
+### Generate Single Image
 ```bash
-python demo_notebooklm.py
-```
+POST /api/v1/diffusion/generate
+Content-Type: application/json
+Authorization: Bearer <token>
 
-## 🎯 Usage Examples
-
-### Basic Document Processing
-
-```python
-from infrastructure.ai_engines import DocumentProcessor
-
-# Initialize processor
-processor = DocumentProcessor()
-
-# Process document
-analysis = processor.process_document(
-    content="Your document content here...",
-    title="Document Title"
-)
-
-print(f"Word count: {analysis['word_count']}")
-print(f"Sentiment: {analysis['sentiment']}")
-print(f"Key points: {analysis['key_points']}")
-```
-
-### AI Response Generation
-
-```python
-from infrastructure.ai_engines import AdvancedLLMEngine, AIEngineConfig
-
-# Initialize LLM engine
-config = AIEngineConfig(
-    model_name="microsoft/DialoGPT-medium",
-    temperature=0.7
-)
-engine = AdvancedLLMEngine(config)
-
-# Generate response
-response = await engine.generate_response(
-    prompt="What is artificial intelligence?",
-    context="AI is a branch of computer science..."
-)
-print(response)
-```
-
-### Citation Generation
-
-```python
-from infrastructure.ai_engines import CitationGenerator
-
-# Initialize citation generator
-generator = CitationGenerator()
-
-# Generate citation
-source = {
-    "title": "Attention Is All You Need",
-    "authors": ["Vaswani, A.", "Shazeer, N."],
-    "publication_date": "2017-06-12",
-    "publisher": "NeurIPS"
+{
+  "prompt": "A beautiful sunset over mountains",
+  "negative_prompt": "blurry, low quality",
+  "pipeline_type": "text_to_image",
+  "model_type": "stable-diffusion-v1-5",
+  "num_inference_steps": 50,
+  "guidance_scale": 7.5,
+  "width": 512,
+  "height": 512,
+  "seed": 42,
+  "batch_size": 1
 }
-
-citation = generator.generate_citation(source, format="apa")
-print(citation)
 ```
 
-### Complete Notebook Workflow
-
-```python
-from core.entities import Notebook, Document, User, DocumentType
-
-# Create user and notebook
-user = User(
-    id=UserId(),
-    username="researcher",
-    email="researcher@example.com"
-)
-
-notebook = Notebook(
-    id=NotebookId(),
-    title="Research Notebook",
-    user_id=user.id
-)
-
-# Add document
-document = Document(
-    id=DocumentId(),
-    title="Research Paper",
-    content="Your research content...",
-    document_type=DocumentType.PDF
-)
-
-notebook.add_document(document)
-```
-
-## 🔧 Configuration
-
-### AI Engine Configuration
-
-```python
-from infrastructure.ai_engines import AIEngineConfig
-
-config = AIEngineConfig(
-    model_name="microsoft/DialoGPT-medium",  # Model to use
-    max_length=2048,                         # Maximum sequence length
-    temperature=0.7,                         # Generation temperature
-    top_p=0.9,                              # Nucleus sampling
-    top_k=50,                               # Top-k sampling
-    use_quantization=True,                  # Enable quantization
-    use_flash_attention=True,               # Enable flash attention
-    device="auto",                          # Device selection
-    batch_size=4,                           # Batch size
-    max_workers=4                           # Parallel workers
-)
-```
-
-### Environment Variables
-
+### Generate Batch Images
 ```bash
-# AI Model Configuration
-NOTEBOOKLM_MODEL_NAME=microsoft/DialoGPT-medium
-NOTEBOOKLM_MAX_LENGTH=2048
-NOTEBOOKLM_TEMPERATURE=0.7
+POST /api/v1/diffusion/generate-batch
+Content-Type: application/json
+Authorization: Bearer <token>
 
-# Database Configuration
-NOTEBOOKLM_DB_URL=postgresql://user:pass@localhost/notebooklm
-NOTEBOOKLM_REDIS_URL=redis://localhost:6379
-
-# API Configuration
-NOTEBOOKLM_API_HOST=0.0.0.0
-NOTEBOOKLM_API_PORT=8000
-NOTEBOOKLM_API_WORKERS=4
-
-# Security
-NOTEBOOKLM_SECRET_KEY=your-secret-key
-NOTEBOOKLM_ACCESS_TOKEN_EXPIRE_MINUTES=30
+{
+  "requests": [
+    {
+      "prompt": "A beautiful sunset",
+      "width": 512,
+      "height": 512
+    },
+    {
+      "prompt": "A futuristic city",
+      "width": 768,
+      "height": 512
+    }
+  ]
+}
 ```
 
-## 📊 Performance Optimization
-
-### GPU Acceleration
-
-The system automatically detects and uses CUDA GPUs when available:
-
-```python
-# Check GPU availability
-import torch
-print(f"CUDA available: {torch.cuda.is_available()}")
-print(f"GPU count: {torch.cuda.device_count()}")
-print(f"Current device: {torch.cuda.current_device()}")
-```
-
-### Quantization
-
-Enable 4-bit quantization for memory efficiency:
-
-```python
-config = AIEngineConfig(
-    use_quantization=True,  # Enable 4-bit quantization
-    device="cuda"
-)
-```
-
-### Batch Processing
-
-Process multiple documents efficiently:
-
-```python
-# Batch document processing
-documents = ["doc1", "doc2", "doc3"]
-results = processor.batch_process_documents(documents)
-```
-
-## 🧪 Testing
-
-### Run All Tests
-
+### Upload Image
 ```bash
-# Run unit tests
-pytest tests/unit/ -v
+POST /api/v1/diffusion/upload
+Content-Type: multipart/form-data
+Authorization: Bearer <token>
 
-# Run integration tests
-pytest tests/integration/ -v
+file: <image_file>
+```
+
+### Metrics
+```bash
+GET /metrics
+```
+
+## Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `APP_NAME` | `notebooklm_ai` | Application name |
+| `APP_VERSION` | `1.0.0` | Application version |
+| `DEBUG` | `false` | Debug mode |
+| `DATABASE_URL` | `postgresql://user:pass@localhost/db` | Database connection URL |
+| `REDIS_URL` | `redis://localhost:6379` | Redis connection URL |
+| `API_TIMEOUT` | `30` | API timeout in seconds |
+| `MAX_CONNECTIONS` | `100` | Maximum database connections |
+| `RATE_LIMIT_PER_MINUTE` | `60` | Rate limit per minute |
+| `HOST` | `0.0.0.0` | Host to bind to |
+| `PORT` | `8000` | Port to bind to |
+| `LOG_LEVEL` | `info` | Logging level |
+
+## Architecture
+
+### Data Models
+- **Pydantic v2**: Modern validation with computed fields
+- **Type Safety**: Full type hints and validation
+- **JSON Schema**: Automatic OpenAPI documentation
+
+### Middleware
+- **Request ID**: Unique request tracing
+- **Logging**: Structured request/response logging
+- **Performance**: Prometheus metrics collection
+- **Security**: OWASP security headers
+
+### Services
+- **Database**: Async PostgreSQL with connection pooling
+- **Cache**: Redis for performance optimization
+- **Diffusion**: Business logic for image generation
+
+### Dependencies
+- **Authentication**: JWT-based authentication
+- **Rate Limiting**: Redis-based rate limiting
+- **Health Checks**: Comprehensive system monitoring
+
+## Development
+
+### Running Tests
+```bash
+# Install test dependencies
+pip install pytest pytest-asyncio pytest-cov
+
+# Run tests
+pytest
 
 # Run with coverage
-pytest --cov=notebooklm_ai --cov-report=html
+pytest --cov=app --cov-report=html
 ```
 
-### Performance Testing
-
+### Code Quality
 ```bash
-# Run performance benchmarks
-python -m pytest tests/performance/ -v
+# Install development dependencies
+pip install black isort flake8 mypy
 
-# Load testing
-python tests/load_test.py
+# Format code
+black .
+isort .
+
+# Lint code
+flake8 .
+mypy .
 ```
 
-## 📈 Monitoring and Logging
+### Pre-commit Hooks
+```bash
+# Install pre-commit
+pip install pre-commit
 
-### Structured Logging
+# Install hooks
+pre-commit install
 
-```python
-import logging
-from shared.utils import setup_logging
-
-# Setup structured logging
-logger = setup_logging()
-
-# Log with context
-logger.info("Processing document", extra={
-    "document_id": doc.id.value,
-    "user_id": user.id.value,
-    "processing_time": 1.23
-})
+# Run hooks
+pre-commit run --all-files
 ```
 
-### Metrics Collection
+## Monitoring
 
-```python
-from shared.metrics import MetricsCollector
+### Prometheus Metrics
+- HTTP request counts and duration
+- Database connection metrics
+- Cache hit/miss rates
+- Custom business metrics
 
-# Initialize metrics
-metrics = MetricsCollector()
+### Health Checks
+- Database connectivity
+- Redis connectivity
+- GPU availability
+- Model loading status
 
-# Record metrics
-metrics.record_processing_time("document_analysis", 1.23)
-metrics.record_accuracy("entity_extraction", 0.85)
+### Logging
+- Structured JSON logging
+- Request correlation with IDs
+- Performance metrics
+- Error tracking
+
+## Security
+
+### Headers
+- Content-Type Options
+- Frame Options
+- XSS Protection
+- Referrer Policy
+- Permissions Policy
+
+### Validation
+- Input sanitization
+- File type validation
+- Size limits
+- Rate limiting
+
+### Authentication
+- JWT tokens
+- Bearer authentication
+- User validation
+
+## Performance
+
+### Optimization
+- Async/await throughout
+- Connection pooling
+- Caching strategies
+- Parallel processing
+
+### Monitoring
+- Request duration tracking
+- Memory usage monitoring
+- Database query optimization
+- Cache performance metrics
+
+## Deployment
+
+### Docker
+```bash
+# Build image
+docker build -t notebooklm_ai .
+
+# Run container
+docker run -p 8000:8000 notebooklm_ai
 ```
 
-## 🔒 Security
+### Docker Compose
+```bash
+# Start all services
+docker-compose up -d
 
-### Authentication and Authorization
-
-```python
-from shared.security import SecurityManager
-
-# Initialize security
-security = SecurityManager()
-
-# Verify token
-user = security.verify_token(token)
-
-# Check permissions
-if security.has_permission(user, "read_document", document_id):
-    # Access granted
-    pass
+# Scale application
+docker-compose up -d --scale app=3
 ```
 
-### Data Encryption
+### Production
+- Use reverse proxy (nginx)
+- Enable HTTPS
+- Set up monitoring
+- Configure backups
+- Use secrets management
 
-```python
-from shared.encryption import EncryptionManager
+## API Documentation
 
-# Initialize encryption
-encryption = EncryptionManager()
+Once the application is running, visit:
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
+- **OpenAPI JSON**: http://localhost:8000/openapi.json
 
-# Encrypt sensitive data
-encrypted_data = encryption.encrypt(sensitive_data)
+## Contributing
 
-# Decrypt data
-decrypted_data = encryption.decrypt(encrypted_data)
-```
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Run code quality checks
+6. Submit a pull request
 
-## 🚀 Deployment
+## License
 
-### Docker Deployment
-
-```dockerfile
-FROM python:3.9-slim
-
-WORKDIR /app
-COPY requirements_notebooklm.txt .
-RUN pip install -r requirements_notebooklm.txt
-
-COPY . .
-CMD ["python", "demo_notebooklm.py"]
-```
-
-### Kubernetes Deployment
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: notebooklm-ai
-spec:
-  replicas: 3
-  selector:
-    matchLabels:
-      app: notebooklm-ai
-  template:
-    metadata:
-      labels:
-        app: notebooklm-ai
-    spec:
-      containers:
-      - name: notebooklm-ai
-        image: notebooklm-ai:latest
-        ports:
-        - containerPort: 8000
-        resources:
-          requests:
-            memory: "4Gi"
-            cpu: "2"
-          limits:
-            memory: "8Gi"
-            cpu: "4"
-```
-
-## 🤝 Contributing
-
-### Development Setup
-
-1. **Fork the repository**
-2. **Create a feature branch:**
-   ```bash
-   git checkout -b feature/amazing-feature
-   ```
-3. **Install development dependencies:**
-   ```bash
-   pip install -r requirements_dev.txt
-   ```
-4. **Run tests:**
-   ```bash
-   pytest tests/ -v
-   ```
-5. **Submit a pull request**
-
-### Code Style
-
-- Follow PEP 8 guidelines
-- Use type hints
-- Write docstrings for all functions
-- Maintain test coverage above 80%
-
-## 📚 Documentation
-
-- [API Reference](docs/api.md)
-- [Architecture Guide](docs/architecture.md)
-- [Performance Guide](docs/performance.md)
-- [Security Guide](docs/security.md)
-- [Deployment Guide](docs/deployment.md)
-
-## 🆘 Support
-
-### Common Issues
-
-1. **CUDA out of memory:**
-   - Reduce batch size
-   - Enable quantization
-   - Use smaller models
-
-2. **Slow processing:**
-   - Enable GPU acceleration
-   - Increase batch size
-   - Use optimized models
-
-3. **Import errors:**
-   - Check Python version (3.9+)
-   - Install all dependencies
-   - Verify spaCy model installation
-
-### Getting Help
-
-- Create an issue on GitHub
-- Check the documentation
-- Review the demo examples
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- Inspired by Google's NotebookLM
-- Built with Hugging Face Transformers
-- Powered by PyTorch and spaCy
-- Enhanced with modern AI libraries
-
----
-
-**NotebookLM AI** - Advanced Document Intelligence for the Modern Age 🚀 
+This project is licensed under the MIT License. 

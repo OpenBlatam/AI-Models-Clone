@@ -33,7 +33,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function RadialTextChart() {
+export default function RadialTextChart() {
   return (
     <Card className="flex flex-col">
       {/* <CardHeader className="items-center pb-0">

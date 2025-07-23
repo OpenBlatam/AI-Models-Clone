@@ -41,20 +41,12 @@ class BatchMetrics:
     
     def get_counter(self, name: str) -> Counter:
         """Get or create a counter metric."""
-        if name not in self.counters:
-            self.counters[name] = Counter(
-                f"video_model_{name}_total", 
-                f"Total {name} calls"
-            )
+        if name not in self.counters: self.counters[name] = Counter(f"video_model_{name}_total", f"Total {name} calls")
         return self.counters[name]
     
     def get_histogram(self, name: str) -> Histogram:
         """Get or create a histogram metric."""
-        if name not in self.histograms:
-            self.histograms[name] = Histogram(
-                f"video_model_{name}_duration", 
-                f"Duration of {name} operations"
-            )
+        if name not in self.histograms: self.histograms[name] = Histogram(f"video_model_{name}_duration", f"Duration of {name} operations")
         return self.histograms[name]
 
 # Global metrics instance
@@ -100,8 +92,7 @@ def _optimized_batch_timeit(fn: Callable) -> Callable:
 
 def _vectorized_batch_operation(items: List[T], operation: Callable, **kwargs) -> List[T]:
     """Vectorized batch operations using numpy for better performance."""
-    if not items:
-        return []
+    if not items: return []
     
     # Convert to numpy array for vectorized operations
     arr = np.array(items, dtype=object)
@@ -117,8 +108,7 @@ def _vectorized_batch_operation(items: List[T], operation: Callable, **kwargs) -
 def _parallel_batch_operation(items: List[T], operation: Callable, 
                             max_workers: int = DEFAULT_MAX_WORKERS, **kwargs) -> List[T]:
     """Parallel batch operations for I/O intensive tasks."""
-    if not items:
-        return []
+    if not items: return []
     
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = [executor.submit(operation, item, **kwargs) for item in items]
@@ -156,8 +146,7 @@ def _optimized_batch_sort(items: List[T], key: Union[str, Callable],
 
 def _optimized_batch_deduplicate(items: List[T], key: Union[str, Callable] = None) -> List[T]:
     """Optimized deduplication with custom key function."""
-    if not items:
-        return []
+    if not items: return []
     
     seen = set()
     result = []
@@ -191,39 +180,33 @@ class OptimizedBatchMixin:
     @classmethod
     def batch_to_numpy(cls, items: List[T]):
         """Vectorized conversion to numpy array."""
-        if not items:
-            return np.array([], dtype=object)
+        if not items: return np.array([], dtype=object)
         return np.array([item.as_tuple() for item in items], dtype=object)
     
     @classmethod
     def batch_to_pandas(cls, items: List[T]):
         """Optimized conversion to pandas DataFrame."""
-        if not PANDAS_AVAILABLE:
-            raise ImportError("pandas is not installed")
-        if not items:
-            return pd.DataFrame()
+        if not PANDAS_AVAILABLE: raise ImportError("pandas is not installed")
+        if not items: return pd.DataFrame()
         return pd.DataFrame([item.__dict__ for item in items])
     
     @classmethod
     def batch_to_parquet(cls, items: List[T], path: str):
         """Optimized conversion to Parquet with snappy compression."""
-        if not PANDAS_AVAILABLE:
-            raise ImportError("pandas is not installed")
+        if not PANDAS_AVAILABLE: raise ImportError("pandas is not installed")
         cls.batch_to_pandas(items).to_parquet(path, compression='snappy')
     
     @classmethod
     def batch_from_parquet(cls, path: str) -> List[T]:
         """Optimized conversion from Parquet."""
-        if not PANDAS_AVAILABLE:
-            raise ImportError("pandas is not installed")
+        if not PANDAS_AVAILABLE: raise ImportError("pandas is not installed")
         df = pd.read_parquet(path)
         return [cls(**d) for d in df.to_dict(orient="records")]
     
     @classmethod
     def batch_validate_unique(cls, items: List[T], key: Callable = None):
         """Optimized unique validation with early exit."""
-        if not items:
-            return
+        if not items: return
         
         seen = set()
         key_fn = key or (lambda x: x.as_tuple())

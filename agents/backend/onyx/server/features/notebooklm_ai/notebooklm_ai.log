@@ -1,0 +1,3 @@
+2025-07-11 21:44:11,353 - optimized_main - INFO - Loading configuration
+2025-07-11 21:44:11,455 - optimized_main - ERROR - Failed to load module config: cannot import name 'ConfigManager' from 'environment_variables_examples' (C:\Users\USER\blatam-academy\agents\backend\onyx\server\features\notebooklm_ai\environment_variables_examples.py)
+2025-07-11 21:44:11,456 - optimized_main - INFO - Setting up middleware stack

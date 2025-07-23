@@ -16,8 +16,7 @@ logger = structlog.get_logger()
 
 # --- Redis Cache Helper ---
 def get_redis_cache(redis_url=None):
-    if redis_url:
-        return redis.Redis.from_url(redis_url)
+    if redis_url: return redis.Redis.from_url(redis_url)
     return None
 
 # --- Prompting Helper ---

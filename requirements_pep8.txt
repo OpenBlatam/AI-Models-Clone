@@ -1,0 +1,15 @@
+# PEP 8 Compliance Tools
+black==23.3.0
+flake8==6.0.0
+isort==5.12.0
+mypy==1.3.0
+pre-commit==3.3.3
+
+# Additional linting tools
+pylint==2.17.4
+bandit==1.7.5
+safety==2.3.5
+
+# Type checking
+types-requests==2.31.0.2
+types-PyYAML==6.0.12.9 

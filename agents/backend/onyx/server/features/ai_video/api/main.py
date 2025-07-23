@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-FastAPI Main Application - AI Video System
+🚀 FASTAPI MAIN - AI VIDEO SYSTEM
+=================================
 
-Main FastAPI application with lifespan context manager for startup/shutdown,
-modern dependency injection, and comprehensive error handling.
+Main FastAPI application for the AI Video system.
 """
 
 import asyncio
@@ -31,16 +31,69 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-# Create FastAPI application with lifespan
+# ============================================================================
+# LIFESPAN MANAGEMENT
+# ============================================================================
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """
+    Application lifespan manager.
+    
+    Handles startup and shutdown events.
+    """
+    # Startup
+    logger.info("🚀 AI Video System starting up...")
+    
+    # Initialize resources (database, cache, etc.)
+    # In a real application, you would:
+    # - Initialize database connections
+    # - Set up caching systems
+    # - Load AI models
+    # - Start background workers
+    
+    yield
+    
+    # Shutdown
+    logger.info("🛑 AI Video System shutting down...")
+    
+    # Cleanup resources
+    # In a real application, you would:
+    # - Close database connections
+    # - Stop background workers
+    # - Save any pending data
+    # - Clean up temporary files
+
+
+# ============================================================================
+# FASTAPI APPLICATION
+# ============================================================================
+
+# Create FastAPI app
 app = FastAPI(
-    title="AI Video System API",
-    description="Advanced AI video generation system with performance optimization",
-    version="1.0.0",
+    title="AI Video System",
+    description="High-performance video processing API with AI enhancement",
+    version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
-    lifespan=lifespan  # Use lifespan context manager instead of on_event
+    lifespan=lifespan,
+    responses={
+        400: {"description": "Bad request", "model": ErrorResponse},
+        401: {"description": "Unauthorized", "model": ErrorResponse},
+        403: {"description": "Forbidden", "model": ErrorResponse},
+        404: {"description": "Not found", "model": ErrorResponse},
+        422: {"description": "Validation error", "model": ErrorResponse},
+        429: {"description": "Too many requests", "model": ErrorResponse},
+        500: {"description": "Internal server error", "model": ErrorResponse},
+        502: {"description": "Bad gateway", "model": ErrorResponse},
+        503: {"description": "Service unavailable", "model": ErrorResponse},
+    }
 )
 
+
+# ============================================================================
+# MIDDLEWARE CONFIGURATION
+# ============================================================================
 
 # Add middleware
 app.add_middleware(
@@ -188,21 +241,38 @@ async def generic_exception_handler(request: Request, exc: Exception):
     )
 
 
+# ============================================================================
+# ROUTER INCLUSION
+# ============================================================================
+
 # Include routers
-app.include_router(video_router, prefix="/api/v1/videos", tags=["videos"])
+app.include_router(video_router, prefix="/api/v1")
 app.include_router(system_router, prefix="/api/v1/system", tags=["system"])
 
 
-# Root endpoint
-@app.get("/")
+# ============================================================================
+# ROOT ENDPOINT
+# ============================================================================
+
+@app.get("/", tags=["root"])
 async def root():
-    """Root endpoint with API information."""
+    """
+    Root endpoint with API information.
+    
+    Returns:
+        dict: API information and available endpoints
+    """
     return {
         "message": "AI Video System API",
-        "version": "1.0.0",
+        "version": "2.0.0",
         "docs": "/docs",
-        "health": "/api/v1/system/health",
-        "status": "/api/v1/system/status"
+        "redoc": "/redoc",
+        "health": "/health",
+        "endpoints": {
+            "videos": "/api/v1/videos",
+            "system": "/api/v1/system",
+            "health": "/health"
+        }
     }
 
 
@@ -244,14 +314,18 @@ def custom_openapi():
 app.openapi = custom_openapi
 
 
-# Development server configuration
+# ============================================================================
+# APPLICATION ENTRY POINT
+# ============================================================================
+
 if __name__ == "__main__":
     import uvicorn
     
+    # Run the application
     uvicorn.run(
-        "api.main:app",
-        host="0.0.0.0",
+        app, 
+        host="0.0.0.0", 
         port=8000,
-        reload=True,
-        log_level="info"
+        log_level="info",
+        access_log=True
     ) 
