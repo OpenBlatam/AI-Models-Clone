@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-HeyGen AI FastAPI Middleware Package
-FastAPI best practices for middleware organization and registration.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import Dict, List, Any, Optional, Callable, Awaitable
 from fastapi import Request, Response
@@ -16,6 +21,16 @@ import time
 import json
 import hashlib
 from datetime import datetime, timezone
+            import traceback
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+HeyGen AI FastAPI Middleware Package
+FastAPI best practices for middleware organization and registration.
+"""
+
 
 logger = structlog.get_logger()
 
@@ -44,7 +59,7 @@ class MiddlewareType(Enum):
 class MiddlewareRegistry:
     """Middleware registry following FastAPI best practices."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.middleware: Dict[str, Any] = {}
         self.middleware_order: List[str] = []
         self._is_initialized = False
@@ -95,7 +110,7 @@ class MiddlewareRegistry:
         """Get middleware execution order."""
         return self.middleware_order.copy()
     
-    def setup_app(self, app):
+    def setup_app(self, app) -> Any:
         """Setup all middleware on the FastAPI app."""
         if self._is_initialized:
             return
@@ -128,7 +143,9 @@ class BaseMiddleware(BaseHTTPMiddleware):
     """Base middleware class following FastAPI best practices."""
     
     def __init__(self, app, name: str = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.name = name or self.__class__.__name__
         self.logger = structlog.get_logger(self.name)
     
@@ -192,7 +209,9 @@ class RequestLoggingMiddleware(BaseMiddleware):
     """Request logging middleware following FastAPI best practices."""
     
     def __init__(self, app, include_body: bool = False, include_headers: bool = True):
-        super().__init__(app, "RequestLogging")
+        
+    """__init__ function."""
+super().__init__(app, "RequestLogging")
         self.include_body = include_body
         self.include_headers = include_headers
     
@@ -275,7 +294,9 @@ class ErrorHandlingMiddleware(BaseMiddleware):
     """Error handling middleware following FastAPI best practices."""
     
     def __init__(self, app, include_traceback: bool = False):
-        super().__init__(app, "ErrorHandling")
+        
+    """__init__ function."""
+super().__init__(app, "ErrorHandling")
         self.include_traceback = include_traceback
     
     async def handle_error(self, request: Request, error: Exception, start_time: float) -> Response:
@@ -295,7 +316,6 @@ class ErrorHandlingMiddleware(BaseMiddleware):
         }
         
         if self.include_traceback:
-            import traceback
             error_data["traceback"] = traceback.format_exc()
         
         self.logger.error("Unhandled error", **error_data)
@@ -330,7 +350,9 @@ class AuthenticationMiddleware(BaseMiddleware):
     """Authentication middleware following FastAPI best practices."""
     
     def __init__(self, app, exclude_paths: List[str] = None):
-        super().__init__(app, "Authentication")
+        
+    """__init__ function."""
+super().__init__(app, "Authentication")
         self.exclude_paths = exclude_paths or [
             "/docs",
             "/redoc",
@@ -403,7 +425,9 @@ class RateLimitingMiddleware(BaseMiddleware):
     """Rate limiting middleware following FastAPI best practices."""
     
     def __init__(self, app, requests_per_minute: int = 60, burst_size: int = 10):
-        super().__init__(app, "RateLimiting")
+        
+    """__init__ function."""
+super().__init__(app, "RateLimiting")
         self.requests_per_minute = requests_per_minute
         self.burst_size = burst_size
         self.rate_limits: Dict[str, List[float]] = {}
@@ -524,7 +548,7 @@ def create_trusted_host_middleware(allowed_hosts: List[str] = None) -> TrustedHo
     
     return TrustedHostMiddleware(allowed_hosts=allowed_hosts)
 
-def create_https_redirect_middleware() -> HTTPSRedirectMiddleware:
+async def create_https_redirect_middleware() -> HTTPSRedirectMiddleware:
     """Create HTTPS redirect middleware following FastAPI best practices."""
     return HTTPSRedirectMiddleware()
 

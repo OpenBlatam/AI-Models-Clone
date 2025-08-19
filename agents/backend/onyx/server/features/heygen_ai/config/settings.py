@@ -1,10 +1,26 @@
-"""
-Configuration settings for HeyGen AI equivalent.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import os
 from typing import Dict, List, Optional
 from pydantic import BaseSettings, Field
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Configuration settings for HeyGen AI equivalent.
+"""
+
 
 
 class HeyGenAISettings(BaseSettings):
@@ -163,7 +179,8 @@ class HeyGenAISettings(BaseSettings):
     chunk_size: int = Field(default=1000, env="CHUNK_SIZE")
     chunk_overlap: int = Field(default=200, env="CHUNK_OVERLAP")
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         case_sensitive = False
 

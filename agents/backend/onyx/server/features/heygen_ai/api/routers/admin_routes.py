@@ -1,23 +1,32 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Dict, Any, List
+import logging
+from ..core.database import get_session
+from ..core.auth import get_current_admin_user
+from ..models.schemas import (
+from ..services.admin_service import (
+from ..utils.helpers import generate_request_id, format_error_message
+        from ..routers.health_routes import get_detailed_health_status
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Admin routes for HeyGen AI API
 Provides administrative endpoints for system management with Pydantic models and type hints.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Dict, Any, List
-import logging
 
-from ..core.database import get_session
-from ..core.auth import get_current_admin_user
-from ..models.schemas import (
     SystemSettingsInput,
     SystemSettingsOutput,
     RateLimitInput,
     RateLimitOutput
 )
-from ..services.admin_service import (
     get_system_settings,
     update_system_settings,
     get_system_statistics,
@@ -28,7 +37,6 @@ from ..services.admin_service import (
     clear_cache,
     backup_database
 )
-from ..utils.helpers import generate_request_id, format_error_message
 
 logger = logging.getLogger(__name__)
 
@@ -205,7 +213,6 @@ async def detailed_health_check(
 ) -> Dict[str, Any]:
     """Get detailed system health information"""
     try:
-        from ..routers.health_routes import get_detailed_health_status
         health_status = await get_detailed_health_status(session)
         return health_status
     except Exception as e:

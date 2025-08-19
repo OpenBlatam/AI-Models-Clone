@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-Performance Optimization Middleware for HeyGen AI API
-Caching, compression, rate limiting, and performance monitoring.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import hashlib
@@ -12,7 +20,6 @@ from typing import Dict, Any, Optional, List, Callable, Union, Tuple
 from datetime import datetime, timezone, timedelta
 from collections import defaultdict, deque
 import functools
-
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -20,6 +27,16 @@ from starlette.types import ASGIApp
 from starlette.responses import StreamingResponse
 import structlog
 import redis.asyncio as redis
+            import gzip
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Performance Optimization Middleware for HeyGen AI API
+Caching, compression, rate limiting, and performance monitoring.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -30,7 +47,7 @@ logger = structlog.get_logger()
 class PerformanceMetrics:
     """Performance metrics collection and analysis."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.request_times: deque = deque(maxlen=1000)
         self.response_sizes: deque = deque(maxlen=1000)
         self.error_counts: Dict[str, int] = defaultdict(int)
@@ -57,11 +74,11 @@ class PerformanceMetrics:
         """Record error occurrence."""
         self.error_counts[error_type] += 1
     
-    def record_cache_hit(self):
+    def record_cache_hit(self) -> Any:
         """Record cache hit."""
         self.cache_hits += 1
     
-    def record_cache_miss(self):
+    def record_cache_miss(self) -> Any:
         """Record cache miss."""
         self.cache_misses += 1
     
@@ -143,7 +160,9 @@ class CacheManager:
     """Cache management system."""
     
     def __init__(self, redis_client: Optional[redis.Redis] = None):
-        self.redis_client = redis_client
+        
+    """__init__ function."""
+self.redis_client = redis_client
         self.memory_cache: Dict[str, Tuple[Any, datetime]] = {}
         self.cache_stats = {"hits": 0, "misses": 0}
     
@@ -259,7 +278,9 @@ class RateLimiter:
         default_limit: int = 100,
         default_window: int = 60
     ):
-        self.redis_client = redis_client
+        
+    """__init__ function."""
+self.redis_client = redis_client
         self.default_limit = default_limit
         self.default_window = default_window
         self.memory_limits: Dict[str, deque] = defaultdict(lambda: deque(maxlen=1000))
@@ -364,7 +385,9 @@ class CompressionManager:
     """Response compression management."""
     
     def __init__(self, min_size: int = 1024, compression_level: int = 6):
-        self.min_size = min_size
+        
+    """__init__ function."""
+self.min_size = min_size
         self.compression_level = compression_level
         self.compressible_types = {
             "text/", "application/json", "application/xml", "application/javascript"
@@ -387,7 +410,6 @@ class CompressionManager:
     def compress_response(self, response: Response) -> Response:
         """Compress response content."""
         try:
-            import gzip
             
             # Get response content
             if hasattr(response, 'body'):
@@ -435,7 +457,9 @@ class PerformanceMiddleware(BaseHTTPMiddleware):
         exclude_paths: Optional[List[str]] = None,
         exclude_methods: Optional[List[str]] = None,
     ):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         
         # Initialize components
         self.cache_manager = CacheManager(redis_client) if enable_caching else None
@@ -453,7 +477,7 @@ class PerformanceMiddleware(BaseHTTPMiddleware):
         if self.rate_limiter:
             self._setup_rate_limits()
     
-    def _setup_rate_limits(self):
+    def _setup_rate_limits(self) -> Any:
         """Setup rate limits for different endpoints."""
         # General API limit
         self.rate_limiter.set_limit("api", 1000, 60)  # 1000 requests per minute
@@ -510,7 +534,7 @@ class PerformanceMiddleware(BaseHTTPMiddleware):
             
             raise
     
-    def _should_exclude_request(self, request: Request) -> bool:
+    async def _should_exclude_request(self, request: Request) -> bool:
         """Check if request should be excluded from performance optimizations."""
         # Check path exclusions
         for exclude_path in self.exclude_paths:

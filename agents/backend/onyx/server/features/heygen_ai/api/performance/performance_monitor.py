@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-API Performance Monitor for HeyGen AI FastAPI
-Comprehensive performance monitoring system for tracking response time, latency, and throughput.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -24,11 +32,19 @@ from concurrent.futures import ThreadPoolExecutor
 import psutil
 import aiohttp
 from prometheus_client import Counter, Histogram, Gauge, Summary, generate_latest
-
 from fastapi import Request, Response
 from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, validator
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+API Performance Monitor for HeyGen AI FastAPI
+Comprehensive performance monitoring system for tracking response time, latency, and throughput.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -164,7 +180,9 @@ class PerformanceMonitor:
     """Main performance monitoring system."""
     
     def __init__(self, thresholds: Optional[PerformanceThresholds] = None):
-        self.thresholds = thresholds or PerformanceThresholds()
+        
+    """__init__ function."""
+self.thresholds = thresholds or PerformanceThresholds()
         self.request_metrics: Dict[str, RequestMetrics] = {}
         self.endpoint_metrics: Dict[str, EndpointMetrics] = {}
         self.system_metrics: List[SystemMetrics] = []
@@ -187,7 +205,7 @@ class PerformanceMonitor:
         self._alerting_task: Optional[asyncio.Task] = None
         self._is_running = False
     
-    def _setup_prometheus_metrics(self):
+    def _setup_prometheus_metrics(self) -> Any:
         """Setup Prometheus metrics."""
         # Request metrics
         self.request_duration = Histogram(
@@ -279,7 +297,7 @@ class PerformanceMonitor:
             ['api_name', 'endpoint']
         )
     
-    async def start_monitoring(self):
+    async def start_monitoring(self) -> Any:
         """Start performance monitoring."""
         if self._is_running:
             return
@@ -290,7 +308,7 @@ class PerformanceMonitor:
         
         logger.info("Performance monitoring started")
     
-    async def stop_monitoring(self):
+    async def stop_monitoring(self) -> Any:
         """Stop performance monitoring."""
         if not self._is_running:
             return
@@ -313,7 +331,7 @@ class PerformanceMonitor:
         
         logger.info("Performance monitoring stopped")
     
-    async def _monitoring_loop(self):
+    async def _monitoring_loop(self) -> Any:
         """System monitoring loop."""
         while self._is_running:
             try:
@@ -332,7 +350,7 @@ class PerformanceMonitor:
                 logger.error(f"Error in monitoring loop: {e}")
                 await asyncio.sleep(10)
     
-    async def _alerting_loop(self):
+    async def _alerting_loop(self) -> Any:
         """Performance alerting loop."""
         while self._is_running:
             try:
@@ -423,7 +441,7 @@ class PerformanceMonitor:
         self.throughput.set(system_metrics.throughput_rps)
         self.error_rate.set(system_metrics.error_rate_percent)
     
-    async def _check_performance_alerts(self):
+    async def _check_performance_alerts(self) -> Any:
         """Check for performance alerts."""
         if not self.system_metrics:
             return
@@ -484,7 +502,7 @@ class PerformanceMonitor:
         self.performance_alerts.append(alert)
         logger.warning(f"Performance Alert: {title} - {message}")
     
-    def start_request(self, request: Request) -> str:
+    async def start_request(self, request: Request) -> str:
         """Start monitoring a request."""
         request_id = f"req_{int(time.time() * 1000)}_{id(request)}"
         
@@ -702,7 +720,9 @@ class PerformanceMiddleware(BaseHTTPMiddleware):
     """FastAPI middleware for performance monitoring."""
     
     def __init__(self, app, monitor: PerformanceMonitor):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.monitor = monitor
     
     async def dispatch(self, request: Request, call_next):
@@ -744,7 +764,7 @@ def monitor_performance(operation_name: str = None):
     """Decorator for monitoring function performance."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             
             try:
@@ -768,7 +788,7 @@ def monitor_database_query(table: str = None):
     """Decorator for monitoring database queries."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             
             try:

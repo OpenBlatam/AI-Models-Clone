@@ -1,15 +1,20 @@
-#!/usr/bin/env python3
-"""
-Git Version Control Setup Script for HeyGen AI.
-Automates git repository initialization and configuration.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import sys
 import subprocess
 import logging
 from pathlib import Path
 from typing import List, Optional
+    import argparse
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Git Version Control Setup Script for HeyGen AI.
+Automates git repository initialization and configuration.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -18,7 +23,9 @@ class GitSetup:
     """Manages git version control setup for the project."""
     
     def __init__(self, project_root: str = None):
-        self.project_root = Path(project_root) if project_root else Path.cwd()
+        
+    """__init__ function."""
+self.project_root = Path(project_root) if project_root else Path.cwd()
         self.git_dir = self.project_root / ".git"
         
     def run_command(self, command: List[str], cwd: Optional[Path] = None) -> bool:
@@ -246,7 +253,15 @@ echo "Pre-commit checks passed!"
         
         pre_commit_path = hooks_dir / "pre-commit"
         with open(pre_commit_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(pre_commit_hook)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         # Make executable
         os.chmod(pre_commit_path, 0o755)
@@ -275,7 +290,15 @@ fi
         
         commit_msg_path = hooks_dir / "commit-msg"
         with open(commit_msg_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(commit_msg_hook)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         os.chmod(commit_msg_path, 0o755)
         
@@ -420,7 +443,15 @@ Pipfile.lock text
         
         git_attributes_path = self.project_root / ".gitattributes"
         with open(git_attributes_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(git_attributes)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         logger.info("Created .gitattributes file")
         return True
@@ -511,7 +542,6 @@ Contributors:
 
 def main():
     """Main function for git setup."""
-    import argparse
     
     parser = argparse.ArgumentParser(description="Setup git version control for HeyGen AI")
     parser.add_argument("--name", help="Git user name")
@@ -551,5 +581,6 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

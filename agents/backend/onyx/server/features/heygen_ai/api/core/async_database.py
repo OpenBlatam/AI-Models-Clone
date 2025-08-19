@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-"""
-Enhanced Async Database System for HeyGen AI API
-Supports multiple database backends: asyncpg, aiomysql, aiosqlite
-Features: Connection pooling, health checks, migrations, monitoring
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -13,33 +11,41 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 from enum import Enum
 import json
+from sqlalchemy.ext.asyncio import (
+from sqlalchemy.pool import QueuePool
+from sqlalchemy import text, MetaData
+from sqlalchemy.exc import SQLAlchemyError, OperationalError
+    import asyncpg
+    import aiomysql
+    import aiosqlite
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Enhanced Async Database System for HeyGen AI API
+Supports multiple database backends: asyncpg, aiomysql, aiosqlite
+Features: Connection pooling, health checks, migrations, monitoring
+"""
+
 
 # SQLAlchemy async imports
-from sqlalchemy.ext.asyncio import (
     AsyncSession, 
     create_async_engine, 
     async_sessionmaker,
     AsyncEngine
 )
-from sqlalchemy.pool import QueuePool
-from sqlalchemy import text, MetaData
-from sqlalchemy.exc import SQLAlchemyError, OperationalError
 
 # Database driver imports
 try:
-    import asyncpg
     ASYNCPG_AVAILABLE = True
 except ImportError:
     ASYNCPG_AVAILABLE = False
 
 try:
-    import aiomysql
     AIOMYSQL_AVAILABLE = True
 except ImportError:
     AIOMYSQL_AVAILABLE = False
 
 try:
-    import aiosqlite
     AIOSQLITE_AVAILABLE = True
 except ImportError:
     AIOSQLITE_AVAILABLE = False
@@ -91,7 +97,9 @@ class AsyncDatabaseManager:
     """
     
     def __init__(self, config: DatabaseConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.engine: Optional[AsyncEngine] = None
         self.async_session: Optional[async_sessionmaker] = None
         self.stats = ConnectionStats()
@@ -101,7 +109,7 @@ class AsyncDatabaseManager:
         # Validate database type and driver availability
         self._validate_database_type()
     
-    def _validate_database_type(self):
+    def _validate_database_type(self) -> bool:
         """Validate database type and driver availability."""
         if self.config.type == DatabaseType.POSTGRESQL and not ASYNCPG_AVAILABLE:
             raise ImportError("asyncpg is required for PostgreSQL support")
@@ -328,7 +336,7 @@ class DatabaseConnectionPool:
     Supports load balancing and failover.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.databases: Dict[str, AsyncDatabaseManager] = {}
         self.primary_db: Optional[str] = None
         self.failover_dbs: List[str] = []

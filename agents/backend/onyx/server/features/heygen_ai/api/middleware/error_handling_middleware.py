@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Error Handling Middleware for HeyGen AI API
-Comprehensive middleware for handling unexpected errors, logging, and monitoring.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import traceback
@@ -19,8 +21,16 @@ import uuid
 import json
 from dataclasses import dataclass, asdict
 from enum import Enum
-
 from ..exceptions.http_exceptions import (
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Error Handling Middleware for HeyGen AI API
+Comprehensive middleware for handling unexpected errors, logging, and monitoring.
+"""
+
+
     BaseHTTPException, InternalServerError, ErrorResponse,
     ErrorCategory, ErrorSeverity
 )
@@ -68,7 +78,7 @@ class ErrorContext:
     headers: Optional[Dict[str, str]] = None
     timestamp: datetime = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.timestamp is None:
             self.timestamp = datetime.now(timezone.utc)
     
@@ -83,7 +93,7 @@ class ErrorContext:
 class ErrorClassifier:
     """Classify errors based on exception type and message."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_patterns = {
             # Database errors
             "database": [
@@ -191,7 +201,7 @@ class ErrorClassifier:
 class ErrorMonitor:
     """Monitor and track errors for alerting and analysis."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_counts: Dict[str, int] = {}
         self.error_history: List[Dict[str, Any]] = []
         self.alert_thresholds = {
@@ -279,7 +289,7 @@ class ErrorMonitor:
             }
         }
     
-    def clear_history(self):
+    def clear_history(self) -> Any:
         """Clear error history."""
         self.error_history.clear()
         self.error_counts.clear()
@@ -291,7 +301,7 @@ class ErrorMonitor:
 class ErrorRecovery:
     """Error recovery strategies and fallbacks."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.recovery_strategies = {
             ErrorType.DATABASE: self._database_recovery,
             ErrorType.CACHE: self._cache_recovery,
@@ -374,7 +384,9 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         log_request_body: bool = False,
         log_headers: bool = False
     ):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.enable_recovery = enable_recovery
         self.enable_monitoring = enable_monitoring
         self.log_request_body = log_request_body
@@ -409,7 +421,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
             # Handle unexpected exceptions
             return await self._handle_unexpected_exception(exc, request, start_time)
     
-    def _get_request_id(self, request: Request) -> str:
+    async def _get_request_id(self, request: Request) -> str:
         """Get or generate request ID."""
         return (
             request.headers.get("X-Request-ID") or
@@ -436,7 +448,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
             ip_address=self._get_client_ip(request)
         )
     
-    async def _handle_http_exception(
+    async async def _handle_http_exception(
         self,
         exception: BaseHTTPException,
         request: Request,
@@ -621,13 +633,15 @@ class ErrorMonitoringEndpoints:
     """Endpoints for error monitoring and management."""
     
     def __init__(self, error_monitor: ErrorMonitor):
-        self.error_monitor = error_monitor
+        
+    """__init__ function."""
+self.error_monitor = error_monitor
     
     def get_error_stats(self) -> Dict[str, Any]:
         """Get error statistics."""
         return self.error_monitor.get_error_stats()
     
-    def clear_error_history(self):
+    def clear_error_history(self) -> Any:
         """Clear error history."""
         self.error_monitor.clear_history()
         return {"message": "Error history cleared"}

@@ -1,33 +1,41 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+from typing import List, Optional
+from datetime import datetime
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
+from api.core.async_database import (
+from api.core.repositories import (
+from api.core.migrations import MigrationManager, CommonMigrations
+from config.database_config import get_database_config_by_environment
+        import uuid
+    import uvicorn
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Async Database System Example for HeyGen AI API
 Demonstrates integration with FastAPI, repositories, and health monitoring
 """
 
-import asyncio
-import logging
-from typing import List, Optional
-from datetime import datetime
 
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 
 # Import our async database system
-from api.core.async_database import (
     AsyncDatabaseManager,
     DatabaseConnectionPool,
     get_db_session,
     check_database_health
 )
-from api.core.repositories import (
     UserRepository,
     VideoRepository,
     ModelUsageRepository,
     RepositoryFactory
 )
-from api.core.migrations import MigrationManager, CommonMigrations
-from config.database_config import get_database_config_by_environment
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -344,7 +352,6 @@ async def create_video(
 ):
     """Create a new video generation request."""
     try:
-        import uuid
         
         video_id = f"video_{uuid.uuid4().hex[:8]}"
         
@@ -602,7 +609,6 @@ async def create_sample_data():
 
 
 if __name__ == "__main__":
-    import uvicorn
     
     # Run the application
     uvicorn.run(

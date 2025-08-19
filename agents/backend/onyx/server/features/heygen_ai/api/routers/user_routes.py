@@ -1,17 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Dict, Any, List
+import logging
+from ..core.database import get_session
+from ..core.auth import get_current_user, get_current_admin_user
+from ..models.schemas import (
+from ..services.user_service import (
+from ..utils.helpers import generate_request_id, format_error_message
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 User routes for HeyGen AI API
 Provides user management endpoints with Pydantic models and type hints.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Dict, Any, List
-import logging
 
-from ..core.database import get_session
-from ..core.auth import get_current_user, get_current_admin_user
-from ..models.schemas import (
     UserCreateInput,
     UserUpdateInput,
     UserCreateOutput,
@@ -19,7 +25,6 @@ from ..models.schemas import (
     UserListOutput,
     UserDetailOutput
 )
-from ..services.user_service import (
     create_user,
     get_user_by_id,
     get_user_by_email,
@@ -28,7 +33,6 @@ from ..services.user_service import (
     list_users,
     get_user_statistics
 )
-from ..utils.helpers import generate_request_id, format_error_message
 
 logger = logging.getLogger(__name__)
 

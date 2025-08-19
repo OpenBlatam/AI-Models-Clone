@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Video Routes for HeyGen AI FastAPI
-Well-structured video processing routes with clear dependencies.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Path, UploadFile, File, Form
 from typing import Dict, List, Any, Optional
@@ -11,14 +16,23 @@ import structlog
 import os
 import uuid
 import json
-
 from .base import (
+from api.models.video import VideoCreate, VideoUpdate, VideoResponse, VideoProcessingOptions
+from api.schemas.pagination import PaginationParams
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Video Routes for HeyGen AI FastAPI
+Well-structured video processing routes with clear dependencies.
+"""
+
+
     BaseRoute, RouteCategory, BaseResponse, ErrorResponse, PaginatedResponse,
     route_metrics, require_auth, rate_limit, cache_response,
     get_database_operations, get_current_user, get_request_id
 )
-from api.models.video import VideoCreate, VideoUpdate, VideoResponse, VideoProcessingOptions
-from api.schemas.pagination import PaginationParams
 
 logger = structlog.get_logger()
 
@@ -29,7 +43,7 @@ logger = structlog.get_logger()
 class VideoRoutes(BaseRoute):
     """Video processing routes with clear structure and dependencies."""
     
-    def __init__(self, db_operations, api_operations, file_storage):
+    def __init__(self, db_operations, api_operations, file_storage) -> Any:
         super().__init__(
             name="Video Processing",
             description="Video processing operations including upload, processing, and management",
@@ -46,7 +60,7 @@ class VideoRoutes(BaseRoute):
         # Register routes
         self._register_routes()
     
-    def _register_routes(self):
+    def _register_routes(self) -> Any:
         """Register all video routes with clear organization."""
         
         # =====================================================================

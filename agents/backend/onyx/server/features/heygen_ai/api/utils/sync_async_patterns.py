@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Synchronous and Asynchronous Patterns for HeyGen AI API
-Clear guidelines for when to use def vs async def with practical examples.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -10,13 +15,22 @@ import hashlib
 import json
 import re
 from typing import (
-    Any, Dict, List, Optional, Union, Callable, Awaitable,
-    TypeVar, Generic, Tuple
-)
 from functools import wraps, lru_cache
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import structlog
 from datetime import datetime, timezone
+    import secrets
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Synchronous and Asynchronous Patterns for HeyGen AI API
+Clear guidelines for when to use def vs async def with practical examples.
+"""
+
+    Any, Dict, List, Optional, Union, Callable, Awaitable,
+    TypeVar, Generic, Tuple
+)
 
 logger = structlog.get_logger()
 
@@ -139,14 +153,13 @@ def validate_email_format_sync(email: str) -> str:
         raise ValueError("Invalid email format")
     return email.lower()
 
-def generate_api_key_sync() -> str:
+async def generate_api_key_sync() -> str:
     """
     Synchronous API key generation.
     
     Returns:
         Generated API key
     """
-    import secrets
     return secrets.token_urlsafe(32)
 
 def calculate_age_sync(birth_date: datetime) -> int:
@@ -283,7 +296,7 @@ async def process_video_async(video_data: Dict[str, Any]) -> Dict[str, Any]:
         logger.error("Error processing video asynchronously", error=str(e))
         raise
 
-async def fetch_user_data_async(user_id: int) -> Optional[Dict[str, Any]]:
+async async def fetch_user_data_async(user_id: int) -> Optional[Dict[str, Any]]:
     """
     Asynchronous user data fetching.
     
@@ -350,7 +363,7 @@ def sync_to_async(func: Callable[..., T]) -> Callable[..., Awaitable[T]]:
         Asynchronous wrapper function
     """
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, func, *args, **kwargs)
     return wrapper
@@ -368,7 +381,7 @@ def async_to_sync(func: Callable[..., Awaitable[T]]) -> Callable[..., T]:
         Synchronous wrapper function
     """
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         try:
@@ -513,7 +526,7 @@ class SyncAsyncUtils:
 class UserService:
     """Service class demonstrating sync/async patterns."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.executor = ThreadPoolExecutor(max_workers=4)
     
     def validate_user_sync(self, user_data: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
@@ -684,7 +697,7 @@ class PerformanceOptimizer:
         
         Use async def for parallel I/O operations.
         """
-        async def fetch_url(url: str) -> str:
+        async async def fetch_url(url: str) -> str:
             # Simulate async HTTP request
             await asyncio.sleep(0.1)
             return f"Response from {url}"
@@ -717,7 +730,7 @@ class ErrorHandler:
             Wrapped function that returns None on error
         """
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             try:
                 return func(*args, **kwargs)
             except Exception as e:
@@ -737,7 +750,7 @@ class ErrorHandler:
             Wrapped function that returns None on error
         """
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             try:
                 return await func(*args, **kwargs)
             except Exception as e:
@@ -762,7 +775,9 @@ def demonstrate_sync_async_patterns():
     
     # Asynchronous operations (use async def)
     async def async_demo():
-        # Validate user asynchronously
+        
+    """async_demo function."""
+# Validate user asynchronously
         is_valid, error = await validate_user_async({
             'username': 'john_doe',
             'email': 'john@example.com',

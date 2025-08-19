@@ -1,19 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+from typing import Dict, List, Any, Optional, Union, Generic, TypeVar
+from datetime import datetime, timezone
+from enum import Enum
+from pydantic import (
+import uuid
+from .base_schemas import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 API Response Schemas for HeyGen AI API
 Consistent response formatting and error handling for all endpoints.
 """
 
-from typing import Dict, List, Any, Optional, Union, Generic, TypeVar
-from datetime import datetime, timezone
-from enum import Enum
-from pydantic import (
     BaseModel, Field, validator, root_validator, 
     ConfigDict, computed_field, model_validator
 )
-import uuid
 
-from .base_schemas import (
     BaseResponse, ErrorResponse, DataResponse, PaginatedDataResponse,
     ValidationError, ValidationResponse
 )

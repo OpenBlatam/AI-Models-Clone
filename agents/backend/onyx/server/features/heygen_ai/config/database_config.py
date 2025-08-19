@@ -1,14 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+from typing import Optional, Dict, Any
+from pydantic import BaseSettings, Field
+from api.core.async_database import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Database Configuration for HeyGen AI API
 Environment-based configuration for multiple database backends
 """
 
-import os
-from typing import Optional, Dict, Any
-from pydantic import BaseSettings, Field
 
-from api.core.async_database import (
     DatabaseConfig,
     DatabaseType,
     create_postgresql_config,
@@ -56,7 +69,8 @@ class DatabaseSettings(BaseSettings):
     health_check_interval: int = Field(default=30, env="DATABASE_HEALTH_CHECK_INTERVAL")
     health_check_enabled: bool = Field(default=True, env="DATABASE_HEALTH_CHECK_ENABLED")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "HEYGEN_"
         case_sensitive = False
 

@@ -1,13 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from typing import Dict, Any, Optional, TypeVar, Generic
+from pydantic import BaseModel, Field
+from datetime import datetime
+import logging
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 RORO (Receive an Object, Return an Object) pattern implementation
 Provides base classes and utilities for clean function signatures.
 """
 
-from typing import Dict, Any, Optional, TypeVar, Generic
-from pydantic import BaseModel, Field
-from datetime import datetime
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -23,7 +35,8 @@ class RoroRequest(BaseModel):
     user_id: Optional[str] = Field(None, description="User identifier")
     session_id: Optional[str] = Field(None, description="Session identifier")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -38,7 +51,8 @@ class RoroResponse(BaseModel):
     data: Optional[Dict[str, Any]] = Field(None, description="Response data")
     errors: Optional[list] = Field(None, description="List of errors if any")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -162,7 +176,7 @@ def create_error_response(
     )
 
 
-def validate_roro_request(request_data: Dict[str, Any], request_class: type) -> tuple[bool, Optional[Any], Optional[list]]:
+async def validate_roro_request(request_data: Dict[str, Any], request_class: type) -> tuple[bool, Optional[Any], Optional[list]]:
     """Validate RORO request data against request class"""
     try:
         validated_request = request_class(**request_data)

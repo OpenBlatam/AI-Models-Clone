@@ -1,17 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import (
+from datetime import datetime, timezone
+from enum import Enum
+import structlog
+from fastapi import HTTPException, status
+from pydantic import BaseModel, Field
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 HTTP Exceptions for HeyGen AI API
 Comprehensive exception handling with specific HTTP status codes and structured responses.
 """
 
-from typing import (
     Dict, List, Any, Optional, Union, Type, ClassVar
 )
-from datetime import datetime, timezone
-from enum import Enum
-import structlog
-from fastapi import HTTPException, status
-from pydantic import BaseModel, Field
 
 logger = structlog.get_logger()
 
@@ -84,7 +89,9 @@ class BaseHTTPException(HTTPException):
         retry_after: Optional[int] = None,
         **kwargs
     ):
-        self.message = message or self.get_default_message()
+        
+    """__init__ function."""
+self.message = message or self.get_default_message()
         self.details = details
         self.request_id = request_id
         self.retry_after = retry_after

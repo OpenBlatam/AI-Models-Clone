@@ -1,7 +1,7 @@
-"""
-Advanced AI Workflows for HeyGen AI equivalent.
-Complex workflows using LangChain for sophisticated video generation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -9,8 +9,14 @@ from typing import Dict, List, Optional, Any, Union
 from pathlib import Path
 import json
 from datetime import datetime
-
 from .langchain_manager import LangChainManager
+from typing import Any, List, Dict, Optional
+"""
+Advanced AI Workflows for HeyGen AI equivalent.
+Complex workflows using LangChain for sophisticated video generation.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +41,7 @@ class AdvancedAIWorkflows:
         self.templates = {}
         self.initialized = False
         
-    def initialize(self):
+    def initialize(self) -> Any:
         """Initialize advanced workflows."""
         try:
             self._load_workflow_templates()
@@ -46,7 +52,7 @@ class AdvancedAIWorkflows:
             logger.error(f"Failed to initialize Advanced AI Workflows: {e}")
             raise
     
-    def _load_workflow_templates(self):
+    def _load_workflow_templates(self) -> Any:
         """Load workflow templates for different use cases."""
         self.templates = {
             "educational_series": {
@@ -99,7 +105,7 @@ class AdvancedAIWorkflows:
             }
         }
     
-    def _setup_workflow_chains(self):
+    def _setup_workflow_chains(self) -> Any:
         """Setup LangChain chains for workflows."""
         # Topic research chain
         research_template = """

@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Connection Pooling and Async Optimization for HeyGen AI API
-Efficient connection management for databases, HTTP clients, and external services.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -23,6 +28,14 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import httpx
 import ssl
 import certifi
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Connection Pooling and Async Optimization for HeyGen AI API
+Efficient connection management for databases, HTTP clients, and external services.
+"""
+
 
 logger = structlog.get_logger()
 
@@ -92,7 +105,9 @@ class BaseConnectionPool:
         config: ConnectionConfig,
         pool_strategy: PoolStrategy = PoolStrategy.STATIC
     ):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.pool_strategy = pool_strategy
         self.stats = PoolStats(max_connections=config.pool_size)
         self._connections: List[Any] = []
@@ -102,7 +117,7 @@ class BaseConnectionPool:
         # Start cleanup task
         self._start_cleanup_task()
     
-    async def get_connection(self) -> Any:
+    async def get_connection(self) -> Optional[Dict[str, Any]]:
         """Get connection from pool."""
         async with self._lock:
             if self._connections:
@@ -137,7 +152,7 @@ class BaseConnectionPool:
                 await self._close_connection(connection)
                 self.stats.total_connections -= 1
     
-    async def close_all(self):
+    async def close_all(self) -> Any:
         """Close all connections in pool."""
         async with self._lock:
             for connection in self._connections:
@@ -178,10 +193,12 @@ class BaseConnectionPool:
         
         raise TimeoutError("Connection pool timeout")
     
-    def _start_cleanup_task(self):
+    def _start_cleanup_task(self) -> Any:
         """Start periodic cleanup task."""
         async def cleanup():
-            while True:
+            
+    """cleanup function."""
+while True:
                 try:
                     await asyncio.sleep(300)  # Cleanup every 5 minutes
                     await self._cleanup_idle_connections()
@@ -192,7 +209,7 @@ class BaseConnectionPool:
         
         self._cleanup_task = asyncio.create_task(cleanup())
     
-    async def _cleanup_idle_connections(self):
+    async def _cleanup_idle_connections(self) -> Any:
         """Cleanup idle connections."""
         async with self._lock:
             current_time = datetime.now(timezone.utc)
@@ -234,7 +251,9 @@ class DatabaseConnectionPool(BaseConnectionPool):
     """Database connection pool using SQLAlchemy."""
     
     def __init__(self, config: ConnectionConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         
         # Create SQLAlchemy engine
         self.engine = create_async_engine(
@@ -264,7 +283,7 @@ class DatabaseConnectionPool(BaseConnectionPool):
         )
     
     @asynccontextmanager
-    async def get_session(self):
+    async def get_session(self) -> Optional[Dict[str, Any]]:
         """Get database session with automatic cleanup."""
         session = self.session_factory()
         try:
@@ -367,7 +386,9 @@ class RedisConnectionPool(BaseConnectionPool):
     """Redis connection pool."""
     
     def __init__(self, config: ConnectionConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         
         # Create Redis connection pool
         self.redis_pool = redis.ConnectionPool.from_url(
@@ -449,7 +470,9 @@ class HTTPConnectionPool(BaseConnectionPool):
     """HTTP connection pool using aiohttp."""
     
     def __init__(self, config: ConnectionConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         
         # SSL context
         ssl_context = None
@@ -482,7 +505,7 @@ class HTTPConnectionPool(BaseConnectionPool):
             }
         )
     
-    async def request(
+    async async def request(
         self,
         method: str,
         url: str,
@@ -553,7 +576,7 @@ class HTTPConnectionPool(BaseConnectionPool):
                 (self.stats.avg_query_time_ms + duration_ms) / 2
             )
     
-    async def close_all(self):
+    async def close_all(self) -> Any:
         """Close all HTTP connections."""
         await super().close_all()
         await self.session.close()
@@ -566,7 +589,9 @@ class MongoDBConnectionPool(BaseConnectionPool):
     """MongoDB connection pool using motor."""
     
     def __init__(self, config: ConnectionConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         
         # Create MongoDB client
         self.client = AsyncIOMotorClient(
@@ -663,7 +688,7 @@ class MongoDBConnectionPool(BaseConnectionPool):
 class ConnectionPoolManager:
     """Manages multiple connection pools."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.pools: Dict[str, BaseConnectionPool] = {}
         self._lock = asyncio.Lock()
     
@@ -704,7 +729,7 @@ class ConnectionPoolManager:
                 await pool.close_all()
                 del self.pools[name]
     
-    async def close_all(self):
+    async def close_all(self) -> Any:
         """Close all connection pools."""
         async with self._lock:
             for pool in self.pools.values():
@@ -752,7 +777,9 @@ class AsyncOptimizer:
     """Async optimization utilities."""
     
     def __init__(self, max_concurrent_tasks: int = 100):
-        self.max_concurrent_tasks = max_concurrent_tasks
+        
+    """__init__ function."""
+self.max_concurrent_tasks = max_concurrent_tasks
         self.semaphore = asyncio.Semaphore(max_concurrent_tasks)
         self.task_stats = {
             "total_tasks": 0,
@@ -769,7 +796,7 @@ class AsyncOptimizer:
         """Run tasks concurrently with controlled concurrency."""
         semaphore = asyncio.Semaphore(max_concurrent or self.max_concurrent_tasks)
         
-        async def run_task(task):
+        async def run_task(task) -> Any:
             async with semaphore:
                 self.task_stats["total_tasks"] += 1
                 self.task_stats["active_tasks"] += 1

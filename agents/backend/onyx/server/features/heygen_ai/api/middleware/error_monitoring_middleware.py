@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Error Monitoring Middleware for HeyGen AI API
-Real-time error tracking, alerting, metrics collection, and error analysis.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -19,8 +24,16 @@ from dataclasses import dataclass, asdict
 from enum import Enum
 import traceback
 import hashlib
-
 from ..exceptions.http_exceptions import (
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Error Monitoring Middleware for HeyGen AI API
+Real-time error tracking, alerting, metrics collection, and error analysis.
+"""
+
+
     BaseHTTPException, ErrorCategory, ErrorSeverity
 )
 
@@ -87,7 +100,9 @@ class ErrorMetricsCollector:
     """Collect and track error metrics."""
     
     def __init__(self, retention_hours: int = 24):
-        self.retention_hours = retention_hours
+        
+    """__init__ function."""
+self.retention_hours = retention_hours
         self.error_counts: Dict[str, int] = defaultdict(int)
         self.error_timeline: deque = deque(maxlen=10000)
         self.error_patterns: Dict[str, int] = defaultdict(int)
@@ -117,7 +132,7 @@ class ErrorMetricsCollector:
         # Clean old data
         self._clean_old_data()
     
-    def _clean_old_data(self):
+    def _clean_old_data(self) -> Any:
         """Clean old error data."""
         cutoff_time = datetime.now(timezone.utc) - timedelta(hours=self.retention_hours)
         
@@ -180,7 +195,7 @@ class ErrorMetricsCollector:
 class ErrorAlertingSystem:
     """Alert system for error monitoring."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.alert_rules: List[Dict[str, Any]] = []
         self.alert_history: List[Dict[str, Any]] = []
         self.alert_channels: Dict[str, Callable] = {}
@@ -230,12 +245,7 @@ class ErrorAlertingSystem:
             "timestamp": datetime.now(timezone.utc),
             "rule_name": rule["name"],
             "alert_level": rule["alert_level"].value,
-            "message": rule["message_template"].format(
-                error_type=error_event.error_type.value,
-                error_message=error_event.error_message,
-                endpoint=error_event.endpoint or "unknown",
-                user_id=error_event.user_id or "unknown"
-            ),
+            "message": rule["message_template"f"]",
             "error_event": error_event.to_dict()
         }
         
@@ -255,7 +265,7 @@ class ErrorAlertingSystem:
             except Exception as e:
                 logger.error(f"Failed to send alert through channel {channel_name}", error=str(e))
     
-    def setup_default_alerts(self):
+    def setup_default_alerts(self) -> Any:
         """Setup default alert rules."""
         # High error rate alert
         self.add_alert_rule(
@@ -308,7 +318,7 @@ class ErrorAlertingSystem:
 class ErrorAnalysisEngine:
     """Analyze errors for patterns and insights."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_patterns: Dict[str, Dict[str, Any]] = {}
         self.error_correlations: Dict[str, List[str]] = defaultdict(list)
         self.root_cause_analysis: Dict[str, str] = {}
@@ -422,7 +432,7 @@ class ErrorAnalysisEngine:
 class ErrorRecoveryStrategies:
     """Error recovery strategies and fallbacks."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.recovery_strategies: Dict[ErrorType, Callable] = {
             ErrorType.DATABASE_ERROR: self._database_recovery,
             ErrorType.CACHE_ERROR: self._cache_recovery,
@@ -513,7 +523,9 @@ class ErrorMonitoringMiddleware(BaseHTTPMiddleware):
         enable_recovery: bool = True,
         retention_hours: int = 24
     ):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         
         self.enable_metrics = enable_metrics
         self.enable_alerting = enable_alerting
@@ -741,7 +753,9 @@ class ErrorMonitoringEndpoints:
     """Endpoints for error monitoring and management."""
     
     def __init__(self, middleware: ErrorMonitoringMiddleware):
-        self.middleware = middleware
+        
+    """__init__ function."""
+self.middleware = middleware
     
     def get_metrics(self) -> Dict[str, Any]:
         """Get error metrics."""

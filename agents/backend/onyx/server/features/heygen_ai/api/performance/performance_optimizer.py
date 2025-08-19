@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-Performance Optimizer for HeyGen AI FastAPI
-Advanced optimization strategies for improving API performance.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -24,10 +32,18 @@ from concurrent.futures import ThreadPoolExecutor
 import hashlib
 import pickle
 import zlib
-
 from fastapi import Request, Response, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from pydantic import BaseModel, Field, validator
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Performance Optimizer for HeyGen AI FastAPI
+Advanced optimization strategies for improving API performance.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -90,7 +106,9 @@ class IntelligentCache:
     """Intelligent caching system with adaptive strategies."""
     
     def __init__(self, config: OptimizationConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.cache: Dict[str, Any] = {}
         self.access_count: Dict[str, int] = defaultdict(int)
         self.last_access: Dict[str, datetime] = {}
@@ -101,12 +119,12 @@ class IntelligentCache:
         self._lock = threading.Lock()
         self._cleanup_task: Optional[asyncio.Task] = None
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start the cache system."""
         self._cleanup_task = asyncio.create_task(self._cleanup_loop())
         logger.info("Intelligent cache system started")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop the cache system."""
         if self._cleanup_task:
             self._cleanup_task.cancel()
@@ -168,7 +186,7 @@ class IntelligentCache:
                 return True
             return False
     
-    def clear(self):
+    def clear(self) -> Any:
         """Clear all cache entries."""
         with self._lock:
             self.cache.clear()
@@ -301,7 +319,7 @@ class IntelligentCache:
             self.delete(key)
             freed_size += size
     
-    async def _cleanup_loop(self):
+    async def _cleanup_loop(self) -> Any:
         """Background cleanup loop."""
         while True:
             try:
@@ -312,7 +330,7 @@ class IntelligentCache:
             except Exception as e:
                 logger.error(f"Cache cleanup error: {e}")
     
-    def _cleanup_expired(self):
+    def _cleanup_expired(self) -> Any:
         """Cleanup expired entries."""
         now = datetime.now(timezone.utc)
         expired_keys = []
@@ -343,7 +361,9 @@ class QueryOptimizer:
     """Database query optimization system."""
     
     def __init__(self, config: OptimizationConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.query_stats: Dict[str, Dict[str, Any]] = defaultdict(lambda: {
             "count": 0,
             "total_time": 0.0,
@@ -467,7 +487,9 @@ class CompressionOptimizer:
     """Response compression optimization."""
     
     def __init__(self, config: OptimizationConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.compression_stats = {
             "compressed_responses": 0,
             "total_bytes_saved": 0,
@@ -522,7 +544,9 @@ class BatchProcessor:
     """Batch processing for multiple operations."""
     
     def __init__(self, config: OptimizationConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.batch_queue: Dict[str, List[Any]] = defaultdict(list)
         self.batch_timers: Dict[str, asyncio.Task] = {}
         self.batch_handlers: Dict[str, Callable] = {}
@@ -595,7 +619,9 @@ class BackgroundTaskManager:
     """Background task processing manager."""
     
     def __init__(self, config: OptimizationConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.task_queue: asyncio.Queue = asyncio.Queue()
         self.workers: List[asyncio.Task] = []
         self.task_stats = {
@@ -606,7 +632,7 @@ class BackgroundTaskManager:
         }
         self._is_running = False
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start background task manager."""
         if self._is_running:
             return
@@ -620,7 +646,7 @@ class BackgroundTaskManager:
         
         logger.info(f"Background task manager started with {self.config.background_workers} workers")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop background task manager."""
         if not self._is_running:
             return
@@ -696,7 +722,9 @@ class PerformanceOptimizer:
     """Main performance optimization system."""
     
     def __init__(self, config: OptimizationConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.cache = IntelligentCache(config)
         self.query_optimizer = QueryOptimizer(config)
         self.compression_optimizer = CompressionOptimizer(config)
@@ -705,7 +733,7 @@ class PerformanceOptimizer:
         self.metrics = OptimizationMetrics()
         self._is_initialized = False
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the performance optimizer."""
         if self._is_initialized:
             return
@@ -721,7 +749,7 @@ class PerformanceOptimizer:
         self._is_initialized = True
         logger.info("Performance optimizer initialized")
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup the performance optimizer."""
         if not self._is_initialized:
             return
@@ -763,7 +791,7 @@ def optimize_performance(cache_key: str = None, ttl: int = None, compress: bool 
     """Decorator for performance optimization."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # This would be used with the performance optimizer
             # The actual optimization would happen at the function level
             return await func(*args, **kwargs)
@@ -774,7 +802,7 @@ def batch_operation(batch_type: str):
     """Decorator for batch operations."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # This would be used with the batch processor
             # The actual batching would happen at the function level
             return await func(*args, **kwargs)
@@ -785,7 +813,7 @@ def background_task():
     """Decorator for background tasks."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # This would be used with the background task manager
             # The actual background processing would happen at the function level
             return await func(*args, **kwargs)

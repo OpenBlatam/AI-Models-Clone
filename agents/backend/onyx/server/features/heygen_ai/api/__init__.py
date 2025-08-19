@@ -1,9 +1,5 @@
-#!/usr/bin/env python3
-"""
-HeyGen AI FastAPI Application
-Main API module with comprehensive error handling, middleware, and router configuration.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -13,8 +9,22 @@ import logging
 import time
 from contextlib import asynccontextmanager
 from typing import Dict, Any
-
 from .core.error_handling import (
+from .core.database import init_database, close_database
+from .core.auth import setup_auth_middleware
+from .routers import (
+from .utils.helpers import generate_request_id
+    from pydantic import ValidationError as PydanticValidationError
+    from fastapi import HTTPException
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+HeyGen AI FastAPI Application
+Main API module with comprehensive error handling, middleware, and router configuration.
+"""
+
+
     HeyGenBaseError,
     heygen_exception_handler,
     pydantic_validation_handler,
@@ -23,16 +33,12 @@ from .core.error_handling import (
     ErrorCategory,
     ErrorSeverity
 )
-from .core.database import init_database, close_database
-from .core.auth import setup_auth_middleware
-from .routers import (
     video_router,
     user_router,
     auth_router,
     admin_router,
     analytics_router
 )
-from .utils.helpers import generate_request_id
 
 # Configure logging
 logging.basicConfig(
@@ -128,15 +134,13 @@ def setup_exception_handlers(app: FastAPI) -> None:
     app.add_exception_handler(Exception, general_exception_handler)
     
     # Register Pydantic validation error handler
-    from pydantic import ValidationError as PydanticValidationError
     app.add_exception_handler(PydanticValidationError, pydantic_validation_handler)
     
     # Register HTTP exception handler
-    from fastapi import HTTPException
     app.add_exception_handler(HTTPException, http_exception_handler)
 
 
-def setup_request_middleware(app: FastAPI) -> None:
+async def setup_request_middleware(app: FastAPI) -> None:
     """Setup request middleware for request tracking and timing"""
     
     @app.middleware("http")

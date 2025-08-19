@@ -1,16 +1,34 @@
-#!/usr/bin/env python3
-"""
-Video service module using RORO pattern
-Provides video-related operations with comprehensive type hints and Pydantic models.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import Dict, Any, List, Optional, Union
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, insert, update, delete
 import logging
 from datetime import datetime
-
 from ..core.roro import (
+from ..models.video import Video
+from ..models.schemas import (
+from ..utils.helpers import (
+from ..utils.validators import validate_video_id
+        import os
+    from sqlalchemy import select
+    from sqlalchemy import select
+        import os
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Video service module using RORO pattern
+Provides video-related operations with comprehensive type hints and Pydantic models.
+"""
+
+
     VideoGenerationRequest,
     VideoGenerationResponse,
     VideoStatusRequest,
@@ -20,8 +38,6 @@ from ..core.roro import (
     create_success_response,
     create_error_response
 )
-from ..models.video import Video
-from ..models.schemas import (
     VideoGenerationInput,
     VideoStatusInput,
     UserVideosInput,
@@ -32,14 +48,12 @@ from ..models.schemas import (
     VideoStatus,
     ProcessingSettings
 )
-from ..utils.helpers import (
     generate_video_id, 
     create_output_directory,
     calculate_progress,
     generate_thumbnail_url,
     validate_video_id_format
 )
-from ..utils.validators import validate_video_id
 
 logger = logging.getLogger(__name__)
 
@@ -382,7 +396,6 @@ def delete_video_file(file_path: Optional[str]) -> None:
         return
     
     try:
-        import os
         if os.path.exists(file_path):
             os.remove(file_path)
     except Exception as e:
@@ -391,7 +404,6 @@ def delete_video_file(file_path: Optional[str]) -> None:
 
 def build_user_videos_query(request: UserVideosRequest):
     """Build user videos query (pure function)"""
-    from sqlalchemy import select
     
     query = select(Video).where(Video.user_id == request.user_id)
     
@@ -414,7 +426,6 @@ def build_user_videos_query(request: UserVideosRequest):
 
 def build_count_query(request: UserVideosRequest):
     """Build count query (pure function)"""
-    from sqlalchemy import select
     
     query = select(Video).where(Video.user_id == request.user_id)
     
@@ -461,7 +472,6 @@ def get_video_file_size(video: Video) -> Optional[int]:
         return None
     
     try:
-        import os
         return os.path.getsize(video.file_path)
     except Exception:
         return None

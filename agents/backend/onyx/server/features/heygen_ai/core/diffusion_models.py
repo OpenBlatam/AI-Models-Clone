@@ -1,7 +1,10 @@
-"""
-Advanced Diffusion Models for HeyGen AI.
-Implements multiple diffusion pipelines, training, evaluation, and Gradio integration.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import torch
 import torch.nn as nn
@@ -21,24 +24,31 @@ from dataclasses import dataclass
 import numpy as np
 from pathlib import Path
 import warnings
-
 from transformers import (
-    AutoTokenizer, AutoModel, AutoModelForCausalLM, AutoModelForSeq2SeqLM,
-    PreTrainedTokenizer, PreTrainedModel, TrainingArguments, Trainer,
-    DataCollatorForLanguageModeling, DataCollatorForSeq2Seq
-)
 from diffusers import (
-    DiffusionPipeline, DDIMScheduler, DDPMScheduler, 
-    UNet2DConditionModel, AutoencoderKL, StableDiffusionPipeline,
-    StableDiffusionXLPipeline, ControlNetPipeline, TextToVideoPipeline,
-    EulerDiscreteScheduler, DPMSolverMultistepScheduler
-)
 from peft import LoraConfig, get_peft_model, TaskType
 from accelerate import Accelerator
 import gradio as gr
 from tqdm import tqdm
 import wandb
 from torch.utils.tensorboard import SummaryWriter
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Advanced Diffusion Models for HeyGen AI.
+Implements multiple diffusion pipelines, training, evaluation, and Gradio integration.
+"""
+
+
+    AutoTokenizer, AutoModel, AutoModelForCausalLM, AutoModelForSeq2SeqLM,
+    PreTrainedTokenizer, PreTrainedModel, TrainingArguments, Trainer,
+    DataCollatorForLanguageModeling, DataCollatorForSeq2Seq
+)
+    DiffusionPipeline, DDIMScheduler, DDPMScheduler, 
+    UNet2DConditionModel, AutoencoderKL, StableDiffusionPipeline,
+    StableDiffusionXLPipeline, ControlNetPipeline, TextToVideoPipeline,
+    EulerDiscreteScheduler, DPMSolverMultistepScheduler
+)
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +74,9 @@ class DiffusionPipelineManager:
     """Manages multiple diffusion pipelines for different tasks."""
     
     def __init__(self, config: DiffusionConfig = None):
-        self.config = config or DiffusionConfig()
+        
+    """__init__ function."""
+self.config = config or DiffusionConfig()
         self.pipelines = {}
         self.schedulers = {}
         self.device = self.config.device
@@ -168,7 +180,9 @@ class DiffusionDataset(Dataset):
     """Custom dataset for diffusion model training."""
     
     def __init__(self, data_path: str, tokenizer, max_length: int = 77):
-        self.data_path = data_path
+        
+    """__init__ function."""
+self.data_path = data_path
         self.tokenizer = tokenizer
         self.max_length = max_length
         self.data = self._load_data()
@@ -213,7 +227,9 @@ class DiffusionTrainer:
     """Advanced trainer for diffusion models with proper error handling and optimization."""
     
     def __init__(self, model: nn.Module, config: DiffusionConfig = None):
-        self.model = model
+        
+    """__init__ function."""
+self.model = model
         self.config = config or DiffusionConfig()
         self.device = self.config.device
         self.scaler = GradScaler() if self.config.use_fp16 else None
@@ -225,7 +241,7 @@ class DiffusionTrainer:
         # Setup logging
         self.setup_logging()
     
-    def setup_distributed_training(self):
+    def setup_distributed_training(self) -> Any:
         """Setup distributed training if multiple GPUs are available."""
         if torch.cuda.device_count() > 1:
             if dist.is_available():
@@ -235,7 +251,7 @@ class DiffusionTrainer:
                 self.model = DataParallel(self.model)
             self.logger.info(f"Using {torch.cuda.device_count()} GPUs for training")
     
-    def setup_logging(self):
+    def setup_logging(self) -> Any:
         """Setup experiment tracking."""
         try:
             wandb.init(project="diffusion-training", config=vars(self.config))
@@ -337,7 +353,9 @@ class GradioInterface:
     """Gradio interface for diffusion model inference."""
     
     def __init__(self, pipeline_manager: DiffusionPipelineManager):
-        self.pipeline_manager = pipeline_manager
+        
+    """__init__ function."""
+self.pipeline_manager = pipeline_manager
         self.logger = logging.getLogger(__name__)
     
     def create_interface(self) -> gr.Interface:
@@ -422,7 +440,7 @@ class GradioInterface:
 class PerformanceProfiler:
     """Profiler for identifying performance bottlenecks."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = logging.getLogger(__name__)
     
     def profile_model(self, model: nn.Module, input_data: torch.Tensor, 
@@ -514,5 +532,6 @@ def main():
         raise
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

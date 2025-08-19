@@ -1,14 +1,16 @@
-"""
-LangChain Manager for HeyGen AI equivalent.
-Handles LangChain integration with OpenRouter for advanced AI capabilities.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import logging
 from typing import Dict, List, Optional, Any, Union
 from pathlib import Path
 import json
-
 from langchain.llms import OpenRouter
 from langchain.chat_models import ChatOpenRouter
 from langchain.schema import HumanMessage, SystemMessage, AIMessage
@@ -23,6 +25,13 @@ from langchain.embeddings import OpenAIEmbeddings
 from langchain.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.document_loaders import TextLoader
+from typing import Any, List, Dict, Optional
+"""
+LangChain Manager for HeyGen AI equivalent.
+Handles LangChain integration with OpenRouter for advanced AI capabilities.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -50,7 +59,7 @@ class LangChainManager:
         self.vectorstores = {}
         self.initialized = False
         
-    def initialize(self):
+    def initialize(self) -> Any:
         """Initialize LangChain components and models."""
         try:
             # Initialize OpenRouter models
@@ -72,7 +81,7 @@ class LangChainManager:
             logger.error(f"Failed to initialize LangChain Manager: {e}")
             raise
     
-    def _initialize_models(self):
+    def _initialize_models(self) -> Any:
         """Initialize different AI models via OpenRouter."""
         logger.info("Initializing OpenRouter models...")
         
@@ -110,7 +119,7 @@ class LangChainManager:
             )
         }
     
-    def _initialize_chains(self):
+    def _initialize_chains(self) -> Any:
         """Initialize LangChain chains for different tasks."""
         logger.info("Initializing LangChain chains...")
         
@@ -233,7 +242,7 @@ class LangChainManager:
             )
         )
     
-    def _initialize_memories(self):
+    def _initialize_memories(self) -> Any:
         """Initialize conversation memories."""
         logger.info("Initializing conversation memories...")
         
@@ -252,7 +261,7 @@ class LangChainManager:
             )
         }
     
-    def _initialize_agents(self):
+    def _initialize_agents(self) -> Any:
         """Initialize LangChain agents for complex workflows."""
         logger.info("Initializing LangChain agents...")
         

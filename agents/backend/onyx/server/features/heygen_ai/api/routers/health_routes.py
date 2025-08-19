@@ -1,25 +1,35 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
+import logging
+import time
+from typing import Dict, Any, Optional
+from ..core.roro import (
+from ..core.database import get_session
+from ..utils.helpers import get_system_version, get_uptime
+import asyncio
+        import os
+        import psutil
+        from ..core.database import get_session
+        import os
+        import psutil
+        import psutil
+        import platform
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Health routes using RORO pattern
 Provides health check and system status endpoints.
 """
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.ext.asyncio import AsyncSession
-import logging
-import time
-from typing import Dict, Any, Optional
 
-from ..core.roro import (
     HealthCheckRequest,
     HealthCheckResponse,
     create_success_response,
     create_error_response,
     validate_roro_request
 )
-from ..core.database import get_session
-from ..utils.helpers import get_system_version, get_uptime
-import asyncio
 
 logger = logging.getLogger(__name__)
 
@@ -195,18 +205,24 @@ async def check_core_components(
         components["database"] = True
         
         # Check file system
-        import os
         test_file = "/tmp/health_check_test"
         try:
             with open(test_file, "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write("test")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             os.remove(test_file)
             components["file_system"] = True
         except Exception:
             pass
         
         # Check memory usage
-        import psutil
         memory = psutil.virtual_memory()
         if memory.percent < 90:  # Less than 90% memory usage
             components["memory"] = True
@@ -290,7 +306,6 @@ async def check_readiness() -> bool:
     
     try:
         # Check database connectivity
-        from ..core.database import get_session
         async with get_session() as session:
             await session.execute("SELECT 1")
         
@@ -298,7 +313,6 @@ async def check_readiness() -> bool:
         # In production, check if AI models are loaded and ready
         
         # Check if file system is accessible
-        import os
         test_dir = "/tmp"
         if not os.access(test_dir, os.W_OK):
             return False
@@ -318,7 +332,6 @@ async def check_liveness() -> bool:
         # In production, add more comprehensive checks
         
         # Check memory usage
-        import psutil
         memory = psutil.virtual_memory()
         if memory.percent > 95:  # More than 95% memory usage
             return False
@@ -337,8 +350,6 @@ async def get_system_status() -> Dict[str, Any]:
     """Get comprehensive system status information"""
     
     try:
-        import psutil
-        import platform
         
         # System information
         system_info = {

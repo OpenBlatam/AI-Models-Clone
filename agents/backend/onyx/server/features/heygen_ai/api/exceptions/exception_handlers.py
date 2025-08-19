@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Exception Handlers for HeyGen AI API
-Comprehensive exception handling with structured responses and logging.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import Dict, Any, Optional, Union
 from fastapi import FastAPI, Request, status
@@ -11,8 +16,23 @@ from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 import structlog
 from datetime import datetime, timezone
-
 from .http_exceptions import (
+import uuid
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import Response
+    from fastapi import FastAPI
+    from .exceptions.exception_handlers import register_exception_handlers, RequestIDMiddleware
+    from .exceptions.http_exceptions import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Exception Handlers for HeyGen AI API
+Comprehensive exception handling with structured responses and logging.
+"""
+
+
     BaseHTTPException, ValidationError, AuthenticationError,
     AuthorizationError, NotFoundError, RateLimitError,
     ExternalServiceError, ResourceConflictError, PayloadTooLargeError,
@@ -27,7 +47,7 @@ logger = structlog.get_logger()
 # Exception Handler Functions
 # =============================================================================
 
-async def http_exception_handler(
+async async def http_exception_handler(
     request: Request,
     exc: BaseHTTPException
 ) -> JSONResponse:
@@ -82,7 +102,7 @@ async def validation_exception_handler(
         content=error_response
     )
 
-async def starlette_http_exception_handler(
+async async def starlette_http_exception_handler(
     request: Request,
     exc: StarletteHTTPException
 ) -> JSONResponse:
@@ -233,15 +253,14 @@ def register_exception_handlers(app: FastAPI):
 # Middleware for Request ID
 # =============================================================================
 
-import uuid
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.responses import Response
 
 class RequestIDMiddleware(BaseHTTPMiddleware):
     """Middleware to add request ID to all requests."""
     
     async def dispatch(self, request: Request, call_next):
-        # Generate request ID if not present
+        
+    """dispatch function."""
+# Generate request ID if not present
         request_id = request.headers.get("X-Request-ID")
         if not request_id:
             request_id = str(uuid.uuid4())
@@ -350,8 +369,6 @@ def example_usage():
     """Example of how to use the exception system."""
     
     # In your FastAPI app
-    from fastapi import FastAPI
-    from .exceptions.exception_handlers import register_exception_handlers, RequestIDMiddleware
     
     app = FastAPI()
     
@@ -362,14 +379,15 @@ def example_usage():
     app.add_middleware(RequestIDMiddleware)
     
     # In your route handlers
-    from .exceptions.http_exceptions import (
         ValidationError, UserNotFoundError, RateLimitError,
         ExceptionFactory
     )
     
     @app.get("/users/{user_id}")
     async def get_user(user_id: int):
-        # Example: User not found
+        
+    """get_user function."""
+# Example: User not found
         if user_id > 1000:
             raise UserNotFoundError(
                 message=f"User with ID {user_id} not found",
@@ -387,7 +405,9 @@ def example_usage():
     
     @app.post("/videos")
     async def create_video(video_data: dict):
-        # Example: Validation error
+        
+    """create_video function."""
+# Example: Validation error
         if not video_data.get("script"):
             raise ValidationError(
                 message="Script is required for video creation",

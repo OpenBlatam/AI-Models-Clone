@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Compatibility testing script for HeyGen AI dependencies.
-Tests PyTorch, Transformers, Diffusers, and Gradio compatibility.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import sys
 import subprocess
@@ -10,6 +15,30 @@ import importlib
 import warnings
 from typing import List, Tuple, Dict, Any
 import logging
+            import torch
+            from transformers import AutoTokenizer, AutoModel
+            import torch
+            from diffusers import StableDiffusionPipeline
+            import gradio as gr
+            import torch
+            from transformers import AutoTokenizer, AutoModel
+            from diffusers import StableDiffusionPipeline
+            import gradio as gr
+            import torch
+            import time
+            from transformers import AutoTokenizer
+            import os
+        from packaging import version
+    import argparse
+        import json
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Compatibility testing script for HeyGen AI dependencies.
+Tests PyTorch, Transformers, Diffusers, and Gradio compatibility.
+"""
+
 
 # Configure logging
 logging.basicConfig(
@@ -25,7 +54,7 @@ warnings.filterwarnings("ignore")
 class CompatibilityTester:
     """Comprehensive compatibility testing for HeyGen AI dependencies."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.results = {}
         self.required_modules = [
             'torch',
@@ -113,7 +142,6 @@ class CompatibilityTester:
         logger.info("Testing PyTorch functionality...")
         
         try:
-            import torch
             
             # Test basic tensor operations
             x = torch.randn(2, 3)
@@ -149,7 +177,6 @@ class CompatibilityTester:
         logger.info("Testing Transformers functionality...")
         
         try:
-            from transformers import AutoTokenizer, AutoModel
             
             # Test tokenizer
             tokenizer = AutoTokenizer.from_pretrained("gpt2")
@@ -184,8 +211,6 @@ class CompatibilityTester:
         logger.info("Testing Diffusers functionality...")
         
         try:
-            import torch
-            from diffusers import StableDiffusionPipeline
             
             # Test pipeline loading
             pipe = StableDiffusionPipeline.from_pretrained(
@@ -216,10 +241,9 @@ class CompatibilityTester:
         logger.info("Testing Gradio functionality...")
         
         try:
-            import gradio as gr
             
             # Test basic interface creation
-            def dummy_function(x):
+            def dummy_function(x) -> Any:
                 return f"Processed: {x}"
             
             demo = gr.Interface(
@@ -256,13 +280,9 @@ class CompatibilityTester:
         logger.info("Testing library integration...")
         
         try:
-            import torch
-            from transformers import AutoTokenizer, AutoModel
-            from diffusers import StableDiffusionPipeline
-            import gradio as gr
             
             # Test end-to-end pipeline
-            def test_pipeline(text):
+            def test_pipeline(text) -> Any:
                 # Tokenize
                 tokenizer = AutoTokenizer.from_pretrained("gpt2")
                 if tokenizer.pad_token is None:
@@ -301,8 +321,6 @@ class CompatibilityTester:
         logger.info("Testing performance characteristics...")
         
         try:
-            import torch
-            import time
             
             # Test GPU availability
             if torch.cuda.is_available():
@@ -351,13 +369,11 @@ class CompatibilityTester:
         
         try:
             # Test safe model loading
-            from transformers import AutoTokenizer
             
             # Test with trusted model
             tokenizer = AutoTokenizer.from_pretrained("gpt2", trust_remote_code=False)
             
             # Test environment variable handling
-            import os
             if 'HF_TOKEN' in os.environ:
                 logger.info("✓ Hugging Face token found")
                 self.results['hf_token'] = True
@@ -376,7 +392,6 @@ class CompatibilityTester:
     
     def _compare_versions(self, version1: str, version2: str) -> int:
         """Compare two version strings."""
-        from packaging import version
         
         try:
             v1 = version.parse(version1)
@@ -468,7 +483,6 @@ class CompatibilityTester:
 
 def main():
     """Main function for compatibility testing."""
-    import argparse
     
     parser = argparse.ArgumentParser(description="Test compatibility of HeyGen AI dependencies")
     parser.add_argument("--verbose", "-v", action="store_true", help="Verbose output")
@@ -486,11 +500,14 @@ def main():
     
     # Generate report if requested
     if args.report or args.output:
-        import json
         report = tester.generate_report()
         
         if args.output:
             with open(args.output, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(report, f, indent=2)
             logger.info(f"Report saved to {args.output}")
         else:
@@ -500,5 +517,6 @@ def main():
     sys.exit(0 if success else 1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

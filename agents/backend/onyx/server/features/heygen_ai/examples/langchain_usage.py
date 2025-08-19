@@ -1,12 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+from pathlib import Path
+from ..core import HeyGenAI, VideoRequest
+from typing import Any, List, Dict, Optional
 """
 LangChain and OpenRouter usage examples for HeyGen AI equivalent.
 """
 
-import asyncio
-import logging
-from pathlib import Path
 
-from ..core import HeyGenAI, VideoRequest
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -269,5 +272,6 @@ async def main():
     logger.info("All LangChain examples completed!")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

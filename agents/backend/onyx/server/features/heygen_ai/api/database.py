@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-"""
-Database models and operations for HeyGen AI API
-SQLAlchemy-based database layer with async support.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 from sqlalchemy import Column, Integer, String, DateTime, Float, Boolean, Text, ForeignKey
 from sqlalchemy.ext.declarative import declarative_base
@@ -12,6 +11,14 @@ from sqlalchemy.sql import func
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 import logging
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Database models and operations for HeyGen AI API
+SQLAlchemy-based database layer with async support.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -75,11 +82,13 @@ class DatabaseManager:
     """Database manager for async operations."""
     
     def __init__(self, database_url: str):
-        self.database_url = database_url
+        
+    """__init__ function."""
+self.database_url = database_url
         self.engine = None
         self.async_session = None
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize database connection and create tables."""
         try:
             # Create async engine
@@ -107,7 +116,7 @@ class DatabaseManager:
             logger.error(f"Failed to initialize database: {e}")
             raise
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close database connections."""
         if self.engine:
             await self.engine.dispose()
@@ -124,7 +133,9 @@ class VideoRepository:
     """Repository for video-related database operations."""
     
     def __init__(self, db_manager: DatabaseManager):
-        self.db_manager = db_manager
+        
+    """__init__ function."""
+self.db_manager = db_manager
     
     async def create_video(self, video_data: Dict[str, Any]) -> Video:
         """Create a new video record."""
@@ -226,7 +237,9 @@ class UserRepository:
     """Repository for user-related database operations."""
     
     def __init__(self, db_manager: DatabaseManager):
-        self.db_manager = db_manager
+        
+    """__init__ function."""
+self.db_manager = db_manager
     
     async def create_user(self, user_data: Dict[str, Any]) -> User:
         """Create a new user."""
@@ -237,7 +250,7 @@ class UserRepository:
             await session.refresh(user)
             return user
     
-    async def get_user_by_api_key(self, api_key: str) -> Optional[User]:
+    async async def get_user_by_api_key(self, api_key: str) -> Optional[User]:
         """Get user by API key."""
         async with self.db_manager.get_session() as session:
             result = await session.execute(
@@ -280,7 +293,9 @@ class ModelUsageRepository:
     """Repository for model usage tracking."""
     
     def __init__(self, db_manager: DatabaseManager):
-        self.db_manager = db_manager
+        
+    """__init__ function."""
+self.db_manager = db_manager
     
     async def log_usage(self, usage_data: Dict[str, Any]) -> ModelUsage:
         """Log model usage."""

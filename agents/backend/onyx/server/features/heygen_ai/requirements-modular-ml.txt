@@ -1,0 +1,45 @@
+# Modular ML Structure Implementation Requirements
+# Core dependencies for modular machine learning project structure
+
+# Core deep learning framework
+torch>=1.12.0
+torchvision>=0.13.0
+torchaudio>=0.12.0
+
+# Data processing and numerical computing
+numpy>=1.21.0
+pandas>=1.3.0
+
+# Machine learning utilities
+scikit-learn>=1.0.0
+
+# Progress tracking
+tqdm>=4.64.0
+
+# Visualization
+matplotlib>=3.5.0
+seaborn>=0.11.0
+
+# Configuration management
+omegaconf>=2.2.0
+
+# Experiment tracking (optional)
+tensorboard>=2.10.0
+wandb>=0.15.0
+
+# Development and testing
+pytest>=6.0.0
+pytest-cov>=3.0.0
+
+# Code quality
+black>=22.0.0
+flake8>=4.0.0
+mypy>=0.950
+
+# Documentation
+sphinx>=4.0.0
+sphinx-rtd-theme>=1.0.0
+
+# Additional utilities
+pathlib2>=2.3.0  # For Python < 3.4
+typing-extensions>=4.0.0  # For advanced type hints 

@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Main FastAPI Application for HeyGen AI API
-Demonstrates modern lifespan context manager usage.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import signal
@@ -10,34 +12,42 @@ import sys
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator
 from datetime import datetime, timezone
-
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 import structlog
 import uvicorn
+from api.core.lifespan_manager import (
+from api.utils.sync_async_patterns import (
+from api.schemas.functional_models import (
+from api.endpoints.functional_endpoints import (
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Main FastAPI Application for HeyGen AI API
+Demonstrates modern lifespan context manager usage.
+"""
+
+
 
 # Import our lifespan manager and components
-from api.core.lifespan_manager import (
     LifespanManager,
     get_database_session,
     get_redis_client,
     get_lifespan_state
 )
-from api.utils.sync_async_patterns import (
     UserService,
     validate_username_sync,
     create_user_async
 )
-from api.schemas.functional_models import (
     UserCreate,
     UserResponse,
     VideoCreate,
     VideoResponse,
     HealthResponse
 )
-from api.endpoints.functional_endpoints import (
     create_user_endpoint,
     get_user_endpoint,
     create_video_endpoint,
@@ -526,7 +536,7 @@ async def process_video_async(video_id: int, db_session):
 
 def setup_signal_handlers():
     """Setup signal handlers for graceful shutdown."""
-    def signal_handler(signum, frame):
+    def signal_handler(signum, frame) -> Any:
         logger.info(f"Received signal {signum}, initiating graceful shutdown")
         sys.exit(0)
     
@@ -559,5 +569,6 @@ def main():
         logger.error("Application failed to start", error=str(e))
         sys.exit(1)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

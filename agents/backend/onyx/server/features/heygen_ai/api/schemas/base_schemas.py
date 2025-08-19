@@ -1,18 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from typing import Dict, List, Any, Optional, Union, Generic, TypeVar
+from datetime import datetime, timezone
+from enum import Enum
+from pydantic import (
+from pydantic.generics import GenericModel
+import uuid
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Base Pydantic Schemas for HeyGen AI API
 Consistent input/output validation and response schemas.
 """
 
-from typing import Dict, List, Any, Optional, Union, Generic, TypeVar
-from datetime import datetime, timezone
-from enum import Enum
-from pydantic import (
     BaseModel, Field, validator, root_validator, 
     ConfigDict, computed_field, model_validator
 )
-from pydantic.generics import GenericModel
-import uuid
 
 # =============================================================================
 # Base Response Models
@@ -216,14 +224,14 @@ class PaginationRequest(BaseRequest):
     )
     
     @validator('page')
-    def validate_page(cls, v):
+    def validate_page(cls, v) -> bool:
         """Validate page number."""
         if v < 1:
             raise ValueError('Page must be greater than 0')
         return v
     
     @validator('per_page')
-    def validate_per_page(cls, v):
+    def validate_per_page(cls, v) -> bool:
         """Validate per_page number."""
         if v < 1 or v > 100:
             raise ValueError('Per page must be between 1 and 100')
@@ -241,7 +249,7 @@ class SearchRequest(PaginationRequest):
     )
     
     @validator('query')
-    def validate_query(cls, v):
+    def validate_query(cls, v) -> bool:
         """Validate search query."""
         if v is not None and len(v.strip()) == 0:
             return None
@@ -258,7 +266,7 @@ class IDField(BaseModel):
     )
     
     @validator('id')
-    def validate_id(cls, v):
+    def validate_id(cls, v) -> bool:
         """Validate ID format."""
         if not v or len(v.strip()) == 0:
             raise ValueError('ID cannot be empty')
@@ -304,7 +312,7 @@ class MetadataFields(BaseModel):
     )
     
     @validator('tags')
-    def validate_tags(cls, v):
+    def validate_tags(cls, v) -> bool:
         """Validate tags."""
         if v is not None:
             # Remove empty tags and duplicates
@@ -485,7 +493,7 @@ class FileInfo(BaseModel):
     )
     
     @validator('size')
-    def validate_size(cls, v):
+    def validate_size(cls, v) -> bool:
         """Validate file size."""
         if v <= 0:
             raise ValueError('File size must be positive')

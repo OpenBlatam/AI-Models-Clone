@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-FastAPI Dependency Injection Manager for HeyGen AI API
-Comprehensive dependency injection system for managing state and shared resources.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -16,19 +21,27 @@ import weakref
 from functools import lru_cache, wraps
 import inspect
 import gc
-
 from fastapi import Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy.orm import sessionmaker
 import redis.asyncio as redis
 from pydantic import BaseModel, Field, validator, ConfigDict
-
 from .resource_manager import ResourceManager, ResourceType, ResourceConfig
 from .service_container import ServiceContainer
 from .cache_manager import CacheManager
 from .config_manager import ConfigManager
 from .security_manager import SecurityManager
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+FastAPI Dependency Injection Manager for HeyGen AI API
+Comprehensive dependency injection system for managing state and shared resources.
+"""
+
+
+
 
 logger = structlog.get_logger()
 
@@ -86,7 +99,9 @@ class DependencyBase:
     """Base class for all dependencies."""
     
     def __init__(self, config: DependencyConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.stats = DependencyStats(
             name=self.__class__.__name__,
             scope=config.scope,
@@ -178,7 +193,9 @@ class DatabaseDependency(DependencyBase):
     """Database dependency for managing database connections."""
     
     def __init__(self, config: DependencyConfig, database_url: str):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.database_url = database_url
         self.engine = None
         self.session_factory = None
@@ -226,7 +243,9 @@ class RedisDependency(DependencyBase):
     """Redis dependency for managing Redis connections."""
     
     def __init__(self, config: DependencyConfig, redis_url: str):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.redis_url = redis_url
         self.client = None
     
@@ -266,7 +285,9 @@ class ServiceDependency(DependencyBase):
     """Service dependency for managing business logic services."""
     
     def __init__(self, config: DependencyConfig, service_class: Type, **kwargs):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.service_class = service_class
         self.service_kwargs = kwargs
         self.service_instance = None
@@ -284,7 +305,7 @@ class ServiceDependency(DependencyBase):
         if self.service_instance and hasattr(self.service_instance, 'cleanup'):
             await self.service_instance.cleanup()
     
-    def get_service(self) -> Any:
+    def get_service(self) -> Optional[Dict[str, Any]]:
         """Get service instance."""
         if not self._is_initialized:
             raise RuntimeError(f"Service {self.service_class.__name__} not initialized")
@@ -300,7 +321,9 @@ class CacheDependency(DependencyBase):
     """Cache dependency for managing caching systems."""
     
     def __init__(self, config: DependencyConfig, cache_manager: CacheManager):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.cache_manager = cache_manager
     
     async def _initialize_internal(self) -> None:
@@ -327,7 +350,9 @@ class SecurityDependency(DependencyBase):
     """Security dependency for managing authentication and authorization."""
     
     def __init__(self, config: DependencyConfig, security_manager: SecurityManager):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.security_manager = security_manager
         self.http_bearer = HTTPBearer()
     
@@ -368,7 +393,9 @@ class ConfigDependency(DependencyBase):
     """Configuration dependency for managing application configuration."""
     
     def __init__(self, config: DependencyConfig, config_manager: ConfigManager):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.config_manager = config_manager
     
     async def _initialize_internal(self) -> None:
@@ -387,7 +414,7 @@ class ConfigDependency(DependencyBase):
         self.update_stats()
         return self.config_manager
     
-    def get_setting(self, key: str, default: Any = None) -> Any:
+    def get_setting(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Get configuration setting."""
         return self.config_manager.get_setting(key, default)
 
@@ -398,7 +425,7 @@ class ConfigDependency(DependencyBase):
 class DependencyContainer:
     """Main dependency container for managing all dependencies."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.dependencies: Dict[str, DependencyBase] = {}
         self.dependency_factories: Dict[str, Callable] = {}
         self.scope_managers: Dict[DependencyScope, Any] = {}
@@ -424,7 +451,9 @@ class DependencyContainer:
     def create_dependency_function(self, name: str) -> Callable:
         """Create a dependency function for FastAPI."""
         def dependency_function():
-            dependency = self.get_dependency(name)
+            
+    """dependency_function function."""
+dependency = self.get_dependency(name)
             if not dependency:
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -434,7 +463,9 @@ class DependencyContainer:
             if dependency.config.scope == DependencyScope.REQUEST:
                 # For request-scoped dependencies, return a function that yields
                 async def request_dependency():
-                    if not dependency._is_initialized:
+                    
+    """request_dependency function."""
+if not dependency._is_initialized:
                         await dependency.initialize()
                     dependency.update_stats()
                     yield dependency
@@ -545,7 +576,7 @@ def inject_dependency(dependency_name: str):
     """Decorator for injecting dependencies into functions."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # This would be used with the dependency container
             # The actual injection would happen at the FastAPI level
             return await func(*args, **kwargs)
@@ -556,7 +587,7 @@ def singleton_dependency(cls: Type) -> Type:
     """Decorator for creating singleton dependencies."""
     original_init = cls.__init__
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> Any:
         if not hasattr(cls, '_instance'):
             original_init(self, *args, **kwargs)
             cls._instance = self
@@ -573,20 +604,24 @@ def singleton_dependency(cls: Type) -> Type:
 class FastAPIDependencyManager:
     """FastAPI-specific dependency manager."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         self.app = app
         self.container = DependencyContainer()
         self._setup_lifecycle_events()
     
-    def _setup_lifecycle_events(self):
+    def _setup_lifecycle_events(self) -> Any:
         """Setup FastAPI lifecycle events."""
         @self.app.on_event("startup")
         async def startup_event():
-            await self.container.initialize_all()
+            
+    """startup_event function."""
+await self.container.initialize_all()
         
         @self.app.on_event("shutdown")
         async def shutdown_event():
-            await self.container.cleanup_all()
+            
+    """shutdown_event function."""
+await self.container.cleanup_all()
     
     def register_database(
         self,
@@ -689,10 +724,12 @@ class FastAPIDependencyManager:
         """Get dependency function for FastAPI dependency injection."""
         return self.container.create_dependency_function(name)
     
-    def get_health_endpoint(self):
+    def get_health_endpoint(self) -> Optional[Dict[str, Any]]:
         """Get health check endpoint for dependencies."""
         async def health_check():
-            return self.container.get_health_status()
+            
+    """health_check function."""
+return self.container.get_health_status()
         
         return health_check
 

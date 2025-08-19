@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-Async Middleware for HeyGen AI FastAPI
-Middleware and utilities to prevent blocking operations in routes.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -24,11 +32,19 @@ from concurrent.futures import ThreadPoolExecutor
 import queue
 import signal
 import os
-
 from fastapi import Request, Response, HTTPException, BackgroundTasks
 from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field, validator
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Async Middleware for HeyGen AI FastAPI
+Middleware and utilities to prevent blocking operations in routes.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -94,7 +110,9 @@ class AsyncRouteMiddleware(BaseHTTPMiddleware):
     """Middleware to ensure routes are non-blocking."""
     
     def __init__(self, app, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.route_metrics: Dict[str, RouteMetrics] = {}
         self.blocking_operations: List[str] = []
@@ -208,7 +226,9 @@ class NonBlockingMiddleware(BaseHTTPMiddleware):
     """Middleware to ensure non-blocking operations."""
     
     def __init__(self, app, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.thread_pool = ThreadPoolExecutor(max_workers=config.background_workers)
         self.blocking_operations: Dict[str, Any] = {}
@@ -309,7 +329,9 @@ class BackgroundProcessingMiddleware(BaseHTTPMiddleware):
     """Middleware for background processing of heavy operations."""
     
     def __init__(self, app, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.background_queue = asyncio.Queue(maxsize=1000)
         self.workers: List[asyncio.Task] = []
@@ -317,7 +339,7 @@ class BackgroundProcessingMiddleware(BaseHTTPMiddleware):
         self._is_running = False
         self._setup_workers()
     
-    def _setup_workers(self):
+    def _setup_workers(self) -> Any:
         """Setup background workers."""
         for i in range(self.config.background_workers):
             worker = asyncio.create_task(self._worker(f"worker-{i}"))
@@ -418,7 +440,9 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
     """Middleware for rate limiting requests."""
     
     def __init__(self, app, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.request_counts: Dict[str, List[float]] = defaultdict(list)
         self._lock = threading.Lock()
@@ -494,7 +518,9 @@ class CircuitBreakerMiddleware(BaseHTTPMiddleware):
     """Middleware for circuit breaker pattern."""
     
     def __init__(self, app, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.circuit_breakers: Dict[str, Dict[str, Any]] = defaultdict(lambda: {
             "state": "closed",  # closed, open, half-open
@@ -535,7 +561,7 @@ class CircuitBreakerMiddleware(BaseHTTPMiddleware):
             self._record_failure(circuit_key)
             raise
     
-    def _should_allow_request(self, circuit_key: str) -> bool:
+    async def _should_allow_request(self, circuit_key: str) -> bool:
         """Check if request should be allowed based on circuit breaker state."""
         with self._lock:
             circuit = self.circuit_breakers[circuit_key]
@@ -599,7 +625,9 @@ class CachingMiddleware(BaseHTTPMiddleware):
     """Middleware for response caching."""
     
     def __init__(self, app, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.cache: Dict[str, Dict[str, Any]] = {}
         self._lock = threading.Lock()
@@ -685,7 +713,9 @@ class MonitoringMiddleware(BaseHTTPMiddleware):
     """Middleware for request monitoring."""
     
     def __init__(self, app, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.request_metrics: Dict[str, RouteMetrics] = {}
         self._lock = threading.Lock()
@@ -748,7 +778,9 @@ class MiddlewareManager:
     """Manager for all async middlewares."""
     
     def __init__(self, config: MiddlewareConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.middlewares: List[BaseHTTPMiddleware] = []
         self._is_initialized = False
     
@@ -756,7 +788,7 @@ class MiddlewareManager:
         """Add middleware to manager."""
         self.middlewares.append(middleware)
     
-    def setup_default_middlewares(self, app):
+    def setup_default_middlewares(self, app) -> Any:
         """Setup default middlewares."""
         # Add middlewares in order
         app.add_middleware(MonitoringMiddleware, config=self.config)

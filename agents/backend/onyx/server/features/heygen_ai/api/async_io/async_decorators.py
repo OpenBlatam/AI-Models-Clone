@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Async Decorators and Utilities for HeyGen AI API
-Ensure all I/O operations are non-blocking and optimized.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import functools
@@ -14,6 +19,16 @@ import structlog
 from dataclasses import dataclass
 from enum import Enum
 import weakref
+                import hashlib
+                import json
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Async Decorators and Utilities for HeyGen AI API
+Ensure all I/O operations are non-blocking and optimized.
+"""
+
 
 logger = structlog.get_logger()
 
@@ -61,7 +76,7 @@ def async_timeout(
     """Decorator to add timeout to async functions."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             try:
                 if timeout:
                     return await asyncio.wait_for(func(*args, **kwargs), timeout=timeout)
@@ -96,7 +111,7 @@ def async_retry(
     """Decorator to add retry logic to async functions."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             last_exception = None
             
             for attempt in range(max_retries + 1):
@@ -144,7 +159,7 @@ def async_performance_monitor(
     """Decorator to monitor async function performance."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             operation = operation_name or func.__name__
             
@@ -195,7 +210,7 @@ def async_cache(
     """Decorator to cache async function results."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             if key_generator:
                 cache_key = key_generator(*args, **kwargs)
@@ -206,8 +221,6 @@ def async_cache(
                     "args": str(args),
                     "kwargs": str(sorted(kwargs.items()))
                 }
-                import hashlib
-                import json
                 cache_key = hashlib.md5(json.dumps(key_data, sort_keys=True).encode()).hexdigest()
             
             # Try to get from cache
@@ -244,7 +257,9 @@ class AsyncRateLimiter:
     """Async rate limiter implementation."""
     
     def __init__(self, max_calls: int, time_window: float):
-        self.max_calls = max_calls
+        
+    """__init__ function."""
+self.max_calls = max_calls
         self.time_window = time_window
         self.calls: List[float] = []
         self._lock = asyncio.Lock()
@@ -274,7 +289,7 @@ def async_rate_limit(
     
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Get or create rate limiter for this function
             func_name = func.__name__
             if func_name not in rate_limiters:
@@ -305,7 +320,9 @@ class AsyncCircuitBreaker:
         recovery_timeout: float = 60.0,
         expected_exception: type = Exception
     ):
-        self.failure_threshold = failure_threshold
+        
+    """__init__ function."""
+self.failure_threshold = failure_threshold
         self.recovery_timeout = recovery_timeout
         self.expected_exception = expected_exception
         self.failure_count = 0
@@ -352,7 +369,7 @@ def async_circuit_breaker(
     
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Get or create circuit breaker for this function
             func_name = func.__name__
             if func_name not in circuit_breakers:
@@ -379,7 +396,9 @@ def async_batch_processor(
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         async def wrapper(items: List[Any], *args, **kwargs):
-            if not items:
+            
+    """wrapper function."""
+if not items:
                 return []
             
             # Use provided processor or the decorated function
@@ -389,7 +408,7 @@ def async_batch_processor(
             results = []
             semaphore = asyncio.Semaphore(max_concurrent) if max_concurrent else None
             
-            async def process_batch(batch):
+            async def process_batch(batch) -> Any:
                 if semaphore:
                     async with semaphore:
                         return await processor(batch, *args, **kwargs)
@@ -418,12 +437,14 @@ def async_concurrent_processor(
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         async def wrapper(items: List[Any], *args, **kwargs):
-            if not items:
+            
+    """wrapper function."""
+if not items:
                 return []
             
             semaphore = asyncio.Semaphore(max_concurrent)
             
-            async def process_item(item):
+            async def process_item(item) -> Any:
                 async with semaphore:
                     return await func(item, *args, **kwargs)
             
@@ -444,14 +465,14 @@ def async_background_task(
     """Decorator to run function as background task."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             task = asyncio.create_task(func(*args, **kwargs), name=task_name or func.__name__)
             
             if not fire_and_forget:
                 return await task
             
             # Add error handling for fire-and-forget tasks
-            def handle_task_exception(task):
+            def handle_task_exception(task) -> Any:
                 try:
                     task.result()
                 except Exception as e:
@@ -475,7 +496,7 @@ def async_resource_manager(
     """Decorator to manage async resources."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             resource = None
             try:
                 # Acquire resource
@@ -509,7 +530,7 @@ def async_validate_input(
     """Decorator to validate async function inputs."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Validate inputs
             if asyncio.iscoroutinefunction(validator_func):
                 is_valid = await validator_func(*args, **kwargs)
@@ -537,7 +558,7 @@ def async_logging(
     """Decorator to add comprehensive logging to async functions."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             func_name = func.__name__
             
@@ -600,7 +621,7 @@ def async_metrics(
     """Decorator to collect metrics for async functions."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             operation = operation_name or func.__name__
             
@@ -673,12 +694,16 @@ def ensure_async(func: Callable) -> Callable:
         return func
     
     @functools.wraps(func)
-    async def async_wrapper(*args, **kwargs):
+    async def async_wrapper(*args, **kwargs) -> Any:
         return func(*args, **kwargs)
     
     return async_wrapper
 
 def run_async_in_thread(func: Callable, *args, **kwargs):
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     """Run async function in thread pool."""
     loop = asyncio.get_event_loop()
     return loop.run_in_executor(None, func, *args, **kwargs)

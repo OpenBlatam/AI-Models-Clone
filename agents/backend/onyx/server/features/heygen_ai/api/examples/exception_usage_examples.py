@@ -1,15 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field, EmailStr
+import asyncio
+from ..exceptions.http_exceptions import (
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 HTTP Exception Usage Examples for HeyGen AI API
 Practical examples of using HTTP exceptions in API endpoints.
 """
 
-from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field, EmailStr
-import asyncio
 
-from ..exceptions.http_exceptions import (
     ValidationError, InvalidInputError, MissingRequiredFieldError,
     AuthenticationError, InvalidCredentialsError, ExpiredTokenError,
     AuthorizationError, InsufficientPermissionsError, SubscriptionRequiredError,
@@ -70,7 +80,7 @@ class Video(BaseModel):
 class MockUserService:
     """Mock user service for demonstration."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.users = {
             1: User(id=1, email="user1@example.com", name="John Doe", subscription_type="free"),
             2: User(id=2, email="user2@example.com", name="Jane Smith", subscription_type="premium"),
@@ -113,7 +123,7 @@ class MockUserService:
 class MockVideoService:
     """Mock video service for demonstration."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.videos = {}
         self.processing_videos = set()
     
@@ -202,7 +212,7 @@ class MockVideoService:
 class MockRateLimiter:
     """Mock rate limiter for demonstration."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.limits = {}
     
     async def is_limited(self, user_id: int, action: str) -> bool:

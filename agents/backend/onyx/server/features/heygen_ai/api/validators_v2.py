@@ -1,7 +1,16 @@
-"""
-Enhanced Pydantic v2 Validators for HeyGen AI API
-Advanced validation logic with custom validators, performance optimizations, and comprehensive error handling.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 from typing import Any, Dict, List, Optional, Union, Callable, TypeVar, Generic
 from datetime import datetime, timedelta
@@ -11,17 +20,24 @@ import hashlib
 from pathlib import Path
 from urllib.parse import urlparse
 import asyncio
-
 from pydantic import (
+from pydantic_core import core_schema, PydanticCustomError
+from pydantic.json_schema import JsonSchemaValue
+import structlog
+from .core.error_handling import error_factory, ValidationError as HeyGenValidationError
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Enhanced Pydantic v2 Validators for HeyGen AI API
+Advanced validation logic with custom validators, performance optimizations, and comprehensive error handling.
+"""
+
+
     field_validator, model_validator, ValidationError, ValidationInfo,
     PlainValidator, BeforeValidator, AfterValidator, WithJsonSchema,
     GetJsonSchemaHandler, GetCoreSchemaHandler
 )
-from pydantic_core import core_schema, PydanticCustomError
-from pydantic.json_schema import JsonSchemaValue
-import structlog
 
-from .core.error_handling import error_factory, ValidationError as HeyGenValidationError
 
 logger = structlog.get_logger()
 
@@ -564,7 +580,7 @@ async def validate_user_quota_async(user_id: str, operation: str) -> None:
 
 def validate_content_safety(func: Callable[..., T]) -> Callable[..., T]:
     """Decorator to validate content safety."""
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         # Extract content from arguments
         content = None
         for arg in args:
@@ -589,7 +605,7 @@ def validate_content_safety(func: Callable[..., T]) -> Callable[..., T]:
 
 def validate_rate_limit(func: Callable[..., T]) -> Callable[..., T]:
     """Decorator to validate rate limits."""
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         # This would typically check rate limits
         # For now, we'll just pass through
         return func(*args, **kwargs)
@@ -605,7 +621,9 @@ class ValidationCache:
     """Cache for validation results to improve performance."""
     
     def __init__(self, max_size: int = 1000):
-        self.cache: Dict[str, Any] = {}
+        
+    """__init__ function."""
+self.cache: Dict[str, Any] = {}
         self.max_size = max_size
     
     def get(self, key: str) -> Optional[Any]:
@@ -630,7 +648,7 @@ class ValidationCache:
 validation_cache = ValidationCache()
 
 
-def validate_with_cache(validator_func: Callable[[Any], Any], value: Any) -> Any:
+def validate_with_cache(validator_func: Callable[[Any], Any], value: Any) -> bool:
     """Validate with caching for performance."""
     # Create cache key
     cache_key = f"{validator_func.__name__}:{hash(str(value))}"
@@ -751,7 +769,7 @@ def validate_model_with_context(
     model_class: type,
     data: Dict[str, Any],
     context: Optional[Dict[str, Any]] = None
-) -> Any:
+) -> bool:
     """Validate model with additional context."""
     try:
         if context:

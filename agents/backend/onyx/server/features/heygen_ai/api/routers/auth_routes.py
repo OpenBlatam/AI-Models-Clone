@@ -1,24 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Dict, Any
+import logging
+from ..core.database import get_session
+from ..core.auth import (
+from ..models.schemas import (
+from ..services.user_service import create_user, get_user_by_email
+from ..utils.helpers import generate_request_id, format_error_message
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Authentication routes for HeyGen AI API
 Provides authentication and authorization endpoints with Pydantic models and type hints.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordRequestForm
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Dict, Any
-import logging
 
-from ..core.database import get_session
-from ..core.auth import (
     authenticate_user,
     create_access_token,
     create_refresh_token,
     verify_token,
     get_current_user
 )
-from ..models.schemas import (
     UserCreateInput,
     LoginInput,
     LoginOutput,
@@ -26,8 +32,6 @@ from ..models.schemas import (
     TokenRefreshInput,
     TokenRefreshOutput
 )
-from ..services.user_service import create_user, get_user_by_email
-from ..utils.helpers import generate_request_id, format_error_message
 
 logger = logging.getLogger(__name__)
 

@@ -1,26 +1,37 @@
-"""
-Advanced Usage Examples for HeyGen AI.
-Demonstrates transformer models, diffusion models, training, and Gradio interfaces.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import logging
 import os
 import sys
 from pathlib import Path
+from transformer_models import (
+from diffusion_models import (
+from model_training import (
+        import torch.nn as nn
+import random
+        import torch
+        import torch
+        import torch.nn as nn
+from typing import Any, List, Dict, Optional
+"""
+Advanced Usage Examples for HeyGen AI.
+Demonstrates transformer models, diffusion models, training, and Gradio interfaces.
+"""
+
 
 # Add the core directory to the path
 sys.path.append(str(Path(__file__).parent.parent / "core"))
 
-from transformer_models import (
     AdvancedTransformerManager, ModelConfig, TokenizerManager,
     DiffusionModelManager, FineTuningManager
 )
-from diffusion_models import (
     DiffusionPipelineManager, DiffusionConfig, GradioInterface,
     PerformanceProfiler
 )
-from model_training import (
     ModelTrainer, TrainingConfig, ConfigManager, ExperimentTracker,
     ModelCheckpointer, CrossValidator
 )
@@ -242,15 +253,14 @@ async def demonstrate_performance_profiling():
         profiler = PerformanceProfiler()
         
         # Create a simple model for profiling
-        import torch.nn as nn
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.linear = nn.Linear(100, 10)
                 self.relu = nn.ReLU()
             
-            def forward(self, x):
+            def forward(self, x) -> Any:
                 return self.relu(self.linear(x))
         
         model = SimpleModel()
@@ -276,7 +286,8 @@ async def demonstrate_error_handling():
     try:
         # Demonstrate try-except blocks
         def risky_operation():
-            import random
+            
+    """risky_operation function."""
             if random.random() < 0.5:
                 raise ValueError("Simulated error for demonstration")
             return "Operation successful"
@@ -290,10 +301,11 @@ async def demonstrate_error_handling():
                 logger.error(f"Attempt {i+1} failed: {e}")
         
         # Demonstrate gradient anomaly detection
-        import torch
         
         def demonstrate_anomaly_detection():
-            x = torch.randn(2, 2, requires_grad=True)
+            
+    """demonstrate_anomaly_detection function."""
+x = torch.randn(2, 2, requires_grad=True)
             y = x * 2
             
             # Simulate potential gradient issue
@@ -321,12 +333,12 @@ async def demonstrate_optimization_techniques():
     logger.info("=== Optimization Techniques Demonstration ===")
     
     try:
-        import torch
-        import torch.nn as nn
         
         # Demonstrate mixed precision training
         def demonstrate_mixed_precision():
-            model = nn.Linear(100, 10)
+            
+    """demonstrate_mixed_precision function."""
+model = nn.Linear(100, 10)
             optimizer = torch.optim.Adam(model.parameters())
             scaler = torch.cuda.amp.GradScaler()
             
@@ -347,7 +359,9 @@ async def demonstrate_optimization_techniques():
         
         # Demonstrate gradient clipping
         def demonstrate_gradient_clipping():
-            model = nn.Linear(100, 10)
+            
+    """demonstrate_gradient_clipping function."""
+model = nn.Linear(100, 10)
             optimizer = torch.optim.Adam(model.parameters())
             
             x = torch.randn(32, 100)
@@ -365,7 +379,9 @@ async def demonstrate_optimization_techniques():
         
         # Demonstrate distributed training setup
         def demonstrate_distributed_setup():
-            if torch.cuda.device_count() > 1:
+            
+    """demonstrate_distributed_setup function."""
+if torch.cuda.device_count() > 1:
                 logger.info(f"✓ Multiple GPUs detected: {torch.cuda.device_count()}")
                 logger.info("✓ Distributed training setup demonstrated")
             else:

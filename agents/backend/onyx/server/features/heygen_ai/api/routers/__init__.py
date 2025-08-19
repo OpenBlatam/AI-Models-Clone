@@ -1,18 +1,23 @@
-#!/usr/bin/env python3
-"""
-Routers module for HeyGen AI API
-Exports all route modules and main router.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from .video_routes import router as video_router
 from .health_routes import router as health_router
 from .user_routes import router as user_router
 from .auth_routes import router as auth_router
 from .admin_routes import router as admin_router
 from .analytics_routes import router as analytics_router
+from fastapi import APIRouter
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Routers module for HeyGen AI API
+Exports all route modules and main router.
+"""
+
 
 # Main router that combines all sub-routes
-from fastapi import APIRouter
 
 main_router = APIRouter()
 

@@ -1,14 +1,17 @@
-"""
-Video Renderer for HeyGen AI equivalent.
-Handles final video composition, rendering, and post-processing.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import logging
 from typing import Dict, List, Optional, Tuple
 from pathlib import Path
 import cv2
 import numpy as np
+from typing import Any, List, Dict, Optional
+"""
+Video Renderer for HeyGen AI equivalent.
+Handles final video composition, rendering, and post-processing.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -25,13 +28,13 @@ class VideoRenderer:
     - Multiple output format support
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the Video Renderer."""
         self.renderers = {}
         self.effects = {}
         self.initialized = False
         
-    def initialize(self):
+    def initialize(self) -> Any:
         """Initialize video rendering components."""
         try:
             # Load rendering engines
@@ -47,7 +50,7 @@ class VideoRenderer:
             logger.error(f"Failed to initialize Video Renderer: {e}")
             raise
     
-    def _load_renderers(self):
+    def _load_renderers(self) -> Any:
         """Load video rendering engines."""
         # This would load different rendering backends:
         # - FFmpeg for video processing
@@ -62,7 +65,7 @@ class VideoRenderer:
             "gpu": "gpu_accelerated_renderer"
         }
     
-    def _load_video_effects(self):
+    def _load_video_effects(self) -> Any:
         """Load video effects and filters."""
         # Load various video effects for enhancement
         self.effects = {

@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-"""
-Database Migration System for HeyGen AI API
-Supports multiple database backends with version control and rollback capabilities
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import logging
@@ -13,12 +12,19 @@ from pathlib import Path
 from dataclasses import dataclass
 from enum import Enum
 import hashlib
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import text, MetaData, Table, Column, Integer, String, DateTime
 from sqlalchemy.exc import SQLAlchemyError, OperationalError
-
 from .async_database import AsyncDatabaseManager, DatabaseType
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Database Migration System for HeyGen AI API
+Supports multiple database backends with version control and rollback capabilities
+"""
+
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -56,7 +62,9 @@ class MigrationManager:
     """
     
     def __init__(self, db_manager: AsyncDatabaseManager, migrations_dir: str = "migrations"):
-        self.db_manager = db_manager
+        
+    """__init__ function."""
+self.db_manager = db_manager
         self.migrations_dir = Path(migrations_dir)
         self.migrations_dir.mkdir(exist_ok=True)
         
@@ -168,6 +176,10 @@ class MigrationManager:
         }
         
         with open(migration_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(migration_data, f, indent=2)
         
         logger.info(f"✓ Migration file created: {migration_file}")
@@ -179,6 +191,10 @@ class MigrationManager:
         for migration_file in sorted(self.migrations_dir.glob("*.json")):
             try:
                 with open(migration_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     data = json.load(f)
                 
                 migration = Migration(

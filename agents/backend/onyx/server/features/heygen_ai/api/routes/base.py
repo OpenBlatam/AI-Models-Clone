@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Base Route Class for HeyGen AI FastAPI
-Provides common functionality and dependency injection for all routes.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from fastapi.responses import JSONResponse
@@ -15,8 +20,19 @@ import json
 import time
 import traceback
 from functools import wraps
-
 from pydantic import BaseModel, Field, validator
+    from api.async_operations.async_database import AsyncDatabaseOperations
+    from api.async_operations.async_external_api import AsyncExternalAPIOperations
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Base Route Class for HeyGen AI FastAPI
+Provides common functionality and dependency injection for all routes.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -118,7 +134,9 @@ class BaseRoute:
         prefix: str = "",
         dependencies: Optional[Dict[str, Any]] = None
     ):
-        self.name = name
+        
+    """__init__ function."""
+self.name = name
         self.description = description
         self.category = category
         self.tags = tags or []
@@ -155,11 +173,13 @@ class BaseRoute:
         
         logger.info(f"Initialized base route: {name}")
     
-    def _register_middleware(self):
+    def _register_middleware(self) -> Any:
         """Register common middleware for the route."""
         @self.router.middleware("http")
         async def route_middleware(request: Request, call_next):
-            # Start timing
+            
+    """route_middleware function."""
+# Start timing
             start_time = time.time()
             request_id = request.headers.get("X-Request-ID", f"req_{int(start_time * 1000)}")
             
@@ -312,7 +332,7 @@ class BaseRoute:
 def route_metrics(func: Callable) -> Callable:
     """Decorator to track route metrics."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         start_time = time.time()
         try:
             result = await func(*args, **kwargs)
@@ -328,7 +348,7 @@ def route_metrics(func: Callable) -> Callable:
 def require_auth(func: Callable) -> Callable:
     """Decorator to require authentication."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         # Authentication logic would go here
         # For now, just log the requirement
         logger.info(f"Route {func.__name__} requires authentication")
@@ -339,7 +359,7 @@ def rate_limit(requests_per_minute: int = 60) -> Callable:
     """Decorator to apply rate limiting."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Rate limiting logic would go here
             # For now, just log the requirement
             logger.info(f"Route {func.__name__} has rate limit: {requests_per_minute} requests/minute")
@@ -351,7 +371,7 @@ def cache_response(ttl: int = 300) -> Callable:
     """Decorator to cache responses."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Caching logic would go here
             # For now, just log the requirement
             logger.info(f"Route {func.__name__} has cache TTL: {ttl} seconds")
@@ -365,13 +385,11 @@ def cache_response(ttl: int = 300) -> Callable:
 
 def get_database_operations():
     """Get database operations dependency."""
-    from api.async_operations.async_database import AsyncDatabaseOperations
     # This would return the actual database operations instance
     return AsyncDatabaseOperations
 
 def get_api_operations():
     """Get external API operations dependency."""
-    from api.async_operations.async_external_api import AsyncExternalAPIOperations
     # This would return the actual API operations instance
     return AsyncExternalAPIOperations
 
@@ -380,7 +398,7 @@ def get_current_user():
     # This would implement actual user authentication
     return {"user_id": "test_user", "username": "test"}
 
-def get_request_id(request: Request) -> str:
+async def get_request_id(request: Request) -> str:
     """Get request ID from headers or generate one."""
     return request.headers.get("X-Request-ID", f"req_{int(time.time() * 1000)}")
 

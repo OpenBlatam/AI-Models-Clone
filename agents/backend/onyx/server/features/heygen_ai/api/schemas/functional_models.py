@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Functional Pydantic Models for HeyGen AI API
-Modern Pydantic v2 models with functional components, computed fields, and advanced validation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 from typing import Optional, List, Dict, Any, Union, Annotated, Literal
 from datetime import datetime, timezone, timedelta
@@ -11,17 +16,26 @@ import re
 import uuid
 from pathlib import Path
 from enum import Enum
-
 from pydantic import (
+from pydantic.json_schema import JsonSchemaValue
+from pydantic_core import core_schema
+import structlog
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Functional Pydantic Models for HeyGen AI API
+Modern Pydantic v2 models with functional components, computed fields, and advanced validation.
+"""
+
+
     BaseModel, Field, HttpUrl, EmailStr, validator, root_validator,
     computed_field, model_validator, field_validator, ConfigDict,
     PlainSerializer, PlainValidator, BeforeValidator, AfterValidator,
     WithJsonSchema, GetJsonSchemaHandler, GetCoreSchemaHandler,
     ValidationError, ValidationInfo
 )
-from pydantic.json_schema import JsonSchemaValue
-from pydantic_core import core_schema
-import structlog
 
 logger = structlog.get_logger()
 
@@ -75,7 +89,7 @@ def generate_video_id() -> str:
     """Functional video ID generator."""
     return f"video_{uuid.uuid4().hex[:12]}"
 
-def validate_api_key_format(value: str) -> str:
+async def validate_api_key_format(value: str) -> str:
     """Functional API key format validator."""
     if not value or len(value) < 32:
         raise ValueError("API key must be at least 32 characters long")

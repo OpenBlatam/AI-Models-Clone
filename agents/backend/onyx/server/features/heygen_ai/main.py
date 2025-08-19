@@ -1,30 +1,35 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import os
+import sys
+from pathlib import Path
+from typing import Optional
+    from dotenv import load_dotenv
+import uvicorn
+from api.routes.__main__ import create_app, create_development_app, create_production_app
+    import structlog
+        import logging
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 HeyGen AI FastAPI Main Entry Point
 FastAPI best practices for main application entry point with proper configuration.
 """
 
-import os
-import sys
-from pathlib import Path
-from typing import Optional
 
 try:
-    from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
     pass
 
-import uvicorn
 
 # Add the project root to Python path
 project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
-from api.routes.__main__ import create_app, create_development_app, create_production_app
 
 try:
-    import structlog
 except ImportError:
     structlog = None
 
@@ -32,7 +37,9 @@ except ImportError:
 # Logging Configuration
 # =============================================================================
 def configure_logging():
-    if structlog:
+    
+    """configure_logging function."""
+if structlog:
         structlog.configure(
             processors=[
                 structlog.stdlib.filter_by_level,
@@ -52,7 +59,6 @@ def configure_logging():
         )
         return structlog.get_logger()
     else:
-        import logging
         logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO").upper())
         return logging.getLogger("heygen_ai")
 
@@ -86,7 +92,9 @@ def get_reload() -> bool:
 # Application Configuration
 # =============================================================================
 def configure_application():
-    environment = get_environment()
+    
+    """configure_application function."""
+environment = get_environment()
     if environment == "production":
         return create_production_app()
     elif environment == "development":
@@ -97,7 +105,9 @@ def configure_application():
 # Server Configuration
 # =============================================================================
 def get_server_config():
-    return {
+    
+    """get_server_config function."""
+return {
         "host": get_host(),
         "port": get_port(),
         "workers": get_workers(),
@@ -148,5 +158,6 @@ app = configure_application()
 # =============================================================================
 # Entry Point
 # =============================================================================
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

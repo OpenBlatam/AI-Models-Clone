@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-"""
-Enhanced Error Handling System for HeyGen AI API
-Provides comprehensive error handling, validation, and edge case management.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import Dict, Any, Optional, List, Union, Callable, Type, Tuple
 from fastapi import HTTPException, status, Request
@@ -18,6 +17,13 @@ import traceback
 import hashlib
 import json
 import uuid
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Enhanced Error Handling System for HeyGen AI API
+Provides comprehensive error handling, validation, and edge case management.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -304,7 +310,9 @@ class HeyGenBaseError(Exception):
         max_retries: Optional[int] = None,
         circuit_breaker_state: Optional[str] = None
     ):
-        self.message = message
+        
+    """__init__ function."""
+self.message = message
         self.error_code = error_code
         self.category = category
         self.severity = severity
@@ -399,7 +407,9 @@ class ValidationError(HeyGenBaseError):
         validation_errors: Optional[List[str]] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if field:
             details['field'] = field
         if value is not None:
@@ -421,7 +431,9 @@ class AuthenticationError(HeyGenBaseError):
     """Authentication error"""
     
     def __init__(self, message: str, **kwargs):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message=message,
             error_code="AUTHENTICATION_ERROR",
             category=ErrorCategory.AUTHENTICATION,
@@ -434,7 +446,9 @@ class AuthorizationError(HeyGenBaseError):
     """Authorization error"""
     
     def __init__(self, message: str, required_permissions: Optional[List[str]] = None, **kwargs):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if required_permissions:
             details['required_permissions'] = required_permissions
         
@@ -452,7 +466,9 @@ class DatabaseError(HeyGenBaseError):
     """Database operation error"""
     
     def __init__(self, message: str, operation: Optional[str] = None, **kwargs):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if operation:
             details['operation'] = operation
         
@@ -476,7 +492,9 @@ class ResourceNotFoundError(HeyGenBaseError):
         resource_id: Optional[str] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if resource_type:
             details['resource_type'] = resource_type
         if resource_id:
@@ -502,7 +520,9 @@ class VideoProcessingError(HeyGenBaseError):
         processing_stage: Optional[str] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if video_id:
             details['video_id'] = video_id
         if processing_stage:
@@ -528,7 +548,9 @@ class RateLimitError(HeyGenBaseError):
         limit: Optional[int] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if limit:
             details['limit'] = limit
         
@@ -553,7 +575,9 @@ class ExternalServiceError(HeyGenBaseError):
         service_response: Optional[Dict[str, Any]] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if service_name:
             details['service_name'] = service_name
         if service_response:
@@ -579,7 +603,9 @@ class TimeoutError(HeyGenBaseError):
         operation: Optional[str] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if timeout_duration:
             details['timeout_duration'] = timeout_duration
         if operation:
@@ -605,7 +631,9 @@ class CircuitBreakerError(HeyGenBaseError):
         failure_count: Optional[int] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if service_name:
             details['service_name'] = service_name
         if failure_count:
@@ -631,7 +659,9 @@ class RetryExhaustedError(HeyGenBaseError):
         attempts_made: int,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         details['max_retries'] = max_retries
         details['attempts_made'] = attempts_made
         
@@ -656,7 +686,9 @@ class ConcurrencyError(HeyGenBaseError):
         conflict_type: Optional[str] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if resource:
             details['resource'] = resource
         if conflict_type:
@@ -683,7 +715,9 @@ class ResourceExhaustionError(HeyGenBaseError):
         limit: Optional[float] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if resource_type:
             details['resource_type'] = resource_type
         if current_usage:
@@ -713,7 +747,9 @@ class VideoGenerationError(HeyGenBaseError):
         template_id: Optional[str] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if video_id:
             details['video_id'] = video_id
         if generation_stage:
@@ -742,7 +778,9 @@ class VideoRenderingError(HeyGenBaseError):
         render_settings: Optional[Dict[str, Any]] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if video_id:
             details['video_id'] = video_id
         if rendering_stage:
@@ -771,7 +809,9 @@ class VoiceSynthesisError(HeyGenBaseError):
         text_length: Optional[int] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if voice_id:
             details['voice_id'] = voice_id
         if language:
@@ -800,7 +840,9 @@ class TemplateProcessingError(HeyGenBaseError):
         processing_stage: Optional[str] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if template_id:
             details['template_id'] = template_id
         if template_type:
@@ -830,7 +872,9 @@ class FileProcessingError(HeyGenBaseError):
         operation: Optional[str] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if file_path:
             details['file_path'] = file_path
         if file_type:
@@ -862,7 +906,9 @@ class QuotaExceededError(HeyGenBaseError):
         reset_time: Optional[datetime] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if quota_type:
             details['quota_type'] = quota_type
         if current_usage:
@@ -893,7 +939,9 @@ class ContentModerationError(HeyGenBaseError):
         flagged_content: Optional[str] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if content_type:
             details['content_type'] = content_type
         if moderation_result:
@@ -922,7 +970,9 @@ class FeatureUnavailableError(HeyGenBaseError):
         available_alternatives: Optional[List[str]] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if feature_name:
             details['feature_name'] = feature_name
         if reason:
@@ -951,7 +1001,9 @@ class MaintenanceModeError(HeyGenBaseError):
         affected_services: Optional[List[str]] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if maintenance_start:
             details['maintenance_start'] = maintenance_start.isoformat()
         if estimated_duration:
@@ -981,7 +1033,9 @@ class DeprecatedFeatureError(HeyGenBaseError):
         migration_guide: Optional[str] = None,
         **kwargs
     ):
-        details = kwargs.get('details', {})
+        
+    """__init__ function."""
+details = kwargs.get('details', {})
         if feature_name:
             details['feature_name'] = feature_name
         if deprecation_date:
@@ -1394,7 +1448,7 @@ class ErrorFactory:
         )
     
     @staticmethod
-    def file_upload_failed_error(file_path: str, file_type: str, file_size: int, **kwargs) -> FileProcessingError:
+    async def file_upload_failed_error(file_path: str, file_type: str, file_size: int, **kwargs) -> FileProcessingError:
         """Create file upload failed error"""
         return error_factory.file_processing_error(
             message="File upload failed",
@@ -1431,7 +1485,9 @@ class CircuitBreaker:
         recovery_timeout: int = 60,
         expected_exception: Type[Exception] = Exception
     ):
-        self.service_name = service_name
+        
+    """__init__ function."""
+self.service_name = service_name
         self.failure_threshold = failure_threshold
         self.recovery_timeout = recovery_timeout
         self.expected_exception = expected_exception
@@ -1459,12 +1515,12 @@ class CircuitBreaker:
             self._on_failure()
             raise
     
-    def _on_success(self):
+    def _on_success(self) -> Any:
         """Handle successful execution"""
         self.failure_count = 0
         self.state = "CLOSED"
     
-    def _on_failure(self):
+    def _on_failure(self) -> Any:
         """Handle failed execution"""
         self.failure_count += 1
         self.last_failure_time = datetime.utcnow()
@@ -1492,7 +1548,9 @@ class RetryHandler:
         exponential_backoff: bool = True,
         retryable_exceptions: Optional[Tuple[Type[Exception], ...]] = None
     ):
-        self.max_retries = max_retries
+        
+    """__init__ function."""
+self.max_retries = max_retries
         self.base_delay = base_delay
         self.max_delay = max_delay
         self.exponential_backoff = exponential_backoff
@@ -1550,7 +1608,7 @@ def handle_errors(
     """Decorator for handling errors with logging and retry logic"""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             request_id = str(uuid.uuid4())
             user_id = None
             
@@ -1616,7 +1674,7 @@ def handle_errors(
                 raise
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             request_id = str(uuid.uuid4())
             user_id = None
             
@@ -1930,7 +1988,7 @@ async def pydantic_validation_handler(request: Request, exc: PydanticValidationE
     )
 
 
-async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
+async async def http_exception_handler(request: Request, exc: HTTPException) -> JSONResponse:
     """Handle HTTP exceptions with user-friendly messages"""
     # Generate user-friendly message based on status code
     user_message_map = {

@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Async External API Operations for HeyGen AI FastAPI
-Dedicated async functions for external API operations with connection pooling and optimization.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -29,9 +34,17 @@ import hashlib
 import pickle
 import ssl
 import certifi
-
 from fastapi import Request, Response, HTTPException
 from pydantic import BaseModel, Field, validator
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Async External API Operations for HeyGen AI FastAPI
+Dedicated async functions for external API operations with connection pooling and optimization.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -116,7 +129,9 @@ class AsyncExternalAPIManager:
     """Main async external API manager with connection pooling and optimization."""
     
     def __init__(self, config: APIConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.session: Optional[aiohttp.ClientSession] = None
         self.connection_pool = None
         self.api_metrics: Dict[str, APIMetrics] = {}
@@ -128,7 +143,7 @@ class AsyncExternalAPIManager:
         self._is_initialized = False
         self._monitoring_task: Optional[asyncio.Task] = None
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the external API manager."""
         if self._is_initialized:
             return
@@ -182,7 +197,7 @@ class AsyncExternalAPIManager:
             logger.error(f"Failed to initialize external API manager: {e}")
             raise
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup the external API manager."""
         if not self._is_initialized:
             return
@@ -202,7 +217,7 @@ class AsyncExternalAPIManager:
         self._is_initialized = False
         logger.info("External API manager cleaned up")
     
-    async def _test_connection(self):
+    async def _test_connection(self) -> Any:
         """Test API connection."""
         try:
             async with self.session.get(f"{self.config.base_url}/health", timeout=5.0) as response:
@@ -211,7 +226,7 @@ class AsyncExternalAPIManager:
         except Exception as e:
             logger.warning(f"API health check failed: {e}")
     
-    async def _monitoring_loop(self):
+    async def _monitoring_loop(self) -> Any:
         """API monitoring loop."""
         while self._is_initialized:
             try:
@@ -228,7 +243,7 @@ class AsyncExternalAPIManager:
                 logger.error(f"API monitoring error: {e}")
                 await asyncio.sleep(30)
     
-    def get_api_metrics(self) -> Dict[str, APIMetrics]:
+    async def get_api_metrics(self) -> Dict[str, APIMetrics]:
         """Get API performance metrics."""
         return self.api_metrics.copy()
     
@@ -250,11 +265,13 @@ class AsyncExternalAPIOperations:
     """Dedicated async functions for external API operations."""
     
     def __init__(self, api_manager: AsyncExternalAPIManager):
-        self.api_manager = api_manager
+        
+    """__init__ function."""
+self.api_manager = api_manager
         self.response_cache: Dict[str, Any] = {}
         self._lock = asyncio.Lock()
     
-    async def make_request(
+    async async def make_request(
         self,
         method: APIMethod,
         endpoint: str,
@@ -419,7 +436,7 @@ class AsyncExternalAPIOperations:
             headers=headers, timeout=timeout
         )
     
-    async def make_batch_requests(
+    async async def make_batch_requests(
         self,
         requests: List[Dict[str, Any]],
         max_concurrent: int = 10
@@ -427,7 +444,7 @@ class AsyncExternalAPIOperations:
         """Make multiple API requests concurrently."""
         semaphore = asyncio.Semaphore(max_concurrent)
         
-        async def make_single_request(request_data: Dict[str, Any]) -> Dict[str, Any]:
+        async async def make_single_request(request_data: Dict[str, Any]) -> Dict[str, Any]:
             async with semaphore:
                 return await self.make_request(**request_data)
         
@@ -473,7 +490,7 @@ class AsyncExternalAPIOperations:
             logger.error(f"API stream error: {e}")
             raise HTTPException(status_code=500, detail=f"External API stream error: {e}")
     
-    async def upload_file(
+    async async def upload_file(
         self,
         endpoint: str,
         file_path: str,
@@ -494,7 +511,15 @@ class AsyncExternalAPIOperations:
         try:
             # Read file
             async with aiofiles.open(file_path, 'rb') as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 file_data = await file.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Prepare form data
             data = aiohttp.FormData()
@@ -520,7 +545,7 @@ class AsyncExternalAPIOperations:
             logger.error(f"API file upload error: {e}")
             raise HTTPException(status_code=500, detail=f"External API upload error: {e}")
     
-    async def download_file(
+    async async def download_file(
         self,
         endpoint: str,
         save_path: str,
@@ -546,8 +571,16 @@ class AsyncExternalAPIOperations:
                 
                 # Save file
                 async with aiofiles.open(save_path, 'wb') as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     async for chunk in response.content.iter_chunked(8192):
                         await file.write(chunk)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 
                 return {
                     "status_code": response.status,
@@ -560,7 +593,7 @@ class AsyncExternalAPIOperations:
             logger.error(f"API file download error: {e}")
             raise HTTPException(status_code=500, detail=f"External API download error: {e}")
     
-    async def _execute_request(
+    async async def _execute_request(
         self,
         method: APIMethod,
         url: str,
@@ -643,7 +676,7 @@ class AsyncExternalAPIOperations:
             return False
         return True
     
-    async def _update_circuit_breaker(self):
+    async def _update_circuit_breaker(self) -> Any:
         """Update circuit breaker state."""
         async with self.api_manager._lock:
             self.api_manager.circuit_breaker_failures += 1
@@ -654,7 +687,7 @@ class AsyncExternalAPIOperations:
                 self.api_manager.circuit_breaker_state = "open"
                 logger.warning("Circuit breaker opened")
     
-    def _generate_api_id(self, method: APIMethod, endpoint: str, data: Optional[Dict[str, Any]], params: Optional[Dict[str, Any]]) -> str:
+    async def _generate_api_id(self, method: APIMethod, endpoint: str, data: Optional[Dict[str, Any]], params: Optional[Dict[str, Any]]) -> str:
         """Generate unique API request ID."""
         request_str = f"{method.value}:{endpoint}:{json.dumps(data or {}, sort_keys=True)}:{json.dumps(params or {}, sort_keys=True)}"
         return hashlib.md5(request_str.encode()).hexdigest()
@@ -714,7 +747,7 @@ class AsyncExternalAPIOperations:
         
         self.api_manager.api_metrics[api_id] = metrics
     
-    def get_api_metrics(self) -> Dict[str, APIMetrics]:
+    async def get_api_metrics(self) -> Dict[str, APIMetrics]:
         """Get API performance metrics."""
         return self.api_manager.api_metrics.copy()
     

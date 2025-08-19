@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-"""
-Performance Analytics for HeyGen AI FastAPI
-Advanced analytics and reporting for API performance metrics.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -27,9 +26,17 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from io import BytesIO
 import base64
-
 from fastapi import Request, Response
 from pydantic import BaseModel, Field, validator
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Performance Analytics for HeyGen AI FastAPI
+Advanced analytics and reporting for API performance metrics.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -121,13 +128,13 @@ class PerformanceReport:
 class PerformanceAnalytics:
     """Advanced performance analytics system."""
     
-    def __init__(self, monitor):
+    def __init__(self, monitor) -> Any:
         self.monitor = monitor
         self.analysis_cache: Dict[str, Any] = {}
         self.report_templates: Dict[str, Dict[str, Any]] = {}
         self._setup_report_templates()
     
-    def _setup_report_templates(self):
+    def _setup_report_templates(self) -> Any:
         """Setup report templates."""
         self.report_templates = {
             "daily": {
@@ -683,13 +690,15 @@ class PerformanceDashboard:
     """Real-time performance dashboard."""
     
     def __init__(self, monitor: PerformanceMonitor, analytics: PerformanceAnalytics):
-        self.monitor = monitor
+        
+    """__init__ function."""
+self.monitor = monitor
         self.analytics = analytics
         self.dashboard_data: Dict[str, Any] = {}
         self._update_task: Optional[asyncio.Task] = None
         self._is_running = False
     
-    async def start_dashboard(self):
+    async def start_dashboard(self) -> Any:
         """Start dashboard updates."""
         if self._is_running:
             return
@@ -698,7 +707,7 @@ class PerformanceDashboard:
         self._update_task = asyncio.create_task(self._dashboard_update_loop())
         logger.info("Performance dashboard started")
     
-    async def stop_dashboard(self):
+    async def stop_dashboard(self) -> Any:
         """Stop dashboard updates."""
         if not self._is_running:
             return
@@ -714,7 +723,7 @@ class PerformanceDashboard:
         
         logger.info("Performance dashboard stopped")
     
-    async def _dashboard_update_loop(self):
+    async def _dashboard_update_loop(self) -> Any:
         """Dashboard update loop."""
         while self._is_running:
             try:
@@ -725,7 +734,7 @@ class PerformanceDashboard:
                 logger.error(f"Error updating dashboard: {e}")
                 await asyncio.sleep(30)
     
-    async def _update_dashboard_data(self):
+    async def _update_dashboard_data(self) -> Any:
         """Update dashboard data."""
         # Get current performance summary
         summary = self.monitor.get_performance_summary()

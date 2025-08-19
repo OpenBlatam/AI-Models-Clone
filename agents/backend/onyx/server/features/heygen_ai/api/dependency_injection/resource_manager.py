@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Resource Manager for FastAPI Dependency Injection
-Manages shared resources and their lifecycle.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -16,6 +21,22 @@ import weakref
 from functools import lru_cache, wraps
 import inspect
 import gc
+        from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
+        import redis.asyncio as redis
+        import redis.asyncio as redis
+        import aiohttp
+        import os
+        import aiofiles
+        import os
+        import aiofiles
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Resource Manager for FastAPI Dependency Injection
+Manages shared resources and their lifecycle.
+"""
+
 
 logger = structlog.get_logger()
 
@@ -83,7 +104,9 @@ class ResourceBase:
     """Base class for all resources."""
     
     def __init__(self, config: ResourceConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.stats = ResourceStats(
             name=config.name,
             resource_type=config.resource_type,
@@ -160,7 +183,7 @@ class ResourceBase:
         pass
     
     @asynccontextmanager
-    async def get_connection(self):
+    async def get_connection(self) -> Optional[Dict[str, Any]]:
         """Get a connection from the resource pool."""
         if not self._is_initialized:
             raise RuntimeError(f"Resource {self.config.name} not initialized")
@@ -199,7 +222,7 @@ class ResourceBase:
             self.stats.total_connection_time_ms += connection_time_ms
             self.stats.average_connection_time_ms = self.stats.total_connection_time_ms / self.stats.access_count
     
-    async def _get_connection_internal(self) -> Any:
+    async def _get_connection_internal(self) -> Optional[Dict[str, Any]]:
         """Internal method to get connection - to be implemented by subclasses."""
         raise NotImplementedError
     
@@ -256,14 +279,15 @@ class DatabaseResource(ResourceBase):
     """Database resource for managing database connections."""
     
     def __init__(self, config: ResourceConfig, database_url: str):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.database_url = database_url
         self.engine = None
         self.session_factory = None
     
     async def _initialize_internal(self) -> None:
         """Initialize database connection pool."""
-        from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
         
         self.engine = create_async_engine(
             self.database_url,
@@ -289,7 +313,7 @@ class DatabaseResource(ResourceBase):
         if self.engine:
             await self.engine.dispose()
     
-    async def _get_connection_internal(self) -> Any:
+    async def _get_connection_internal(self) -> Optional[Dict[str, Any]]:
         """Get database session."""
         return self.session_factory()
     
@@ -306,13 +330,14 @@ class RedisResource(ResourceBase):
     """Redis resource for managing Redis connections."""
     
     def __init__(self, config: ResourceConfig, redis_url: str):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.redis_url = redis_url
         self.pool = None
     
     async def _initialize_internal(self) -> None:
         """Initialize Redis connection pool."""
-        import redis.asyncio as redis
         
         self.pool = redis.ConnectionPool.from_url(
             self.redis_url,
@@ -333,9 +358,8 @@ class RedisResource(ResourceBase):
         if self.pool:
             await self.pool.disconnect()
     
-    async def _get_connection_internal(self) -> Any:
+    async def _get_connection_internal(self) -> Optional[Dict[str, Any]]:
         """Get Redis client."""
-        import redis.asyncio as redis
         return redis.Redis(connection_pool=self.pool)
     
     async def _perform_health_check(self) -> None:
@@ -352,14 +376,15 @@ class ExternalAPIResource(ResourceBase):
     """External API resource for managing API connections."""
     
     def __init__(self, config: ResourceConfig, base_url: str, headers: Optional[Dict[str, str]] = None):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.base_url = base_url
         self.headers = headers or {}
         self.session = None
     
     async def _initialize_internal(self) -> None:
         """Initialize HTTP session."""
-        import aiohttp
         
         timeout = aiohttp.ClientTimeout(total=self.config.connection_timeout)
         self.session = aiohttp.ClientSession(
@@ -378,7 +403,7 @@ class ExternalAPIResource(ResourceBase):
         if self.session:
             await self.session.close()
     
-    async def _get_connection_internal(self) -> Any:
+    async def _get_connection_internal(self) -> Optional[Dict[str, Any]]:
         """Get HTTP session."""
         return self.session
     
@@ -396,14 +421,14 @@ class FileSystemResource(ResourceBase):
     """File system resource for managing file operations."""
     
     def __init__(self, config: ResourceConfig, base_path: str):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.base_path = base_path
         self._semaphore = None
     
     async def _initialize_internal(self) -> None:
         """Initialize file system resource."""
-        import os
-        import aiofiles
         
         # Ensure base path exists
         os.makedirs(self.base_path, exist_ok=True)
@@ -414,7 +439,15 @@ class FileSystemResource(ResourceBase):
         # Test write access
         test_file = os.path.join(self.base_path, ".test")
         async with aiofiles.open(test_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             await f.write("test")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         os.remove(test_file)
     
     async def _cleanup_internal(self) -> None:
@@ -422,19 +455,25 @@ class FileSystemResource(ResourceBase):
         # Nothing to cleanup for file system
         pass
     
-    async def _get_connection_internal(self) -> Any:
+    async def _get_connection_internal(self) -> Optional[Dict[str, Any]]:
         """Get file system connection (semaphore)."""
         return self._semaphore
     
     async def _perform_health_check(self) -> None:
         """Perform file system health check."""
-        import os
-        import aiofiles
         
         # Test write access
         test_file = os.path.join(self.base_path, f".health_check_{int(time.time())}")
         async with aiofiles.open(test_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             await f.write("health_check")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         os.remove(test_file)
 
 # =============================================================================
@@ -444,7 +483,7 @@ class FileSystemResource(ResourceBase):
 class ResourceManager:
     """Main resource manager for managing all resources."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.resources: Dict[str, ResourceBase] = {}
         self._initialized = False
     

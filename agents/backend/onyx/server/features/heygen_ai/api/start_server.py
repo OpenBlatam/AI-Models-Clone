@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Server startup script for HeyGen AI API
-Handles initialization, configuration, and graceful shutdown.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import logging
@@ -14,11 +16,18 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
-
-# Import application components
 from config import settings, setup_configuration, get_cors_config
 from database import init_database, close_database
 from main import app
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Server startup script for HeyGen AI API
+Handles initialization, configuration, and graceful shutdown.
+"""
+
+
+# Import application components
 
 # Setup logging
 logging.basicConfig(
@@ -35,12 +44,12 @@ logger = logging.getLogger(__name__)
 class ServerManager:
     """Manages server lifecycle and graceful shutdown."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = app
         self.server = None
         self.shutdown_event = asyncio.Event()
     
-    async def startup(self):
+    async def startup(self) -> Any:
         """Initialize application on startup."""
         logger.info("🚀 Starting HeyGen AI API Server...")
         
@@ -67,7 +76,7 @@ class ServerManager:
             logger.error(f"❌ Server startup failed: {e}")
             raise
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Cleanup on shutdown."""
         logger.info("🛑 Shutting down HeyGen AI API Server...")
         
@@ -85,7 +94,7 @@ class ServerManager:
         except Exception as e:
             logger.error(f"❌ Server shutdown error: {e}")
     
-    def _setup_middleware(self):
+    def _setup_middleware(self) -> Any:
         """Setup FastAPI middleware."""
         # CORS middleware
         cors_config = get_cors_config()
@@ -104,23 +113,23 @@ class ServerManager:
         # self.app.add_middleware(RateLimitMiddleware)
         # self.app.add_middleware(AuthMiddleware)
     
-    def _setup_signal_handlers(self):
+    def _setup_signal_handlers(self) -> Any:
         """Setup signal handlers for graceful shutdown."""
-        def signal_handler(signum, frame):
+        def signal_handler(signum, frame) -> Any:
             logger.info(f"Received signal {signum}, initiating graceful shutdown...")
             self.shutdown_event.set()
         
         signal.signal(signal.SIGINT, signal_handler)
         signal.signal(signal.SIGTERM, signal_handler)
     
-    async def _cleanup_resources(self):
+    async def _cleanup_resources(self) -> Any:
         """Cleanup application resources."""
         # Close any open connections
         # Clear caches
         # Stop background tasks
         pass
     
-    async def run_server(self):
+    async def run_server(self) -> Any:
         """Run the server with proper lifecycle management."""
         config = uvicorn.Config(
             app=self.app,

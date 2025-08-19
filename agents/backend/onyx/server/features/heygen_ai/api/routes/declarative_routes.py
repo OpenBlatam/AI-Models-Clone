@@ -1,26 +1,40 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import (
+from datetime import datetime, timezone
+from fastapi import (
+from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel, Field, ValidationError
+import structlog
+from enum import Enum
+from ..schemas.functional_models import (
+from ..services.functional_services import (
+from ..core.dependencies import get_db, get_current_active_user, get_current_user
+from ..core.database import get_user_repository, get_video_repository
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Declarative Route Definitions for HeyGen AI API
 Clear return type annotations and modern FastAPI patterns.
 """
 
-from typing import (
     List, Optional, Dict, Any, Union, Annotated, Literal,
     Tuple, Sequence, Callable, TypeVar, Generic
 )
-from datetime import datetime, timezone
-from fastapi import (
     APIRouter, Depends, HTTPException, status, Query, Path, 
     Header, Body, Form, File, UploadFile, BackgroundTasks,
     Request, Response
 )
-from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, Field, ValidationError
-import structlog
-from enum import Enum
 
-from ..schemas.functional_models import (
     UserCreate, UserUpdate, UserResponse, UserSummary,
     VideoCreate, VideoUpdate, VideoResponse, VideoSummary,
     ModelUsageCreate, ModelUsageResponse,
@@ -28,14 +42,11 @@ from ..schemas.functional_models import (
     AnalyticsRequest, AnalyticsResponse,
     VideoStatus, VideoQuality, ModelType
 )
-from ..services.functional_services import (
     process_user_registration, process_video_creation,
     process_analytics_request, transform_user_to_response,
     transform_video_to_response, create_success_response,
     create_error_response
 )
-from ..core.dependencies import get_db, get_current_active_user, get_current_user
-from ..core.database import get_user_repository, get_video_repository
 
 logger = structlog.get_logger()
 

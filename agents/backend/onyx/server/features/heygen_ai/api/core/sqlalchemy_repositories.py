@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-"""
-Enhanced SQLAlchemy 2.0 Repositories for HeyGen AI API
-Modern repository pattern with SQLAlchemy 2.0 features, type annotations, and performance optimization.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import logging
 from typing import Optional, List, Dict, Any, Union, TypeVar, Generic, Type, Sequence
@@ -14,9 +13,17 @@ from sqlalchemy.exc import SQLAlchemyError, IntegrityError, NoResultFound, Multi
 from sqlalchemy.sql import Select
 from pydantic import BaseModel
 from contextlib import asynccontextmanager
-
 from .sqlalchemy_config import SQLAlchemyManager
 from .models.sqlalchemy_models import Base, User, Video, ModelUsage
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Enhanced SQLAlchemy 2.0 Repositories for HeyGen AI API
+Modern repository pattern with SQLAlchemy 2.0 features, type annotations, and performance optimization.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +37,9 @@ class BaseRepository(Generic[T]):
     """
     
     def __init__(self, sqlalchemy_manager: SQLAlchemyManager, model: Type[T]):
-        self.sqlalchemy_manager = sqlalchemy_manager
+        
+    """__init__ function."""
+self.sqlalchemy_manager = sqlalchemy_manager
         self.model = model
     
     @asynccontextmanager
@@ -283,7 +292,7 @@ class BaseRepository(Generic[T]):
 class UserRepository(BaseRepository[User]):
     """Enhanced user repository with user-specific operations."""
     
-    async def get_by_api_key(self, api_key: str) -> Optional[User]:
+    async async def get_by_api_key(self, api_key: str) -> Optional[User]:
         """Get user by API key with validation."""
         return await self.get_by_field("api_key", api_key)
     
@@ -775,7 +784,9 @@ class RepositoryFactory:
     """Factory for creating repository instances."""
     
     def __init__(self, sqlalchemy_manager: SQLAlchemyManager):
-        self.sqlalchemy_manager = sqlalchemy_manager
+        
+    """__init__ function."""
+self.sqlalchemy_manager = sqlalchemy_manager
     
     def get_user_repository(self) -> UserRepository:
         """Get user repository instance."""

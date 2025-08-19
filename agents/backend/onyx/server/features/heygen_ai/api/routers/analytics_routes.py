@@ -1,25 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.ext.asyncio import AsyncSession
+from typing import Dict, Any, List, Optional
+from datetime import datetime, timedelta
+import logging
+from ..core.database import get_session
+from ..core.auth import get_current_user, get_current_admin_user
+from ..models.schemas import (
+from ..services.analytics_service import (
+from ..utils.helpers import generate_request_id, format_error_message
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Analytics routes for HeyGen AI API
 Provides data analytics and reporting endpoints with Pydantic models and type hints.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
-from typing import Dict, Any, List, Optional
-from datetime import datetime, timedelta
-import logging
 
-from ..core.database import get_session
-from ..core.auth import get_current_user, get_current_admin_user
-from ..models.schemas import (
     AnalyticsInput,
     AnalyticsOutput,
     DateRangeInput,
     UserAnalyticsOutput,
     VideoAnalyticsOutput
 )
-from ..services.analytics_service import (
     get_user_analytics,
     get_video_analytics,
     get_system_analytics,
@@ -27,7 +32,6 @@ from ..services.analytics_service import (
     get_performance_metrics,
     get_revenue_analytics
 )
-from ..utils.helpers import generate_request_id, format_error_message
 
 logger = logging.getLogger(__name__)
 

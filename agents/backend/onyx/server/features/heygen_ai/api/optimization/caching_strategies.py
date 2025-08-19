@@ -1,23 +1,39 @@
-#!/usr/bin/env python3
-"""
-Caching Strategies for HeyGen AI API
-Comprehensive caching implementation with Redis, in-memory caching, and cache warming.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import json
 import hashlib
 import pickle
 from typing import (
-    Dict, List, Any, Optional, Union, Callable, Awaitable,
-    TypeVar, Generic, Tuple, Set
-)
 from datetime import datetime, timezone, timedelta
 from functools import wraps
 import structlog
 from dataclasses import dataclass, asdict
 from enum import Enum
 import redis.asyncio as redis
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Caching Strategies for HeyGen AI API
+Comprehensive caching implementation with Redis, in-memory caching, and cache warming.
+"""
+
+    Dict, List, Any, Optional, Union, Callable, Awaitable,
+    TypeVar, Generic, Tuple, Set
+)
 
 logger = structlog.get_logger()
 
@@ -77,7 +93,7 @@ class CacheEntry:
     size_bytes: int = 0
     compressed: bool = False
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.last_accessed is None:
             self.last_accessed = self.created_at
     
@@ -87,7 +103,7 @@ class CacheEntry:
             return False
         return datetime.now(timezone.utc) > self.expires_at
     
-    def access(self):
+    def access(self) -> Any:
         """Record access to entry."""
         self.access_count += 1
         self.last_accessed = datetime.now(timezone.utc)
@@ -113,7 +129,9 @@ class BaseCache:
     """Base cache interface."""
     
     def __init__(self, config: CacheConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.stats = {
             "hits": 0,
             "misses": 0,
@@ -161,7 +179,9 @@ class RedisCache(BaseCache):
     """Redis-based cache implementation."""
     
     def __init__(self, config: CacheConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.redis_client: Optional[redis.Redis] = None
         self._connection_lock = asyncio.Lock()
     
@@ -283,7 +303,7 @@ class RedisCache(BaseCache):
             logger.error("Redis clear error", error=str(e))
             return False
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close Redis connection."""
         if self.redis_client:
             await self.redis_client.close()
@@ -297,16 +317,18 @@ class MemoryCache(BaseCache):
     """In-memory cache implementation with LRU eviction."""
     
     def __init__(self, config: CacheConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self._cache: Dict[str, CacheEntry] = {}
         self._access_order: List[str] = []
         self._cleanup_task: Optional[asyncio.Task] = None
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start memory cache with cleanup task."""
         self._cleanup_task = asyncio.create_task(self._cleanup_loop())
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop memory cache."""
         if self._cleanup_task:
             self._cleanup_task.cancel()
@@ -315,7 +337,7 @@ class MemoryCache(BaseCache):
             except asyncio.CancelledError:
                 pass
     
-    async def _cleanup_loop(self):
+    async def _cleanup_loop(self) -> Any:
         """Background cleanup loop."""
         while True:
             try:
@@ -326,7 +348,7 @@ class MemoryCache(BaseCache):
             except Exception as e:
                 logger.error("Memory cache cleanup error", error=str(e))
     
-    async def _cleanup_expired(self):
+    async def _cleanup_expired(self) -> Any:
         """Remove expired entries."""
         expired_keys = [
             key for key, entry in self._cache.items()
@@ -337,7 +359,7 @@ class MemoryCache(BaseCache):
             await self.delete(key)
             self.stats["evictions"] += 1
     
-    def _evict_if_needed(self):
+    def _evict_if_needed(self) -> Any:
         """Evict entries if cache is full."""
         while len(self._cache) >= self.config.max_size:
             # Remove least recently used entry
@@ -437,16 +459,18 @@ class HybridCache(BaseCache):
     """Hybrid cache using both Redis and memory cache."""
     
     def __init__(self, config: CacheConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.redis_cache = RedisCache(config)
         self.memory_cache = MemoryCache(config)
         self.memory_ttl = 60  # Shorter TTL for memory cache
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start hybrid cache."""
         await self.memory_cache.start()
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop hybrid cache."""
         await self.memory_cache.stop()
         await self.redis_cache.close()
@@ -525,7 +549,7 @@ def cached(
     """Decorator for caching function results."""
     def decorator(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             if key_generator:
                 cache_key = key_generator(*args, **kwargs)
@@ -559,7 +583,7 @@ def cache_invalidate(pattern: str, cache_type: CacheType = CacheType.HYBRID):
     """Decorator for invalidating cache after function execution."""
     def decorator(func: Callable[..., Awaitable[T]]) -> Callable[..., Awaitable[T]]:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Execute function
             result = await func(*args, **kwargs)
             
@@ -581,7 +605,9 @@ class CacheWarmer:
     """Cache warming utility for preloading frequently accessed data."""
     
     def __init__(self, cache: BaseCache):
-        self.cache = cache
+        
+    """__init__ function."""
+self.cache = cache
         self.warming_tasks: List[asyncio.Task] = []
     
     async def warm_cache(

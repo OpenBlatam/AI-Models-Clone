@@ -1,7 +1,13 @@
-"""
-WebSocket Manager - Real-time Communication
-Comprehensive WebSocket management for real-time video processing updates and notifications.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -11,10 +17,16 @@ from typing import Dict, List, Set, Optional, Any, Callable, Awaitable
 from datetime import datetime, timedelta
 from enum import Enum
 import logging
-
 from fastapi import WebSocket, WebSocketDisconnect, HTTPException, status
 from starlette.websockets import WebSocketState
 import structlog
+from typing import Any, List, Dict, Optional
+"""
+WebSocket Manager - Real-time Communication
+Comprehensive WebSocket management for real-time video processing updates and notifications.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -58,7 +70,9 @@ class WebSocketMessage:
         message_id: Optional[str] = None,
         timestamp: Optional[datetime] = None
     ):
-        self.message_type = message_type
+        
+    """__init__ function."""
+self.message_type = message_type
         self.data = data
         self.message_id = message_id or str(uuid.uuid4())
         self.timestamp = timestamp or datetime.now()
@@ -103,7 +117,9 @@ class VideoProgressMessage(WebSocketMessage):
         message_id: Optional[str] = None,
         timestamp: Optional[datetime] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message_type=MessageType.VIDEO_PROGRESS,
             data={
                 "video_id": video_id,
@@ -128,7 +144,9 @@ class VideoCompleteMessage(WebSocketMessage):
         message_id: Optional[str] = None,
         timestamp: Optional[datetime] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message_type=MessageType.VIDEO_COMPLETE,
             data={
                 "video_id": video_id,
@@ -153,7 +171,9 @@ class VideoErrorMessage(WebSocketMessage):
         message_id: Optional[str] = None,
         timestamp: Optional[datetime] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message_type=MessageType.VIDEO_ERROR,
             data={
                 "video_id": video_id,
@@ -174,7 +194,9 @@ class WebSocketConnection:
     """Individual WebSocket connection with metadata."""
     
     def __init__(self, websocket: WebSocket, connection_id: str, user_id: Optional[str] = None):
-        self.websocket = websocket
+        
+    """__init__ function."""
+self.websocket = websocket
         self.connection_id = connection_id
         self.user_id = user_id
         self.status = ConnectionStatus.CONNECTING
@@ -199,7 +221,7 @@ class WebSocketConnection:
         """Check if connection is stale (no activity for timeout_seconds)."""
         return (datetime.now() - self.last_activity).total_seconds() > timeout_seconds
     
-    def update_activity(self):
+    def update_activity(self) -> Any:
         """Update last activity timestamp."""
         self.last_activity = datetime.now()
     
@@ -226,7 +248,9 @@ class WebSocketManager:
         max_connections: int = 1000,
         max_subscriptions_per_connection: int = 50
     ):
-        self.connections: Dict[str, WebSocketConnection] = {}
+        
+    """__init__ function."""
+self.connections: Dict[str, WebSocketConnection] = {}
         self.topic_subscriptions: Dict[str, Set[str]] = {}
         self.heartbeat_interval = heartbeat_interval
         self.cleanup_interval = cleanup_interval
@@ -247,7 +271,7 @@ class WebSocketManager:
         self.on_disconnect_handlers: List[Callable[[WebSocketConnection], Awaitable[None]]] = []
         self.on_message_handlers: List[Callable[[WebSocketConnection, WebSocketMessage], Awaitable[None]]] = []
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start the WebSocket manager."""
         logger.info("Starting WebSocket manager")
         
@@ -257,7 +281,7 @@ class WebSocketManager:
         
         logger.info("WebSocket manager started")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop the WebSocket manager."""
         logger.info("Stopping WebSocket manager")
         
@@ -529,7 +553,7 @@ class WebSocketManager:
         if topic:
             await self.unsubscribe(connection.connection_id, topic)
     
-    async def _heartbeat_loop(self):
+    async def _heartbeat_loop(self) -> Any:
         """Background task for sending heartbeat messages."""
         while True:
             try:
@@ -548,7 +572,7 @@ class WebSocketManager:
             except Exception as e:
                 logger.error(f"Heartbeat loop error: {e}")
     
-    async def _cleanup_loop(self):
+    async def _cleanup_loop(self) -> Any:
         """Background task for cleaning up stale connections."""
         while True:
             try:
@@ -572,7 +596,7 @@ class WebSocketManager:
             except Exception as e:
                 logger.error(f"Cleanup loop error: {e}")
     
-    async def close_all_connections(self):
+    async def close_all_connections(self) -> Any:
         """Close all active connections."""
         connection_ids = list(self.connections.keys())
         for connection_id in connection_ids:
@@ -610,10 +634,12 @@ class WebSocketEventHandler:
     """Event handler for WebSocket events."""
     
     def __init__(self, manager: WebSocketManager):
-        self.manager = manager
+        
+    """__init__ function."""
+self.manager = manager
         self._setup_handlers()
     
-    def _setup_handlers(self):
+    def _setup_handlers(self) -> Any:
         """Setup default event handlers."""
         self.manager.on_connect_handlers.append(self._on_connect)
         self.manager.on_disconnect_handlers.append(self._on_disconnect)
@@ -646,7 +672,7 @@ class WebSocketEventHandler:
 class VideoWebSocketManager(WebSocketManager):
     """WebSocket manager specialized for video processing updates."""
     
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> Any:
         super().__init__(**kwargs)
         self.video_subscriptions: Dict[str, Set[str]] = {}  # video_id -> connection_ids
     

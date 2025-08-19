@@ -1,20 +1,30 @@
-#!/usr/bin/env python3
-"""
-Database Initialization Script for HeyGen AI API
-Demonstrates setup and configuration of async database system
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import logging
 import os
 import sys
 from pathlib import Path
+from api.core.async_database import (
+from api.core.migrations import MigrationManager, CommonMigrations
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Database Initialization Script for HeyGen AI API
+Demonstrates setup and configuration of async database system
+"""
+
 
 # Add the project root to the Python path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from api.core.async_database import (
     AsyncDatabaseManager,
     DatabaseConnectionPool,
     create_postgresql_config,
@@ -22,7 +32,6 @@ from api.core.async_database import (
     create_sqlite_config,
     DatabaseType
 )
-from api.core.migrations import MigrationManager, CommonMigrations
 
 # Configure logging
 logging.basicConfig(
@@ -351,5 +360,6 @@ async def main():
             await db_pool.close_all()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Specialized Caches for HeyGen AI API
-Specialized cache implementations for different data types.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -14,8 +19,16 @@ import structlog
 from dataclasses import dataclass, asdict
 from enum import Enum
 import weakref
-
 from .cache_manager import CacheManager, CacheConfig, CacheType, CacheStrategy
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Specialized Caches for HeyGen AI API
+Specialized cache implementations for different data types.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -55,7 +68,9 @@ class UserDataCache:
     """Specialized cache for user-related data."""
     
     def __init__(self, cache_manager: CacheManager):
-        self.cache_manager = cache_manager
+        
+    """__init__ function."""
+self.cache_manager = cache_manager
         self.user_cache_config = CachePolicy(
             data_type=DataType.USER_DATA,
             ttl=1800,  # 30 minutes
@@ -135,7 +150,9 @@ class VideoDataCache:
     """Specialized cache for video-related data."""
     
     def __init__(self, cache_manager: CacheManager):
-        self.cache_manager = cache_manager
+        
+    """__init__ function."""
+self.cache_manager = cache_manager
         self.video_cache_config = CachePolicy(
             data_type=DataType.VIDEO_DATA,
             ttl=3600,  # 1 hour
@@ -224,7 +241,9 @@ class StaticContentCache:
     """Specialized cache for static content."""
     
     def __init__(self, cache_manager: CacheManager):
-        self.cache_manager = cache_manager
+        
+    """__init__ function."""
+self.cache_manager = cache_manager
         self.static_cache_config = CachePolicy(
             data_type=DataType.STATIC_CONTENT,
             ttl=86400,  # 24 hours
@@ -255,7 +274,7 @@ class StaticContentCache:
         key = f"config:{config_key}"
         await self.cache_manager.set(key, config_data, self.static_cache_config.ttl, "static_cache")
     
-    async def get_api_documentation(self, version: str = "v1") -> Optional[Dict[str, Any]]:
+    async async def get_api_documentation(self, version: str = "v1") -> Optional[Dict[str, Any]]:
         """Get API documentation from cache."""
         key = f"api_docs:{version}"
         return await self.cache_manager.get(key, "static_cache")
@@ -294,7 +313,9 @@ class FrequentlyAccessedCache:
     """Specialized cache for frequently accessed data."""
     
     def __init__(self, cache_manager: CacheManager):
-        self.cache_manager = cache_manager
+        
+    """__init__ function."""
+self.cache_manager = cache_manager
         self.frequent_cache_config = CachePolicy(
             data_type=DataType.FREQUENTLY_ACCESSED,
             ttl=600,  # 10 minutes
@@ -366,7 +387,9 @@ class AnalyticsDataCache:
     """Specialized cache for analytics data."""
     
     def __init__(self, cache_manager: CacheManager):
-        self.cache_manager = cache_manager
+        
+    """__init__ function."""
+self.cache_manager = cache_manager
         self.analytics_cache_config = CachePolicy(
             data_type=DataType.ANALYTICS_DATA,
             ttl=1800,  # 30 minutes
@@ -426,7 +449,9 @@ class CacheFactory:
     """Factory for creating specialized caches."""
     
     def __init__(self, cache_manager: CacheManager):
-        self.cache_manager = cache_manager
+        
+    """__init__ function."""
+self.cache_manager = cache_manager
         self.specialized_caches: Dict[DataType, Any] = {}
     
     def get_user_cache(self) -> UserDataCache:
@@ -471,7 +496,7 @@ def cache_user_data(ttl: int = 1800):
     """Decorator to cache user data."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Extract user_id from arguments
             user_id = None
             for arg in args:
@@ -511,7 +536,7 @@ def cache_video_data(ttl: int = 3600):
     """Decorator to cache video data."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Extract video_id from arguments
             video_id = None
             for arg in args:
@@ -551,7 +576,7 @@ def cache_static_content(ttl: int = 86400):
     """Decorator to cache static content."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate cache key from function name and arguments
             key_data = {
                 "func": func.__name__,
@@ -585,7 +610,7 @@ def invalidate_user_cache():
     """Decorator to invalidate user cache after function execution."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Execute function
             result = await func(*args, **kwargs)
             
@@ -617,7 +642,7 @@ def invalidate_video_cache():
     """Decorator to invalidate video cache after function execution."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Execute function
             result = await func(*args, **kwargs)
             

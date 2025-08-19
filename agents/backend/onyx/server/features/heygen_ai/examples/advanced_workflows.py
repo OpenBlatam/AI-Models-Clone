@@ -1,13 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import logging
+from pathlib import Path
+from ..core import HeyGenAI
+from typing import Any, List, Dict, Optional
 """
 Advanced Workflows Examples for HeyGen AI equivalent.
 Examples of using advanced AI workflows with LangChain and OpenRouter.
 """
 
-import asyncio
-import logging
-from pathlib import Path
 
-from ..core import HeyGenAI
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -363,5 +369,6 @@ async def main():
         logger.error(f"Advanced workflow examples failed: {e}")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

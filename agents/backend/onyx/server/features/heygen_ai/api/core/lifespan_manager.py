@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Lifespan Context Manager for HeyGen AI API
-Modern approach to managing startup and shutdown events in FastAPI.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import signal
@@ -16,6 +21,19 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 import redis.asyncio as redis
 from prometheus_client import start_http_server, Counter, Histogram, Gauge
 import uvicorn
+    from fastapi import Request
+    from fastapi import Request
+    from fastapi import Request
+        from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+        from fastapi.responses import Response
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Lifespan Context Manager for HeyGen AI API
+Modern approach to managing startup and shutdown events in FastAPI.
+"""
+
 
 logger = structlog.get_logger()
 
@@ -37,7 +55,7 @@ REDIS_CONNECTIONS = Gauge('heygen_api_redis_connections', 'Number of Redis conne
 class LifespanConfig:
     """Configuration for lifespan management."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.database_url: str = "postgresql+asyncpg://user:password@localhost/heygen_ai"
         self.redis_url: str = "redis://localhost:6379"
         self.prometheus_port: int = 8001
@@ -53,7 +71,7 @@ class LifespanConfig:
 class LifespanState:
     """State management for application lifespan."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.startup_time: Optional[datetime] = None
         self.shutdown_time: Optional[datetime] = None
         self.database_engine: Optional[Any] = None
@@ -73,7 +91,9 @@ class DatabaseManager:
     """Database connection and session management."""
     
     def __init__(self, state: LifespanState):
-        self.state = state
+        
+    """__init__ function."""
+self.state = state
     
     async def initialize_database(self) -> None:
         """Initialize database connections."""
@@ -137,7 +157,9 @@ class RedisManager:
     """Redis connection management."""
     
     def __init__(self, state: LifespanState):
-        self.state = state
+        
+    """__init__ function."""
+self.state = state
     
     async def initialize_redis(self) -> None:
         """Initialize Redis connection."""
@@ -191,7 +213,9 @@ class HealthCheckManager:
     """Health check and monitoring management."""
     
     def __init__(self, state: LifespanState):
-        self.state = state
+        
+    """__init__ function."""
+self.state = state
     
     async def start_health_check(self) -> None:
         """Start periodic health checks."""
@@ -262,7 +286,9 @@ class SignalHandler:
     """Signal handling for graceful shutdown."""
     
     def __init__(self, state: LifespanState):
-        self.state = state
+        
+    """__init__ function."""
+self.state = state
         self._original_handlers: Dict[int, Any] = {}
     
     def setup_signal_handlers(self) -> None:
@@ -305,7 +331,7 @@ class SignalHandler:
 class LifespanManager:
     """Main lifespan manager for the application."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.state = LifespanState()
         self.database_manager = DatabaseManager(self.state)
         self.redis_manager = RedisManager(self.state)
@@ -462,7 +488,6 @@ class LifespanManager:
 async def get_database_session() -> AsyncSession:
     """Dependency to get database session."""
     # This will be set during startup
-    from fastapi import Request
     request: Request = Request()
     database_manager: DatabaseManager = request.app.state.database_manager
     return await database_manager.get_database_session()
@@ -470,7 +495,6 @@ async def get_database_session() -> AsyncSession:
 async def get_redis_client() -> redis.Redis:
     """Dependency to get Redis client."""
     # This will be set during startup
-    from fastapi import Request
     request: Request = Request()
     redis_manager: RedisManager = request.app.state.redis_manager
     return await redis_manager.get_redis_client()
@@ -478,7 +502,6 @@ async def get_redis_client() -> redis.Redis:
 def get_lifespan_state() -> LifespanState:
     """Dependency to get lifespan state."""
     # This will be set during startup
-    from fastapi import Request
     request: Request = Request()
     return request.app.state.lifespan_state
 
@@ -505,7 +528,7 @@ def create_app() -> FastAPI:
     
     # Add middleware for metrics
     @app.middleware("http")
-    async def metrics_middleware(request, call_next):
+    async def metrics_middleware(request, call_next) -> Any:
         """Middleware for collecting metrics."""
         start_time = datetime.now(timezone.utc)
         
@@ -552,8 +575,6 @@ def create_app() -> FastAPI:
     @app.get("/metrics")
     async def metrics():
         """Prometheus metrics endpoint."""
-        from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
-        from fastapi.responses import Response
         
         return Response(
             content=generate_latest(),
@@ -587,5 +608,6 @@ def main():
         logger.error("Application failed to start", error=str(e))
         sys.exit(1)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

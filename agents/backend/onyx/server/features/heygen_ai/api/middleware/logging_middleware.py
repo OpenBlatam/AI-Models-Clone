@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Logging Middleware for HeyGen AI API
-Comprehensive logging with structured output, performance metrics, and security monitoring.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -20,6 +25,14 @@ import re
 from dataclasses import dataclass, asdict
 from enum import Enum
 import secrets
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Logging Middleware for HeyGen AI API
+Comprehensive logging with structured output, performance metrics, and security monitoring.
+"""
+
 
 logger = structlog.get_logger()
 
@@ -62,7 +75,7 @@ class LogContext:
     duration_ms: Optional[float] = None
     status_code: Optional[int] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.timestamp is None:
             self.timestamp = datetime.now(timezone.utc)
     
@@ -86,7 +99,9 @@ class RequestResponseLogger:
         sensitive_fields: List[str] = None,
         max_body_size: int = 1024 * 1024  # 1MB
     ):
-        self.log_request_body = log_request_body
+        
+    """__init__ function."""
+self.log_request_body = log_request_body
         self.log_response_body = log_response_body
         self.log_headers = log_headers
         self.sensitive_headers = sensitive_headers or [
@@ -158,7 +173,7 @@ class RequestResponseLogger:
         else:
             logger.info("Response sent", **log_data)
     
-    async def _get_request_body(self, request: Request) -> Optional[str]:
+    async async def _get_request_body(self, request: Request) -> Optional[str]:
         """Get request body safely."""
         try:
             body = await request.body()
@@ -226,7 +241,7 @@ class RequestResponseLogger:
 class PerformanceMonitor:
     """Monitor and log performance metrics."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.slow_request_threshold_ms = 1000  # 1 second
         self.performance_metrics: List[Dict[str, Any]] = []
         self.max_metrics = 1000
@@ -304,7 +319,7 @@ class PerformanceMonitor:
 class SecurityMonitor:
     """Monitor and log security events."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.suspicious_patterns = [
             r"<script[^>]*>",  # XSS attempts
             r"javascript:",     # JavaScript injection
@@ -397,7 +412,7 @@ class SecurityMonitor:
         
         return None
     
-    async def _clean_rate_limit_patterns(self):
+    async def _clean_rate_limit_patterns(self) -> Any:
         """Clean old rate limit patterns."""
         current_time = datetime.now(timezone.utc)
         keys_to_remove = []
@@ -416,7 +431,7 @@ class SecurityMonitor:
 class BusinessLogger:
     """Log business logic events."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.business_events: List[Dict[str, Any]] = []
         self.max_events = 1000
     
@@ -497,7 +512,7 @@ class BusinessLogger:
 class AuditLogger:
     """Log audit events for compliance and security."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.audit_events: List[Dict[str, Any]] = []
         self.max_audit_events = 1000
     
@@ -589,7 +604,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         enable_business_logging: bool = True,
         enable_audit_logging: bool = True
     ):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         
         self.request_response_logger = RequestResponseLogger(
             log_request_body=log_request_body,
@@ -663,7 +680,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             # Re-raise exception
             raise
     
-    def _get_request_id(self, request: Request) -> str:
+    async def _get_request_id(self, request: Request) -> str:
         """Get or generate request ID."""
         return (
             request.headers.get("X-Request-ID") or

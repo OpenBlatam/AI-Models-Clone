@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-Enhanced Validation utilities for HeyGen AI API
-Provides comprehensive validation functions with early error handling and edge case management.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import re
 from typing import Dict, Any, List, Optional, Union, Tuple
@@ -11,8 +19,16 @@ import logging
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 import threading
-
 from ..core.error_handling import (
+from ..models.schemas import QualityLevel, LanguageCode, VideoStatus
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Enhanced Validation utilities for HeyGen AI API
+Provides comprehensive validation functions with early error handling and edge case management.
+"""
+
+
     error_factory,
     validate_required,
     validate_length,
@@ -25,7 +41,6 @@ from ..core.error_handling import (
     ErrorLogger,
     UserFriendlyMessageGenerator
 )
-from ..models.schemas import QualityLevel, LanguageCode, VideoStatus
 
 logger = logging.getLogger(__name__)
 
@@ -565,7 +580,7 @@ def validate_date_range(
     return len(errors) == 0, errors
 
 
-def validate_api_key_format(api_key: str) -> Tuple[bool, List[str]]:
+async def validate_api_key_format(api_key: str) -> Tuple[bool, List[str]]:
     """Validate API key format with early error handling"""
     errors = []
     
@@ -682,7 +697,7 @@ async def validate_video_processing_settings(settings: Dict[str, Any]) -> Tuple[
     return len(errors) == 0, errors
 
 
-def validate_file_upload(
+async def validate_file_upload(
     file_size: int,
     file_type: str,
     max_size_mb: int = 100,
@@ -782,7 +797,7 @@ async def validate_business_logic_constraints(
 
 
 # Enhanced convenience functions with early error handling
-def validate_video_generation_request(data: Dict[str, Any]) -> None:
+async def validate_video_generation_request(data: Dict[str, Any]) -> None:
     """Validate complete video generation request with early error handling"""
     # Early validation - check if data is dict
     if not isinstance(data, dict):

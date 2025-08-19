@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Functional Service Components for HeyGen AI API
-Pure functions and functional programming patterns for business logic.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 from typing import Optional, List, Dict, Any, Tuple, Callable
 from datetime import datetime, timezone, timedelta
@@ -10,8 +15,17 @@ from functools import reduce, partial
 import hashlib
 import secrets
 import structlog
-
 from ..schemas.functional_models import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Functional Service Components for HeyGen AI API
+Pure functions and functional programming patterns for business logic.
+"""
+
+
     UserCreate, UserUpdate, UserResponse, UserSummary,
     VideoCreate, VideoUpdate, VideoResponse, VideoSummary,
     ModelUsageCreate, ModelUsageResponse,
@@ -34,7 +48,7 @@ def hash_password(password: str) -> str:
     """Functional password hashing."""
     return hashlib.sha256(password.encode()).hexdigest()
 
-def generate_api_key() -> str:
+async def generate_api_key() -> str:
     """Functional API key generation."""
     return secrets.token_urlsafe(32)
 
@@ -348,7 +362,7 @@ def transform_model_usage_to_response(usage_data: Dict[str, Any]) -> ModelUsageR
 # API Key Service Functions
 # =============================================================================
 
-def validate_api_key_data(key_data: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+async def validate_api_key_data(key_data: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
     """Functional API key validation."""
     try:
         # Validate name
@@ -366,7 +380,7 @@ def validate_api_key_data(key_data: Dict[str, Any]) -> Tuple[bool, Optional[str]
     except Exception as e:
         return False, str(e)
 
-def create_api_key_dict(key_data: Dict[str, Any], user_id: int) -> Dict[str, Any]:
+async def create_api_key_dict(key_data: Dict[str, Any], user_id: int) -> Dict[str, Any]:
     """Functional API key dictionary creation."""
     validated_data = key_data.copy()
     
@@ -384,7 +398,7 @@ def create_api_key_dict(key_data: Dict[str, Any], user_id: int) -> Dict[str, Any
     
     return validated_data, api_key
 
-def check_api_key_permissions(key_data: Dict[str, Any], required_permission: str) -> bool:
+async def check_api_key_permissions(key_data: Dict[str, Any], required_permission: str) -> bool:
     """Functional API key permission check."""
     permissions = key_data.get('permissions', [])
     
@@ -395,14 +409,14 @@ def check_api_key_permissions(key_data: Dict[str, Any], required_permission: str
     # Check specific permission
     return required_permission in permissions
 
-def is_api_key_expired(key_data: Dict[str, Any]) -> bool:
+async def is_api_key_expired(key_data: Dict[str, Any]) -> bool:
     """Functional API key expiration check."""
     expires_at = key_data.get('expires_at')
     if not expires_at:
         return False
     return datetime.now(timezone.utc) > expires_at
 
-def transform_api_key_to_response(key_data: Dict[str, Any]) -> APIKeyResponse:
+async def transform_api_key_to_response(key_data: Dict[str, Any]) -> APIKeyResponse:
     """Functional API key to response transformation."""
     return APIKeyResponse(**key_data)
 
@@ -410,7 +424,7 @@ def transform_api_key_to_response(key_data: Dict[str, Any]) -> APIKeyResponse:
 # Analytics Service Functions
 # =============================================================================
 
-def validate_analytics_request(request_data: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
+async def validate_analytics_request(request_data: Dict[str, Any]) -> Tuple[bool, Optional[str]]:
     """Functional analytics request validation."""
     try:
         # Validate date range
@@ -491,7 +505,7 @@ def transform_analytics_to_response(
 
 def compose(*functions: Callable) -> Callable:
     """Functional composition of functions."""
-    def inner(arg):
+    def inner(arg) -> Any:
         return reduce(lambda acc, f: f(acc), reversed(functions), arg)
     return inner
 
@@ -546,7 +560,7 @@ def process_video_creation(video_data: Dict[str, Any], user_id: int) -> Tuple[Op
     
     return video_dict, None
 
-def process_analytics_request(request_data: Dict[str, Any], videos: List[Dict[str, Any]], users: List[Dict[str, Any]]) -> Tuple[Optional[AnalyticsResponse], Optional[str]]:
+async def process_analytics_request(request_data: Dict[str, Any], videos: List[Dict[str, Any]], users: List[Dict[str, Any]]) -> Tuple[Optional[AnalyticsResponse], Optional[str]]:
     """Functional analytics processing pipeline."""
     # Validate request
     is_valid, error = validate_analytics_request(request_data)

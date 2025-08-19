@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-Enhanced Video routes using RORO pattern
-Provides video generation and management endpoints with early error handling and edge case validation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 from fastapi import APIRouter, Depends, BackgroundTasks, HTTPException, status, Request
 from fastapi.responses import StreamingResponse
@@ -12,8 +20,27 @@ import time
 import asyncio
 from typing import Dict, Any, Optional, List
 import traceback
-
 from ..core.roro import (
+from ..core.database import get_session
+from ..core.auth import get_current_user
+from ..core.error_handling import (
+from ..models.schemas import (
+from ..services.video_service import (
+from ..utils.helpers import (
+from ..utils.validators import (
+        from ..services.video_service import delete_video_record
+        import os
+        from ..core.database import get_session
+    import random
+        from ..core.database import get_session
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Enhanced Video routes using RORO pattern
+Provides video generation and management endpoints with early error handling and edge case validation.
+"""
+
+
     VideoGenerationRequest,
     VideoGenerationResponse,
     VideoStatusRequest,
@@ -24,9 +51,6 @@ from ..core.roro import (
     create_error_response,
     validate_roro_request
 )
-from ..core.database import get_session
-from ..core.auth import get_current_user
-from ..core.error_handling import (
     handle_errors,
     error_factory,
     ErrorCategory,
@@ -48,7 +72,6 @@ from ..core.error_handling import (
     ErrorLogger,
     UserFriendlyMessageGenerator
 )
-from ..models.schemas import (
     VideoGenerationInput,
     VideoStatusInput,
     UserVideosInput,
@@ -59,14 +82,12 @@ from ..models.schemas import (
     VideoStatus,
     ProcessingSettings
 )
-from ..services.video_service import (
     create_video_record,
     get_video_status,
     update_video_status,
     get_user_videos,
     get_video_statistics
 )
-from ..utils.helpers import (
     generate_video_id,
     calculate_estimated_duration,
     parse_quality_settings,
@@ -74,7 +95,6 @@ from ..utils.helpers import (
     generate_thumbnail_url,
     validate_video_id_format
 )
-from ..utils.validators import (
     validate_video_generation_request,
     validate_video_id,
     validate_script_content,
@@ -106,7 +126,7 @@ retry_handler = RetryHandler(
 )
 
 
-def _validate_request_context(request: Request, user_id: str) -> None:
+async def _validate_request_context(request: Request, user_id: str) -> None:
     """Validate request context at the beginning of functions"""
     # Early validation - check if request has required headers
     if not request.headers.get("user-agent"):
@@ -533,6 +553,10 @@ async def download_video(
     def iterfile() -> Any:
         try:
             with open(status_result["file_path"], "rb") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 yield from f
         except FileNotFoundError:
             raise error_factory.video_processing_error(
@@ -603,7 +627,6 @@ async def delete_video_roro(
     
     # Delete video with error handling
     try:
-        from ..services.video_service import delete_video_record
         success: bool = await delete_video_record(session, video_id)
     except Exception as e:
         logger.error(f"Failed to delete video: {e}", exc_info=True)
@@ -760,7 +783,7 @@ def create_user_videos_response_data(
     }
 
 
-def create_delete_request_object(video_id: str, user_id: str) -> VideoStatusRequest:
+async def create_delete_request_object(video_id: str, user_id: str) -> VideoStatusRequest:
     """Create delete request object with early validation"""
     # Early validation - check if parameters are provided
     if not video_id or not user_id:
@@ -812,7 +835,6 @@ def get_file_size_from_status(status_result: Dict[str, Any]) -> Optional[int]:
     
     # Happy path - get file size
     try:
-        import os
         return os.path.getsize(status_result["file_path"])
     except Exception:
         return None
@@ -900,7 +922,6 @@ async def process_video_background(
             return
         
         # Update status to completed
-        from ..core.database import get_session
         async with get_session() as session:
             await update_video_status(
                 session,
@@ -959,7 +980,6 @@ async def simulate_video_processing(video_id: str) -> None:
     await asyncio.sleep(5)
     
     # Simulate random failures (for testing error handling)
-    import random
     if random.random() < 0.1:  # 10% chance of failure
         raise VideoProcessingError(
             message="Simulated processing failure",
@@ -973,7 +993,6 @@ async def simulate_video_processing(video_id: str) -> None:
 async def update_video_status_failed(video_id: str, error_message: str) -> None:
     """Update video status to failed with error handling"""
     try:
-        from ..core.database import get_session
         async with get_session() as session:
             await update_video_status(
                 session,

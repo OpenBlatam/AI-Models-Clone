@@ -1,0 +1,47 @@
+# Diffusion Models Requirements
+# Core dependencies for diffusion models implementation
+
+# PyTorch ecosystem
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+
+# HuggingFace Transformers and Diffusers
+transformers>=4.30.0
+diffusers>=0.21.0
+accelerate>=0.20.0
+
+# Image processing
+Pillow>=9.5.0
+opencv-python>=4.8.0
+
+# Scientific computing
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Utilities
+tqdm>=4.65.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Optional: For better performance
+xformers>=0.0.20
+flash-attn>=2.0.0
+
+# Optional: For additional model support
+safetensors>=0.3.0
+huggingface-hub>=0.15.0
+
+# Optional: For training utilities
+wandb>=0.15.0
+tensorboard>=2.13.0
+
+# Optional: For data loading
+datasets>=2.12.0
+
+# Optional: For optimization
+optuna>=3.2.0
+
+# Optional: For monitoring
+psutil>=5.9.0
+GPUtil>=1.4.0 

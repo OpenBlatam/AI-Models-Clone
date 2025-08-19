@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Quick Start Example for HeyGen AI Equivalent System
-Demonstrates basic usage of transformer models, diffusion pipelines, and Gradio interface.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import torch
 import gradio as gr
@@ -10,13 +12,25 @@ from core.transformer_models import TransformerModel, DiffusionModelManager
 from core.diffusion_models import StableDiffusionPipeline
 from core.model_training import ConfigManager
 import logging
+        from moviepy.editor import ImageSequenceClip, AudioFileClip, CompositeVideoClip
+        import numpy as np
+        from moviepy.editor import AudioClip
+        import numpy as np
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Quick Start Example for HeyGen AI Equivalent System
+Demonstrates basic usage of transformer models, diffusion pipelines, and Gradio interface.
+"""
+
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 
-def create_video_from_text(text, voice_choice):
+def create_video_from_text(text, voice_choice) -> Any:
     """Generate video from text input using transformer and diffusion models."""
     try:
         # Initialize transformer model
@@ -53,11 +67,9 @@ def create_video_from_text(text, voice_choice):
         return None, f"Error: {str(e)}"
 
 
-def create_video_from_frames(frames, voice_choice):
+def create_video_from_frames(frames, voice_choice) -> Any:
     """Create video from image frames with audio."""
     try:
-        from moviepy.editor import ImageSequenceClip, AudioFileClip, CompositeVideoClip
-        import numpy as np
         
         # Convert PIL images to numpy arrays
         frame_arrays = [np.array(frame) for frame in frames]
@@ -84,11 +96,9 @@ def create_video_from_frames(frames, voice_choice):
         raise
 
 
-def generate_audio(voice_choice, duration):
+def generate_audio(voice_choice, duration) -> Any:
     """Generate audio for the video (placeholder implementation)."""
     try:
-        from moviepy.editor import AudioClip
-        import numpy as np
         
         # Simple sine wave audio as placeholder
         sample_rate = 44100
@@ -114,7 +124,7 @@ def generate_audio(voice_choice, duration):
         raise
 
 
-def validate_input(text):
+def validate_input(text) -> bool:
     """Validate input text."""
     if not text or len(text.strip()) < 10:
         raise gr.Error("Text must be at least 10 characters long")
@@ -187,7 +197,7 @@ def main():
         )
         
         # Event handlers
-        def process_generation(text, voice):
+        def process_generation(text, voice) -> Any:
             """Process video generation with validation."""
             try:
                 # Validate input
@@ -241,5 +251,6 @@ def main():
     )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-"""
-Functional API Endpoints for HeyGen AI API
-Pure functions and functional programming patterns for API endpoints.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 from typing import List, Optional, Dict, Any, Tuple
 from fastapi import APIRouter, Depends, HTTPException, status, Query, Path
@@ -10,8 +9,22 @@ from fastapi.responses import JSONResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 import structlog
 from datetime import datetime
-
 from ..schemas.functional_models import (
+from ..services.functional_services import (
+from ..core.dependencies import get_db, get_current_active_user
+from ..core.database import get_user_repository, get_video_repository
+        from ..core.database import get_model_usage_repository
+        from ..core.database import get_api_key_repository
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Functional API Endpoints for HeyGen AI API
+Pure functions and functional programming patterns for API endpoints.
+"""
+
+
     UserCreate, UserUpdate, UserResponse, UserSummary,
     VideoCreate, VideoUpdate, VideoResponse, VideoSummary,
     ModelUsageCreate, ModelUsageResponse,
@@ -19,7 +32,6 @@ from ..schemas.functional_models import (
     AnalyticsRequest, AnalyticsResponse,
     VideoStatus, VideoQuality, ModelType
 )
-from ..services.functional_services import (
     validate_user_data, create_user_dict, update_user_dict,
     transform_user_to_response, transform_user_to_summary,
     calculate_user_stats,
@@ -37,8 +49,6 @@ from ..services.functional_services import (
     process_analytics_request,
     pipe, compose, map_with_error_handling
 )
-from ..core.dependencies import get_db, get_current_active_user
-from ..core.database import get_user_repository, get_video_repository
 
 logger = structlog.get_logger()
 
@@ -305,7 +315,7 @@ async def get_videos(
         videos = await video_repo.get_user_videos(current_user.id, limit=limit, offset=skip)
         
         # Transform to response using functional composition
-        def filter_videos(videos):
+        def filter_videos(videos) -> Any:
             video_dicts = [v.to_dict() for v in videos]
             
             # Apply filters
@@ -435,7 +445,6 @@ async def log_model_usage(
         )
         
         # Get repository and create usage record
-        from ..core.database import get_model_usage_repository
         usage_repo = get_model_usage_repository(db)
         usage = await usage_repo.create(**usage_data)
         
@@ -476,7 +485,6 @@ async def create_api_key(
         key_data, api_key = create_api_key_dict(key_create.dict(), current_user.id)
         
         # Get repository and create API key
-        from ..core.database import get_api_key_repository
         key_repo = get_api_key_repository(db)
         key_record = await key_repo.create(**key_data)
         

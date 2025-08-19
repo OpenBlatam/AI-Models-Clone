@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Performance Optimizer for HeyGen AI API
-Comprehensive performance optimization with caching, database optimization, and monitoring.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -23,6 +28,14 @@ import pickle
 from dataclasses import dataclass, asdict
 from enum import Enum
 import weakref
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Performance Optimizer for HeyGen AI API
+Comprehensive performance optimization with caching, database optimization, and monitoring.
+"""
+
 
 logger = structlog.get_logger()
 
@@ -56,7 +69,7 @@ class PerformanceMetrics:
     memory_usage_mb: float = 0.0
     timestamp: datetime = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.timestamp is None:
             self.timestamp = datetime.now(timezone.utc)
     
@@ -78,7 +91,9 @@ class CacheManager:
         default_ttl: int = 300,
         compression_enabled: bool = True
     ):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.memory_cache_size = memory_cache_size
         self.default_ttl = default_ttl
         self.compression_enabled = compression_enabled
@@ -285,7 +300,9 @@ class DatabaseOptimizer:
         pool_recycle: int = 3600,
         echo: bool = False
     ):
-        self.database_url = database_url
+        
+    """__init__ function."""
+self.database_url = database_url
         self.pool_size = pool_size
         self.max_overflow = max_overflow
         self.pool_timeout = pool_timeout
@@ -330,7 +347,7 @@ class DatabaseOptimizer:
         }
     
     @asynccontextmanager
-    async def get_session(self):
+    async def get_session(self) -> Optional[Dict[str, Any]]:
         """Get database session with automatic cleanup."""
         async with self.session_factory() as session:
             try:
@@ -420,14 +437,14 @@ class DatabaseOptimizer:
             "overflow_connections": self.engine.pool.overflow()
         }
     
-    async def optimize_tables(self):
+    async def optimize_tables(self) -> Any:
         """Optimize database tables."""
         async with self.get_session() as session:
             # Analyze tables for better query planning
             await session.execute(text("ANALYZE"))
             await session.commit()
     
-    async def vacuum_database(self):
+    async def vacuum_database(self) -> Any:
         """Vacuum database to reclaim space and update statistics."""
         async with self.get_session() as session:
             await session.execute(text("VACUUM ANALYZE"))
@@ -441,7 +458,9 @@ class QueryOptimizer:
     """Query optimization and caching."""
     
     def __init__(self, cache_manager: CacheManager):
-        self.cache_manager = cache_manager
+        
+    """__init__ function."""
+self.cache_manager = cache_manager
         self.query_cache: Dict[str, Any] = {}
         self.query_stats = {
             "cache_hits": 0,
@@ -527,7 +546,9 @@ class PerformanceMonitor:
     """Performance monitoring and metrics collection."""
     
     def __init__(self, max_metrics: int = 10000):
-        self.max_metrics = max_metrics
+        
+    """__init__ function."""
+self.max_metrics = max_metrics
         self.metrics: List[PerformanceMetrics] = []
         self.slow_query_threshold_ms = 1000
         self.memory_threshold_mb = 100
@@ -633,7 +654,7 @@ class PerformanceMonitor:
             operation_counts[metric.operation] = operation_counts.get(metric.operation, 0) + 1
         return operation_counts
     
-    def clear_metrics(self):
+    def clear_metrics(self) -> Any:
         """Clear all metrics."""
         self.metrics.clear()
 
@@ -649,7 +670,7 @@ def cache_result(
     """Decorator to cache function results."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             if key_generator:
                 cache_key = key_generator(*args, **kwargs)
@@ -685,7 +706,7 @@ def monitor_performance(operation_name: Optional[str] = None):
     """Decorator to monitor function performance."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             
             try:
@@ -720,7 +741,7 @@ def optimize_database_query(timeout: Optional[int] = None):
     """Decorator to optimize database queries."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Add query optimization logic here
             # This would integrate with the QueryOptimizer
             
@@ -746,7 +767,9 @@ class PerformanceOptimizer:
         database_pool_size: int = 20,
         max_metrics: int = 10000
     ):
-        self.optimization_level = optimization_level
+        
+    """__init__ function."""
+self.optimization_level = optimization_level
         
         # Initialize components
         self.cache_manager = CacheManager(
@@ -767,7 +790,7 @@ class PerformanceOptimizer:
         # Configure optimization level
         self._configure_optimization_level()
     
-    def _configure_optimization_level(self):
+    def _configure_optimization_level(self) -> Any:
         """Configure optimization based on level."""
         if self.optimization_level == OptimizationLevel.BASIC:
             # Basic optimizations
@@ -789,7 +812,7 @@ class PerformanceOptimizer:
             # Custom optimizations (configure manually)
             pass
     
-    async def optimize_system(self):
+    async def optimize_system(self) -> Any:
         """Run system-wide optimizations."""
         logger.info("Starting system optimization")
         

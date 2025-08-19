@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-Specialized Pydantic Models for HeyGen AI API
-Optimized models for different data types with enhanced serialization.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -12,9 +20,17 @@ from decimal import Decimal
 from uuid import UUID
 import structlog
 from enum import Enum
-
 from pydantic import BaseModel, Field, validator, root_validator, ConfigDict, computed_field
 from .pydantic_optimizer import (
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Specialized Pydantic Models for HeyGen AI API
+Optimized models for different data types with enhanced serialization.
+"""
+
+
     OptimizedBaseModel, FastSerializationModel, CompactSerializationModel, ValidatedSerializationModel
 )
 
@@ -64,7 +80,7 @@ class TimestampMixin:
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
     @validator('updated_at', pre=True, always=True)
-    def set_updated_at(cls, v):
+    def set_updated_at(cls, v) -> Any:
         return datetime.now(timezone.utc)
 
 class IDMixin:
@@ -113,7 +129,7 @@ class UserProfile(FastSerializationModel, TimestampMixin):
     social_links: Dict[str, str] = Field(default_factory=dict)
     
     @validator('avatar_url')
-    def validate_avatar_url(cls, v):
+    def validate_avatar_url(cls, v) -> bool:
         if v and not v.startswith(('http://', 'https://')):
             raise ValueError('Avatar URL must be a valid HTTP/HTTPS URL')
         return v
@@ -131,7 +147,7 @@ class UserPreferences(CompactSerializationModel):
     theme: str = Field(default="light")
     
     @validator('language')
-    def validate_language(cls, v):
+    def validate_language(cls, v) -> bool:
         valid_languages = ['en', 'es', 'fr', 'de', 'it', 'pt', 'ru', 'zh', 'ja', 'ko']
         if v not in valid_languages:
             raise ValueError(f'Language must be one of: {valid_languages}')
@@ -149,7 +165,7 @@ class UserSession(ValidatedSerializationModel, TimestampMixin):
     is_active: bool = Field(default=True)
     
     @validator('expires_at')
-    def validate_expires_at(cls, v):
+    def validate_expires_at(cls, v) -> bool:
         if v <= datetime.now(timezone.utc):
             raise ValueError('Session must expire in the future')
         return v
@@ -421,7 +437,7 @@ class PerformanceMetrics(ValidatedSerializationModel, TimestampMixin):
     tags: Dict[str, str] = Field(default_factory=dict)
     
     @validator('value')
-    def validate_value(cls, v):
+    def validate_value(cls, v) -> bool:
         if not isinstance(v, (int, float)):
             raise ValueError('Value must be a number')
         return float(v)
@@ -449,7 +465,7 @@ class SearchQuery(OptimizedBaseModel):
     per_page: int = Field(default=20, ge=1, le=100)
     
     @validator('query')
-    def validate_query(cls, v):
+    def validate_query(cls, v) -> bool:
         return v.strip()
     
     @computed_field
@@ -515,6 +531,10 @@ class NotificationBase(OptimizedBaseModel, TimestampMixin, IDMixin):
     @computed_field
     @property
     def is_unread(self) -> bool:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         """Check if notification is unread."""
         return not self.is_read
 
@@ -643,7 +663,7 @@ class ErrorResponse(ValidatedSerializationModel):
 class ModelRegistry:
     """Registry for optimized models."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.models: Dict[str, Type[OptimizedBaseModel]] = {}
         self.serialization_configs: Dict[str, Dict[str, Any]] = {}
     
@@ -672,7 +692,7 @@ class ModelRegistry:
         """List all registered models."""
         return list(self.models.keys())
     
-    def clear(self):
+    def clear(self) -> Any:
         """Clear all registered models."""
         self.models.clear()
         self.serialization_configs.clear()
@@ -685,7 +705,9 @@ class ModelFactory:
     """Factory for creating optimized models."""
     
     def __init__(self, registry: ModelRegistry):
-        self.registry = registry
+        
+    """__init__ function."""
+self.registry = registry
     
     def create_user_model(self, **kwargs) -> UserBase:
         """Create user model with validation."""
@@ -703,7 +725,7 @@ class ModelFactory:
         """Create search query with validation."""
         return SearchQuery(**kwargs)
     
-    def create_api_response(self, **kwargs) -> APIResponse:
+    async def create_api_response(self, **kwargs) -> APIResponse:
         """Create API response with validation."""
         return APIResponse(**kwargs)
     

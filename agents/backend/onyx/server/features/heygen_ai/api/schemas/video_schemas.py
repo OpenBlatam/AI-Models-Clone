@@ -1,19 +1,36 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+from typing import Dict, List, Any, Optional, Union
+from datetime import datetime, timezone
+from enum import Enum
+from pydantic import (
+import re
+from .base_schemas import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Video Schemas for HeyGen AI API
 Video creation, management, and processing operations.
 """
 
-from typing import Dict, List, Any, Optional, Union
-from datetime import datetime, timezone
-from enum import Enum
-from pydantic import (
     BaseModel, Field, validator, root_validator, 
     ConfigDict, computed_field, model_validator
 )
-import re
 
-from .base_schemas import (
     BaseRequest, BaseResponse, DataResponse, PaginatedDataResponse,
     IDField, TimestampFields, StatusFields, MetadataFields
 )
@@ -102,14 +119,14 @@ class VideoBase(BaseModel):
     )
     
     @validator('title')
-    def validate_title(cls, v):
+    def validate_title(cls, v) -> bool:
         """Validate video title."""
         if not v or not v.strip():
             raise ValueError('Video title cannot be empty')
         return v.strip()
     
     @validator('description')
-    def validate_description(cls, v):
+    def validate_description(cls, v) -> bool:
         """Validate video description."""
         if v is not None:
             return v.strip()
@@ -144,14 +161,14 @@ class VideoScript(BaseModel):
     )
     
     @validator('content')
-    def validate_content(cls, v):
+    def validate_content(cls, v) -> bool:
         """Validate script content."""
         if not v or not v.strip():
             raise ValueError('Script content cannot be empty')
         return v.strip()
     
     @validator('speed')
-    def validate_speed(cls, v):
+    def validate_speed(cls, v) -> bool:
         """Validate speech speed."""
         if v < 0.5 or v > 2.0:
             raise ValueError('Speed must be between 0.5 and 2.0')
@@ -220,7 +237,7 @@ class VideoSettings(BaseModel):
     )
     
     @validator('resolution')
-    def validate_resolution(cls, v):
+    def validate_resolution(cls, v) -> bool:
         """Validate resolution format."""
         if v and not re.match(r'^\d+x\d+$', v):
             raise ValueError('Resolution must be in format WIDTHxHEIGHT (e.g., 1920x1080)')

@@ -1,12 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import APIRouter, FastAPI
+from typing import Dict, List, Any, Optional
+import structlog
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 HeyGen AI FastAPI Routes Package
 Main routes package initialization with dependency injection and route registration.
 """
 
-from fastapi import APIRouter, FastAPI
-from typing import Dict, List, Any, Optional
-import structlog
 
 logger = structlog.get_logger()
 
@@ -17,7 +22,7 @@ logger = structlog.get_logger()
 class RouteRegistry:
     """Central route registry for managing all API routes."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.routes: Dict[str, APIRouter] = {}
         self.dependencies: Dict[str, Any] = {}
         self.middleware: List[Any] = []
@@ -97,7 +102,7 @@ route_registry = RouteRegistry()
 class DependencyContainer:
     """Dependency injection container for managing service dependencies."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.services: Dict[str, Any] = {}
         self.singletons: Dict[str, Any] = {}
         self._is_initialized = False
@@ -130,7 +135,7 @@ class DependencyContainer:
         
         return None
     
-    def initialize_services(self):
+    def initialize_services(self) -> Any:
         """Initialize all registered services."""
         if self._is_initialized:
             return
@@ -143,7 +148,7 @@ class DependencyContainer:
         self._is_initialized = True
         logger.info("Dependency container initialization completed")
     
-    def cleanup_services(self):
+    def cleanup_services(self) -> Any:
         """Cleanup all services."""
         for name, service_info in self.services.items():
             if service_info["instance"] and hasattr(service_info["instance"], "cleanup"):

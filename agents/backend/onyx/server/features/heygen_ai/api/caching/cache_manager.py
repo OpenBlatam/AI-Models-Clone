@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-Cache Manager for HeyGen AI API
-Comprehensive caching system for static and frequently accessed data.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -21,6 +29,14 @@ from collections import OrderedDict
 import weakref
 import threading
 import gc
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Cache Manager for HeyGen AI API
+Comprehensive caching system for static and frequently accessed data.
+"""
+
 
 logger = structlog.get_logger()
 
@@ -81,7 +97,7 @@ class CacheStats:
     last_accessed: Optional[datetime] = None
     created_at: datetime = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.created_at is None:
             self.created_at = datetime.now(timezone.utc)
     
@@ -109,7 +125,9 @@ class MemoryCache:
         strategy: CacheStrategy = CacheStrategy.LRU,
         ttl_enabled: bool = True
     ):
-        self.max_size = max_size
+        
+    """__init__ function."""
+self.max_size = max_size
         self.strategy = strategy
         self.ttl_enabled = ttl_enabled
         
@@ -129,10 +147,12 @@ class MemoryCache:
         self._cleanup_task = None
         self._start_cleanup_task()
     
-    def _start_cleanup_task(self):
+    def _start_cleanup_task(self) -> Any:
         """Start periodic cleanup task."""
         def cleanup():
-            while True:
+            
+    """cleanup function."""
+while True:
                 try:
                     time.sleep(60)  # Cleanup every minute
                     self._cleanup_expired()
@@ -140,9 +160,13 @@ class MemoryCache:
                     logger.error(f"Cache cleanup error: {e}")
         
         self._cleanup_task = threading.Thread(target=cleanup, daemon=True)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         self._cleanup_task.start()
     
-    def _cleanup_expired(self):
+    def _cleanup_expired(self) -> Any:
         """Remove expired items from cache."""
         with self._lock:
             current_time = time.time()
@@ -185,7 +209,7 @@ class MemoryCache:
             # No change needed for FIFO
             pass
     
-    def _evict_if_needed(self):
+    def _evict_if_needed(self) -> Any:
         """Evict items if cache is full."""
         if len(self._cache) < self.max_size:
             return
@@ -259,7 +283,7 @@ class MemoryCache:
                 return True
             return False
     
-    def clear(self):
+    def clear(self) -> Any:
         """Clear all cache."""
         with self._lock:
             self._cache.clear()
@@ -324,7 +348,9 @@ class RedisCache:
         retry_on_timeout: bool = True,
         compression_enabled: bool = True
     ):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.compression_enabled = compression_enabled
         
         # Create Redis connection pool
@@ -476,7 +502,9 @@ class HybridCache:
         redis_cache: RedisCache,
         memory_first: bool = True
     ):
-        self.memory_cache = memory_cache
+        
+    """__init__ function."""
+self.memory_cache = memory_cache
         self.redis_cache = redis_cache
         self.memory_first = memory_first
         
@@ -532,7 +560,7 @@ class HybridCache:
         self.stats.deletes += 1
         return memory_result or redis_result
     
-    async def clear(self):
+    async def clear(self) -> Any:
         """Clear both caches."""
         self.memory_cache.clear()
         await self.redis_cache.clear()
@@ -566,7 +594,9 @@ class TieredCache:
     """Tiered cache with multiple levels."""
     
     def __init__(self, caches: List[Any]):
-        self.caches = caches
+        
+    """__init__ function."""
+self.caches = caches
         
         # Statistics
         self.stats = CacheStats()
@@ -625,7 +655,7 @@ class TieredCache:
         self.stats.deletes += 1
         return any(results)
     
-    async def clear(self):
+    async def clear(self) -> Any:
         """Clear all cache tiers."""
         for cache in self.caches:
             if hasattr(cache, 'clear'):
@@ -665,7 +695,9 @@ class CacheManager:
     """Main cache manager for the application."""
     
     def __init__(self, config: CacheConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.caches: Dict[str, Any] = {}
         
         # Initialize caches based on configuration
@@ -674,7 +706,7 @@ class CacheManager:
         # Statistics
         self.stats = CacheStats()
     
-    def _initialize_caches(self):
+    def _initialize_caches(self) -> Any:
         """Initialize caches based on configuration."""
         if self.config.cache_type == CacheType.MEMORY:
             self.caches["memory"] = MemoryCache(
@@ -840,7 +872,7 @@ def cache_result(
     """Decorator to cache function results."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             if key_generator:
                 cache_key = key_generator(*args, **kwargs)
@@ -883,7 +915,7 @@ def invalidate_cache(pattern: str, cache_name: str = "default"):
     """Decorator to invalidate cache after function execution."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Execute function
             result = await func(*args, **kwargs)
             

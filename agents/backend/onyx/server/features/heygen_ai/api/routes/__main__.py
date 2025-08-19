@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-HeyGen AI FastAPI Main Application
-FastAPI best practices for main application setup with models and middleware integration.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from fastapi import FastAPI, Request, Response, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,17 +20,26 @@ import structlog
 import time
 from datetime import datetime, timezone
 from typing import Dict, List, Any, Optional
-
-# Import our custom modules
 from . import RouteRegistry, DependencyContainer, RouteCategory
 from .base import BaseRoute
 from .users import UserRoutes
 from .videos import VideoRoutes
 from ..models import (
+from ..middleware import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+HeyGen AI FastAPI Main Application
+FastAPI best practices for main application setup with models and middleware integration.
+"""
+
+
+# Import our custom modules
     UserCreate, UserResponse, UserListResponse, UserAuthResponse,
     VideoCreate, VideoResponse, VideoListResponse, VideoStatusResponse
 )
-from ..middleware import (
     setup_default_middleware, RequestLoggingMiddleware, 
     ErrorHandlingMiddleware, AuthenticationMiddleware, RateLimitingMiddleware
 )

@@ -1,14 +1,29 @@
-#!/usr/bin/env python3
-"""
-Configuration management for HeyGen AI API
-Environment-based settings with validation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import os
 from typing import Optional, List
 from pydantic import BaseSettings, validator
 from pathlib import Path
 import logging
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Configuration management for HeyGen AI API
+Environment-based settings with validation.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -97,52 +112,53 @@ class Settings(BaseSettings):
     log_sql: bool = False
     
     @validator('cors_origins', pre=True)
-    def parse_cors_origins(cls, v):
+    def parse_cors_origins(cls, v) -> Any:
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(',')]
         return v
     
     @validator('cors_allow_methods', pre=True)
-    def parse_cors_methods(cls, v):
+    def parse_cors_methods(cls, v) -> Any:
         if isinstance(v, str):
             return [method.strip() for method in v.split(',')]
         return v
     
     @validator('cors_allow_headers', pre=True)
-    def parse_cors_headers(cls, v):
+    def parse_cors_headers(cls, v) -> Any:
         if isinstance(v, str):
             return [header.strip() for header in v.split(',')]
         return v
     
     @validator('log_level')
-    def validate_log_level(cls, v):
+    def validate_log_level(cls, v) -> bool:
         valid_levels = ['DEBUG', 'INFO', 'WARNING', 'ERROR', 'CRITICAL']
         if v.upper() not in valid_levels:
             raise ValueError(f'Log level must be one of {valid_levels}')
         return v.upper()
     
     @validator('transformer_model_size')
-    def validate_model_size(cls, v):
+    def validate_model_size(cls, v) -> bool:
         valid_sizes = ['small', 'medium', 'large']
         if v not in valid_sizes:
             raise ValueError(f'Model size must be one of {valid_sizes}')
         return v
     
     @validator('default_quality')
-    def validate_quality(cls, v):
+    def validate_quality(cls, v) -> bool:
         valid_qualities = ['low', 'medium', 'high']
         if v not in valid_qualities:
             raise ValueError(f'Quality must be one of {valid_qualities}')
         return v
     
     @validator('storage_type')
-    def validate_storage_type(cls, v):
+    def validate_storage_type(cls, v) -> bool:
         valid_types = ['local', 's3', 'gcs']
         if v not in valid_types:
             raise ValueError(f'Storage type must be one of {valid_types}')
         return v
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False

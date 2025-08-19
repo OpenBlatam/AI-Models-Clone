@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Service Container for FastAPI Dependency Injection
-Manages service dependencies and their lifecycle.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -16,6 +18,14 @@ import weakref
 from functools import lru_cache, wraps
 import inspect
 import gc
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Service Container for FastAPI Dependency Injection
+Manages service dependencies and their lifecycle.
+"""
+
 
 logger = structlog.get_logger()
 
@@ -78,7 +88,7 @@ class ServiceStats:
 class ServiceBase:
     """Base class for all services."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._is_initialized = False
         self._dependencies: Dict[str, Any] = {}
     
@@ -138,7 +148,9 @@ class ServiceInstance:
     """Service instance wrapper."""
     
     def __init__(self, service: Any, config: ServiceConfig, stats: ServiceStats):
-        self.service = service
+        
+    """__init__ function."""
+self.service = service
         self.config = config
         self.stats = stats
         self.created_at = datetime.now(timezone.utc)
@@ -172,7 +184,7 @@ class ServiceInstance:
 class ServiceContainer:
     """Main service container for managing service dependencies."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.services: Dict[str, ServiceConfig] = {}
         self.instances: Dict[str, ServiceInstance] = {}
         self.factories: Dict[str, Callable] = {}
@@ -208,7 +220,7 @@ class ServiceContainer:
         """Get service configuration."""
         return self.services.get(name)
     
-    async def get_service(self, name: str, **kwargs) -> Any:
+    async def get_service(self, name: str, **kwargs) -> Optional[Dict[str, Any]]:
         """Get a service instance."""
         config = self.get_service_config(name)
         if not config:
@@ -254,7 +266,7 @@ class ServiceContainer:
             logger.error(f"Failed to create singleton service {name}: {e}")
             raise
     
-    async def _get_application_instance(self, name: str, config: ServiceConfig, **kwargs) -> Any:
+    async def _get_application_instance(self, name: str, config: ServiceConfig, **kwargs) -> Optional[Dict[str, Any]]:
         """Get application-scoped service instance."""
         if name in self.instances:
             service_instance = self.instances[name]
@@ -290,13 +302,13 @@ class ServiceContainer:
             logger.error(f"Failed to create application service {name}: {e}")
             raise
     
-    async def _get_session_instance(self, name: str, config: ServiceConfig, **kwargs) -> Any:
+    async def _get_session_instance(self, name: str, config: ServiceConfig, **kwargs) -> Optional[Dict[str, Any]]:
         """Get session-scoped service instance."""
         # For session scope, we would typically use a session ID
         # For now, we'll create a new instance per request
         return await self._create_request_instance(name, config, **kwargs)
     
-    async def _create_request_instance(self, name: str, config: ServiceConfig, **kwargs) -> Any:
+    async async def _create_request_instance(self, name: str, config: ServiceConfig, **kwargs) -> Any:
         """Create request-scoped service instance."""
         start_time = time.time()
         try:
@@ -414,7 +426,7 @@ def inject_service(service_name: str):
     """Decorator for injecting services into functions."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # This would be used with the service container
             # The actual injection would happen at the FastAPI level
             return await func(*args, **kwargs)
@@ -425,7 +437,7 @@ def singleton_service(cls: Type) -> Type:
     """Decorator for creating singleton services."""
     original_init = cls.__init__
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> Any:
         if not hasattr(cls, '_instance'):
             original_init(self, *args, **kwargs)
             cls._instance = self
@@ -442,20 +454,24 @@ def singleton_service(cls: Type) -> Type:
 class FastAPIServiceContainer:
     """FastAPI-specific service container."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         self.app = app
         self.container = ServiceContainer()
         self._setup_lifecycle_events()
     
-    def _setup_lifecycle_events(self):
+    def _setup_lifecycle_events(self) -> Any:
         """Setup FastAPI lifecycle events."""
         @self.app.on_event("startup")
         async def startup_event():
-            await self.container.initialize_all()
+            
+    """startup_event function."""
+await self.container.initialize_all()
         
         @self.app.on_event("shutdown")
         async def shutdown_event():
-            await self.container.cleanup_all()
+            
+    """shutdown_event function."""
+await self.container.cleanup_all()
     
     def register_service(
         self,
@@ -479,14 +495,18 @@ class FastAPIServiceContainer:
     def get_service_function(self, name: str) -> Callable:
         """Get service function for FastAPI dependency injection."""
         async def service_dependency():
-            return await self.container.get_service(name)
+            
+    """service_dependency function."""
+return await self.container.get_service(name)
         
         return service_dependency
     
-    def get_health_endpoint(self):
+    def get_health_endpoint(self) -> Optional[Dict[str, Any]]:
         """Get health check endpoint for services."""
         async def health_check():
-            return self.container.get_health_status()
+            
+    """health_check function."""
+return self.container.get_health_status()
         
         return health_check
 

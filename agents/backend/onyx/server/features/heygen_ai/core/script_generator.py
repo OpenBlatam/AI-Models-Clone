@@ -1,14 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+from typing import Dict, List, Optional, Tuple
+import re
+from .langchain_manager import LangChainManager
+from typing import Any, List, Dict, Optional
 """
 Script Generator for HeyGen AI equivalent.
 Handles AI-powered script generation and editing using LangChain and OpenRouter.
 """
 
-import asyncio
-import logging
-from typing import Dict, List, Optional, Tuple
-import re
 
-from .langchain_manager import LangChainManager
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +39,7 @@ class ScriptGenerator:
         if openrouter_api_key:
             self.langchain_manager = LangChainManager(openrouter_api_key)
         
-    def initialize(self):
+    def initialize(self) -> Any:
         """Initialize script generation components."""
         try:
             # Initialize LangChain manager if available
@@ -53,7 +56,7 @@ class ScriptGenerator:
             logger.error(f"Failed to initialize Script Generator: {e}")
             raise
     
-    def _load_script_templates(self):
+    def _load_script_templates(self) -> Any:
         """Load script templates for different use cases."""
         self.templates = {
             "professional": {

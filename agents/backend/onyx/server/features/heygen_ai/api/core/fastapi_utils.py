@@ -1,7 +1,16 @@
-"""
-FastAPI Utilities - Advanced Features and Middleware
-Comprehensive utilities for enhanced FastAPI applications with production-ready features.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -12,7 +21,6 @@ from functools import wraps
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 import logging
-
 from fastapi import Request, Response, HTTPException, status, Depends
 from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.responses import JSONResponse
@@ -21,6 +29,13 @@ from starlette.types import ASGIApp
 import redis.asyncio as redis
 from prometheus_client import Counter, Histogram, Gauge, generate_latest
 import structlog
+from typing import Any, List, Dict, Optional
+"""
+FastAPI Utilities - Advanced Features and Middleware
+Comprehensive utilities for enhanced FastAPI applications with production-ready features.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -32,7 +47,9 @@ class RedisRateLimiter:
     """Redis-backed rate limiter with sliding window."""
     
     def __init__(self, redis_client: redis.Redis, prefix: str = "rate_limit"):
-        self.redis = redis_client
+        
+    """__init__ function."""
+self.redis = redis_client
         self.prefix = prefix
     
     async def is_allowed(
@@ -81,7 +98,9 @@ class RedisRateLimitMiddleware(BaseHTTPMiddleware):
         default_window: int = 60,
         key_func: Optional[Callable[[Request], str]] = None
     ):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.rate_limiter = RedisRateLimiter(redis_client)
         self.default_limit = default_limit
         self.default_window = default_window
@@ -93,7 +112,9 @@ class RedisRateLimitMiddleware(BaseHTTPMiddleware):
         return f"{client_ip}:{request.url.path}"
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        # Get rate limit key
+        
+    """dispatch function."""
+# Get rate limit key
         key = self.key_func(request)
         
         # Check rate limit
@@ -136,7 +157,9 @@ class RedisCache:
     """Redis-backed caching with TTL and compression."""
     
     def __init__(self, redis_client: redis.Redis, prefix: str = "cache"):
-        self.redis = redis_client
+        
+    """__init__ function."""
+self.redis = redis_client
         self.prefix = prefix
     
     def _make_key(self, key: str) -> str:
@@ -190,7 +213,9 @@ class RedisCacheMiddleware(BaseHTTPMiddleware):
         default_ttl: int = 300,
         cacheable_paths: Optional[List[str]] = None
     ):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.cache = RedisCache(redis_client)
         self.default_ttl = default_ttl
         self.cacheable_paths = cacheable_paths or ["/api/"]
@@ -213,7 +238,9 @@ class RedisCacheMiddleware(BaseHTTPMiddleware):
         return hashlib.md5(":".join(key_parts).encode()).hexdigest()
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        if not self._is_cacheable(request):
+        
+    """dispatch function."""
+if not self._is_cacheable(request):
             return await call_next(request)
         
         # Check cache
@@ -264,7 +291,7 @@ class RedisCacheMiddleware(BaseHTTPMiddleware):
 class BackgroundTaskManager:
     """Background task manager with monitoring and error handling."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.tasks: Dict[str, asyncio.Task] = {}
         self.task_metadata: Dict[str, Dict[str, Any]] = {}
     
@@ -417,13 +444,17 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
         max_content_length: int = 10 * 1024 * 1024,
         allowed_content_types: Optional[List[str]] = None
     ):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.max_content_length = max_content_length
         self.allowed_content_types = allowed_content_types or ["application/json", "multipart/form-data"]
         self.validator = RequestValidator()
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        # Validate content length
+        
+    """dispatch function."""
+# Validate content length
         if not self.validator.validate_content_length(request, self.max_content_length):
             return JSONResponse(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
@@ -454,7 +485,7 @@ class RequestValidationMiddleware(BaseHTTPMiddleware):
 class PerformanceMonitor:
     """Performance monitoring with detailed metrics."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Request metrics
         self.request_counter = Counter('http_requests_total', 'Total HTTP requests', ['method', 'endpoint', 'status'])
         self.request_duration = Histogram('http_request_duration_seconds', 'HTTP request duration', ['method', 'endpoint'])
@@ -502,11 +533,15 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
     """Performance monitoring middleware."""
     
     def __init__(self, app: ASGIApp, monitor: Optional[PerformanceMonitor] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.monitor = monitor or PerformanceMonitor()
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint):
-        start_time = time.time()
+        
+    """dispatch function."""
+start_time = time.time()
         
         # Record request start
         method = request.method
@@ -577,7 +612,7 @@ def rate_limit(max_requests: int, window_seconds: int = 60):
     """Rate limiting decorator."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Get rate limiter from dependencies
             rate_limiter = await get_rate_limiter()
             
@@ -602,7 +637,7 @@ def cache_response(ttl: int = 300, key_func: Optional[Callable] = None):
     """Response caching decorator."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Get cache from dependencies
             cache_client = await get_cache()
             
@@ -632,7 +667,7 @@ def background_task(task_type: str = "default"):
     """Background task decorator."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Get task manager from dependencies
             task_manager = await get_task_manager()
             

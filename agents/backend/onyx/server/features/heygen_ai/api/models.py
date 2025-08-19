@@ -1,12 +1,81 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Dict, List, Optional, Union
+from pydantic import BaseModel, Field, HttpUrl
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 API Models for HeyGen AI equivalent.
 Request and response models for the REST API with LangChain integration.
 """
 
-from typing import Dict, List, Optional, Union
-from pydantic import BaseModel, Field, HttpUrl
-from enum import Enum
+# =============================================================================
+# Core Request/Response Models (Compatible with Enhanced Core)
+# =============================================================================
 
+class VideoRequest(BaseModel):
+    """Core video generation request model."""
+    script: str = Field(..., min_length=10, max_length=5000, 
+                       description="Script text for the video")
+    avatar_id: str = Field(..., description="ID of the avatar to use")
+    voice_id: str = Field(..., description="ID of the voice to use")
+    language: str = Field(default="en", description="Language code")
+    resolution: str = Field(default="1080p", description="Video resolution")
+    quality_preset: str = Field(default="medium", description="Quality preset (low/medium/high/ultra)")
+    output_format: str = Field(default="mp4", description="Output video format")
+    duration: Optional[int] = Field(None, ge=10, le=600, 
+                                  description="Video duration in seconds (10-600)")
+    background: Optional[str] = Field(None, description="Background image/video path")
+    custom_settings: Optional[Dict] = Field(default_factory=dict, 
+                                          description="Custom video settings")
+    enable_expressions: bool = Field(default=True, description="Enable facial expressions")
+    enable_effects: bool = Field(default=False, description="Enable video effects")
+
+class VoiceGenerationRequest(BaseModel):
+    """Core voice generation request model."""
+    text: str = Field(..., min_length=1, max_length=5000, description="Text to synthesize")
+    voice_id: str = Field(..., description="Voice ID to use")
+    language: str = Field(default="en", description="Language code")
+    quality: str = Field(default="medium", description="Audio quality (low/medium/high)")
+    speed: float = Field(default=1.0, ge=0.5, le=2.0, description="Speech speed multiplier")
+    pitch: float = Field(default=1.0, ge=0.5, le=2.0, description="Pitch multiplier")
+    emotion: Optional[str] = Field(None, description="Emotional tone")
+
+class AvatarGenerationRequest(BaseModel):
+    """Core avatar generation request model."""
+    avatar_id: str = Field(..., description="Avatar ID to use")
+    audio_path: str = Field(..., description="Path to audio file for lip-sync")
+    resolution: str = Field(default="1080p", description="Output resolution")
+    quality_preset: str = Field(default="medium", description="Quality preset")
+    enable_expressions: bool = Field(default=True, description="Enable facial expressions")
+    background: Optional[str] = Field(None, description="Background image/video path")
+    custom_settings: Optional[Dict] = Field(default_factory=dict, description="Custom settings")
+
+class VideoResponse(BaseModel):
+    """Core video generation response model."""
+    video_id: str = Field(..., description="Unique video ID")
+    status: str = Field(..., description="Video generation status")
+    output_url: Optional[str] = Field(None, description="URL to generated video")
+    duration: Optional[float] = Field(None, description="Video duration in seconds")
+    file_size: Optional[int] = Field(None, description="Video file size in bytes")
+    created_at: str = Field(..., description="Creation timestamp")
+    updated_at: str = Field(..., description="Last update timestamp")
+    metadata: Dict = Field(default_factory=dict, description="Video metadata")
+    error_message: Optional[str] = Field(None, description="Error message if failed")
+    quality_metrics: Optional[Dict] = Field(None, description="Video quality metrics")
+    processing_steps: Optional[List[str]] = Field(None, description="Processing steps completed")
+
+# =============================================================================
+# Legacy Models (Maintained for Backward Compatibility)
+# =============================================================================
 
 class VideoStatus(str, Enum):
     """Video generation status."""
@@ -14,7 +83,6 @@ class VideoStatus(str, Enum):
     PROCESSING = "processing"
     COMPLETED = "completed"
     FAILED = "failed"
-
 
 class LanguageCode(str, Enum):
     """Supported language codes."""
@@ -28,7 +96,6 @@ class LanguageCode(str, Enum):
     JAPANESE = "ja"
     KOREAN = "ko"
 
-
 class VideoStyle(str, Enum):
     """Video style options."""
     PROFESSIONAL = "professional"
@@ -37,13 +104,11 @@ class VideoStyle(str, Enum):
     MARKETING = "marketing"
     ENTERTAINMENT = "entertainment"
 
-
 class Resolution(str, Enum):
     """Video resolution options."""
     HD_720P = "720p"
     FULL_HD_1080P = "1080p"
     UHD_4K = "4k"
-
 
 class OutputFormat(str, Enum):
     """Video output format options."""
@@ -51,7 +116,6 @@ class OutputFormat(str, Enum):
     MOV = "mov"
     AVI = "avi"
     WEBM = "webm"
-
 
 # Request Models
 class CreateVideoRequest(BaseModel):
@@ -73,6 +137,9 @@ class CreateVideoRequest(BaseModel):
     background: Optional[HttpUrl] = Field(None, description="Background image/video URL")
     custom_settings: Optional[Dict] = Field(default_factory=dict, 
                                           description="Custom video settings")
+    quality_preset: str = Field(default="medium", description="Quality preset")
+    enable_expressions: bool = Field(default=True, description="Enable facial expressions")
+    enable_effects: bool = Field(default=False, description="Enable video effects")
 
 
 class BatchCreateVideoRequest(BaseModel):

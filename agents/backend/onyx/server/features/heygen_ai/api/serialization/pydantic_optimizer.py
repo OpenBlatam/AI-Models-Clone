@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Pydantic Serialization Optimizer for HeyGen AI API
-Optimized data serialization and deserialization with Pydantic.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -19,13 +21,21 @@ import weakref
 from functools import lru_cache, wraps
 import inspect
 import gc
-
 from pydantic import BaseModel, Field, validator, root_validator, ConfigDict
 from pydantic.json import pydantic_encoder, ENCODERS_BY_TYPE
 from pydantic.types import Json
 import orjson
 import ujson
 import msgpack
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Pydantic Serialization Optimizer for HeyGen AI API
+Optimized data serialization and deserialization with Pydantic.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -98,7 +108,7 @@ class SerializationStats:
     last_deserialization: Optional[datetime] = None
     created_at: datetime = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.created_at is None:
             self.created_at = datetime.now(timezone.utc)
     
@@ -155,7 +165,7 @@ class OptimizedBaseModel(BaseModel):
         str_max_length=None,
     )
     
-    def __init__(self, **data):
+    def __init__(self, **data) -> Any:
         super().__init__(**data)
     
     def model_dump(self, **kwargs) -> Dict[str, Any]:
@@ -237,7 +247,9 @@ class OptimizedJSONEncoder:
     """Optimized JSON encoder with performance enhancements."""
     
     def __init__(self, config: SerializationConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.encoders = self._build_encoders()
     
     def _build_encoders(self) -> Dict[Type, Callable]:
@@ -308,7 +320,9 @@ class OptimizedJSONDecoder:
     """Optimized JSON decoder with performance enhancements."""
     
     def __init__(self, config: SerializationConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
     
     def decode(self, data: Union[str, bytes]) -> Any:
         """Decode data based on format."""
@@ -351,7 +365,9 @@ class SerializationCache:
     """Cache for serialized/deserialized data."""
     
     def __init__(self, max_size: int = 1000):
-        self.max_size = max_size
+        
+    """__init__ function."""
+self.max_size = max_size
         self._cache: Dict[str, Any] = {}
         self._access_order: List[str] = []
         self._lock = asyncio.Lock()
@@ -406,7 +422,7 @@ class SerializationCache:
                 del self._cache[oldest_key]
                 self._access_order.pop(0)
     
-    async def clear(self):
+    async def clear(self) -> Any:
         """Clear cache."""
         async with self._lock:
             self._cache.clear()
@@ -428,7 +444,9 @@ class PydanticSerializationOptimizer:
     """Main Pydantic serialization optimizer."""
     
     def __init__(self, config: SerializationConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.encoder = OptimizedJSONEncoder(config)
         self.decoder = OptimizedJSONDecoder(config)
         self.cache = SerializationCache(config.cache_size) if config.enable_caching else None
@@ -590,12 +608,12 @@ class PydanticSerializationOptimizer:
             }
         }
     
-    async def clear_cache(self):
+    async def clear_cache(self) -> Any:
         """Clear serialization cache."""
         if self.cache:
             await self.cache.clear()
     
-    async def optimize_memory(self):
+    async def optimize_memory(self) -> Any:
         """Optimize memory usage."""
         # Clear caches
         await self.clear_cache()
@@ -619,7 +637,7 @@ def optimized_serialization(
     """Decorator for optimized serialization."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Get optimizer from function context or create new one
             optimizer = getattr(wrapper, '_optimizer', None)
             if not optimizer:
@@ -650,7 +668,7 @@ def optimized_deserialization(
     """Decorator for optimized deserialization."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Get optimizer from function context or create new one
             optimizer = getattr(wrapper, '_optimizer', None)
             if not optimizer:
@@ -680,7 +698,7 @@ def cached_serialization(
     """Decorator for cached serialization."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             key_data = {
                 "func": func.__name__,
@@ -772,7 +790,7 @@ def create_optimized_model(
 class SerializationPerformanceMonitor:
     """Monitor serialization performance."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics: Dict[str, List[float]] = {
             "serialization_times": [],
             "deserialization_times": [],

@@ -1,19 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from typing import Dict, List, Any, Optional, Union
+from datetime import datetime, timezone, date
+from enum import Enum
+from pydantic import (
+import re
+from .base_schemas import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 User Schemas for HeyGen AI API
 User management, authentication, and profile operations.
 """
 
-from typing import Dict, List, Any, Optional, Union
-from datetime import datetime, timezone, date
-from enum import Enum
-from pydantic import (
     BaseModel, Field, validator, root_validator, 
     ConfigDict, computed_field, model_validator, EmailStr
 )
-import re
 
-from .base_schemas import (
     BaseRequest, BaseResponse, DataResponse, PaginatedDataResponse,
     IDField, TimestampFields, StatusFields, MetadataFields
 )
@@ -84,14 +92,14 @@ class UserBase(BaseModel):
     )
     
     @validator('first_name', 'last_name')
-    def validate_name(cls, v):
+    def validate_name(cls, v) -> bool:
         """Validate name fields."""
         if not v or not v.strip():
             raise ValueError('Name cannot be empty')
         return v.strip()
     
     @validator('email')
-    def validate_email(cls, v):
+    def validate_email(cls, v) -> bool:
         """Validate email format."""
         if not v or not v.strip():
             raise ValueError('Email cannot be empty')
@@ -137,14 +145,14 @@ class UserProfile(BaseModel):
     )
     
     @validator('website')
-    def validate_website(cls, v):
+    def validate_website(cls, v) -> bool:
         """Validate website URL."""
         if v and not v.startswith(('http://', 'https://')):
             v = 'https://' + v
         return v
     
     @validator('phone')
-    def validate_phone(cls, v):
+    def validate_phone(cls, v) -> bool:
         """Validate phone number."""
         if v:
             # Remove all non-digit characters
@@ -191,7 +199,7 @@ class UserCreateRequest(BaseRequest):
     )
     
     @validator('password')
-    def validate_password(cls, v):
+    def validate_password(cls, v) -> bool:
         """Validate password strength."""
         if len(v) < 8:
             raise ValueError('Password must be at least 8 characters long')
@@ -252,7 +260,7 @@ class UserPasswordUpdateRequest(BaseRequest):
     )
     
     @root_validator
-    def validate_passwords(cls, values):
+    def validate_passwords(cls, values) -> bool:
         """Validate password update."""
         new_password = values.get('new_password')
         confirm_password = values.get('confirm_password')

@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-Specialized Lazy Loaders for HeyGen AI API
-Specialized lazy loading implementations for different data types.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -12,9 +20,17 @@ import structlog
 from dataclasses import dataclass, asdict
 from enum import Enum
 from uuid import UUID
-
 from pydantic import BaseModel, Field, validator, ConfigDict
 from .lazy_loader import (
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Specialized Lazy Loaders for HeyGen AI API
+Specialized lazy loading implementations for different data types.
+"""
+
+
     LazyLoadingManager, LazyLoadingConfig, LoadingStrategy, 
     DataSourceType, LoadingPriority, lazy_load, lazy_stream
 )
@@ -84,7 +100,9 @@ class VideoLazyLoader:
     """Specialized lazy loader for video data."""
     
     def __init__(self, config: LazyLoadingConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.manager = LazyLoadingManager(config)
     
     @lazy_load(strategy=LoadingStrategy.PAGINATION, batch_size=50, enable_caching=True)
@@ -214,7 +232,9 @@ class UserLazyLoader:
     """Specialized lazy loader for user data."""
     
     def __init__(self, config: LazyLoadingConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.manager = LazyLoadingManager(config)
     
     @lazy_load(strategy=LoadingStrategy.PAGINATION, batch_size=100, enable_caching=True)
@@ -340,7 +360,9 @@ class AnalyticsLazyLoader:
     """Specialized lazy loader for analytics data."""
     
     def __init__(self, config: LazyLoadingConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.manager = LazyLoadingManager(config)
     
     @lazy_load(strategy=LoadingStrategy.WINDOW_BASED, batch_size=1000, enable_caching=True)
@@ -483,7 +505,9 @@ class TemplateLazyLoader:
     """Specialized lazy loader for template data."""
     
     def __init__(self, config: LazyLoadingConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.manager = LazyLoadingManager(config)
     
     @lazy_load(strategy=LoadingStrategy.PAGINATION, batch_size=50, enable_caching=True)
@@ -577,7 +601,9 @@ class SearchResultsLazyLoader:
     """Specialized lazy loader for search results."""
     
     def __init__(self, config: LazyLoadingConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.manager = LazyLoadingManager(config)
     
     @lazy_load(strategy=LoadingStrategy.PAGINATION, batch_size=20, enable_caching=True)
@@ -685,7 +711,9 @@ class LazyLoadingFactory:
     """Factory for creating specialized lazy loaders."""
     
     def __init__(self, config: LazyLoadingConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.loaders: Dict[DataType, Any] = {}
     
     def get_video_loader(self) -> VideoLazyLoader:

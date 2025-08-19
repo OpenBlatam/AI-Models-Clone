@@ -1,7 +1,16 @@
-"""
-Enhanced Pydantic v2 Models for HeyGen AI API
-Advanced models with computed fields, validators, serialization, and performance optimizations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 from typing import Dict, List, Optional, Union, Any, Annotated, Literal
 from datetime import datetime, timezone
@@ -9,17 +18,26 @@ from decimal import Decimal
 import re
 import uuid
 from pathlib import Path
-
 from pydantic import (
+from pydantic.json_schema import JsonSchemaValue
+from pydantic_core import core_schema
+from enum import Enum
+import structlog
+        import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Enhanced Pydantic v2 Models for HeyGen AI API
+Advanced models with computed fields, validators, serialization, and performance optimizations.
+"""
+
+
     BaseModel, Field, HttpUrl, EmailStr, validator, root_validator,
     computed_field, model_validator, field_validator, ConfigDict,
     PlainSerializer, PlainValidator, BeforeValidator, AfterValidator,
     WithJsonSchema, GetJsonSchemaHandler, GetCoreSchemaHandler
 )
-from pydantic.json_schema import JsonSchemaValue
-from pydantic_core import core_schema
-from enum import Enum
-import structlog
 
 logger = structlog.get_logger()
 
@@ -533,7 +551,6 @@ class GenerateScriptRequest(BaseHeyGenModel):
     def validate_target_duration(cls, v: str) -> str:
         """Validate and normalize target duration."""
         # Parse duration string
-        import re
         match = re.match(r'^(\d+)\s*(seconds?|minutes?|hours?)$', v.lower())
         if not match:
             raise ValueError("Invalid duration format. Use 'X seconds/minutes/hours'")

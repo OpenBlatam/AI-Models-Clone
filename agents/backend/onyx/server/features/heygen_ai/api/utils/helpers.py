@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-Helper functions for HeyGen AI API
-Provides utility functions with comprehensive type hints and Pydantic model integration.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import hashlib
@@ -10,8 +18,20 @@ import uuid
 from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List, Union, Tuple
 from pathlib import Path
-
 from ..models.schemas import QualityLevel, LanguageCode, VideoStatus, ProcessingSettings
+    import re
+    import re
+    import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Helper functions for HeyGen AI API
+Provides utility functions with comprehensive type hints and Pydantic model integration.
+"""
+
+
 
 # Global variables for tracking
 _start_time: float = time.time()
@@ -162,7 +182,6 @@ def generate_thumbnail_url(video_id: str) -> str:
 
 def validate_video_id_format(video_id: str) -> bool:
     """Validate video ID format (pure function)"""
-    import re
     pattern = re.compile(r'^video_\d+_[a-zA-Z0-9_-]+$')
     return bool(pattern.match(video_id))
 
@@ -194,7 +213,7 @@ def calculate_processing_cost(quality: Union[str, QualityLevel], duration: float
     return round(base_cost * (duration / 60), 2)
 
 
-def generate_request_id() -> str:
+async def generate_request_id() -> str:
     """Generate unique request ID (pure function)"""
     timestamp: int = int(time.time() * 1000)
     random_suffix: str = str(uuid.uuid4())[:8]
@@ -203,19 +222,17 @@ def generate_request_id() -> str:
 
 def validate_email_format(email: str) -> bool:
     """Validate email format (pure function)"""
-    import re
     pattern = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
     return bool(pattern.match(email))
 
 
 def validate_username_format(username: str) -> bool:
     """Validate username format (pure function)"""
-    import re
     pattern = re.compile(r'^[a-zA-Z0-9_-]{3,50}$')
     return bool(pattern.match(username))
 
 
-def generate_api_key() -> str:
+async def generate_api_key() -> str:
     """Generate secure API key (pure function)"""
     return hashlib.sha256(uuid.uuid4().bytes).hexdigest()
 

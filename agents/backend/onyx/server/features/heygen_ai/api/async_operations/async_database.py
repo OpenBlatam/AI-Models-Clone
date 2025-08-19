@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Async Database Operations for HeyGen AI FastAPI
-Dedicated async functions for database operations with connection pooling and optimization.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -27,12 +32,20 @@ import signal
 import os
 import hashlib
 import pickle
-
 from fastapi import Request, Response, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
 from sqlalchemy import text, select, insert, update, delete
 from sqlalchemy.orm import DeclarativeBase
 from pydantic import BaseModel, Field, validator
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Async Database Operations for HeyGen AI FastAPI
+Dedicated async functions for database operations with connection pooling and optimization.
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -119,7 +132,9 @@ class AsyncDatabaseManager:
     """Main async database manager with connection pooling and optimization."""
     
     def __init__(self, config: DatabaseConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.engine = None
         self.session_factory = None
         self.connection_pool = None
@@ -130,7 +145,7 @@ class AsyncDatabaseManager:
         self._is_initialized = False
         self._monitoring_task: Optional[asyncio.Task] = None
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the database manager."""
         if self._is_initialized:
             return
@@ -184,7 +199,7 @@ class AsyncDatabaseManager:
             logger.error(f"Failed to initialize database manager: {e}")
             raise
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup the database manager."""
         if not self._is_initialized:
             return
@@ -205,7 +220,7 @@ class AsyncDatabaseManager:
         logger.info("Database manager cleaned up")
     
     @asynccontextmanager
-    async def get_session(self):
+    async def get_session(self) -> Optional[Dict[str, Any]]:
         """Get database session from pool."""
         if not self._is_initialized:
             raise RuntimeError("Database manager not initialized")
@@ -219,7 +234,7 @@ class AsyncDatabaseManager:
         finally:
             await session.close()
     
-    async def _monitoring_loop(self):
+    async def _monitoring_loop(self) -> Any:
         """Database monitoring loop."""
         while self._is_initialized:
             try:
@@ -263,7 +278,9 @@ class AsyncDatabaseOperations:
     """Dedicated async functions for database operations."""
     
     def __init__(self, db_manager: AsyncDatabaseManager):
-        self.db_manager = db_manager
+        
+    """__init__ function."""
+self.db_manager = db_manager
         self.query_cache: Dict[str, Any] = {}
         self._lock = asyncio.Lock()
     
@@ -720,11 +737,13 @@ class AsyncRedisOperations:
     """Dedicated async functions for Redis operations."""
     
     def __init__(self, redis_url: str = "redis://localhost:6379"):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.redis: Optional[aioredis.Redis] = None
         self._is_initialized = False
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize Redis connection."""
         if self._is_initialized:
             return
@@ -738,7 +757,7 @@ class AsyncRedisOperations:
             logger.error(f"Failed to initialize Redis: {e}")
             raise
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup Redis connection."""
         if self.redis:
             await self.redis.close()
@@ -808,7 +827,7 @@ class AsyncRedisOperations:
             logger.error(f"Redis expire error: {e}")
             return False
     
-    async def get_or_set(self, key: str, fetch_func: Callable, ttl: int = 300) -> Any:
+    async def get_or_set(self, key: str, fetch_func: Callable, ttl: int = 300) -> Optional[Dict[str, Any]]:
         """Get from Redis or fetch and set."""
         # Try to get from Redis
         cached_value = await self.get(key)

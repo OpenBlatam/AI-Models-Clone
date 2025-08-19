@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-"""
-Enhanced Async Database Repositories for HeyGen AI API
-Optimized CRUD operations, bulk operations, and advanced querying
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import logging
 from typing import Optional, List, Dict, Any, Union, TypeVar, Generic, Type
@@ -12,8 +11,19 @@ from sqlalchemy import select, update, delete, func, and_, or_, desc, asc
 from sqlalchemy.orm import selectinload, joinedload
 from sqlalchemy.exc import SQLAlchemyError, IntegrityError
 from pydantic import BaseModel
-
 from .async_database import AsyncDatabaseManager, DatabaseConnectionPool
+        from .database import User  # Import here to avoid circular imports
+        from .database import Video  # Import here to avoid circular imports
+        from .database import ModelUsage  # Import here to avoid circular imports
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Enhanced Async Database Repositories for HeyGen AI API
+Optimized CRUD operations, bulk operations, and advanced querying
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +37,9 @@ class BaseRepository(Generic[T]):
     """
     
     def __init__(self, db_manager: AsyncDatabaseManager, model: Type[T]):
-        self.db_manager = db_manager
+        
+    """__init__ function."""
+self.db_manager = db_manager
         self.model = model
     
     async def create(self, **kwargs) -> T:
@@ -215,7 +227,7 @@ class BaseRepository(Generic[T]):
 class UserRepository(BaseRepository):
     """Enhanced user repository with user-specific operations."""
     
-    async def get_by_api_key(self, api_key: str) -> Optional[Any]:
+    async async def get_by_api_key(self, api_key: str) -> Optional[Any]:
         """Get user by API key."""
         return await self.get_by_field("api_key", api_key)
     
@@ -512,7 +524,9 @@ class RepositoryFactory:
     """Factory for creating repository instances."""
     
     def __init__(self, db_pool: DatabaseConnectionPool):
-        self.db_pool = db_pool
+        
+    """__init__ function."""
+self.db_pool = db_pool
     
     def get_user_repository(self, db_name: Optional[str] = None) -> UserRepository:
         """Get user repository instance."""
@@ -522,7 +536,6 @@ class RepositoryFactory:
             raise RuntimeError("No primary database configured")
         
         db_manager = self.db_pool.databases[self.db_pool.primary_db]
-        from .database import User  # Import here to avoid circular imports
         return UserRepository(db_manager, User)
     
     def get_video_repository(self, db_name: Optional[str] = None) -> VideoRepository:
@@ -531,7 +544,6 @@ class RepositoryFactory:
             raise RuntimeError("No primary database configured")
         
         db_manager = self.db_pool.databases[self.db_pool.primary_db]
-        from .database import Video  # Import here to avoid circular imports
         return VideoRepository(db_manager, Video)
     
     def get_model_usage_repository(self, db_name: Optional[str] = None) -> ModelUsageRepository:
@@ -540,5 +552,4 @@ class RepositoryFactory:
             raise RuntimeError("No primary database configured")
         
         db_manager = self.db_pool.databases[self.db_pool.primary_db]
-        from .database import ModelUsage  # Import here to avoid circular imports
         return ModelUsageRepository(db_manager, ModelUsage) 

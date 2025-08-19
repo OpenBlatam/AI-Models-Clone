@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Enhanced SQLAlchemy 2.0 Configuration for HeyGen AI API
-Modern SQLAlchemy 2.0 setup with advanced features, connection pooling, and optimization.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -12,24 +14,31 @@ from datetime import datetime, timedelta
 from dataclasses import dataclass
 from enum import Enum
 import json
-
-# SQLAlchemy 2.0 imports
 from sqlalchemy.ext.asyncio import (
-    AsyncSession, 
-    create_async_engine, 
-    async_sessionmaker,
-    AsyncEngine,
-    async_scoped_session
-)
 from sqlalchemy.pool import QueuePool, NullPool, StaticPool
 from sqlalchemy import text, MetaData, event, inspect
 from sqlalchemy.exc import SQLAlchemyError, OperationalError, DisconnectionError
 from sqlalchemy.orm import sessionmaker, scoped_session
 from sqlalchemy.sql import func
 from sqlalchemy.schema import CreateTable, DropTable
+from .models.sqlalchemy_models import Base, get_all_models
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Enhanced SQLAlchemy 2.0 Configuration for HeyGen AI API
+Modern SQLAlchemy 2.0 setup with advanced features, connection pooling, and optimization.
+"""
+
+
+# SQLAlchemy 2.0 imports
+    AsyncSession, 
+    create_async_engine, 
+    async_sessionmaker,
+    AsyncEngine,
+    async_scoped_session
+)
 
 # Import our models
-from .models.sqlalchemy_models import Base, get_all_models
 
 logger = logging.getLogger(__name__)
 
@@ -86,7 +95,9 @@ class SQLAlchemyManager:
     """
     
     def __init__(self, config: SQLAlchemyConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.engine: Optional[AsyncEngine] = None
         self.async_session_factory: Optional[async_sessionmaker] = None
         self.scoped_session_factory: Optional[async_scoped_session] = None
@@ -176,12 +187,12 @@ class SQLAlchemyManager:
             return
         
         @event.listens_for(self.engine, "before_cursor_execute")
-        def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        def before_cursor_execute(conn, cursor, statement, parameters, context, executemany) -> Any:
             """Track query execution start."""
             conn.info.setdefault('query_start_time', []).append(datetime.now())
         
         @event.listens_for(self.engine, "after_cursor_execute")
-        def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+        def after_cursor_execute(conn, cursor, statement, parameters, context, executemany) -> Any:
             """Track query execution end and performance."""
             if not conn.info.get('query_start_time'):
                 return
