@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .engine import CopywritingEngine
+from .models import CopywritingRequest, CopywritingResponse, CopywritingVariant
+from .services import CopywritingService, OptimizationService, CacheService
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Core Copywriting System
 =======================
@@ -9,9 +17,6 @@ This module contains the core components of the copywriting system:
 - Utils: Utility functions
 """
 
-from .engine import CopywritingEngine
-from .models import CopywritingRequest, CopywritingResponse, CopywritingVariant
-from .services import CopywritingService, OptimizationService, CacheService
 
 __all__ = [
     'CopywritingEngine',

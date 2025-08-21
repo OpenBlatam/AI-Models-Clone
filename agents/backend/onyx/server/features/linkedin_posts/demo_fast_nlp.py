@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import json
+from datetime import datetime
+from typing import Dict, List, Any
+import statistics
+from infrastructure.nlp.fast_nlp_enhancer import FastNLPEnhancer, get_fast_nlp_enhancer
+from infrastructure.nlp.async_nlp_processor import AsyncNLPProcessor, get_async_nlp_processor
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Fast NLP System Demo for LinkedIn Posts
@@ -10,16 +28,8 @@ Comprehensive demo showcasing ultra-fast NLP processing:
 - Batch processing capabilities
 """
 
-import asyncio
-import time
-import json
-from datetime import datetime
-from typing import Dict, List, Any
-import statistics
 
 # Import our fast NLP modules
-from infrastructure.nlp.fast_nlp_enhancer import FastNLPEnhancer, get_fast_nlp_enhancer
-from infrastructure.nlp.async_nlp_processor import AsyncNLPProcessor, get_async_nlp_processor
 
 
 class FastNLPDemo:
@@ -27,7 +37,7 @@ class FastNLPDemo:
     Comprehensive demo of fast NLP system for LinkedIn posts.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the fast NLP demo system."""
         self.fast_nlp = get_fast_nlp_enhancer()
         self.async_nlp = get_async_nlp_processor()
@@ -55,7 +65,7 @@ class FastNLPDemo:
             "batch_processing_times": [],
         }
     
-    async def run_fast_nlp_demo(self):
+    async def run_fast_nlp_demo(self) -> Any:
         """Run the comprehensive fast NLP demo."""
         print("🚀 Starting Fast NLP System Demo for LinkedIn Posts")
         print("=" * 60)
@@ -94,7 +104,7 @@ class FastNLPDemo:
         print("\n✅ Fast NLP System Demo Completed!")
         print("=" * 60)
     
-    async def _demo_performance_comparison(self):
+    async def _demo_performance_comparison(self) -> Any:
         """Demo performance comparison between different NLP approaches."""
         print("\n🏁 Demo 1: Performance Comparison")
         print("-" * 40)
@@ -136,7 +146,7 @@ class FastNLPDemo:
         print(f"   Fast NLP: {fast_time:.3f}s ({((standard_time - fast_time) / standard_time * 100):.1f}% faster)")
         print(f"   Async NLP: {async_time:.3f}s ({((standard_time - async_time) / standard_time * 100):.1f}% faster)")
     
-    async def _demo_fast_nlp_caching(self):
+    async def _demo_fast_nlp_caching(self) -> Any:
         """Demo fast NLP caching system."""
         print("\n💾 Demo 2: Fast NLP Caching")
         print("-" * 40)
@@ -181,7 +191,7 @@ class FastNLPDemo:
         print(f"   Memory Cache Size: {cache_stats['memory_cache_size']}")
         print(f"   Redis Connected: {cache_stats['redis_connected']}")
     
-    async def _demo_async_nlp_processing(self):
+    async def _demo_async_nlp_processing(self) -> Any:
         """Demo async NLP processing capabilities."""
         print("\n🔄 Demo 3: Async NLP Processing")
         print("-" * 40)
@@ -216,7 +226,7 @@ class FastNLPDemo:
         print(f"   Average Processing Time: {async_stats['average_processing_time']:.3f}s")
         print(f"   Concurrent Operations: {async_stats['concurrent_operations']}")
     
-    async def _demo_batch_processing(self):
+    async def _demo_batch_processing(self) -> Any:
         """Demo batch processing capabilities."""
         print("\n📦 Demo 4: Batch Processing")
         print("-" * 40)
@@ -254,7 +264,7 @@ class FastNLPDemo:
         print(f"   📊 Average per text: {async_batch_time / len(batch_texts):.3f}s")
         print(f"   📈 Speed improvement: {((individual_time - async_batch_time) / individual_time * 100):.1f}%")
     
-    async def _demo_nlp_quality_analysis(self):
+    async def _demo_nlp_quality_analysis(self) -> Any:
         """Demo NLP quality analysis features."""
         print("\n🔍 Demo 5: NLP Quality Analysis")
         print("-" * 40)
@@ -300,7 +310,7 @@ class FastNLPDemo:
         print(f"   Cached: {result.get('cached', False)}")
         print(f"   Async Optimized: {result.get('async_optimized', False)}")
     
-    async def _demo_throughput_testing(self):
+    async def _demo_throughput_testing(self) -> Any:
         """Demo throughput testing and load handling."""
         print("\n🚀 Demo 6: Throughput Testing")
         print("-" * 40)
@@ -338,7 +348,7 @@ class FastNLPDemo:
         print(f"   Fast NLP Success: {fast_success}/{len(test_texts)} ({fast_success/len(test_texts)*100:.1f}%)")
         print(f"   Async NLP Success: {async_success}/{len(test_texts)} ({async_success/len(test_texts)*100:.1f}%)")
     
-    async def _demo_performance_analysis(self):
+    async def _demo_performance_analysis(self) -> Any:
         """Demo comprehensive performance analysis."""
         print("\n📊 Demo 7: Performance Analysis")
         print("-" * 40)
@@ -376,7 +386,7 @@ class FastNLPDemo:
             print(f"   Async NLP Avg Time: {async_avg:.3f}s")
             print(f"   Async Improvement: {improvement:.1f}%")
     
-    async def _demo_speed_improvements(self):
+    async def _demo_speed_improvements(self) -> Any:
         """Demo speed improvements summary."""
         print("\n🚀 Demo 8: Speed Improvements Summary")
         print("-" * 40)

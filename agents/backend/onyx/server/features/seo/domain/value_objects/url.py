@@ -1,12 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import re
+from urllib.parse import urlparse, urljoin
+from typing import Optional, List
+from dataclasses import dataclass
+        from urllib.parse import parse_qs
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 URL Value Object
 Domain-Driven Design with validation and business logic
 """
 
-import re
-from urllib.parse import urlparse, urljoin
-from typing import Optional, List
-from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
@@ -20,7 +26,7 @@ class URL:
     
     value: str
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate URL after initialization"""
         if not self._is_valid_format():
             raise ValueError(f"Invalid URL format: {self.value}")
@@ -81,7 +87,6 @@ class URL:
         Returns:
             dict: Query parameters
         """
-        from urllib.parse import parse_qs
         return parse_qs(urlparse(self.value).query)
     
     def get_fragment(self) -> str:
@@ -93,7 +98,7 @@ class URL:
         """
         return urlparse(self.value).fragment
     
-    def is_https(self) -> bool:
+    async def is_https(self) -> bool:
         """
         Check if URL uses HTTPS
         
@@ -102,7 +107,7 @@ class URL:
         """
         return self.get_scheme().lower() == 'https'
     
-    def is_http(self) -> bool:
+    async def is_http(self) -> bool:
         """
         Check if URL uses HTTP
         
@@ -385,7 +390,7 @@ class URL:
             return None
     
     @classmethod
-    def create_https(cls, domain: str, path: str = "/") -> "URL":
+    async def create_https(cls, domain: str, path: str = "/") -> "URL":
         """
         Create HTTPS URL
         
@@ -400,7 +405,7 @@ class URL:
         return cls(url)
     
     @classmethod
-    def create_http(cls, domain: str, path: str = "/") -> "URL":
+    async def create_http(cls, domain: str, path: str = "/") -> "URL":
         """
         Create HTTP URL
         

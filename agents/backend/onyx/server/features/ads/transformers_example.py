@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import torch
+from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassification
+from transformers import Trainer, TrainingArguments
+from torch.utils.data import Dataset, DataLoader
+from official_docs_reference import OfficialDocsReference
+from transformers import AutoModel, AutoTokenizer
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Transformers Example - Using Official Documentation References
@@ -6,23 +23,18 @@ Transformers Example - Using Official Documentation References
 Ejemplo práctico de Transformers usando las referencias de documentación oficial.
 """
 
-import torch
-from transformers import AutoModel, AutoTokenizer, AutoModelForSequenceClassification
-from transformers import Trainer, TrainingArguments
-from torch.utils.data import Dataset, DataLoader
-from official_docs_reference import OfficialDocsReference
 
 class TextDataset(Dataset):
-    def __init__(self, texts, labels, tokenizer, max_length=512):
+    def __init__(self, texts, labels, tokenizer, max_length=512) -> Any:
         self.texts = texts
         self.labels = labels
         self.tokenizer = tokenizer
         self.max_length = max_length
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return len(self.texts)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         text = self.texts[idx]
         label = self.labels[idx]
         
@@ -88,7 +100,7 @@ def prepare_data():
     
     return texts, labels
 
-def tokenize_data(texts, tokenizer):
+def tokenize_data(texts, tokenizer) -> Any:
     """Tokenizar datos siguiendo las mejores prácticas."""
     ref = OfficialDocsReference()
     
@@ -119,7 +131,7 @@ def tokenize_data(texts, tokenizer):
     print("✅ Tokenización completada!")
     return tokenized_texts
 
-def train_with_trainer(model, tokenizer, texts, labels):
+def train_with_trainer(model, tokenizer, texts, labels) -> Any:
     """Entrenar usando Trainer siguiendo las mejores prácticas."""
     ref = OfficialDocsReference()
     
@@ -175,7 +187,7 @@ def train_with_trainer(model, tokenizer, texts, labels):
     print("✅ Entrenamiento completado!")
     return trainer
 
-def predict_sentiment(model, tokenizer, text):
+def predict_sentiment(model, tokenizer, text) -> Any:
     """Predecir sentimiento de un texto."""
     model.eval()
     
@@ -204,7 +216,6 @@ def validate_code():
     
     # Código de ejemplo
     code = """
-from transformers import AutoModel, AutoTokenizer
 
 model = AutoModel.from_pretrained("bert-base-uncased")
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
@@ -269,5 +280,6 @@ def main():
     print("\n🎉 ¡Ejemplo completado exitosamente!")
     print("El código sigue las mejores prácticas oficiales de Transformers.")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

@@ -1,9 +1,10 @@
-"""
-Functional Instagram Captions API
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Pure functions, declarative patterns, no classes.
-Uses security_functions.py for all security operations.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import time
 import logging
@@ -12,9 +13,18 @@ from fastapi import FastAPI, HTTPException, Request, Depends, status, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field, validator
+from .security_functions import (
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Functional Instagram Captions API
+
+Pure functions, declarative patterns, no classes.
+Uses security_functions.py for all security operations.
+"""
+
 
 # Import functional security
-from .security_functions import (
     validate_api_key, enforce_rate_limit, sanitize_content,
     validate_request_data, log_security_event, log_authentication_attempt,
     create_security_middleware, add_security_headers, generate_request_id,
@@ -42,11 +52,11 @@ class CaptionRequest(BaseModel):
     include_emoji: bool = Field(default=True)
     
     @validator('content_description')
-    def validate_content(cls, v):
+    def validate_content(cls, v) -> bool:
         return sanitize_content(v)
     
     @validator('style')
-    def validate_style(cls, v):
+    def validate_style(cls, v) -> bool:
         allowed_styles = ['casual', 'formal', 'creative', 'professional']
         if v not in allowed_styles:
             raise ValueError('Invalid style')
@@ -95,7 +105,7 @@ def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(security)
     return api_key
 
 
-def get_user_id_from_api_key(api_key: str) -> str:
+async def get_user_id_from_api_key(api_key: str) -> str:
     """Extract user ID from API key."""
     try:
         return api_key.split('.')[0]
@@ -107,7 +117,7 @@ def get_user_id_from_api_key(api_key: str) -> str:
 # PURE FUNCTIONS - REQUEST PROCESSING
 # =============================================================================
 
-def process_caption_request(request_data: Dict[str, Any], user_id: str) -> CaptionResponse:
+async def process_caption_request(request_data: Dict[str, Any], user_id: str) -> CaptionResponse:
     """Process single caption request."""
     start_time = time.time()
     
@@ -140,7 +150,7 @@ def process_caption_request(request_data: Dict[str, Any], user_id: str) -> Capti
     )
 
 
-def process_batch_request(batch_data: Dict[str, Any], user_id: str) -> BatchResponse:
+async def process_batch_request(batch_data: Dict[str, Any], user_id: str) -> BatchResponse:
     """Process batch caption request."""
     start_time = time.time()
     
@@ -304,7 +314,7 @@ def create_info_endpoint(app: FastAPI):
     """Create API info endpoint."""
     
     @app.get("/api/functional/info")
-    async def get_api_info() -> Dict[str, Any]:
+    async async def get_api_info() -> Dict[str, Any]:
         """Get API information."""
         return {
             "name": "Instagram Captions API - Functional",
@@ -395,7 +405,7 @@ def create_functional_app() -> FastAPI:
 # PURE FUNCTIONS - UTILITY
 # =============================================================================
 
-def calculate_request_metrics(request_data: Dict[str, Any]) -> Dict[str, Any]:
+async def calculate_request_metrics(request_data: Dict[str, Any]) -> Dict[str, Any]:
     """Calculate request metrics."""
     return {
         "content_length": len(str(request_data.get('content_description', ''))),
@@ -405,7 +415,7 @@ def calculate_request_metrics(request_data: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def validate_batch_request(batch_data: Dict[str, Any]) -> Tuple[bool, str]:
+async def validate_batch_request(batch_data: Dict[str, Any]) -> Tuple[bool, str]:
     """Validate batch request."""
     requests = batch_data.get('requests', [])
     

@@ -1,15 +1,13 @@
-"""
-FastAPI Best Practices - Middleware
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module implements middleware following FastAPI best practices:
-- Request/response processing
-- Error handling and logging
-- Performance monitoring
-- Security headers
-- CORS handling
-- Rate limiting
-- Request ID tracking
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import uuid
@@ -25,6 +23,21 @@ from starlette.responses import JSONResponse
 import json
 import hashlib
 from datetime import datetime, timezone
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+FastAPI Best Practices - Middleware
+
+This module implements middleware following FastAPI best practices:
+- Request/response processing
+- Error handling and logging
+- Performance monitoring
+- Security headers
+- CORS handling
+- Rate limiting
+- Request ID tracking
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +57,9 @@ class RequestIDMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app, header_name: str = "X-Request-ID"):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.header_name = header_name
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -82,7 +97,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app, log_request_body: bool = False, log_response_body: bool = False):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.log_request_body = log_request_body
         self.log_response_body = log_response_body
     
@@ -199,7 +216,9 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app, slow_request_threshold: float = 5.0):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.slow_request_threshold = slow_request_threshold
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -258,7 +277,7 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     - Clickjacking protection
     """
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -302,7 +321,9 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app, requests_per_minute: int = 100, requests_per_hour: int = 1000):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.requests_per_minute = requests_per_minute
         self.requests_per_hour = requests_per_hour
         self.request_counts: Dict[str, Dict[str, Any]] = {}
@@ -409,7 +430,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
     - User-friendly messages
     """
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -456,7 +477,7 @@ class CacheControlMiddleware(BaseHTTPMiddleware):
     - Performance optimization
     """
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -552,7 +573,7 @@ def create_gzip_middleware() -> GZipMiddleware:
 # UTILITY FUNCTIONS
 # =============================================================================
 
-def get_request_id(request: Request) -> str:
+async def get_request_id(request: Request) -> str:
     """Get request ID from request state"""
     return getattr(request.state, 'request_id', 'unknown')
 

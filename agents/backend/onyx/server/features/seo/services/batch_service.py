@@ -1,7 +1,10 @@
-"""
-Batch Processing Service para el servicio SEO ultra-optimizado.
-Procesamiento en lote con control de concurrencia y métricas.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -11,9 +14,17 @@ from loguru import logger
 import statistics
 from concurrent.futures import ThreadPoolExecutor
 import psutil
-
 from ..models import SEOScrapeRequest, SEOScrapeResponse
 from ..core.metrics import PerformanceTracker, MetricsCollector
+            from urllib.parse import urlparse
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Batch Processing Service para el servicio SEO ultra-optimizado.
+Procesamiento en lote con control de concurrencia y métricas.
+"""
+
+
 
 
 @dataclass
@@ -35,7 +46,9 @@ class BatchProcessingService:
     """Servicio de procesamiento en lote ultra-optimizado."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self.performance_tracker = PerformanceTracker(self.config.get('performance', {}))
         self.metrics_collector = MetricsCollector()
         
@@ -144,7 +157,7 @@ class BatchProcessingService:
         
         return batch_result
     
-    async def _process_single_request(
+    async async def _process_single_request(
         self,
         request: SEOScrapeRequest,
         seo_service,
@@ -326,7 +339,7 @@ class BatchProcessingService:
             )
         }
     
-    def reset_stats(self):
+    def reset_stats(self) -> Any:
         """Resetea estadísticas globales."""
         self.total_batches_processed = 0
         self.total_requests_processed = 0
@@ -375,7 +388,6 @@ class BatchProcessingService:
     def _is_valid_url(self, url: str) -> bool:
         """Valida si una URL es válida."""
         try:
-            from urllib.parse import urlparse
             result = urlparse(url)
             return all([result.scheme, result.netloc])
         except:

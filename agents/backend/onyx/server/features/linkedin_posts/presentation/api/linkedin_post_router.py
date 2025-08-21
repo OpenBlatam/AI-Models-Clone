@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from fastapi import APIRouter, HTTPException, Depends, Query, Response
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+from ...core.domain.entities.linkedin_post import PostStatus, PostType, PostTone
+from ...application.use_cases.linkedin_post_use_cases import LinkedInPostUseCases
+from ...infrastructure.repositories.linkedin_post_repository import LinkedInPostRepository
+from ...shared.schemas.linkedin_post_schemas import (
+from ...shared.logging import get_logger
+from ...shared.dependencies import get_current_user, rate_limiter, User
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 LinkedIn Post API Router
 =======================
@@ -5,14 +22,7 @@ LinkedIn Post API Router
 FastAPI router for LinkedIn post management with fast NLP integration.
 """
 
-from fastapi import APIRouter, HTTPException, Depends, Query, Response
-from typing import List, Optional, Dict, Any
-from datetime import datetime
 
-from ...core.domain.entities.linkedin_post import PostStatus, PostType, PostTone
-from ...application.use_cases.linkedin_post_use_cases import LinkedInPostUseCases
-from ...infrastructure.repositories.linkedin_post_repository import LinkedInPostRepository
-from ...shared.schemas.linkedin_post_schemas import (
     LinkedInPostCreate,
     LinkedInPostUpdate,
     LinkedInPostResponse,
@@ -22,8 +32,6 @@ from ...shared.schemas.linkedin_post_schemas import (
     BatchOptimizationRequest,
     NLPPerformanceResponse,
 )
-from ...shared.logging import get_logger
-from ...shared.dependencies import get_current_user, rate_limiter, User
 
 logger = get_logger(__name__)
 

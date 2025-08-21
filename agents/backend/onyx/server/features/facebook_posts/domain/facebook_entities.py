@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+import hashlib
+import uuid
+from dataclasses import dataclass
+from ..models.facebook_models import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 Facebook Posts - Domain Entities
 ===================================
@@ -6,13 +17,7 @@ Entidades del dominio core para Facebook posts siguiendo Clean Architecture.
 Aggregate Root: FacebookPostEntity
 """
 
-from typing import List, Optional, Dict, Any
-from datetime import datetime
-import hashlib
-import uuid
-from dataclasses import dataclass
 
-from ..models.facebook_models import (
     ContentIdentifier, PostSpecification, GenerationConfig, FacebookPostContent,
     FacebookPostAnalysis, ContentStatus, PostType, ContentTone, TargetAudience,
     EngagementTier, QualityTier
@@ -33,7 +38,9 @@ class FacebookPostDomainEntity:
         content: FacebookPostContent,
         analysis: Optional[FacebookPostAnalysis] = None
     ):
-        # Validación de invariantes del dominio
+        
+    """__init__ function."""
+# Validación de invariantes del dominio
         self._validate_domain_rules(identifier, specification, content)
         
         # Estado inmutable de identidad

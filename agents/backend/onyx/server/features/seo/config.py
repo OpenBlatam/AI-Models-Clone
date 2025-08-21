@@ -1,12 +1,23 @@
-"""
-Configuración modular y refactorizada para el Servicio SEO Ultra-Optimizado.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import os
 from pathlib import Path
 from typing import Dict, Any, Optional
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Configuración modular y refactorizada para el Servicio SEO Ultra-Optimizado.
+"""
+
 
 
 class Environment(Enum):
@@ -100,7 +111,7 @@ class OptimizationConfig:
 class Config:
     """Configuración principal del servicio SEO."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.environment = Environment(os.getenv("ENVIRONMENT", "development"))
         self.base_dir = Path(__file__).parent
         
@@ -163,7 +174,7 @@ class Config:
         """Verifica si está en modo producción."""
         return self.environment == Environment.PRODUCTION
     
-    def get_httpx_config(self) -> Dict[str, Any]:
+    async def get_httpx_config(self) -> Dict[str, Any]:
         """Obtiene configuración para httpx."""
         return {
             "timeout": self.optimization.httpx_timeout,

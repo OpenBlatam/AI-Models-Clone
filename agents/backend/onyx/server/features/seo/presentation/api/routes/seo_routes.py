@@ -1,23 +1,31 @@
-"""
-SEO API Routes
-Production-ready FastAPI routes for SEO analysis
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import time
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request, Response
 from fastapi.responses import JSONResponse
 from loguru import logger
-
 from application.use_cases import AnalyzeURLUseCase, AnalyzeBatchUseCase
 from application.dto import AnalyzeURLRequest, AnalyzeURLResponse, AnalyzeBatchRequest, AnalyzeBatchResponse
 from presentation.api.dependencies import get_analyze_url_use_case, get_analyze_batch_use_case
 from presentation.api.schemas import (
+from presentation.api.middleware import get_request_id
+from shared.monitoring.metrics import record_request, record_analysis, record_cache_hit, record_cache_miss
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+SEO API Routes
+Production-ready FastAPI routes for SEO analysis
+"""
+
+
     AnalyzeURLSchema, AnalyzeBatchSchema, AnalyzeURLResponseSchema,
     HealthResponse, ErrorResponse
 )
-from presentation.api.middleware import get_request_id
-from shared.monitoring.metrics import record_request, record_analysis, record_cache_hit, record_cache_miss
 
 
 router = APIRouter(prefix="/seo", tags=["SEO Analysis"])

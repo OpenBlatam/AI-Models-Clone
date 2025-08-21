@@ -1,9 +1,13 @@
-"""
-Cache Manager
-=============
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Multi-level caching system with memory, Redis, compression, and intelligent eviction.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import asyncio
@@ -14,9 +18,19 @@ from collections import OrderedDict
 import hashlib
 import pickle
 from datetime import datetime, timedelta
-
 from .config import get_config
 from .optimization import get_optimization_manager
+                import redis
+                import redis
+from typing import Any, List, Dict, Optional
+"""
+Cache Manager
+=============
+
+Multi-level caching system with memory, Redis, compression, and intelligent eviction.
+"""
+
+
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -43,7 +57,9 @@ class MemoryCache:
     """High-performance in-memory cache with LRU eviction"""
     
     def __init__(self, max_size: int = 1000, ttl: int = 3600):
-        self.max_size = max_size
+        
+    """__init__ function."""
+self.max_size = max_size
         self.ttl = ttl
         self._cache = OrderedDict()
         self._timestamps = {}
@@ -55,7 +71,7 @@ class MemoryCache:
             return True
         return time.time() - self._timestamps[key] > self.ttl
     
-    def _evict_expired(self):
+    def _evict_expired(self) -> Any:
         """Remove expired entries"""
         current_time = time.time()
         expired_keys = [
@@ -74,7 +90,7 @@ class MemoryCache:
         if key in self._timestamps:
             del self._timestamps[key]
     
-    def _evict_lru(self):
+    def _evict_lru(self) -> Any:
         """Evict least recently used items"""
         while len(self._cache) >= self.max_size:
             oldest_key = next(iter(self._cache))
@@ -124,7 +140,7 @@ class MemoryCache:
             return True
         return False
     
-    def clear(self):
+    def clear(self) -> Any:
         """Clear all cache entries"""
         self._cache.clear()
         self._timestamps.clear()
@@ -139,12 +155,12 @@ class MemoryCache:
 class RedisCache:
     """Redis-based distributed cache"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.redis_client = None
         self.stats = CacheStats()
         self._setup_redis()
     
-    def _setup_redis(self):
+    def _setup_redis(self) -> Any:
         """Setup Redis connection"""
         try:
             config = get_config()
@@ -152,7 +168,6 @@ class RedisCache:
             # Try to import redis with hiredis for better performance
             optimization_manager = get_optimization_manager()
             if optimization_manager.profile.libraries.get("hiredis", None) and optimization_manager.profile.libraries["hiredis"].available:
-                import redis
                 self.redis_client = redis.from_url(
                     config.redis.url,
                     max_connections=config.redis.max_connections,
@@ -163,7 +178,6 @@ class RedisCache:
                 )
                 logger.info("✓ Redis connected with hiredis parser")
             else:
-                import redis
                 self.redis_client = redis.from_url(
                     config.redis.url,
                     max_connections=config.redis.max_connections,
@@ -274,7 +288,7 @@ class RedisCache:
 class CacheManager:
     """Multi-level cache manager with compression and intelligent strategies"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         config = get_config()
         self.optimization_manager = get_optimization_manager()
         
@@ -409,7 +423,7 @@ class CacheManager:
         # Clear from Redis cache
         await self.redis_cache.clear_pattern(f"*{pattern}*")
     
-    async def clear_all(self):
+    async def clear_all(self) -> Any:
         """Clear all caches"""
         self.memory_cache.clear()
         await self.redis_cache.clear_pattern("*")

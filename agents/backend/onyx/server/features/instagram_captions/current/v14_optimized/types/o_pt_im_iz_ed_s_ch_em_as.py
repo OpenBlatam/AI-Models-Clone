@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import re
+import hashlib
+from typing import Dict, Any, List, Optional, Union, Literal
+from datetime import datetime, timezone
+from enum import Enum
+from pydantic import Field, field_validator, computed_field
+from core.optimized_serialization import OptimizedBaseModel, SerializationFormat
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Optimized Pydantic Schemas for Instagram Captions API v14.0
 
@@ -9,15 +24,8 @@ Ultra-fast serialization with:
 - Memory-efficient serialization
 """
 
-import re
-import hashlib
-from typing import Dict, Any, List, Optional, Union, Literal
-from datetime import datetime, timezone
-from enum import Enum
-from pydantic import Field, field_validator, computed_field
 
 # Import optimized base model
-from core.optimized_serialization import OptimizedBaseModel, SerializationFormat
 
 
 # =============================================================================
@@ -229,7 +237,7 @@ class CaptionGenerationRequest(OptimizedBaseModel):
     
     @computed_field
     @property
-    def request_hash(self) -> str:
+    async def request_hash(self) -> str:
         """Generate unique hash for request caching"""
         key_data = {
             "content": self.content_description,
@@ -305,7 +313,7 @@ class BatchCaptionRequest(OptimizedBaseModel):
     
     @field_validator('requests')
     @classmethod
-    def validate_requests(cls, v: List[CaptionGenerationRequest]) -> List[CaptionGenerationRequest]:
+    async def validate_requests(cls, v: List[CaptionGenerationRequest]) -> List[CaptionGenerationRequest]:
         """Validate batch requests"""
         if len(v) > 100:
             raise ValueError("Batch size cannot exceed 100 requests")
@@ -707,7 +715,7 @@ class PerformanceMetrics(OptimizedBaseModel):
 # UTILITY FUNCTIONS
 # =============================================================================
 
-def validate_request_data(data: Dict[str, Any], schema_class: type) -> OptimizedBaseModel:
+async def validate_request_data(data: Dict[str, Any], schema_class: type) -> OptimizedBaseModel:
     """Validate request data against schema with optimization"""
     try:
         return schema_class.model_validate(data)
@@ -720,7 +728,7 @@ def serialize_response(response: OptimizedBaseModel, format: SerializationFormat
     return response.to_json() if format == SerializationFormat.JSON else response.to_dict()
 
 
-def deserialize_request(data: Union[str, Dict[str, Any]], schema_class: type) -> OptimizedBaseModel:
+async def deserialize_request(data: Union[str, Dict[str, Any]], schema_class: type) -> OptimizedBaseModel:
     """Deserialize request data with optimization"""
     if isinstance(data, str):
         return schema_class.from_json(data)

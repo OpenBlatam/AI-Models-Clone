@@ -1,25 +1,37 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from typing import Any, Optional, Dict, List, Tuple
+    from .config_v5 import config
+    from .metrics_v5 import metrics
+    from config_v5 import config
+    from metrics_v5 import metrics
+from typing import Any, List, Dict, Optional
+import logging
 """
 Instagram Captions API v5.0 - Cache Module
 
 Ultra-fast caching system with LRU eviction and intelligent cleanup.
 """
 
-import asyncio
-import time
-from typing import Any, Optional, Dict, List, Tuple
 try:
-    from .config_v5 import config
-    from .metrics_v5 import metrics
 except ImportError:
-    from config_v5 import config
-    from metrics_v5 import metrics
 
 
 class UltraFastCache:
     """Ultra-fast LRU cache with automatic cleanup and performance optimization."""
     
     def __init__(self, max_size: int = None, ttl: int = None):
-        self.max_size = max_size or config.CACHE_MAX_SIZE
+        
+    """__init__ function."""
+self.max_size = max_size or config.CACHE_MAX_SIZE
         self.ttl = ttl or config.CACHE_TTL
         
         # Storage
@@ -218,7 +230,7 @@ class UltraFastCache:
 class CacheManager:
     """High-level cache management with multiple cache instances."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Different caches for different purposes
         self.caption_cache = UltraFastCache(
             max_size=config.CACHE_MAX_SIZE,

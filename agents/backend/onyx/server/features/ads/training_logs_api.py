@@ -1,21 +1,30 @@
-"""
-Training logs API for accessing training progress, errors, and statistics.
-Provides endpoints for monitoring training progress and retrieving detailed logs.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from typing import Dict, Any, List, Optional, Union
 from datetime import datetime, timedelta
 import json
 import asyncio
 from pathlib import Path
-import aioredis
+try:
+    import aioredis  # type: ignore
+except Exception:  # pragma: no cover - optional in tests
+    aioredis = None  # type: ignore[assignment]
 from fastapi import APIRouter, HTTPException, Query, Depends
 from pydantic import BaseModel, Field
 import logging
-
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.optimized_config import settings
 from onyx.server.features.ads.training_logger import TrainingLogger, TrainingPhase, AsyncTrainingLogger
 from onyx.server.features.ads.pytorch_debug_utils import PyTorchDebugger, TrainingDebugger, DiffusionModelDebugger, DebugLevel
+from typing import Any, List, Dict, Optional
+"""
+Training logs API for accessing training progress, errors, and statistics.
+Provides endpoints for monitoring training progress and retrieving detailed logs.
+"""
+
 
 logger = setup_logger()
 
@@ -102,7 +111,7 @@ class LogFilter(BaseModel):
 class TrainingLogsService:
     """Service for managing training logs and statistics."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the training logs service."""
         self._redis_client = None
         self.log_dirs = {
@@ -121,7 +130,7 @@ class TrainingLogsService:
         self.general_debugger = PyTorchDebugger(DebugLevel.BASIC)
     
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         """Lazy initialization of Redis client."""
         if self._redis_client is None:
             self._redis_client = await aioredis.from_url(
@@ -351,6 +360,10 @@ class TrainingLogsService:
                 for log_file in log_files:
                     try:
                         with open(log_file, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                             for line in f:
                                 try:
                                     # Parse log line

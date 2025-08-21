@@ -1,7 +1,7 @@
-"""
-Production API routes for Ultra-Optimized SEO Service.
-FastAPI routes with comprehensive validation and error handling.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 from typing import List, Dict, Any, Optional
 from fastapi import APIRouter, HTTPException, Depends, Query, Path, Body
@@ -10,9 +10,16 @@ from pydantic import BaseModel, Field, HttpUrl, validator
 from loguru import logger
 import time
 import asyncio
-
 from ..services.seo_service_factory import get_seo_service, get_factory
 from ..core.ultra_optimized_analyzer import SEOAnalysis, KeywordAnalysis
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Production API routes for Ultra-Optimized SEO Service.
+FastAPI routes with comprehensive validation and error handling.
+"""
+
+
 
 # Create router
 router = APIRouter(prefix="/seo", tags=["SEO Analysis"])
@@ -454,7 +461,7 @@ async def reload_service(
 
 # Error handlers
 @router.exception_handler(Exception)
-async def global_exception_handler(request, exc):
+async def global_exception_handler(request, exc) -> Any:
     """Global exception handler."""
     logger.error(f"Unhandled exception: {exc}")
     
@@ -470,7 +477,7 @@ async def global_exception_handler(request, exc):
 
 # Middleware for request logging
 @router.middleware("http")
-async def log_requests(request, call_next):
+async async def log_requests(request, call_next) -> Any:
     """Log all requests."""
     start_time = time.perf_counter()
     

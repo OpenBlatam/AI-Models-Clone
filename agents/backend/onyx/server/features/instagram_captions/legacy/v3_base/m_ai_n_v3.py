@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import sys
+import uvicorn
+from pathlib import Path
+from contextlib import asynccontextmanager
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from config import get_settings
+from api_v3 import router, startup, shutdown
+        import httpx
+        import httpx
+        import time
+    import argparse
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Instagram Captions API v3.0 - Refactored Main Application
@@ -10,20 +27,11 @@ Clean, simple, and optimized:
 - High performance
 """
 
-import asyncio
-import sys
-import uvicorn
-from pathlib import Path
-from contextlib import asynccontextmanager
 
 # Add current directory to Python path
 sys.path.append(str(Path(__file__).parent))
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
 
-from config import get_settings
-from api_v3 import router, startup, shutdown
 
 settings = get_settings()
 
@@ -63,7 +71,9 @@ def create_app() -> FastAPI:
     # Root endpoint
     @app.get("/")
     async def root():
-        return {
+        
+    """root function."""
+return {
             "name": "Instagram Captions API v3.0",
             "version": "3.0.0",
             "description": "Refactored & optimized Instagram caption generation",
@@ -147,7 +157,6 @@ def run_server():
 async def health_check():
     """Quick health check."""
     try:
-        import httpx
         
         base_url = f"http://{settings.host}:{settings.port}"
         
@@ -223,8 +232,6 @@ def show_api_info():
 async def benchmark():
     """Quick performance benchmark."""
     try:
-        import httpx
-        import time
         
         base_url = f"http://{settings.host}:{settings.port}"
         
@@ -278,7 +285,6 @@ async def benchmark():
 
 
 if __name__ == "__main__":
-    import argparse
     
     parser = argparse.ArgumentParser(description="Instagram Captions API v3.0 - Refactored")
     parser.add_argument(

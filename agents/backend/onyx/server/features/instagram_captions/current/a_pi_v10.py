@@ -1,9 +1,13 @@
-"""
-Instagram Captions API v10.0 - Refactored Architecture
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Complete API solution consolidating v9.0 ultra-advanced capabilities
-into a clean, maintainable, and deployable architecture.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import logging
@@ -13,13 +17,23 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from .core_v10 import (
+from .ai_service_v10 import refactored_ai_service
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Instagram Captions API v10.0 - Refactored Architecture
+
+Complete API solution consolidating v9.0 ultra-advanced capabilities
+into a clean, maintainable, and deployable architecture.
+"""
+
 
 # Import refactored components
-from .core_v10 import (
     config, RefactoredCaptionRequest, RefactoredCaptionResponse,
     BatchRefactoredRequest, RefactoredUtils, metrics
 )
-from .ai_service_v10 import refactored_ai_service
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -62,7 +76,7 @@ class RefactoredCaptionsAPI:
     with the simplicity and maintainability of refactored architecture.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = self._create_app()
         self._setup_middleware()
         self._setup_routes()
@@ -78,7 +92,7 @@ class RefactoredCaptionsAPI:
             openapi_url="/openapi.json"
         )
     
-    def _setup_middleware(self):
+    def _setup_middleware(self) -> Any:
         """Setup essential middleware stack."""
         
         # CORS
@@ -96,7 +110,7 @@ class RefactoredCaptionsAPI:
         # Custom middleware
         self.app.middleware("http")(rate_limit_middleware)
     
-    def _setup_routes(self):
+    def _setup_routes(self) -> Any:
         """Setup API routes."""
         
         @self.app.post(
@@ -246,7 +260,7 @@ class RefactoredCaptionsAPI:
             summary="API Information",
             description="Get detailed information about the API capabilities and features"
         )
-        async def get_api_info() -> Dict[str, Any]:
+        async async def get_api_info() -> Dict[str, Any]:
             """Get comprehensive API information."""
             
             return {
@@ -341,7 +355,6 @@ __all__ = ['app', 'refactored_api']
 
 
 if __name__ == "__main__":
-    import uvicorn
     
     print("=" * 80)
     print(f"🚀 {config.API_NAME}")

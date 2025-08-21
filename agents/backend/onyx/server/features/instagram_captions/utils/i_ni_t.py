@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+    from .api_optimized_v7 import app as optimized_app_v7
+    from .core_v7 import (
+    from .ai_service_v7 import ultra_ai_service, UltraFastRedisCache
+    from .core_v6 import (
+    from .ai_service_v6 import ai_service as refactored_ai_service
+    from .api_v6 import app as refactored_app_v6
+    from .config_v5 import config as modular_config
+    from .schemas_v5 import UltraFastCaptionRequest, BatchCaptionRequest
+    from .api_modular_v5 import app as modular_app_v5
+    from .ai_engine_v5 import ai_engine as modular_ai_engine
+    from .service import InstagramCaptionsService
+    from .core import InstagramCaptionsCore, CaptionGenerationParams
+    from .models import CaptionRequest as LegacyCaptionRequest
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API - Ultra-Optimized Architecture v7.0
 
@@ -73,13 +94,10 @@ docker run -d -p 6379:6379 redis:7-alpine  # Optional but recommended
 
 try:
     # Primary v7.0 optimized components
-    from .api_optimized_v7 import app as optimized_app_v7
-    from .core_v7 import (
         OptimizedCaptionRequest, BatchOptimizedRequest, 
         OptimizedCaptionResponse, config as optimized_config,
         UltraOptimizedUtils, PrometheusMetrics
     )
-    from .ai_service_v7 import ultra_ai_service, UltraFastRedisCache
     V7_AVAILABLE = True
     V7_STATUS = "✅ Ultra-optimized v7.0 loaded successfully"
 except ImportError as e:
@@ -91,12 +109,9 @@ except ImportError as e:
 # ============================================================================
 
 try:
-    from .core_v6 import (
         config as refactored_config, CaptionRequest, BatchRequest,
         CaptionResponse, BatchResponse, Utils, metrics
     )
-    from .ai_service_v6 import ai_service as refactored_ai_service
-    from .api_v6 import app as refactored_app_v6
     V6_AVAILABLE = True
     V6_STATUS = "✅ Refactored v6.0 available"
 except ImportError:
@@ -108,10 +123,6 @@ except ImportError:
 # ============================================================================
 
 try:
-    from .config_v5 import config as modular_config
-    from .schemas_v5 import UltraFastCaptionRequest, BatchCaptionRequest
-    from .api_modular_v5 import app as modular_app_v5
-    from .ai_engine_v5 import ai_engine as modular_ai_engine
     V5_AVAILABLE = True
     V5_STATUS = "✅ Modular v5.0 available"
 except ImportError:
@@ -123,9 +134,6 @@ except ImportError:
 # ============================================================================
 
 try:
-    from .service import InstagramCaptionsService
-    from .core import InstagramCaptionsCore, CaptionGenerationParams
-    from .models import CaptionRequest as LegacyCaptionRequest
     LEGACY_AVAILABLE = True
     LEGACY_STATUS = "✅ Legacy components available"
 except ImportError:

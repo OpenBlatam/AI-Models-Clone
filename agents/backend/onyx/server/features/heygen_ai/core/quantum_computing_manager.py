@@ -828,3 +828,4 @@ async def shutdown_quantum_computing_manager():
     if quantum_computing_manager:
         await quantum_computing_manager.shutdown()
         quantum_computing_manager = None
+

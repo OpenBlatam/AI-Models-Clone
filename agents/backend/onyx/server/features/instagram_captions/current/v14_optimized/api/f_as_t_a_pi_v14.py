@@ -1,23 +1,34 @@
-"""
-Instagram Captions API v14.0 - FastAPI Implementation
-Ultra-optimized FastAPI application with comprehensive Pydantic validation
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import time
 import logging
 import uuid
 from typing import Dict, Any, List, Optional
 from contextlib import asynccontextmanager
-
 from fastapi import FastAPI, HTTPException, Depends, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
+from ..types.schemas import (
+from ..core.prioritized_engine import PrioritizedAIEngine
+from ..middleware import create_middleware_stack
+from ..utils.error_handling import ValidationEngine, error_tracker
+from ..utils.performance_monitor import PerformanceMonitor
+from ..utils.cache_manager import SmartCacheManager
+from ..utils.rate_limiter import RateLimiter
+from ..types.exceptions import (
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v14.0 - FastAPI Implementation
+Ultra-optimized FastAPI application with comprehensive Pydantic validation
+"""
+
+
 
 # Import our comprehensive schemas
-from ..types.schemas import (
     CaptionGenerationRequest,
     CaptionGenerationResponse,
     BatchCaptionRequest,
@@ -32,15 +43,8 @@ from ..types.schemas import (
 )
 
 # Import our optimized components
-from ..core.prioritized_engine import PrioritizedAIEngine
-from ..middleware import create_middleware_stack
-from ..utils.error_handling import ValidationEngine, error_tracker
-from ..utils.performance_monitor import PerformanceMonitor
-from ..utils.cache_manager import SmartCacheManager
-from ..utils.rate_limiter import RateLimiter
 
 # Import exception types
-from ..types.exceptions import (
     ValidationError,
     ContentValidationError,
     StyleValidationError,
@@ -131,11 +135,11 @@ for middleware in middleware_stack:
 # DEPENDENCY INJECTION
 # =============================================================================
 
-async def get_request_id() -> str:
+async async def get_request_id() -> str:
     """Generate unique request ID"""
     return str(uuid.uuid4())
 
-async def validate_api_key_dependency(request: Request) -> str:
+async async def validate_api_key_dependency(request: Request) -> str:
     """Validate API key from headers"""
     api_key = request.headers.get("X-API-Key")
     if not api_key:
@@ -709,7 +713,6 @@ async def root():
 # =============================================================================
 
 if __name__ == "__main__":
-    import uvicorn
     
     uvicorn.run(
         "fast_api_v14:app",

@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from abc import ABC, abstractmethod
+from typing import Dict, List, Optional, Any, Union, Protocol, TypeVar, Generic
+from dataclasses import dataclass
+from enum import Enum
+import asyncio
+from typing import Any, List, Dict, Optional
+import logging
 """
 🔧 BLATAM AI CORE INTERFACES v5.0.0
 ===================================
@@ -10,11 +22,6 @@ Interfaces base modulares para arquitectura limpia:
 - ⚙️ Configuration interfaces
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Union, Protocol, TypeVar, Generic
-from dataclasses import dataclass
-from enum import Enum
-import asyncio
 
 # =============================================================================
 # 🎯 CORE ENUMS

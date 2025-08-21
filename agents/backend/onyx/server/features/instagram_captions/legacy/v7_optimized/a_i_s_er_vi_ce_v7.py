@@ -1,3 +1,34 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import random
+import numpy as np
+from concurrent.futures import ThreadPoolExecutor
+from typing import List, Dict, Any, Optional, Tuple
+from contextlib import asynccontextmanager
+    import orjson as json
+    import json
+import redis.asyncio as redis
+from cachetools import TTLCache, LRUCache
+from sentence_transformers import SentenceTransformer
+import nltk
+from textstat import flesch_reading_ease
+import httpx
+from loguru import logger
+import structlog
+    from .core_v7 import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Instagram Captions API v7.0 - Ultra-Optimized AI Service
 
@@ -8,43 +39,25 @@ Advanced AI service with specialized libraries:
 - Advanced ML models for quality scoring
 """
 
-import asyncio
-import time
-import random
-import numpy as np
-from concurrent.futures import ThreadPoolExecutor
-from typing import List, Dict, Any, Optional, Tuple
-from contextlib import asynccontextmanager
 
 # Ultra-fast JSON and serialization
 try:
-    import orjson as json
     JSON_LOADS = orjson.loads
     JSON_DUMPS = lambda obj: orjson.dumps(obj).decode()
 except ImportError:
-    import json
     JSON_LOADS = json.loads
     JSON_DUMPS = json.dumps
 
 # Advanced caching with Redis
-import redis.asyncio as redis
-from cachetools import TTLCache, LRUCache
 
 # AI/ML libraries
-from sentence_transformers import SentenceTransformer
-import nltk
-from textstat import flesch_reading_ease
 
 # HTTP client for external APIs
-import httpx
 
 # Monitoring and logging
-from loguru import logger
-import structlog
 
 # Core imports (assuming they exist)
 try:
-    from .core_v7 import (
         config, OptimizedCaptionRequest, UltraOptimizedUtils,
         metrics, redis_manager, JSON_LOADS, JSON_DUMPS
     )
@@ -67,7 +80,7 @@ except ImportError:
 class UltraRedisCache:
     """Ultra-optimized Redis cache with intelligent features."""
     
-    def __init__(self, redis_client=None):
+    def __init__(self, redis_client=None) -> Any:
         self.redis_client = redis_client or None
         self.local_cache = TTLCache(maxsize=1000, ttl=300)  # 5-minute local cache
         self.stats = {
@@ -186,7 +199,7 @@ class UltraRedisCache:
 class UltraAIEngine:
     """Ultra-optimized AI engine with advanced ML capabilities."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.executor = ThreadPoolExecutor(max_workers=config.AI_PARALLEL_WORKERS)
         self.sentence_transformer = None
         self.quality_model = None
@@ -272,7 +285,7 @@ class UltraAIEngine:
             ]
         }
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize AI models asynchronously."""
         try:
             # Initialize sentence transformer for semantic analysis
@@ -293,7 +306,7 @@ class UltraAIEngine:
         except Exception as e:
             logger.error(f"❌ AI model initialization failed: {e}")
     
-    def _download_nltk_data(self):
+    async def _download_nltk_data(self) -> Any:
         """Download required NLTK data."""
         try:
             nltk.download('punkt', quiet=True)
@@ -356,7 +369,7 @@ class UltraAIEngine:
         tasks = []
         semaphore = asyncio.Semaphore(config.AI_PARALLEL_WORKERS)
         
-        async def process_with_semaphore(request):
+        async def process_with_semaphore(request) -> Any:
             async with semaphore:
                 return await self.generate_single_caption(request)
         
@@ -460,18 +473,14 @@ class UltraAIEngine:
         
         # Select intelligent hook based on content analysis
         hook_category = self._analyze_hook_category(content)
-        hooks = self.intelligent_hooks.get(hook_category, self.intelligent_hooks["curiosity"])
+        hooks = self.intelligent_hooks.get(hook_category, self.intelligent_hooks["curiosity"f"])
         hook = random.choice(hooks)
         
         # Generate contextual CTA
         cta = self._generate_contextual_cta(request)
         
         # Create caption with intelligent replacements
-        caption = template.format(
-            content=content,
-            hook=hook,
-            cta=cta
-        )
+        caption = template"
         
         # Apply post-processing optimizations
         caption = self._optimize_caption_length(caption, request.max_caption_length)
@@ -630,11 +639,11 @@ class UltraAIEngine:
 class UltraCachedAIService:
     """Ultra-optimized AI service with intelligent Redis caching."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.ai_engine = UltraAIEngine()
         self.cache = UltraRedisCache()
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize all service components."""
         await self.ai_engine.initialize()
         await self.cache.initialize()

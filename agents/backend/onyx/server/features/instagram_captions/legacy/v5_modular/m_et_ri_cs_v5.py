@@ -1,23 +1,37 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import time
+import threading
+from typing import Dict, Any, List
+from datetime import datetime, timezone
+    from .config_v5 import config
+    from config_v5 import config
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v5.0 - Metrics Module
 
 Thread-safe performance monitoring and metrics collection.
 """
 
-import time
-import threading
-from typing import Dict, Any, List
-from datetime import datetime, timezone
 try:
-    from .config_v5 import config
 except ImportError:
-    from config_v5 import config
 
 
 class UltraFastMetrics:
     """Thread-safe metrics collector for ultra-fast performance monitoring."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._lock = threading.Lock()
         
         # Request metrics
@@ -42,7 +56,7 @@ class UltraFastMetrics:
         self.peak_concurrent_requests = 0
         self.current_active_requests = 0
     
-    def record_request_start(self) -> None:
+    async def record_request_start(self) -> None:
         """Record the start of a request."""
         with self._lock:
             self.current_active_requests += 1
@@ -51,7 +65,7 @@ class UltraFastMetrics:
                 self.current_active_requests
             )
     
-    def record_request_end(self, success: bool, response_time: float, batch_size: int = 1) -> None:
+    async def record_request_end(self, success: bool, response_time: float, batch_size: int = 1) -> None:
         """Record the completion of a request."""
         with self._lock:
             self.current_active_requests = max(0, self.current_active_requests - 1)

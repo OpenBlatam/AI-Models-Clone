@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import re
+import html
+from typing import Any, Dict, List, Optional, Union, Callable
+from datetime import datetime, timezone
+from enum import Enum
+from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
+from pydantic.types import StrictStr, StrictInt, StrictFloat
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Comprehensive Validation System for Instagram Captions API
 
@@ -9,14 +27,7 @@ This module provides:
 - Security validation for user inputs
 """
 
-import re
-import html
-from typing import Any, Dict, List, Optional, Union, Callable
-from datetime import datetime, timezone
-from enum import Enum
 
-from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
-from pydantic.types import StrictStr, StrictInt, StrictFloat
 
 # ============================================================================
 # VALIDATION CONSTANTS
@@ -153,7 +164,7 @@ class BatchCaptionRequest(BaseValidationModel):
 
     @field_validator('requests')
     @classmethod
-    def validate_requests(cls, v: List[CaptionRequest]) -> List[CaptionRequest]:
+    async def validate_requests(cls, v: List[CaptionRequest]) -> List[CaptionRequest]:
         """Validate batch requests."""
         if not v:
             raise ValueError("At least one caption request is required")
@@ -283,7 +294,7 @@ def sanitize_html(*, html_content: str, allowed_tags: List[str] = None) -> Dict[
         return {"sanitized": "", "removed_tags": []}
     pattern = r'<(/?)([^>]+)>|<!--.*?-->'
     removed_tags = []
-    def replace_tag(match):
+    def replace_tag(match) -> Any:
         tag = match.group(2).split()[0].lower() if match.group(2) else ""
         if tag not in allowed_tags:
             removed_tags.append(tag)
@@ -338,9 +349,9 @@ def validate_caption_content(*, caption: str, content_type: ContentType) -> Dict
 # VALIDATION DECORATORS
 # ============================================================================
 
-def validate_caption_request(func: Callable[..., Any]) -> Callable[..., Any]:
+async def validate_caption_request(func: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator to validate caption request."""
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         # Extract request data
         request_data = kwargs.get('request') or (args[0] if args else None)
         

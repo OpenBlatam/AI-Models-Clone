@@ -1,20 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+from typing import Dict, Any, Optional
+from contextlib import asynccontextmanager
+import structlog
+from .config import get_settings
+from .logging import get_logger
+from ..http.ultra_fast_client import UltraFastHTTPClient, get_http_client, cleanup_http_client
+from ..cache.ultra_fast_cache import UltraFastCache, get_cache, cleanup_cache
+from ..parsers.ultra_fast_parser import UltraFastHTMLParser, get_html_parser
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Ultra-Optimized Container v10
 Production-ready dependency injection with maximum performance
 """
 
-import asyncio
-from typing import Dict, Any, Optional
-from contextlib import asynccontextmanager
 
-import structlog
 
-from .config import get_settings
-from .logging import get_logger
-from ..http.ultra_fast_client import UltraFastHTTPClient, get_http_client, cleanup_http_client
-from ..cache.ultra_fast_cache import UltraFastCache, get_cache, cleanup_cache
-from ..parsers.ultra_fast_parser import UltraFastHTMLParser, get_html_parser
 
 logger = get_logger(__name__)
 
@@ -22,13 +26,13 @@ logger = get_logger(__name__)
 class Container:
     """Ultra-optimized dependency injection container"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.settings = get_settings()
         self._components: Dict[str, Any] = {}
         self._initialized = False
         self._cleanup_tasks = []
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize all components with maximum performance"""
         if self._initialized:
             return
@@ -62,7 +66,7 @@ class Container:
             await self.cleanup()
             raise
     
-    async def _health_check(self):
+    async def _health_check(self) -> Any:
         """Perform health checks on all components"""
         logger.info("Performing health checks...")
         
@@ -84,7 +88,7 @@ class Container:
         
         logger.info("All health checks passed")
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup all components"""
         if not self._initialized:
             return
@@ -110,7 +114,7 @@ class Container:
         
         logger.info("Container cleaned up successfully")
     
-    def get_http_client(self) -> UltraFastHTTPClient:
+    async def get_http_client(self) -> UltraFastHTTPClient:
         """Get HTTP client instance"""
         if not self._initialized:
             raise RuntimeError("Container not initialized")
@@ -128,7 +132,7 @@ class Container:
             raise RuntimeError("Container not initialized")
         return self._components["html_parser"]
     
-    def get_settings(self):
+    def get_settings(self) -> Optional[Dict[str, Any]]:
         """Get settings instance"""
         return self.settings
     

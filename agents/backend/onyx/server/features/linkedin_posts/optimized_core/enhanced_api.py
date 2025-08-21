@@ -1,17 +1,13 @@
-"""
-Enhanced API - LinkedIn Posts Ultra Optimized
-============================================
-
-API mejorada con características avanzadas y optimizaciones adicionales.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
 import json
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
-
-# FastAPI imports
 from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request, Response, Query
 from fastapi.responses import ORJSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -19,19 +15,32 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 import uvicorn
-
-# Pydantic models
 from pydantic import BaseModel, Field, validator, ConfigDict
 from pydantic_settings import BaseSettings
-
-# Monitoring and metrics
 from prometheus_client import Counter, Histogram, Gauge, generate_latest
 import structlog
 from loguru import logger
-
-# Import core components
 from .ultra_fast_engine import UltraFastEngine, get_ultra_fast_engine
 from .advanced_features import (
+            import psutil
+            import psutil
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Enhanced API - LinkedIn Posts Ultra Optimized
+============================================
+
+API mejorada con características avanzadas y optimizaciones adicionales.
+"""
+
+
+# FastAPI imports
+
+# Pydantic models
+
+# Monitoring and metrics
+
+# Import core components
     AdvancedAnalytics, AITestingEngine, ContentOptimizer, RealTimeAnalytics,
     PostAnalytics, AITestResult, initialize_advanced_features
 )
@@ -134,7 +143,9 @@ class EnhancedMiddleware(BaseHTTPMiddleware):
     """Middleware mejorado con características avanzadas."""
     
     def __init__(self, app, metrics: Dict[str, Any]):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.metrics = metrics
         self.request_counter = Counter('enhanced_requests_total', 'Total enhanced requests', ['method', 'endpoint'])
         self.request_duration = Histogram('enhanced_request_duration_seconds', 'Enhanced request duration')
@@ -180,7 +191,7 @@ class EnhancedMiddleware(BaseHTTPMiddleware):
 class EnhancedAPI:
     """API mejorada con características avanzadas."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = FastAPI(
             title="LinkedIn Posts Enhanced API",
             description="Ultra optimized LinkedIn Posts management system with advanced features",
@@ -197,7 +208,7 @@ class EnhancedAPI:
         self._setup_enhanced_routes()
         self._setup_enhanced_events()
     
-    def _setup_enhanced_middleware(self):
+    def _setup_enhanced_middleware(self) -> Any:
         """Setup enhanced middleware."""
         # Add enhanced middleware
         self.app.add_middleware(EnhancedMiddleware, metrics=self.metrics)
@@ -221,7 +232,7 @@ class EnhancedAPI:
             allowed_hosts=["*"]
         )
     
-    def _setup_enhanced_routes(self):
+    def _setup_enhanced_routes(self) -> Any:
         """Setup enhanced API routes."""
         
         @self.app.get("/health/enhanced", response_class=ORJSONResponse)
@@ -445,7 +456,9 @@ class EnhancedAPI:
         async def streaming_metrics():
             """Streaming metrics endpoint for real-time monitoring."""
             async def generate_metrics():
-                while True:
+                
+    """generate_metrics function."""
+while True:
                     try:
                         # Get real-time metrics
                         rt_analytics = RealTimeAnalytics()
@@ -519,7 +532,7 @@ class EnhancedAPI:
                 logger.error(f"Enhanced post retrieval error: {e}")
                 raise HTTPException(status_code=500, detail=str(e))
     
-    def _setup_enhanced_events(self):
+    def _setup_enhanced_events(self) -> Any:
         """Setup enhanced startup and shutdown events."""
         
         @self.app.on_event("startup")
@@ -543,7 +556,6 @@ class EnhancedAPI:
     def _get_memory_usage(self) -> float:
         """Get memory usage."""
         try:
-            import psutil
             return psutil.Process().memory_percent()
         except:
             return 0.0
@@ -551,7 +563,6 @@ class EnhancedAPI:
     def _get_cpu_usage(self) -> float:
         """Get CPU usage."""
         try:
-            import psutil
             return psutil.Process().cpu_percent()
         except:
             return 0.0

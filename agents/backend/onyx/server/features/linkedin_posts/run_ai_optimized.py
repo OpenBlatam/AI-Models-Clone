@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import json
+import time
+from pathlib import Path
+import sys
+from main_optimized import LinkedInPostsOptimizedSystem, LinkedInPostRequest
+    import argparse
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 LinkedIn Posts AI System - Demo Runner
@@ -6,21 +20,15 @@ LinkedIn Posts AI System - Demo Runner
 Demo script to showcase the AI-optimized LinkedIn posts system.
 """
 
-import asyncio
-import json
-import time
-from pathlib import Path
-import sys
 
 # Add the current directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from main_optimized import LinkedInPostsOptimizedSystem, LinkedInPostRequest
 
 class LinkedInPostsDemo:
     """Demo class for showcasing the LinkedIn Posts AI system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.system = LinkedInPostsOptimizedSystem()
         self.demo_posts = [
             {
@@ -49,7 +57,7 @@ class LinkedInPostsDemo:
             }
         ]
     
-    async def run_demo(self):
+    async def run_demo(self) -> Any:
         """Run the complete demo."""
         print("🚀 LinkedIn Posts AI System Demo")
         print("=" * 50)
@@ -175,6 +183,10 @@ class LinkedInPostsDemo:
             # Save to file
             output_file = "demo_results.json"
             with open(output_file, 'w', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(results, f, indent=2, ensure_ascii=False)
             
             print(f"✅ Results saved to {output_file}")
@@ -275,7 +287,6 @@ class LinkedInPostsDemo:
 
 async def main():
     """Main entry point for the demo."""
-    import argparse
     
     parser = argparse.ArgumentParser(description="LinkedIn Posts AI System Demo")
     parser.add_argument("--mode", choices=["full", "single"], default="full", help="Demo mode")
@@ -296,5 +307,6 @@ async def main():
     else:
         await demo.run_demo()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

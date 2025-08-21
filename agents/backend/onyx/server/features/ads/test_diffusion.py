@@ -1,6 +1,11 @@
-"""
-Comprehensive tests for the diffusion models service.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import pytest
 import asyncio
 import torch
@@ -10,8 +15,13 @@ from PIL import Image
 import numpy as np
 import base64
 from io import BytesIO
-
 from onyx.server.features.ads.diffusion_service import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Comprehensive tests for the diffusion models service.
+"""
+
     DiffusionService,
     DiffusionModelManager,
     ImageProcessor,
@@ -22,14 +32,14 @@ from onyx.server.features.ads.diffusion_service import (
 class TestImageProcessor:
     """Test cases for ImageProcessor class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         self.processor = ImageProcessor()
         
         # Create test image
         self.test_image = Image.new('RGB', (100, 100), color='red')
     
-    def test_load_image(self):
+    def test_load_image(self) -> Any:
         """Test image loading from path."""
         with patch('PIL.Image.open') as mock_open:
             mock_open.return_value = self.test_image
@@ -39,7 +49,7 @@ class TestImageProcessor:
             assert result == self.test_image
             mock_open.assert_called_once_with("test.jpg")
     
-    def test_load_image_from_url(self):
+    def test_load_image_from_url(self) -> Any:
         """Test image loading from URL."""
         with patch('requests.get') as mock_get:
             mock_response = Mock()
@@ -55,7 +65,7 @@ class TestImageProcessor:
                 assert result == self.test_image
                 mock_get.assert_called_once_with("http://example.com/image.jpg", timeout=30)
     
-    def test_load_image_from_base64(self):
+    def test_load_image_from_base64(self) -> Any:
         """Test image loading from base64 string."""
         # Create base64 string
         buffer = BytesIO()
@@ -68,14 +78,14 @@ class TestImageProcessor:
         assert isinstance(result, Image.Image)
         assert result.size == self.test_image.size
     
-    def test_resize_image(self):
+    def test_resize_image(self) -> Any:
         """Test image resizing."""
         result = self.processor.resize_image(self.test_image, 200, 200)
         
         assert result.size == (200, 200)
         assert isinstance(result, Image.Image)
     
-    def test_create_mask(self):
+    def test_create_mask(self) -> Any:
         """Test mask creation."""
         # Test center mask
         center_mask = self.processor.create_mask(self.test_image, "center")
@@ -92,7 +102,7 @@ class TestImageProcessor:
         assert full_mask.mode == 'L'
         assert full_mask.size == self.test_image.size
     
-    def test_apply_canny_edge_detection(self):
+    def test_apply_canny_edge_detection(self) -> Any:
         """Test Canny edge detection."""
         with patch('cv2.cvtColor') as mock_cvt:
             with patch('cv2.Canny') as mock_canny:
@@ -105,7 +115,7 @@ class TestImageProcessor:
                 mock_cvt.assert_called_once()
                 mock_canny.assert_called_once()
     
-    def test_apply_depth_estimation(self):
+    def test_apply_depth_estimation(self) -> Any:
         """Test depth estimation."""
         with patch('cv2.GaussianBlur') as mock_blur:
             mock_blur.return_value = np.zeros((100, 100), dtype=np.uint8)
@@ -115,7 +125,7 @@ class TestImageProcessor:
             assert isinstance(result, Image.Image)
             mock_blur.assert_called_once()
     
-    def test_save_image(self):
+    def test_save_image(self) -> Any:
         """Test image saving."""
         with patch.object(self.test_image, 'save') as mock_save:
             result = self.processor.save_image(self.test_image, "test_output.png")
@@ -123,7 +133,7 @@ class TestImageProcessor:
             assert result == "test_output.png"
             mock_save.assert_called_once_with("test_output.png", format="PNG")
     
-    def test_image_to_base64(self):
+    def test_image_to_base64(self) -> Any:
         """Test image to base64 conversion."""
         result = self.processor.image_to_base64(self.test_image)
         
@@ -133,19 +143,19 @@ class TestImageProcessor:
 class TestDiffusionModelManager:
     """Test cases for DiffusionModelManager class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         with patch('onyx.server.features.ads.diffusion_service.TokenizationService'):
             self.manager = DiffusionModelManager()
     
-    def test_get_model_key(self):
+    def test_get_model_key(self) -> Optional[Dict[str, Any]]:
         """Test model key generation."""
         key = self.manager._get_model_key("test_model", "text2img")
         
         assert key == "diffusion:test_model:text2img"
     
     @patch('diffusers.StableDiffusionPipeline.from_pretrained')
-    def test_get_text_to_image_pipeline(self, mock_from_pretrained):
+    def test_get_text_to_image_pipeline(self, mock_from_pretrained) -> Optional[Dict[str, Any]]:
         """Test text-to-image pipeline loading."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -156,7 +166,7 @@ class TestDiffusionModelManager:
         mock_from_pretrained.assert_called_once()
     
     @patch('diffusers.StableDiffusionImg2ImgPipeline.from_pretrained')
-    def test_get_image_to_image_pipeline(self, mock_from_pretrained):
+    def test_get_image_to_image_pipeline(self, mock_from_pretrained) -> Optional[Dict[str, Any]]:
         """Test image-to-image pipeline loading."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -167,7 +177,7 @@ class TestDiffusionModelManager:
         mock_from_pretrained.assert_called_once()
     
     @patch('diffusers.StableDiffusionInpaintPipeline.from_pretrained')
-    def test_get_inpaint_pipeline(self, mock_from_pretrained):
+    def test_get_inpaint_pipeline(self, mock_from_pretrained) -> Optional[Dict[str, Any]]:
         """Test inpainting pipeline loading."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -179,7 +189,7 @@ class TestDiffusionModelManager:
     
     @patch('diffusers.ControlNetModel.from_pretrained')
     @patch('diffusers.StableDiffusionControlNetPipeline.from_pretrained')
-    def test_get_controlnet_pipeline(self, mock_controlnet_from_pretrained, mock_controlnet_model):
+    def test_get_controlnet_pipeline(self, mock_controlnet_from_pretrained, mock_controlnet_model) -> Optional[Dict[str, Any]]:
         """Test ControlNet pipeline loading."""
         mock_controlnet = Mock()
         mock_pipeline = Mock()
@@ -195,7 +205,7 @@ class TestDiffusionModelManager:
 class TestDiffusionService:
     """Test cases for DiffusionService class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         with patch('onyx.server.features.ads.diffusion_service.DiffusionModelManager'):
             with patch('onyx.server.features.ads.diffusion_service.ImageProcessor'):
@@ -204,7 +214,7 @@ class TestDiffusionService:
                 self.service.image_processor = Mock()
     
     @pytest.mark.asyncio
-    async def test_generate_text_to_image(self):
+    async def test_generate_text_to_image(self) -> Any:
         """Test text-to-image generation."""
         # Create test parameters
         params = GenerationParams(
@@ -233,7 +243,7 @@ class TestDiffusionService:
             mock_pipeline.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_generate_image_to_image(self):
+    async def test_generate_image_to_image(self) -> Any:
         """Test image-to-image generation."""
         # Create test parameters
         params = GenerationParams(
@@ -266,7 +276,7 @@ class TestDiffusionService:
             mock_pipeline.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_inpaint_image(self):
+    async def test_inpaint_image(self) -> Any:
         """Test image inpainting."""
         # Create test parameters
         params = GenerationParams(
@@ -302,7 +312,7 @@ class TestDiffusionService:
             mock_pipeline.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_generate_with_controlnet(self):
+    async def test_generate_with_controlnet(self) -> Any:
         """Test ControlNet generation."""
         # Create test parameters
         params = GenerationParams(
@@ -335,7 +345,7 @@ class TestDiffusionService:
             assert isinstance(result[0], Image.Image)
             mock_pipeline.assert_called_once()
     
-    def test_get_cache_key(self):
+    def test_get_cache_key(self) -> Optional[Dict[str, Any]]:
         """Test cache key generation."""
         params = GenerationParams(
             prompt="Test prompt",
@@ -348,7 +358,7 @@ class TestDiffusionService:
         assert isinstance(key, str)
         assert len(key) > 0
     
-    def test_encode_images_for_cache(self):
+    def test_encode_images_for_cache(self) -> Any:
         """Test image encoding for cache."""
         test_images = [Image.new('RGB', (100, 100))]
         
@@ -357,7 +367,7 @@ class TestDiffusionService:
         assert isinstance(result, str)
         assert len(result) > 0
     
-    def test_decode_cached_images(self):
+    def test_decode_cached_images(self) -> Any:
         """Test cached image decoding."""
         # Create test encoded data
         test_image = Image.new('RGB', (100, 100))
@@ -369,7 +379,7 @@ class TestDiffusionService:
         assert isinstance(result[0], Image.Image)
     
     @pytest.mark.asyncio
-    async def test_get_generation_stats(self):
+    async def test_get_generation_stats(self) -> Optional[Dict[str, Any]]:
         """Test generation statistics."""
         with patch.object(self.service, 'redis_client') as mock_redis:
             mock_redis.return_value.keys.return_value = ["key1", "key2", "key3"]
@@ -385,7 +395,7 @@ class TestDiffusionService:
             assert 'device' in result
     
     @pytest.mark.asyncio
-    async def test_cleanup_cache(self):
+    async def test_cleanup_cache(self) -> Any:
         """Test cache cleanup."""
         with patch.object(self.service, 'redis_client') as mock_redis:
             mock_redis.return_value.keys.return_value = ["key1", "key2"]
@@ -400,7 +410,7 @@ class TestDiffusionService:
 class TestGenerationParams:
     """Test cases for GenerationParams dataclass."""
     
-    def test_generation_params_creation(self):
+    def test_generation_params_creation(self) -> Any:
         """Test GenerationParams creation."""
         params = GenerationParams(
             prompt="Test prompt",
@@ -422,7 +432,7 @@ class TestGenerationParams:
         assert params.num_inference_steps == 50
         assert params.seed == 42
     
-    def test_generation_params_defaults(self):
+    def test_generation_params_defaults(self) -> Any:
         """Test GenerationParams default values."""
         params = GenerationParams(prompt="Test prompt")
         
@@ -438,7 +448,7 @@ class TestIntegration:
     """Integration tests for diffusion service."""
     
     @pytest.mark.asyncio
-    async def test_full_generation_pipeline(self):
+    async def test_full_generation_pipeline(self) -> Any:
         """Test complete generation pipeline."""
         # Mock all dependencies
         with patch('onyx.server.features.ads.diffusion_service.DiffusionModelManager'):
@@ -474,7 +484,7 @@ class TestIntegration:
             assert isinstance(result[0], Image.Image)
             mock_pipeline.assert_called_once()
     
-    def test_image_processing_pipeline(self):
+    def test_image_processing_pipeline(self) -> Any:
         """Test complete image processing pipeline."""
         processor = ImageProcessor()
         
@@ -503,7 +513,7 @@ class TestErrorHandling:
     """Test error handling scenarios."""
     
     @pytest.mark.asyncio
-    async def test_generation_with_invalid_params(self):
+    async def test_generation_with_invalid_params(self) -> Any:
         """Test generation with invalid parameters."""
         service = DiffusionService()
         
@@ -514,7 +524,7 @@ class TestErrorHandling:
             await service.generate_text_to_image(params)
     
     @pytest.mark.asyncio
-    async def test_pipeline_loading_error(self):
+    async def test_pipeline_loading_error(self) -> Any:
         """Test pipeline loading error handling."""
         with patch('onyx.server.features.ads.diffusion_service.DiffusionModelManager'):
             service = DiffusionService()
@@ -526,12 +536,13 @@ class TestErrorHandling:
         with pytest.raises(Exception):
             await service.generate_text_to_image(params)
     
-    def test_image_loading_error(self):
+    def test_image_loading_error(self) -> Any:
         """Test image loading error handling."""
         processor = ImageProcessor()
         
         with pytest.raises(Exception):
             processor.load_image("nonexistent.jpg")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

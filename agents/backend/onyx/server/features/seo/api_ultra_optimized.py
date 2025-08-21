@@ -1,6 +1,16 @@
-"""
-API Ultra-Optimizada para el Servicio SEO con máxima eficiencia.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import asyncio
@@ -23,9 +33,16 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import Response
 import uvicorn
-
 from .service_ultra_optimized import UltraOptimizedSEOService, scrape
 from .models import SEOScrapeRequest, SEOScrapeResponse
+    from .service_ultra_optimized import seo_service
+from typing import Any, List, Dict, Optional
+import logging
+"""
+API Ultra-Optimizada para el Servicio SEO con máxima eficiencia.
+"""
+
+
 
 # Configurar logging ultra-eficiente
 structlog.configure(
@@ -88,7 +105,9 @@ class MetricsMiddleware(BaseHTTPMiddleware):
     """Middleware para métricas ultra-optimizado."""
     
     async def dispatch(self, request: Request, call_next):
-        start_time = time.perf_counter()
+        
+    """dispatch function."""
+start_time = time.perf_counter()
         ACTIVE_REQUESTS.inc()
         
         try:
@@ -143,7 +162,6 @@ class HealthResponse(BaseModel):
 # Dependencias ultra-optimizadas
 async def get_seo_service() -> UltraOptimizedSEOService:
     """Obtiene instancia del servicio SEO."""
-    from .service_ultra_optimized import seo_service
     return seo_service
 
 

@@ -1,9 +1,10 @@
-"""
-Instagram Captions API v12.0 - Speed Optimized API
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Ultra-fast API optimized for maximum speed with sub-20ms response times.
-Focused on performance over features for speed-critical applications.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import time
 import asyncio
@@ -11,17 +12,26 @@ from typing import Dict, Any, List
 from fastapi import FastAPI, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+    from .core_speed_v12 import FastCaptionRequest, FastCaptionResponse, speed_config
+    from .speed_service_v12 import speed_service
+import logging
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v12.0 - Speed Optimized API
+
+Ultra-fast API optimized for maximum speed with sub-20ms response times.
+Focused on performance over features for speed-critical applications.
+"""
+
 
 # Import speed components
 try:
-    from .core_speed_v12 import FastCaptionRequest, FastCaptionResponse, speed_config
-    from .speed_service_v12 import speed_service
     SPEED_AVAILABLE = True
 except ImportError:
     SPEED_AVAILABLE = False
 
 # Minimal logging for maximum speed
-import logging
 logging.basicConfig(level=logging.ERROR)
 
 
@@ -32,7 +42,7 @@ logging.basicConfig(level=logging.ERROR)
 class SpeedAPI:
     """Ultra-fast API optimized for maximum speed and minimum latency."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = self._create_speed_app()
         self._setup_speed_middleware()
         self._setup_speed_routes()
@@ -46,7 +56,7 @@ class SpeedAPI:
             docs_url="/docs" if speed_config.API_VERSION else None  # Disable in production
         )
     
-    def _setup_speed_middleware(self):
+    def _setup_speed_middleware(self) -> Any:
         """Setup minimal middleware for maximum speed."""
         # Only essential CORS (minimal overhead)
         self.app.add_middleware(
@@ -57,7 +67,7 @@ class SpeedAPI:
             expose_headers=["X-Response-Time"]
         )
     
-    def _setup_speed_routes(self):
+    def _setup_speed_routes(self) -> Any:
         """Setup speed-optimized routes."""
         
         @self.app.post("/api/v12/speed/generate", response_model=FastCaptionResponse)
@@ -167,7 +177,6 @@ async def speed_startup():
 
 
 if __name__ == "__main__":
-    import uvicorn
     
     print("=" * 70)
     print("⚡ STARTING SPEED OPTIMIZED API v12.0")

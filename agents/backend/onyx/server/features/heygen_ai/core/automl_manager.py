@@ -734,3 +734,4 @@ async def shutdown_automl_manager():
     if automl_manager:
         await automl_manager.shutdown()
         automl_manager = None
+

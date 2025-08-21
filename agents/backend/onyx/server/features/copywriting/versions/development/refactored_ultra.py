@@ -1,13 +1,13 @@
-"""
-Refactored Ultra-Optimized Copywriting Service.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Clean, production-ready architecture with maximum performance:
-- Modular design with clear separation of concerns
-- Advanced optimization libraries with graceful fallbacks
-- Comprehensive error handling and logging
-- Production monitoring and metrics
-- Clean code following best practices
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import os
@@ -19,18 +19,47 @@ from typing import Dict, Any, List, Optional, Union, Tuple
 from dataclasses import dataclass
 from contextlib import asynccontextmanager
 import multiprocessing as mp
-
-# FastAPI Core
 from fastapi import FastAPI, HTTPException, Depends, Body, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
+            import orjson
+                import ujson
+                import json
+            import uvloop
+            import polars as pl
+                import pandas as pd
+            import lz4
+                import gzip
+            import xxhash
+            import hashlib
+            import redis.asyncio as aioredis
+            import numba
+            from prometheus_fastapi_instrumentator import Instrumentator
+from .models import CopywritingInput, CopywritingOutput, CopyVariant, Language, CopyTone, UseCase
+import structlog
+        import numba
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Refactored Ultra-Optimized Copywriting Service.
+
+Clean, production-ready architecture with maximum performance:
+- Modular design with clear separation of concerns
+- Advanced optimization libraries with graceful fallbacks
+- Comprehensive error handling and logging
+- Production monitoring and metrics
+- Clean code following best practices
+"""
+
+
+# FastAPI Core
 
 # === OPTIMIZATION IMPORTS WITH FALLBACKS ===
 class OptimizationLibs:
     """Container for optimization libraries with fallback detection."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.json_lib = self._detect_json_lib()
         self.event_loop = self._detect_event_loop()
         self.data_processing = self._detect_data_processing()
@@ -46,20 +75,16 @@ class OptimizationLibs:
     def _detect_json_lib(self) -> Tuple[str, float, Any]:
         """Detect best available JSON library."""
         try:
-            import orjson
             return ("orjson", 5.0, orjson)
         except ImportError:
             try:
-                import ujson
                 return ("ujson", 3.0, ujson)
             except ImportError:
-                import json
                 return ("json", 1.0, json)
     
     def _detect_event_loop(self) -> Tuple[str, float, Any]:
         """Detect event loop optimization."""
         try:
-            import uvloop
             if sys.platform != 'win32':
                 return ("uvloop", 4.0, uvloop)
         except ImportError:
@@ -69,11 +94,9 @@ class OptimizationLibs:
     def _detect_data_processing(self) -> Tuple[str, float, Any]:
         """Detect data processing optimization."""
         try:
-            import polars as pl
             return ("polars", 10.0, pl)
         except ImportError:
             try:
-                import pandas as pd
                 return ("pandas", 1.0, pd)
             except ImportError:
                 return ("native", 1.0, None)
@@ -81,11 +104,9 @@ class OptimizationLibs:
     def _detect_compression(self) -> Tuple[str, float, Any]:
         """Detect compression library."""
         try:
-            import lz4
             return ("lz4", 4.0, lz4)
         except ImportError:
             try:
-                import gzip
                 return ("gzip", 1.0, gzip)
             except ImportError:
                 return ("none", 1.0, None)
@@ -93,16 +114,13 @@ class OptimizationLibs:
     def _detect_hashing(self) -> Tuple[str, float, Any]:
         """Detect hashing library."""
         try:
-            import xxhash
             return ("xxhash", 4.0, xxhash)
         except ImportError:
-            import hashlib
             return ("hashlib", 1.0, hashlib)
     
     def _detect_caching(self) -> Tuple[str, float, Any]:
         """Detect caching library."""
         try:
-            import redis.asyncio as aioredis
             return ("redis", 3.0, aioredis)
         except ImportError:
             return ("memory", 1.0, None)
@@ -110,7 +128,6 @@ class OptimizationLibs:
     def _detect_jit(self) -> Tuple[str, float, Any]:
         """Detect JIT compilation."""
         try:
-            import numba
             return ("numba", 15.0, numba)
         except ImportError:
             return ("none", 1.0, None)
@@ -118,7 +135,6 @@ class OptimizationLibs:
     def _detect_monitoring(self) -> Tuple[str, float, Any]:
         """Detect monitoring library."""
         try:
-            from prometheus_fastapi_instrumentator import Instrumentator
             return ("prometheus", 1.0, Instrumentator)
         except ImportError:
             return ("basic", 1.0, None)
@@ -180,10 +196,8 @@ class OptimizationLibs:
 OPTS = OptimizationLibs()
 
 # Import models
-from .models import CopywritingInput, CopywritingOutput, CopyVariant, Language, CopyTone, UseCase
 
 # Setup logging
-import structlog
 logger = structlog.get_logger(__name__)
 
 # === CONFIGURATION ===
@@ -220,7 +234,7 @@ config = RefactoredConfig()
 class RefactoredCacheManager:
     """Clean, efficient caching manager."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.memory_cache: Dict[str, Any] = {}
         self.redis_client: Optional[Any] = None
         self.stats = {"hits": 0, "misses": 0, "sets": 0}
@@ -230,7 +244,7 @@ class RefactoredCacheManager:
         self.compression_lib = OPTS.compression[2]
         self.hashing_lib = OPTS.hashing[2]
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize cache connections."""
         if OPTS.caching[0] == "redis" and config.enable_cache:
             try:
@@ -338,7 +352,6 @@ class RefactoredCacheManager:
 def create_jit_functions():
     """Create JIT-optimized functions if available."""
     if OPTS.jit[0] == "numba" and config.enable_jit:
-        import numba
         
         @numba.jit(nopython=True, cache=True)
         def calculate_metrics_jit(text_length: int, word_count: int) -> tuple:
@@ -374,7 +387,7 @@ calculate_metrics = create_jit_functions()
 class RefactoredCopywritingService:
     """Clean, refactored copywriting service with optimizations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.cache_manager = RefactoredCacheManager()
         self.template_cache = {}
         self.performance_stats = {
@@ -388,7 +401,7 @@ class RefactoredCopywritingService:
                    performance_level=OPTS.performance_level,
                    total_speedup=OPTS.total_speedup)
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the service."""
         await self.cache_manager.initialize()
         logger.info("Service initialized with optimizations", summary=OPTS.get_summary())
@@ -515,8 +528,8 @@ class RefactoredCopywritingService:
         template = self._get_template(input_data, variant_index)
         
         # Generate content
-        headline = template["headline"].format(product=product_name, benefit=benefit)
-        primary_text = template["text"].format(product=product_name, benefit=benefit)
+        headline = template["headline"f"]"
+        primary_text = template["text"f"]"
         
         # Add creativity elements
         if input_data.effective_creativity_score > 0.6:
@@ -949,7 +962,6 @@ refactored_app = create_refactored_app()
 
 # === MAIN ===
 if __name__ == "__main__":
-    import uvicorn
     
     # Setup logging
     logging.basicConfig(

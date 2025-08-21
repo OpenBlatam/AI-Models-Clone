@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+import uuid
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+from concurrent.futures import ThreadPoolExecutor
+import multiprocessing as mp
+    import polars as pl
+    import numpy as np
+    import rapidfuzz
+import structlog
+from .config import get_config
+from .cache import get_cache_manager, cached
+from .optimization import get_optimization_detector
+from ..models import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Modular Copywriting Service with High-Performance Libraries.
 
@@ -8,40 +33,25 @@ Clean, modular service with optimized libraries:
 - Performance monitoring
 """
 
-import asyncio
-import time
-import uuid
-from typing import List, Dict, Any, Optional
-from datetime import datetime
-from concurrent.futures import ThreadPoolExecutor
-import multiprocessing as mp
 
 # High-performance imports
 try:
-    import polars as pl
     POLARS_AVAILABLE = True
 except ImportError:
     POLARS_AVAILABLE = False
 
 try:
-    import numpy as np
     NUMPY_AVAILABLE = True
 except ImportError:
     NUMPY_AVAILABLE = False
 
 try:
-    import rapidfuzz
     RAPIDFUZZ_AVAILABLE = True
 except ImportError:
     RAPIDFUZZ_AVAILABLE = False
 
-import structlog
-from .config import get_config
-from .cache import get_cache_manager, cached
-from .optimization import get_optimization_detector
 
 # Import models
-from ..models import (
     CopywritingInput, CopywritingOutput, CopyVariant, 
     Language, CopyTone, UseCase, CreativityLevel,
     WebsiteInfo, BrandVoice, TranslationSettings
@@ -52,7 +62,7 @@ logger = structlog.get_logger(__name__)
 class ModularCopywritingService:
     """Modular copywriting service with high-performance optimizations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = get_config()
         self.cache_manager = get_cache_manager()
         self.optimization_detector = get_optimization_detector()
@@ -75,7 +85,7 @@ class ModularCopywritingService:
                    optimization_level=self.optimization_detector.performance_level,
                    expected_speedup=f"{self.optimization_detector.total_speedup:.1f}x")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize service components."""
         await self.cache_manager.initialize()
         logger.info("ModularCopywritingService fully initialized")
@@ -338,29 +348,22 @@ class ModularCopywritingService:
             creativity_emojis = ["✨", "🌟", "💫", "🔥", "⚡", "🎯", "💎", "🚀"]
             emoji = creativity_emojis[variant_index % len(creativity_emojis)]
             if not any(e in headline_template for e in creativity_emojis):
-                headline_template = f"{emoji} {headline_template}"
+                headline_template = f"{emoji} {headline_template}"f"
         
         # Smart replacements
-        headline = headline_template.format(
-            product=product_name,
-            brand=brand_name,
-            benefit=benefit
-        )
+        headline = headline_template"
         
         return headline[:200]  # Ensure reasonable length
     
     def _generate_primary_text_optimized(self, input_data: CopywritingInput, template: Dict[str, str], variant_index: int) -> str:
         """Generate optimized primary text."""
-        text_template = template.get("text", "Descubre {product}.")
+        text_template = template.get("text", "Descubre {product}."f")
         
         product_name = self._extract_product_name(input_data)
         benefit = self._extract_primary_benefit(input_data)
         
         # Base text
-        text = text_template.format(
-            product=product_name,
-            benefit=benefit
-        )
+        text = text_template"
         
         # Add features if available
         if input_data.website_info and input_data.website_info.features:
@@ -656,7 +659,7 @@ class ModularCopywritingService:
             "optimizations": self.optimization_detector.optimizations
         }
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup service resources."""
         try:
             await self.cache_manager.cleanup()

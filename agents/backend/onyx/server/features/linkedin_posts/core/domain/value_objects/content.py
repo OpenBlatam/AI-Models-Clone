@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+from typing import List, Optional
+import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Content Value Object
 ===================
@@ -5,9 +13,6 @@ Content Value Object
 Value object for post content with validation and business rules.
 """
 
-from dataclasses import dataclass
-from typing import List, Optional
-import re
 
 
 @dataclass(frozen=True)
@@ -21,7 +26,7 @@ class Content:
     
     value: str
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate content after initialization."""
         self._validate_content()
     

@@ -1,6 +1,17 @@
-"""
-Optimized API for ads generation and management with production-ready features.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 from typing import List, Optional, Dict, Any, BackgroundTasks
 from fastapi import APIRouter, HTTPException, File, UploadFile, Depends, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -11,9 +22,11 @@ import asyncio
 import time
 import json
 from datetime import datetime, timedelta
-import aioredis
+try:
+    import aioredis  # type: ignore
+except Exception:  # pragma: no cover - optional in tests
+    aioredis = None  # type: ignore[assignment]
 from contextlib import asynccontextmanager
-
 from onyx.server.auth_check import check_router_auth
 from onyx.server.utils import BasicAuthenticationError
 from onyx.utils.logger import setup_logger
@@ -24,6 +37,12 @@ from onyx.server.features.ads.optimized_service import OptimizedAdsService
 from onyx.server.features.ads.optimized_config import settings
 from onyx.server.features.ads.tokenization_api import router as tokenization_router
 from onyx.server.features.ads.diffusion_api import router as diffusion_router
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Optimized API for ads generation and management with production-ready features.
+"""
+
 
 logger = setup_logger()
 
@@ -97,11 +116,11 @@ router.include_router(diffusion_router)
 
 # Rate limiting middleware
 class RateLimiter:
-    def __init__(self):
+    def __init__(self) -> Any:
         self._redis_client = None
     
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         if self._redis_client is None:
             self._redis_client = await aioredis.from_url(
                 settings.redis_url,
@@ -132,26 +151,26 @@ rate_limiter = RateLimiter()
 
 # Background task queue
 class BackgroundTaskQueue:
-    def __init__(self):
+    def __init__(self) -> Any:
         self._queue = asyncio.Queue(maxsize=settings.task_queue_size)
         self._workers = []
         self._running = False
     
-    async def start_workers(self):
+    async def start_workers(self) -> Any:
         """Start background task workers."""
         self._running = True
         for _ in range(settings.background_task_workers):
             worker = asyncio.create_task(self._worker())
             self._workers.append(worker)
     
-    async def stop_workers(self):
+    async def stop_workers(self) -> Any:
         """Stop background task workers."""
         self._running = False
         for worker in self._workers:
             worker.cancel()
         await asyncio.gather(*self._workers, return_exceptions=True)
     
-    async def _worker(self):
+    async def _worker(self) -> Any:
         """Background task worker."""
         while self._running:
             try:
@@ -182,12 +201,12 @@ class BackgroundTaskQueue:
         except Exception as e:
             logger.error(f"Analytics batch processing error: {e}")
     
-    async def _cleanup_temp_files(self):
+    async def _cleanup_temp_files(self) -> Any:
         """Clean up temporary files."""
         # Implementation for temp file cleanup
         pass
     
-    async def _cleanup_cache(self):
+    async def _cleanup_cache(self) -> Any:
         """Clean up expired cache entries."""
         try:
             redis = await rate_limiter.redis_client

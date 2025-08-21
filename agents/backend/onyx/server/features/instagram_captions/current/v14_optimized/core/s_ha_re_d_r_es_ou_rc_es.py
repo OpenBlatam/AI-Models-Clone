@@ -1,15 +1,16 @@
-"""
-Shared Resources for Instagram Captions API v14.0
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive shared resource management including:
-- Connection pools (database, HTTP, Redis)
-- Shared caches (memory, disk, distributed)
-- AI model instances
-- Configuration management
-- Resource lifecycle management
-- Thread-safe resource access
-- Resource monitoring and metrics
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -32,16 +33,30 @@ import aiohttp
 import aioredis
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
 from sqlalchemy.pool import QueuePool
+    import numba
+    from numba import jit, njit
+from typing import Any, List, Dict, Optional
+"""
+Shared Resources for Instagram Captions API v14.0
+
+Comprehensive shared resource management including:
+- Connection pools (database, HTTP, Redis)
+- Shared caches (memory, disk, distributed)
+- AI model instances
+- Configuration management
+- Resource lifecycle management
+- Thread-safe resource access
+- Resource monitoring and metrics
+"""
+
 
 # Performance libraries
 try:
-    import numba
-    from numba import jit, njit
     NUMBA_AVAILABLE = True
 except ImportError:
     NUMBA_AVAILABLE = False
-    def jit(*args, **kwargs):
-        def decorator(func):
+    def jit(*args, **kwargs) -> Any:
+        def decorator(func) -> Any:
             return func
         return decorator
     njit = jit
@@ -136,14 +151,16 @@ class ConnectionPool:
     """Generic connection pool for various resource types"""
     
     def __init__(self, pool_size: int = 20, max_overflow: int = 30):
-        self.pool_size = pool_size
+        
+    """__init__ function."""
+self.pool_size = pool_size
         self.max_overflow = max_overflow
         self._pool: List[Any] = []
         self._in_use: Set[Any] = set()
         self._lock = asyncio.Lock()
         self._semaphore = asyncio.Semaphore(pool_size + max_overflow)
     
-    async def get(self) -> Any:
+    async def get(self) -> Optional[Dict[str, Any]]:
         """Get a connection from the pool"""
         async with self._semaphore:
             async with self._lock:
@@ -175,7 +192,7 @@ class ConnectionPool:
         """Close a connection - to be overridden"""
         raise NotImplementedError
     
-    async def close_all(self):
+    async def close_all(self) -> Any:
         """Close all connections in the pool"""
         async with self._lock:
             for conn in self._pool:
@@ -190,12 +207,14 @@ class DatabasePool(ConnectionPool):
     """Database connection pool"""
     
     def __init__(self, database_url: str, pool_size: int = 20, max_overflow: int = 30):
-        super().__init__(pool_size, max_overflow)
+        
+    """__init__ function."""
+super().__init__(pool_size, max_overflow)
         self.database_url = database_url
         self.engine = None
         self.session_factory = None
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the database pool"""
         self.engine = create_async_engine(
             self.database_url,
@@ -232,11 +251,13 @@ class HTTPClientPool(ConnectionPool):
     """HTTP client connection pool"""
     
     def __init__(self, timeout: int = 30, max_connections: int = 100):
-        super().__init__(max_connections, max_connections // 2)
+        
+    """__init__ function."""
+super().__init__(max_connections, max_connections // 2)
         self.timeout = timeout
         self.session = None
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the HTTP client pool"""
         connector = aiohttp.TCPConnector(
             limit=self.pool_size,
@@ -272,11 +293,13 @@ class RedisPool(ConnectionPool):
     """Redis connection pool"""
     
     def __init__(self, redis_url: str, pool_size: int = 20):
-        super().__init__(pool_size, pool_size // 2)
+        
+    """__init__ function."""
+super().__init__(pool_size, pool_size // 2)
         self.redis_url = redis_url
         self.redis_pool = None
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the Redis pool"""
         self.redis_pool = aioredis.from_url(
             self.redis_url,
@@ -307,14 +330,16 @@ class AIModelPool:
     """AI model instance pool"""
     
     def __init__(self, model_cache_size: int = 5, memory_limit_mb: int = 2048):
-        self.model_cache_size = model_cache_size
+        
+    """__init__ function."""
+self.model_cache_size = model_cache_size
         self.memory_limit_mb = memory_limit_mb
         self.models: Dict[str, Any] = {}
         self.model_info: Dict[str, ResourceInfo] = {}
         self._lock = asyncio.Lock()
         self._semaphore = asyncio.Semaphore(model_cache_size)
     
-    async def get_model(self, model_name: str, loader_func: Callable[[], Any]) -> Any:
+    async def get_model(self, model_name: str, loader_func: Callable[[], Any]) -> Optional[Dict[str, Any]]:
         """Get an AI model instance"""
         async with self._semaphore:
             async with self._lock:
@@ -365,14 +390,16 @@ class SharedCache:
     """Shared cache with multiple backends"""
     
     def __init__(self, cache_size: int = 10000, ttl: int = 3600):
-        self.cache_size = cache_size
+        
+    """__init__ function."""
+self.cache_size = cache_size
         self.ttl = ttl
         self.memory_cache: Dict[str, Any] = {}
         self.cache_timestamps: Dict[str, float] = {}
         self._lock = asyncio.Lock()
         self._cleanup_task = None
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the cache"""
         self._cleanup_task = asyncio.create_task(self._cleanup_expired())
     
@@ -410,13 +437,13 @@ class SharedCache:
                 del self.memory_cache[key]
                 del self.cache_timestamps[key]
     
-    async def clear(self):
+    async def clear(self) -> Any:
         """Clear all cache"""
         async with self._lock:
             self.memory_cache.clear()
             self.cache_timestamps.clear()
     
-    async def _cleanup_expired(self):
+    async def _cleanup_expired(self) -> Any:
         """Clean up expired cache entries"""
         while True:
             try:
@@ -455,7 +482,9 @@ class SharedResources:
     """Main shared resources manager"""
     
     def __init__(self, config: ResourceConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.resources: Dict[str, Any] = {}
         self.resource_info: Dict[str, ResourceInfo] = {}
         self._lock = asyncio.Lock()
@@ -503,7 +532,7 @@ class SharedResources:
             "errors": 0
         }
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize all shared resources"""
         if self._initialized:
             return
@@ -543,7 +572,7 @@ class SharedResources:
             logger.error(f"❌ Failed to initialize shared resources: {e}")
             raise
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Shutdown all shared resources"""
         if self._shutdown:
             return
@@ -580,7 +609,7 @@ class SharedResources:
         """Return a database session"""
         await self.database_pool.return_session(session)
     
-    async def get_http_client(self) -> aiohttp.ClientSession:
+    async async def get_http_client(self) -> aiohttp.ClientSession:
         """Get an HTTP client"""
         self.stats["http_requests"] += 1
         return await self.http_pool.get_client()
@@ -598,7 +627,7 @@ class SharedResources:
         """Return a Redis client"""
         await self.redis_pool.return_redis(redis)
     
-    async def get_ai_model(self, model_name: str, loader_func: Callable[[], Any]) -> Any:
+    async def get_ai_model(self, model_name: str, loader_func: Callable[[], Any]) -> Optional[Dict[str, Any]]:
         """Get an AI model"""
         self.stats["model_loads"] += 1
         return await self.ai_model_pool.get_model(model_name, loader_func)
@@ -614,7 +643,7 @@ class SharedResources:
         """Set a value in cache"""
         await self.shared_cache.set(key, value, ttl)
     
-    async def _monitor_resources(self):
+    async def _monitor_resources(self) -> Any:
         """Monitor resource usage"""
         while not self._shutdown:
             try:
@@ -634,7 +663,7 @@ class SharedResources:
                 logger.error(f"Resource monitoring error: {e}")
                 await asyncio.sleep(60)
     
-    async def _health_check(self):
+    async def _health_check(self) -> Any:
         """Health check for resources"""
         while not self._shutdown:
             try:
@@ -743,9 +772,9 @@ async def redis_client():
 # Decorators for resource management
 def with_cache(ttl: Optional[int] = None):
     """Decorator to cache function results"""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             cache_key = f"{func.__name__}:{hash(str(args) + str(kwargs))}"
             
@@ -769,9 +798,9 @@ def with_cache(ttl: Optional[int] = None):
 
 def with_ai_model(model_name: str, loader_func: Callable[[], Any]):
     """Decorator to use AI models"""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             resources = await get_shared_resources()
             model = await resources.get_ai_model(model_name, loader_func)
             

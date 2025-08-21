@@ -1,9 +1,13 @@
-"""
-Happy Path Implementation: Place the Happy Path Last
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module demonstrates how to structure functions with the happy path last
-for improved readability, maintainability, and debugging.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import logging
@@ -12,6 +16,15 @@ from datetime import datetime, timedelta, date
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from enum import Enum
+            import os
+from typing import Any, List, Dict, Optional
+"""
+Happy Path Implementation: Place the Happy Path Last
+
+This module demonstrates how to structure functions with the happy path last
+for improved readability, maintainability, and debugging.
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -94,7 +107,7 @@ async def get_user_daily_posts(user_id: str) -> int:
     await asyncio.sleep(0.01)
     return 2  # Mock: user has 2 posts today
 
-async def get_user_upload_count(user_id: str, upload_date: date) -> int:
+async async def get_user_upload_count(user_id: str, upload_date: date) -> int:
     """Mock function to get user's upload count for a date"""
     await asyncio.sleep(0.01)
     return 3  # Mock: user has 3 uploads today
@@ -148,7 +161,7 @@ async def update_post_in_database(post_id: str, new_content: str) -> Dict[str, A
         "updated_at": datetime.now()
     }
 
-async def upload_file_to_storage(file, filename: str) -> str:
+async async def upload_file_to_storage(file, filename: str) -> str:
     """Mock function to upload file to storage"""
     await asyncio.sleep(0.1)
     return f"https://storage.example.com/files/{filename}"
@@ -226,7 +239,7 @@ async def log_post_update(post_id: str, user_id: str, action: str) -> None:
     await asyncio.sleep(0.01)
     logger.info(f"Post update logged: {post_id} by {user_id} - {action}")
 
-async def increment_user_upload_count(user_id: str, upload_date: date) -> None:
+async async def increment_user_upload_count(user_id: str, upload_date: date) -> None:
     """Mock function to increment user upload count"""
     await asyncio.sleep(0.01)
     logger.info(f"Upload count incremented for {user_id} on {upload_date}")
@@ -378,7 +391,7 @@ class PostService:
             return create_error_response("FETCH_FAILED", f"Failed to fetch posts: {str(e)}")
     
     @staticmethod
-    async def upload_file_happy_path_last(user_id: str, file, post_id: str = None) -> Dict[str, Any]:
+    async async def upload_file_happy_path_last(user_id: str, file, post_id: str = None) -> Dict[str, Any]:
         """
         Upload file with happy path last pattern.
         
@@ -435,7 +448,6 @@ class PostService:
         
         try:
             # Generate safe filename
-            import os
             file_extension = os.path.splitext(file.filename)[1].lower()
             safe_filename = f"{user_id}_{uuid.uuid4()}{file_extension}"
             

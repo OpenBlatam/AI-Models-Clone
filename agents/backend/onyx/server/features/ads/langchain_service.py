@@ -1,6 +1,11 @@
-"""
-LangChain integration service for Onyx ads functionality.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from typing import List, Dict, Any, Optional, AsyncGenerator
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
@@ -31,7 +36,6 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.messages import HumanMessage, AIMessage
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
-
 import logging
 from datetime import datetime
 import json
@@ -44,13 +48,18 @@ import cohere
 from voyageai import Client as VoyageClient
 import litellm
 from google.cloud import aiplatform
+from typing import Any, List, Dict, Optional
+"""
+LangChain integration service for Onyx ads functionality.
+"""
+
 
 logger = logging.getLogger(__name__)
 
 class LangChainService:
     """Service for LangChain integration with Onyx."""
     
-    def __init__(self, llm, embeddings=None):
+    def __init__(self, llm, embeddings=None) -> Any:
         self.llm = llm
         self.embeddings = embeddings or self._initialize_embeddings()
         self.memory = ConversationBufferMemory(
@@ -63,7 +72,7 @@ class LangChainService:
         )
         self._initialize_model_clients()
     
-    def _initialize_embeddings(self):
+    def _initialize_embeddings(self) -> Any:
         """Initialize embeddings with multiple providers."""
         try:
             # Try OpenAI embeddings first
@@ -79,7 +88,7 @@ class LangChainService:
                 logger.error(f"Failed to initialize HuggingFace embeddings: {e}")
                 raise
     
-    def _initialize_model_clients(self):
+    def _initialize_model_clients(self) -> Any:
         """Initialize various model clients."""
         try:
             # Initialize Cohere client
@@ -113,7 +122,7 @@ class LangChainService:
             search_kwargs={"k": 4}
         )
     
-    async def create_qa_chain(self, retriever):
+    async def create_qa_chain(self, retriever) -> Any:
         """Create a QA chain with retriever."""
         # Create the base prompt
         prompt = ChatPromptTemplate.from_messages([

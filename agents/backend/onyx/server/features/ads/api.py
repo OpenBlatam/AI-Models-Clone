@@ -1,6 +1,11 @@
-"""
-Ads generation and management API for Onyx.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from typing import List, Optional, Dict, Any
 from fastapi import APIRouter, HTTPException, File, UploadFile, Depends
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -14,7 +19,6 @@ import cv2
 import pyvips
 import logging
 from datetime import datetime
-
 from onyx.server.auth_check import check_router_auth
 from onyx.server.utils import BasicAuthenticationError
 from onyx.utils.logger import setup_logger
@@ -22,8 +26,27 @@ from onyx.core.auth import get_current_user
 from onyx.core.functions import format_response, handle_error
 from onyx.server.features.ads.db_service import AdsDBService
 from onyx.server.features.ads.service import AdsService
+    from rembg import remove, new_session
+        from onyx.llm.interface import generate_ads_lcel_streaming_parallel
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Deprecated module. Use unified routers under `agents.backend.onyx.server.features.ads.api` package.
+
+This file re-exports the unified core router to preserve backward compatibility for imports that still
+reference `...features.ads.api` as a module.
+"""
+
 
 logger = setup_logger()
+
+try:
+    from .api import core as _core
+    router = _core.router  # Back-compat: expose a router from unified API
+except Exception:
+    # Provide a minimal router to avoid import errors
+    from fastapi import APIRouter
+    router = APIRouter(prefix="/ads/legacy", tags=["ads-legacy"])
 
 # Models
 class AdsRequest(BaseModel):
@@ -159,7 +182,6 @@ ads_service = AdsService()
 
 # Initialize rembg session
 try:
-    from rembg import remove, new_session
     rembg_session = new_session("u2netp")
     rembg_session_fast = new_session("u2netp")
     rembg_session_std = new_session("u2net")
@@ -444,10 +466,11 @@ async def stream_ads(
             website_text = website_text[:800]  # Limit to 800 characters for speed
 
         # Import streaming function here to avoid circular imports
-        from onyx.llm.interface import generate_ads_lcel_streaming_parallel
 
         async def content_generator():
-            async for content in generate_ads_lcel_streaming_parallel(website_text or "", n_ads=1):
+            
+    """content_generator function."""
+async for content in generate_ads_lcel_streaming_parallel(website_text or "", n_ads=1):
                 yield content
 
         return StreamingResponse(

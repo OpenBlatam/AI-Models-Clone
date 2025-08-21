@@ -1,9 +1,7 @@
-"""
-GMT System for Instagram Captions.
-
-Simplified and consolidated GMT system for optimal timing,
-cultural adaptation, and global campaign coordination.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 from typing import Dict, Any, List, Optional, Tuple
@@ -11,8 +9,16 @@ from dataclasses import dataclass
 from enum import Enum
 from datetime import datetime, timezone, timedelta
 import logging
-
 from models import CaptionStyle, InstagramTarget
+from typing import Any, List, Dict, Optional
+"""
+GMT System for Instagram Captions.
+
+Simplified and consolidated GMT system for optimal timing,
+cultural adaptation, and global campaign coordination.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +52,7 @@ class TimezoneInsights:
 class CulturalAdapter:
     """Handle cultural adaptation for different regions."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.cultural_profiles = {
             "US/Eastern": {
                 "greeting_style": "Hey there! / What's up?",
@@ -122,7 +128,7 @@ class CulturalAdapter:
 class GMTEngagementCalculator:
     """Calculate optimal engagement windows for different timezones."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Base engagement patterns (24-hour format, local time)
         self.base_patterns = {
             "weekday": {
@@ -240,7 +246,7 @@ class GMTEngagementCalculator:
 class SimplifiedGMTSystem:
     """Simplified GMT system integrating timing and cultural adaptation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.cultural_adapter = CulturalAdapter()
         self.engagement_calculator = GMTEngagementCalculator()
     

@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import pytest
+import asyncio
+import time
+import psutil
+from unittest.mock import Mock, patch, AsyncMock
+from typing import Dict, Any
+from onyx.server.features.ads.performance_optimizer import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test suite for Performance Optimization System
 
@@ -8,14 +31,7 @@ This module tests all components of the performance optimization system:
 - Database optimization
 - Performance monitoring
 """
-import pytest
-import asyncio
-import time
-import psutil
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Dict, Any
 
-from onyx.server.features.ads.performance_optimizer import (
     PerformanceOptimizer,
     PerformanceConfig,
     MemoryManager,
@@ -32,7 +48,7 @@ from onyx.server.features.ads.performance_optimizer import (
 class TestPerformanceConfig:
     """Test PerformanceConfig class."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration values."""
         config = PerformanceConfig()
         
@@ -43,7 +59,7 @@ class TestPerformanceConfig:
         assert config.profiling_enabled is True
         assert config.tracemalloc_enabled is True
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration values."""
         config = PerformanceConfig(
             cache_ttl=7200,
@@ -62,12 +78,12 @@ class TestPerformanceConfig:
 class TestMemoryManager:
     """Test MemoryManager class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method."""
         self.config = PerformanceConfig()
         self.memory_manager = MemoryManager(self.config)
     
-    def test_get_memory_usage(self):
+    def test_get_memory_usage(self) -> Optional[Dict[str, Any]]:
         """Test memory usage retrieval."""
         memory_usage = self.memory_manager.get_memory_usage()
         
@@ -83,7 +99,7 @@ class TestMemoryManager:
         assert memory_usage['available'] > 0
         assert memory_usage['total'] > 0
     
-    def test_should_cleanup_memory(self):
+    def test_should_cleanup_memory(self) -> Any:
         """Test memory cleanup threshold check."""
         # Mock high memory usage
         with patch.object(psutil.Process, 'memory_info') as mock_memory_info:
@@ -98,7 +114,7 @@ class TestMemoryManager:
                 should_cleanup = self.memory_manager.should_cleanup_memory()
                 assert should_cleanup is True
     
-    def test_cleanup_memory(self):
+    def test_cleanup_memory(self) -> Any:
         """Test memory cleanup functionality."""
         with patch('gc.collect') as mock_gc_collect:
             mock_gc_collect.return_value = 100
@@ -113,7 +129,7 @@ class TestMemoryManager:
             
             mock_gc_collect.assert_called_once()
     
-    def test_get_memory_stats(self):
+    def test_get_memory_stats(self) -> Optional[Dict[str, Any]]:
         """Test memory statistics retrieval."""
         stats = self.memory_manager.get_memory_stats()
         
@@ -129,19 +145,19 @@ class TestMemoryManager:
 class TestAdvancedCache:
     """Test AdvancedCache class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method."""
         self.config = PerformanceConfig()
         self.cache = AdvancedCache(self.config)
     
-    def test_cache_key_generation(self):
+    def test_cache_key_generation(self) -> Any:
         """Test cache key generation."""
         key = self.cache._get_cache_key("test_key", "test_prefix")
         
         assert key.startswith("test_prefix:")
         assert len(key) > len("test_prefix:") + 10  # Should be hashed
     
-    def test_data_compression(self):
+    def test_data_compression(self) -> Any:
         """Test data compression and decompression."""
         test_data = {"key": "value", "number": 123, "list": [1, 2, 3]}
         
@@ -151,7 +167,7 @@ class TestAdvancedCache:
         assert isinstance(compressed, bytes)
         assert decompressed == test_data
     
-    def test_cache_set_get(self):
+    def test_cache_set_get(self) -> Optional[Dict[str, Any]]:
         """Test cache set and get operations."""
         test_key = "test_key"
         test_value = {"data": "test_value"}
@@ -163,12 +179,12 @@ class TestAdvancedCache:
         retrieved_value = self.cache.get(test_key, cache_type="l1")
         assert retrieved_value == test_value
     
-    def test_cache_miss(self):
+    def test_cache_miss(self) -> Any:
         """Test cache miss behavior."""
         retrieved_value = self.cache.get("nonexistent_key", cache_type="l1")
         assert retrieved_value is None
     
-    def test_cache_clear(self):
+    def test_cache_clear(self) -> Any:
         """Test cache clearing."""
         # Add some data
         self.cache.set("key1", "value1", cache_type="l1")
@@ -181,7 +197,7 @@ class TestAdvancedCache:
         assert self.cache.get("key1", cache_type="l1") is None
         assert self.cache.get("key2", cache_type="l2") == "value2"
     
-    def test_cache_stats(self):
+    def test_cache_stats(self) -> Any:
         """Test cache statistics."""
         # Add some data to generate stats
         self.cache.set("key1", "value1", cache_type="l1")
@@ -205,15 +221,15 @@ class TestAsyncTaskManager:
     """Test AsyncTaskManager class."""
     
     @pytest.fixture
-    def task_manager(self):
+    def task_manager(self) -> Any:
         """Create task manager fixture."""
         config = PerformanceConfig(max_workers=2)
         return AsyncTaskManager(config)
     
     @pytest.mark.asyncio
-    async def test_submit_task(self, task_manager):
+    async def test_submit_task(self, task_manager) -> Any:
         """Test task submission."""
-        async def test_function(x, y):
+        async def test_function(x, y) -> Any:
             await asyncio.sleep(0.1)
             return x + y
         
@@ -224,9 +240,9 @@ class TestAsyncTaskManager:
         assert task.done()
     
     @pytest.mark.asyncio
-    async def test_batch_submit(self, task_manager):
+    async def test_batch_submit(self, task_manager) -> Any:
         """Test batch task submission."""
-        async def test_function(x):
+        async def test_function(x) -> Any:
             await asyncio.sleep(0.1)
             return x * 2
         
@@ -243,10 +259,12 @@ class TestAsyncTaskManager:
         assert results == [2, 4, 6]
     
     @pytest.mark.asyncio
-    async def test_task_timeout(self, task_manager):
+    async def test_task_timeout(self, task_manager) -> Any:
         """Test task timeout handling."""
         async def slow_function():
-            await asyncio.sleep(2.0)
+            
+    """slow_function function."""
+await asyncio.sleep(2.0)
             return "done"
         
         task = await task_manager.submit_task(slow_function)
@@ -255,17 +273,19 @@ class TestAsyncTaskManager:
             await asyncio.wait_for(task, timeout=0.5)
     
     @pytest.mark.asyncio
-    async def test_task_error_handling(self, task_manager):
+    async def test_task_error_handling(self, task_manager) -> Any:
         """Test task error handling."""
         async def error_function():
-            raise ValueError("Test error")
+            
+    """error_function function."""
+raise ValueError("Test error")
         
         task = await task_manager.submit_task(error_function)
         
         with pytest.raises(ValueError):
             await task
     
-    def test_get_stats(self, task_manager):
+    def test_get_stats(self, task_manager) -> Optional[Dict[str, Any]]:
         """Test task statistics."""
         stats = task_manager.get_stats()
         
@@ -280,12 +300,12 @@ class TestAsyncTaskManager:
 class TestDatabaseOptimizer:
     """Test DatabaseOptimizer class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method."""
         self.config = PerformanceConfig()
         self.db_optimizer = DatabaseOptimizer(self.config)
     
-    def test_query_timer_context(self):
+    def test_query_timer_context(self) -> Any:
         """Test query timer context manager."""
         with self.db_optimizer.query_timer("test_query"):
             time.sleep(0.1)  # Simulate query time
@@ -295,7 +315,7 @@ class TestDatabaseOptimizer:
         assert stats['query_stats']['test_query']['count'] == 1
         assert stats['query_stats']['test_query']['avg_time'] > 0
     
-    def test_query_caching(self):
+    def test_query_caching(self) -> Any:
         """Test query result caching."""
         test_key = "test_query_key"
         test_result = {"data": "test_result"}
@@ -307,7 +327,7 @@ class TestDatabaseOptimizer:
         cached_result = self.db_optimizer.get_cached_query(test_key)
         assert cached_result == test_result
     
-    def test_slow_query_detection(self):
+    def test_slow_query_detection(self) -> Any:
         """Test slow query detection."""
         # Simulate slow query
         with self.db_optimizer.query_timer("slow_query"):
@@ -322,23 +342,25 @@ class TestPerformanceDecorators:
     """Test performance decorators."""
     
     @pytest.mark.asyncio
-    async def test_performance_monitor_decorator(self):
+    async def test_performance_monitor_decorator(self) -> Any:
         """Test performance monitor decorator."""
         @performance_monitor("test_operation")
         async def test_function():
-            await asyncio.sleep(0.1)
+            
+    """test_function function."""
+await asyncio.sleep(0.1)
             return "result"
         
         result = await test_function()
         assert result == "result"
     
     @pytest.mark.asyncio
-    async def test_cache_result_decorator(self):
+    async def test_cache_result_decorator(self) -> Any:
         """Test cache result decorator."""
         call_count = 0
         
         @cache_result(ttl=3600, cache_type="l1")
-        async def test_function(x):
+        async def test_function(x) -> Any:
             nonlocal call_count
             call_count += 1
             return x * 2
@@ -354,14 +376,14 @@ class TestPerformanceDecorators:
         assert call_count == 1  # Should not increment
     
     @pytest.mark.asyncio
-    async def test_performance_context(self):
+    async def test_performance_context(self) -> Any:
         """Test performance context manager."""
         async with performance_context("test_context"):
             await asyncio.sleep(0.1)
         
         # Context manager should complete without error
     
-    def test_memory_context(self):
+    def test_memory_context(self) -> Any:
         """Test memory context manager."""
         with memory_context():
             # Simulate memory-intensive operation
@@ -373,7 +395,7 @@ class TestPerformanceOptimizer:
     """Test PerformanceOptimizer class."""
     
     @pytest.fixture
-    def performance_optimizer(self):
+    def performance_optimizer(self) -> Any:
         """Create performance optimizer fixture."""
         config = PerformanceConfig(
             cache_ttl=1800,
@@ -384,7 +406,7 @@ class TestPerformanceOptimizer:
         return PerformanceOptimizer(config)
     
     @pytest.mark.asyncio
-    async def test_start_stop(self, performance_optimizer):
+    async def test_start_stop(self, performance_optimizer) -> Any:
         """Test optimizer start and stop."""
         # Start optimizer
         await performance_optimizer.start()
@@ -395,7 +417,7 @@ class TestPerformanceOptimizer:
         assert performance_optimizer._started is False
     
     @pytest.mark.asyncio
-    async def test_get_performance_stats(self, performance_optimizer):
+    async def test_get_performance_stats(self, performance_optimizer) -> Optional[Dict[str, Any]]:
         """Test performance statistics retrieval."""
         await performance_optimizer.start()
         
@@ -410,7 +432,7 @@ class TestPerformanceOptimizer:
         await performance_optimizer.stop()
     
     @pytest.mark.asyncio
-    async def test_monitoring_loop(self, performance_optimizer):
+    async def test_monitoring_loop(self, performance_optimizer) -> Any:
         """Test monitoring loop functionality."""
         await performance_optimizer.start()
         
@@ -427,7 +449,7 @@ class TestIntegration:
     """Integration tests for the performance optimization system."""
     
     @pytest.mark.asyncio
-    async def test_full_workflow(self):
+    async def test_full_workflow(self) -> Any:
         """Test complete performance optimization workflow."""
         # Create optimizer
         config = PerformanceConfig(
@@ -453,7 +475,9 @@ class TestIntegration:
         
         # Test task management
         async def test_task():
-            await asyncio.sleep(0.1)
+            
+    """test_task function."""
+await asyncio.sleep(0.1)
             return "task_result"
         
         task = await optimizer.task_manager.submit_task(test_task)
@@ -479,7 +503,7 @@ class TestErrorHandling:
     """Test error handling in performance optimization system."""
     
     @pytest.mark.asyncio
-    async def test_cache_error_handling(self):
+    async def test_cache_error_handling(self) -> Any:
         """Test cache error handling."""
         config = PerformanceConfig()
         cache = AdvancedCache(config)
@@ -495,13 +519,15 @@ class TestErrorHandling:
         assert result is None or isinstance(result, UnserializableObject)
     
     @pytest.mark.asyncio
-    async def test_task_error_handling(self):
+    async def test_task_error_handling(self) -> Any:
         """Test task error handling."""
         config = PerformanceConfig(max_workers=1)
         task_manager = AsyncTaskManager(config)
         
         async def error_task():
-            raise RuntimeError("Task error")
+            
+    """error_task function."""
+raise RuntimeError("Task error")
         
         task = await task_manager.submit_task(error_task)
         
@@ -509,7 +535,7 @@ class TestErrorHandling:
             await task
     
     @pytest.mark.asyncio
-    async def test_memory_cleanup_error_handling(self):
+    async def test_memory_cleanup_error_handling(self) -> Any:
         """Test memory cleanup error handling."""
         config = PerformanceConfig()
         memory_manager = MemoryManager(config)
@@ -519,5 +545,6 @@ class TestErrorHandling:
             result = memory_manager.cleanup_memory(force=True)
             assert 'error' in result or result is not None
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

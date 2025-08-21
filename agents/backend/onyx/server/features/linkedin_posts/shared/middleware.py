@@ -1,9 +1,16 @@
-"""
-Advanced Middleware for LinkedIn Posts API
-==========================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-High-performance middleware with monitoring, security, and optimization features.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 from fastapi import Request, Response, HTTPException
 from fastapi.responses import JSONResponse
@@ -21,10 +28,20 @@ import jwt
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from circuitbreaker import circuit
-
 from .logging import get_logger
 from .cache import cache_manager
 from .config import settings
+            import gzip
+    import httpx
+from typing import Any, List, Dict, Optional
+"""
+Advanced Middleware for LinkedIn Posts API
+==========================================
+
+High-performance middleware with monitoring, security, and optimization features.
+"""
+
+
 
 logger = get_logger(__name__)
 
@@ -249,7 +266,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app, calls: int = 100, period: int = 60):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.calls = calls
         self.period = period
     
@@ -414,7 +433,6 @@ class CompressionMiddleware(BaseHTTPMiddleware):
         
         # Compress based on accept-encoding
         if "gzip" in accept_encoding:
-            import gzip
             compressed = gzip.compress(body)
             
             # Only use if smaller
@@ -444,7 +462,6 @@ async def call_external_service(url: str, **kwargs):
     """
     Call external service with circuit breaker pattern.
     """
-    import httpx
     async with httpx.AsyncClient() as client:
         response = await client.get(url, **kwargs)
         response.raise_for_status()

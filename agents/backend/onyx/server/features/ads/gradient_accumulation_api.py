@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+import asyncio
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Query, Depends
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+import torch
+from onyx.utils.logger import setup_logger
+from onyx.server.features.ads.gradient_accumulation import (
+from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
+from onyx.server.features.ads.multi_gpu_training import GPUMonitor, GPUConfig
+from onyx.server.features.ads.optimized_config import settings
+from typing import Any, List, Dict, Optional
+import logging
 """
 Gradient Accumulation API for Onyx Ads Backend
 
@@ -9,16 +25,7 @@ This module provides REST API endpoints for:
 - Automatic batch size calculation
 - Integration with multi-GPU training
 """
-from typing import Dict, Any, List, Optional
-from datetime import datetime
-import asyncio
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Query, Depends
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-import torch
 
-from onyx.utils.logger import setup_logger
-from onyx.server.features.ads.gradient_accumulation import (
     GradientAccumulationConfig,
     GradientAccumulator,
     AdaptiveGradientAccumulator,
@@ -27,9 +34,6 @@ from onyx.server.features.ads.gradient_accumulation import (
     calculate_accumulation_steps,
     adjust_learning_rate
 )
-from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
-from onyx.server.features.ads.multi_gpu_training import GPUMonitor, GPUConfig
-from onyx.server.features.ads.optimized_config import settings
 
 logger = setup_logger()
 

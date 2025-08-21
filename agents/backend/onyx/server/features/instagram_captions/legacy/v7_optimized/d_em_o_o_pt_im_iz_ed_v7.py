@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import aiohttp
+import time
+import statistics
+from typing import Dict, Any, List
+from typing import Any, List, Dict, Optional
+import logging
 """
 Instagram Captions API v7.0 - Optimized Demo
 
@@ -8,18 +23,15 @@ Demonstrates the performance improvements with specialized libraries:
 - Advanced AI analysis with sentence transformers
 """
 
-import asyncio
-import aiohttp
-import time
-import statistics
-from typing import Dict, Any, List
 
 
 class OptimizedAPIDemo:
     """Demo showcasing v7.0 optimizations and performance improvements."""
     
     def __init__(self, base_url: str = "http://localhost:8080"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.headers = {"Content-Type": "application/json"}
     
     async def test_optimized_single_generation(self) -> Dict[str, Any]:
@@ -144,7 +156,7 @@ class OptimizedAPIDemo:
         """Test concurrent request handling with optimizations."""
         print(f"🔥 Testing concurrent optimization ({concurrent_count} parallel requests)...")
         
-        async def single_request(session, request_id):
+        async async def single_request(session, request_id) -> Any:
             payload = {
                 "content_description": f"Optimización concurrente request {request_id}",
                 "style": "professional",
@@ -338,5 +350,6 @@ async def main():
     await demo.run_comprehensive_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

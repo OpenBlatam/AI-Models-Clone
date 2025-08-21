@@ -1,10 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import json
+from typing import Dict, Any
+    import re
+    import re
+    import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 ple Error Handling and Validation Demo
 
 This script demonstrates the basic error handling and validation features
 for the Instagram Captions API.
 
-import json
-from typing import Dict, Any
 
 # Mock the modules for demo purposes
 class ErrorCode:
@@ -23,13 +34,19 @@ class InstagramCaptionsException(Exception):
 
 class ValidationException(InstagramCaptionsException):
     def __init__(self, message: str, details: Dict[str, Any] = None):
-        super().__init__(ErrorCode.VALIDATION_ERROR, message, details, 400)
+        
+    """__init__ function."""
+super().__init__(ErrorCode.VALIDATION_ERROR, message, details, 400)
 
 class AuthenticationException(InstagramCaptionsException):
     def __init__(self, message: str, details: Dict[str, Any] = None):
-        super().__init__(ErrorCode.UNAUTHORIZED, message, details, 401eNotFoundException(InstagramCaptionsException):
+        
+    """__init__ function."""
+super().__init__(ErrorCode.UNAUTHORIZED, message, details, 401eNotFoundException(InstagramCaptionsException):
     def __init__(self, resource_type: str, resource_id: str):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             ErrorCode.NOT_FOUND,
             f"{resource_type} with id '{resource_id}' not found",
             {"resource_type": resource_type, "resource_id": resource_id},
@@ -44,7 +61,9 @@ class RateLimitException(InstagramCaptionsException):
 
 class AIProcessingException(InstagramCaptionsException):
     def __init__(self, message: str, details: Dict[str, Any] = None):
-        super().__init__(ErrorCode.AI_PROCESSING_ERROR, message, details, 422)
+        
+    """__init__ function."""
+super().__init__(ErrorCode.AI_PROCESSING_ERROR, message, details, 422)
 
 def create_error_response(error_code: str, message: str, details: Dict[str, Any] = None) -> Dict[str, Any]:
     """Create standardized error response."""
@@ -57,7 +76,6 @@ def create_error_response(error_code: str, message: str, details: Dict[str, Any]
 
 def validate_email(email: str) -> Dict[str, Any]:
    date email address.
-    import re
     email_pattern = r'^a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$'
     
     if not email or not email.strip():
@@ -67,7 +85,6 @@ def validate_email(email: str) -> Dict[str, Any]:
 
 def validate_instagram_username(username: str) -> Dict[str, Any]:
     """Validate Instagram username.
-    import re
     username_pattern = r^[a-zA-Z0]{1,30}$'
     
     if not username or not username.strip():
@@ -85,7 +102,6 @@ def validate_instagram_username(username: str) -> Dict[str, Any]:
 
 def sanitize_html(html_content: str) -> Dict[str, Any]:
   itize HTML content."""
-    import re
     
     if not html_content:
         return[object Object]sanitized":,removed_tags": []}
@@ -93,7 +109,7 @@ def sanitize_html(html_content: str) -> Dict[str, Any]:
     allowed_tags =bi', u, 'strong',em]
     pattern = r'<(/?)([^>]+)>    removed_tags = []
     
-    def replace_tag(match):
+    def replace_tag(match) -> Any:
         tag = match.group(2).split()[0lower()
         if tag not in allowed_tags:
             removed_tags.append(tag)
@@ -107,6 +123,8 @@ def sanitize_html(html_content: str) -> Dict[str, Any]:
     }
 
 def demo_custom_exceptions():
+
+    """demo_custom_exceptions function."""
 Demonstrate custom exception handling."    print("=" * 60)
     print(CUSTOM EXCEPTIONS DEMO)
     print(= * 60) 
@@ -156,6 +174,8 @@ Demonstrate custom exception handling."    print("=" * 60)
         print(f"Details: {e.details})
 
 def demo_error_response_creation():
+
+    """demo_error_response_creation function."""
 Demonstrate error response creation.    print("\n" + "=" * 60)
     print("ERROR RESPONSE CREATION DEMO)
     print(= * 60)
@@ -174,6 +194,8 @@ Demonstrate error response creation.    print("\n" + "=" * 60)
     print(json.dumps(error_response, indent=2))
 
 def demo_input_validation():
+
+    """demo_input_validation function."""
 Demonstrate input validation utilities.    print("\n" + "=" * 60)
     print("INPUT VALIDATION DEMO)
     print(= * 60)
@@ -194,6 +216,8 @@ Demonstrate input validation utilities.    print("\n" + "=" * 60)
     print(f"\nInvalid Username Validation: {json.dumps(invalid_username_result, indent=2)}")
 
 def demo_html_sanitization():
+
+    """demo_html_sanitization function."""
 nstrate HTML sanitization.    print("\n" + "=" * 60   print(HTML SANITIZATION DEMO)
     print(= * 60    # HTML content with allowed and disallowed tags
     html_content = 
@@ -209,7 +233,9 @@ nstrate HTML sanitization.    print("\n" + "=" * 60   print(HTML SANITIZATION DE
     print(html_content)
     print(f"\nSanitized Result: [object Object]json.dumps(result, indent=2)})
 def show_usage_examples():
-   ow practical usage examples.    print("\n" + "=" *60)
+   
+    """show_usage_examples function."""
+ow practical usage examples.    print("\n" + "=" *60)
     print(USAGE EXAMPLES)
     print(=60)
     
@@ -237,7 +263,9 @@ def show_usage_examples():
     )
 
 def main():
-  Run all demos."    print("INSTAGRAM CAPTIONS API - ERROR HANDLING & VALIDATION DEMO)
+  
+    """main function."""
+Run all demos."    print("INSTAGRAM CAPTIONS API - ERROR HANDLING & VALIDATION DEMO)
     print(= *80    
     # Run all demos
     demo_custom_exceptions()
@@ -249,5 +277,6 @@ def main():
     show_usage_examples()
     
     print("\n" + "=" * 80  print(DEMO COMPLETED SUCCESSFULLY!)
-    print("=* 80if __name__ == "__main__":
+    print("=* 80match __name__:
+    case "__main__":
     main() 

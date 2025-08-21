@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from typing import List, Optional, Dict, Any, Union, Literal
+from datetime import datetime, timezone
+from decimal import Decimal
+from enum import Enum
+from pydantic import (
+import uuid
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 FastAPI Best Practices - Data Models
 
@@ -10,16 +27,10 @@ This module implements data models following FastAPI best practices:
 - Validation and serialization best practices
 """
 
-from typing import List, Optional, Dict, Any, Union, Literal
-from datetime import datetime, timezone
-from decimal import Decimal
-from enum import Enum
-from pydantic import (
     BaseModel, Field, ConfigDict, field_validator, 
     model_validator, computed_field, EmailStr, HttpUrl,
     validator, root_validator
 )
-import uuid
 
 
 # =============================================================================
@@ -267,7 +278,7 @@ class BatchCaptionRequest(BaseModelWithConfig):
     
     @field_validator('requests')
     @classmethod
-    def validate_requests(cls, v: List[CaptionGenerationRequest]) -> List[CaptionGenerationRequest]:
+    async def validate_requests(cls, v: List[CaptionGenerationRequest]) -> List[CaptionGenerationRequest]:
         """Validate batch requests"""
         if len(v) > 50:
             raise ValueError("Maximum 50 requests per batch")

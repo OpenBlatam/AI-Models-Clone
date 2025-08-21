@@ -1,3 +1,46 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import os
+import sys
+import time
+from contextlib import asynccontextmanager
+from typing import Dict, Any, Optional, List
+import multiprocessing as mp
+from fastapi import FastAPI, Request, HTTPException, Depends, Body, Query, Security
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.security.api_key import APIKeyHeader
+    import orjson
+    import json as orjson
+    import uvloop
+    import redis.asyncio as aioredis
+    from prometheus_fastapi_instrumentator import Instrumentator
+    from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.util import get_remote_address
+    from slowapi.errors import RateLimitExceeded
+import structlog
+import logging
+from .models import (
+            import orjson
+            import polars
+            import numba
+            import xxhash
+            import polars
+            import numba
+            from .ultra_service import get_ultra_service
+                from .optimized_service import get_optimized_service
+                from .service import CopywritingService
+        from .models import CopyVariant
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 Refactored Ultra-Optimized Copywriting Service.
 
@@ -8,61 +51,38 @@ Clean architecture with maximum performance optimizations:
 - All advanced features: languages, tones, variants, translations, website info
 """
 
-import asyncio
-import os
-import sys
-import time
-from contextlib import asynccontextmanager
-from typing import Dict, Any, Optional, List
-import multiprocessing as mp
 
 # FastAPI and ASGI
-from fastapi import FastAPI, Request, HTTPException, Depends, Body, Query, Security
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.security.api_key import APIKeyHeader
 
 # High-performance imports with fallbacks
 try:
-    import orjson
     JSON_LIB = "orjson"
 except ImportError:
-    import json as orjson
     JSON_LIB = "json"
 
 try:
-    import uvloop
     UVLOOP_AVAILABLE = True
 except ImportError:
     UVLOOP_AVAILABLE = False
 
 try:
-    import redis.asyncio as aioredis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
 
 try:
-    from prometheus_fastapi_instrumentator import Instrumentator
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
 try:
-    from slowapi import Limiter, _rate_limit_exceeded_handler
-    from slowapi.util import get_remote_address
-    from slowapi.errors import RateLimitExceeded
     RATE_LIMIT_AVAILABLE = True
 except ImportError:
     RATE_LIMIT_AVAILABLE = False
 
 # Logging
-import structlog
-import logging
 
 # Import models and services
-from .models import (
     CopywritingInput, CopywritingOutput, Language, CopyTone, 
     UseCase, CreativityLevel, WebsiteInfo, BrandVoice,
     TranslationSettings, VariantSettings
@@ -74,7 +94,7 @@ logger = structlog.get_logger(__name__)
 class RefactoredConfig:
     """Centralized configuration with intelligent defaults."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.api_key = os.getenv("COPYWRITING_API_KEY", "refactored-ultra-key-2024")
         self.redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/3")
         self.enable_cache = os.getenv("ENABLE_CACHE", "true").lower() == "true"
@@ -93,25 +113,21 @@ class RefactoredConfig:
         
         # Check high-impact libraries
         try:
-            import orjson
             optimizations.append("orjson")
         except ImportError:
             pass
         
         try:
-            import polars
             optimizations.append("polars")
         except ImportError:
             pass
         
         try:
-            import numba
             optimizations.append("numba")
         except ImportError:
             pass
         
         try:
-            import xxhash
             optimizations.append("xxhash")
         except ImportError:
             pass
@@ -134,13 +150,11 @@ class RefactoredConfig:
             multiplier *= 5.0
         
         try:
-            import polars
             multiplier *= 8.0  # Conservative estimate
         except ImportError:
             pass
         
         try:
-            import numba
             multiplier *= 3.0  # JIT compilation benefit
         except ImportError:
             pass
@@ -156,7 +170,7 @@ config = RefactoredConfig()
 class RefactoredCopywritingService:
     """Refactored service with intelligent optimization selection."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = config
         self.redis_client: Optional[aioredis.Redis] = None
         self.cache = {}
@@ -170,23 +184,20 @@ class RefactoredCopywritingService:
                    performance_multiplier=f"{self.config.performance_multiplier:.1f}x",
                    service_impl=self._service_impl.__class__.__name__)
     
-    def _select_service_implementation(self):
+    def _select_service_implementation(self) -> Any:
         """Intelligently select the best available service implementation."""
         try:
             # Try ultra service first
-            from .ultra_service import get_ultra_service
             return asyncio.create_task(get_ultra_service())
         except ImportError:
             try:
                 # Fall back to optimized service
-                from .optimized_service import get_optimized_service
                 return asyncio.create_task(get_optimized_service())
             except ImportError:
                 # Fall back to basic service
-                from .service import CopywritingService
                 return CopywritingService()
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize async components."""
         if REDIS_AVAILABLE and self.config.enable_cache:
             try:
@@ -237,7 +248,6 @@ class RefactoredCopywritingService:
     
     async def _generate_basic_copy(self, input_data: CopywritingInput) -> CopywritingOutput:
         """Basic copy generation fallback."""
-        from .models import CopyVariant
         
         # Simple variant generation
         variants = []
@@ -569,7 +579,6 @@ app = create_refactored_app()
 
 # === DEVELOPMENT SERVER ===
 if __name__ == "__main__":
-    import uvicorn
     
     logging.basicConfig(level=logging.INFO)
     logger.info("Starting refactored development server")

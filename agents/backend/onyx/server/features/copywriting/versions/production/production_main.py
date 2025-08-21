@@ -1,3 +1,40 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import os
+import sys
+from contextlib import asynccontextmanager
+from typing import Dict, Any
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+    import uvloop
+    import orjson
+    from prometheus_fastapi_instrumentator import Instrumentator
+import structlog
+import logging
+from .production_api import router as copywriting_router
+    import psutil
+    import multiprocessing as mp
+        import time
+        import time
+        import psutil
+            import json
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 Ultra-Optimized Production Copywriting Application.
 
@@ -9,44 +46,29 @@ Complete production-ready application with all optimizations:
 - Comprehensive error handling
 """
 
-import asyncio
-import os
-import sys
-from contextlib import asynccontextmanager
-from typing import Dict, Any
 
 # FastAPI and ASGI
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
 
 # High-performance imports
 try:
-    import uvloop
     UVLOOP_AVAILABLE = True
 except ImportError:
     UVLOOP_AVAILABLE = False
 
 try:
-    import orjson
     JSON_AVAILABLE = True
 except ImportError:
     JSON_AVAILABLE = False
 
 # Monitoring
 try:
-    from prometheus_fastapi_instrumentator import Instrumentator
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
 # Logging
-import structlog
-import logging
 
 # Import API router
-from .production_api import router as copywriting_router
 
 # Configure structured logging
 structlog.configure(
@@ -99,8 +121,6 @@ async def lifespan(app: FastAPI):
         logger.info("Prometheus metrics enabled")
     
     # Log system information
-    import psutil
-    import multiprocessing as mp
     
     system_info = {
         "cpu_count": mp.cpu_count(),
@@ -181,7 +201,6 @@ def create_app() -> FastAPI:
     @app.middleware("http")
     async def performance_middleware(request: Request, call_next):
         """Add performance headers and monitoring."""
-        import time
         
         start_time = time.perf_counter()
         
@@ -284,8 +303,6 @@ def create_app() -> FastAPI:
     @app.get("/performance-test", summary="Performance test endpoint")
     async def performance_test():
         """Test endpoint for performance benchmarking."""
-        import time
-        import psutil
         
         start_time = time.perf_counter()
         
@@ -295,7 +312,6 @@ def create_app() -> FastAPI:
             serialized = orjson.dumps(data)
             deserialized = orjson.loads(serialized)
         else:
-            import json
             data = {"test": "performance", "timestamp": time.time()}
             serialized = json.dumps(data)
             deserialized = json.loads(serialized)
@@ -324,7 +340,6 @@ app = create_app()
 # === DEVELOPMENT SERVER ===
 
 if __name__ == "__main__":
-    import uvicorn
     
     # Configure logging for development
     logging.basicConfig(

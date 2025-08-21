@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+from typing import Optional, List, Dict, Any
+from datetime import datetime
+from ..models.facebook_models import (
+from ..services.langchain_service import FacebookLangChainService
+            from ..models.facebook_models import (
+            from ..models.facebook_models import ContentMetrics, EngagementPrediction, QualityAssessment, QualityTier
+        import re
+        from ..models.facebook_models import QualityTier
+from typing import Any, List, Dict, Optional
 """
 🎯 Facebook Posts Engine - Core
 ===============================
@@ -6,18 +28,12 @@ Motor principal para generación y análisis de Facebook posts.
 Integración completa con Onyx y LangChain.
 """
 
-import asyncio
-import logging
-from typing import Optional, List, Dict, Any
-from datetime import datetime
 
-from ..models.facebook_models import (
     FacebookPostEntity, FacebookPostRequest, FacebookPostResponse,
     FacebookPostAnalysis, ContentIdentifier, PostSpecification,
     GenerationConfig, FacebookPostContent, FacebookPostFactory,
     ContentStatus, PostType, ContentTone, TargetAudience
 )
-from ..services.langchain_service import FacebookLangChainService
 
 
 class FacebookPostEngine:
@@ -27,7 +43,9 @@ class FacebookPostEngine:
     """
     
     def __init__(self, langchain_service: FacebookLangChainService):
-        self.langchain_service = langchain_service
+        
+    """__init__ function."""
+self.langchain_service = langchain_service
         self.logger = logging.getLogger(__name__)
         
         # Analytics y métricas
@@ -168,7 +186,6 @@ class FacebookPostEngine:
             )
             
             # Create comprehensive analysis
-            from ..models.facebook_models import (
                 ContentMetrics, EngagementPrediction, QualityAssessment, QualityTier
             )
             
@@ -237,7 +254,6 @@ class FacebookPostEngine:
             self.logger.error(f"Error analyzing Facebook post: {e}")
             
             # Return basic analysis on error
-            from ..models.facebook_models import ContentMetrics, EngagementPrediction, QualityAssessment, QualityTier
             
             return FacebookPostAnalysis(
                 content_metrics=ContentMetrics(
@@ -396,7 +412,6 @@ class FacebookPostEngine:
     
     def _count_emojis(self, text: str) -> int:
         """Contar emojis en el texto."""
-        import re
         emoji_pattern = re.compile(
             "["
             "\U0001F600-\U0001F64F"  # emoticons
@@ -410,7 +425,6 @@ class FacebookPostEngine:
     
     def _determine_quality_tier(self, score: float) -> 'QualityTier':
         """Determinar tier de calidad basado en score."""
-        from ..models.facebook_models import QualityTier
         
         if score >= 0.9:
             return QualityTier.PREMIUM

@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import json
+from typing import Dict, Any, List
+from core_v10 import (
+from ai_service_v10 import refactored_ai_service
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Instagram Captions API v10.0 - Refactored Demo
@@ -6,17 +22,11 @@ Demonstrates the refactored ultra-advanced capabilities in a clean,
 maintainable architecture.
 """
 
-import asyncio
-import time
-import json
-from typing import Dict, Any, List
 
 # Import refactored components
-from core_v10 import (
     RefactoredCaptionRequest, BatchRefactoredRequest, 
     AIProvider, config
 )
-from ai_service_v10 import refactored_ai_service
 
 
 class RefactoredAPIDemo:
@@ -25,7 +35,7 @@ class RefactoredAPIDemo:
     Shows how v9.0 ultra-advanced capabilities are maintained in a simplified design.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.demo_stats = {
             "tests_run": 0,
             "tests_passed": 0,
@@ -43,7 +53,7 @@ class RefactoredAPIDemo:
         """Print formatted result."""
         print(f"   {label}: {value}{unit}")
     
-    async def test_single_generation(self):
+    async def test_single_generation(self) -> Any:
         """Test single caption generation with advanced analysis."""
         
         print("\n1️⃣  SINGLE CAPTION GENERATION (Advanced Analysis)")
@@ -102,7 +112,7 @@ class RefactoredAPIDemo:
             except Exception as e:
                 print(f"   ❌ Test {i} failed: {e}")
     
-    async def test_batch_processing(self):
+    async def test_batch_processing(self) -> Any:
         """Test batch processing capabilities."""
         
         print("\n2️⃣  BATCH PROCESSING (Concurrent Optimization)")
@@ -169,7 +179,7 @@ class RefactoredAPIDemo:
         except Exception as e:
             print(f"   ❌ Batch processing failed: {e}")
     
-    async def test_health_and_metrics(self):
+    async def test_health_and_metrics(self) -> Any:
         """Test health check and metrics capabilities."""
         
         print("\n3️⃣  HEALTH CHECK & PERFORMANCE METRICS")
@@ -207,7 +217,7 @@ class RefactoredAPIDemo:
         except Exception as e:
             print(f"   ❌ Health check failed: {e}")
     
-    async def test_advanced_features(self):
+    async def test_advanced_features(self) -> Any:
         """Test advanced features inherited from v9.0."""
         
         print("\n4️⃣  ADVANCED FEATURES (v9.0 Capabilities)")
@@ -264,7 +274,7 @@ class RefactoredAPIDemo:
         except Exception as e:
             print(f"   ❌ Advanced features test failed: {e}")
     
-    def demo_refactoring_benefits(self):
+    def demo_refactoring_benefits(self) -> Any:
         """Demonstrate the benefits of v9.0 → v10.0 refactoring."""
         
         print("\n5️⃣  REFACTORING BENEFITS (v9.0 → v10.0)")
@@ -307,7 +317,7 @@ class RefactoredAPIDemo:
         print("   • Easier deployment")
         print("   • Improved documentation")
     
-    async def run_comprehensive_demo(self):
+    async def run_comprehensive_demo(self) -> Any:
         """Run the complete demonstration of refactored capabilities."""
         
         self.print_header("INSTAGRAM CAPTIONS API v10.0 - REFACTORED DEMO")
@@ -376,5 +386,6 @@ async def main():
     await demo.run_comprehensive_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from datetime import datetime
+from nlp.core.engine import ProductionNLPEngine, RequestContext
+from nlp.utils.cache import ProductionCache
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 🏭 Production Demo - Sistema NLP Facebook Posts
@@ -6,13 +24,8 @@
 Demo del sistema NLP de producción con todas las características empresariales.
 """
 
-import asyncio
-import time
-from datetime import datetime
 
 # Production imports
-from nlp.core.engine import ProductionNLPEngine, RequestContext
-from nlp.utils.cache import ProductionCache
 
 
 async def main():
@@ -143,5 +156,6 @@ Características implementadas:
 """)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

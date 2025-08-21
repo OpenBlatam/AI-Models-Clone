@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
 import gradio as gr
 import asyncio
 import logging
@@ -5,12 +13,13 @@ import traceback
 from PIL import Image, ImageDraw
 from agents.backend.onyx.server.features.ads.diffusion_service import DiffusionService, GenerationParams
 
+from typing import Any, List, Dict, Optional
 DEBUG = False  # Set to True to show tracebacks in UI
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("gradio_image_demo")
 
-def error_image(message):
+def error_image(message) -> Any:
     # Create a simple image with the error message
     img = Image.new('RGB', (512, 128), color=(255, 230, 230))
     d = ImageDraw.Draw(img)
@@ -23,7 +32,7 @@ except Exception as e:
     logger.error(f"Error initializing diffusion service: {e}\n{traceback.format_exc()}")
     diffusion_service = None
 
-def run_async(coro):
+def run_async(coro) -> Any:
     try:
         return asyncio.get_event_loop().run_until_complete(coro)
     except Exception as e:
@@ -32,7 +41,7 @@ def run_async(coro):
             return [error_image(f"Async error: {e}\n\n{traceback.format_exc()}")]
         return [error_image("Internal async error. Please try again later.")]
 
-def generate_images(prompt, negative_prompt, width, height, num_images, guidance_scale, num_inference_steps, seed):
+def generate_images(prompt, negative_prompt, width, height, num_images, guidance_scale, num_inference_steps, seed) -> Any:
     # Input validation
     if not prompt or not prompt.strip():
         return [error_image("Please enter a non-empty prompt.")]
@@ -107,5 +116,6 @@ iface = gr.Interface(
     allow_flagging="never"
 )
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     iface.launch() 

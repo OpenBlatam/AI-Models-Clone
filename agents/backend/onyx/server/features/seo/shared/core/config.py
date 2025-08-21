@@ -1,13 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import os
+from typing import List, Optional
+from pydantic import BaseSettings, Field
+from pydantic_settings import BaseSettings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Ultra-Optimized Configuration v10
 Production-ready settings with maximum performance
 """
 
-import os
-from typing import List, Optional
-from pydantic import BaseSettings, Field
-from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -99,7 +115,8 @@ class Settings(BaseSettings):
     reload: bool = Field(default=False, env="RELOAD")
     reload_dirs: List[str] = Field(default=[], env="RELOAD_DIRS")
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False

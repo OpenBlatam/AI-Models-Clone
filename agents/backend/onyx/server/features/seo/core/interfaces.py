@@ -1,11 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Dict, List, Any, Optional, Protocol
+from dataclasses import dataclass
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Abstract interfaces for the ultra-optimized SEO service.
 Defines contracts for all core components.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Any, Optional, Protocol
-from dataclasses import dataclass
 
 
 @dataclass
@@ -38,7 +43,7 @@ class HTTPClient(ABC):
     """Interfaz abstracta para clientes HTTP ultra-optimizados."""
     
     @abstractmethod
-    async def fetch(self, url: str) -> Optional[str]:
+    async async def fetch(self, url: str) -> Optional[str]:
         """Obtiene contenido HTML con throttling y retry."""
         pass
     
@@ -48,7 +53,7 @@ class HTTPClient(ABC):
         pass
     
     @abstractmethod
-    async def close(self):
+    async def close(self) -> Any:
         """Cierra la sesión HTTP."""
         pass
 
@@ -130,7 +135,7 @@ class ErrorHandler(Protocol):
 class ConfigurationProvider(Protocol):
     """Protocolo para proveedores de configuración."""
     
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Obtiene un valor de configuración."""
         pass
     

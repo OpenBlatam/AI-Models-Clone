@@ -1,12 +1,5 @@
-#!/usr/bin/env python3
-"""
-FastAPI Integration - Official Documentation Reference System
-============================================================
-
-Integración de FastAPI con el sistema de referencias de documentación oficial
-para desarrollo de APIs escalables.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -17,9 +10,19 @@ import asyncio
 import logging
 from datetime import datetime
 import json
+from official_docs_reference import OfficialDocsReference
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+FastAPI Integration - Official Documentation Reference System
+============================================================
+
+Integración de FastAPI con el sistema de referencias de documentación oficial
+para desarrollo de APIs escalables.
+"""
+
 
 # Importar el sistema de referencias
-from official_docs_reference import OfficialDocsReference
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -393,7 +396,7 @@ async def analyze_project(
 
 # Middleware para logging
 @app.middleware("http")
-async def log_requests(request, call_next):
+async async def log_requests(request, call_next) -> Any:
     """Middleware para logging de requests."""
     start_time = datetime.now()
     
@@ -411,7 +414,7 @@ async def log_requests(request, call_next):
 
 # Exception handlers
 @app.exception_handler(HTTPException)
-async def http_exception_handler(request, exc):
+async async def http_exception_handler(request, exc) -> Any:
     """Handler para excepciones HTTP."""
     return JSONResponse(
         status_code=exc.status_code,
@@ -423,7 +426,7 @@ async def http_exception_handler(request, exc):
     )
 
 @app.exception_handler(Exception)
-async def general_exception_handler(request, exc):
+async def general_exception_handler(request, exc) -> Any:
     """Handler para excepciones generales."""
     logger.error(f"Unhandled exception: {exc}")
     return JSONResponse(
@@ -446,5 +449,6 @@ def run_server(host: str = "0.0.0.0", port: int = 8000, reload: bool = True):
         log_level="info"
     )
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     run_server() 

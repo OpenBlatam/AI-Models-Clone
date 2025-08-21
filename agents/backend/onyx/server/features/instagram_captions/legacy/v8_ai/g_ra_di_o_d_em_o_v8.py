@@ -1,9 +1,13 @@
-"""
-Instagram Captions API v8.0 - Interactive Gradio Demo
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Interactive demo showcasing deep learning and transformer capabilities
-with real-time AI generation and analysis.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import gradio as gr
 import asyncio
@@ -15,13 +19,24 @@ from typing import Dict, Any, List, Tuple
 import matplotlib.pyplot as plt
 import pandas as pd
 from datetime import datetime
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Instagram Captions API v8.0 - Interactive Gradio Demo
+
+Interactive demo showcasing deep learning and transformer capabilities
+with real-time AI generation and analysis.
+"""
+
 
 
 class GradioAIDemo:
     """Interactive Gradio demo for AI-powered caption generation."""
     
     def __init__(self, api_url: str = "http://localhost:8080"):
-        self.api_url = api_url
+        
+    """__init__ function."""
+self.api_url = api_url
         self.session_stats = {
             "total_generations": 0,
             "avg_quality": 0,
@@ -156,7 +171,7 @@ class GradioAIDemo:
         
         return "\n".join(debug_lines)
     
-    async def get_api_health(self) -> str:
+    async async def get_api_health(self) -> str:
         """Get API health status."""
         try:
             async with aiohttp.ClientSession() as session:
@@ -213,7 +228,7 @@ class GradioAIDemo:
         """
         
         # Wrapper function for async call
-        def generate_wrapper(content, style, hashtag_count, model_size, semantics, engagement):
+        def generate_wrapper(content, style, hashtag_count, model_size, semantics, engagement) -> Any:
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
@@ -225,7 +240,9 @@ class GradioAIDemo:
                 loop.close()
         
         def health_wrapper():
-            loop = asyncio.new_event_loop()
+            
+    """health_wrapper function."""
+loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
             try:
                 result = loop.run_until_complete(self.get_api_health())
@@ -407,5 +424,6 @@ def main():
     )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

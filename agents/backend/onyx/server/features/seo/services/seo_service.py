@@ -1,7 +1,7 @@
-"""
-Servicio SEO principal ultra-optimizado con arquitectura refactorizada.
-Implementación modular con inyección de dependencias.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import asyncio
@@ -9,7 +9,6 @@ from typing import Dict, List, Any, Optional
 from urllib.parse import urljoin, urlparse
 from loguru import logger
 import psutil
-
 from ..core.interfaces import HTMLParser, HTTPClient, CacheManager, SEOAnalyzer, PerformanceTracker
 from ..core.parsers import ParserFactory
 from ..core.http_client import HTTPClientFactory
@@ -17,13 +16,26 @@ from ..core.cache_manager import CacheManagerFactory
 from ..core.analyzer import AnalyzerFactory
 from ..core.metrics import PerformanceTracker, MetricsCollector
 from ..models import SEOScrapeRequest, SEOScrapeResponse, SEOMetrics
+            from .selenium_service import SeleniumService
+        import hashlib
+        import orjson
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Servicio SEO principal ultra-optimizado con arquitectura refactorizada.
+Implementación modular con inyección de dependencias.
+"""
+
+
 
 
 class UltraOptimizedSEOService:
     """Servicio SEO ultra-optimizado con arquitectura modular."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self.performance_tracker = PerformanceTracker(self.config.get('performance', {}))
         self.metrics_collector = MetricsCollector()
         
@@ -35,7 +47,7 @@ class UltraOptimizedSEOService:
         if self.config.get('enable_selenium', False):
             self._setup_selenium()
     
-    def _initialize_components(self):
+    def _initialize_components(self) -> Any:
         """Inicializa todos los componentes del servicio."""
         # Parser
         parser_config = self.config.get('parser', {})
@@ -71,10 +83,9 @@ class UltraOptimizedSEOService:
         logger.info(f"  Cache Manager: {type(self.cache_manager).__name__}")
         logger.info(f"  Analyzer: {self.analyzer.get_analyzer_name()}")
     
-    def _setup_selenium(self):
+    def _setup_selenium(self) -> Any:
         """Configura el servicio Selenium."""
         try:
-            from .selenium_service import SeleniumService
             self.selenium_service = SeleniumService(self.config.get('selenium', {}))
             logger.info("Selenium service initialized")
         except Exception as e:
@@ -174,8 +185,6 @@ class UltraOptimizedSEOService:
     
     def _generate_cache_key(self, url: str, options: Dict[str, Any]) -> str:
         """Genera clave de caché única."""
-        import hashlib
-        import orjson
         
         # Crear string único basado en URL y opciones
         key_data = {
@@ -312,7 +321,7 @@ class UltraOptimizedSEOService:
             }
         }
     
-    async def close(self):
+    async def close(self) -> Any:
         """Cierra recursos del servicio."""
         await self.http_client.close()
         if self.selenium_service:

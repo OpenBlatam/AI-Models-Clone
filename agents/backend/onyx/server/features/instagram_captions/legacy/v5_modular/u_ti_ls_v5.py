@@ -1,8 +1,13 @@
-"""
-Instagram Captions API v5.0 - Utils Module
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Ultra-fast utility functions for common operations and optimizations.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import hashlib
 import json
@@ -10,17 +15,26 @@ import time
 import uuid
 from typing import Any, Dict, List, Optional, Union
 from datetime import datetime, timezone
-try:
     from .config_v5 import config
-except ImportError:
     from config_v5 import config
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Instagram Captions API v5.0 - Utils Module
+
+Ultra-fast utility functions for common operations and optimizations.
+"""
+
+try:
+except ImportError:
 
 
 class UltraFastUtils:
     """Ultra-fast utility functions for common operations."""
     
     @staticmethod
-    def generate_request_id(prefix: str = "ultra") -> str:
+    async def generate_request_id(prefix: str = "ultra") -> str:
         """Generate unique request ID for tracking."""
         timestamp = int(time.time() * 1000000)  # Microsecond precision
         return f"{prefix}-{timestamp % 1000000:06d}"
@@ -245,7 +259,7 @@ class CacheKeyGenerator:
 class PerformanceTracker:
     """Track and analyze performance patterns."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.operation_times: Dict[str, List[float]] = {}
     
     def track_operation(self, operation_name: str, duration_ms: float) -> None:

@@ -1,7 +1,13 @@
-"""
-Ultra-Optimized HTML Parser v2.0
-Using the fastest parsing libraries available: Selectolax + LXML + Zstandard
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import asyncio
@@ -14,8 +20,16 @@ from selectolax.parser import HTMLParser as SelectolaxParser
 from lxml import html, etree
 import re
 from urllib.parse import urljoin, urlparse
-
 from .interfaces import HTMLParserInterface, ParsedData
+        import hashlib
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Ultra-Optimized HTML Parser v2.0
+Using the fastest parsing libraries available: Selectolax + LXML + Zstandard
+"""
+
+
 
 
 @dataclass
@@ -34,7 +48,9 @@ class UltraOptimizedParserV2(HTMLParserInterface):
     """Parser ultra-optimizado con las librerías más rápidas."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         
         # Configuraciones de parsing
         self.primary_parser = self.config.get('primary_parser', 'selectolax')
@@ -500,7 +516,6 @@ class UltraOptimizedParserV2(HTMLParserInterface):
     
     def _generate_cache_key(self, html_content: str, url: Optional[str]) -> str:
         """Generar clave de cache."""
-        import hashlib
         content_hash = hashlib.md5(html_content.encode()).hexdigest()
         url_hash = hashlib.md5((url or '').encode()).hexdigest()
         return f"{content_hash}:{url_hash}"
@@ -555,7 +570,7 @@ class UltraOptimizedParserV2(HTMLParserInterface):
             'compression_level': self.compression_level
         }
     
-    def clear_cache(self):
+    def clear_cache(self) -> Any:
         """Limpiar cache."""
         self.parsing_cache.clear()
         logger.info("Parser cache cleared")

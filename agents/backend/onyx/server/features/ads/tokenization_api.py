@@ -1,16 +1,26 @@
-"""
-API endpoints for advanced tokenization and sequence handling.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from typing import Dict, Any, List, Optional
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel, Field
 import asyncio
 import json
 from datetime import datetime
-
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.tokenization_service import TokenizationService
 from onyx.server.features.ads.optimized_config import settings
+from typing import Any, List, Dict, Optional
+import logging
+"""
+API endpoints for advanced tokenization and sequence handling.
+"""
+
 
 logger = setup_logger()
 router = APIRouter(prefix="/tokenization", tags=["tokenization"])

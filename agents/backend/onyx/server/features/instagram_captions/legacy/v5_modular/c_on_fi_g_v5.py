@@ -1,19 +1,35 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+import secrets
+from typing import List
+from pydantic import Field
+    from pydantic_settings import BaseSettings
+    from pydantic import BaseSettings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v5.0 - Configuration Module
 
 Modular configuration management for ultra-fast processing.
 """
 
-import os
-import secrets
-from typing import List
-from pydantic import Field
 
 try:
-    from pydantic_settings import BaseSettings
 except ImportError:
     # Fallback for older pydantic versions
-    from pydantic import BaseSettings
 
 
 class UltraFastConfig(BaseSettings):
@@ -69,14 +85,17 @@ class UltraFastConfig(BaseSettings):
     # Middleware Configuration
     GZIP_MINIMUM_SIZE: int = Field(default=500, env="GZIP_MINIMUM_SIZE")
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True
         
         @classmethod
         def parse_env_var(cls, field_name: str, raw_val: str):
-            if field_name in ["VALID_API_KEYS", "CORS_ORIGINS"]:
+            
+    """parse_env_var function."""
+if field_name in ["VALID_API_KEYS", "CORS_ORIGINS"]:
                 return [x.strip() for x in raw_val.split(",") if x.strip()]
             return cls.json_loads(raw_val)
     

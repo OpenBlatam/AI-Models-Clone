@@ -1,9 +1,13 @@
-"""
-Guard Clauses Implementation: Handle Preconditions and Invalid States Early
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module demonstrates how to use guard clauses at the beginning of functions
-to handle preconditions, invalid states, and edge cases early for fail-fast behavior.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import logging
@@ -12,6 +16,14 @@ from datetime import datetime, timedelta, date
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, List, Dict, Optional
+"""
+Guard Clauses Implementation: Handle Preconditions and Invalid States Early
+
+This module demonstrates how to use guard clauses at the beginning of functions
+to handle preconditions, invalid states, and edge cases early for fail-fast behavior.
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -251,7 +263,7 @@ async def add_comment_to_post(user_id: str, post_id: str, comment_text: str) -> 
     await asyncio.sleep(0.02)
     logger.info(f"User {user_id} commented on post {post_id}: {comment_text}")
 
-async def upload_file_to_storage(file) -> str:
+async async def upload_file_to_storage(file) -> str:
     """Mock function to upload file to storage"""
     await asyncio.sleep(0.1)
     return f"https://storage.example.com/files/{uuid.uuid4().hex[:8]}"
@@ -608,7 +620,7 @@ class FileService:
     """Service class demonstrating guard clauses for file operations"""
     
     @staticmethod
-    async def upload_file_with_guard_clauses(user_id: str, file) -> Dict[str, Any]:
+    async async def upload_file_with_guard_clauses(user_id: str, file) -> Dict[str, Any]:
         """
         Upload file using guard clauses.
         

@@ -1,3 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+from typing import Optional, Any, Dict
+from functools import lru_cache
+    import orjson
+    import json as orjson
+    import redis.asyncio as aioredis
+    import hiredis
+        import redis.asyncio as aioredis
+    import xxhash
+    import lz4.frame
+import structlog
+from .config import get_config
+            import hashlib
+            import json
+            import json
+            import hashlib
+from typing import Any, List, Dict, Optional
+import logging
 """
 Modular Cache Manager with High-Performance Libraries.
 
@@ -8,27 +35,18 @@ Multi-level caching with optimized libraries:
 - xxhash for fast hashing
 """
 
-import asyncio
-import time
-from typing import Optional, Any, Dict
-from functools import lru_cache
 
 # High-performance imports with fallbacks
 try:
-    import orjson
     JSON_LIB = "orjson"
 except ImportError:
-    import json as orjson
     JSON_LIB = "json"
 
 try:
-    import redis.asyncio as aioredis
-    import hiredis
     REDIS_AVAILABLE = True
     HIREDIS_AVAILABLE = True
 except ImportError:
     try:
-        import redis.asyncio as aioredis
         REDIS_AVAILABLE = True
         HIREDIS_AVAILABLE = False
     except ImportError:
@@ -36,26 +54,22 @@ except ImportError:
         HIREDIS_AVAILABLE = False
 
 try:
-    import xxhash
     XXHASH_AVAILABLE = True
 except ImportError:
     XXHASH_AVAILABLE = False
 
 try:
-    import lz4.frame
     LZ4_AVAILABLE = True
 except ImportError:
     LZ4_AVAILABLE = False
 
-import structlog
-from .config import get_config
 
 logger = structlog.get_logger(__name__)
 
 class OptimizedCacheManager:
     """High-performance cache manager with multiple optimization libraries."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = get_config()
         self.redis_client: Optional[aioredis.Redis] = None
         self.memory_cache: Dict[str, Any] = {}
@@ -76,7 +90,7 @@ class OptimizedCacheManager:
         
         logger.info("OptimizedCacheManager initialized", optimizations=self.optimizations)
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize Redis connection with optimizations."""
         if not REDIS_AVAILABLE or not self.config.enable_cache:
             logger.info("Redis caching disabled")
@@ -113,7 +127,6 @@ class OptimizedCacheManager:
         if XXHASH_AVAILABLE:
             return xxhash.xxh64(data.encode()).hexdigest()
         else:
-            import hashlib
             return hashlib.md5(data.encode()).hexdigest()
     
     def _fast_compress(self, data: bytes) -> bytes:
@@ -139,7 +152,6 @@ class OptimizedCacheManager:
         if JSON_LIB == "orjson":
             return orjson.dumps(obj)
         else:
-            import json
             return json.dumps(obj).encode()
     
     def _fast_deserialize(self, data: bytes) -> Any:
@@ -147,10 +159,9 @@ class OptimizedCacheManager:
         if JSON_LIB == "orjson":
             return orjson.loads(data)
         else:
-            import json
             return json.loads(data.decode())
     
-    async def get(self, key: str, default: Any = None) -> Any:
+    async def get(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Get value from cache with ultra-fast operations."""
         start_time = time.perf_counter()
         
@@ -323,7 +334,7 @@ class OptimizedCacheManager:
         
         return info
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup cache resources."""
         try:
             if self.redis_client:
@@ -354,12 +365,11 @@ async def initialize_cache():
 # Cache decorator for functions
 def cached(key_prefix: str = "func", ttl: Optional[int] = None):
     """Decorator for caching function results."""
-    def decorator(func):
-        async def wrapper(*args, **kwargs):
+    def decorator(func) -> Any:
+        async def wrapper(*args, **kwargs) -> Any:
             cache_manager = get_cache_manager()
             
             # Generate cache key
-            import hashlib
             key_data = f"{key_prefix}:{func.__name__}:{str(args)}:{str(kwargs)}"
             cache_key = hashlib.md5(key_data.encode()).hexdigest()
             

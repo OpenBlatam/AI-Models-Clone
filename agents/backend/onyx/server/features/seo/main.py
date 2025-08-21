@@ -1,7 +1,10 @@
-"""
-Punto de entrada principal para el servicio SEO ultra-optimizado en producción.
-Configuración completa con logging, métricas y manejo de señales.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import signal
@@ -14,12 +17,23 @@ from loguru import logger
 import structlog
 import tracemalloc
 import psutil
-
 from api import app
 from services.seo_service import UltraOptimizedSEOService
 from services.batch_service import BatchProcessingService
 from core.metrics import PerformanceTracker, MetricsCollector
 from utils.config import load_config
+    import pytest
+    import subprocess
+        from test_ultra_optimized import UltraOptimizedTester
+    import argparse
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Punto de entrada principal para el servicio SEO ultra-optimizado en producción.
+Configuración completa con logging, métricas y manejo de señales.
+"""
+
+
 
 
 # Configuración global
@@ -31,7 +45,7 @@ metrics_collector = None
 
 
 @asynccontextmanager
-async def lifespan(app):
+async def lifespan(app) -> Any:
     """Gestión del ciclo de vida de la aplicación."""
     global config, seo_service, batch_service, performance_tracker, metrics_collector
     
@@ -138,7 +152,7 @@ def setup_logging(logging_config: Dict[str, Any]):
 
 def setup_signal_handlers():
     """Configura manejo de señales del sistema."""
-    def signal_handler(signum, frame):
+    def signal_handler(signum, frame) -> Any:
         logger.info(f"Received signal {signum}, initiating graceful shutdown")
         sys.exit(0)
     
@@ -253,8 +267,6 @@ def run_development():
 
 def run_tests():
     """Ejecuta tests de la aplicación."""
-    import pytest
-    import subprocess
     
     logger.info("🧪 Running tests")
     
@@ -279,10 +291,11 @@ def run_benchmarks():
     
     try:
         # Importar y ejecutar benchmarks
-        from test_ultra_optimized import UltraOptimizedTester
         
         async def run_benchmarks_async():
-            tester = UltraOptimizedTester()
+            
+    """run_benchmarks_async function."""
+tester = UltraOptimizedTester()
             await tester.run_performance_test()
         
         asyncio.run(run_benchmarks_async())
@@ -315,7 +328,6 @@ def show_status():
 
 def main():
     """Función principal."""
-    import argparse
     
     parser = argparse.ArgumentParser(description="SEO Analysis API v2 - Ultra Optimized")
     parser.add_argument('--mode', choices=['production', 'development', 'test', 'benchmark', 'status'],
@@ -362,5 +374,6 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

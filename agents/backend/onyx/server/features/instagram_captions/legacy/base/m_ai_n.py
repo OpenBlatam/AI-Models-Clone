@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import sys
+import uvicorn
+from pathlib import Path
+from api import app
+from config import get_settings
+from speed_optimizations import initialize_speed_optimizations, cleanup_speed_optimizations
+        from dependencies import (
+        from speed_optimizations import get_performance_stats
+    from speed_optimizations import get_performance_stats
+    import requests
+    import time
+    import argparse
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Instagram Captions API v2.1 - Ultra-Fast Main Application Entry Point
@@ -11,17 +28,10 @@ Maximum performance optimizations:
 - Background task processing
 """
 
-import asyncio
-import sys
-import uvicorn
-from pathlib import Path
 
 # Add current directory to Python path
 sys.path.append(str(Path(__file__).parent))
 
-from api import app
-from config import get_settings
-from speed_optimizations import initialize_speed_optimizations, cleanup_speed_optimizations
 
 settings = get_settings()
 
@@ -131,13 +141,11 @@ def run_development():
 async def ultra_health_check():
     """Perform an ultra-fast health check with optimization metrics."""
     try:
-        from dependencies import (
             get_captions_engine,
             get_gmt_system,
             get_redis_client,
             get_health_checker
         )
-        from speed_optimizations import get_performance_stats
         
         print("🔍 Performing ultra-fast health check...")
         
@@ -195,7 +203,6 @@ async def ultra_health_check():
 
 def show_ultra_api_info():
     """Display ultra-fast API information and endpoints."""
-    from speed_optimizations import get_performance_stats
     
     perf_stats = get_performance_stats()
     
@@ -247,8 +254,6 @@ def benchmark_performance():
     """Run a quick performance benchmark."""
     print("🔥 Running performance benchmark...")
     
-    import requests
-    import time
     
     base_url = f"http://{settings.host}:{settings.port}"
     
@@ -269,7 +274,6 @@ def benchmark_performance():
 
 
 if __name__ == "__main__":
-    import argparse
     
     parser = argparse.ArgumentParser(description="Instagram Captions Ultra-Fast API v2.1")
     parser.add_argument(

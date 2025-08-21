@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import os
+from typing import Dict, List, Optional, Any
+from dataclasses import dataclass, field
+from pathlib import Path
+import logging
+            import json
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Configuration Management
 =======================
@@ -6,11 +22,6 @@ Centralized configuration for the copywriting service with environment-based
 settings, intelligent defaults, and validation.
 """
 
-import os
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
-from pathlib import Path
-import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -185,12 +196,12 @@ class CopywritingConfig:
         "headline", "tagline", "slogan"
     ])
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate configuration after initialization"""
         self._validate_config()
         self._setup_logging()
         
-    def _validate_config(self):
+    def _validate_config(self) -> bool:
         """Validate configuration settings"""
         errors = []
         
@@ -218,14 +229,13 @@ class CopywritingConfig:
         if errors:
             raise ValueError(f"Configuration validation failed: {'; '.join(errors)}")
     
-    def _setup_logging(self):
+    def _setup_logging(self) -> Any:
         """Setup logging configuration"""
         log_level = getattr(logging, self.monitoring.log_level.upper(), logging.INFO)
         
         if self.monitoring.log_format == "json":
-            import json
             class JsonFormatter(logging.Formatter):
-                def format(self, record):
+                def format(self, record) -> Any:
                     log_data = {
                         "timestamp": self.formatTime(record),
                         "level": record.levelname,

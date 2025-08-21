@@ -1,9 +1,7 @@
-"""
-Content Optimizer for LinkedIn Posts
-===================================
-
-AI-powered content optimization using LangChain for better LinkedIn engagement.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import re
 from typing import Dict, List, Optional, Tuple
@@ -11,8 +9,18 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.schema import HumanMessage
-
 from ...shared.logging import get_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Content Optimizer for LinkedIn Posts
+===================================
+
+AI-powered content optimization using LangChain for better LinkedIn engagement.
+"""
+
+
 
 logger = get_logger(__name__)
 
@@ -30,7 +38,7 @@ class ContentOptimizer:
         self.llm = llm
         self._setup_optimization_chains()
     
-    def _setup_optimization_chains(self):
+    def _setup_optimization_chains(self) -> Any:
         """Setup optimization chains."""
         
         # Readability optimization

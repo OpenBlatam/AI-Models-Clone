@@ -1,16 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+from pydantic import BaseModel, Field, field_validator
+    from .config_v5 import config
+    from config_v5 import config
+        import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v5.0 - Schemas Module
 
 Pydantic models for ultra-fast mass processing with advanced validation.
 """
 
-from typing import List, Dict, Any, Optional
-from datetime import datetime
-from pydantic import BaseModel, Field, field_validator
 try:
-    from .config_v5 import config
 except ImportError:
-    from config_v5 import config
 
 
 class UltraFastCaptionRequest(BaseModel):
@@ -111,7 +123,7 @@ class BatchCaptionRequest(BaseModel):
     
     @field_validator('requests')
     @classmethod
-    def validate_requests(cls, v: List[UltraFastCaptionRequest]) -> List[UltraFastCaptionRequest]:
+    async def validate_requests(cls, v: List[UltraFastCaptionRequest]) -> List[UltraFastCaptionRequest]:
         """Validate batch requests."""
         if not v:
             raise ValueError("Batch cannot be empty")
@@ -218,7 +230,6 @@ class ValidationUtils:
     def sanitize_text(text: str) -> str:
         """Sanitize text by removing potentially dangerous content."""
         # Remove HTML tags
-        import re
         text = re.sub(r'<[^>]+>', '', text)
         
         # Remove JavaScript-like patterns

@@ -1,9 +1,15 @@
-"""
-Advanced Pytest Configuration with Best Libraries
-================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
 
-Ultra-modern testing setup using the best Python testing libraries.
-"""
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import pytest
 import asyncio
@@ -12,13 +18,10 @@ import os
 from typing import AsyncGenerator, Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from pathlib import Path
-
-# Advanced testing libraries
 from unittest.mock import AsyncMock, MagicMock, patch, call
 import factory
 from faker import Faker
 from hypothesis import given, strategies as st
-# from hypothesis.extra.pytest import register_random  # Removed for compatibility
 import responses
 import httpretty
 from aioresponses import aioresponses
@@ -26,28 +29,44 @@ import freezegun
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.waiting_utils import wait_for_logs
 import redis.asyncio as redis
-
-# FastAPI testing
 from fastapi.testclient import TestClient
 from httpx import AsyncClient
 import pytest_httpx
 import pytest_asyncio
-
-# Performance testing
 import psutil
 from memory_profiler import profile
 import pytest_benchmark
-
-# Data generation
 from mimesis import Generic
 from factory import Factory, Faker as FactoryFaker, SubFactory
-
-# Our modules
 from ..core.domain.entities.linkedin_post import LinkedInPost, PostStatus, PostType, PostTone
 from ..application.use_cases.linkedin_post_use_cases import LinkedInPostUseCases
 from ..infrastructure.repositories.linkedin_post_repository import LinkedInPostRepository
 from ..shared.cache import CacheManager
 from ..shared.config import Settings
+        import uvloop
+    from fastapi import FastAPI
+    from fastapi.middleware.cors import CORSMiddleware
+    from ..presentation.api.linkedin_post_router_v2 import router
+        import logging
+from typing import Any, List, Dict, Optional
+"""
+Advanced Pytest Configuration with Best Libraries
+================================================
+
+Ultra-modern testing setup using the best Python testing libraries.
+"""
+
+
+# Advanced testing libraries
+# from hypothesis.extra.pytest import register_random  # Removed for compatibility
+
+# FastAPI testing
+
+# Performance testing
+
+# Data generation
+
+# Our modules
 
 # Initialize Faker
 fake = Faker()
@@ -58,7 +77,8 @@ generic = Generic()
 class LinkedInPostFactory(Factory):
     """Factory for creating LinkedIn post test data."""
     
-    class Meta:
+    @dataclass
+class Meta:
         model = LinkedInPost
     
     id = FactoryFaker('uuid4')
@@ -81,7 +101,8 @@ class LinkedInPostFactory(Factory):
 class PostDataFactory(Factory):
     """Factory for creating post data dictionaries."""
     
-    class Meta:
+    @dataclass
+class Meta:
         model = dict
     
     content = FactoryFaker('text', max_nb_chars=500)
@@ -97,7 +118,7 @@ class PostDataFactory(Factory):
 
 # Hypothesis Strategies for Property-Based Testing
 @st.composite
-def linkedin_post_strategy(draw):
+def linkedin_post_strategy(draw) -> Any:
     """Strategy for generating LinkedIn post data."""
     return {
         'content': draw(st.text(min_size=10, max_size=500)),
@@ -109,7 +130,7 @@ def linkedin_post_strategy(draw):
 
 
 @st.composite
-def batch_post_strategy(draw):
+def batch_post_strategy(draw) -> Any:
     """Strategy for generating batch post data."""
     size = draw(st.integers(min_value=1, max_value=10))
     return [draw(linkedin_post_strategy()) for _ in range(size)]
@@ -120,7 +141,6 @@ def batch_post_strategy(draw):
 def event_loop():
     """Create an instance of the default event loop for the test session."""
     try:
-        import uvloop
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     except ImportError:
         pass
@@ -160,7 +180,7 @@ def redis_container():
 
 
 @pytest.fixture
-async def redis_client(redis_container):
+async def redis_client(redis_container) -> Any:
     """Real Redis client for integration testing."""
     client = redis.from_url(redis_container, decode_responses=True)
     await client.ping()
@@ -195,7 +215,7 @@ def mock_redis():
 
 
 @pytest.fixture
-def mock_cache_manager(mock_redis):
+def mock_cache_manager(mock_redis) -> Any:
     """Advanced mock cache manager with comprehensive methods."""
     with patch('linkedin_posts.shared.cache.cache_manager') as mock:
         # Basic operations
@@ -230,7 +250,7 @@ def sample_posts_batch():
 
 
 @pytest.fixture
-def mock_repository(sample_linkedin_post, sample_posts_batch):
+def mock_repository(sample_linkedin_post, sample_posts_batch) -> Any:
     """Advanced mock repository with comprehensive methods."""
     mock_repo = AsyncMock(spec=LinkedInPostRepository)
     
@@ -260,7 +280,7 @@ def mock_repository(sample_linkedin_post, sample_posts_batch):
 
 
 @pytest.fixture
-def mock_use_cases(mock_repository):
+def mock_use_cases(mock_repository) -> Any:
     """Mock use cases with repository."""
     return LinkedInPostUseCases(mock_repository)
 
@@ -303,9 +323,6 @@ def mock_nlp_processor():
 @pytest.fixture
 def test_app():
     """Test FastAPI application with advanced configuration."""
-    from fastapi import FastAPI
-    from fastapi.middleware.cors import CORSMiddleware
-    from ..presentation.api.linkedin_post_router_v2 import router
     
     app = FastAPI(
         title="LinkedIn Posts API Test",
@@ -328,7 +345,7 @@ def test_app():
 
 
 @pytest.fixture
-def test_client(test_app):
+def test_client(test_app) -> Any:
     """Test client for FastAPI with advanced configuration."""
     return TestClient(
         app=test_app,
@@ -337,7 +354,7 @@ def test_client(test_app):
 
 
 @pytest.fixture
-async def async_client(test_app):
+async def async_client(test_app) -> Any:
     """Async test client for FastAPI with advanced configuration."""
     async with AsyncClient(
         app=test_app,
@@ -616,7 +633,7 @@ class AdvancedAsyncTestUtils:
     """Advanced async testing utilities."""
     
     @staticmethod
-    async def wait_for_condition(condition_func, timeout=5.0, interval=0.1):
+    async def wait_for_condition(condition_func, timeout=5.0, interval=0.1) -> Any:
         """Wait for a condition to be true with advanced error handling."""
         start_time = asyncio.get_event_loop().time()
         
@@ -633,12 +650,14 @@ class AdvancedAsyncTestUtils:
         return False
     
     @staticmethod
-    async def run_concurrent_requests(client, url, count=10, **kwargs):
+    async async def run_concurrent_requests(client, url, count=10, **kwargs) -> Any:
         """Run concurrent requests with advanced error handling."""
         semaphore = asyncio.Semaphore(10)  # Limit concurrency
         
         async def make_request():
-            async with semaphore:
+            
+    """make_request function."""
+async with semaphore:
                 try:
                     return await client.get(url, **kwargs)
                 except Exception as e:
@@ -648,7 +667,7 @@ class AdvancedAsyncTestUtils:
         return await asyncio.gather(*tasks, return_exceptions=True)
     
     @staticmethod
-    async def measure_performance(func, iterations=100):
+    async def measure_performance(func, iterations=100) -> Any:
         """Measure function performance with detailed metrics."""
         times = []
         memory_usage = []
@@ -693,7 +712,7 @@ class AdvancedDebugUtils:
     """Advanced debugging utilities."""
     
     @staticmethod
-    def print_response_details(response):
+    def print_response_details(response) -> Any:
         """Print detailed response information for debugging."""
         print(f"\n=== Response Details ===")
         print(f"Status Code: {response.status_code}")
@@ -709,7 +728,7 @@ class AdvancedDebugUtils:
             print(f"Response Body: {response.text}")
     
     @staticmethod
-    def print_performance_metrics(metrics):
+    def print_performance_metrics(metrics) -> Any:
         """Print performance metrics for debugging."""
         print(f"\n=== Performance Metrics ===")
         for key, value in metrics.items():
@@ -728,7 +747,6 @@ class AdvancedDebugUtils:
     @staticmethod
     def create_debug_logger():
         """Create an advanced debug logger."""
-        import logging
         
         logger = logging.getLogger("advanced_debug")
         logger.setLevel(logging.DEBUG)
@@ -755,10 +773,10 @@ class AdvancedDebugUtils:
         return logger
     
     @staticmethod
-    def profile_memory(func):
+    def profile_memory(func) -> Any:
         """Decorator to profile memory usage."""
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             process = psutil.Process()
             memory_before = process.memory_info().rss
             
@@ -772,7 +790,7 @@ class AdvancedDebugUtils:
             return result
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             process = psutil.Process()
             memory_before = process.memory_info().rss
             

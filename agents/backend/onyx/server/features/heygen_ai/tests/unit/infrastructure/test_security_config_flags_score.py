@@ -26,3 +26,4 @@ def test_validate_security_configuration_score_bounds(tmp_path):
 
 
 
+

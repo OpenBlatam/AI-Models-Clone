@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+import sys
+import os
+from pathlib import Path
+from typing import Dict, Any, List
+from optimized_core.ultra_fast_engine import UltraFastEngine, get_ultra_fast_engine
+from optimized_core.ultra_fast_api import UltraFastAPI, app
+        import psutil
+        import gc
+        import uvloop
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Ultra Optimized LinkedIn Posts Runner
@@ -6,31 +30,23 @@ Ultra Optimized LinkedIn Posts Runner
 Script para ejecutar el sistema ultra optimizado con las mejores librerías.
 """
 
-import asyncio
-import time
-import sys
-import os
-from pathlib import Path
-from typing import Dict, Any, List
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 # Import ultra fast components
-from optimized_core.ultra_fast_engine import UltraFastEngine, get_ultra_fast_engine
-from optimized_core.ultra_fast_api import UltraFastAPI, app
 
 
 class UltraOptimizedRunner:
     """Runner para el sistema ultra optimizado."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.engine = None
         self.api = None
         self.start_time = time.time()
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Inicializar el sistema ultra optimizado."""
         print("🚀 Inicializando Sistema Ultra Optimizado...")
         
@@ -44,7 +60,7 @@ class UltraOptimizedRunner:
         
         print("🎉 Sistema Ultra Optimizado listo!")
     
-    async def run_performance_test(self):
+    async def run_performance_test(self) -> Any:
         """Ejecutar test de performance ultra optimizado."""
         print("\n⚡ Ejecutando Test de Performance Ultra Optimizado...")
         
@@ -135,7 +151,7 @@ class UltraOptimizedRunner:
         
         return metrics
     
-    async def run_load_test(self):
+    async def run_load_test(self) -> Any:
         """Ejecutar test de carga ultra optimizado."""
         print("\n🔥 Ejecutando Test de Carga Ultra Optimizado...")
         
@@ -181,12 +197,10 @@ class UltraOptimizedRunner:
             "success_rate": successful/len(results)*100
         }
     
-    async def run_memory_test(self):
+    async def run_memory_test(self) -> Any:
         """Ejecutar test de memoria ultra optimizado."""
         print("\n🧠 Ejecutando Test de Memoria Ultra Optimizado...")
         
-        import psutil
-        import gc
         
         process = psutil.Process()
         initial_memory = process.memory_info().rss / 1024 / 1024  # MB
@@ -233,7 +247,7 @@ class UltraOptimizedRunner:
             "memory_per_post": memory_increase/len(test_posts)
         }
     
-    async def run_cache_test(self):
+    async def run_cache_test(self) -> Any:
         """Ejecutar test de cache ultra optimizado."""
         print("\n💾 Ejecutando Test de Cache Ultra Optimizado...")
         
@@ -289,7 +303,7 @@ class UltraOptimizedRunner:
             "accesses_per_second": 1/avg_cache_time
         }
     
-    async def run_comprehensive_test(self):
+    async def run_comprehensive_test(self) -> Any:
         """Ejecutar test comprehensivo ultra optimizado."""
         print("\n🎯 Ejecutando Test Comprehensivo Ultra Optimizado...")
         
@@ -370,7 +384,6 @@ async def main():
 if __name__ == "__main__":
     # Set up asyncio with uvloop if available
     try:
-        import uvloop
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
         print("🚀 Usando uvloop para máxima performance")
     except ImportError:

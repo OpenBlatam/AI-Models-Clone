@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Ultra-Optimized SEO Service v9 - Clean Architecture
-Maximum Performance with Fastest Libraries
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import signal
@@ -10,16 +12,12 @@ import sys
 import time
 from contextlib import asynccontextmanager
 from typing import Dict, Any
-
-# Ultra-fast imports
 import uvloop
 import uvicorn
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
-
-# Application imports
 from shared.core.config import get_settings, settings
 from shared.core.logging import setup_logging, get_logger, log_startup, log_shutdown
 from shared.core.container import Container
@@ -28,6 +26,18 @@ from presentation.api.health_routes import router as health_router
 from presentation.api.metrics_routes import router as metrics_routes
 from presentation.middleware.performance_middleware import PerformanceMiddleware
 from presentation.middleware.error_middleware import ErrorMiddleware
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Ultra-Optimized SEO Service v9 - Clean Architecture
+Maximum Performance with Fastest Libraries
+"""
+
+
+# Ultra-fast imports
+
+# Application imports
 
 # Configure uvloop for maximum performance
 asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
@@ -132,7 +142,7 @@ def create_app() -> FastAPI:
 app = create_app()
 
 
-def signal_handler(signum, frame):
+def signal_handler(signum, frame) -> Any:
     """Handle shutdown signals"""
     logger.info(f"Received signal {signum}, shutting down gracefully")
     sys.exit(0)

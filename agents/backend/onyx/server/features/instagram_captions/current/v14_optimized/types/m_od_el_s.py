@@ -1,11 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from typing import Dict, Any, List, Optional, Literal
+from pydantic import BaseModel, Field, field_validator
+from datetime import datetime
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v14.0 - Type Models
 Comprehensive Pydantic models for request/response validation
 """
 
-from typing import Dict, Any, List, Optional, Literal
-from pydantic import BaseModel, Field, field_validator
-from datetime import datetime
 
 class OptimizedConfig(BaseModel):
     """Optimized configuration for v14.0"""
@@ -87,7 +98,7 @@ class BatchRequest(BaseModel):
     
     @field_validator('requests')
     @classmethod
-    def validate_requests(cls, v: List[OptimizedRequest]) -> List[OptimizedRequest]:
+    async def validate_requests(cls, v: List[OptimizedRequest]) -> List[OptimizedRequest]:
         """Validate batch requests"""
         if not v:
             raise ValueError("Batch must contain at least one request")
@@ -103,7 +114,7 @@ class BatchResponse(BaseModel):
     
     @field_validator('successful_requests')
     @classmethod
-    def validate_successful_requests(cls, v: int, info) -> int:
+    async def validate_successful_requests(cls, v: int, info) -> int:
         """Validate successful requests count"""
         total_requests = info.data.get('total_requests', 0)
         if v > total_requests:

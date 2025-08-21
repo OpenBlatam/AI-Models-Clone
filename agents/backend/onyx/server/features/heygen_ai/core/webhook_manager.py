@@ -539,3 +539,4 @@ async def shutdown_webhook_manager():
     if webhook_manager:
         await webhook_manager.stop()
         webhook_manager = None
+

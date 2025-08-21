@@ -1,9 +1,7 @@
-"""
-Functional Programming Demo for Instagram Captions API
-
-Demonstrates pure functions, declarative patterns, and functional composition.
-No classes - purely functional approach.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -12,16 +10,24 @@ import requests
 from typing import Dict, Any, List, Callable
 from functools import reduce, partial, compose
 import logging
+from .security_functions import (
+from .api_functional import (
+from typing import Any, List, Dict, Optional
+"""
+Functional Programming Demo for Instagram Captions API
+
+Demonstrates pure functions, declarative patterns, and functional composition.
+No classes - purely functional approach.
+"""
+
 
 # Import functional components
-from .security_functions import (
     hash_password, verify_password, create_access_token, verify_token,
     generate_api_key, validate_api_key, check_rate_limit, enforce_rate_limit,
     sanitize_content, validate_content_description, validate_style,
     log_security_event, generate_request_id, calculate_request_hash
 )
 
-from .api_functional import (
     process_caption_request, process_batch_request, get_health_status,
     get_metrics, compose_security_checks, compose_processing_pipeline
 )
@@ -37,7 +43,7 @@ logger = logging.getLogger(__name__)
 
 def pipe(*functions: Callable) -> Callable:
     """Functional pipe operator - compose functions left to right."""
-    def pipe_inner(value):
+    def pipe_inner(value) -> Any:
         return reduce(lambda acc, func: func(acc), functions, value)
     return pipe_inner
 
@@ -66,7 +72,7 @@ def reduce_with_func(func: Callable, initial=None) -> Callable:
 # PURE FUNCTIONS - DATA TRANSFORMATION
 # =============================================================================
 
-def transform_request_data(data: Dict[str, Any]) -> Dict[str, Any]:
+async def transform_request_data(data: Dict[str, Any]) -> Dict[str, Any]:
     """Transform request data using functional patterns."""
     transformations = pipe(
         lambda d: {**d, 'content_description': sanitize_content(d.get('content_description', ''))},
@@ -78,7 +84,7 @@ def transform_request_data(data: Dict[str, Any]) -> Dict[str, Any]:
     return transformations(data)
 
 
-def validate_multiple_requests(requests: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+async def validate_multiple_requests(requests: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     """Validate multiple requests using functional patterns."""
     validation_pipeline = pipe(
         map_over_list(transform_request_data),

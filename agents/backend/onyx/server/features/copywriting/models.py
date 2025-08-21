@@ -1,9 +1,13 @@
-"""
-Ultra-Optimized Copywriting Models with High-Performance Libraries.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Production-ready models with advanced features: language, tone, voice, variants,
-creativity, translation, use cases, website info, and comprehensive optimization.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import Optional, List, Dict, Any, Union, Literal
 from enum import Enum
@@ -11,39 +15,51 @@ from functools import lru_cache
 import time
 from datetime import datetime
 import uuid
+    import orjson
+    import json as orjson
+    import msgspec
+    import polars as pl
+    import numpy as np
+from pydantic import BaseModel, Field, validator, ConfigDict, computed_field
+from pydantic_settings import BaseSettings
+import structlog
+            import json
+            import json
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Ultra-Optimized Copywriting Models with High-Performance Libraries.
+
+Production-ready models with advanced features: language, tone, voice, variants,
+creativity, translation, use cases, website info, and comprehensive optimization.
+"""
+
 
 # High-performance imports
 try:
-    import orjson
     JSON_AVAILABLE = True
 except ImportError:
-    import json as orjson
     JSON_AVAILABLE = False
 
 try:
-    import msgspec
     MSGSPEC_AVAILABLE = True
 except ImportError:
     MSGSPEC_AVAILABLE = False
 
 try:
-    import polars as pl
     POLARS_AVAILABLE = True
 except ImportError:
     POLARS_AVAILABLE = False
 
 try:
-    import numpy as np
     NUMPY_AVAILABLE = True
 except ImportError:
     NUMPY_AVAILABLE = False
 
 # Fast validation with pydantic v2
-from pydantic import BaseModel, Field, validator, ConfigDict, computed_field
-from pydantic_settings import BaseSettings
 
 # Performance monitoring
-import structlog
 logger = structlog.get_logger(__name__)
 
 class CopyTone(str, Enum):
@@ -188,7 +204,6 @@ class FastSerializationMixin:
         elif JSON_AVAILABLE:
             return orjson.dumps(self.model_dump())
         else:
-            import json
             return json.dumps(self.model_dump()).encode()
     
     @classmethod
@@ -199,7 +214,6 @@ class FastSerializationMixin:
         elif JSON_AVAILABLE:
             return cls(**orjson.loads(data))
         else:
-            import json
             return cls(**json.loads(data))
 
 class OptimizedBaseModel(BaseModel, FastSerializationMixin):
@@ -249,7 +263,7 @@ class WebsiteInfo(OptimizedBaseModel):
     headquarters: Optional[str] = Field(None, max_length=100, description="Sede principal")
     
     @validator('features')
-    def validate_features(cls, v):
+    def validate_features(cls, v) -> bool:
         if v:
             return [feature.strip() for feature in v if feature.strip()][:20]
         return v
@@ -277,7 +291,7 @@ class BrandVoice(OptimizedBaseModel):
     cultural_context: Optional[str] = Field(None, max_length=200, description="Contexto cultural")
     
     @validator('personality_traits')
-    def validate_traits(cls, v):
+    def validate_traits(cls, v) -> bool:
         if v:
             return [trait.strip().lower() for trait in v if trait.strip()][:15]
         return v
@@ -325,7 +339,7 @@ class PlatformSettings(OptimizedBaseModel):
     supports_links: Optional[bool] = Field(True, description="Soporte para enlaces")
     
     @validator('max_characters')
-    def validate_max_characters(cls, v, values):
+    def validate_max_characters(cls, v, values) -> bool:
         """Set default character limits based on platform."""
         if v is None and 'platform' in values:
             platform_limits = {
@@ -440,13 +454,13 @@ class CopywritingInput(OptimizedBaseModel):
     timeout: Optional[int] = Field(30, ge=5, le=300, description="Timeout en segundos")
     
     @validator('key_points')
-    def validate_key_points(cls, v):
+    def validate_key_points(cls, v) -> bool:
         if v:
             return [point.strip() for point in v if point.strip()][:15]
         return v
     
     @validator('keywords')
-    def validate_keywords(cls, v):
+    def validate_keywords(cls, v) -> bool:
         if v:
             return [kw.strip().lower() for kw in v if kw.strip()][:20]
         return v
@@ -508,7 +522,7 @@ class CopyVariant(OptimizedBaseModel):
     extra: Optional[Dict[str, Any]] = Field(None, description="Metadatos adicionales")
     
     @validator('hashtags')
-    def validate_hashtags(cls, v):
+    def validate_hashtags(cls, v) -> bool:
         if v:
             # Clean and format hashtags
             clean_hashtags = []

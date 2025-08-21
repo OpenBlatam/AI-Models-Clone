@@ -1,18 +1,32 @@
-#!/usr/bin/env python3
-"""
-Simple test script for early stopping and learning rate scheduling framework
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 import numpy as np
+        from early_stopping_lr_scheduling import (
+        from early_stopping_lr_scheduling import EarlyStoppingConfig, LRSchedulerConfig
+        from early_stopping_lr_scheduling import (
+        import traceback
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Simple test script for early stopping and learning rate scheduling framework
+"""
+
 
 def test_imports():
     """Test that all imports work correctly"""
     try:
-        from early_stopping_lr_scheduling import (
             EarlyStoppingConfig, LRSchedulerConfig, TrainingMetrics,
             EarlyStopping, AdvancedLRScheduler, TrainingMonitor, TrainingOptimizer
         )
@@ -25,7 +39,6 @@ def test_imports():
 def test_configs():
     """Test configuration classes"""
     try:
-        from early_stopping_lr_scheduling import EarlyStoppingConfig, LRSchedulerConfig
         
         # Test early stopping config
         early_stopping_config = EarlyStoppingConfig(
@@ -51,7 +64,6 @@ def test_configs():
 def test_basic_functionality():
     """Test basic functionality with a simple model"""
     try:
-        from early_stopping_lr_scheduling import (
             EarlyStoppingConfig, LRSchedulerConfig, TrainingOptimizer
         )
         
@@ -116,7 +128,6 @@ def test_basic_functionality():
         return True
     except Exception as e:
         print(f"✗ Basic functionality error: {e}")
-        import traceback
         traceback.print_exc()
         return False
 
@@ -149,5 +160,6 @@ def main():
     else:
         print("✗ Some tests failed. Please check the implementation.")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

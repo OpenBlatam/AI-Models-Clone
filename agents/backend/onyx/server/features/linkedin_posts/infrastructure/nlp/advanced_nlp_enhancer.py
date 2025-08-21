@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import spacy
+from transformers import pipeline
+import textstat
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+import language_tool_python
+from keybert import KeyBERT
+from typing import Dict, List, Any
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Advanced NLP Enhancer for LinkedIn Posts
 ========================================
@@ -11,16 +23,9 @@ Provides advanced NLP-based quality enhancement for LinkedIn posts using:
 - keybert (keyword extraction)
 """
 
-import spacy
-from transformers import pipeline
-import textstat
-from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
-import language_tool_python
-from keybert import KeyBERT
-from typing import Dict, List, Any
 
 class AdvancedNLPEnhancer:
-    def __init__(self):
+    def __init__(self) -> Any:
         self.nlp = spacy.load("en_core_web_sm")
         self.sentiment = SentimentIntensityAnalyzer()
         self.grammar_tool = language_tool_python.LanguageTool('en-US')

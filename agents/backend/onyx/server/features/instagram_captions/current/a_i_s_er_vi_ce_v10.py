@@ -1,17 +1,23 @@
-"""
-Instagram Captions API v10.0 - Refactored AI Service
-
-Consolidates advanced AI capabilities from v9.0 into a clean, efficient service.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
 import logging
 from typing import Dict, Any, List
 from concurrent.futures import ThreadPoolExecutor
+from .core_v10 import (
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v10.0 - Refactored AI Service
+
+Consolidates advanced AI capabilities from v9.0 into a clean, efficient service.
+"""
+
 
 # Import from refactored core
-from .core_v10 import (
     config, RefactoredCaptionRequest, RefactoredCaptionResponse,
     BatchRefactoredRequest, ai_engine, metrics, RefactoredUtils
 )
@@ -22,7 +28,7 @@ logger = logging.getLogger(__name__)
 class RefactoredAIService:
     """Consolidated AI service with essential v9.0 capabilities."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.executor = ThreadPoolExecutor(max_workers=config.AI_WORKERS)
         self.stats = {
             "service_started": time.time(),
@@ -91,7 +97,9 @@ class RefactoredAIService:
             semaphore = asyncio.Semaphore(config.AI_WORKERS)
             
             async def process_single_with_semaphore(req: RefactoredCaptionRequest):
-                async with semaphore:
+                
+    """process_single_with_semaphore function."""
+async with semaphore:
                     return await self.generate_single_caption(req)
             
             # Execute batch processing

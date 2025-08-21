@@ -1,12 +1,17 @@
-"""
-Template domain entity for LinkedIn Posts system.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 from enum import Enum
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Template domain entity for LinkedIn Posts system.
+"""
+
 
 
 class TemplateCategory(str, Enum):
@@ -99,7 +104,7 @@ class Template:
     created_by: Optional[UUID] = None
     version: str = "1.0.0"
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Post-initialization processing."""
         if isinstance(self.variables, list):
             self.variables = [

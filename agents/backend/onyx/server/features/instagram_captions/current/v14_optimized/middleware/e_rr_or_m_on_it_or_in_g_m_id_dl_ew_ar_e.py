@@ -1,13 +1,13 @@
-"""
-Error Monitoring Middleware for Instagram Captions API v14.0
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive middleware for:
-- Unexpected error handling and recovery
-- Structured error logging with context
-- Error monitoring and alerting
-- Performance impact tracking
-- Error categorization and prioritization
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import uuid
@@ -19,16 +19,28 @@ from datetime import datetime, timezone
 from collections import defaultdict, deque
 from dataclasses import dataclass, asdict
 from enum import Enum
-
 from fastapi import Request, Response, HTTPException
 from fastapi.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
-
 from ..types.exceptions import (
+from ..utils.error_handling import ErrorTracker, ErrorType, ErrorSeverity
+from typing import Any, List, Dict, Optional
+"""
+Error Monitoring Middleware for Instagram Captions API v14.0
+
+Comprehensive middleware for:
+- Unexpected error handling and recovery
+- Structured error logging with context
+- Error monitoring and alerting
+- Performance impact tracking
+- Error categorization and prioritization
+"""
+
+
+
     create_error_response, AIGenerationError, CacheError, 
     ModelLoadingError, ServiceUnavailableError
 )
-from ..utils.error_handling import ErrorTracker, ErrorType, ErrorSeverity
 
 logger = logging.getLogger(__name__)
 
@@ -79,7 +91,9 @@ class ErrorMonitor:
     """Advanced error monitoring and alerting system"""
     
     def __init__(self, max_errors: int = 1000, alert_threshold: int = 10):
-        self.errors: deque = deque(maxlen=max_errors)
+        
+    """__init__ function."""
+self.errors: deque = deque(maxlen=max_errors)
         self.error_counts: Dict[str, int] = defaultdict(int)
         self.category_counts: Dict[ErrorCategory, int] = defaultdict(int)
         self.priority_counts: Dict[ErrorPriority, int] = defaultdict(int)
@@ -250,7 +264,9 @@ class ErrorMonitoringMiddleware(BaseHTTPMiddleware):
     """Comprehensive error monitoring middleware"""
     
     def __init__(self, app, enable_detailed_logging: bool = True):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.error_monitor = ErrorMonitor()
         self.enable_detailed_logging = enable_detailed_logging
         self.error_tracker = ErrorTracker()
@@ -424,7 +440,7 @@ class ErrorMonitoringMiddleware(BaseHTTPMiddleware):
 class ErrorRecoveryMiddleware(BaseHTTPMiddleware):
     """Middleware for error recovery and graceful degradation"""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
         self.recovery_strategies = {
             "ai_model": self._recover_ai_model,

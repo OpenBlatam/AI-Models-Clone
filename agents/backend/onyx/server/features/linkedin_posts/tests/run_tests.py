@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-"""
-Test Runner for LinkedIn Posts API
-==================================
-
-Comprehensive test runner with multiple configurations and reporting.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import sys
 import os
@@ -15,18 +12,29 @@ from datetime import datetime
 from pathlib import Path
 import json
 import asyncio
+from tests.debug_tools import APIDebugger, print_debug_info
+            from tests.load_test import run_comprehensive_load_test
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Test Runner for LinkedIn Posts API
+==================================
+
+Comprehensive test runner with multiple configurations and reporting.
+"""
+
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from tests.debug_tools import APIDebugger, print_debug_info
 
 
 class TestRunner:
     """Comprehensive test runner with multiple configurations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.debugger = APIDebugger()
         self.test_results = {}
         self.start_time = None
@@ -117,7 +125,6 @@ class TestRunner:
         print("🚀 Running Load Tests...")
         
         try:
-            from tests.load_test import run_comprehensive_load_test
             start_time = time.time()
             report = await run_comprehensive_load_test()
             end_time = time.time()
@@ -252,7 +259,7 @@ class TestRunner:
             "total_duration": total_duration
         }
     
-    def print_summary(self):
+    def print_summary(self) -> Any:
         """Print test summary."""
         summary = self.generate_summary()
         
@@ -305,6 +312,10 @@ class TestRunner:
         }
         
         with open(filename, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(data, f, indent=2)
         
         print(f"📄 Test results saved to: {filename}")
@@ -386,5 +397,6 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

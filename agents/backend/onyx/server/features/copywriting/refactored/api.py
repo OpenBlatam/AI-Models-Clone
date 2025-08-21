@@ -1,3 +1,34 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import time
+from typing import Dict, List, Optional, Any
+from contextlib import asynccontextmanager
+import uvicorn
+from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse, PlainTextResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import httpx
+from .config import get_config, CopywritingConfig
+from .models import (
+from .service import get_copywriting_service, cleanup_service
+from .monitoring import get_metrics_collector
+from typing import Any, List, Dict, Optional
 """
 FastAPI Application
 ==================
@@ -6,27 +37,11 @@ Production-ready FastAPI application for the copywriting service with
 comprehensive endpoints, middleware, and monitoring.
 """
 
-import asyncio
-import logging
-import time
-from typing import Dict, List, Optional, Any
-from contextlib import asynccontextmanager
-import uvicorn
 
-from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request, Response
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse, PlainTextResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import httpx
 
-from .config import get_config, CopywritingConfig
-from .models import (
     CopywritingRequest, CopywritingResponse, BatchCopywritingRequest, BatchCopywritingResponse,
     HealthCheckResponse, MetricsResponse
 )
-from .service import get_copywriting_service, cleanup_service
-from .monitoring import get_metrics_collector
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -40,11 +55,15 @@ class RateLimitMiddleware:
     """Simple rate limiting middleware"""
     
     def __init__(self, requests_per_minute: int = 100):
-        self.requests_per_minute = requests_per_minute
+        
+    """__init__ function."""
+self.requests_per_minute = requests_per_minute
         self.requests: Dict[str, List[float]] = {}
     
     async def __call__(self, request: Request, call_next):
-        client_ip = request.client.host
+        
+    """__call__ function."""
+client_ip = request.client.host
         current_time = time.time()
         
         # Clean old requests
@@ -132,11 +151,15 @@ def create_app(config: Optional[CopywritingConfig] = None) -> FastAPI:
     
     @app.middleware("http")
     async def add_rate_limiting(request: Request, call_next):
-        return await rate_limit_middleware(request, call_next)
+        
+    """add_rate_limiting function."""
+return await rate_limit_middleware(request, call_next)
     
     @app.middleware("http")
     async def add_process_time_header(request: Request, call_next):
-        start_time = time.time()
+        
+    """add_process_time_header function."""
+start_time = time.time()
         response = await call_next(request)
         process_time = time.time() - start_time
         response.headers["X-Process-Time"] = str(process_time)
@@ -399,5 +422,6 @@ def run_production():
     uvicorn.run(**uvicorn_config)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     run_production() 

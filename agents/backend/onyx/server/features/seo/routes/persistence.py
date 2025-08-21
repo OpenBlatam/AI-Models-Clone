@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from fastapi import APIRouter, Depends, HTTPException
+from typing import List
+from ..dependencies import (
+from ..models import SEOResultModel
+from ..operations import AsyncDataPersistenceOperations
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Persistence routes for Ultra-Optimized SEO Service v15.
 
@@ -8,15 +21,10 @@ This module contains data persistence operation endpoints including:
 - Data export in various formats
 """
 
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List
 
-from ..dependencies import (
     get_async_persistence_operations,
     get_logger
 )
-from ..models import SEOResultModel
-from ..operations import AsyncDataPersistenceOperations
 
 # Create router with prefix and tags
 router = APIRouter(

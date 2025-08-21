@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import os
+import sys
+from pathlib import Path
+    from core_v10 import (
+    from ai_service_v10 import refactored_ai_service
+    from api_v10 import app as v10_app, refactored_api
+    from ultra_ai_v9 import app as v9_app
+    from api_ai_v8 import app as v8_app
+    from api_optimized_v7 import app as v7_app
+    from api_v6 import app as v6_app
+    from api_modular_v5 import app as v5_app
+    from api_v3 import app as v3_app
+    from utils import *
+    from middleware import *
+    from dependencies import *
+    from config import *
+    from schemas import *
+    from models import *
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions Feature - Organized Architecture v10.0
 
@@ -64,9 +87,6 @@ instagram_captions/
 # VERSION IMPORTS (ORGANIZED BY LOCATION)
 # =============================================================================
 
-import os
-import sys
-from pathlib import Path
 
 # Add current directory to path for imports
 current_dir = Path(__file__).parent
@@ -80,7 +100,6 @@ try:
     # Import v10.0 refactored components from current/
     sys.path.insert(0, str(current_dir / "current"))
     
-    from core_v10 import (
         config as v10_config,
         RefactoredCaptionRequest,
         RefactoredCaptionResponse,
@@ -91,8 +110,6 @@ try:
         AIProvider
     )
     
-    from ai_service_v10 import refactored_ai_service
-    from api_v10 import app as v10_app, refactored_api
     
     V10_AVAILABLE = True
     V10_STATUS = "✅ v10.0 Refactored architecture loaded successfully"
@@ -110,7 +127,6 @@ except ImportError as e:
 # v9.0 Ultra-Advanced Fallback
 try:
     sys.path.insert(0, str(current_dir / "legacy" / "v9_ultra"))
-    from ultra_ai_v9 import app as v9_app
     V9_AVAILABLE = True
 except ImportError:
     V9_AVAILABLE = False
@@ -118,7 +134,6 @@ except ImportError:
 # v8.0 AI Integration Fallback  
 try:
     sys.path.insert(0, str(current_dir / "legacy" / "v8_ai"))
-    from api_ai_v8 import app as v8_app
     V8_AVAILABLE = True
 except ImportError:
     V8_AVAILABLE = False
@@ -126,7 +141,6 @@ except ImportError:
 # v7.0 Optimized Fallback
 try:
     sys.path.insert(0, str(current_dir / "legacy" / "v7_optimized"))
-    from api_optimized_v7 import app as v7_app
     V7_AVAILABLE = True
 except ImportError:
     V7_AVAILABLE = False
@@ -134,7 +148,6 @@ except ImportError:
 # v6.0 Refactored Fallback
 try:
     sys.path.insert(0, str(current_dir / "legacy" / "v6_refactored"))
-    from api_v6 import app as v6_app
     V6_AVAILABLE = True
 except ImportError:
     V6_AVAILABLE = False
@@ -142,7 +155,6 @@ except ImportError:
 # v5.0 Modular Fallback
 try:
     sys.path.insert(0, str(current_dir / "legacy" / "v5_modular"))
-    from api_modular_v5 import app as v5_app
     V5_AVAILABLE = True
 except ImportError:
     V5_AVAILABLE = False
@@ -150,7 +162,6 @@ except ImportError:
 # v3.0 Base Fallback
 try:
     sys.path.insert(0, str(current_dir / "legacy" / "v3_base"))
-    from api_v3 import app as v3_app
     V3_AVAILABLE = True
 except ImportError:
     V3_AVAILABLE = False
@@ -161,18 +172,12 @@ except ImportError:
 
 try:
     sys.path.insert(0, str(current_dir / "utils"))
-    from utils import *
-    from middleware import *
-    from dependencies import *
     UTILS_AVAILABLE = True
 except ImportError:
     UTILS_AVAILABLE = False
 
 try:
     sys.path.insert(0, str(current_dir / "config"))
-    from config import *
-    from schemas import *
-    from models import *
     CONFIG_AVAILABLE = True
 except ImportError:
     CONFIG_AVAILABLE = False

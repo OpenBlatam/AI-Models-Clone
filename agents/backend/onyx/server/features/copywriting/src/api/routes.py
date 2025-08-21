@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from typing import List
+from ..models.requests import (
+from ..models.responses import (
+from ..core.engine import CopywritingEngine
+from ..services.analytics import log_request_analytics
+from .dependencies import get_engine
+        import time
+        import time
+        from ..models.requests import CopywritingRequest
+        import time
+        import time
+        from datetime import datetime
+        import time
+        from datetime import datetime
+        import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 API Routes
 =========
@@ -5,16 +29,12 @@ API Routes
 FastAPI routes for the copywriting system.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from typing import List
 
-from ..models.requests import (
     CopywritingRequest, 
     BatchRequest, 
     OptimizationRequest,
     AnalysisRequest
 )
-from ..models.responses import (
     CopywritingResponse, 
     BatchResponse, 
     OptimizationResponse,
@@ -22,9 +42,6 @@ from ..models.responses import (
     SystemMetrics,
     ErrorResponse
 )
-from ..core.engine import CopywritingEngine
-from ..services.analytics import log_request_analytics
-from .dependencies import get_engine
 
 router = APIRouter(prefix="/copywriting", tags=["copywriting"])
 
@@ -79,7 +96,6 @@ async def batch_generate_copywriting(
     Process multiple copywriting requests efficiently in a single batch.
     """
     try:
-        import time
         start_time = time.time()
         
         # Process batch
@@ -139,11 +155,9 @@ async def optimize_text(
     Optimize and improve existing text content for better engagement and performance.
     """
     try:
-        import time
         start_time = time.time()
         
         # Create a copywriting request from optimization request
-        from ..models.requests import CopywritingRequest
         
         copywriting_request = CopywritingRequest(
             prompt=optimization_request.text,
@@ -187,7 +201,6 @@ async def analyze_content(
     Perform comprehensive analysis of text content including sentiment, readability, and engagement.
     """
     try:
-        import time
         start_time = time.time()
         
         # Perform analysis using engine
@@ -263,8 +276,6 @@ async def get_metrics(engine: CopywritingEngine = Depends(get_engine)) -> System
     Retrieve comprehensive system performance and health metrics.
     """
     try:
-        import time
-        from datetime import datetime
         
         metrics = engine.get_metrics()
         
@@ -297,8 +308,6 @@ async def detailed_health_check(engine: CopywritingEngine = Depends(get_engine))
     Perform comprehensive health check of all system components.
     """
     try:
-        import time
-        from datetime import datetime
         
         # Get comprehensive metrics
         metrics = engine.get_metrics()
@@ -365,7 +374,6 @@ async def clear_cache(engine: CopywritingEngine = Depends(get_engine)):
     Clear all cached data and reset cache statistics.
     """
     try:
-        import time
         
         # Clear cache
         await engine.clear_cache()

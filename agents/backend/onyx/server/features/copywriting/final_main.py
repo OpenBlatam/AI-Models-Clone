@@ -1,3 +1,41 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import os
+import sys
+import time
+from contextlib import asynccontextmanager
+from typing import Dict, Any, Optional, List
+from datetime import datetime
+import multiprocessing as mp
+from fastapi import FastAPI, Request, HTTPException, Depends, Body, Security
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.security.api_key import APIKeyHeader
+    import orjson
+    import json as orjson
+    import uvloop
+    import redis.asyncio as aioredis
+    import polars as pl
+    from prometheus_fastapi_instrumentator import Instrumentator
+import structlog
+import logging
+from .models import (
+                        import json
+                    import json
+        import hashlib
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 Final Refactored Copywriting Service.
 
@@ -9,32 +47,16 @@ Clean, production-ready service with optimized libraries:
 - Easy to maintain and extend
 """
 
-import asyncio
-import os
-import sys
-import time
-from contextlib import asynccontextmanager
-from typing import Dict, Any, Optional, List
-from datetime import datetime
-import multiprocessing as mp
 
 # FastAPI and ASGI
-from fastapi import FastAPI, Request, HTTPException, Depends, Body, Security
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.security.api_key import APIKeyHeader
 
 # High-performance imports with graceful fallbacks
 try:
-    import orjson
     JSON_LIB = "orjson (5x faster)"
 except ImportError:
-    import json as orjson
     JSON_LIB = "json (standard)"
 
 try:
-    import uvloop
     UVLOOP_AVAILABLE = True
     EVENT_LOOP = "uvloop (4x faster)"
 except ImportError:
@@ -42,7 +64,6 @@ except ImportError:
     EVENT_LOOP = "asyncio (standard)"
 
 try:
-    import redis.asyncio as aioredis
     REDIS_AVAILABLE = True
     CACHE_TYPE = "Redis (3x faster)"
 except ImportError:
@@ -50,7 +71,6 @@ except ImportError:
     CACHE_TYPE = "Memory (standard)"
 
 try:
-    import polars as pl
     POLARS_AVAILABLE = True
     DATA_PROCESSING = "Polars (10x faster)"
 except ImportError:
@@ -58,7 +78,6 @@ except ImportError:
     DATA_PROCESSING = "Standard (1x)"
 
 try:
-    from prometheus_fastapi_instrumentator import Instrumentator
     PROMETHEUS_AVAILABLE = True
     MONITORING = "Prometheus (production)"
 except ImportError:
@@ -66,11 +85,8 @@ except ImportError:
     MONITORING = "Basic (development)"
 
 # Logging
-import structlog
-import logging
 
 # Import models
-from .models import (
     CopywritingInput, CopywritingOutput, Language, CopyTone, 
     UseCase, CreativityLevel, WebsiteInfo, BrandVoice,
     TranslationSettings, VariantSettings, CopyVariant
@@ -82,7 +98,7 @@ logger = structlog.get_logger(__name__)
 class FinalConfig:
     """Final production configuration."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # API Settings
         self.api_key = os.getenv("COPYWRITING_API_KEY", "final-optimized-2024")
         self.version = "1.0.0-final"
@@ -158,13 +174,13 @@ config = FinalConfig()
 class FinalCacheManager:
     """Final optimized cache manager."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.redis_client: Optional[aioredis.Redis] = None
         self.memory_cache: Dict[str, Any] = {}
         self.cache_hits = 0
         self.cache_misses = 0
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize Redis connection."""
         if not REDIS_AVAILABLE or not config.enable_cache:
             logger.info("Cache disabled or Redis not available")
@@ -198,7 +214,6 @@ class FinalCacheManager:
                     if "orjson" in JSON_LIB:
                         result = orjson.loads(cached_data)
                     else:
-                        import json
                         result = json.loads(cached_data)
                     
                     self.memory_cache[key] = result
@@ -224,7 +239,6 @@ class FinalCacheManager:
                 if "orjson" in JSON_LIB:
                     data = orjson.dumps(value)
                 else:
-                    import json
                     data = json.dumps(value)
                 
                 await self.redis_client.setex(key, ttl, data)
@@ -251,7 +265,7 @@ class FinalCacheManager:
 class FinalCopywritingService:
     """Final optimized copywriting service."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.cache_manager = FinalCacheManager()
         self.template_cache = {}
         self.performance_stats = {
@@ -263,7 +277,7 @@ class FinalCopywritingService:
                    performance_level=config.performance_level,
                    total_speedup=f"{config.total_speedup:.1f}x")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize service."""
         await self.cache_manager.initialize()
     
@@ -362,7 +376,6 @@ class FinalCopywritingService:
             key_parts.append(input_data.website_info.website_name or "")
         
         key_string = "|".join(key_parts)
-        import hashlib
         return f"final:v1:{hashlib.md5(key_string.encode()).hexdigest()}"
     
     async def _generate_variants(self, input_data: CopywritingInput) -> List[CopyVariant]:
@@ -397,8 +410,8 @@ class FinalCopywritingService:
         benefit = self._extract_benefit(input_data)
         
         # Generate content
-        headline = template["headline"].format(product=product_name, benefit=benefit)
-        primary_text = template["text"].format(product=product_name, benefit=benefit)
+        headline = template["headline"f"]"
+        primary_text = template["text"f"]"
         
         # Add creativity
         if input_data.effective_creativity_score > 0.6:
@@ -860,7 +873,6 @@ app = create_final_app()
 
 # === DEVELOPMENT SERVER ===
 if __name__ == "__main__":
-    import uvicorn
     
     logging.basicConfig(level=logging.INFO)
     logger.info("Starting final development server")

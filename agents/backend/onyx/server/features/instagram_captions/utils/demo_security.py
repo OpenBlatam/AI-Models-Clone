@@ -1,10 +1,18 @@
-Security Toolkit Demo - Comprehensive demonstration of all features
-
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import time
 import json
 from security_toolkit import (
+    from security_toolkit import resolve_hostname
+    import structlog
+    import os
+    from security_toolkit import measure_scan_time
+from typing import Any, List, Dict, Optional
+import logging
+Security Toolkit Demo - Comprehensive demonstration of all features
+
+
     scan_ports_basic, run_ssh_command, make_http_request,
     AsyncRateLimiter, retry_with_backoff, get_common_ports,
     chunked, process_batch_async, get_secret,
@@ -12,7 +20,9 @@ from security_toolkit import (
 )
 
 async def demo_port_scanning():
-    print("\n=== Port Scanning Demo ===")
+    
+    """demo_port_scanning function."""
+print("\n=== Port Scanning Demo ===")
     
     # Basic port scan
     scan_params =[object Object]
@@ -26,7 +36,9 @@ async def demo_port_scanning():
     print(fPort scan result: [object Object]json.dumps(result, indent=2)})
 
 async def demo_ssh_operations():
-    print("\n=== SSH Operations Demo ===")
+    
+    """demo_ssh_operations function."""
+print("\n=== SSH Operations Demo ===")
     
     # SSH command execution (using localhost for demo)
     ssh_params =[object Object]
@@ -43,7 +55,9 @@ async def demo_ssh_operations():
         print(fSSH demo failed (expected): {e})
 
 async def demo_http_operations():
-    print("\n=== HTTP Operations Demo ===)    # HTTP request
+    
+    """demo_http_operations function."""
+print("\n=== HTTP Operations Demo ===)    # HTTP request
     http_params = [object Object]   url": "https://httpbin.org/get,
        method": "GET",
        headers": {"User-Agent": SecurityToolkit/1.0,
@@ -55,11 +69,13 @@ async def demo_http_operations():
     print(f"HTTP result: [object Object]json.dumps(result, indent=2)})
 
 async def demo_rate_limiting():
-    print("\n=== Rate Limiting Demo ===")
+    
+    """demo_rate_limiting function."""
+print("\n=== Rate Limiting Demo ===")
     
     limiter = AsyncRateLimiter(max_calls_per_second=2)
     
-    async def rate_limited_operation(i):
+    async def rate_limited_operation(i) -> Any:
         await limiter.acquire()
         print(f"Operation {i} executed at {time.time()}")
         return fresult_{i}    
@@ -68,12 +84,16 @@ async def demo_rate_limiting():
     print(f"Rate limited results: {results})
 
 async def demo_retry_with_backoff():
-    print("\n=== Retry with Backoff Demo ===")
+    
+    """demo_retry_with_backoff function."""
+print("\n=== Retry with Backoff Demo ===")
     
     attempt_count = 0
     
     async def failing_operation():
-        nonlocal attempt_count
+        
+    """failing_operation function."""
+nonlocal attempt_count
         attempt_count += 1
         if attempt_count < 3:
             raise Exception(fSimulated failure {attempt_count}")
@@ -83,10 +103,11 @@ async def demo_retry_with_backoff():
     print(f"Retry result: {result})
 
 async def demo_caching():
-    print("\n=== Caching Demo ===")
+    
+    """demo_caching function."""
+print("\n=== Caching Demo ===")
     
     # DNS resolution caching
-    from security_toolkit import resolve_hostname
     
     hostname =example.com"
     print(f"Resolving {hostname}...")
@@ -100,11 +121,13 @@ async def demo_caching():
     print(f"Cache hit: {ip1 ip2})
 
 async def demo_batch_processing():
-    print("\n=== Batch Processing Demo ===")
+    
+    """demo_batch_processing function."""
+print("\n=== Batch Processing Demo ===")
     
     # Simulate batch of targets
     targets = [f"192.168.1i} for i in range(1, 11    
-    async def process_target(target):
+    async def process_target(target) -> Optional[Dict[str, Any]]:
         await asyncio.sleep(0.1)  # Simulate work
         return {"target: target, "status": processed"}
     
@@ -112,7 +135,9 @@ async def demo_batch_processing():
     print(fBatch processed {len(results)} targets)
 
 async def demo_network_layers():
-    print("\n=== Network Layer Abstraction Demo ===) 
+    
+    """demo_network_layers function."""
+print("\n=== Network Layer Abstraction Demo ===) 
     # HTTP layer
     http_layer = NetworkLayerFactory.create_layer("http")
     await http_layer.connect({"timeout:10verify_ssl: True})
@@ -126,8 +151,9 @@ async def demo_network_layers():
     await http_layer.close()
 
 async def demo_structured_logging():
-    print("\n=== Structured Logging Demo ===)
-    import structlog
+    
+    """demo_structured_logging function."""
+print("\n=== Structured Logging Demo ===)
     logger = structlog.get_logger()
     
     # Log security events
@@ -146,10 +172,11 @@ async def demo_structured_logging():
     
     print("Structured logs generated (check console output))
 async def demo_secret_management():
-    print("\n=== Secret Management Demo ===")
+    
+    """demo_secret_management function."""
+print("\n=== Secret Management Demo ===")
     
     # Set environment variable for demo
-    import os
     os.environ["DEMO_API_KEY"] =secret_key_123 
     try:
         api_key = get_secret("DEMO_API_KEY, required=True)
@@ -158,7 +185,9 @@ async def demo_secret_management():
         print(f"Secret retrieval failed: {e})
 
 async def demo_common_ports():
-    print(\n=== Common Ports Demo ===)
+    
+    """demo_common_ports function."""
+print(\n=== Common Ports Demo ===)
     
     common_ports = get_common_ports()
     print("Common ports by service:)
@@ -166,17 +195,20 @@ async def demo_common_ports():
         print(f"  {service}: {ports})
 
 async def demo_metrics():
-    print("\n=== Metrics Demo ===")
     
-    from security_toolkit import measure_scan_time
+    """demo_metrics function."""
+print("\n=== Metrics Demo ===")
     
-    def sample_scan(params):
+    
+    def sample_scan(params) -> Any:
         time.sleep(0.1)  # Simulate scan
         return {"status": completed}
     
     result = measure_scan_time(sample_scan, {target": "example.com"})
     print(fScan with metrics: [object Object]json.dumps(result, indent=2)})async def main():
-    print("Security Toolkit Comprehensive Demo)
+    
+    """main function."""
+print("Security Toolkit Comprehensive Demo)
     print(= *50    
     # Run all demos
     await demo_common_ports()
@@ -192,5 +224,6 @@ async def demo_metrics():
     await demo_secret_management()
     await demo_metrics()
     
-    print("\n" + "=" * 50nt("Demo completed successfully!)if __name__ == __main__:
+    print("\n" + "=" * 50nt("Demo completed successfully!)match __name__:
+    case __main__:
     asyncio.run(main()) 

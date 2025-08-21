@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import requests
+import json
+import asyncio
+import aiohttp
+from typing import Dict, List, Any
+import time
+import torch
+from torch.cuda.amp import autocast, GradScaler
+from transformers import AutoModel, AutoTokenizer
+    import concurrent.futures
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 FastAPI Client - Official Documentation Reference System
@@ -7,21 +21,17 @@ Cliente de ejemplo para demostrar el uso de la API FastAPI del sistema
 de referencias de documentación oficial.
 """
 
-import requests
-import json
-import asyncio
-import aiohttp
-from typing import Dict, List, Any
-import time
 
 class OfficialDocsAPIClient:
     """Cliente para la API de referencias de documentación oficial."""
     
     def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.session = requests.Session()
     
-    def _make_request(self, method: str, endpoint: str, data: Dict = None) -> Dict:
+    async def _make_request(self, method: str, endpoint: str, data: Dict = None) -> Dict:
         """Realizar request HTTP."""
         url = f"{self.base_url}{endpoint}"
         
@@ -45,7 +55,7 @@ class OfficialDocsAPIClient:
         data = {"library_name": library_name}
         return self._make_request("POST", "/library/info", data)
     
-    def get_api_reference(self, library_name: str, api_name: str) -> Dict:
+    async def get_api_reference(self, library_name: str, api_name: str) -> Dict:
         """Obtener referencia de una API."""
         data = {"library_name": library_name, "api_name": api_name}
         return self._make_request("POST", "/api/reference", data)
@@ -85,7 +95,7 @@ class OfficialDocsAPIClient:
         """Listar librerías disponibles."""
         return self._make_request("GET", "/libraries")
     
-    def list_apis(self, library_name: str) -> Dict:
+    async def list_apis(self, library_name: str) -> Dict:
         """Listar APIs de una librería."""
         return self._make_request("GET", f"/apis/{library_name}")
     
@@ -101,9 +111,11 @@ class AsyncOfficialDocsAPIClient:
     """Cliente asíncrono para la API de referencias."""
     
     def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
     
-    async def _make_request(self, session: aiohttp.ClientSession, method: str, endpoint: str, data: Dict = None) -> Dict:
+    async async def _make_request(self, session: aiohttp.ClientSession, method: str, endpoint: str, data: Dict = None) -> Dict:
         """Realizar request HTTP asíncrono."""
         url = f"{self.base_url}{endpoint}"
         
@@ -126,7 +138,7 @@ class AsyncOfficialDocsAPIClient:
         data = {"library_name": library_name}
         return await self._make_request(session, "POST", "/library/info", data)
     
-    async def get_api_reference_async(self, session: aiohttp.ClientSession, library_name: str, api_name: str) -> Dict:
+    async async def get_api_reference_async(self, session: aiohttp.ClientSession, library_name: str, api_name: str) -> Dict:
         """Obtener referencia de API de forma asíncrona."""
         data = {"library_name": library_name, "api_name": api_name}
         return await self._make_request(session, "POST", "/api/reference", data)
@@ -204,14 +216,11 @@ def demonstrate_sync_client():
     print("\n4. 🔍 Validación de código:")
     code_samples = [
         ("pytorch", """
-import torch
-from torch.cuda.amp import autocast, GradScaler
 scaler = GradScaler()
 with autocast():
     output = model(input)
 """),
         ("transformers", """
-from transformers import AutoModel, AutoTokenizer
 model = AutoModel.from_pretrained("bert-base-uncased")
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
 """)
@@ -314,10 +323,11 @@ def performance_test():
     print("\n🔄 Requests concurrentes:")
     start_time = time.time()
     
-    import concurrent.futures
     
     def make_request():
-        return client.get_library_info("pytorch")
+        
+    """make_request function."""
+return client.get_library_info("pytorch")
     
     with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
         futures = [executor.submit(make_request) for _ in range(5)]
@@ -365,5 +375,6 @@ def main():
     print("\n🎉 ¡Demostración completada exitosamente!")
     print("El cliente FastAPI está listo para usar en producción.")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

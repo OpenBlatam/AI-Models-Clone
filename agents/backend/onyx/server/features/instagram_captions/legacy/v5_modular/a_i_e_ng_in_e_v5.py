@@ -1,8 +1,13 @@
-"""
-Instagram Captions API v5.0 - AI Engine Module
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Ultra-fast AI processing engine with parallel workers and premium quality.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import hashlib
@@ -10,20 +15,28 @@ import random
 import time
 from concurrent.futures import ThreadPoolExecutor
 from typing import List, Dict, Any, Tuple
-try:
     from .config_v5 import config
     from .schemas_v5 import UltraFastCaptionRequest
     from .metrics_v5 import metrics
-except ImportError:
     from config_v5 import config
     from schemas_v5 import UltraFastCaptionRequest
     from metrics_v5 import metrics
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Instagram Captions API v5.0 - AI Engine Module
+
+Ultra-fast AI processing engine with parallel workers and premium quality.
+"""
+
+try:
+except ImportError:
 
 
 class UltraFastAIEngine:
     """Ultra-fast AI engine with parallel processing and premium quality."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.executor = ThreadPoolExecutor(max_workers=config.AI_PARALLEL_WORKERS)
         
         # Premium AI templates for ultra-high quality
@@ -148,7 +161,7 @@ class UltraFastAIEngine:
         style = request.style
         
         # Select premium template based on style
-        templates = self.premium_templates.get(style, self.premium_templates["casual"])
+        templates = self.premium_templates.get(style, self.premium_templates["casual"f"])
         template = random.choice(templates)
         
         # Add dynamic elements
@@ -156,11 +169,7 @@ class UltraFastAIEngine:
         cta = random.choice(self.ctas)
         
         # Generate caption with intelligence
-        caption = template.format(
-            content=content,
-            hook=hook,
-            cta=cta
-        )
+        caption = template"
         
         # Add emojis for engagement
         caption = self._add_premium_emojis(caption, request.audience)

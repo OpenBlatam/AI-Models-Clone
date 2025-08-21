@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Optional, List, Dict, Any
+from datetime import datetime
+from ..models.facebook_models import FacebookPostEntity
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 External Service Interfaces
 ==============================
@@ -5,11 +14,7 @@
 Interfaces para servicios externos e integraciones.
 """
 
-from abc import ABC, abstractmethod
-from typing import Optional, List, Dict, Any
-from datetime import datetime
 
-from ..models.facebook_models import FacebookPostEntity
 
 
 class FacebookAPIInterface(ABC):

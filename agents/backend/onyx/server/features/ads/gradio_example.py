@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import gradio as gr
+import torch
+import numpy as np
+from official_docs_reference import OfficialDocsReference
+import gradio as gr
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Gradio Example - Using Official Documentation References
@@ -6,12 +25,8 @@ Gradio Example - Using Official Documentation References
 Ejemplo práctico de Gradio usando las referencias de documentación oficial.
 """
 
-import gradio as gr
-import torch
-import numpy as np
-from official_docs_reference import OfficialDocsReference
 
-def simple_text_prediction(text):
+def simple_text_prediction(text) -> Any:
     """Función simple de predicción de texto."""
     if not text:
         return "Por favor ingresa algún texto"
@@ -23,7 +38,7 @@ def simple_text_prediction(text):
     
     return f"Análisis: {word_count} palabras, sentimiento: {sentiment}"
 
-def image_processing(image, text, intensity):
+def image_processing(image, text, intensity) -> Any:
     """Procesamiento de imagen con parámetros."""
     if image is None:
         return None, "Por favor sube una imagen"
@@ -201,7 +216,7 @@ def create_error_handling_interface():
     
     print("\n🛡️ Creando interfaz con manejo de errores...")
     
-    def robust_prediction(text):
+    def robust_prediction(text) -> Any:
         """Función con manejo robusto de errores."""
         try:
             if not text or text.strip() == "":
@@ -260,9 +275,8 @@ def validate_code():
     
     # Código de ejemplo
     code = """
-import gradio as gr
 
-def predict(text):
+def predict(text) -> Any:
     return f"Prediction: {text}"
 
 interface = gr.Interface(
@@ -328,5 +342,6 @@ def main():
     print("\n🎉 ¡Ejemplo completado exitosamente!")
     print("El código sigue las mejores prácticas oficiales de Gradio.")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

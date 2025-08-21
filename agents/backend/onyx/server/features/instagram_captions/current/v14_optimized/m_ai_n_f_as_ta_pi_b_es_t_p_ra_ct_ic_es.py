@@ -1,3 +1,34 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import uuid
+import logging
+from contextlib import asynccontextmanager
+from typing import Dict, Any, List, Optional
+from fastapi import FastAPI, HTTPException, Depends, Request, Response, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.openapi.utils import get_openapi
+import uvicorn
+from models.fastapi_best_practices import (
+from routes.fastapi_best_practices import router as best_practices_router
+from middleware.fastapi_best_practices import (
+from core.optimized_engine import (
+from core.exceptions import (
+from dependencies import CoreDependencies, AdvancedDependencies
+from config import settings
+import logging
+from typing import Any, List, Dict, Optional
 """
 FastAPI Best Practices Implementation - Main Application
 
@@ -11,53 +42,34 @@ This module implements a complete FastAPI application following best practices:
 - Comprehensive documentation and examples
 """
 
-import asyncio
-import time
-import uuid
-import logging
-from contextlib import asynccontextmanager
-from typing import Dict, Any, List, Optional
 
-from fastapi import FastAPI, HTTPException, Depends, Request, Response, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.openapi.utils import get_openapi
-import uvicorn
 
 # Import FastAPI best practices components
-from models.fastapi_best_practices import (
     CaptionGenerationRequest, CaptionGenerationResponse,
     BatchCaptionRequest, BatchCaptionResponse,
     UserPreferences, ErrorResponse, HealthResponse,
     CaptionAnalytics, ServiceStatus, ErrorDetail
 )
 
-from routes.fastapi_best_practices import router as best_practices_router
 
-from middleware.fastapi_best_practices import (
     create_middleware_stack, create_cors_middleware,
     create_gzip_middleware, get_request_id, get_processing_time
 )
 
 # Import core components
-from core.optimized_engine import (
     engine, OptimizedRequest, OptimizedResponse,
     generate_caption_optimized, generate_batch_captions_optimized,
     get_engine_stats
 )
 
-from core.exceptions import (
     ValidationError, AIGenerationError, CacheError,
     handle_validation_error, handle_ai_error, handle_cache_error
 )
 
 # Import dependencies
-from dependencies import CoreDependencies, AdvancedDependencies
 
 # Import configuration
-from config import settings
 
-import logging
 
 # Configure logging
 logging.basicConfig(

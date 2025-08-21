@@ -1,13 +1,11 @@
-"""
-Comprehensive Test Suite for Configuration Management and Experiment Tracking
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module provides extensive testing for:
-- Configuration management functionality
-- Experiment tracking with different backends
-- Model checkpointing and versioning
-- Integration with existing systems
-- Error handling and edge cases
-"""
+# Constants
+MAX_RETRIES = 100
+
 import unittest
 import tempfile
 import shutil
@@ -21,15 +19,28 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
+from onyx.server.features.ads.config_manager import (
+from onyx.server.features.ads.experiment_tracker import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Comprehensive Test Suite for Configuration Management and Experiment Tracking
+
+This module provides extensive testing for:
+- Configuration management functionality
+- Experiment tracking with different backends
+- Model checkpointing and versioning
+- Integration with existing systems
+- Error handling and edge cases
+"""
 
 # Import the modules to test
-from onyx.server.features.ads.config_manager import (
     ConfigManager, ModelConfig, TrainingConfig, DataConfig,
     ExperimentConfig, OptimizationConfig, DeploymentConfig,
     ConfigType, create_config_from_dict, merge_configs
 )
 
-from onyx.server.features.ads.experiment_tracker import (
     ExperimentTracker, ExperimentMetadata, CheckpointInfo,
     CheckpointManager, TrackingBackendBase, LocalBackend,
     create_experiment_tracker, experiment_context
@@ -38,17 +49,17 @@ from onyx.server.features.ads.experiment_tracker import (
 class TestConfigurationManager(unittest.TestCase):
     """Test cases for Configuration Manager."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.config_dir = Path(self.temp_dir) / "configs"
         self.config_manager = ConfigManager(str(self.config_dir))
         
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_create_default_configs(self):
+    def test_create_default_configs(self) -> Any:
         """Test creating default configuration files."""
         project_name = "test_project"
         config_files = self.config_manager.create_default_configs(project_name)
@@ -59,7 +70,7 @@ class TestConfigurationManager(unittest.TestCase):
             self.assertIn(config_type, config_files)
             self.assertTrue(Path(config_files[config_type]).exists())
     
-    def test_save_and_load_config(self):
+    def test_save_and_load_config(self) -> Any:
         """Test saving and loading configurations."""
         # Create test config
         model_config = ModelConfig(
@@ -89,7 +100,7 @@ class TestConfigurationManager(unittest.TestCase):
         self.assertEqual(loaded_config.hidden_sizes, model_config.hidden_sizes)
         self.assertEqual(loaded_config.dropout_rate, model_config.dropout_rate)
     
-    def test_load_all_configs(self):
+    def test_load_all_configs(self) -> Any:
         """Test loading all configurations for a project."""
         # Create default configs
         project_name = "test_project"
@@ -104,7 +115,7 @@ class TestConfigurationManager(unittest.TestCase):
             self.assertIn(config_type, configs)
             self.assertIsNotNone(configs[config_type])
     
-    def test_update_config(self):
+    def test_update_config(self) -> Any:
         """Test updating existing configuration."""
         # Create and save initial config
         training_config = TrainingConfig(
@@ -134,7 +145,7 @@ class TestConfigurationManager(unittest.TestCase):
         self.assertEqual(updated_config.learning_rate, 2e-4)
         self.assertEqual(updated_config.epochs, 20)
     
-    def test_validate_config(self):
+    def test_validate_config(self) -> bool:
         """Test configuration validation."""
         # Valid model config
         valid_model_config = ModelConfig(
@@ -174,7 +185,7 @@ class TestConfigurationManager(unittest.TestCase):
         )
         self.assertFalse(self.config_manager.validate_config(invalid_training_config, ConfigType.TRAINING))
     
-    def test_get_config_summary(self):
+    def test_get_config_summary(self) -> Optional[Dict[str, Any]]:
         """Test generating configuration summary."""
         # Create test configs
         configs = {
@@ -211,7 +222,7 @@ class TestConfigurationManager(unittest.TestCase):
 class TestExperimentTracker(unittest.TestCase):
     """Test cases for Experiment Tracker."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.checkpoint_dir = Path(self.temp_dir) / "checkpoints"
@@ -238,11 +249,11 @@ class TestExperimentTracker(unittest.TestCase):
         self.optimizer = optim.Adam(self.model.parameters())
         self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=1)
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_experiment_tracker_initialization(self):
+    def test_experiment_tracker_initialization(self) -> Any:
         """Test experiment tracker initialization."""
         tracker = ExperimentTracker(self.experiment_config)
         
@@ -252,7 +263,7 @@ class TestExperimentTracker(unittest.TestCase):
         self.assertEqual(tracker.current_epoch, 0)
         self.assertEqual(tracker.current_step, 0)
     
-    def test_start_experiment(self):
+    def test_start_experiment(self) -> Any:
         """Test starting an experiment."""
         tracker = ExperimentTracker(self.experiment_config)
         
@@ -274,7 +285,7 @@ class TestExperimentTracker(unittest.TestCase):
         metadata_file = experiment_dir / "metadata.yaml"
         self.assertTrue(metadata_file.exists())
     
-    def test_log_hyperparameters(self):
+    def test_log_hyperparameters(self) -> Any:
         """Test logging hyperparameters."""
         tracker = ExperimentTracker(self.experiment_config)
         tracker.start_experiment()
@@ -293,13 +304,17 @@ class TestExperimentTracker(unittest.TestCase):
         
         # Verify hyperparameters
         with open(hp_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             loaded_hp = yaml.safe_load(f)
         
         self.assertEqual(loaded_hp['learning_rate'], 1e-4)
         self.assertEqual(loaded_hp['batch_size'], 32)
         self.assertEqual(loaded_hp['epochs'], 10)
     
-    def test_log_metrics(self):
+    def test_log_metrics(self) -> Any:
         """Test logging metrics."""
         tracker = ExperimentTracker(self.experiment_config)
         tracker.start_experiment()
@@ -322,7 +337,7 @@ class TestExperimentTracker(unittest.TestCase):
         self.assertEqual(loss_history[0]['step'], 100)
         self.assertEqual(loss_history[0]['epoch'], 5)
     
-    def test_log_model_architecture(self):
+    def test_log_model_architecture(self) -> Any:
         """Test logging model architecture."""
         tracker = ExperimentTracker(self.experiment_config)
         tracker.start_experiment()
@@ -335,13 +350,21 @@ class TestExperimentTracker(unittest.TestCase):
         
         # Verify summary content
         with open(summary_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             summary = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         self.assertIn("Model Architecture Summary", summary)
         self.assertIn("Sequential", summary)
         self.assertIn("Total Parameters", summary)
     
-    def test_save_and_load_checkpoint(self):
+    def test_save_and_load_checkpoint(self) -> Any:
         """Test saving and loading checkpoints."""
         tracker = ExperimentTracker(self.experiment_config)
         tracker.start_experiment()
@@ -383,7 +406,7 @@ class TestExperimentTracker(unittest.TestCase):
         self.assertEqual(checkpoint_info['metrics']['accuracy'], 0.85)
         self.assertTrue(checkpoint_info['is_best'])
     
-    def test_end_experiment(self):
+    def test_end_experiment(self) -> Any:
         """Test ending an experiment."""
         tracker = ExperimentTracker(self.experiment_config)
         tracker.start_experiment()
@@ -400,6 +423,10 @@ class TestExperimentTracker(unittest.TestCase):
         
         # Verify summary content
         with open(summary_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             summary = yaml.safe_load(f)
         
         self.assertEqual(summary['experiment_id'], tracker.experiment_id)
@@ -409,7 +436,7 @@ class TestExperimentTracker(unittest.TestCase):
 class TestCheckpointManager(unittest.TestCase):
     """Test cases for Checkpoint Manager."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.checkpoint_dir = Path(self.temp_dir) / "checkpoints"
@@ -431,11 +458,11 @@ class TestCheckpointManager(unittest.TestCase):
         self.optimizer = optim.Adam(self.model.parameters())
         self.scheduler = optim.lr_scheduler.StepLR(self.optimizer, step_size=1)
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_save_checkpoint(self):
+    def test_save_checkpoint(self) -> Any:
         """Test saving checkpoints."""
         experiment_id = "test_exp"
         metrics = {"loss": 0.5, "accuracy": 0.85}
@@ -464,7 +491,7 @@ class TestCheckpointManager(unittest.TestCase):
         self.assertEqual(checkpoint_info['metrics']['loss'], 0.5)
         self.assertTrue(checkpoint_info['is_best'])
     
-    def test_load_checkpoint(self):
+    def test_load_checkpoint(self) -> Any:
         """Test loading checkpoints."""
         experiment_id = "test_exp"
         metrics = {"loss": 0.5, "accuracy": 0.85}
@@ -504,7 +531,7 @@ class TestCheckpointManager(unittest.TestCase):
         self.assertEqual(checkpoint_info['metrics']['loss'], 0.5)
         self.assertTrue(checkpoint_info['is_best'])
     
-    def test_get_best_checkpoint(self):
+    def test_get_best_checkpoint(self) -> Optional[Dict[str, Any]]:
         """Test getting best checkpoint."""
         experiment_id = "test_exp"
         
@@ -527,7 +554,7 @@ class TestCheckpointManager(unittest.TestCase):
         self.assertIsNotNone(best_checkpoint)
         self.assertIn("_best.pt", best_checkpoint)
     
-    def test_get_latest_checkpoint(self):
+    def test_get_latest_checkpoint(self) -> Optional[Dict[str, Any]]:
         """Test getting latest checkpoint."""
         experiment_id = "test_exp"
         
@@ -548,7 +575,7 @@ class TestCheckpointManager(unittest.TestCase):
         latest_checkpoint = self.checkpoint_manager.get_latest_checkpoint(experiment_id)
         self.assertIsNotNone(latest_checkpoint)
     
-    def test_cleanup_old_checkpoints(self):
+    def test_cleanup_old_checkpoints(self) -> Any:
         """Test cleanup of old checkpoints."""
         experiment_id = "test_exp"
         
@@ -576,7 +603,7 @@ class TestCheckpointManager(unittest.TestCase):
 class TestTrackingBackends(unittest.TestCase):
     """Test cases for tracking backends."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.experiment_config = ExperimentConfig(
             experiment_name="test_experiment",
@@ -587,7 +614,7 @@ class TestTrackingBackends(unittest.TestCase):
             checkpoint_dir="./checkpoints"
         )
     
-    def test_local_backend(self):
+    def test_local_backend(self) -> Any:
         """Test local tracking backend."""
         backend = LocalBackend(self.experiment_config)
         
@@ -614,7 +641,7 @@ class TestTrackingBackends(unittest.TestCase):
     
     @patch('onyx.server.features.ads.experiment_tracker.WANDB_AVAILABLE', True)
     @patch('onyx.server.features.ads.experiment_tracker.wandb')
-    def test_wandb_backend(self, mock_wandb):
+    def test_wandb_backend(self, mock_wandb) -> Any:
         """Test Weights & Biases backend."""
         self.experiment_config.tracking_backend = "wandb"
         
@@ -649,7 +676,7 @@ class TestTrackingBackends(unittest.TestCase):
 class TestIntegration(unittest.TestCase):
     """Test integration scenarios."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.config_dir = Path(self.temp_dir) / "configs"
@@ -668,11 +695,11 @@ class TestIntegration(unittest.TestCase):
             checkpoint_dir=str(self.checkpoint_dir)
         )
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_full_workflow(self):
+    def test_full_workflow(self) -> Any:
         """Test complete workflow from config creation to experiment tracking."""
         # 1. Create configurations
         config_files = self.config_manager.create_default_configs("integration_test")
@@ -753,7 +780,7 @@ class TestIntegration(unittest.TestCase):
         checkpoint_infos = tracker.checkpoint_manager.get_checkpoint_info(tracker.experiment_id)
         self.assertGreater(len(checkpoint_infos), 0)
     
-    def test_context_manager(self):
+    def test_context_manager(self) -> Any:
         """Test experiment context manager."""
         with experiment_context(self.experiment_config) as tracker:
             # Log some metrics
@@ -766,32 +793,40 @@ class TestIntegration(unittest.TestCase):
 class TestErrorHandling(unittest.TestCase):
     """Test error handling scenarios."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.config_dir = Path(self.temp_dir) / "configs"
         self.config_manager = ConfigManager(str(self.config_dir))
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_load_nonexistent_config(self):
+    def test_load_nonexistent_config(self) -> Any:
         """Test loading non-existent configuration."""
         with self.assertRaises(FileNotFoundError):
             self.config_manager.load_config("nonexistent_config.yaml")
     
-    def test_invalid_config_file(self):
+    def test_invalid_config_file(self) -> Any:
         """Test loading invalid configuration file."""
         # Create invalid YAML file
         invalid_config_path = self.config_dir / "invalid_config.yaml"
         with open(invalid_config_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("invalid: yaml: content: [")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         with self.assertRaises(Exception):
             self.config_manager.load_config(str(invalid_config_path))
     
-    def test_checkpoint_loading_error(self):
+    def test_checkpoint_loading_error(self) -> Any:
         """Test checkpoint loading error handling."""
         checkpoint_manager = CheckpointManager()
         

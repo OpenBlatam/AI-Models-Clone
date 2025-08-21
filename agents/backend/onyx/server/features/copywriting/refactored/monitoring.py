@@ -1,10 +1,13 @@
-"""
-Monitoring and Metrics
-=====================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive monitoring system with metrics collection, performance tracking,
-and alerting capabilities.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import asyncio
@@ -16,8 +19,17 @@ from collections import defaultdict, deque
 import psutil
 import threading
 from contextlib import contextmanager
-
 from .config import get_config
+from typing import Any, List, Dict, Optional
+"""
+Monitoring and Metrics
+=====================
+
+Comprehensive monitoring system with metrics collection, performance tracking,
+and alerting capabilities.
+"""
+
+
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -77,7 +89,7 @@ class MetricSeries:
 class MetricsCollector:
     """Centralized metrics collection and monitoring"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics: Dict[str, MetricSeries] = {}
         self.counters: Dict[str, float] = defaultdict(float)
         self.gauges: Dict[str, float] = {}
@@ -99,7 +111,7 @@ class MetricsCollector:
         
         self._setup_default_metrics()
     
-    def _setup_default_metrics(self):
+    def _setup_default_metrics(self) -> Any:
         """Setup default system metrics"""
         self.metrics["requests_total"] = MetricSeries("requests_total")
         self.metrics["request_duration"] = MetricSeries("request_duration")
@@ -110,25 +122,29 @@ class MetricsCollector:
         self.metrics["memory_usage"] = MetricSeries("memory_usage")
         self.metrics["cpu_usage"] = MetricSeries("cpu_usage")
     
-    def start_monitoring(self):
+    def start_monitoring(self) -> Any:
         """Start background monitoring thread"""
         if not self._monitoring_active:
             self._monitoring_active = True
             self._monitoring_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 target=self._monitoring_loop,
                 daemon=True
             )
             self._monitoring_thread.start()
             logger.info("✓ Monitoring started")
     
-    def stop_monitoring(self):
+    def stop_monitoring(self) -> Any:
         """Stop background monitoring"""
         self._monitoring_active = False
         if self._monitoring_thread:
             self._monitoring_thread.join(timeout=5)
         logger.info("✓ Monitoring stopped")
     
-    def _monitoring_loop(self):
+    def _monitoring_loop(self) -> Any:
         """Background monitoring loop"""
         while self._monitoring_active:
             try:
@@ -138,7 +154,7 @@ class MetricsCollector:
                 logger.error(f"Monitoring error: {e}")
                 time.sleep(60)  # Wait longer on error
     
-    def _collect_system_metrics(self):
+    def _collect_system_metrics(self) -> Any:
         """Collect system performance metrics"""
         try:
             # Memory usage
@@ -267,7 +283,7 @@ class MetricsCollector:
         """Get service uptime in seconds"""
         return time.time() - self.start_time
     
-    def get_request_rate(self, seconds: int = 300) -> float:
+    async def get_request_rate(self, seconds: int = 300) -> float:
         """Get request rate (requests per second) over the last N seconds"""
         if "requests_total" not in self.metrics:
             return 0.0
@@ -337,7 +353,7 @@ class MetricsCollector:
         """Add global alert callback"""
         self.alert_callbacks.append(callback)
     
-    def _check_alerts(self):
+    def _check_alerts(self) -> Any:
         """Check alert thresholds and trigger callbacks"""
         for metric_name, alert_config in self.alert_thresholds.items():
             if metric_name in self.gauges:
@@ -431,7 +447,7 @@ class MetricsCollector:
         
         return "\n".join(lines)
     
-    def reset_metrics(self):
+    def reset_metrics(self) -> Any:
         """Reset all metrics"""
         self.metrics.clear()
         self.counters.clear()
@@ -454,9 +470,9 @@ def get_metrics_collector() -> MetricsCollector:
 
 
 # Decorator for automatic request monitoring
-def monitor_requests(func):
+async def monitor_requests(func) -> Any:
     """Decorator to automatically monitor API requests"""
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         start_time = time.time()
         method = kwargs.get('method', 'UNKNOWN')
         endpoint = kwargs.get('endpoint', func.__name__)

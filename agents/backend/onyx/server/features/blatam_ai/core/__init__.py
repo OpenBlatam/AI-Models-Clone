@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from abc import ABC, abstractmethod
+from typing import Dict, List, Optional, Any, Union, Protocol
+from dataclasses import dataclass, field
+from enum import Enum
+import logging
+import time
+from datetime import datetime
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🏗️ BLATAM AI CORE MODULE v5.0.0
 ==============================
@@ -11,13 +31,6 @@ Módulo core con interfaces base y configuraciones centralizadas:
 - 🎯 Constants y enums
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Union, Protocol
-from dataclasses import dataclass, field
-from enum import Enum
-import logging
-import time
-from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
@@ -131,7 +144,7 @@ class SystemHealth:
 class MetricsCollector:
     """Recolector centralizado de métricas."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics_history: List[PerformanceMetrics] = []
         self.component_metrics: Dict[str, List[PerformanceMetrics]] = {}
     
@@ -199,7 +212,7 @@ class EventObserver(ABC):
 class EventBus:
     """Bus de eventos centralizado."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.observers: Dict[EventType, List[EventObserver]] = {}
     
     def subscribe(self, event_type: EventType, observer: EventObserver):
@@ -287,7 +300,7 @@ class ComponentFactory(ABC):
 class ServiceContainer:
     """Contenedor de servicios para dependency injection."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._services: Dict[str, Any] = {}
         self._factories: Dict[str, ComponentFactory] = {}
     
@@ -299,7 +312,7 @@ class ServiceContainer:
         """Registra una factory."""
         self._factories[component_type] = factory
     
-    def get_service(self, name: str) -> Any:
+    def get_service(self, name: str) -> Optional[Dict[str, Any]]:
         """Obtiene un servicio."""
         if name not in self._services:
             raise ValueError(f"Service '{name}' not found")

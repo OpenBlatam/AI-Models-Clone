@@ -1,7 +1,10 @@
-"""
-Instagram Captions API v14.0 - Optimized Engine with Concise Conditionals
-Ultra-fast caption generation with concise one-line conditional syntax
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import hashlib
@@ -14,17 +17,23 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from numba import jit
 import numpy as np
 import logging
-
 from ..types import OptimizedRequest, OptimizedResponse
 from ..utils import generate_request_id
 from ..config import config
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v14.0 - Optimized Engine with Concise Conditionals
+Ultra-fast caption generation with concise one-line conditional syntax
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
 class OptimizedAIEngine:
     """Ultra-fast AI engine with concise conditional syntax"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize optimized engine with concise conditionals"""
         self.device = "cuda" if torch.cuda.is_available() and config.USE_GPU else "cpu"
         self.tokenizer = None
@@ -38,7 +47,7 @@ class OptimizedAIEngine:
         
         asyncio.create_task(self._initialize_models())
     
-    async def _initialize_models(self):
+    async def _initialize_models(self) -> Any:
         """Initialize models with concise conditionals"""
         try:
             self.tokenizer = AutoTokenizer.from_pretrained(config.MODEL_NAME)
@@ -201,7 +210,7 @@ optimized_engine = OptimizedAIEngine()
 class PerformanceMonitor:
     """Real-time performance monitoring with concise syntax"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = {
             "response_times": [],
             "error_count": 0,

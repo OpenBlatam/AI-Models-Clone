@@ -1,16 +1,23 @@
-#!/usr/bin/env python3
-"""
-Test script for the Model Training and Evaluation Framework
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
 import logging
+from model_training_evaluation import (
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Test script for the Model Training and Evaluation Framework
+"""
+
 
 # Import the training framework
-from model_training_evaluation import (
     TrainingConfig, ModelTrainer, ModelEvaluator, 
     EfficientDataLoader, TrainingMetrics
 )
@@ -21,22 +28,22 @@ logger = logging.getLogger(__name__)
 class SimpleTestDataset(Dataset):
     """Simple test dataset"""
     
-    def __init__(self, num_samples=100, num_features=10, num_classes=2):
+    def __init__(self, num_samples=100, num_features=10, num_classes=2) -> Any:
         self.num_samples = num_samples
         self.num_features = num_features
         self.num_classes = num_classes
         self._generate_data()
     
-    def _generate_data(self):
+    def _generate_data(self) -> Any:
         """Generate synthetic data"""
         np.random.seed(42)
         self.features = torch.randn(self.num_samples, self.num_features)
         self.labels = torch.randint(0, self.num_classes, (self.num_samples,))
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return self.num_samples
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         return {
             'features': self.features[idx],
             'labels': self.labels[idx]
@@ -45,14 +52,14 @@ class SimpleTestDataset(Dataset):
 class SimpleTestModel(nn.Module):
     """Simple test model"""
     
-    def __init__(self, input_size=10, hidden_size=32, num_classes=2):
+    def __init__(self, input_size=10, hidden_size=32, num_classes=2) -> Any:
         super().__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.2)
         self.fc2 = nn.Linear(hidden_size, num_classes)
     
-    def forward(self, x):
+    def forward(self, x) -> Any:
         if isinstance(x, dict):
             x = x['features']
         x = self.fc1(x)
@@ -204,5 +211,6 @@ def main():
         logger.error(f"Test failed: {e}")
         raise
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

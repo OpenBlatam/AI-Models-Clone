@@ -1,7 +1,16 @@
-"""
-Ultra-Optimized Cache Manager v2.0
-Multi-level caching with memory, Redis, and disk using the fastest libraries
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import asyncio
@@ -15,8 +24,18 @@ import aioredis
 import diskcache
 import hashlib
 from contextlib import asynccontextmanager
-
 from .interfaces import CacheInterface
+            import json
+                        import json
+                import json
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Ultra-Optimized Cache Manager v2.0
+Multi-level caching with memory, Redis, and disk using the fastest libraries
+"""
+
+
 
 
 @dataclass
@@ -37,7 +56,9 @@ class UltraOptimizedCacheV2(CacheInterface):
     """Cache ultra-optimizado con múltiples niveles."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         
         # Configuraciones de cache
         self.memory_size = self.config.get('memory_size', 1000)
@@ -73,7 +94,7 @@ class UltraOptimizedCacheV2(CacheInterface):
         
         logger.info("Ultra-Optimized Cache v2.0 initialized")
     
-    def _init_memory_cache(self):
+    def _init_memory_cache(self) -> Any:
         """Inicializar cache en memoria."""
         self.memory_cache = TTLCache(
             maxsize=self.memory_size,
@@ -81,7 +102,7 @@ class UltraOptimizedCacheV2(CacheInterface):
         )
         logger.info(f"Memory cache initialized: size={self.memory_size}, ttl={self.memory_ttl}s")
     
-    def _init_redis_client(self):
+    def _init_redis_client(self) -> Any:
         """Inicializar cliente Redis."""
         self.redis_client = None
         self.redis_available = False
@@ -93,7 +114,7 @@ class UltraOptimizedCacheV2(CacheInterface):
             except Exception as e:
                 logger.warning(f"Redis configuration failed: {e}")
     
-    async def _get_redis_client(self):
+    async def _get_redis_client(self) -> Optional[Dict[str, Any]]:
         """Obtener cliente Redis (lazy initialization)."""
         if self.redis_client is None and self.redis_url:
             try:
@@ -114,7 +135,7 @@ class UltraOptimizedCacheV2(CacheInterface):
         
         return self.redis_client if self.redis_available else None
     
-    def _init_disk_cache(self):
+    def _init_disk_cache(self) -> Any:
         """Inicializar cache en disco."""
         try:
             self.disk_cache = diskcache.Cache(
@@ -349,7 +370,7 @@ class UltraOptimizedCacheV2(CacheInterface):
             logger.error(f"Cache set_many failed: {e}")
             return False
     
-    async def pipeline(self):
+    async def pipeline(self) -> Any:
         """Obtener pipeline de Redis para operaciones en lote."""
         redis_client = await self._get_redis_client()
         if redis_client:
@@ -361,7 +382,6 @@ class UltraOptimizedCacheV2(CacheInterface):
         if self.use_orjson:
             json_data = orjson.dumps(data)
         else:
-            import json
             json_data = json.dumps(data).encode('utf-8')
         
         # Comprimir si está habilitado y el tamaño supera el umbral
@@ -387,7 +407,6 @@ class UltraOptimizedCacheV2(CacheInterface):
                     if self.use_orjson:
                         return orjson.loads(decompressed_data)
                     else:
-                        import json
                         return json.loads(decompressed_data.decode('utf-8'))
                 except Exception:
                     # Si falla la descompresión, intentar como JSON normal
@@ -397,7 +416,6 @@ class UltraOptimizedCacheV2(CacheInterface):
             if self.use_orjson:
                 return orjson.loads(data)
             else:
-                import json
                 return json.loads(data.decode('utf-8'))
                 
         except Exception as e:
@@ -486,7 +504,7 @@ class UltraOptimizedCacheV2(CacheInterface):
         
         return health_status
     
-    async def close(self):
+    async def close(self) -> Any:
         """Cerrar conexiones del cache."""
         try:
             # Cerrar Redis
@@ -504,10 +522,10 @@ class UltraOptimizedCacheV2(CacheInterface):
         except Exception as e:
             logger.error(f"Error closing cache: {e}")
     
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Context manager entry."""
         return self
     
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
         """Context manager exit."""
         await self.close() 

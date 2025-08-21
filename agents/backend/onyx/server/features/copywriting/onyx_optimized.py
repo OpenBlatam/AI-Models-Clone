@@ -1,3 +1,39 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import os
+import sys
+import time
+from datetime import datetime, timezone
+from typing import Dict, Any, List, Optional, Union
+from contextlib import asynccontextmanager
+import logging
+from fastapi import FastAPI, HTTPException, Depends, Body, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+    import orjson
+    import json as JSON_LIB
+    import uvloop
+    import redis.asyncio as aioredis
+    from langchain.llms import OpenAI
+    from langchain.chat_models import ChatOpenAI
+    from langchain.schema import HumanMessage, SystemMessage
+    from langchain.prompts import PromptTemplate, ChatPromptTemplate
+    from langchain.chains import LLMChain
+    from langchain.callbacks import AsyncCallbackHandler
+    import openai
+    from prometheus_fastapi_instrumentator import Instrumentator
+import structlog
+from .models import CopywritingInput, CopywritingOutput, CopyVariant, Language, CopyTone, UseCase
+        import hashlib
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 Onyx-Optimized Copywriting Service.
 
@@ -9,78 +45,53 @@ Production-ready copywriting service integrated with Onyx backend:
 - Production monitoring and caching
 """
 
-import asyncio
-import os
-import sys
-import time
-from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional, Union
-from contextlib import asynccontextmanager
-import logging
 
 # FastAPI and core dependencies
-from fastapi import FastAPI, HTTPException, Depends, Body, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
 
 # Optimization libraries with fallbacks
 try:
-    import orjson
     JSON_LIB = orjson
     JSON_SPEEDUP = 5.0
 except ImportError:
-    import json as JSON_LIB
     JSON_SPEEDUP = 1.0
 
 try:
-    import uvloop
     UVLOOP_AVAILABLE = True
 except ImportError:
     UVLOOP_AVAILABLE = False
 
 try:
-    import redis.asyncio as aioredis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
 
 # LangChain imports
 try:
-    from langchain.llms import OpenAI
-    from langchain.chat_models import ChatOpenAI
-    from langchain.schema import HumanMessage, SystemMessage
-    from langchain.prompts import PromptTemplate, ChatPromptTemplate
-    from langchain.chains import LLMChain
-    from langchain.callbacks import AsyncCallbackHandler
     LANGCHAIN_AVAILABLE = True
 except ImportError:
     LANGCHAIN_AVAILABLE = False
 
 # OpenRouter integration
 try:
-    import openai
     OPENAI_AVAILABLE = True
 except ImportError:
     OPENAI_AVAILABLE = False
 
 # Monitoring
 try:
-    from prometheus_fastapi_instrumentator import Instrumentator
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
-import structlog
 logger = structlog.get_logger(__name__)
 
 # Import models
-from .models import CopywritingInput, CopywritingOutput, CopyVariant, Language, CopyTone, UseCase
 
 # === ONYX CONFIGURATION ===
 class OnyxConfig:
     """Onyx-specific configuration."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Onyx backend settings
         self.onyx_api_key = os.getenv("ONYX_API_KEY", "onyx-secret-key")
         self.onyx_base_url = os.getenv("ONYX_BASE_URL", "http://localhost:8080")
@@ -138,13 +149,13 @@ config = OnyxConfig()
 class AIProviderManager:
     """Manage multiple AI providers with OpenRouter and LangChain."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.providers = {}
         self.current_provider = None
         self.fallback_providers = []
         self._initialize_providers()
     
-    def _initialize_providers(self):
+    def _initialize_providers(self) -> Any:
         """Initialize available AI providers."""
         
         # OpenRouter provider
@@ -264,12 +275,12 @@ class AIProviderManager:
 class OnyxCacheManager:
     """Onyx-optimized cache manager."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.memory_cache = {}
         self.redis_client = None
         self.stats = {"hits": 0, "misses": 0, "sets": 0}
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize cache connections."""
         if REDIS_AVAILABLE and config.enable_cache:
             try:
@@ -287,7 +298,6 @@ class OnyxCacheManager:
     
     def _generate_key(self, data: str) -> str:
         """Generate cache key."""
-        import hashlib
         return f"onyx:copy:{hashlib.md5(data.encode()).hexdigest()[:16]}"
     
     async def get(self, key: str) -> Optional[Any]:
@@ -354,11 +364,11 @@ class OnyxCacheManager:
 class OnyxPromptManager:
     """Advanced prompt management with LangChain integration."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.prompt_templates = {}
         self._initialize_templates()
     
-    def _initialize_templates(self):
+    def _initialize_templates(self) -> Any:
         """Initialize copywriting prompt templates."""
         
         # Base system prompt
@@ -540,7 +550,7 @@ Tono: {tone}
 Caso de uso: {use_case}
 
 Genera contenido persuasivo y optimizado para la plataforma especificada.
-"""
+"""f"
         
         # Format template with provided data
         try:
@@ -548,7 +558,7 @@ Genera contenido persuasivo y optimizado para la plataforma especificada.
                 prompt_template = PromptTemplate.from_template(template_key)
                 return prompt_template.format(**kwargs)
             else:
-                return template_key.format(**kwargs)
+                return template_key"
         except KeyError as e:
             logger.warning(f"Missing template variable: {e}")
             return template_key
@@ -561,7 +571,7 @@ Genera contenido persuasivo y optimizado para la plataforma especificada.
 class OnyxCopywritingService:
     """Main Onyx-integrated copywriting service."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.ai_manager = AIProviderManager()
         self.cache_manager = OnyxCacheManager()
         self.prompt_manager = OnyxPromptManager()
@@ -578,7 +588,7 @@ class OnyxCopywritingService:
                    performance_level=config.performance_level,
                    ai_providers=len(self.ai_manager.providers))
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the service."""
         await self.cache_manager.initialize()
         logger.info("Onyx copywriting service initialized")
@@ -1032,7 +1042,6 @@ onyx_app = create_onyx_app()
 
 # === MAIN ===
 if __name__ == "__main__":
-    import uvicorn
     
     logging.basicConfig(level=logging.INFO)
     logger.info("Starting Onyx-Optimized Copywriting Service")

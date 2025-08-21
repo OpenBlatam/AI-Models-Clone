@@ -1,13 +1,19 @@
-"""
-Production-ready LinkedIn Posts FastAPI application.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
 import time
 from contextlib import asynccontextmanager
 from typing import Dict, Any, Optional
-
 import uvicorn
 from fastapi import FastAPI, Request, Response, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,7 +26,6 @@ import redis.asyncio as redis
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 import structlog
-
 from .config.settings import Settings
 from .api.routes.posts import router as posts_router
 from .api.routes.analytics import router as analytics_router
@@ -36,6 +41,13 @@ from .core.services.post_service import PostService
 from .core.services.ai_service import AIService
 from .core.services.analytics_service import AnalyticsService
 from .core.services.template_service import TemplateService
+from typing import Any, List, Dict, Optional
+"""
+Production-ready LinkedIn Posts FastAPI application.
+"""
+
+
+
 
 
 # Configure structured logging

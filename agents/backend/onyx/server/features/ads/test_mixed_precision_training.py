@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import pytest
+import torch
+import torch.nn as nn
+import asyncio
+import time
+from unittest.mock import Mock, patch, MagicMock
+from typing import Dict, Any, List
+from onyx.server.features.ads.mixed_precision_training import (
+from onyx.server.features.ads.gradient_accumulation import (
+from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test suite for Mixed Precision Training System
 
@@ -9,15 +32,7 @@ This module provides comprehensive tests for:
 - API endpoints and error handling
 - Memory efficiency and training stability
 """
-import pytest
-import torch
-import torch.nn as nn
-import asyncio
-import time
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, Any, List
 
-from onyx.server.features.ads.mixed_precision_training import (
     MixedPrecisionConfig,
     MixedPrecisionTrainer,
     AdaptiveMixedPrecisionTrainer,
@@ -27,10 +42,8 @@ from onyx.server.features.ads.mixed_precision_training import (
     optimize_mixed_precision_settings,
     mixed_precision_context
 )
-from onyx.server.features.ads.gradient_accumulation import (
     GradientAccumulationConfig
 )
-from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
 
 # Test fixtures
 @pytest.fixture
@@ -48,15 +61,15 @@ def sample_model():
 def sample_dataset():
     """Create a sample dataset for testing."""
     class MockDataset:
-        def __init__(self, size=100):
+        def __init__(self, size=100) -> Any:
             self.size = size
             self.data = torch.randn(size, 100)
             self.targets = torch.randint(0, 10, (size,))
         
-        def __len__(self):
+        def __len__(self) -> Any:
             return self.size
         
-        def __getitem__(self, idx):
+        def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
             return self.data[idx], self.targets[idx]
     
     return MockDataset()
@@ -97,7 +110,7 @@ def advanced_mp_config():
 class TestMixedPrecisionConfig:
     """Test mixed precision configuration."""
     
-    def test_basic_config_creation(self):
+    def test_basic_config_creation(self) -> Any:
         """Test basic configuration creation."""
         config = MixedPrecisionConfig()
         
@@ -106,7 +119,7 @@ class TestMixedPrecisionConfig:
         assert config.init_scale == 2**16
         assert config.memory_efficient == True
     
-    def test_advanced_config_creation(self, advanced_mp_config):
+    def test_advanced_config_creation(self, advanced_mp_config) -> Any:
         """Test advanced configuration creation."""
         config = advanced_mp_config
         
@@ -122,7 +135,7 @@ class TestMixedPrecisionConfig:
         assert config.log_precision == True
         assert config.log_memory_usage == True
     
-    def test_config_validation(self):
+    def test_config_validation(self) -> Any:
         """Test configuration validation."""
         # Test invalid dtype
         with pytest.raises(ValueError):
@@ -143,7 +156,7 @@ class TestMixedPrecisionConfig:
 class TestMixedPrecisionTrainer:
     """Test mixed precision trainer."""
     
-    def test_trainer_initialization(self, basic_mp_config):
+    def test_trainer_initialization(self, basic_mp_config) -> Any:
         """Test trainer initialization."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -152,7 +165,7 @@ class TestMixedPrecisionTrainer:
         assert trainer.scaler is not None
         assert trainer.autocast_context is not None
     
-    def test_should_use_mixed_precision(self, basic_mp_config, sample_model):
+    def test_should_use_mixed_precision(self, basic_mp_config, sample_model) -> Any:
         """Test mixed precision decision logic."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -166,7 +179,7 @@ class TestMixedPrecisionTrainer:
         should_use = trainer_disabled.should_use_mixed_precision(sample_model)
         assert should_use == False
     
-    def test_memory_savings_calculation(self, basic_mp_config, sample_model):
+    def test_memory_savings_calculation(self, basic_mp_config, sample_model) -> Any:
         """Test memory savings calculation."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -175,7 +188,7 @@ class TestMixedPrecisionTrainer:
         assert isinstance(memory_savings, float)
     
     @pytest.mark.asyncio
-    async def test_forward_pass(self, basic_mp_config, sample_model):
+    async def test_forward_pass(self, basic_mp_config, sample_model) -> Any:
         """Test forward pass with mixed precision."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -190,7 +203,7 @@ class TestMixedPrecisionTrainer:
         assert outputs.dtype in [torch.float16, torch.float32]
     
     @pytest.mark.asyncio
-    async def test_backward_pass(self, basic_mp_config, sample_model):
+    async def test_backward_pass(self, basic_mp_config, sample_model) -> Any:
         """Test backward pass with mixed precision."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -216,7 +229,7 @@ class TestMixedPrecisionTrainer:
         assert backward_stats["scaler_scale"] > 0
     
     @pytest.mark.asyncio
-    async def test_optimizer_step(self, basic_mp_config, sample_model):
+    async def test_optimizer_step(self, basic_mp_config, sample_model) -> Any:
         """Test optimizer step with mixed precision."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -241,7 +254,7 @@ class TestMixedPrecisionTrainer:
         assert "optimizer_time" in optimizer_stats
         assert "scaler_scale" in optimizer_stats
     
-    def test_training_stats(self, basic_mp_config):
+    def test_training_stats(self, basic_mp_config) -> Any:
         """Test training statistics retrieval."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -254,7 +267,7 @@ class TestMixedPrecisionTrainer:
         assert "overflow_count" in stats
         assert "underflow_count" in stats
     
-    def test_stats_reset(self, basic_mp_config):
+    def test_stats_reset(self, basic_mp_config) -> Any:
         """Test statistics reset."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -271,7 +284,7 @@ class TestMixedPrecisionTrainer:
 class TestAdaptiveMixedPrecisionTrainer:
     """Test adaptive mixed precision trainer."""
     
-    def test_adaptive_trainer_initialization(self, advanced_mp_config):
+    def test_adaptive_trainer_initialization(self, advanced_mp_config) -> Any:
         """Test adaptive trainer initialization."""
         trainer = AdaptiveMixedPrecisionTrainer(advanced_mp_config)
         
@@ -280,14 +293,14 @@ class TestAdaptiveMixedPrecisionTrainer:
         assert trainer.performance_history == []
         assert trainer.memory_thresholds == []
     
-    def test_adaptive_mixed_precision_decision(self, advanced_mp_config, sample_model):
+    def test_adaptive_mixed_precision_decision(self, advanced_mp_config, sample_model) -> Any:
         """Test adaptive mixed precision decision."""
         trainer = AdaptiveMixedPrecisionTrainer(advanced_mp_config)
         
         should_use = trainer.should_use_mixed_precision_adaptive(sample_model)
         assert should_use == True
     
-    def test_precision_settings_optimization(self, advanced_mp_config, sample_model):
+    def test_precision_settings_optimization(self, advanced_mp_config, sample_model) -> Any:
         """Test precision settings optimization."""
         trainer = AdaptiveMixedPrecisionTrainer(advanced_mp_config)
         
@@ -299,7 +312,7 @@ class TestAdaptiveMixedPrecisionTrainer:
         assert "gpu_memory_gb" in optimization
         assert optimization["model_params"] > 0
     
-    def test_config_adaptive_update(self, advanced_mp_config, sample_model):
+    def test_config_adaptive_update(self, advanced_mp_config, sample_model) -> Any:
         """Test adaptive configuration update."""
         trainer = AdaptiveMixedPrecisionTrainer(advanced_mp_config)
         
@@ -317,7 +330,7 @@ class TestAdaptiveMixedPrecisionTrainer:
 class TestMixedPrecisionGradientAccumulator:
     """Test mixed precision gradient accumulator."""
     
-    def test_accumulator_initialization(self, basic_mp_config):
+    def test_accumulator_initialization(self, basic_mp_config) -> Any:
         """Test accumulator initialization."""
         acc_config = GradientAccumulationConfig(
             accumulation_steps=4,
@@ -332,7 +345,7 @@ class TestMixedPrecisionGradientAccumulator:
         assert accumulator.accumulator is not None
     
     @pytest.mark.asyncio
-    async def test_gradient_accumulation_mp(self, basic_mp_config, sample_model):
+    async def test_gradient_accumulation_mp(self, basic_mp_config, sample_model) -> Any:
         """Test gradient accumulation with mixed precision."""
         acc_config = GradientAccumulationConfig(
             accumulation_steps=4,
@@ -368,7 +381,7 @@ class TestMixedPrecisionGradientAccumulator:
         assert "optimizer_stats" in acc_stats
         assert "mp_stats" in acc_stats
     
-    def test_combined_stats(self, basic_mp_config):
+    def test_combined_stats(self, basic_mp_config) -> Any:
         """Test combined statistics retrieval."""
         acc_config = GradientAccumulationConfig(
             accumulation_steps=4,
@@ -389,7 +402,7 @@ class TestMixedPrecisionGradientAccumulator:
 class TestUtilityFunctions:
     """Test utility functions."""
     
-    def test_create_mixed_precision_config(self):
+    def test_create_mixed_precision_config(self) -> Any:
         """Test mixed precision configuration creation."""
         config = create_mixed_precision_config(
             enabled=True,
@@ -403,7 +416,7 @@ class TestUtilityFunctions:
         assert config.init_scale == 2**16
         assert config.memory_efficient == True
     
-    def test_should_use_mixed_precision_utility(self, sample_model):
+    def test_should_use_mixed_precision_utility(self, sample_model) -> Any:
         """Test should_use_mixed_precision utility function."""
         # Test with large model and limited memory
         should_use = should_use_mixed_precision(sample_model, gpu_memory_gb=4.0)
@@ -413,7 +426,7 @@ class TestUtilityFunctions:
         should_use = should_use_mixed_precision(sample_model, gpu_memory_gb=16.0)
         assert should_use == True  # Still recommended for most models
     
-    def test_optimize_mixed_precision_settings(self, sample_model):
+    def test_optimize_mixed_precision_settings(self, sample_model) -> Any:
         """Test mixed precision settings optimization."""
         optimization = optimize_mixed_precision_settings(
             model=sample_model,
@@ -431,7 +444,7 @@ class TestUtilityFunctions:
 class TestContextManager:
     """Test context manager."""
     
-    def test_mixed_precision_context(self, basic_mp_config):
+    def test_mixed_precision_context(self, basic_mp_config) -> Any:
         """Test mixed precision context manager."""
         with mixed_precision_context(basic_mp_config) as trainer:
             assert trainer is not None
@@ -442,7 +455,7 @@ class TestIntegrationWithFineTuning:
     """Test integration with fine-tuning service."""
     
     @pytest.mark.asyncio
-    async def test_setup_mixed_precision(self):
+    async def test_setup_mixed_precision(self) -> Any:
         """Test mixed precision setup in fine-tuning service."""
         service = OptimizedFineTuningService()
         
@@ -464,7 +477,7 @@ class TestIntegrationWithFineTuning:
         assert "mp_stats" in result
     
     @pytest.mark.asyncio
-    async def test_get_mixed_precision_stats(self):
+    async def test_get_mixed_precision_stats(self) -> Optional[Dict[str, Any]]:
         """Test mixed precision statistics retrieval."""
         service = OptimizedFineTuningService()
         
@@ -492,7 +505,7 @@ class TestIntegrationWithFineTuning:
         assert result["underflow_count"] == 0
     
     @pytest.mark.asyncio
-    async def test_optimize_mixed_precision_settings(self):
+    async def test_optimize_mixed_precision_settings(self) -> Any:
         """Test mixed precision settings optimization."""
         service = OptimizedFineTuningService()
         
@@ -517,7 +530,7 @@ class TestIntegrationWithFineTuning:
 class TestPerformanceMonitoring:
     """Test performance monitoring."""
     
-    def test_performance_monitoring_decorators(self, basic_mp_config):
+    def test_performance_monitoring_decorators(self, basic_mp_config) -> Any:
         """Test performance monitoring decorators."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -526,7 +539,7 @@ class TestPerformanceMonitoring:
         assert hasattr(trainer.backward_pass, '__wrapped__')
         assert hasattr(trainer.optimizer_step, '__wrapped__')
     
-    def test_memory_monitoring(self, basic_mp_config, sample_model):
+    def test_memory_monitoring(self, basic_mp_config, sample_model) -> Any:
         """Test memory monitoring."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -538,12 +551,12 @@ class TestPerformanceMonitoring:
 class TestErrorHandling:
     """Test error handling."""
     
-    def test_invalid_config_handling(self):
+    def test_invalid_config_handling(self) -> Any:
         """Test invalid configuration handling."""
         with pytest.raises(ValueError):
             MixedPrecisionConfig(init_scale=-1)
     
-    def test_cuda_unavailable_handling(self):
+    def test_cuda_unavailable_handling(self) -> Any:
         """Test CUDA unavailable handling."""
         with patch('torch.cuda.is_available', return_value=False):
             config = MixedPrecisionConfig(enabled=True)
@@ -553,7 +566,7 @@ class TestErrorHandling:
             assert trainer.scaler is None
             assert trainer.autocast_context is None
     
-    def test_model_compatibility_handling(self, basic_mp_config):
+    def test_model_compatibility_handling(self, basic_mp_config) -> Any:
         """Test model compatibility handling."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -567,7 +580,7 @@ class TestErrorHandling:
 class TestMemoryEfficiency:
     """Test memory efficiency."""
     
-    def test_memory_savings_calculation(self, basic_mp_config, sample_model):
+    def test_memory_savings_calculation(self, basic_mp_config, sample_model) -> Any:
         """Test memory savings calculation accuracy."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -582,7 +595,7 @@ class TestMemoryEfficiency:
         # Allow small tolerance for floating point precision
         assert abs(actual_savings - expected_savings) < 0.01
     
-    def test_memory_efficient_settings(self):
+    def test_memory_efficient_settings(self) -> Any:
         """Test memory efficient settings."""
         config = MixedPrecisionConfig(
             enabled=True,
@@ -597,7 +610,7 @@ class TestTrainingStability:
     """Test training stability."""
     
     @pytest.mark.asyncio
-    async def test_gradient_scaling(self, basic_mp_config, sample_model):
+    async def test_gradient_scaling(self, basic_mp_config, sample_model) -> Any:
         """Test gradient scaling for stability."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -622,7 +635,7 @@ class TestTrainingStability:
             assert backward_stats["scaler_scale"] > 0
             assert backward_stats["scaler_scale"] <= 2**16
     
-    def test_overflow_underflow_handling(self, basic_mp_config):
+    def test_overflow_underflow_handling(self, basic_mp_config) -> Any:
         """Test overflow and underflow handling."""
         trainer = MixedPrecisionTrainer(basic_mp_config)
         
@@ -636,5 +649,6 @@ class TestTrainingStability:
         assert stats["underflow_count"] == 3
 
 # Run tests
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

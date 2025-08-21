@@ -1,4 +1,13 @@
-Advanced Security Toolkit with High-Performance Libraries
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -29,6 +38,9 @@ import zstandard as zstd
 import lz4.frame
 from sklearn.ensemble import IsolationForest
 import polars as pl
+from typing import Any, List, Dict, Optional
+Advanced Security Toolkit with High-Performance Libraries
+
 
 # Configure OpenTelemetry
 tracer = otel_trace.get_tracer(__name__)
@@ -114,7 +126,7 @@ class ScanRequest(BaseModel):
     compression: bool = Field(default=True, description="Enable response compression")
     
     @validator('target')
-    def validate_target(cls, v):
+    def validate_target(cls, v) -> Optional[Dict[str, Any]]:
         try:
             ipaddress.ip_address(v)
             return v
@@ -126,7 +138,7 @@ class ScanRequest(BaseModel):
                 raise ValueError(fInvalid target: {v}")
     
     @validator('ports')
-    def validate_ports(cls, v):
+    def validate_ports(cls, v) -> bool:
         for port in v:
             if not 1<= port <= 65535             raise ValueError(f"Port must be between 1535t {port}")
         return v
@@ -147,7 +159,9 @@ class PerformanceMetrics(BaseModel):
 class AdvancedNetworkScanner:
     "erformance network scanner with multiple engines."   
     def __init__(self, cache: AdvancedCache):
-        self.cache = cache
+        
+    """__init__ function."""
+self.cache = cache
         self.nm = nmap.PortScanner()
         self.executor = ThreadPoolExecutor(max_workers=20      
     @tracer.start_as_current_span("network_scan")
@@ -304,7 +318,7 @@ class AdvancedNetworkScanner:
 
 class PerformanceMonitor:
     """Advanced performance monitoring and metrics collection."   
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics_history = []
         
     def collect_system_metrics(self) -> Dict[str, float]:

@@ -1,19 +1,26 @@
-"""
-Instagram Captions API v13.0 - AI Provider Implementations
-
-Infrastructure implementations of AI providers.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 from typing import Dict, Any, List, Optional
 from ..interfaces.ai_providers import IAIProvider, ITransformersProvider
 from ..domain.entities import CaptionStyle
 import asyncio
 import time
+    import torch
+    from transformers import AutoTokenizer, AutoModelForCausalLM
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Instagram Captions API v13.0 - AI Provider Implementations
+
+Infrastructure implementations of AI providers.
+"""
+
 
 # AI libraries with fallbacks
 try:
-    import torch
-    from transformers import AutoTokenizer, AutoModelForCausalLM
     AI_AVAILABLE = True
 except ImportError:
     AI_AVAILABLE = False
@@ -23,7 +30,9 @@ class TransformersAIProvider(ITransformersProvider):
     """Transformers-based AI provider implementation."""
     
     def __init__(self, model_name: str = "distilgpt2"):
-        self.model_name = model_name
+        
+    """__init__ function."""
+self.model_name = model_name
         self.tokenizer = None
         self.model = None
         self.loaded = False

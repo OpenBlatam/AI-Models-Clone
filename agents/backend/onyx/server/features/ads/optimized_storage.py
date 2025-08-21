@@ -1,6 +1,8 @@
-"""
-Optimized storage service for handling file uploads and retrievals with async operations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from typing import Optional, BinaryIO, Dict, Any, List
 import os
 import uuid
@@ -13,18 +15,26 @@ import asyncio
 from contextlib import asynccontextmanager
 import mimetypes
 from fastapi import UploadFile, HTTPException
-import aioredis
+try:
+    import aioredis  # type: ignore
+except Exception:  # pragma: no cover - optional in tests
+    aioredis = None  # type: ignore[assignment]
 import json
-
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.optimized_config import settings
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Optimized storage service for handling file uploads and retrievals with async operations.
+"""
+
 
 logger = setup_logger()
 
 class OptimizedStorageService:
     """Optimized service for handling file storage operations with caching and async operations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the service with optimized settings."""
         self.base_path = Path(settings.storage_path)
         self.cache_ttl = settings.image_cache_ttl
@@ -33,7 +43,7 @@ class OptimizedStorageService:
         self._redis_client = None
         self._ensure_storage_path()
     
-    def _ensure_storage_path(self):
+    def _ensure_storage_path(self) -> Any:
         """Ensure the storage path exists with proper permissions."""
         try:
             self.base_path.mkdir(parents=True, exist_ok=True)
@@ -46,7 +56,7 @@ class OptimizedStorageService:
             raise
     
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         """Lazy initialization of Redis client for caching."""
         if self._redis_client is None:
             self._redis_client = await aioredis.from_url(
@@ -169,11 +179,19 @@ class OptimizedStorageService:
             
             # Save file with chunked writing for large files
             async with aiofiles.open(file_path, 'wb') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 chunk_size = settings.chunk_size
                 total_size = 0
                 
                 while True:
                     chunk = await file.read(chunk_size)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     if not chunk:
                         break
                     
@@ -183,6 +201,10 @@ class OptimizedStorageService:
                         raise ValueError(f"File too large: {total_size} bytes")
                     
                     await f.write(chunk)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Store file metadata in cache
             file_info = {
@@ -204,7 +226,7 @@ class OptimizedStorageService:
             logger.exception("Error saving file")
             raise
     
-    async def save_upload_file(
+    async async def save_upload_file(
         self,
         upload_file: UploadFile,
         subdirectory: str = "",
@@ -246,10 +268,18 @@ class OptimizedStorageService:
             # Save file with progress tracking
             total_size = 0
             async with aiofiles.open(file_path, 'wb') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 chunk_size = settings.chunk_size
                 
                 while True:
                     chunk = await upload_file.read(chunk_size)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     if not chunk:
                         break
                     
@@ -263,6 +293,10 @@ class OptimizedStorageService:
                         )
                     
                     await f.write(chunk)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Store file metadata
             file_info = {
@@ -310,7 +344,15 @@ class OptimizedStorageService:
             cached_info = await self._get_cached_file_info(cache_key)
             
             async with aiofiles.open(file_path, 'rb') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 content = await f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Update cache with access time
             if cached_info:
@@ -549,7 +591,7 @@ class OptimizedStorageService:
             logger.exception("Error getting storage stats")
             raise
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close Redis connection."""
         if self._redis_client:
             await self._redis_client.close() 

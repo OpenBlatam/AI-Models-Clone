@@ -1,8 +1,13 @@
-"""
-Instagram Captions API v5.0 - Middleware Module
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Ultra-fast middleware stack with security, rate limiting, and performance monitoring.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import json
@@ -11,16 +16,24 @@ from typing import Dict, Any, Callable, Optional
 from fastapi import Request, Response, HTTPException, status
 from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.responses import JSONResponse
-
-try:
     from .config_v5 import config
     from .metrics_v5 import metrics
     from .schemas_v5 import ErrorResponse
-except ImportError:
-    # Handle standalone execution
     from config_v5 import config
     from metrics_v5 import metrics
     from schemas_v5 import ErrorResponse
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Instagram Captions API v5.0 - Middleware Module
+
+Ultra-fast middleware stack with security, rate limiting, and performance monitoring.
+"""
+
+
+try:
+except ImportError:
+    # Handle standalone execution
 
 
 # Configure structured logging
@@ -37,7 +50,9 @@ class UltraFastAuthMiddleware(BaseHTTPMiddleware):
     """Ultra-fast API key authentication middleware."""
     
     def __init__(self, app, excluded_paths: list = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.excluded_paths = excluded_paths or ["/health", "/metrics", "/docs", "/openapi.json"]
     
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
@@ -86,7 +101,7 @@ class UltraFastAuthMiddleware(BaseHTTPMiddleware):
 class UltraFastRateLimitMiddleware(BaseHTTPMiddleware):
     """Ultra-fast rate limiting middleware with sliding window."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
         self.client_requests: Dict[str, list] = {}
     
@@ -121,7 +136,7 @@ class UltraFastRateLimitMiddleware(BaseHTTPMiddleware):
         # Check if limit exceeded
         return len(self.client_requests[client_id]) >= config.RATE_LIMIT_REQUESTS
     
-    def _record_request(self, client_id: str, current_time: float) -> None:
+    async def _record_request(self, client_id: str, current_time: float) -> None:
         """Record request timestamp for client."""
         if client_id not in self.client_requests:
             self.client_requests[client_id] = []
@@ -285,7 +300,7 @@ class MiddlewareUtils:
         }
     
     @staticmethod
-    def create_middleware_stack(app):
+    def create_middleware_stack(app) -> Any:
         """Create and configure the complete middleware stack."""
         
         # Security middleware (first layer)

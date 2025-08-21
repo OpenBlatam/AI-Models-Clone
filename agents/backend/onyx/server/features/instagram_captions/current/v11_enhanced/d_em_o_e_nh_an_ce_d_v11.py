@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import json
+from typing import Dict, Any, List
+    from core_enhanced_v11 import (
+    from enhanced_service_v11 import enhanced_ai_service
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Instagram Captions API v11.0 - Enhanced Refactor Demo
@@ -6,17 +22,11 @@ Demonstrates the enhanced refactoring improvements with enterprise patterns,
 advanced features, and cutting-edge optimizations.
 """
 
-import asyncio
-import time
-import json
-from typing import Dict, Any, List
 
 # Fallback imports for demo
 try:
-    from core_enhanced_v11 import (
         EnhancedCaptionRequest, CaptionStyle, AIProviderType
     )
-    from enhanced_service_v11 import enhanced_ai_service
     ENHANCED_AVAILABLE = True
 except ImportError:
     ENHANCED_AVAILABLE = False
@@ -28,7 +38,7 @@ class EnhancedRefactorDemo:
     Shows enterprise patterns, advanced features, and optimization improvements.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.demo_results = {
             "tests_run": 0,
             "tests_passed": 0,
@@ -43,7 +53,7 @@ class EnhancedRefactorDemo:
         print(f"🚀 {title}")
         print("=" * 80)
     
-    async def test_enhanced_single_generation(self):
+    async def test_enhanced_single_generation(self) -> Any:
         """Test enhanced single caption generation with advanced features."""
         
         print("\n1️⃣  ENHANCED SINGLE CAPTION GENERATION")
@@ -131,7 +141,7 @@ class EnhancedRefactorDemo:
             except Exception as e:
                 print(f"   ❌ Enhanced Test {i} failed: {e}")
     
-    async def test_enterprise_features(self):
+    async def test_enterprise_features(self) -> Any:
         """Test enterprise-specific features."""
         
         print("\n2️⃣  ENTERPRISE FEATURES TESTING")
@@ -169,7 +179,7 @@ class EnhancedRefactorDemo:
         
         print("   ✅ Enterprise features tested successfully")
     
-    async def test_advanced_monitoring(self):
+    async def test_advanced_monitoring(self) -> Any:
         """Test advanced monitoring and observability."""
         
         print("\n3️⃣  ADVANCED MONITORING & OBSERVABILITY")
@@ -218,7 +228,7 @@ class EnhancedRefactorDemo:
         except Exception as e:
             print(f"   ❌ Monitoring test failed: {e}")
     
-    async def test_performance_optimizations(self):
+    async def test_performance_optimizations(self) -> Any:
         """Test performance optimizations and enhancements."""
         
         print("\n4️⃣  PERFORMANCE OPTIMIZATIONS")
@@ -246,7 +256,7 @@ class EnhancedRefactorDemo:
         
         print("   ✅ Performance optimizations verified")
     
-    async def _simulate_enhanced_generation(self):
+    async def _simulate_enhanced_generation(self) -> Any:
         """Simulate enhanced generation when core is not available."""
         
         print("🔄 Simulating Enhanced Generation...")
@@ -289,7 +299,7 @@ class EnhancedRefactorDemo:
             self.demo_results["total_time"] += result['processing_time']
             self.demo_results["avg_quality"] += result['quality_score']
     
-    def demo_enhancement_achievements(self):
+    def demo_enhancement_achievements(self) -> Any:
         """Demonstrate the achievements of the enhanced refactor."""
         
         print("\n5️⃣  ENHANCED REFACTOR ACHIEVEMENTS")
@@ -325,7 +335,7 @@ class EnhancedRefactorDemo:
         print("   • Backward compatibility")
         print("   • Optional enterprise features")
     
-    async def run_enhanced_demo(self):
+    async def run_enhanced_demo(self) -> Any:
         """Run complete enhanced refactor demonstration."""
         
         self.print_header("INSTAGRAM CAPTIONS API v11.0 - ENHANCED REFACTOR DEMO")
@@ -396,5 +406,6 @@ async def main():
     await demo.run_enhanced_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

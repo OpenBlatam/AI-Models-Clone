@@ -816,3 +816,4 @@ async def shutdown_security_manager():
     if security_manager:
         await security_manager.shutdown()
         security_manager = None
+

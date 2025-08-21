@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from contextlib import asynccontextmanager
+from typing import Dict, Any
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import logging
+import time
+from routes import router_registry
+from routes.factory import route_factory, create_core_router, create_advanced_router
+from routes.structured_captions import router as structured_captions_router
+from dependencies import get_request_context
+from core.middleware import create_middleware_stack
+from core.exceptions import (
+from core.shared_resources import initialize_shared_resources, cleanup_shared_resources
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Main Application for Instagram Captions API v14.0 - Structured Version
 
@@ -9,29 +28,15 @@ Well-structured FastAPI application demonstrating:
 - Proper error handling and monitoring
 """
 
-from contextlib import asynccontextmanager
-from typing import Dict, Any
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import logging
-import time
 
 # Import structured routing components
-from routes import router_registry
-from routes.factory import route_factory, create_core_router, create_advanced_router
-from routes.structured_captions import router as structured_captions_router
 
 # Import dependencies
-from dependencies import get_request_context
 
 # Import core components
-from core.middleware import create_middleware_stack
-from core.exceptions import (
     ValidationError, AIGenerationError, CacheError, 
     DatabaseError, RateLimitError
 )
-from core.shared_resources import initialize_shared_resources, cleanup_shared_resources
 
 # Configure logging
 logging.basicConfig(
@@ -481,7 +486,6 @@ async def debug_dependencies():
 # =============================================================================
 
 if __name__ == "__main__":
-    import uvicorn
     
     logger.info("Starting Instagram Captions API v14.0 - Structured Version")
     

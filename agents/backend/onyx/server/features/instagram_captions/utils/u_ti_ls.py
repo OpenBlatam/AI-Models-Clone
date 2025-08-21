@@ -1,8 +1,13 @@
-"""
-Utility functions for Instagram Captions API.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Pure functions and helpers for common operations, error handling, and performance optimization.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -12,14 +17,21 @@ from typing import Any, Dict, List, Optional, Callable, TypeVar, Union
 from functools import wraps
 from datetime import datetime, timezone
 import logging
-
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, ValidationError, field_validator
 import re
-
 from .schemas import ErrorResponse
 import inspect
 from .error_handling import log_error
+from typing import Any, List, Dict, Optional
+"""
+Utility functions for Instagram Captions API.
+
+Pure functions and helpers for common operations, error handling, and performance optimization.
+"""
+
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -63,10 +75,10 @@ def create_error_response(*, error_code: str, message: str, details: dict = None
     }
 
 
-def handle_api_errors(func: Callable[..., Any]) -> Callable[..., Any]:
+async def handle_api_errors(func: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator for standardized API error handling (RORO)."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         try:
             return await func(*args, **kwargs)
         except HTTPException as exc:
@@ -127,7 +139,7 @@ def generate_cache_key(*, args: tuple = (), kwargs: dict = None) -> dict:
 def measure_execution_time(func: Callable[..., Any]) -> Callable[..., Any]:
     """Decorator to measure and log function execution time (RORO)."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         start_time = time.perf_counter()
         try:
             result = await func(*args, **kwargs)
@@ -343,7 +355,7 @@ def truncate_text(*, input: TruncateTextInput) -> dict:
 class PerformanceMonitor:
     """Simple performance monitoring utility."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = {}
     
     def start_timer(self, operation: str) -> float:
@@ -368,7 +380,7 @@ class PerformanceMonitor:
         """Get all collected metrics."""
         return self.metrics.copy()
     
-    def reset(self):
+    def reset(self) -> Any:
         """Reset all metrics."""
         self.metrics.clear()
 
@@ -381,7 +393,7 @@ def log_performance_metrics(operation: str):
     """Decorator to automatically log performance metrics."""
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = performance_monitor.start_timer(operation)
             
             try:

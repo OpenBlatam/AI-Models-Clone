@@ -1,9 +1,10 @@
-"""
-Modular API Implementation - Instagram Captions API
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Uses functional_core.py with descriptive variable names and modular design.
-Eliminates code duplication through reusable functional modules.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import time
 import logging
@@ -12,9 +13,18 @@ from fastapi import FastAPI, HTTPException, Request, Depends, status, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field, validator
+from .functional_core import (
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Modular API Implementation - Instagram Captions API
+
+Uses functional_core.py with descriptive variable names and modular design.
+Eliminates code duplication through reusable functional modules.
+"""
+
 
 # Import modular functional core
-from .functional_core import (
     validate_api_key_signature, enforce_rate_limit_for_user, sanitize_content_for_xss,
     validate_complete_request_data, log_security_event_with_details, log_authentication_attempt_result,
     create_security_middleware_function, add_security_headers_to_response, generate_unique_request_identifier,
@@ -43,11 +53,11 @@ class CaptionGenerationRequest(BaseModel):
     should_include_emoji: bool = Field(default=True)
     
     @validator('content_description')
-    def validate_and_sanitize_content(cls, content_value):
+    def validate_and_sanitize_content(cls, content_value) -> bool:
         return sanitize_content_for_xss(content_value)
     
     @validator('caption_style')
-    def validate_caption_style(cls, style_value):
+    def validate_caption_style(cls, style_value) -> bool:
         allowed_styles = ['casual', 'formal', 'creative', 'professional']
         if style_value not in allowed_styles:
             raise ValueError('Invalid caption style')
@@ -97,7 +107,7 @@ def verify_api_key_authentication(credentials: HTTPAuthorizationCredentials = De
     return api_key_string
 
 
-def extract_user_identifier_from_api_key(api_key_string: str) -> str:
+async def extract_user_identifier_from_api_key(api_key_string: str) -> str:
     """Extract user identifier from API key."""
     try:
         return api_key_string.split('.')[0]
@@ -109,7 +119,7 @@ def extract_user_identifier_from_api_key(api_key_string: str) -> str:
 # PURE FUNCTIONS - REQUEST PROCESSING MODULE
 # =============================================================================
 
-def process_single_caption_request(request_data: Dict[str, Any], user_identifier: str) -> CaptionGenerationResponse:
+async def process_single_caption_request(request_data: Dict[str, Any], user_identifier: str) -> CaptionGenerationResponse:
     """Process single caption request with modular approach."""
     processing_start_time = time.time()
     
@@ -159,7 +169,7 @@ def process_single_caption_request(request_data: Dict[str, Any], user_identifier
     )
 
 
-def process_batch_caption_requests(batch_data: Dict[str, Any], user_identifier: str) -> BatchProcessingResponse:
+async def process_batch_caption_requests(batch_data: Dict[str, Any], user_identifier: str) -> BatchProcessingResponse:
     """Process batch caption requests with modular functional approach."""
     batch_processing_start_time = time.time()
     
@@ -317,7 +327,7 @@ def create_api_information_endpoint(app: FastAPI):
     """Create API information endpoint with modular approach."""
     
     @app.get("/api/modular/info")
-    async def get_api_information() -> Dict[str, Any]:
+    async async def get_api_information() -> Dict[str, Any]:
         """Get API information."""
         return {
             "api_name": "Instagram Captions API - Modular",
@@ -408,7 +418,7 @@ def create_modular_application() -> FastAPI:
 # PURE FUNCTIONS - UTILITY MODULE
 # =============================================================================
 
-def calculate_request_metrics(request_data: Dict[str, Any]) -> Dict[str, Any]:
+async def calculate_request_metrics(request_data: Dict[str, Any]) -> Dict[str, Any]:
     """Calculate request metrics with descriptive naming."""
     return {
         "content_length_characters": len(str(request_data.get('content_description', ''))),
@@ -418,7 +428,7 @@ def calculate_request_metrics(request_data: Dict[str, Any]) -> Dict[str, Any]:
     }
 
 
-def validate_batch_request_structure(batch_data: Dict[str, Any]) -> Tuple[bool, str]:
+async def validate_batch_request_structure(batch_data: Dict[str, Any]) -> Tuple[bool, str]:
     """Validate batch request structure with descriptive naming."""
     caption_requests = batch_data.get('caption_requests', [])
     

@@ -1,9 +1,22 @@
-"""
-Storage configuration for the ads module.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 from typing import Optional
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Storage configuration for the ads module.
+"""
 
 class DatabaseSettings(BaseModel):
     """Database settings."""
@@ -45,7 +58,8 @@ class StorageSettings(BaseSettings):
     max_file_size: int = Field(default=10 * 1024 * 1024)  # 10MB
     allowed_extensions: list[str] = Field(default=["txt", "pdf", "doc", "docx"])
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "STORAGE_"
         env_file = ".env"
         env_file_encoding = "utf-8"

@@ -1,3 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import time
+import uuid
+import logging
+import asyncio
+from typing import Callable, Dict, Any, Optional
+from datetime import datetime, timezone
+from contextlib import asynccontextmanager
+from fastapi import Request, Response, HTTPException
+from fastapi.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
+from ..utils.error_handling import ErrorTracker, ErrorType, ErrorSeverity
+from ..utils.performance_monitor import PerformanceMonitor
+from typing import Any, List, Dict, Optional
 """
 Performance Middleware for Instagram Captions API v14.0
 
@@ -9,20 +36,8 @@ Advanced middleware for:
 - Response optimization and caching
 """
 
-import time
-import uuid
-import logging
-import asyncio
-from typing import Callable, Dict, Any, Optional
-from datetime import datetime, timezone
-from contextlib import asynccontextmanager
 
-from fastapi import Request, Response, HTTPException
-from fastapi.middleware.base import BaseHTTPMiddleware
-from starlette.responses import JSONResponse
 
-from ..utils.error_handling import ErrorTracker, ErrorType, ErrorSeverity
-from ..utils.performance_monitor import PerformanceMonitor
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +46,9 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """Advanced request/response logging middleware with structured data."""
     
     def __init__(self, app, enable_detailed_logging: bool = True):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.enable_detailed_logging = enable_detailed_logging
         self.error_tracker = ErrorTracker()
     
@@ -149,7 +166,9 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
     """Advanced performance monitoring middleware with metrics collection."""
     
     def __init__(self, app, slow_request_threshold: float = 1.0, enable_metrics: bool = True):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.slow_request_threshold = slow_request_threshold
         self.enable_metrics = enable_metrics
         self.performance_monitor = PerformanceMonitor()
@@ -339,7 +358,7 @@ class SecurityMiddleware(BaseHTTPMiddleware):
 class ErrorHandlingMiddleware(BaseHTTPMiddleware):
     """Centralized error handling middleware with structured responses."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
         self.error_tracker = ErrorTracker()
     
@@ -406,7 +425,9 @@ class CompressionMiddleware(BaseHTTPMiddleware):
     """Response compression middleware for performance optimization."""
     
     def __init__(self, app, min_size: int = 1000, enable_gzip: bool = True):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.min_size = min_size
         self.enable_gzip = enable_gzip
     
@@ -446,7 +467,7 @@ class CompressionMiddleware(BaseHTTPMiddleware):
 class CacheMiddleware(BaseHTTPMiddleware):
     """Cache control middleware for response optimization."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
         self.cache_settings = {
             "/health": {"max_age": 30},  # 30 seconds

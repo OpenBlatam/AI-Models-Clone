@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+from typing import Dict, Any, List
+from dataclasses import dataclass
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 Facebook Posts - Configuration Settings
 ==========================================
@@ -5,10 +23,6 @@
 Configuraciones centralizadas para el sistema de Facebook posts.
 """
 
-import os
-from typing import Dict, Any, List
-from dataclasses import dataclass
-from enum import Enum
 
 
 class Environment(str, Enum):
@@ -29,7 +43,7 @@ class LangChainConfig:
     timeout_seconds: int = 30
     retry_attempts: int = 3
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not self.api_key:
             raise ValueError("LangChain API key is required")
 
@@ -79,7 +93,9 @@ class FacebookPostsSettings:
     """Configuraciones principales del sistema."""
     
     def __init__(self, environment: Environment = Environment.DEVELOPMENT):
-        self.environment = environment
+        
+    """__init__ function."""
+self.environment = environment
         self.debug = environment in [Environment.DEVELOPMENT, Environment.TESTING]
         
         # Load configurations
@@ -129,7 +145,7 @@ class FacebookPostsSettings:
             parallel_processing=os.getenv("ANALYSIS_PARALLEL", "true").lower() == "true"
         )
     
-    def _load_facebook_api_config(self) -> FacebookAPIConfig:
+    async def _load_facebook_api_config(self) -> FacebookAPIConfig:
         """Cargar configuración de Facebook API."""
         return FacebookAPIConfig(
             app_id=os.getenv("FACEBOOK_APP_ID", ""),

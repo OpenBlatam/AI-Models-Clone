@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Optional, List, Dict, Any
+from .entities import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v13.0 - Domain Repositories
 
@@ -5,9 +13,6 @@ Repository interfaces for data persistence abstraction.
 Following Clean Architecture principles - domain defines contracts.
 """
 
-from abc import ABC, abstractmethod
-from typing import Optional, List, Dict, Any
-from .entities import (
     CaptionRequest, CaptionResponse, BatchRequest, BatchResponse,
     RequestId, QualityMetrics, PerformanceMetrics
 )
@@ -51,7 +56,7 @@ class IMetricsRepository(ABC):
     """Repository interface for metrics storage."""
     
     @abstractmethod
-    async def record_request(
+    async async def record_request(
         self, 
         request: CaptionRequest, 
         response: CaptionResponse
@@ -97,7 +102,7 @@ class IAuditRepository(ABC):
     """Repository interface for audit logging."""
     
     @abstractmethod
-    async def log_request(
+    async async def log_request(
         self, 
         request: CaptionRequest, 
         response: CaptionResponse,

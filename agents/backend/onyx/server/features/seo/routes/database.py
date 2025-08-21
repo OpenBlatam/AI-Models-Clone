@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import APIRouter, Depends, HTTPException
+from typing import List
+from ..dependencies import (
+from ..models import SEOResultModel
+from ..operations import AsyncDatabaseOperations
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Database routes for Ultra-Optimized SEO Service v15.
 
@@ -8,15 +18,10 @@ This module contains database operation endpoints including:
 - Database statistics
 """
 
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List
 
-from ..dependencies import (
     get_async_db_operations,
     get_logger
 )
-from ..models import SEOResultModel
-from ..operations import AsyncDatabaseOperations
 
 # Create router with prefix and tags
 router = APIRouter(

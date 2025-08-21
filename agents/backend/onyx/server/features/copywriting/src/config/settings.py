@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import os
+from typing import Optional, List
+from pydantic import BaseSettings, Field
+from functools import lru_cache
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Settings Configuration
 =====================
@@ -5,10 +28,6 @@ Settings Configuration
 Centralized configuration management for the copywriting system.
 """
 
-import os
-from typing import Optional, List
-from pydantic import BaseSettings, Field
-from functools import lru_cache
 
 
 class EngineConfig(BaseSettings):
@@ -49,7 +68,8 @@ class EngineConfig(BaseSettings):
     request_timeout: float = Field(default=45.0, description="Request timeout in seconds")
     batch_timeout: float = Field(default=120.0, description="Batch timeout in seconds")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "ENGINE_"
 
 
@@ -71,7 +91,8 @@ class APIConfig(BaseSettings):
     enable_rate_limiting: bool = Field(default=True, description="Enable rate limiting")
     max_requests_per_minute: int = Field(default=100, description="Max requests per minute")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "API_"
 
 
@@ -93,7 +114,8 @@ class SecurityConfig(BaseSettings):
     enable_input_validation: bool = Field(default=True, description="Enable input validation")
     max_request_size: int = Field(default=10485760, description="Max request size (10MB)")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "SECURITY_"
 
 
@@ -114,7 +136,8 @@ class MonitoringConfig(BaseSettings):
     health_check_interval: int = Field(default=30, description="Health check interval")
     enable_detailed_health: bool = Field(default=True, description="Enable detailed health checks")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "MONITORING_"
 
 
@@ -131,7 +154,8 @@ class Settings(BaseSettings):
     security: SecurityConfig = Field(default_factory=SecurityConfig)
     monitoring: MonitoringConfig = Field(default_factory=MonitoringConfig)
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
@@ -148,7 +172,7 @@ def get_engine_config() -> EngineConfig:
     return get_settings().engine
 
 
-def get_api_config() -> APIConfig:
+async def get_api_config() -> APIConfig:
     """Get API configuration"""
     return get_settings().api
 

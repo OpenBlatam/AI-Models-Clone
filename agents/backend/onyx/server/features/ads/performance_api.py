@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from typing import Dict, Any, List, Optional
+from datetime import datetime, timedelta
+import asyncio
+import json
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Query, Depends
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+import psutil
+from onyx.utils.logger import setup_logger
+from onyx.server.features.ads.performance_optimizer import (
+from onyx.server.features.ads.optimized_config import settings
+        from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from typing import Any, List, Dict, Optional
+import logging
 """
 Performance Optimization API for Onyx Ads Backend
 
@@ -9,23 +28,12 @@ This module provides REST API endpoints for:
 - Async task management
 - Resource usage monitoring
 """
-from typing import Dict, Any, List, Optional
-from datetime import datetime, timedelta
-import asyncio
-import json
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Query, Depends
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-import psutil
 
-from onyx.utils.logger import setup_logger
-from onyx.server.features.ads.performance_optimizer import (
     PerformanceOptimizer, 
     PerformanceConfig, 
     optimizer,
     PERFORMANCE_METRICS
 )
-from onyx.server.features.ads.optimized_config import settings
 
 logger = setup_logger()
 
@@ -464,7 +472,6 @@ async def update_performance_config(
 async def get_prometheus_metrics():
     """Get Prometheus metrics."""
     try:
-        from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
         
         metrics = generate_latest()
         return JSONResponse(

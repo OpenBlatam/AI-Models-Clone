@@ -1,14 +1,8 @@
-"""
-Comprehensive Test Suite for Version Control System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-This module provides extensive testing for:
-- Version control manager functionality
-- Integrated version control system
-- Git operations and repository management
-- Configuration versioning and rollback
-- Experiment reproducibility
-- Error handling and edge cases
-"""
 import unittest
 import tempfile
 import shutil
@@ -20,21 +14,36 @@ from datetime import datetime
 from unittest.mock import Mock, patch, MagicMock
 import subprocess
 import sys
+from onyx.server.features.ads.version_control_manager import (
+from onyx.server.features.ads.integrated_version_control import (
+        import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Comprehensive Test Suite for Version Control System
+
+This module provides extensive testing for:
+- Version control manager functionality
+- Integrated version control system
+- Git operations and repository management
+- Configuration versioning and rollback
+- Experiment reproducibility
+- Error handling and edge cases
+"""
 
 # Import the modules to test
-from onyx.server.features.ads.version_control_manager import (
     VersionControlManager, ExperimentVersionControl, GitCommit, ExperimentVersion,
     VersionInfo, GitStatus, create_version_control_manager, create_experiment_vc
 )
 
-from onyx.server.features.ads.integrated_version_control import (
     IntegratedVersionControl, IntegratedExperimentInfo, create_integrated_vc
 )
 
 class TestVersionControlManager(unittest.TestCase):
     """Test cases for Version Control Manager."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.project_root = Path(self.temp_dir) / "test_project"
@@ -44,11 +53,11 @@ class TestVersionControlManager(unittest.TestCase):
         (self.project_root / "test_file.py").write_text("print('Hello, World!')")
         (self.project_root / "config.yaml").write_text("model: test\nbatch_size: 32")
         
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_initialize_git_repository(self):
+    def test_initialize_git_repository(self) -> Any:
         """Test git repository initialization."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -67,7 +76,7 @@ class TestVersionControlManager(unittest.TestCase):
         self.assertIn("*.pth", gitignore_content)
         self.assertIn("checkpoints/", gitignore_content)
     
-    def test_git_status(self):
+    def test_git_status(self) -> Any:
         """Test git status functionality."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -91,7 +100,7 @@ class TestVersionControlManager(unittest.TestCase):
         status = vc_manager.get_git_status()
         self.assertEqual(status, GitStatus.CLEAN)
     
-    def test_get_current_branch(self):
+    def test_get_current_branch(self) -> Optional[Dict[str, Any]]:
         """Test getting current branch."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -99,7 +108,7 @@ class TestVersionControlManager(unittest.TestCase):
         self.assertIsInstance(branch, str)
         self.assertIn(branch, ["main", "master"])  # Default branch names
     
-    def test_get_current_commit(self):
+    def test_get_current_commit(self) -> Optional[Dict[str, Any]]:
         """Test getting current commit information."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -112,7 +121,7 @@ class TestVersionControlManager(unittest.TestCase):
         self.assertIsInstance(commit.message, str)
         self.assertGreater(len(commit.hash), 0)
     
-    def test_get_file_version_info(self):
+    def test_get_file_version_info(self) -> Optional[Dict[str, Any]]:
         """Test getting file version information."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -126,7 +135,7 @@ class TestVersionControlManager(unittest.TestCase):
         self.assertIsInstance(version_info.branch, str)
         self.assertIsInstance(version_info.is_dirty, bool)
     
-    def test_commit_experiment(self):
+    def test_commit_experiment(self) -> Any:
         """Test committing experiment changes."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -155,7 +164,7 @@ class TestVersionControlManager(unittest.TestCase):
         self.assertEqual(version_info.experiment_id, "test_exp")
         self.assertEqual(version_info.git_hash, commit_hash)
     
-    def test_create_experiment_branch(self):
+    def test_create_experiment_branch(self) -> Any:
         """Test creating experiment branches."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -168,7 +177,7 @@ class TestVersionControlManager(unittest.TestCase):
         current_branch = vc_manager.get_current_branch()
         self.assertEqual(current_branch, branch_name)
     
-    def test_switch_to_branch(self):
+    def test_switch_to_branch(self) -> Any:
         """Test switching between branches."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -183,7 +192,7 @@ class TestVersionControlManager(unittest.TestCase):
         current_branch = vc_manager.get_current_branch()
         self.assertEqual(current_branch, "main")
     
-    def test_get_experiment_version(self):
+    def test_get_experiment_version(self) -> Optional[Dict[str, Any]]:
         """Test getting experiment version information."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -199,7 +208,7 @@ class TestVersionControlManager(unittest.TestCase):
         self.assertEqual(version_info.git_hash, commit_hash)
         self.assertTrue(version_info.is_reproducible)
     
-    def test_reproduce_experiment(self):
+    def test_reproduce_experiment(self) -> Any:
         """Test experiment reproduction."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -218,7 +227,7 @@ class TestVersionControlManager(unittest.TestCase):
         current_commit = vc_manager.get_current_commit()
         self.assertEqual(current_commit.hash, commit_hash)
     
-    def test_tag_experiment(self):
+    def test_tag_experiment(self) -> Any:
         """Test tagging experiments."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -237,17 +246,17 @@ class TestVersionControlManager(unittest.TestCase):
 class TestExperimentVersionControl(unittest.TestCase):
     """Test cases for Experiment Version Control."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.project_root = Path(self.temp_dir) / "test_project"
         self.project_root.mkdir(parents=True, exist_ok=True)
         
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_start_experiment(self):
+    def test_start_experiment(self) -> Any:
         """Test starting an experiment with version control."""
         exp_vc = ExperimentVersionControl(str(self.project_root))
         
@@ -270,7 +279,7 @@ class TestExperimentVersionControl(unittest.TestCase):
         current_branch = exp_vc.vc_manager.get_current_branch()
         self.assertIn("experiment/test_exp", current_branch)
     
-    def test_commit_experiment_changes(self):
+    def test_commit_experiment_changes(self) -> Any:
         """Test committing experiment changes."""
         exp_vc = ExperimentVersionControl(str(self.project_root))
         
@@ -294,7 +303,7 @@ class TestExperimentVersionControl(unittest.TestCase):
         self.assertIsInstance(commit_hash, str)
         self.assertGreater(len(commit_hash), 0)
     
-    def test_end_experiment(self):
+    def test_end_experiment(self) -> Any:
         """Test ending an experiment."""
         exp_vc = ExperimentVersionControl(str(self.project_root))
         
@@ -319,7 +328,7 @@ class TestExperimentVersionControl(unittest.TestCase):
         tags = exp_vc.vc_manager.get_experiment_tags("test_exp")
         self.assertIn("v1.0", tags)
     
-    def test_reproduce_experiment(self):
+    def test_reproduce_experiment(self) -> Any:
         """Test experiment reproduction."""
         exp_vc = ExperimentVersionControl(str(self.project_root))
         
@@ -336,7 +345,7 @@ class TestExperimentVersionControl(unittest.TestCase):
         success = exp_vc.reproduce_experiment("test_exp")
         self.assertTrue(success)
     
-    def test_get_experiment_info(self):
+    def test_get_experiment_info(self) -> Optional[Dict[str, Any]]:
         """Test getting experiment information."""
         exp_vc = ExperimentVersionControl(str(self.project_root))
         
@@ -357,17 +366,17 @@ class TestExperimentVersionControl(unittest.TestCase):
 class TestIntegratedVersionControl(unittest.TestCase):
     """Test cases for Integrated Version Control."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.project_root = Path(self.temp_dir) / "test_project"
         self.project_root.mkdir(parents=True, exist_ok=True)
         
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_start_integrated_experiment(self):
+    def test_start_integrated_experiment(self) -> Any:
         """Test starting an integrated experiment."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -401,7 +410,7 @@ class TestIntegratedVersionControl(unittest.TestCase):
         # Check that experiment is tracked
         self.assertIn("test_exp", integrated_vc.active_experiments)
     
-    def test_commit_experiment_changes(self):
+    def test_commit_experiment_changes(self) -> Any:
         """Test committing changes during integrated experiment."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -425,7 +434,7 @@ class TestIntegratedVersionControl(unittest.TestCase):
         self.assertIsInstance(commit_hash, str)
         self.assertGreater(len(commit_hash), 0)
     
-    def test_end_integrated_experiment(self):
+    def test_end_integrated_experiment(self) -> Any:
         """Test ending an integrated experiment."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -449,7 +458,7 @@ class TestIntegratedVersionControl(unittest.TestCase):
         # Check that experiment is no longer active
         self.assertNotIn("test_exp", integrated_vc.active_experiments)
     
-    def test_reproduce_integrated_experiment(self):
+    def test_reproduce_integrated_experiment(self) -> Any:
         """Test reproducing an integrated experiment."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -466,7 +475,7 @@ class TestIntegratedVersionControl(unittest.TestCase):
         tracker = integrated_vc.reproduce_integrated_experiment("test_exp")
         self.assertIsNotNone(tracker)
     
-    def test_get_integrated_experiment_info(self):
+    def test_get_integrated_experiment_info(self) -> Optional[Dict[str, Any]]:
         """Test getting integrated experiment information."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -487,7 +496,7 @@ class TestIntegratedVersionControl(unittest.TestCase):
         self.assertIsInstance(info.git_hash, str)
         self.assertIsInstance(info.branch, str)
     
-    def test_compare_experiments(self):
+    def test_compare_experiments(self) -> Any:
         """Test comparing multiple experiments."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -512,7 +521,7 @@ class TestIntegratedVersionControl(unittest.TestCase):
         self.assertIn("summary", comparison)
         self.assertEqual(comparison["summary"]["total_experiments"], 3)
     
-    def test_create_experiment_snapshot(self):
+    def test_create_experiment_snapshot(self) -> Any:
         """Test creating experiment snapshots."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -533,6 +542,10 @@ class TestIntegratedVersionControl(unittest.TestCase):
         
         # Check snapshot content
         with open(snapshot_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             snapshot_data = json.load(f)
         
         self.assertEqual(snapshot_data["experiment_id"], "test_exp")
@@ -541,17 +554,17 @@ class TestIntegratedVersionControl(unittest.TestCase):
 class TestErrorHandling(unittest.TestCase):
     """Test error handling scenarios."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.project_root = Path(self.temp_dir) / "test_project"
         self.project_root.mkdir(parents=True, exist_ok=True)
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_git_not_available(self):
+    def test_git_not_available(self) -> Any:
         """Test handling when git is not available."""
         with patch('subprocess.run') as mock_run:
             mock_run.side_effect = FileNotFoundError("git command not found")
@@ -559,7 +572,7 @@ class TestErrorHandling(unittest.TestCase):
             with self.assertRaises(Exception):
                 VersionControlManager(str(self.project_root))
     
-    def test_git_operation_failure(self):
+    def test_git_operation_failure(self) -> Any:
         """Test handling git operation failures."""
         vc_manager = VersionControlManager(str(self.project_root))
         
@@ -567,7 +580,7 @@ class TestErrorHandling(unittest.TestCase):
         success = vc_manager.switch_to_branch("invalid_branch")
         self.assertFalse(success)
     
-    def test_experiment_not_found(self):
+    def test_experiment_not_found(self) -> Any:
         """Test handling when experiment is not found."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -575,7 +588,7 @@ class TestErrorHandling(unittest.TestCase):
         info = integrated_vc.get_integrated_experiment_info("non_existent")
         self.assertIsNone(info)
     
-    def test_configuration_loading_failure(self):
+    def test_configuration_loading_failure(self) -> Any:
         """Test handling configuration loading failures."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -586,17 +599,17 @@ class TestErrorHandling(unittest.TestCase):
 class TestIntegration(unittest.TestCase):
     """Test integration scenarios."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.project_root = Path(self.temp_dir) / "test_project"
         self.project_root.mkdir(parents=True, exist_ok=True)
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_full_workflow(self):
+    def test_full_workflow(self) -> Any:
         """Test complete integrated workflow."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -647,7 +660,7 @@ class TestIntegration(unittest.TestCase):
         reproduced_tracker = integrated_vc.reproduce_integrated_experiment("test_exp")
         self.assertIsNotNone(reproduced_tracker)
     
-    def test_multiple_experiments(self):
+    def test_multiple_experiments(self) -> Any:
         """Test managing multiple experiments."""
         integrated_vc = IntegratedVersionControl(str(self.project_root))
         
@@ -696,7 +709,6 @@ def run_performance_tests():
     try:
         vc_manager = VersionControlManager(str(project_root))
         
-        import time
         
         # Test multiple commits
         start_time = time.time()

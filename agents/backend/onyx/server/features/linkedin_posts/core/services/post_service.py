@@ -1,19 +1,23 @@
-"""
-Post service for LinkedIn Posts business logic.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 from datetime import datetime, timedelta
 from typing import List, Optional, Dict, Any, Tuple
 from uuid import UUID, uuid4
 import logging
-
 from ..entities.linkedin_post import LinkedInPost, PostStatus, PostType, PostTone
 from ..entities.user import User
 from ..entities.template import Template
 from ..repositories.post_repository import PostRepository
 from ..repositories.user_repository import UserRepository
 from ..repositories.template_repository import TemplateRepository
+            from ..entities.linkedin_post import PostContent
+from typing import Any, List, Dict, Optional
+"""
+Post service for LinkedIn Posts business logic.
+"""
+
+
 
 
 logger = logging.getLogger(__name__)
@@ -39,7 +43,9 @@ class PostService:
         ai_service: Optional['AIService'] = None,
         analytics_service: Optional['AnalyticsService'] = None
     ):
-        self.post_repository = post_repository
+        
+    """__init__ function."""
+self.post_repository = post_repository
         self.user_repository = user_repository
         self.template_repository = template_repository
         self.ai_service = ai_service
@@ -68,7 +74,6 @@ class PostService:
                 raise ValueError(f"User with id {user_id} not found")
             
             # Create post content
-            from ..entities.linkedin_post import PostContent
             post_content = PostContent(
                 text=content,
                 hashtags=hashtags or [],

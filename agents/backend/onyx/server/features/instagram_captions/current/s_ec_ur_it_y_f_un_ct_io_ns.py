@@ -1,9 +1,13 @@
-"""
-Functional Security Implementation for Instagram Captions API
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Pure functions, decorators, and declarative patterns for security.
-No classes - functional programming approach.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import hashlib
 import hmac
@@ -18,6 +22,16 @@ from jose import JWTError, jwt
 from passlib.context import CryptContext
 from fastapi import HTTPException, Request, Depends, status
 import structlog
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Functional Security Implementation for Instagram Captions API
+
+Pure functions, decorators, and declarative patterns for security.
+No classes - functional programming approach.
+"""
+
 
 # Configuration
 SECRET_KEY = "your-secret-key"  # Use environment variable
@@ -67,7 +81,7 @@ def verify_token(token: str) -> Dict[str, Any]:
         raise HTTPException(status_code=401, detail="Invalid token")
 
 
-def generate_api_key(user_id: str) -> str:
+async def generate_api_key(user_id: str) -> str:
     """Generate secure API key."""
     timestamp = str(int(time.time()))
     message = f"{user_id}:{timestamp}"
@@ -79,7 +93,7 @@ def generate_api_key(user_id: str) -> str:
     return f"{user_id}.{timestamp}.{signature}"
 
 
-def validate_api_key(api_key: str) -> bool:
+async def validate_api_key(api_key: str) -> bool:
     """Validate API key format and signature."""
     try:
         parts = api_key.split('.')
@@ -205,7 +219,7 @@ def validate_hashtag_count(count: int) -> Tuple[bool, str]:
     return True, "Valid"
 
 
-def validate_request_data(data: Dict[str, Any]) -> Tuple[bool, Dict[str, Any], str]:
+async def validate_request_data(data: Dict[str, Any]) -> Tuple[bool, Dict[str, Any], str]:
     """Validate complete request data."""
     errors = []
     
@@ -297,7 +311,7 @@ def log_input_validation_error(user_id: str, error_message: str) -> None:
 def require_authentication(func: Callable) -> Callable:
     """Decorator to require authentication."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         # Extract token from kwargs or request
         token = kwargs.get('token')
         if not token:
@@ -314,7 +328,7 @@ def require_authentication(func: Callable) -> Callable:
 def require_rate_limit(func: Callable) -> Callable:
     """Decorator to enforce rate limiting."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         user_id = kwargs.get('current_user', {}).get('user_id') or kwargs.get('api_key')
         if user_id:
             enforce_rate_limit(user_id)
@@ -325,7 +339,7 @@ def require_rate_limit(func: Callable) -> Callable:
 def validate_input(func: Callable) -> Callable:
     """Decorator to validate input data."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         request_data = kwargs.get('request_data') or kwargs.get('data')
         if request_data:
             is_valid, cleaned_data, error_message = validate_request_data(request_data)
@@ -345,7 +359,7 @@ def log_security_events(event_type: str) -> Callable:
     """Decorator to log security events."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             result = await func(*args, **kwargs)
             
             # Log the event
@@ -422,7 +436,7 @@ def add_cache_headers(response_headers: Dict[str, str], cache_control: str = "no
 # PURE FUNCTIONS - UTILITY
 # =============================================================================
 
-def generate_request_id() -> str:
+async def generate_request_id() -> str:
     """Generate unique request ID."""
     return f"req_{int(time.time() * 1000)}_{hash(str(time.time()))}"
 
@@ -434,7 +448,7 @@ def mask_sensitive_data(data: str, mask_char: str = "*") -> str:
     return data[:2] + mask_char * (len(data) - 4) + data[-2:]
 
 
-def is_suspicious_request(request_data: Dict[str, Any]) -> Tuple[bool, str]:
+async def is_suspicious_request(request_data: Dict[str, Any]) -> Tuple[bool, str]:
     """Check if request is suspicious."""
     suspicious_patterns = [
         (r'<script', "Script tag detected"),
@@ -456,7 +470,7 @@ def is_suspicious_request(request_data: Dict[str, Any]) -> Tuple[bool, str]:
     return False, ""
 
 
-def calculate_request_hash(request_data: Dict[str, Any]) -> str:
+async def calculate_request_hash(request_data: Dict[str, Any]) -> str:
     """Calculate hash of request data for deduplication."""
     data_str = json.dumps(request_data, sort_keys=True, default=str)
     return hashlib.sha256(data_str.encode()).hexdigest()
@@ -469,7 +483,9 @@ def calculate_request_hash(request_data: Dict[str, Any]) -> str:
 def create_security_middleware() -> Callable:
     """Create security middleware function."""
     async def security_middleware(request: Request, call_next):
-        # Add request ID
+        
+    """security_middleware function."""
+# Add request ID
         request.state.request_id = generate_request_id()
         request.state.start_time = time.time()
         

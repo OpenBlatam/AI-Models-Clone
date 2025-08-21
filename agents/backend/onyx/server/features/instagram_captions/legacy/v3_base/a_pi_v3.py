@@ -1,3 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import json
+import hashlib
+from typing import Dict, Any, List, Optional
+from functools import wraps, lru_cache
+from datetime import datetime
+import logging
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request
+from fastapi.responses import StreamingResponse, JSONResponse
+from schemas import (
+from dependencies import get_captions_engine, get_gmt_system, get_redis_client
+from core import InstagramCaptionsEngine
+from gmt_system import SimplifiedGMTSystem
+from typing import Any, List, Dict, Optional
 """
 Instagram Captions API v3.0 - Refactored & Optimized
 
@@ -9,19 +35,8 @@ Clean, simple, and ultra-fast architecture:
 - Performance monitoring
 """
 
-import asyncio
-import time
-import json
-import hashlib
-from typing import Dict, Any, List, Optional
-from functools import wraps, lru_cache
-from datetime import datetime
-import logging
 
-from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Request
-from fastapi.responses import StreamingResponse, JSONResponse
 
-from schemas import (
     CaptionGenerationRequest,
     CaptionGenerationResponse,
     QualityAnalysisRequest,
@@ -31,9 +46,6 @@ from schemas import (
     BatchOptimizationRequest,
     HealthCheckResponse
 )
-from dependencies import get_captions_engine, get_gmt_system, get_redis_client
-from core import InstagramCaptionsEngine
-from gmt_system import SimplifiedGMTSystem
 
 logger = logging.getLogger(__name__)
 
@@ -56,9 +68,9 @@ router = APIRouter(
 
 def smart_cache(ttl: int = 300):
     """Smart caching decorator with automatic cleanup."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate simple cache key
             cache_key = f"{func.__name__}:{hash(str(args) + str(kwargs))}"
             
@@ -96,10 +108,10 @@ def smart_cache(ttl: int = 300):
     return decorator
 
 
-def handle_errors(func):
+def handle_errors(func) -> Any:
     """Simple error handling decorator."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         try:
             return await func(*args, **kwargs)
         except HTTPException:
@@ -114,7 +126,7 @@ def handle_errors(func):
 
 @router.get("/")
 @smart_cache(ttl=3600)
-async def get_api_info() -> Dict[str, Any]:
+async async def get_api_info() -> Dict[str, Any]:
     """Get API information."""
     return {
         "name": "Instagram Captions API v3.0",
@@ -168,6 +180,10 @@ async def generate_caption(
             timezone_insights = await asyncio.wait_for(
                 asyncio.create_task(
                     asyncio.to_thread(gmt_system.get_timezone_insights, request.timezone)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 ),
                 timeout=1.0
             )
@@ -204,6 +220,10 @@ async def analyze_quality(
     
     # Use thread pool for CPU-intensive analysis
     quality_metrics = await asyncio.to_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         engine.analyze_quality,
         caption=request.caption,
         style=request.style,
@@ -227,6 +247,10 @@ async def optimize_caption(
     
     # Parallel execution for maximum speed
     original_task = asyncio.to_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         engine.analyze_quality,
         caption=request.caption,
         style=request.style,
@@ -276,14 +300,22 @@ async def batch_optimize(
         raise ValueError("At least one caption is required")
     
     async def process_streaming():
-        yield f'{{"status": "processing", "total": {len(request.captions)}, "results": ['
+        
+    """process_streaming function."""
+yield f'{{"status": "processing", "total": {len(request.captions)}, "results": ['
         
         first = True
         
         async def optimize_single(caption: str, index: int):
-            try:
+            
+    """optimize_single function."""
+try:
                 # Quick parallel processing
                 original_task = asyncio.to_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     engine.analyze_quality, caption, request.style, request.audience
                 )
                 optimization_task = engine.optimize_content(
@@ -348,8 +380,14 @@ async def health_check(
     """Quick health check with parallel testing."""
     
     async def check_engine():
-        try:
+        
+    """check_engine function."""
+try:
             test_quality = await asyncio.to_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 engine.analyze_quality, "Test caption"
             )
             return {"status": "healthy", "test_score": test_quality.overall_score}
@@ -357,8 +395,14 @@ async def health_check(
             return {"status": "unhealthy", "error": str(e)}
     
     async def check_gmt():
-        try:
+        
+    """check_gmt function."""
+try:
             insights = await asyncio.to_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 gmt_system.get_timezone_insights, "UTC"
             )
             return {"status": "healthy", "timezones": len(insights.optimal_posting_times)}
@@ -366,7 +410,9 @@ async def health_check(
             return {"status": "unhealthy", "error": str(e)}
     
     async def check_redis():
-        if not redis_client:
+        
+    """check_redis function."""
+if not redis_client:
             return {"status": "disabled"}
         try:
             await redis_client.ping()

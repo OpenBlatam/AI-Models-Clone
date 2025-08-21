@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import List, Optional, Dict, Any
+from uuid import UUID, uuid4
+from enum import Enum
+from ..value_objects.content import Content
+from ..value_objects.author import Author
+from ..value_objects.post_metadata import PostMetadata
+from ..value_objects.engagement_metrics import EngagementMetrics
+from ..events.post_events import (
+from ..exceptions.post_exceptions import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 LinkedIn Post Domain Entity - Refactored
 ========================================
@@ -6,17 +22,7 @@ Rich domain entity with business logic, value objects, and domain events.
 Following Domain-Driven Design principles.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import List, Optional, Dict, Any
-from uuid import UUID, uuid4
-from enum import Enum
 
-from ..value_objects.content import Content
-from ..value_objects.author import Author
-from ..value_objects.post_metadata import PostMetadata
-from ..value_objects.engagement_metrics import EngagementMetrics
-from ..events.post_events import (
     PostCreatedEvent,
     PostPublishedEvent,
     PostOptimizedEvent,
@@ -24,7 +30,6 @@ from ..events.post_events import (
     PostDeletedEvent,
     EventFactory
 )
-from ..exceptions.post_exceptions import (
     InvalidPostStateError,
     ContentValidationError,
     PostAlreadyPublishedError
@@ -92,7 +97,7 @@ class LinkedInPost:
     _events: List[Any] = field(default_factory=list, init=False)
     _version: int = field(default=1, init=False)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate entity after initialization."""
         self._validate_initial_state()
     

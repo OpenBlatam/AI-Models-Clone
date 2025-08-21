@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import re
+import string
+from typing import List, Dict, Tuple, Optional
+from collections import Counter, defaultdict
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🔧 NLP Utilities for Facebook Posts
 ===================================
@@ -5,10 +17,6 @@
 Utilidades NLP específicas para análisis de Facebook posts.
 """
 
-import re
-import string
-from typing import List, Dict, Tuple, Optional
-from collections import Counter, defaultdict
 
 
 def extract_features(text: str) -> Dict[str, float]:

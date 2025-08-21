@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import pytest
+import asyncio
+import torch
+import torch.nn as nn
+from unittest.mock import Mock, patch, MagicMock
+from typing import Dict, Any, List
+import tempfile
+import os
+from onyx.server.features.ads.multi_gpu_training import (
+from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
+from onyx.server.features.ads.multi_gpu_api import router as multigpu_router
+from fastapi.testclient import TestClient
+    from fastapi import FastAPI
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test suite for Multi-GPU Training System
 
@@ -10,16 +30,7 @@ This module provides comprehensive tests for:
 - Performance optimization
 - Error handling and edge cases
 """
-import pytest
-import asyncio
-import torch
-import torch.nn as nn
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, Any, List
-import tempfile
-import os
 
-from onyx.server.features.ads.multi_gpu_training import (
     MultiGPUTrainingManager,
     GPUConfig,
     DataParallelTrainer,
@@ -28,9 +39,6 @@ from onyx.server.features.ads.multi_gpu_training import (
     gpu_monitoring_context,
     cleanup_gpu_memory
 )
-from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
-from onyx.server.features.ads.multi_gpu_api import router as multigpu_router
-from fastapi.testclient import TestClient
 
 # Test configuration
 TEST_CONFIG = {
@@ -45,7 +53,9 @@ class MockGPUMonitor:
     """Mock GPU monitor for testing."""
     
     def __init__(self, config: GPUConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.mock_gpus = {
             "gpu_0": {
                 "id": 0,
@@ -87,30 +97,36 @@ class MockGPUMonitor:
         return {}
     
     def log_gpu_stats(self, prefix: str = ""):
-        pass
+        
+    """log_gpu_stats function."""
+pass
 
 class MockDataset:
     """Mock dataset for testing."""
     
     def __init__(self, size: int = 100):
-        self.size = size
+        
+    """__init__ function."""
+self.size = size
         self.data = torch.randn(size, 128)
         self.labels = torch.randint(0, 10, (size,))
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return self.size
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         return self.data[idx], self.labels[idx]
 
 class MockModel(nn.Module):
     """Mock model for testing."""
     
     def __init__(self, input_size: int = 128, output_size: int = 10):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.linear = nn.Linear(input_size, output_size)
     
-    def forward(self, x):
+    def forward(self, x) -> Any:
         return self.linear(x)
 
 @pytest.fixture
@@ -131,12 +147,12 @@ def multi_gpu_manager():
     return MultiGPUTrainingManager()
 
 @pytest.fixture
-def dataparallel_trainer(gpu_config):
+def dataparallel_trainer(gpu_config) -> Any:
     """Create a test DataParallel trainer."""
     return DataParallelTrainer(gpu_config)
 
 @pytest.fixture
-def distributed_trainer(gpu_config):
+def distributed_trainer(gpu_config) -> Any:
     """Create a test DistributedDataParallel trainer."""
     return DistributedDataParallelTrainer(gpu_config)
 
@@ -148,7 +164,6 @@ def finetuning_service():
 @pytest.fixture
 def test_client():
     """Create a test FastAPI client."""
-    from fastapi import FastAPI
     app = FastAPI()
     app.include_router(multigpu_router)
     return TestClient(app)
@@ -156,7 +171,7 @@ def test_client():
 class TestGPUConfig:
     """Test GPU configuration."""
     
-    def test_gpu_config_defaults(self):
+    def test_gpu_config_defaults(self) -> Any:
         """Test GPU configuration defaults."""
         config = GPUConfig()
         
@@ -167,13 +182,13 @@ class TestGPUConfig:
         assert config.batch_size_per_gpu == 8
         assert config.mixed_precision is True
     
-    def test_gpu_config_custom(self, gpu_config):
+    def test_gpu_config_custom(self, gpu_config) -> Any:
         """Test custom GPU configuration."""
         assert gpu_config.gpu_ids == [0, 1]
         assert gpu_config.batch_size_per_gpu == 4
         assert gpu_config.mixed_precision is True
     
-    def test_gpu_config_validation(self):
+    def test_gpu_config_validation(self) -> Any:
         """Test GPU configuration validation."""
         config = GPUConfig(
             gpu_ids=[0, 1, 2, 3],
@@ -189,7 +204,7 @@ class TestGPUMonitor:
     """Test GPU monitoring functionality."""
     
     @patch('onyx.server.features.ads.multi_gpu_training.GPUtil')
-    def test_gpu_monitor_initialization(self, mock_gputil, gpu_config):
+    def test_gpu_monitor_initialization(self, mock_gputil, gpu_config) -> Any:
         """Test GPU monitor initialization."""
         monitor = GPUMonitor(gpu_config)
         assert monitor.config == gpu_config
@@ -197,7 +212,7 @@ class TestGPUMonitor:
         assert monitor._monitoring is False
     
     @patch('onyx.server.features.ads.multi_gpu_training.GPUtil')
-    def test_get_gpu_info(self, mock_gputil, gpu_config):
+    def test_get_gpu_info(self, mock_gputil, gpu_config) -> Optional[Dict[str, Any]]:
         """Test getting GPU information."""
         # Mock GPU data
         mock_gpu1 = Mock()
@@ -232,7 +247,7 @@ class TestGPUMonitor:
         assert gpu_info["gpu_0"]["memory_utilization"] == 50.0
     
     @patch('onyx.server.features.ads.multi_gpu_training.GPUtil')
-    def test_get_available_gpus(self, mock_gputil, gpu_config):
+    def test_get_available_gpus(self, mock_gputil, gpu_config) -> Optional[Dict[str, Any]]:
         """Test getting available GPUs."""
         # Mock GPU data with different memory utilization
         mock_gpu1 = Mock()
@@ -251,7 +266,7 @@ class TestGPUMonitor:
         assert available_gpus == [0]  # Only GPU 0 is available
     
     @patch('onyx.server.features.ads.multi_gpu_training.GPUtil')
-    def test_monitor_gpu_usage(self, mock_gputil, gpu_config):
+    def test_monitor_gpu_usage(self, mock_gputil, gpu_config) -> Any:
         """Test monitoring specific GPU usage."""
         mock_gpu = Mock()
         mock_gpu.memoryUsed = 4096
@@ -273,7 +288,7 @@ class TestDataParallelTrainer:
     """Test DataParallel trainer functionality."""
     
     @patch('onyx.server.features.ads.multi_gpu_training.GPUMonitor')
-    def test_dataparallel_trainer_initialization(self, mock_gpu_monitor, gpu_config):
+    def test_dataparallel_trainer_initialization(self, mock_gpu_monitor, gpu_config) -> Any:
         """Test DataParallel trainer initialization."""
         trainer = DataParallelTrainer(gpu_config)
         
@@ -284,7 +299,7 @@ class TestDataParallelTrainer:
     
     @patch('torch.cuda.is_available')
     @patch('onyx.server.features.ads.multi_gpu_training.GPUMonitor')
-    def test_setup_gpus(self, mock_gpu_monitor, mock_cuda_available, gpu_config):
+    def test_setup_gpus(self, mock_gpu_monitor, mock_cuda_available, gpu_config) -> Any:
         """Test GPU setup for DataParallel."""
         mock_cuda_available.return_value = True
         
@@ -296,7 +311,7 @@ class TestDataParallelTrainer:
         assert trainer.config.output_device == 0
     
     @patch('torch.cuda.is_available')
-    def test_setup_model(self, mock_cuda_available, dataparallel_trainer):
+    def test_setup_model(self, mock_cuda_available, dataparallel_trainer) -> Any:
         """Test model setup for DataParallel."""
         mock_cuda_available.return_value = True
         dataparallel_trainer.config.device_ids = [0, 1]
@@ -307,7 +322,7 @@ class TestDataParallelTrainer:
         assert wrapped_model is not None
         assert dataparallel_trainer.model is not None
     
-    def test_setup_dataloader(self, dataparallel_trainer):
+    def test_setup_dataloader(self, dataparallel_trainer) -> Any:
         """Test DataLoader setup for DataParallel."""
         dataset = MockDataset(100)
         dataloader = dataparallel_trainer.setup_dataloader(dataset)
@@ -316,7 +331,7 @@ class TestDataParallelTrainer:
         assert hasattr(dataloader, 'batch_size')
     
     @pytest.mark.asyncio
-    async def test_train_epoch(self, dataparallel_trainer):
+    async def test_train_epoch(self, dataparallel_trainer) -> Any:
         """Test training epoch with DataParallel."""
         # Setup model and dataloader
         model = MockModel()
@@ -337,7 +352,7 @@ class TestDataParallelTrainer:
         assert "num_batches" in metrics
         assert metrics["num_batches"] > 0
     
-    def test_cleanup(self, dataparallel_trainer):
+    def test_cleanup(self, dataparallel_trainer) -> Any:
         """Test DataParallel cleanup."""
         dataparallel_trainer.model = MockModel()
         dataparallel_trainer.cleanup()
@@ -349,7 +364,7 @@ class TestDistributedDataParallelTrainer:
     """Test DistributedDataParallel trainer functionality."""
     
     @patch('torch.distributed.init_process_group')
-    def test_setup_distributed(self, mock_init_process_group, distributed_trainer):
+    def test_setup_distributed(self, mock_init_process_group, distributed_trainer) -> Any:
         """Test distributed training setup."""
         distributed_trainer.setup_distributed(rank=0, world_size=4)
         
@@ -359,7 +374,7 @@ class TestDistributedDataParallelTrainer:
         mock_init_process_group.assert_called_once()
     
     @patch('torch.distributed.init_process_group')
-    def test_setup_model(self, mock_init_process_group, distributed_trainer):
+    def test_setup_model(self, mock_init_process_group, distributed_trainer) -> Any:
         """Test model setup for DistributedDataParallel."""
         distributed_trainer.setup_distributed(rank=0, world_size=4)
         
@@ -369,7 +384,7 @@ class TestDistributedDataParallelTrainer:
         assert wrapped_model is not None
         assert distributed_trainer.model is not None
     
-    def test_setup_dataloader(self, distributed_trainer):
+    def test_setup_dataloader(self, distributed_trainer) -> Any:
         """Test DataLoader setup for DistributedDataParallel."""
         dataset = MockDataset(100)
         distributed_trainer.config.world_size = 4
@@ -382,7 +397,7 @@ class TestDistributedDataParallelTrainer:
     
     @pytest.mark.asyncio
     @patch('torch.distributed.all_reduce')
-    async def test_train_epoch(self, mock_all_reduce, distributed_trainer):
+    async def test_train_epoch(self, mock_all_reduce, distributed_trainer) -> Any:
         """Test training epoch with DistributedDataParallel."""
         # Setup distributed environment
         distributed_trainer.setup_distributed(rank=0, world_size=4)
@@ -408,7 +423,7 @@ class TestDistributedDataParallelTrainer:
         assert "local_loss" in metrics
         assert "num_batches" in metrics
     
-    def test_save_checkpoint(self, distributed_trainer, tmp_path):
+    def test_save_checkpoint(self, distributed_trainer, tmp_path) -> Any:
         """Test checkpoint saving."""
         distributed_trainer.config.rank = 0  # Main process
         distributed_trainer.model = MockModel()
@@ -419,7 +434,7 @@ class TestDistributedDataParallelTrainer:
         
         assert checkpoint_path.exists()
     
-    def test_load_checkpoint(self, distributed_trainer, tmp_path):
+    def test_load_checkpoint(self, distributed_trainer, tmp_path) -> Any:
         """Test checkpoint loading."""
         # Create a test checkpoint
         model = MockModel()
@@ -443,7 +458,7 @@ class TestDistributedDataParallelTrainer:
         epoch = distributed_trainer.load_checkpoint(str(checkpoint_path))
         assert epoch == 1
     
-    def test_cleanup(self, distributed_trainer):
+    def test_cleanup(self, distributed_trainer) -> Any:
         """Test DistributedDataParallel cleanup."""
         distributed_trainer.model = MockModel()
         distributed_trainer.cleanup()
@@ -455,7 +470,7 @@ class TestMultiGPUTrainingManager:
     """Test Multi-GPU training manager functionality."""
     
     @patch('onyx.server.features.ads.multi_gpu_training.GPUMonitor')
-    def test_initialization(self, mock_gpu_monitor, multi_gpu_manager):
+    def test_initialization(self, mock_gpu_monitor, multi_gpu_manager) -> Any:
         """Test Multi-GPU manager initialization."""
         assert multi_gpu_manager.config is not None
         assert multi_gpu_manager.gpu_monitor is not None
@@ -464,7 +479,7 @@ class TestMultiGPUTrainingManager:
     
     @patch('torch.cuda.device_count')
     @patch('onyx.server.features.ads.multi_gpu_training.GPUMonitor')
-    def test_detect_gpu_configuration(self, mock_gpu_monitor, mock_device_count, multi_gpu_manager):
+    def test_detect_gpu_configuration(self, mock_gpu_monitor, mock_device_count, multi_gpu_manager) -> Any:
         """Test GPU configuration detection."""
         mock_device_count.return_value = 4
         
@@ -477,7 +492,7 @@ class TestMultiGPUTrainingManager:
         assert config.use_multi_gpu is True
         assert len(config.gpu_ids) > 0
     
-    def test_setup_trainer_dataparallel(self, multi_gpu_manager):
+    def test_setup_trainer_dataparallel(self, multi_gpu_manager) -> Any:
         """Test DataParallel trainer setup."""
         trainer = multi_gpu_manager.setup_trainer(distributed=False)
         
@@ -485,7 +500,7 @@ class TestMultiGPUTrainingManager:
         assert multi_gpu_manager.dataparallel_trainer is not None
         assert multi_gpu_manager.current_trainer is not None
     
-    def test_setup_trainer_distributed(self, multi_gpu_manager):
+    def test_setup_trainer_distributed(self, multi_gpu_manager) -> Any:
         """Test DistributedDataParallel trainer setup."""
         trainer = multi_gpu_manager.setup_trainer(distributed=True, world_size=4, rank=0)
         
@@ -494,7 +509,7 @@ class TestMultiGPUTrainingManager:
         assert multi_gpu_manager.current_trainer is not None
     
     @pytest.mark.asyncio
-    async def test_train_model(self, multi_gpu_manager):
+    async def test_train_model(self, multi_gpu_manager) -> Any:
         """Test model training with Multi-GPU manager."""
         # Setup trainer
         multi_gpu_manager.setup_trainer(distributed=False)
@@ -520,14 +535,14 @@ class TestMultiGPUTrainingManager:
             assert "best_loss" in result
             assert "final_model" in result
     
-    def test_get_gpu_stats(self, multi_gpu_manager):
+    def test_get_gpu_stats(self, multi_gpu_manager) -> Optional[Dict[str, Any]]:
         """Test getting GPU statistics."""
         stats = multi_gpu_manager.get_gpu_stats()
         
         assert "config" in stats
         assert "current_trainer" in stats
     
-    def test_cleanup(self, multi_gpu_manager):
+    def test_cleanup(self, multi_gpu_manager) -> Any:
         """Test Multi-GPU manager cleanup."""
         multi_gpu_manager.cleanup()
         
@@ -537,7 +552,7 @@ class TestMultiGPUTrainingManager:
 class TestMultiGPUAPI:
     """Test Multi-GPU API endpoints."""
     
-    def test_health_check(self, test_client):
+    def test_health_check(self, test_client) -> Any:
         """Test health check endpoint."""
         response = test_client.get("/multigpu/health")
         
@@ -548,7 +563,7 @@ class TestMultiGPUAPI:
         assert "cuda_available" in data
         assert "gpu_count" in data
     
-    def test_configure_gpu(self, test_client):
+    def test_configure_gpu(self, test_client) -> Any:
         """Test GPU configuration endpoint."""
         config_data = {
             "use_multi_gpu": True,
@@ -565,7 +580,7 @@ class TestMultiGPUAPI:
         assert "config" in data
         assert "available_gpus" in data
     
-    def test_get_gpu_stats(self, test_client):
+    def test_get_gpu_stats(self, test_client) -> Optional[Dict[str, Any]]:
         """Test GPU statistics endpoint."""
         response = test_client.get("/multigpu/stats")
         
@@ -575,7 +590,7 @@ class TestMultiGPUAPI:
         assert "available_gpus" in data
         assert "total_gpus" in data
     
-    def test_get_specific_gpu_stats(self, test_client):
+    def test_get_specific_gpu_stats(self, test_client) -> Optional[Dict[str, Any]]:
         """Test specific GPU statistics endpoint."""
         response = test_client.get("/multigpu/gpu/0/stats")
         
@@ -585,7 +600,7 @@ class TestMultiGPUAPI:
         assert "stats" in data
         assert "timestamp" in data
     
-    def test_configure_training(self, test_client):
+    def test_configure_training(self, test_client) -> Any:
         """Test training configuration endpoint."""
         training_data = {
             "model_name": "gpt2",
@@ -604,7 +619,7 @@ class TestMultiGPUAPI:
         assert "training_id" in data
         assert "config" in data
     
-    def test_train_dataparallel(self, test_client):
+    def test_train_dataparallel(self, test_client) -> Any:
         """Test DataParallel training endpoint."""
         training_data = {
             "model_name": "gpt2",
@@ -625,7 +640,7 @@ class TestMultiGPUAPI:
         # Should return 200 or 500 depending on GPU availability
         assert response.status_code in [200, 500]
     
-    def test_train_distributed(self, test_client):
+    def test_train_distributed(self, test_client) -> Any:
         """Test DistributedDataParallel training endpoint."""
         training_data = {
             "model_name": "gpt2",
@@ -647,7 +662,7 @@ class TestMultiGPUAPI:
         # Should return 200 or 500 depending on GPU availability
         assert response.status_code in [200, 500]
     
-    def test_train_auto(self, test_client):
+    def test_train_auto(self, test_client) -> Any:
         """Test auto training method selection endpoint."""
         training_data = {
             "model_name": "gpt2",
@@ -668,7 +683,7 @@ class TestMultiGPUAPI:
         # Should return 200 or 500 depending on GPU availability
         assert response.status_code in [200, 500]
     
-    def test_manage_resources(self, test_client):
+    def test_manage_resources(self, test_client) -> Any:
         """Test resource management endpoint."""
         resource_data = {"action": "cleanup"}
         
@@ -679,7 +694,7 @@ class TestMultiGPUAPI:
         assert data["success"] is True
         assert data["action"] == "cleanup"
     
-    def test_get_resource_status(self, test_client):
+    def test_get_resource_status(self, test_client) -> Optional[Dict[str, Any]]:
         """Test resource status endpoint."""
         response = test_client.get("/multigpu/resources/status")
         
@@ -689,7 +704,7 @@ class TestMultiGPUAPI:
         assert "gpu_count" in data
         assert "available_gpus" in data
     
-    def test_get_performance_metrics(self, test_client):
+    def test_get_performance_metrics(self, test_client) -> Optional[Dict[str, Any]]:
         """Test performance metrics endpoint."""
         response = test_client.get("/multigpu/performance/metrics")
         
@@ -699,7 +714,7 @@ class TestMultiGPUAPI:
         assert "gpu_count" in data
         assert "gpu_utilization" in data
     
-    def test_get_training_history(self, test_client):
+    def test_get_training_history(self, test_client) -> Optional[Dict[str, Any]]:
         """Test training history endpoint."""
         response = test_client.get("/multigpu/training/history?user_id=123&limit=5")
         
@@ -709,7 +724,7 @@ class TestMultiGPUAPI:
         assert "training_history" in data
         assert "total_sessions" in data
     
-    def test_test_gpu_setup(self, test_client):
+    def test_test_gpu_setup(self, test_client) -> Any:
         """Test GPU setup testing endpoint."""
         response = test_client.post("/multigpu/gpu/test?gpu_ids=0&gpu_ids=1")
         
@@ -718,7 +733,7 @@ class TestMultiGPUAPI:
         assert "test_results" in data
         assert "timestamp" in data
     
-    def test_get_gpu_recommendations(self, test_client):
+    def test_get_gpu_recommendations(self, test_client) -> Optional[Dict[str, Any]]:
         """Test GPU recommendations endpoint."""
         response = test_client.get("/multigpu/gpu/recommendations?model_size=medium&batch_size=8")
         
@@ -731,13 +746,13 @@ class TestMultiGPUAPI:
 class TestUtilityFunctions:
     """Test utility functions."""
     
-    def test_gpu_monitoring_context(self):
+    def test_gpu_monitoring_context(self) -> Any:
         """Test GPU monitoring context manager."""
         with gpu_monitoring_context([0, 1]):
             # Context should work without errors
             assert True
     
-    def test_cleanup_gpu_memory(self):
+    def test_cleanup_gpu_memory(self) -> Any:
         """Test GPU memory cleanup."""
         cleanup_gpu_memory()
         
@@ -748,7 +763,7 @@ class TestIntegration:
     """Integration tests for multi-GPU training system."""
     
     @pytest.mark.asyncio
-    async def test_end_to_end_dataparallel_training(self, finetuning_service):
+    async def test_end_to_end_dataparallel_training(self, finetuning_service) -> Any:
         """Test end-to-end DataParallel training."""
         # This test would require actual GPUs
         # For now, just test the interface
@@ -765,7 +780,7 @@ class TestIntegration:
             assert "CUDA" in str(e) or "GPU" in str(e)
     
     @pytest.mark.asyncio
-    async def test_end_to_end_distributed_training(self, finetuning_service):
+    async def test_end_to_end_distributed_training(self, finetuning_service) -> Any:
         """Test end-to-end DistributedDataParallel training."""
         # This test would require actual GPUs and distributed setup
         # For now, just test the interface
@@ -782,7 +797,7 @@ class TestIntegration:
             # Expected if no GPUs available or distributed setup not configured
             assert "CUDA" in str(e) or "GPU" in str(e) or "distributed" in str(e)
     
-    def test_api_integration(self, test_client):
+    async def test_api_integration(self, test_client) -> Any:
         """Test API integration."""
         # Test health check
         health_response = test_client.get("/multigpu/health")
@@ -797,5 +812,6 @@ class TestIntegration:
                                           json={"action": "cleanup"})
         assert cleanup_response.status_code == 200
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

@@ -1,6 +1,5 @@
-"""
-Advanced Onyx functionalities for ads module.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import List, Dict, Any, Optional
 from pydantic import BaseModel
 from fastapi import HTTPException
@@ -10,6 +9,11 @@ import logging
 from datetime import datetime
 from onyx.core.config import settings
 from onyx.core.functions import format_response, handle_error
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Advanced Onyx functionalities for ads module.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +68,9 @@ class AdvancedAdsService:
     """Service for advanced Onyx functionalities."""
     
     def __init__(self, httpx_client: httpx.AsyncClient):
-        self.client = httpx_client
+        
+    """__init__ function."""
+self.client = httpx_client
         self.base_url = settings.ONYX_API_URL
         self.headers = {
             "Authorization": f"Bearer {settings.ONYX_API_KEY}",

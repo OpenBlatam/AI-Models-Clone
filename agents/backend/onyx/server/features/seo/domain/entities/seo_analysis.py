@@ -1,7 +1,10 @@
-"""
-SEO Analysis Domain Entity
-Clean Architecture with Domain-Driven Design
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from dataclasses import dataclass
 from datetime import datetime
@@ -9,6 +12,14 @@ from typing import List, Optional
 from domain.value_objects.url import URL
 from domain.value_objects.meta_tags import MetaTags
 from domain.value_objects.seo_score import SEOScore
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+SEO Analysis Domain Entity
+Clean Architecture with Domain-Driven Design
+"""
+
 
 
 @dataclass(frozen=True)
@@ -31,7 +42,7 @@ class SEOAnalysis:
     processing_time: float
     created_at: datetime
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate entity after initialization"""
         if not self.url.is_valid():
             raise ValueError("Invalid URL")

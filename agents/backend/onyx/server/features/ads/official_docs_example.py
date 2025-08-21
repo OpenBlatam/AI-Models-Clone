@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import sys
+import os
+from pathlib import Path
+from official_docs_reference import OfficialDocsReference
+import torch
+from torch.utils.data import DataLoader
+import torch
+from torch.utils.data import DataLoader
+import torch
+from torch.cuda.amp import autocast, GradScaler
+from transformers import AutoModel, AutoTokenizer
+from transformers import AutoModel
+import torch
+from torch.cuda.amp import autocast, GradScaler
+from transformers import AutoModel, AutoTokenizer
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Official Documentation Reference System - Usage Example
 =====================================================
@@ -6,14 +29,10 @@ This module demonstrates how to use the official documentation reference system
 to get best practices, API references, and up-to-date information for ML libraries.
 """
 
-import sys
-import os
-from pathlib import Path
 
 # Add the current directory to the path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from official_docs_reference import OfficialDocsReference
 
 
 def demonstrate_pytorch_references():
@@ -299,8 +318,6 @@ def demonstrate_code_validation():
     pytorch_code_snippets = [
         # Good code
         """
-import torch
-from torch.utils.data import DataLoader
 
 dataloader = DataLoader(
     dataset,
@@ -311,15 +328,11 @@ dataloader = DataLoader(
 """,
         # Code with issues
         """
-import torch
-from torch.utils.data import DataLoader
 
 dataloader = DataLoader(dataset)  # Missing optimizations
 """,
         # Mixed precision code
         """
-import torch
-from torch.cuda.amp import autocast, GradScaler
 
 scaler = GradScaler()
 with autocast():
@@ -349,7 +362,6 @@ with autocast():
     transformers_code_snippets = [
         # Good code
         """
-from transformers import AutoModel, AutoTokenizer
 
 model = AutoModel.from_pretrained("bert-base-uncased")
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
@@ -363,7 +375,6 @@ inputs = tokenizer(
 """,
         # Code with issues
         """
-from transformers import AutoModel
 
 model = AutoModel.from_pretrained("bert-base-uncased")
 # Missing tokenizer and proper preprocessing
@@ -504,9 +515,6 @@ def demonstrate_complete_workflow():
     # 5. Validate a code snippet
     print("5. Validating code snippet...")
     code_snippet = """
-import torch
-from torch.cuda.amp import autocast, GradScaler
-from transformers import AutoModel, AutoTokenizer
 
 model = AutoModel.from_pretrained("bert-base-uncased")
 tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
@@ -571,5 +579,6 @@ def main():
     print("and stays up-to-date with the latest library versions and APIs.")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

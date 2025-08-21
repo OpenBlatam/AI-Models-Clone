@@ -1,8 +1,10 @@
-"""
-Optimized Copywriting Service with High-Performance Libraries.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Enhanced service using orjson, asyncio, and caching for ultra-fast operations.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -10,37 +12,51 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import uuid
 import logging
+    import orjson
+    import json as orjson
+    import aioredis
+    import httpx
+    import aiohttp
+import structlog
+from functools import wraps
+from concurrent.futures import ThreadPoolExecutor
+import multiprocessing as mp
+from .models import (
+            import json
+        import hashlib
+from typing import Any, List, Dict, Optional
+
+# Import v11 optimized engine
+from .ultra_optimized_engine_v11 import UltraOptimizedEngineV11, get_engine, cleanup_engine
+
+"""
+Optimized Copywriting Service with High-Performance Libraries.
+
+Enhanced service using orjson, asyncio, and caching for ultra-fast operations.
+Now includes v11 integration for maximum performance.
+"""
+
 
 # High-performance imports
 try:
-    import orjson
     JSON_AVAILABLE = True
 except ImportError:
-    import json as orjson
     JSON_AVAILABLE = False
 
 try:
-    import aioredis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
 
 # Fast HTTP client
 try:
-    import httpx
     HTTPX_AVAILABLE = True
 except ImportError:
-    import aiohttp
     HTTPX_AVAILABLE = False
 
 # Performance monitoring
-import structlog
-from functools import wraps
-from concurrent.futures import ThreadPoolExecutor
-import multiprocessing as mp
 
 # Import optimized models
-from .models import (
     CopywritingInput, CopywritingOutput, CopyVariant, Metric,
     CopyTone, ContentType, Platform, Language, BrandVoice,
     get_settings, validate_input_fast, calculate_metrics_fast
@@ -49,10 +65,10 @@ from .models import (
 logger = structlog.get_logger(__name__)
 
 # Performance decorator
-def performance_monitor(func):
+def performance_monitor(func) -> Any:
     """Decorator to monitor function performance."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         start_time = time.perf_counter()
         try:
             result = await func(*args, **kwargs)
@@ -68,7 +84,7 @@ def performance_monitor(func):
 class OptimizedCopywritingService:
     """Ultra-optimized copywriting service with performance enhancements."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.settings = get_settings()
         self.redis_client = None
         self.http_client = None
@@ -78,10 +94,15 @@ class OptimizedCopywritingService:
         self._template_cache = {}
         self._metrics_cache = {}
         
+        # Performance tracking
+        self._request_count = 0
+        self._error_count = 0
+        self._total_processing_time = 0.0
+        
         # Initialize async components
         asyncio.create_task(self._initialize_async_components())
     
-    async def _initialize_async_components(self):
+    async def _initialize_async_components(self) -> Any:
         """Initialize async components like Redis and HTTP client."""
         try:
             if REDIS_AVAILABLE:
@@ -106,47 +127,56 @@ class OptimizedCopywritingService:
     async def generate_copy(self, input_data: CopywritingInput) -> CopywritingOutput:
         """Generate optimized copywriting content."""
         start_time = time.perf_counter()
+        self._request_count += 1
         
-        # Fast validation
-        if not validate_input_fast(input_data.model_dump()):
-            raise ValueError("Invalid input data")
-        
-        # Check cache first
-        cache_key = self._generate_cache_key(input_data)
-        cached_result = await self._get_from_cache(cache_key)
-        if cached_result:
-            logger.info("Returning cached result")
-            return CopywritingOutput.from_json(cached_result)
-        
-        # Generate variants in parallel
-        variants = await self._generate_variants_parallel(input_data)
-        
-        # Calculate metrics for all variants
-        await self._calculate_metrics_parallel(variants)
-        
-        # Select best variant
-        best_variant_id = self._select_best_variant(variants)
-        
-        # Create output
-        generation_time = time.perf_counter() - start_time
-        output = CopywritingOutput(
-            variants=variants,
-            model_used="optimized-service",
-            generation_time=generation_time,
-            best_variant_id=best_variant_id,
-            confidence_score=0.85,
-            tracking_id=input_data.tracking_id,
-            created_at=datetime.now()
-        )
-        
-        # Cache result
-        await self._cache_result(cache_key, output.to_json())
-        
-        logger.info(f"Generated {len(variants)} variants", 
-                   generation_time=generation_time,
-                   best_variant=best_variant_id)
-        
-        return output
+        try:
+            # Fast validation
+            if not validate_input_fast(input_data.model_dump()):
+                raise ValueError("Invalid input data")
+            
+            # Check cache first
+            cache_key = self._generate_cache_key(input_data)
+            cached_result = await self._get_from_cache(cache_key)
+            if cached_result:
+                logger.info("Returning cached result")
+                return CopywritingOutput.from_json(cached_result)
+            
+            # Generate variants in parallel
+            variants = await self._generate_variants_parallel(input_data)
+            
+            # Calculate metrics for all variants
+            await self._calculate_metrics_parallel(variants)
+            
+            # Select best variant
+            best_variant_id = self._select_best_variant(variants)
+            
+            # Create output
+            generation_time = time.perf_counter() - start_time
+            self._total_processing_time += generation_time
+            
+            output = CopywritingOutput(
+                variants=variants,
+                model_used="optimized-service",
+                generation_time=generation_time,
+                best_variant_id=best_variant_id,
+                confidence_score=0.85,
+                tracking_id=input_data.tracking_id,
+                created_at=datetime.now()
+            )
+            
+            # Cache result
+            await self._cache_result(cache_key, output.to_json())
+            
+            logger.info(f"Generated {len(variants)} variants", 
+                       generation_time=generation_time,
+                       best_variant=best_variant_id)
+            
+            return output
+            
+        except Exception as e:
+            self._error_count += 1
+            logger.error(f"Generation failed: {e}")
+            raise
     
     async def _generate_variants_parallel(self, input_data: CopywritingInput) -> List[CopyVariant]:
         """Generate multiple variants in parallel."""
@@ -270,11 +300,7 @@ class OptimizedCopywritingService:
         variations = ["", " 🔥", " ⭐", " 💎", " 🚀"]
         variation = variations[variant_index % len(variations)]
         
-        headline = headline_template.format(
-            product=product_name,
-            target=input_data.target_audience or "ti",
-            benefit="mejorar tus resultados"
-        ) + variation
+        headline = headline_template.format(product=product_name) + variation
         
         return headline[:200]  # Limit length
     
@@ -289,11 +315,7 @@ class OptimizedCopywritingService:
         if input_data.key_points:
             benefit = input_data.key_points[0] if input_data.key_points else benefit
         
-        text = text_template.format(
-            product=product_name,
-            benefit=benefit,
-            target=input_data.target_audience or "usuarios"
-        )
+        text = text_template.format(product=product_name, benefit=benefit)
         
         # Add key points if available
         if input_data.key_points and len(input_data.key_points) > 1:
@@ -403,10 +425,8 @@ class OptimizedCopywritingService:
         if JSON_AVAILABLE:
             key_bytes = orjson.dumps(key_data, sort_keys=True)
         else:
-            import json
             key_bytes = json.dumps(key_data, sort_keys=True).encode()
         
-        import hashlib
         return f"copy:{hashlib.md5(key_bytes).hexdigest()}"
     
     async def _get_from_cache(self, cache_key: str) -> Optional[bytes]:
@@ -450,7 +470,19 @@ class OptimizedCopywritingService:
             }
         }
     
-    async def cleanup(self):
+    def get_performance_stats(self) -> Dict[str, Any]:
+        """Get performance statistics for the service."""
+        return {
+            "request_count": self._request_count,
+            "error_count": self._error_count,
+            "success_rate": round((self._request_count - self._error_count) / max(self._request_count, 1) * 100, 2),
+            "average_processing_time": round(self._total_processing_time / max(self._request_count, 1), 3),
+            "total_processing_time": round(self._total_processing_time, 3),
+            "cache_size": len(self._template_cache),
+            "metrics_cache_size": len(self._metrics_cache)
+        }
+    
+    async def cleanup(self) -> Any:
         """Cleanup resources."""
         if self.redis_client:
             await self.redis_client.close()
@@ -459,6 +491,170 @@ class OptimizedCopywritingService:
             await self.http_client.aclose()
         
         self.thread_pool.shutdown(wait=True)
+
+# New v11 Service Wrapper
+class CopywritingServiceV11:
+    """V11 optimized copywriting service wrapper."""
+    
+    def __init__(self, model_name: str = "gpt2"):
+        self.model_name = model_name
+        self.engine = None
+        self._initialized = False
+        self._request_count = 0
+        self._error_count = 0
+        self._total_processing_time = 0.0
+    
+    async def _ensure_engine(self):
+        """Ensure the v11 engine is initialized."""
+        if not self._initialized:
+            self.engine = await get_engine()
+            self._initialized = True
+    
+    async def generate(self, request: CopywritingInput) -> CopywritingOutput:
+        """Generate copywriting using v11 optimized engine."""
+        start_time = time.perf_counter()
+        self._request_count += 1
+        
+        await self._ensure_engine()
+        
+        try:
+            # Convert CopywritingInput to the format expected by v11 engine
+            v11_request = {
+                "product_description": request.product_description,
+                "target_platform": request.target_platform.value if hasattr(request.target_platform, 'value') else str(request.target_platform),
+                "tone": request.tone.value if hasattr(request.tone, 'value') else str(request.tone),
+                "target_audience": request.target_audience,
+                "key_points": request.key_points,
+                "instructions": request.instructions,
+                "restrictions": request.restrictions,
+                "creativity_level": request.creativity_level,
+                "language": request.language.value if hasattr(request.language, 'value') else str(request.language),
+                "content_type": request.content_type.value if hasattr(request.content_type, 'value') else str(request.content_type),
+                "brand_voice": request.brand_voice.value if hasattr(request.brand_voice, 'value') else str(request.brand_voice),
+                "max_variants": request.max_variants,
+                "tracking_id": request.tracking_id
+            }
+            
+            result = await self.engine.generate_copywriting(v11_request)
+            
+            # Calculate processing time
+            processing_time = time.perf_counter() - start_time
+            self._total_processing_time += processing_time
+            
+            # Convert v11 result back to CopywritingOutput format
+            return CopywritingOutput(
+                variants=result.get("variants", []),
+                model_used=result.get("model_used", "v11-optimized"),
+                generation_time=processing_time,
+                best_variant_id=result.get("best_variant_id", ""),
+                confidence_score=result.get("confidence_score", 0.85),
+                tracking_id=result.get("tracking_id", request.tracking_id),
+                created_at=datetime.now()
+            )
+            
+        except Exception as e:
+            self._error_count += 1
+            logger.error(f"v11 generation failed: {e}")
+            raise
+    
+    async def get_performance_stats(self) -> Dict[str, Any]:
+        """Get performance statistics from v11 engine."""
+        await self._ensure_engine()
+        
+        engine_stats = self.engine.get_performance_stats()
+        
+        # Add service-level stats
+        service_stats = {
+            "request_count": self._request_count,
+            "error_count": self._error_count,
+            "success_rate": round((self._request_count - self._error_count) / max(self._request_count, 1) * 100, 2),
+            "average_processing_time": round(self._total_processing_time / max(self._request_count, 1), 3),
+            "total_processing_time": round(self._total_processing_time, 3)
+        }
+        
+        return {
+            "engine_stats": engine_stats,
+            "service_stats": service_stats
+        }
+    
+    async def get_engine_info(self) -> Dict[str, Any]:
+        """Get detailed engine information."""
+        await self._ensure_engine()
+        
+        return {
+            "model_name": self.model_name,
+            "engine_initialized": self._initialized,
+            "engine_type": "UltraOptimizedEngineV11",
+            "components": {
+                "intelligent_cache": hasattr(self.engine, 'intelligent_cache'),
+                "memory_manager": hasattr(self.engine, 'memory_manager'),
+                "batch_processor": hasattr(self.engine, 'batch_processor'),
+                "circuit_breaker": hasattr(self.engine, 'circuit_breaker')
+            }
+        }
+    
+    async def optimize_config(self, config_params: Dict[str, Any]) -> Dict[str, Any]:
+        """Optimize engine configuration."""
+        await self._ensure_engine()
+        
+        try:
+            # Apply configuration parameters
+            for key, value in config_params.items():
+                if hasattr(self.engine.config, key):
+                    setattr(self.engine.config, key, value)
+            
+            return {
+                "status": "optimization_applied",
+                "applied_parameters": config_params
+            }
+        except Exception as e:
+            logger.error(f"Failed to optimize config: {e}")
+            raise
+    
+    async def cleanup(self):
+        """Cleanup v11 engine resources."""
+        if self.engine:
+            await cleanup_engine()
+
+# Legacy service for backward compatibility
+class CopywritingService:
+    """Legacy copywriting service for backward compatibility."""
+    
+    def __init__(self, model_name: str = "gpt2"):
+        self.model_name = model_name
+        self.optimized_service = OptimizedCopywritingService()
+        self.v11_service = CopywritingServiceV11(model_name)
+    
+    async def generate(self, request: CopywritingInput) -> CopywritingOutput:
+        """Generate copywriting using legacy service."""
+        return await self.optimized_service.generate_copy(request)
+    
+    async def generate_v11(self, request: CopywritingInput) -> CopywritingOutput:
+        """Generate copywriting using v11 optimized engine."""
+        return await self.v11_service.generate(request)
+    
+    async def get_performance_stats(self) -> Dict[str, Any]:
+        """Get performance statistics."""
+        legacy_stats = self.optimized_service.get_performance_stats()
+        v11_stats = await self.v11_service.get_performance_stats()
+        
+        return {
+            "legacy_stats": legacy_stats,
+            "v11_stats": v11_stats
+        }
+    
+    async def get_engine_info(self) -> Dict[str, Any]:
+        """Get engine information."""
+        return await self.v11_service.get_engine_info()
+    
+    async def optimize_config(self, config_params: Dict[str, Any]) -> Dict[str, Any]:
+        """Optimize engine configuration."""
+        return await self.v11_service.optimize_config(config_params)
+    
+    async def cleanup(self):
+        """Cleanup resources."""
+        await self.optimized_service.cleanup()
+        await self.v11_service.cleanup()
 
 # Global service instance
 _service_instance = None
@@ -470,4 +666,16 @@ async def get_copywriting_service() -> OptimizedCopywritingService:
     if _service_instance is None:
         _service_instance = OptimizedCopywritingService()
     
-    return _service_instance 
+    return _service_instance
+
+# Global v11 service instance
+_v11_service_instance = None
+
+async def get_copywriting_service_v11() -> CopywritingServiceV11:
+    """Get v11 optimized copywriting service instance."""
+    global _v11_service_instance
+    
+    if _v11_service_instance is None:
+        _v11_service_instance = CopywritingServiceV11()
+    
+    return _v11_service_instance 

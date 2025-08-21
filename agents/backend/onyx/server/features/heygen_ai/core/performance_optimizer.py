@@ -746,3 +746,4 @@ async def shutdown_performance_optimizer():
     if performance_optimizer:
         await performance_optimizer.shutdown()
         performance_optimizer = None
+

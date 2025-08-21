@@ -1,3 +1,43 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import os
+import sys
+import time
+import asyncio
+import logging
+from typing import Dict, List, Optional, Any, Union
+from datetime import datetime
+from dataclasses import dataclass
+from functools import lru_cache
+import uuid
+import uvicorn
+from fastapi import FastAPI, HTTPException, Depends, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+import httpx
+            import orjson
+            import msgspec
+            import json
+            import blake3
+            import xxhash
+            import hashlib
+            import uvloop
+                import redis
+            import lz4.frame
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Refactored Enterprise Copywriting Service
@@ -12,24 +52,8 @@ Clean, modular, production-ready copywriting service with:
 - Production deployment ready
 """
 
-import os
-import sys
-import time
-import asyncio
-import logging
-from typing import Dict, List, Optional, Any, Union
-from datetime import datetime
-from dataclasses import dataclass
-from functools import lru_cache
-import uuid
 
 # Core dependencies
-import uvicorn
-from fastapi import FastAPI, HTTPException, Depends, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-import httpx
 
 # ============================================================================
 # OPTIMIZATION LIBRARY DETECTION
@@ -38,13 +62,13 @@ import httpx
 class OptimizationManager:
     """Intelligent optimization library detection and management"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.libraries = {}
         self.performance_score = 0.0
         self.tier = "basic"
         self._detect_libraries()
     
-    def _detect_libraries(self):
+    def _detect_libraries(self) -> Any:
         """Detect available optimization libraries"""
         libs_to_check = {
             # JSON serialization
@@ -103,17 +127,15 @@ class OptimizationManager:
         else:
             self.tier = "basic"
     
-    def get_optimized_json(self):
+    def get_optimized_json(self) -> Optional[Dict[str, Any]]:
         """Get best available JSON serializer"""
         if self.libraries["orjson"]["available"]:
-            import orjson
             return {
                 "dumps": lambda x: orjson.dumps(x).decode(),
                 "loads": orjson.loads,
                 "name": "orjson"
             }
         elif self.libraries["msgspec"]["available"]:
-            import msgspec
             encoder = msgspec.json.Encoder()
             decoder = msgspec.json.Decoder()
             return {
@@ -122,29 +144,24 @@ class OptimizationManager:
                 "name": "msgspec"
             }
         else:
-            import json
             return {
                 "dumps": json.dumps,
                 "loads": json.loads,
                 "name": "json"
             }
     
-    def get_optimized_hasher(self):
+    def get_optimized_hasher(self) -> Optional[Dict[str, Any]]:
         """Get best available hash function"""
         if self.libraries["blake3"]["available"]:
-            import blake3
             return lambda data: blake3.blake3(data.encode()).hexdigest()
         elif self.libraries["xxhash"]["available"]:
-            import xxhash
             return lambda data: xxhash.xxh64(data.encode()).hexdigest()
         else:
-            import hashlib
             return lambda data: hashlib.sha256(data.encode()).hexdigest()
     
-    def setup_event_loop(self):
+    def setup_event_loop(self) -> Any:
         """Setup optimized event loop"""
         if self.libraries["uvloop"]["available"]:
-            import uvloop
             asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
             return True
         return False
@@ -198,7 +215,7 @@ class Config:
     # Security
     api_keys: List[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.api_keys is None:
             keys = os.getenv("VALID_API_KEYS", "")
             self.api_keys = [k.strip() for k in keys.split(",") if k.strip()]
@@ -222,7 +239,7 @@ config = Config()
 class CacheManager:
     """Multi-level caching system"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # L1: Memory cache
         self.memory_cache: Dict[str, Any] = {}
         self.cache_timestamps: Dict[str, float] = {}
@@ -232,7 +249,6 @@ class CacheManager:
         self.redis_client = None
         if optimization.libraries["redis"]["available"]:
             try:
-                import redis
                 self.redis_client = redis.Redis(
                     host=os.getenv("REDIS_HOST", "localhost"),
                     port=int(os.getenv("REDIS_PORT", "6379")),
@@ -245,7 +261,6 @@ class CacheManager:
         # Compression (if available)
         self.compressor = None
         if optimization.libraries["lz4"]["available"]:
-            import lz4.frame
             self.compressor = {
                 "compress": lz4.frame.compress,
                 "decompress": lz4.frame.decompress
@@ -353,7 +368,7 @@ cache_manager = CacheManager()
 class AIProviderManager:
     """Multi-AI provider management with fallbacks"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.client = httpx.AsyncClient(timeout=30.0)
         self.providers = self._setup_providers()
     
@@ -503,7 +518,7 @@ class CopywritingResponse(BaseModel):
 class CopywritingService:
     """Main copywriting service"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = {
             "total_requests": 0,
             "successful_requests": 0,
@@ -773,5 +788,6 @@ def main():
         access_log=True
     )
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

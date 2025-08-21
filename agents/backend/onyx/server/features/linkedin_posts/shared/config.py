@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+from pydantic import BaseSettings, Field, validator
+from typing import Optional, List, Dict, Any
+import os
+from functools import lru_cache
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Advanced Configuration for LinkedIn Posts API
 ============================================
@@ -5,10 +25,6 @@ Advanced Configuration for LinkedIn Posts API
 Environment-based configuration with validation and defaults.
 """
 
-from pydantic import BaseSettings, Field, validator
-from typing import Optional, List, Dict, Any
-import os
-from functools import lru_cache
 
 
 class Settings(BaseSettings):
@@ -134,26 +150,27 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = Field("production", env="ENVIRONMENT")
     
     @validator("CORS_ORIGINS", pre=True)
-    def parse_cors_origins(cls, v):
+    def parse_cors_origins(cls, v) -> Any:
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",")]
         return v
     
     @validator("LOG_LEVEL")
-    def validate_log_level(cls, v):
+    def validate_log_level(cls, v) -> bool:
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         if v.upper() not in valid_levels:
             raise ValueError(f"Invalid log level. Must be one of: {valid_levels}")
         return v.upper()
     
     @validator("ENVIRONMENT")
-    def validate_environment(cls, v):
+    def validate_environment(cls, v) -> bool:
         valid_envs = ["development", "staging", "production", "testing"]
         if v.lower() not in valid_envs:
             raise ValueError(f"Invalid environment. Must be one of: {valid_envs}")
         return v.lower()
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True

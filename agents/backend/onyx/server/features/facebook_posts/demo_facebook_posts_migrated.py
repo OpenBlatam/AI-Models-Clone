@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+from datetime import datetime
+from typing import Dict, Any
+from models.facebook_models import (
+from domain.entities import (
+            from models.facebook_models import (
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 🎯 DEMO - Facebook Posts System Migrated
@@ -7,13 +27,8 @@ Demo completo del sistema migrado de Facebook posts para Onyx.
 Muestra todas las funcionalidades: generación, análisis, domain entities, etc.
 """
 
-import asyncio
-import json
-from datetime import datetime
-from typing import Dict, Any
 
 # Import migrated models
-from models.facebook_models import (
     FacebookPostEntity, FacebookPostFactory, FacebookPostRequest,
     ContentIdentifier, PostSpecification, GenerationConfig,
     FacebookPostContent, PostType, ContentTone, TargetAudience,
@@ -21,7 +36,6 @@ from models.facebook_models import (
 )
 
 # Import domain entities  
-from domain.entities import (
     FacebookPostDomainEntity, FacebookPostDomainFactory,
     DomainValidationError
 )
@@ -30,7 +44,7 @@ from domain.entities import (
 class FacebookPostsMigratedDemo:
     """Demo completo del sistema migrado."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.demo_stats = {
             'posts_created': 0,
             'successful_analyses': 0, 
@@ -55,7 +69,7 @@ class FacebookPostsMigratedDemo:
         """Imprimir resultado."""
         print(f"   • {key}: {value}")
     
-    async def run_complete_demo(self):
+    async def run_complete_demo(self) -> Any:
         """Ejecutar demo completo."""
         print("""
 🎉 FACEBOOK POSTS SYSTEM - MIGRATION DEMO 🎉
@@ -81,7 +95,7 @@ Demostrando todas las funcionalidades del sistema migrado:
         # Final stats
         await self.show_demo_statistics()
     
-    async def demo_basic_model_creation(self):
+    async def demo_basic_model_creation(self) -> Any:
         """Demo de creación básica de modelos."""
         self.print_header("1. Basic Model Creation", "🏗️")
         
@@ -143,7 +157,7 @@ Demostrando todas las funcionalidades del sistema migrado:
         except Exception as e:
             print(f"❌ Error in basic model creation: {e}")
     
-    async def demo_factory_patterns(self):
+    async def demo_factory_patterns(self) -> Any:
         """Demo de Factory patterns."""
         self.print_header("2. Factory Patterns", "🏭")
         
@@ -195,7 +209,7 @@ Demostrando todas las funcionalidades del sistema migrado:
         except Exception as e:
             print(f"❌ Error in factory patterns: {e}")
     
-    async def demo_advanced_generation(self):
+    async def demo_advanced_generation(self) -> Any:
         """Demo de generación avanzada."""
         self.print_header("3. Advanced Generation", "🤖")
         
@@ -262,7 +276,7 @@ Demostrando todas las funcionalidades del sistema migrado:
         except Exception as e:
             print(f"❌ Error in advanced generation: {e}")
     
-    async def demo_content_analysis(self):
+    async def demo_content_analysis(self) -> Any:
         """Demo de análisis de contenido."""
         self.print_header("4. Content Analysis", "📊")
         
@@ -274,7 +288,6 @@ Demostrando todas las funcionalidades del sistema migrado:
             )
             
             # Simulate analysis creation
-            from models.facebook_models import (
                 FacebookPostAnalysis, ContentMetrics, EngagementPrediction, 
                 QualityAssessment, QualityTier
             )
@@ -358,7 +371,7 @@ Demostrando todas las funcionalidades del sistema migrado:
         except Exception as e:
             print(f"❌ Error in content analysis: {e}")
     
-    async def demo_domain_entities(self):
+    async def demo_domain_entities(self) -> Any:
         """Demo de entidades del dominio."""
         self.print_header("5. Domain Entities (DDD)", "🏛️")
         
@@ -408,7 +421,7 @@ Demostrando todas las funcionalidades del sistema migrado:
         except Exception as e:
             print(f"❌ Error in domain entities: {e}")
     
-    async def demo_business_rules(self):
+    async def demo_business_rules(self) -> Any:
         """Demo de reglas de negocio."""
         self.print_header("6. Business Rules", "⚖️")
         
@@ -482,7 +495,7 @@ Demostrando todas las funcionalidades del sistema migrado:
         except Exception as e:
             print(f"❌ Error in business rules demo: {e}")
     
-    async def demo_performance_features(self):
+    async def demo_performance_features(self) -> Any:
         """Demo de características de performance."""
         self.print_header("7. Performance Features", "⚡")
         
@@ -546,7 +559,7 @@ Demostrando todas las funcionalidades del sistema migrado:
         except Exception as e:
             print(f"❌ Error in performance demo: {e}")
     
-    async def demo_onyx_integration(self):
+    async def demo_onyx_integration(self) -> Any:
         """Demo de integración con Onyx."""
         self.print_header("8. Onyx Integration", "🔗")
         
@@ -612,7 +625,7 @@ Demostrando todas las funcionalidades del sistema migrado:
         except Exception as e:
             print(f"❌ Error in Onyx integration demo: {e}")
     
-    async def show_demo_statistics(self):
+    async def show_demo_statistics(self) -> Any:
         """Mostrar estadísticas finales."""
         self.print_header("📈 Demo Statistics & Summary", "📊")
         

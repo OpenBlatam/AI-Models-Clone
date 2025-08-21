@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+import json
+import requests
+from typing import Dict, Any, List
+import logging
+from models.fastapi_best_practices import (
+from middleware.fastapi_best_practices import (
+from typing import Any, List, Dict, Optional
 """
 FastAPI Best Practices Demo
 
@@ -10,22 +27,14 @@ This script demonstrates the complete FastAPI best practices implementation:
 - Security best practices
 """
 
-import asyncio
-import time
-import json
-import requests
-from typing import Dict, Any, List
-import logging
 
 # Import FastAPI best practices components
-from models.fastapi_best_practices import (
     CaptionGenerationRequest, CaptionGenerationResponse,
     BatchCaptionRequest, BatchCaptionResponse,
     UserPreferences, ErrorResponse, HealthResponse,
     CaptionAnalytics, ServiceStatus, CaptionStyle, CaptionTone, LanguageCode
 )
 
-from middleware.fastapi_best_practices import (
     RequestIDMiddleware, LoggingMiddleware, PerformanceMonitoringMiddleware,
     SecurityHeadersMiddleware, RateLimitingMiddleware, ErrorHandlingMiddleware,
     CacheControlMiddleware, create_middleware_stack
@@ -40,14 +49,16 @@ class FastAPIBestPracticesDemo:
     """Demo class for FastAPI best practices"""
     
     def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.session = requests.Session()
         self.session.headers.update({
             "Authorization": "Bearer demo-api-key",
             "Content-Type": "application/json"
         })
     
-    def run_all_demos(self):
+    def run_all_demos(self) -> Any:
         """Run all FastAPI best practices demos"""
         logger.info("🚀 Starting FastAPI Best Practices Demo")
         
@@ -79,7 +90,7 @@ class FastAPIBestPracticesDemo:
             logger.error(f"❌ Demo failed: {e}")
             raise
     
-    def demo_data_models(self):
+    def demo_data_models(self) -> Any:
         """Demo Pydantic v2 data models with validation"""
         logger.info("\n📋 Demo: Data Models with Pydantic v2")
         
@@ -177,7 +188,7 @@ class FastAPIBestPracticesDemo:
         except Exception as e:
             logger.error(f"❌ Error response validation failed: {e}")
     
-    def demo_path_operations(self):
+    def demo_path_operations(self) -> Any:
         """Demo path operations with proper HTTP methods"""
         logger.info("\n🛣️ Demo: Path Operations with HTTP Methods")
         
@@ -225,7 +236,7 @@ class FastAPIBestPracticesDemo:
             except Exception as e:
                 logger.error(f"❌ {test_case['description']} failed: {e}")
     
-    def demo_middleware(self):
+    def demo_middleware(self) -> Any:
         """Demo middleware functionality"""
         logger.info("\n🔧 Demo: Middleware Stack")
         
@@ -276,7 +287,7 @@ class FastAPIBestPracticesDemo:
         except Exception as e:
             logger.error(f"❌ Security headers test failed: {e}")
     
-    def demo_error_handling(self):
+    def demo_error_handling(self) -> Any:
         """Demo error handling and validation"""
         logger.info("\n🚨 Demo: Error Handling and Validation")
         
@@ -332,7 +343,7 @@ class FastAPIBestPracticesDemo:
             except Exception as e:
                 logger.error(f"❌ Error test failed: {e}")
     
-    def demo_performance(self):
+    def demo_performance(self) -> Any:
         """Demo performance monitoring and optimization"""
         logger.info("\n⚡ Demo: Performance Monitoring")
         
@@ -394,7 +405,7 @@ class FastAPIBestPracticesDemo:
         except Exception as e:
             logger.error(f"❌ Batch performance test failed: {e}")
     
-    def demo_security(self):
+    def demo_security(self) -> Any:
         """Demo security features"""
         logger.info("\n🔒 Demo: Security Features")
         
@@ -443,7 +454,7 @@ class FastAPIBestPracticesDemo:
         except Exception as e:
             logger.error(f"❌ CORS test failed: {e}")
     
-    def demo_api_integration(self):
+    async def demo_api_integration(self) -> Any:
         """Demo complete API integration"""
         logger.info("\n🔗 Demo: Complete API Integration")
         
@@ -518,5 +529,6 @@ def main():
     logger.info("🔧 API is ready for production use with best practices implemented")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

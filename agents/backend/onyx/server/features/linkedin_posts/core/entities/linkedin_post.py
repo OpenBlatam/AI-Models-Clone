@@ -1,6 +1,7 @@
-"""
-LinkedIn Post domain entity with advanced features and optimizations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 from datetime import datetime
 from typing import Optional, List, Dict, Any
@@ -8,6 +9,13 @@ from enum import Enum
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 import json
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+LinkedIn Post domain entity with advanced features and optimizations.
+"""
+
 
 
 class PostStatus(str, Enum):
@@ -131,7 +139,7 @@ class LinkedInPost:
     reach_score: float = 0.0
     engagement_score: float = 0.0
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Post-initialization processing."""
         if isinstance(self.content, dict):
             self.content = PostContent(**self.content)

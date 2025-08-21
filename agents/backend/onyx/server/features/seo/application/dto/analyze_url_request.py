@@ -1,12 +1,26 @@
-"""
-Analyze URL Request DTO
-Data Transfer Object with validation
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from dataclasses import dataclass
 from typing import Optional
 from pydantic import BaseModel, validator, Field
 from domain.value_objects.url import URL
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Analyze URL Request DTO
+Data Transfer Object with validation
+"""
+
 
 
 class AnalyzeURLRequest(BaseModel):
@@ -24,7 +38,7 @@ class AnalyzeURLRequest(BaseModel):
     timeout: float = Field(10.0, description="Request timeout in seconds", ge=1.0, le=60.0)
     
     @validator('url')
-    def validate_url(cls, v):
+    def validate_url(cls, v) -> bool:
         """Validate URL format"""
         try:
             url_obj = URL.create(v)
@@ -35,7 +49,7 @@ class AnalyzeURLRequest(BaseModel):
             raise ValueError(f"Invalid URL: {str(e)}")
     
     @validator('max_links')
-    def validate_max_links(cls, v):
+    def validate_max_links(cls, v) -> bool:
         """Validate max links"""
         if v < 0:
             raise ValueError("Max links cannot be negative")
@@ -44,7 +58,7 @@ class AnalyzeURLRequest(BaseModel):
         return v
     
     @validator('timeout')
-    def validate_timeout(cls, v):
+    def validate_timeout(cls, v) -> bool:
         """Validate timeout"""
         if v < 1.0:
             raise ValueError("Timeout must be at least 1 second")

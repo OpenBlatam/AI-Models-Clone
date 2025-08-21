@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from dataclasses import dataclass, field
+from typing import List, Optional, Dict, Any
+from enum import Enum
+from datetime import datetime
+import uuid
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v13.0 - Domain Entities
 
@@ -5,11 +24,6 @@ Clean Architecture domain layer with pure business entities.
 No dependencies on external frameworks or infrastructure.
 """
 
-from dataclasses import dataclass, field
-from typing import List, Optional, Dict, Any
-from enum import Enum
-from datetime import datetime
-import uuid
 
 
 class CaptionStyle(str, Enum):
@@ -45,7 +59,7 @@ class RequestId:
     """Value object for request identification."""
     value: str = field(default_factory=lambda: f"v13-{uuid.uuid4().hex[:8]}")
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not self.value or len(self.value) < 3:
             raise ValueError("RequestId must have valid value")
 
@@ -55,7 +69,7 @@ class Content:
     """Value object for content description."""
     description: str
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not self.description or len(self.description.strip()) < 3:
             raise ValueError("Content description must be at least 3 characters")
         
@@ -76,7 +90,7 @@ class Hashtags:
     """Value object for hashtag collection."""
     tags: List[str]
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         # Validate and clean hashtags
         clean_tags = []
         for tag in self.tags:
@@ -104,7 +118,7 @@ class QualityMetrics:
     virality_score: float
     readability_score: float
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         # Validate score ranges
         for field_name in ['score', 'engagement_prediction', 'virality_score', 'readability_score']:
             value = getattr(self, field_name)
@@ -136,7 +150,7 @@ class PerformanceMetrics:
     model_used: str
     confidence_score: float
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.processing_time < 0:
             raise ValueError("Processing time cannot be negative")
         if not 0 <= self.confidence_score <= 1:
@@ -183,7 +197,7 @@ class CaptionRequest:
     # Timestamps
     created_at: datetime = field(default_factory=datetime.utcnow)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         # Validate hashtag count
         if not 5 <= self.hashtag_count <= 50:
             self.hashtag_count = max(5, min(50, self.hashtag_count))
@@ -193,7 +207,7 @@ class CaptionRequest:
             self.custom_instructions = self.custom_instructions[:500]
     
     @property
-    def is_premium_request(self) -> bool:
+    async def is_premium_request(self) -> bool:
         return self.enable_advanced_analysis and self.enable_sentiment_analysis
     
     @property
@@ -274,14 +288,14 @@ class BatchRequest:
     max_concurrent: int = 50
     created_at: datetime = field(default_factory=datetime.utcnow)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not self.requests:
             raise ValueError("Batch requests cannot be empty")
         if len(self.requests) > 100:
             raise ValueError("Batch size cannot exceed 100 requests")
     
     @property
-    def request_count(self) -> int:
+    async def request_count(self) -> int:
         return len(self.requests)
     
     @property

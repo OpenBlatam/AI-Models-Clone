@@ -1,7 +1,10 @@
-"""
-Main entry point for Ultra-Optimized SEO Service.
-Clean architecture implementation with dependency injection.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import signal
@@ -15,12 +18,19 @@ from fastapi.middleware.gzip import GZipMiddleware
 from loguru import logger
 import prometheus_client
 from prometheus_client import Counter, Histogram, Gauge
-
-# Import our modules
 from config.loader import load_config
 from services.seo_service_factory import SEOServiceFactory, cleanup_factory
 from api.routes import router as seo_router
 from api.middleware import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Main entry point for Ultra-Optimized SEO Service.
+Clean architecture implementation with dependency injection.
+"""
+
+
+# Import our modules
     RequestLoggingMiddleware,
     MetricsMiddleware,
     RateLimitMiddleware,
@@ -197,7 +207,7 @@ def add_exception_handlers(app: FastAPI):
     logger.info("🛡️ Exception handlers configured")
 
 
-async def shutdown_handler(signum, frame):
+async def shutdown_handler(signum, frame) -> Any:
     """Handle shutdown signals."""
     logger.info(f"🛑 Received signal {signum}, shutting down gracefully...")
     
@@ -291,5 +301,6 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

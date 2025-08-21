@@ -1,15 +1,24 @@
-"""
-AI service for LinkedIn Posts optimization and generation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 from typing import Dict, List, Optional, Any, Tuple
 from uuid import UUID
 import logging
 import json
-
 from ..entities.linkedin_post import LinkedInPost, PostTone, PostType
 from ..entities.template import Template
+from typing import Any, List, Dict, Optional
+"""
+AI service for LinkedIn Posts optimization and generation.
+"""
+
+
 
 
 logger = logging.getLogger(__name__)
@@ -28,7 +37,7 @@ class AIService:
     - A/B testing
     """
     
-    def __init__(self, llm_client=None, nlp_engine=None):
+    def __init__(self, llm_client=None, nlp_engine=None) -> Any:
         self.llm_client = llm_client
         self.nlp_engine = nlp_engine
         self._cache = {}

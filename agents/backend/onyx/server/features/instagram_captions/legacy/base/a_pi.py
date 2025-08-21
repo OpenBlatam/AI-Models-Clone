@@ -1,31 +1,52 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import logging
+from typing import Dict, Any
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from .config import get_settings, get_cors_config, get_logging_config, validate_environment_variables
+from .middleware import (
+from .api_optimized import router as optimized_router
+from .dependencies import dependency_lifespan, cleanup_dependencies
+import logging.config
+    from .api_ultra_fast import ultra_router
+from datetime import datetime
+from typing import List, Optional
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
+from fastapi import Field
+from .models import (
+from .gmt_instagram_agent import GMTInstagramAgent
+from .service import InstagramCaptionsService
+        from .core import InstagramCaptionsEngine
+        from .core import InstagramCaptionsEngine
+        from .core import InstagramCaptionsEngine
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Instagram Captions API v2.0.
 
 Modern FastAPI implementation with optimization, caching, and comprehensive error handling.
 """
 
-import logging
-from typing import Dict, Any
-from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 
-from .config import get_settings, get_cors_config, get_logging_config, validate_environment_variables
-from .middleware import (
     RequestLoggingMiddleware,
     PerformanceMonitoringMiddleware,
     SecurityMiddleware,
     ErrorHandlingMiddleware,
     CacheHeaderMiddleware
 )
-from .api_optimized import router as optimized_router
-from .dependencies import dependency_lifespan, cleanup_dependencies
 
 # Configure logging
 settings = get_settings()
-import logging.config
 logging.config.dictConfig(get_logging_config(settings))
 
 logger = logging.getLogger(__name__)
@@ -94,7 +115,6 @@ def create_optimized_app() -> FastAPI:
     app.include_router(optimized_router)
     
     # Include ultra-fast router
-    from .api_ultra_fast import ultra_router
     app.include_router(ultra_router)
     
     # Root endpoint
@@ -139,13 +159,8 @@ def create_optimized_app() -> FastAPI:
 app = create_optimized_app()
 
 # Legacy compatibility: maintain old router structure
-from datetime import datetime
-from typing import List, Optional
 
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends
-from fastapi import Field
 
-from .models import (
     InstagramCaptionRequest,
     InstagramCaptionResponse,
     InstagramCaptionError,
@@ -157,8 +172,6 @@ from .models import (
     InstagramTarget,
     HashtagStrategy
 )
-from .gmt_instagram_agent import GMTInstagramAgent
-from .service import InstagramCaptionsService
 
 # Legacy router for backward compatibility
 instagram_captions_router = APIRouter(
@@ -574,7 +587,6 @@ async def analyze_caption_quality(
 ):
     """Analyze the quality of an existing caption."""
     try:
-        from .core import InstagramCaptionsEngine
         
         engine = InstagramCaptionsEngine()
         quality_metrics = engine.analyze_quality(caption)
@@ -599,7 +611,6 @@ async def optimize_existing_caption(
 ):
     """Optimize an existing caption for better quality and engagement."""
     try:
-        from .core import InstagramCaptionsEngine
         
         engine = InstagramCaptionsEngine()
         optimized_caption, quality_metrics = await engine.optimize_content(caption, style, audience)
@@ -693,7 +704,6 @@ async def batch_optimize_captions(
 ):
     """Optimize multiple captions in batch for better efficiency."""
     try:
-        from .core import InstagramCaptionsEngine
         
         if len(captions) > 10:
             raise HTTPException(status_code=400, detail="Maximum 10 captions per batch")

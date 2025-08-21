@@ -1,17 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 from fastapi.testclient import TestClient
 from fastapi import FastAPI
-from onyx.server.features.ads.backend_ads.api import backend_ads_router
-from onyx.server.features.ads.backend_ads.models import AdsGenerationRequest, ModelConfig
+from onyx.server.features.ads.api import router as ads_router
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def client():
     app = FastAPI()
-    app.include_router(backend_ads_router)
+    app.include_router(ads_router)
     return TestClient(app)
 
 @pytest.mark.asyncio
-def test_generate_ads_success(client):
+def test_generate_ads_success(client) -> Any:
     # Prepare a valid AdsGenerationRequest payload
     payload = {
         "url": "https://example.com",
@@ -35,10 +45,10 @@ def test_generate_ads_success(client):
         }
     }
 
-    response = client.post("/backend-ads/generate", json=payload)
+    response = client.post("/ads/core/generate", json=payload)
     assert response.status_code == 200
     data = response.json()
     assert "status" in data
     assert data["status"] == "success"
     assert "data" in data
-    assert "timestamp" in dataas
+    assert "timestamp" in data

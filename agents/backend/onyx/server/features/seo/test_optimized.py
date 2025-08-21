@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Script de prueba optimizado para el servicio de análisis SEO con LangChain
-Demuestra todas las nuevas funcionalidades y optimizaciones
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import os
 import sys
@@ -12,18 +14,28 @@ import asyncio
 import requests
 from pathlib import Path
 from typing import List, Dict
+from features.seo.service import SEOService
+from features.seo.models import SEOScrapeRequest
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Script de prueba optimizado para el servicio de análisis SEO con LangChain
+Demuestra todas las nuevas funcionalidades y optimizaciones
+"""
+
 
 # Agregar el directorio padre al path para importar los módulos
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from features.seo.service import SEOService
-from features.seo.models import SEOScrapeRequest
 
 class SEOTester:
     """Clase para probar el servicio SEO optimizado"""
     
     def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.session = requests.Session()
         self.session.headers.update({
             'Content-Type': 'application/json',
@@ -313,5 +325,6 @@ def main():
     else:
         print("⚠️  Algunas pruebas fallaron. Revisar logs para más detalles.")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

@@ -1,7 +1,11 @@
-"""
-Backend Ads API - Enhanced Onyx Integration
-Complete API with advanced Onyx capabilities and model adaptation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from typing import Dict, Any, Optional, AsyncGenerator
 from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.responses import StreamingResponse
@@ -9,6 +13,13 @@ from onyx.utils.logger import setup_logger
 from onyx.core.functions import format_response
 from onyx.server.features.ads.backend_ads.service import BackendAdsService
 from onyx.server.features.ads.backend_ads.models import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Backend Ads API - Enhanced Onyx Integration
+Complete API with advanced Onyx capabilities and model adaptation.
+"""
     AdsGenerationRequest,
     BrandKitRequest,
     EmailSequenceRequest,

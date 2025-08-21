@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import Depends, HTTPException, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Optional
+from ..core.engine import CopywritingEngine
+from ..config.settings import get_settings, get_security_config
+from .app import get_engine
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 API Dependencies
 ===============
@@ -5,13 +16,7 @@ API Dependencies
 Dependency injection functions for the FastAPI application.
 """
 
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from typing import Optional
 
-from ..core.engine import CopywritingEngine
-from ..config.settings import get_settings, get_security_config
-from .app import get_engine
 
 # Security
 security = HTTPBearer()

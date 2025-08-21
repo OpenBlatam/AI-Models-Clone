@@ -807,3 +807,4 @@ async def shutdown_mlops_manager():
     if mlops_manager:
         await mlops_manager.shutdown()
         mlops_manager = None
+

@@ -1,21 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import pytest
+from datetime import datetime
+from ..models.facebook_models import (
+from ..domain.entities import FacebookPostDomainEntity, FacebookPostDomainFactory
+        from ..models.facebook_models import FacebookPostRequest
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Tests for Facebook Posts System
 """
 
-import pytest
-from datetime import datetime
-from ..models.facebook_models import (
     FacebookPostEntity, FacebookPostFactory, ContentIdentifier,
     PostSpecification, GenerationConfig, FacebookPostContent,
     PostType, ContentTone, TargetAudience, EngagementTier
 )
-from ..domain.entities import FacebookPostDomainEntity, FacebookPostDomainFactory
 
 
 class TestFacebookPostModels:
     """Tests para modelos de Facebook posts."""
     
-    def test_content_identifier_generation(self):
+    def test_content_identifier_generation(self) -> Any:
         """Test generación de ContentIdentifier."""
         content_text = "Test content for Facebook post"
         identifier = ContentIdentifier.generate(content_text)
@@ -25,7 +31,7 @@ class TestFacebookPostModels:
         assert identifier.created_at is not None
         assert identifier.fingerprint is not None
     
-    def test_facebook_post_creation(self):
+    def test_facebook_post_creation(self) -> Any:
         """Test creación de FacebookPost."""
         post = FacebookPostFactory.create_high_performance_post(
             topic="Digital Marketing",
@@ -37,7 +43,7 @@ class TestFacebookPostModels:
         assert post.content.text is not None
         assert len(post.content.hashtags) > 0
     
-    def test_post_validation(self):
+    def test_post_validation(self) -> Any:
         """Test validación de posts."""
         post = FacebookPostFactory.create_high_performance_post(
             topic="Test Topic"
@@ -47,7 +53,7 @@ class TestFacebookPostModels:
         # Should have errors because no analysis
         assert len(errors) > 0
     
-    def test_domain_entity_creation(self):
+    def test_domain_entity_creation(self) -> Any:
         """Test creación de entidad del dominio."""
         domain_post = FacebookPostDomainFactory.create_new_post(
             topic="Domain Test",
@@ -63,11 +69,10 @@ class TestFacebookPostEngine:
     """Tests para el engine de Facebook posts."""
     
     @pytest.mark.asyncio
-    async def test_post_generation_request(self):
+    async async def test_post_generation_request(self) -> Any:
         """Test solicitud de generación de post."""
         # This would test the actual engine
         # For now, just test the model creation
-        from ..models.facebook_models import FacebookPostRequest
         
         request = FacebookPostRequest(
             topic="Test Topic",

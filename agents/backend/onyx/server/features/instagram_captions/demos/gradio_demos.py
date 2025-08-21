@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import gradio as gr
 import torch
 import torch.nn as nn
@@ -16,12 +27,17 @@ from pathlib import Path
 import os
 import sys
 
+    from utils.deep_learning_integration import (
+    from utils.model_evaluation import ModelEvaluator, CaptionQualityEvaluator
+    from utils.task_specific_metrics import InstagramCaptionMetrics
+    from utils.efficient_data_loading import EfficientDataLoaderFactory
+from typing import Any, List, Dict, Optional
+import asyncio
 # Add the utils directory to the path
 sys.path.append(os.path.join(os.path.dirname(__file__), ..utils'))
 
 # Import our deep learning modules
 try:
-    from utils.deep_learning_integration import (
         DeepLearningIntegration, 
         DeepLearningConfig, 
         InstagramCaptionModel,
@@ -29,9 +45,6 @@ try:
         train_instagram_caption_model,
         generate_instagram_captions
     )
-    from utils.model_evaluation import ModelEvaluator, CaptionQualityEvaluator
-    from utils.task_specific_metrics import InstagramCaptionMetrics
-    from utils.efficient_data_loading import EfficientDataLoaderFactory
 except ImportError:
     # Fallback for demo purposes
     print("Warning: Some modules not found, using demo implementations")
@@ -47,7 +60,7 @@ evaluation_results =[object Object]
 
 class GradioDemoManager:
     nager for all Gradio demo interfaces."   
-    def __init__(self):
+    def __init__(self) -> Any:
         self.model = None
         self.config = None
         self.training_history =   self.evaluation_results =[object Object]       self.sample_data = self._create_sample_data()
@@ -431,7 +444,8 @@ class GradioDemoManager:
             return f"Creative and artistic caption for: {text}"
         elif style == "Minimalist":
             return f"Simple and clean caption for: {text}"
-        elif style == "Engaging":
+        elmatch style:
+    case "Engaging":
             return f"Engaging and interactive caption for: {text}   else:  # Casual
             return f"Casual and fun caption for: {text}"
     

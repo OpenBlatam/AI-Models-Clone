@@ -1,9 +1,10 @@
-"""
-Optimized Pytest Configuration
-=============================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Clean, fast, and efficient testing setup with only essential dependencies.
-"""
+# Constants
+BUFFER_SIZE = 1024
 
 import pytest
 import asyncio
@@ -15,15 +16,25 @@ from typing import Dict, Any, List, Optional
 from datetime import datetime
 from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
-
-# Essential testing libraries
 from faker import Faker
 import factory
 from factory import Factory, Faker as FactoryFaker
 import psutil
+from memory_profiler import profile
+        import uvloop
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Optimized Pytest Configuration
+=============================
+
+Clean, fast, and efficient testing setup with only essential dependencies.
+"""
+
+
+# Essential testing libraries
 
 # Performance testing
-from memory_profiler import profile
 
 # Initialize Faker
 fake = Faker()
@@ -32,7 +43,7 @@ fake = Faker()
 class OptimizedTestDataGenerator:
     """Optimized test data generator with caching and performance improvements."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.fake = Faker()
         self._cache = {}
         self._cache_ttl = 300  # 5 minutes
@@ -65,7 +76,7 @@ class OptimizedTestDataGenerator:
         """Generate optimized batch data."""
         return [self.generate_post_data(**overrides) for _ in range(count)]
     
-    def clear_cache(self):
+    def clear_cache(self) -> Any:
         """Clear the data cache."""
         self._cache.clear()
 
@@ -73,7 +84,7 @@ class OptimizedTestDataGenerator:
 class OptimizedPerformanceMonitor:
     """Optimized performance monitoring with minimal overhead."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.process = psutil.Process()
         self.metrics = {}
     
@@ -132,7 +143,6 @@ class OptimizedLinkedInPostFactory(Factory):
 def event_loop():
     """Create an optimized event loop for the test session."""
     try:
-        import uvloop
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     except ImportError:
         pass
@@ -268,7 +278,9 @@ class OptimizedTestUtils:
         semaphore = asyncio.Semaphore(max_concurrent)
         
         async def limited_operation():
-            async with semaphore:
+            
+    """limited_operation function."""
+async with semaphore:
                 return await operation_func()
         
         tasks = [limited_operation() for _ in range(count)]
@@ -295,7 +307,7 @@ class OptimizedTestUtils:
         }
     
     @staticmethod
-    def profile_memory(func):
+    def profile_memory(func) -> Any:
         """Profile memory usage with minimal overhead."""
         process = psutil.Process()
         

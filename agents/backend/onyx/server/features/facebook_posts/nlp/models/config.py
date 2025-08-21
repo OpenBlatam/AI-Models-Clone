@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Any
+from enum import Enum
+import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 ⚙️ NLP Configuration Models
 ===========================
@@ -6,10 +21,6 @@ Configuración modular para el sistema NLP.
 Settings, patterns, thresholds, y configuraciones por módulo.
 """
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
-from enum import Enum
-import os
 
 
 class ModelQuality(str, Enum):
@@ -37,7 +48,7 @@ class PerformanceConfig:
     cache_size_mb: int = 100
     cache_ttl_seconds: int = 3600
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.max_concurrent_analyses <= 0:
             raise ValueError("max_concurrent_analyses must be positive")
 
@@ -235,7 +246,7 @@ class NLPSystemConfig:
     optimization: OptimizationConfig = field(default_factory=OptimizationConfig)
     
     # Environment overrides
-    def load_from_env(self):
+    def load_from_env(self) -> Any:
         """Load configuration from environment variables."""
         
         # Performance settings
@@ -259,7 +270,7 @@ class NLPSystemConfig:
             self.emotion.model_quality = quality_enum
             self.engagement.model_quality = quality_enum
     
-    def get_model_config(self, analysis_type: str) -> Any:
+    def get_model_config(self, analysis_type: str) -> Optional[Dict[str, Any]]:
         """Get configuration for specific analysis type."""
         configs = {
             'sentiment': self.sentiment,

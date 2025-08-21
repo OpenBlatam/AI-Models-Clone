@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from pydantic import BaseModel, Field
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+from .entities import CopywritingVariant, PerformanceMetrics
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Response Models
 ==============
@@ -5,10 +19,6 @@ Response Models
 Pydantic models for API response validation.
 """
 
-from pydantic import BaseModel, Field
-from typing import List, Optional, Dict, Any
-from datetime import datetime
-from .entities import CopywritingVariant, PerformanceMetrics
 
 
 class CopywritingResponse(BaseModel):
@@ -30,7 +40,8 @@ class CopywritingResponse(BaseModel):
     tokens_generated: Optional[int] = Field(default=None, description="Number of tokens generated")
     confidence_score: Optional[float] = Field(default=None, ge=0.0, le=1.0, description="Confidence score")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "request_id": "req_1234567890",
@@ -76,7 +87,8 @@ class BatchResponse(BaseModel):
     avg_processing_time: float = Field(..., description="Average processing time per request")
     throughput: float = Field(..., description="Requests processed per second")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "batch_id": "batch_1234567890",
@@ -116,7 +128,8 @@ class OptimizationResponse(BaseModel):
     suggestions: Optional[List[str]] = Field(default=None, description="Additional suggestions")
     confidence_score: Optional[float] = Field(default=None, ge=0.0, le=1.0, description="Confidence score")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "request_id": "opt_1234567890",
@@ -157,7 +170,8 @@ class AnalysisResponse(BaseModel):
     overall_score: float = Field(..., ge=0.0, le=1.0, description="Overall content score")
     suggestions: List[str] = Field(default=[], description="Improvement suggestions")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "request_id": "analysis_1234567890",
@@ -202,7 +216,8 @@ class SystemMetrics(BaseModel):
     health_status: str = Field(..., description="Overall health status")
     last_health_check: datetime = Field(..., description="Last health check timestamp")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "engine_status": {
@@ -238,7 +253,8 @@ class ErrorResponse(BaseModel):
     request_id: Optional[str] = Field(default=None, description="Request identifier")
     details: Optional[Dict[str, Any]] = Field(default=None, description="Additional error details")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "error": "Invalid request parameters",

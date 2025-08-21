@@ -1,14 +1,21 @@
-"""
-Instagram Captions API v9.0 - Ultra-Advanced Demo
-
-Demo interactivo que muestra las capacidades ultra-avanzadas con librerías de vanguardia.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
 import json
 import requests
 from typing import Dict, Any
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Instagram Captions API v9.0 - Ultra-Advanced Demo
+
+Demo interactivo que muestra las capacidades ultra-avanzadas con librerías de vanguardia.
+"""
+
 
 # Test imports to show available capabilities
 CAPABILITIES = {}
@@ -39,9 +46,11 @@ class UltraAdvancedDemo:
     """Demo de capacidades ultra-avanzadas."""
     
     def __init__(self, api_url: str = "http://localhost:8090"):
-        self.api_url = api_url
+        
+    """__init__ function."""
+self.api_url = api_url
     
-    def show_capabilities(self):
+    def show_capabilities(self) -> Any:
         """Mostrar capacidades disponibles."""
         print("🔬 ULTRA-ADVANCED CAPABILITIES")
         print("=" * 50)
@@ -71,7 +80,7 @@ class UltraAdvancedDemo:
         
         return capability_percentage
     
-    def test_api_connection(self) -> bool:
+    async def test_api_connection(self) -> bool:
         """Test API connection."""
         try:
             response = requests.get(f"{self.api_url}/ultra/health", timeout=5)
@@ -79,7 +88,7 @@ class UltraAdvancedDemo:
         except:
             return False
     
-    def test_ultra_generation(self):
+    def test_ultra_generation(self) -> Any:
         """Test ultra-advanced generation."""
         
         test_requests = [
@@ -178,7 +187,7 @@ class UltraAdvancedDemo:
             except Exception as e:
                 print(f"❌ Connection error: {e}")
     
-    def show_api_capabilities(self):
+    async def show_api_capabilities(self) -> Any:
         """Show API capabilities."""
         try:
             response = requests.get(f"{self.api_url}/ultra/capabilities", timeout=10)
@@ -215,7 +224,7 @@ class UltraAdvancedDemo:
         except Exception as e:
             print(f"❌ Connection error: {e}")
     
-    def interactive_demo(self):
+    def interactive_demo(self) -> Any:
         """Demo interactivo."""
         print("\n🎮 INTERACTIVE ULTRA-ADVANCED DEMO")
         print("=" * 50)
@@ -344,5 +353,6 @@ def main():
     print(f"Ultra-advanced features: {'Ready' if capability_percentage > 70 else 'Limited'}")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

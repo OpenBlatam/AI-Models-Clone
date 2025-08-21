@@ -1,9 +1,10 @@
-"""
-Instagram Captions API v7.0 - Ultra-Optimized Core Module
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Advanced optimization using specialized libraries for maximum performance
-and functionality. Built with the best Python ecosystem tools.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import os
 import secrets
@@ -14,41 +15,51 @@ from typing import Any, Dict, List, Optional, Union, Literal
 from datetime import datetime, timezone
 from enum import Enum
 from contextlib import asynccontextmanager
+    import orjson as json
+    import json
+from dynaconf import Dynaconf
+from pydantic import BaseModel, Field, field_validator, ConfigDict
+from pydantic_settings import BaseSettings
+import structlog
+from loguru import logger
+from cachetools import TTLCache, LRUCache
+import redis.asyncio as redis
+from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+import time
+from functools import wraps
+from cryptography.fernet import Fernet
+import nltk
+from sentence_transformers import SentenceTransformer
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Instagram Captions API v7.0 - Ultra-Optimized Core Module
+
+Advanced optimization using specialized libraries for maximum performance
+and functionality. Built with the best Python ecosystem tools.
+"""
+
 
 # Ultra-fast JSON serialization
 try:
-    import orjson as json
     JSON_LOADS = orjson.loads
     JSON_DUMPS = lambda obj: orjson.dumps(obj).decode()
 except ImportError:
-    import json
     JSON_LOADS = json.loads
     JSON_DUMPS = json.dumps
 
 # Advanced configuration management
-from dynaconf import Dynaconf
-from pydantic import BaseModel, Field, field_validator, ConfigDict
-from pydantic_settings import BaseSettings
 
 # Structured logging
-import structlog
-from loguru import logger
 
 # Advanced caching
-from cachetools import TTLCache, LRUCache
-import redis.asyncio as redis
 
 # Performance monitoring
-from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
-import time
-from functools import wraps
 
 # Cryptographic operations
-from cryptography.fernet import Fernet
 
 # Text processing
-import nltk
-from sentence_transformers import SentenceTransformer
 
 # =============================================================================
 # ADVANCED CONFIGURATION WITH DYNACONF
@@ -170,7 +181,7 @@ logger.configure(
 class PrometheusMetrics:
     """Advanced metrics collection with Prometheus."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Request metrics
         self.requests_total = Counter(
             'instagram_captions_requests_total',
@@ -267,9 +278,9 @@ metrics = PrometheusMetrics()
 
 def monitor_performance(endpoint: str):
     """Decorator to monitor performance automatically."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             metrics.active_requests.inc()
             
@@ -540,7 +551,7 @@ class UltraOptimizedUtils:
     """Ultra-optimized utility functions with advanced features."""
     
     @staticmethod
-    def generate_request_id(prefix: str = "req") -> str:
+    async def generate_request_id(prefix: str = "req") -> str:
         """Generate cryptographically secure request ID."""
         timestamp = int(time.time() * 1000000)
         random_part = secrets.token_hex(4)
@@ -592,11 +603,11 @@ class UltraOptimizedUtils:
 class RedisManager:
     """Advanced Redis connection manager with connection pooling."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.redis_client = None
         self.connection_pool = None
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize Redis connection with optimized settings."""
         self.connection_pool = redis.ConnectionPool.from_url(
             config.REDIS_URL,
@@ -616,7 +627,7 @@ class RedisManager:
         await self.redis_client.ping()
         logger.info("Redis connection established successfully")
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close Redis connections gracefully."""
         if self.redis_client:
             await self.redis_client.close()

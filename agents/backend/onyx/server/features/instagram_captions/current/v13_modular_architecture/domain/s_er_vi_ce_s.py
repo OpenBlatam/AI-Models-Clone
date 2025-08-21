@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import List, Dict, Any, Optional, Tuple
+from .entities import (
+import re
+import math
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v13.0 - Domain Services
 
@@ -5,13 +20,9 @@ Domain services for complex business logic that doesn't belong to entities.
 Pure business logic without external dependencies.
 """
 
-from typing import List, Dict, Any, Optional, Tuple
-from .entities import (
     CaptionRequest, CaptionResponse, CaptionStyle, Content, Hashtags,
     QualityMetrics, PerformanceMetrics, QualityLevel, RequestId
 )
-import re
-import math
 
 
 class QualityAssessmentService:
@@ -330,7 +341,7 @@ class CaptionGenerationService:
     """Service for caption generation business logic."""
     
     @staticmethod
-    def validate_request(request: CaptionRequest) -> List[str]:
+    async def validate_request(request: CaptionRequest) -> List[str]:
         """Validate caption request and return list of validation errors."""
         errors = []
         

@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from ..dependencies import (
+from ..core import CacheManager
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Cache routes for Ultra-Optimized SEO Service v15.
 
@@ -8,14 +20,10 @@ This module contains cache management endpoints including:
 - Cache health monitoring
 """
 
-from fastapi import APIRouter, Depends, HTTPException
-from typing import Optional
 
-from ..dependencies import (
     get_cache_manager,
     get_logger
 )
-from ..core import CacheManager
 
 # Create router with prefix and tags
 router = APIRouter(

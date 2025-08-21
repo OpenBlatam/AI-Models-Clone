@@ -511,3 +511,4 @@ async def shutdown_cache_manager():
     if cache_manager:
         await cache_manager.shutdown()
         cache_manager = None
+

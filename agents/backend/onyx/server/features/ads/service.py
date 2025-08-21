@@ -1,6 +1,8 @@
-"""
-Service for handling ads-related business logic.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from typing import Dict, Any, Optional, List
 import httpx
 import base64
@@ -11,24 +13,30 @@ import pyvips
 import cv2
 from rembg import remove, new_session
 from uuid import UUID
-
 from onyx.llm.interface import (
-    generate_ads_lcel,
-    generate_brand_kit_lcel,
-    generate_custom_content_lcel
-)
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.storage import StorageService
 from onyx.server.features.ads.config import settings
 from .models import Ad
 from .schemas import AdCreate
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Service for handling ads-related business logic.
+"""
+
+    generate_ads_lcel,
+    generate_brand_kit_lcel,
+    generate_custom_content_lcel
+)
 
 logger = setup_logger()
 
 class AdsService:
     """Service for handling ads-related business logic."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the service."""
         self.rembg_session = new_session()
         self.storage_service = StorageService()
@@ -125,6 +133,10 @@ class AdsService:
                     img_vips = img_vips.resize(scale)
                 png_bytes = img_vips.write_to_buffer(".png")
                 input_image = Image.open(io.BytesIO(png_bytes))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             except Exception as e:
                 logger.warning(f"pyvips failed: {e}, falling back to OpenCV")
                 arr = np.frombuffer(image_bytes, np.uint8)

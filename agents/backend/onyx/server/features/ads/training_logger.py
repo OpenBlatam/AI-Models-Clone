@@ -1,7 +1,17 @@
-"""
-Comprehensive training logger service for ads generation features.
-Provides detailed logging for training progress, errors, metrics, and performance monitoring.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 import logging
 import json
 import os
@@ -16,7 +26,10 @@ from enum import Enum
 import time
 import threading
 from contextlib import contextmanager
-import aioredis
+try:
+    import aioredis  # type: ignore
+except Exception:  # pragma: no cover - optional in tests
+    aioredis = None  # type: ignore[assignment]
 from collections import defaultdict, deque
 import numpy as np
 import torch
@@ -25,9 +38,15 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from io import StringIO
 from torch.autograd import detect_anomaly
-
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.optimized_config import settings
+            import psutil
+from typing import Any, List, Dict, Optional
+"""
+Comprehensive training logger service for ads generation features.
+Provides detailed logging for training progress, errors, metrics, and performance monitoring.
+"""
+
 
 logger = setup_logger()
 
@@ -74,7 +93,7 @@ class TrainingMetrics:
     phase: TrainingPhase = TrainingPhase.TRAINING
     timestamp: datetime = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.timestamp is None:
             self.timestamp = datetime.now()
 
@@ -90,7 +109,7 @@ class ErrorLog:
     timestamp: datetime = None
     context: Optional[Dict[str, Any]] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.timestamp is None:
             self.timestamp = datetime.now()
 
@@ -172,7 +191,7 @@ class TrainingLogger:
         if self.enable_autograd_debug:
             logger.info("PyTorch autograd anomaly detection enabled")
     
-    def _setup_logging(self):
+    def _setup_logging(self) -> Any:
         """Setup file and console logging."""
         if self.enable_file_logging:
             self._setup_file_logging()
@@ -180,7 +199,7 @@ class TrainingLogger:
         if self.enable_console_logging:
             self._setup_console_logging()
     
-    def _setup_file_logging(self):
+    def _setup_file_logging(self) -> Any:
         """Setup file logging with rotation."""
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         log_file = self.log_dir / f"training_{self.user_id}_{self.model_name}_{timestamp}.log"
@@ -199,7 +218,7 @@ class TrainingLogger:
         logger.addHandler(file_handler)
         self.file_handler = file_handler
     
-    def _setup_console_logging(self):
+    def _setup_console_logging(self) -> Any:
         """Setup console logging."""
         console_handler = logging.StreamHandler(sys.stdout)
         console_handler.setLevel(logging.INFO)
@@ -212,7 +231,7 @@ class TrainingLogger:
         logger.addHandler(console_handler)
         self.console_handler = console_handler
     
-    def _setup_tensorboard(self):
+    def _setup_tensorboard(self) -> Any:
         """Setup TensorBoard logging."""
         if self.enable_tensorboard:
             tb_dir = self.log_dir / "tensorboard"
@@ -221,14 +240,14 @@ class TrainingLogger:
         else:
             self.tensorboard_writer = None
     
-    def _setup_redis(self):
+    def _setup_redis(self) -> Any:
         """Setup Redis for distributed logging."""
         self._redis_client = None
         if self.enable_redis_logging:
             self._redis_client = None  # Will be initialized lazily
     
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         """Lazy initialization of Redis client."""
         if self._redis_client is None and self.enable_redis_logging:
             self._redis_client = await aioredis.from_url(
@@ -263,7 +282,7 @@ class TrainingLogger:
         
         self._log_training_start()
     
-    def _log_training_start(self):
+    def _log_training_start(self) -> Any:
         """Log training start information."""
         message = f"Training started - Epochs: {self.training_progress.total_epochs}, Steps: {self.training_progress.total_steps}"
         self.log_info(message, phase=self.training_progress.phase)
@@ -271,7 +290,7 @@ class TrainingLogger:
         # Log system information
         self._log_system_info()
     
-    def _log_system_info(self):
+    def _log_system_info(self) -> Any:
         """Log system information."""
         system_info = {
             "device": str(torch.device("cuda" if torch.cuda.is_available() else "cpu")),
@@ -363,7 +382,7 @@ class TrainingLogger:
                 for name, value in metrics.custom_metrics.items():
                     self.tensorboard_writer.add_scalar(f'Custom/{name}', value, global_step)
     
-    def _log_progress_update(self):
+    def _log_progress_update(self) -> Any:
         """Log progress update."""
         if self.training_progress:
             progress = self.training_progress.progress_percentage
@@ -447,7 +466,7 @@ class TrainingLogger:
         if self.tensorboard_writer:
             self.tensorboard_writer.close()
     
-    def _log_training_summary(self):
+    def _log_training_summary(self) -> Any:
         """Log training summary."""
         if not self.metrics_history:
             return
@@ -594,7 +613,7 @@ class TrainingLogger:
                 except Exception as e:
                     logger.warning(f"Failed to delete log file {log_file}: {e}")
     
-    def close(self):
+    def close(self) -> Any:
         """Close the logger and cleanup resources."""
         # Remove handlers
         if hasattr(self, 'file_handler'):
@@ -693,7 +712,7 @@ class TrainingLogger:
         
         return gradient_info
     
-    def enable_autograd_debugging(self):
+    def enable_autograd_debugging(self) -> Any:
         """Enable PyTorch autograd anomaly detection."""
         if not self.enable_autograd_debug:
             self.enable_autograd_debug = True
@@ -702,7 +721,7 @@ class TrainingLogger:
                 self.autograd_context.__enter__()
                 self.log_info("PyTorch autograd anomaly detection enabled")
     
-    def disable_autograd_debugging(self):
+    def disable_autograd_debugging(self) -> Any:
         """Disable PyTorch autograd anomaly detection."""
         if self.autograd_context:
             self.autograd_context.__exit__(None, None, None)
@@ -733,14 +752,13 @@ class TrainingLogger:
 class MemoryTracker:
     """Track memory usage during training."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize memory tracker."""
         self.start_memory = self._get_memory_usage()
     
     def _get_memory_usage(self) -> float:
         """Get current memory usage in MB."""
         try:
-            import psutil
             process = psutil.Process()
             return process.memory_info().rss / 1024 / 1024  # Convert to MB
         except ImportError:
@@ -826,12 +844,12 @@ class AsyncTrainingLogger(TrainingLogger):
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, self.log_tensor_debug_info, tensor, name, step)
     
-    async def enable_autograd_debugging_async(self):
+    async def enable_autograd_debugging_async(self) -> Any:
         """Async version of enable_autograd_debugging."""
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, self.enable_autograd_debugging)
     
-    async def disable_autograd_debugging_async(self):
+    async def disable_autograd_debugging_async(self) -> Any:
         """Async version of disable_autograd_debugging."""
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, self.disable_autograd_debugging)

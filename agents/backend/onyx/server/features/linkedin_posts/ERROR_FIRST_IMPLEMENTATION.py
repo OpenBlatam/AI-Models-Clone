@@ -1,7 +1,13 @@
-"""
-Error-First Pattern Implementation for LinkedIn Posts System
-Practical examples of handling errors and edge cases at the beginning of functions
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import re
@@ -12,6 +18,12 @@ from fastapi import HTTPException, UploadFile, status
 from pydantic import BaseModel, Field, validator
 import uuid
 import os
+from typing import Any, List, Dict, Optional
+"""
+Error-First Pattern Implementation for LinkedIn Posts System
+Practical examples of handling errors and edge cases at the beginning of functions
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +34,9 @@ logger = logging.getLogger(__name__)
 class ValidationError(Exception):
     """Custom validation error with context"""
     def __init__(self, message: str, field: str = None, code: str = None):
-        self.message = message
+        
+    """__init__ function."""
+self.message = message
         self.field = field
         self.code = code
         super().__init__(self.message)
@@ -420,7 +434,7 @@ async def update_post_content_error_first(
             }
         )
 
-async def upload_post_image_error_first(
+async async def upload_post_image_error_first(
     user_id: str, 
     file: UploadFile, 
     post_id: str = None
@@ -812,11 +826,11 @@ async def get_user_post_count(user_id: str) -> int:
     """Mock function to get user post count"""
     return 0
 
-async def get_user_upload_count(user_id: str, date: date) -> int:
+async async def get_user_upload_count(user_id: str, date: date) -> int:
     """Mock function to get user upload count"""
     return 0
 
-async def upload_file_to_storage(file: UploadFile, filename: str) -> str:
+async async def upload_file_to_storage(file: UploadFile, filename: str) -> str:
     """Mock function to upload file to storage"""
     return f"https://storage.example.com/{filename}"
 
@@ -873,5 +887,6 @@ async def example_usage():
     except HTTPException as e:
         print(f"Error getting posts: {e.detail}")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(example_usage()) 

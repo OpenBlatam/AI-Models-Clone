@@ -1,9 +1,22 @@
-"""
-API configuration for the ads module.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Optional, List
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+API configuration for the ads module.
+"""
 
 class SecuritySettings(BaseModel):
     """Security settings."""
@@ -48,7 +61,8 @@ class APISettings(BaseSettings):
     enable_request_validation: bool = Field(default=True)
     enable_response_validation: bool = Field(default=True)
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "API_"
         env_file = ".env"
         env_file_encoding = "utf-8"

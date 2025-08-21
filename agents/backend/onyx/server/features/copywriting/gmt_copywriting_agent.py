@@ -1,13 +1,13 @@
-"""
-GMT Copywriting Agent Platform.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Global time-aware copywriting agent for managing content generation across timezones:
-- Multi-timezone content scheduling
-- Global campaign coordination
-- Time-sensitive content optimization
-- Regional content adaptation
-- Performance tracking across time zones
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import os
@@ -19,40 +19,57 @@ from enum import Enum
 import time
 import uuid
 from contextlib import asynccontextmanager
-
-# FastAPI and dependencies
 from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
+    import orjson
+    import json as orjson
+    import pytz
+    import redis.asyncio as aioredis
+from .models import (
+import structlog
+            import pytz
+                    import pytz
+            from .final_main import get_service
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+"""
+GMT Copywriting Agent Platform.
+
+Global time-aware copywriting agent for managing content generation across timezones:
+- Multi-timezone content scheduling
+- Global campaign coordination
+- Time-sensitive content optimization
+- Regional content adaptation
+- Performance tracking across time zones
+"""
+
+
+# FastAPI and dependencies
 
 # High-performance imports
 try:
-    import orjson
     JSON_AVAILABLE = True
 except ImportError:
-    import json as orjson
     JSON_AVAILABLE = False
 
 try:
-    import pytz
     PYTZ_AVAILABLE = True
 except ImportError:
     PYTZ_AVAILABLE = False
 
 try:
-    import redis.asyncio as aioredis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
 
 # Import copywriting models
-from .models import (
     CopywritingInput, CopywritingOutput, Language, CopyTone, 
     UseCase, CopyVariant, WebsiteInfo, BrandVoice
 )
 
 # Logging
-import structlog
 logger = structlog.get_logger(__name__)
 
 # === TIME ZONE DEFINITIONS ===
@@ -141,7 +158,7 @@ class GMTCopywritingResponse(BaseModel):
 class GMTTimeManager:
     """Advanced time management for global operations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.timezone_cache = {}
         self.business_hours = {
             "start": 9,  # 9 AM
@@ -168,7 +185,6 @@ class GMTTimeManager:
             )
         
         try:
-            import pytz
             
             # Get timezone object
             if tz == TimeZone.GMT or tz == TimeZone.UTC:
@@ -241,7 +257,6 @@ class GMTTimeManager:
             # Calculate local launch time
             if PYTZ_AVAILABLE:
                 try:
-                    import pytz
                     if tz == TimeZone.GMT or tz == TimeZone.UTC:
                         tz_obj = pytz.UTC
                     else:
@@ -259,7 +274,7 @@ class GMTTimeManager:
 class GMTContentAdapter:
     """Adapt content for different regions and timezones."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.regional_preferences = {
             TimeZone.EST: {
                 "greeting_style": "professional",
@@ -347,7 +362,7 @@ class GMTContentAdapter:
 class GMTScheduler:
     """Advanced scheduling system for global content operations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.scheduled_tasks = {}
         self.running_tasks = {}
         self.task_history = []
@@ -455,7 +470,7 @@ class GMTScheduler:
 class GMTCopywritingAgent:
     """Main GMT-aware copywriting agent."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.time_manager = GMTTimeManager()
         self.content_adapter = GMTContentAdapter()
         self.scheduler = GMTScheduler()
@@ -469,18 +484,17 @@ class GMTCopywritingAgent:
         # Import the copywriting service
         self.copywriting_service = None
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the GMT agent."""
         try:
             # Import and initialize copywriting service
-            from .final_main import get_service
             self.copywriting_service = await get_service()
             logger.info("GMT Copywriting Agent initialized successfully")
         except Exception as e:
             logger.error(f"Failed to initialize copywriting service: {e}")
             raise
     
-    async def process_gmt_request(self, request: GMTCopywritingRequest) -> GMTCopywritingResponse:
+    async async def process_gmt_request(self, request: GMTCopywritingRequest) -> GMTCopywritingResponse:
         """Process a GMT-aware copywriting request."""
         start_time = time.perf_counter()
         request_id = str(uuid.uuid4())
@@ -790,7 +804,6 @@ gmt_app = create_gmt_app()
 
 # === MAIN ===
 if __name__ == "__main__":
-    import uvicorn
     
     logging.basicConfig(level=logging.INFO)
     logger.info("Starting GMT Copywriting Agent Platform")

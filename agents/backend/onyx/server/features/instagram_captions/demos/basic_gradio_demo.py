@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import gradio as gr
 import numpy as np
 import time
@@ -6,8 +14,11 @@ from typing import Dict, List, Tuple, Any
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class InstagramCaptionDemo:
-    def __init__(self):
+    def __init__(self) -> Any:
         self.sample_data = self._create_sample_data()
     
     def _create_sample_data(self) -> Dict[str, List[str]]:
@@ -352,7 +363,9 @@ class InstagramCaptionDemo:
 
 
 def create_demo_app():
-    eate the main Gradio demo application."""
+    
+    """create_demo_app function."""
+eate the main Gradio demo application."""
     demo = InstagramCaptionDemo()
     
     with gr.Blocks(title="Instagram Captions AI - Interactive Demo)as app:
@@ -494,7 +507,9 @@ def create_demo_app():
 
 
 def launch_demo_server(host: str = 00.0ort: int =7860hare: bool = False):
-    Launch the Gradio demo server.""  try:
+    
+    """launch_demo_server function."""
+Launch the Gradio demo server.""  try:
         app = create_demo_app()
         
         print(f"🚀 Launching Instagram Captions AI Demo Server...)

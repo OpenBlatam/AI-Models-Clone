@@ -489,3 +489,4 @@ async def shutdown_queue_manager():
     if queue_manager:
         await queue_manager.stop()
         queue_manager = None
+

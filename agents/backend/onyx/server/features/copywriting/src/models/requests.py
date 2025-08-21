@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+from pydantic import BaseModel, Field, validator
+from typing import List, Optional, Dict, Any
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Request Models
 =============
@@ -5,8 +23,6 @@ Request Models
 Pydantic models for API request validation.
 """
 
-from pydantic import BaseModel, Field, validator
-from typing import List, Optional, Dict, Any
 
 
 class CopywritingRequest(BaseModel):
@@ -32,7 +48,7 @@ class CopywritingRequest(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(default=None, description="Additional metadata")
     
     @validator('platform')
-    def validate_platform(cls, v):
+    def validate_platform(cls, v) -> bool:
         valid_platforms = [
             'instagram', 'facebook', 'twitter', 'linkedin', 
             'email', 'blog', 'website', 'ad', 'general'
@@ -42,7 +58,7 @@ class CopywritingRequest(BaseModel):
         return v.lower()
     
     @validator('content_type')
-    def validate_content_type(cls, v):
+    def validate_content_type(cls, v) -> bool:
         valid_types = [
             'post', 'caption', 'ad', 'email', 'article', 
             'headline', 'description', 'bio', 'general'
@@ -52,7 +68,7 @@ class CopywritingRequest(BaseModel):
         return v.lower()
     
     @validator('tone')
-    def validate_tone(cls, v):
+    def validate_tone(cls, v) -> bool:
         valid_tones = [
             'professional', 'casual', 'friendly', 'formal', 
             'conversational', 'persuasive', 'educational', 'humorous'
@@ -62,12 +78,13 @@ class CopywritingRequest(BaseModel):
         return v.lower()
     
     @validator('keywords')
-    def validate_keywords(cls, v):
+    def validate_keywords(cls, v) -> bool:
         if len(v) > 20:
             raise ValueError('Maximum 20 keywords allowed')
         return [kw.strip().lower() for kw in v if kw.strip()]
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "prompt": "Create engaging content about digital marketing",
@@ -91,12 +108,13 @@ class BatchRequest(BaseModel):
     batch_options: Optional[Dict[str, Any]] = Field(default=None, description="Batch processing options")
     
     @validator('requests')
-    def validate_requests(cls, v):
+    async def validate_requests(cls, v) -> bool:
         if not v:
             raise ValueError('At least one request is required')
         return v
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "requests": [
@@ -139,13 +157,14 @@ class OptimizationRequest(BaseModel):
     style_preferences: Optional[Dict[str, Any]] = Field(default=None, description="Style preferences")
     
     @validator('optimization_type')
-    def validate_optimization_type(cls, v):
+    def validate_optimization_type(cls, v) -> bool:
         valid_types = ['general', 'engagement', 'seo', 'clarity', 'conversion']
         if v.lower() not in valid_types:
             raise ValueError(f'Optimization type must be one of: {valid_types}')
         return v.lower()
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "text": "Check out our amazing product!",
@@ -170,14 +189,15 @@ class AnalysisRequest(BaseModel):
     detailed_report: bool = Field(default=False, description="Generate detailed report")
     
     @validator('analysis_types')
-    def validate_analysis_types(cls, v):
+    def validate_analysis_types(cls, v) -> bool:
         valid_types = ['sentiment', 'readability', 'tone', 'engagement', 'seo', 'grammar']
         for analysis_type in v:
             if analysis_type.lower() not in valid_types:
                 raise ValueError(f'Analysis type must be one of: {valid_types}')
         return [t.lower() for t in v]
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "text": "Our product is the best solution for your needs!",

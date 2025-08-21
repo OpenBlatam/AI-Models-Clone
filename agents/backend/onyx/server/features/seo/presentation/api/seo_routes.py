@@ -1,13 +1,18 @@
-"""
-SEO API Routes
-FastAPI routes for SEO analysis endpoints
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import List, Optional
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks, Query, Path
 from fastapi.responses import JSONResponse, StreamingResponse
 import asyncio
-
 from application.use_cases.analyze_url import AnalyzeURLUseCase
 from application.use_cases.analyze_urls_batch import AnalyzeURLsBatchUseCase
 from application.dto.analyze_url_request import AnalyzeURLRequest
@@ -18,6 +23,18 @@ from presentation.middleware.performance_middleware import PerformanceMiddleware
 from shared.core.dependencies import get_analyze_url_use_case, get_analyze_urls_batch_use_case
 from shared.core.logging import get_logger
 from shared.core.metrics import REQUEST_COUNTER, REQUEST_DURATION, ERROR_COUNTER
+        import urllib.parse
+        import urllib.parse
+        import csv
+        import io
+from typing import Any, List, Dict, Optional
+import logging
+"""
+SEO API Routes
+FastAPI routes for SEO analysis endpoints
+"""
+
+
 
 logger = get_logger(__name__)
 
@@ -213,7 +230,6 @@ async def analyze_url_path(
     """
     try:
         # Decode URL from path
-        import urllib.parse
         decoded_url = urllib.parse.unquote(url)
         
         # Create request object
@@ -343,7 +359,6 @@ async def export_analysis(
     """
     try:
         # Decode URL from path
-        import urllib.parse
         decoded_url = urllib.parse.unquote(url)
         
         # Create request object
@@ -385,8 +400,6 @@ async def export_analysis(
     
     def _to_csv(self, result: AnalyzeURLResponse) -> str:
         """Convert result to CSV format"""
-        import csv
-        import io
         
         output = io.StringIO()
         writer = csv.writer(output)

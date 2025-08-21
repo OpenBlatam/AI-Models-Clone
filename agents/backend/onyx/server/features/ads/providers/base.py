@@ -1,10 +1,14 @@
-"""
-Base provider for AI services.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional
 import logging
 from ..config.providers import ProviderConfig
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Base provider for AI services.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -12,7 +16,9 @@ class BaseProvider(ABC):
     """Base class for AI providers."""
     
     def __init__(self, config: ProviderConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.logger = logger
         self._initialized = False
     
@@ -66,7 +72,7 @@ class BaseProvider(ABC):
         if not self._initialized:
             raise RuntimeError("Provider not initialized. Call initialize() first.")
     
-    def _get_config_value(self, key: str, default: Any = None) -> Any:
+    def _get_config_value(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Get configuration value with fallback."""
         return getattr(self.config, key, default)
     

@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import time
+from contextlib import asynccontextmanager
+from typing import Dict, Any, List
+from fastapi import FastAPI, HTTPException, Depends, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import uvicorn
+from core.async_database import (
+from core.shared_resources import (
+from core.optimized_engine import (
+from core.middleware import create_middleware_stack
+from core.exceptions import (
+from core.schemas import (
+from config import settings
+from api.routes import captions_router, batch_router, health_router, stats_router
+from routes.lazy_loading_routes import lazy_loading_router
+from routes.shared_resources_routes import shared_resources_router
+from routes.async_flow_routes import async_flow_router
+from routes.enhanced_async_routes import enhanced_async_router
+import logging
+from typing import Any, List, Dict, Optional
 """
 FastAPI Application for Instagram Captions API v14.0
 
@@ -9,53 +33,32 @@ Ultra-optimized with:
 - Modular router architecture
 """
 
-import asyncio
-import time
-from contextlib import asynccontextmanager
-from typing import Dict, Any, List
 
-from fastapi import FastAPI, HTTPException, Depends, Request, Response
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import uvicorn
 
 # Import async I/O components
-from core.async_database import (
     initialize_async_io, cleanup_async_io,
     db_pool, api_client, io_monitor
 )
 
 # Import shared resources
-from core.shared_resources import (
     initialize_shared_resources, shutdown_shared_resources,
     ResourceConfig
 )
-from core.optimized_engine import (
     engine, OptimizedRequest, OptimizedResponse,
     generate_caption_optimized, generate_batch_captions_optimized,
     get_engine_stats
 )
-from core.middleware import create_middleware_stack
-from core.exceptions import (
     ValidationError, AIGenerationError, CacheError,
     handle_validation_error, handle_ai_error, handle_cache_error
 )
-from core.schemas import (
     CaptionRequest, CaptionResponse, BatchRequest, BatchResponse,
     PerformanceStats, ErrorResponse
 )
 
 # Import configuration
-from config import settings
 
 # Import routers
-from api.routes import captions_router, batch_router, health_router, stats_router
-from routes.lazy_loading_routes import lazy_loading_router
-from routes.shared_resources_routes import shared_resources_router
-from routes.async_flow_routes import async_flow_router
-from routes.enhanced_async_routes import enhanced_async_router
 
-import logging
 
 # Configure logging
 logging.basicConfig(

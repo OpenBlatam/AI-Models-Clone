@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from typing import Dict, Any, Optional, List
+import logging
+from abc import ABC, abstractmethod
+            from ..engines.speed import UltraSpeedEngine
+            from ..engines.nlp import UltraNLPEngine
+            from ..engines.langchain import UltraLangChainEngine
+            from ..engines.evolution import SelfEvolvingEngine
+        from ..core import ServiceContainer
+        from ..engines.manager import ModularEngineManager
+        from .. import ModularBlatamAI
+        from ..engines.manager import EngineRegistry, EngineMetadata
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🏭 BLATAM AI FACTORIES MODULE v5.0.0
 ====================================
@@ -9,9 +30,6 @@ Factories modulares para creación limpia:
 - 🎯 AI System Factory
 """
 
-from typing import Dict, Any, Optional, List
-import logging
-from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +66,6 @@ class SpeedEngineFactory(BlatamComponentFactory):
         """Crea Speed Engine."""
         # Lazy import to avoid circular dependencies
         try:
-            from ..engines.speed import UltraSpeedEngine
             return UltraSpeedEngine(config)
         except ImportError:
             logger.warning("Speed Engine not available")
@@ -75,7 +92,6 @@ class NLPEngineFactory(BlatamComponentFactory):
     async def create(self, config: Dict[str, Any], **kwargs) -> Any:
         """Crea NLP Engine."""
         try:
-            from ..engines.nlp import UltraNLPEngine
             return UltraNLPEngine(config)
         except ImportError:
             logger.warning("NLP Engine not available")
@@ -101,7 +117,6 @@ class LangChainEngineFactory(BlatamComponentFactory):
     async def create(self, config: Dict[str, Any], **kwargs) -> Any:
         """Crea LangChain Engine."""
         try:
-            from ..engines.langchain import UltraLangChainEngine
             return UltraLangChainEngine(config)
         except ImportError:
             logger.warning("LangChain Engine not available")
@@ -127,7 +142,6 @@ class EvolutionEngineFactory(BlatamComponentFactory):
     async def create(self, config: Dict[str, Any], **kwargs) -> Any:
         """Crea Evolution Engine."""
         try:
-            from ..engines.evolution import SelfEvolvingEngine
             return SelfEvolvingEngine(config)
         except ImportError:
             logger.warning("Evolution Engine not available")
@@ -154,7 +168,7 @@ class EvolutionEngineFactory(BlatamComponentFactory):
 class BlatamAIFactory:
     """Factory principal para sistema Blatam AI."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.engine_factories = {
             'speed': SpeedEngineFactory(),
             'nlp': NLPEngineFactory(),
@@ -187,9 +201,6 @@ class BlatamAIFactory:
         **kwargs
     ) -> Any:
         """Crea sistema modular."""
-        from ..core import ServiceContainer
-        from ..engines.manager import ModularEngineManager
-        from .. import ModularBlatamAI
         
         # Create service container
         container = ServiceContainer()
@@ -198,7 +209,6 @@ class BlatamAIFactory:
         engine_manager = ModularEngineManager()
         
         # Register engine factories
-        from ..engines.manager import EngineRegistry, EngineMetadata
         registry = engine_manager.registry
         
         for engine_type, factory in self.engine_factories.items():
@@ -229,11 +239,11 @@ class BlatamAIFactory:
         
         return ai
     
-    async def _create_lightweight_system(self, custom_configs, **kwargs):
+    async def _create_lightweight_system(self, custom_configs, **kwargs) -> Any:
         """Crea sistema ligero."""
         return await self._create_modular_system(['speed', 'nlp'], custom_configs, **kwargs)
     
-    async def _create_full_system(self, custom_configs, **kwargs):
+    async def _create_full_system(self, custom_configs, **kwargs) -> Any:
         """Crea sistema completo."""
         return await self._create_modular_system(None, custom_configs, **kwargs)
     

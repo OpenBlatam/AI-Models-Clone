@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import os
+import sys
+from typing import Dict, List, Optional, Any, Union
+from dataclasses import dataclass, field
+from pathlib import Path
+import logging
+from enum import Enum
+            from dotenv import load_dotenv
+                import json
+                from datetime import datetime
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Enterprise Configuration Management
 ==================================
@@ -10,13 +30,6 @@ Centralized configuration system with:
 - Configuration hot-reloading
 """
 
-import os
-import sys
-from typing import Dict, List, Optional, Any, Union
-from dataclasses import dataclass, field
-from pathlib import Path
-import logging
-from enum import Enum
 
 logger = logging.getLogger(__name__)
 
@@ -241,7 +254,9 @@ class EnterpriseConfig:
     """Main enterprise configuration class"""
     
     def __init__(self, env_file: Optional[str] = None):
-        # Load environment file if specified
+        
+    """__init__ function."""
+# Load environment file if specified
         if env_file:
             self._load_env_file(env_file)
         
@@ -296,7 +311,6 @@ class EnterpriseConfig:
     def _load_env_file(self, env_file: str):
         """Load environment variables from file"""
         try:
-            from dotenv import load_dotenv
             load_dotenv(env_file)
             logger.info(f"Loaded environment from {env_file}")
         except ImportError:
@@ -304,7 +318,7 @@ class EnterpriseConfig:
         except Exception as e:
             logger.warning(f"Failed to load {env_file}: {e}")
     
-    def _validate_config(self):
+    def _validate_config(self) -> bool:
         """Validate configuration settings"""
         errors = []
         warnings = []
@@ -344,18 +358,16 @@ class EnterpriseConfig:
             for warning in warnings:
                 logger.warning(f"Configuration warning: {warning}")
     
-    def _setup_logging(self):
+    def _setup_logging(self) -> Any:
         """Setup logging configuration"""
         log_level = getattr(logging, self.monitoring.log_level.upper(), logging.INFO)
         
         # Create formatter
         if self.monitoring.log_format == "json":
             try:
-                import json
-                from datetime import datetime
                 
                 class JsonFormatter(logging.Formatter):
-                    def format(self, record):
+                    def format(self, record) -> Any:
                         log_data = {
                             "timestamp": datetime.utcnow().isoformat(),
                             "level": record.levelname,

@@ -1,10 +1,7 @@
-"""
-Async NLP Processor for LinkedIn Posts
-=====================================
-
-Ultra-fast async NLP processing with optimized patterns,
-connection pooling, and batch operations for maximum speed.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -14,12 +11,27 @@ from asyncio import Semaphore, Queue
 from concurrent.futures import ThreadPoolExecutor
 from functools import wraps
 import hashlib
-
 import aioredis
 import orjson
 from cachetools import TTLCache
-
 from ...shared.logging import get_logger
+            from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+            import textstat
+            from keybert import KeyBERT
+            import spacy
+            from transformers import pipeline
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Async NLP Processor for LinkedIn Posts
+=====================================
+
+Ultra-fast async NLP processing with optimized patterns,
+connection pooling, and batch operations for maximum speed.
+"""
+
+
+
 
 logger = get_logger(__name__)
 
@@ -69,7 +81,7 @@ class AsyncNLPProcessor:
         asyncio.create_task(self._initialize_redis())
         asyncio.create_task(self._process_batch_queue())
     
-    async def _initialize_redis(self):
+    async def _initialize_redis(self) -> Any:
         """Initialize Redis connection pool."""
         try:
             self.redis_pool = aioredis.from_url(
@@ -156,7 +168,6 @@ class AsyncNLPProcessor:
     def _analyze_sentiment_async(self, text: str) -> Dict[str, float]:
         """Analyze sentiment asynchronously."""
         try:
-            from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
             analyzer = SentimentIntensityAnalyzer()
             return analyzer.polarity_scores(text)
         except Exception as e:
@@ -166,7 +177,6 @@ class AsyncNLPProcessor:
     def _analyze_readability_async(self, text: str) -> Dict[str, float]:
         """Analyze readability asynchronously."""
         try:
-            import textstat
             return {
                 "flesch_reading_ease": textstat.flesch_reading_ease(text),
                 "flesch_kincaid_grade": textstat.flesch_kincaid_grade(text),
@@ -180,7 +190,6 @@ class AsyncNLPProcessor:
     def _extract_keywords_async(self, text: str) -> List[str]:
         """Extract keywords asynchronously."""
         try:
-            from keybert import KeyBERT
             kw_model = KeyBERT('all-MiniLM-L6-v2')
             keywords = kw_model.extract_keywords(text, top_n=5)
             return [kw[0] for kw in keywords]
@@ -191,7 +200,6 @@ class AsyncNLPProcessor:
     def _detect_entities_async(self, text: str) -> List[tuple]:
         """Detect entities asynchronously."""
         try:
-            import spacy
             nlp = spacy.load("en_core_web_sm")
             doc = nlp(text)
             return [(ent.text, ent.label_) for ent in doc.ents]
@@ -202,7 +210,6 @@ class AsyncNLPProcessor:
     def _improve_text_async(self, text: str) -> str:
         """Improve text asynchronously."""
         try:
-            from transformers import pipeline
             rewriter = pipeline("text2text-generation", model="google/flan-t5-base")
             result = rewriter(f"Improve this LinkedIn post: {text}", max_length=256)
             return result[0]['generated_text']
@@ -306,7 +313,7 @@ class AsyncNLPProcessor:
         self.metrics["batch_operations"] += 1
         return processed_results
     
-    async def _process_batch_queue(self):
+    async def _process_batch_queue(self) -> Any:
         """Process batch queue for background operations."""
         while True:
             try:
@@ -347,7 +354,7 @@ class AsyncNLPProcessor:
             "concurrent_operations": self.processing_semaphore._value,
         }
     
-    async def clear_cache_async(self):
+    async def clear_cache_async(self) -> Any:
         """Clear all caches asynchronously."""
         try:
             # Clear memory cache
@@ -378,7 +385,7 @@ def get_async_nlp_processor() -> AsyncNLPProcessor:
 def async_nlp_decorator(func: Callable) -> Callable:
     """Decorator for async NLP enhancement."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         # Extract text from function arguments
         text = None
         for arg in args:

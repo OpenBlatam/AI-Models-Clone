@@ -1,17 +1,26 @@
-"""
-Selectolax HTML Parser
-Ultra-fast HTML parsing with maximum performance
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import time
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
-
 import selectolax
 from shared.core.exceptions import HTMLParsingError
 from shared.core.logging import get_logger
 from domain.value_objects.meta_tags import MetaTags
 from domain.value_objects.parsed_data import ParsedData
+                    import json
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Selectolax HTML Parser
+Ultra-fast HTML parsing with maximum performance
+"""
+
+
 
 logger = get_logger(__name__)
 
@@ -40,7 +49,7 @@ class SelectolaxParser:
     with advanced features and error handling.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize parser"""
         self.parser = selectolax.HTMLParser
         self._parse_count = 0
@@ -324,7 +333,6 @@ class SelectolaxParser:
             # Extract JSON-LD
             for script in tree.css('script[type="application/ld+json"]'):
                 try:
-                    import json
                     data = json.loads(script.text())
                     structured_data.append({
                         "type": "json-ld",

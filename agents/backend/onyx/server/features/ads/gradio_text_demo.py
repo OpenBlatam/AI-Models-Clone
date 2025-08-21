@@ -1,9 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import gradio as gr
 import asyncio
 import logging
 import traceback
 from agents.backend.onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
 
+from typing import Any, List, Dict, Optional
 DEBUG = False  # Set to True to show tracebacks in UI
 
 logging.basicConfig(level=logging.INFO)
@@ -15,7 +18,7 @@ except Exception as e:
     logger.error(f"Error initializing fine-tuning service: {e}\n{traceback.format_exc()}")
     finetuning_service = None
 
-def run_async(coro):
+def run_async(coro) -> Any:
     try:
         return asyncio.get_event_loop().run_until_complete(coro)
     except Exception as e:
@@ -24,7 +27,7 @@ def run_async(coro):
             return f"❌ Async error: {e}\n\n{traceback.format_exc()}"
         return "❌ Internal async error. Please try again later."
 
-def generate_ad(prompt, user_id, max_length, temperature):
+def generate_ad(prompt, user_id, max_length, temperature) -> Any:
     # Input validation
     if not prompt or not prompt.strip():
         return "❌ Please enter a non-empty prompt."
@@ -80,5 +83,6 @@ iface = gr.Interface(
     allow_flagging="never"
 )
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     iface.launch() 

@@ -1,7 +1,8 @@
-"""
-Backend Ads Service - Enhanced Onyx Integration
-Complete integration with advanced Onyx capabilities and model adaptation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from typing import Dict, Any, AsyncGenerator, List, Optional
 from onyx.utils.logger import setup_logger
 from onyx.core.functions import format_response
@@ -10,33 +11,40 @@ from onyx.server.features.ads.service import AdsService
 from onyx.server.features.ads.advanced.service import AdvancedAdsService
 from onyx.server.features.ads.langchain.service import LangchainService
 from onyx.server.features.ads.models import (
-    AdsGenerationRequest,
-    BrandKitRequest,
-    EmailSequenceRequest,
-    BackgroundRemovalRequest
-)
 from onyx.server.features.ads.advanced.models import AdvancedAdsRequest
 from onyx.server.features.ads.langchain.models import LangchainRequest
-
-# Direct imports from backend_ads
 from backend_ads.llm_interface import (
-    generate_ads_lcel,
-    generate_brand_kit_lcel,
-    generate_custom_content_lcel,
-    generate_ads_lcel_streaming
-)
 from backend_ads.remove_bg_api import remove_background
 from backend_ads.ads_api import get_ads_history, get_brand_kit_history
 from backend_ads.scraper import get_website_text
 from backend_ads.email_sequence import generate_email_sequence
 from backend_ads.model_mapping import ModelAdapter
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Backend Ads Service - Enhanced Onyx Integration
+Complete integration with advanced Onyx capabilities and model adaptation.
+"""
+    AdsGenerationRequest,
+    BrandKitRequest,
+    EmailSequenceRequest,
+    BackgroundRemovalRequest
+)
+
+# Direct imports from backend_ads
+    generate_ads_lcel,
+    generate_brand_kit_lcel,
+    generate_custom_content_lcel,
+    generate_ads_lcel_streaming
+)
 
 logger = setup_logger()
 
 class BackendAdsService:
     """Enhanced service with advanced Onyx capabilities."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize all services."""
         self.ads_service = AdsService()
         self.advanced_ads_service = AdvancedAdsService()

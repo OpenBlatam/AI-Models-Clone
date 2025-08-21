@@ -1,28 +1,39 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import sys
+import os
+from agents.backend.onyx.server.features.instagram_captions.core import InstagramCaptionsEngine
+from agents.backend.onyx.server.features.instagram_captions.gmt_system import SimplifiedGMTSystem
+from agents.backend.onyx.server.features.instagram_captions.models import CaptionStyle, InstagramTarget
+            import traceback
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test script for Instagram Captions Refactored System.
 
 Tests the new consolidated architecture with core engine and simplified GMT system.
 """
 
-import asyncio
-import sys
-import os
 
 # Add the project root to the path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))))
 
-from agents.backend.onyx.server.features.instagram_captions.core import InstagramCaptionsEngine
-from agents.backend.onyx.server.features.instagram_captions.gmt_system import SimplifiedGMTSystem
-from agents.backend.onyx.server.features.instagram_captions.models import CaptionStyle, InstagramTarget
 
 class RefactoredSystemTester:
     """Test class for the refactored Instagram captions system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.engine = InstagramCaptionsEngine()
         self.gmt_system = SimplifiedGMTSystem()
         
-    async def test_quality_optimization(self):
+    async def test_quality_optimization(self) -> Any:
         """Test the consolidated quality optimization system."""
         
         print("🚀 REFACTORED INSTAGRAM CAPTIONS SYSTEM DEMO")
@@ -93,7 +104,7 @@ class RefactoredSystemTester:
                     
             print("\n" + "="*60)
     
-    def test_hashtag_generation(self):
+    def test_hashtag_generation(self) -> Any:
         """Test intelligent hashtag generation."""
         
         print("\n🏷️ HASHTAG INTELLIGENCE TEST")
@@ -122,7 +133,7 @@ class RefactoredSystemTester:
             print(f"Generated {len(hashtags)} hashtags:")
             print(" ".join(hashtags[:10]) + " ...")
     
-    def test_gmt_system(self):
+    def test_gmt_system(self) -> Any:
         """Test simplified GMT system."""
         
         print("\n🌍 GMT SYSTEM TEST")
@@ -158,7 +169,7 @@ class RefactoredSystemTester:
             else:
                 print(f"  Cultural adaptation: ℹ️ No changes needed")
     
-    def test_enhanced_prompts(self):
+    def test_enhanced_prompts(self) -> Any:
         """Test enhanced prompt generation."""
         
         print("\n🎨 ENHANCED PROMPT GENERATION TEST")
@@ -180,7 +191,7 @@ class RefactoredSystemTester:
         print(preview)
         print("\n✅ Enhanced prompt created successfully!")
     
-    def demo_refactor_benefits(self):
+    def demo_refactor_benefits(self) -> Any:
         """Demonstrate refactor benefits."""
         
         print("\n🎊 REFACTOR BENEFITS DEMO")
@@ -214,7 +225,7 @@ class RefactoredSystemTester:
         print("• Multiple AI provider integration")
         print("• RESTful API with comprehensive endpoints")
     
-    async def run_comprehensive_demo(self):
+    async def run_comprehensive_demo(self) -> Any:
         """Run complete demonstration of refactored system."""
         
         print("🎉 REFACTORED INSTAGRAM CAPTIONS SYSTEM DEMO")
@@ -261,7 +272,6 @@ class RefactoredSystemTester:
             
         except Exception as e:
             print(f"❌ Error during demonstration: {str(e)}")
-            import traceback
             traceback.print_exc()
 
 async def main():

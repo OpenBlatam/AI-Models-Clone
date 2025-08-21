@@ -1,6 +1,11 @@
-"""
-Optimized database service for ads functionality with connection pooling and caching.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Optional, List, Dict, Any, AsyncGenerator
 from datetime import datetime, timedelta
 import asyncio
@@ -11,19 +16,27 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from sqlalchemy.pool import QueuePool
 from sqlalchemy import and_, desc, func, select, update, delete
 from sqlalchemy.orm import selectinload
-import aioredis
+try:
+    import aioredis  # type: ignore
+except Exception:  # pragma: no cover - optional in tests
+    aioredis = None  # type: ignore[assignment]
 from functools import lru_cache
-
 from onyx.db.ads import AdsGeneration, BackgroundRemoval, AdsAnalytics
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.config import settings
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Optimized database service for ads functionality with connection pooling and caching.
+"""
+
 
 logger = setup_logger()
 
 class OptimizedAdsDBService:
     """Optimized service for handling ads-related database operations with connection pooling and caching."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize with connection pooling and caching."""
         self._engine = None
         self._session_factory = None
@@ -32,7 +45,7 @@ class OptimizedAdsDBService:
         self._cache_ttl = 3600  # 1 hour default
         
     @property
-    async def engine(self):
+    async def engine(self) -> Any:
         """Lazy initialization of async database engine with connection pooling."""
         if self._engine is None:
             self._engine = create_async_engine(
@@ -48,7 +61,7 @@ class OptimizedAdsDBService:
         return self._engine
     
     @property
-    async def session_factory(self):
+    async def session_factory(self) -> Any:
         """Lazy initialization of session factory."""
         if self._session_factory is None:
             engine = await self.engine
@@ -60,7 +73,7 @@ class OptimizedAdsDBService:
         return self._session_factory
     
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         """Lazy initialization of Redis client for caching."""
         if self._redis_client is None:
             self._redis_client = await aioredis.from_url(
@@ -545,7 +558,7 @@ class OptimizedAdsDBService:
             
             return cleanup_stats
 
-    async def close(self):
+    async def close(self) -> Any:
         """Close database connections and cleanup resources."""
         if self._engine:
             await self._engine.dispose()

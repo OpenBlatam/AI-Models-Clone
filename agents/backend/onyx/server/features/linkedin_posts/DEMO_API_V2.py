@@ -1,9 +1,7 @@
-"""
-LinkedIn Posts API V2 - Ultra-Optimized Demo
-===========================================
-
-Demonstrates all the advanced features and optimizations of the improved API.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import httpx
@@ -12,13 +10,25 @@ from datetime import datetime
 import orjson
 from typing import List, Dict, Any
 import statistics
+        import uvloop
+from typing import Any, List, Dict, Optional
+import logging
+"""
+LinkedIn Posts API V2 - Ultra-Optimized Demo
+===========================================
+
+Demonstrates all the advanced features and optimizations of the improved API.
+"""
+
 
 
 class LinkedInAPIDemo:
     """Demo client for LinkedIn Posts API V2."""
     
     def __init__(self, base_url: str = "http://localhost:8000/api/v2"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.client = httpx.AsyncClient(
             base_url=base_url,
             headers={"Content-Type": "application/json"},
@@ -26,18 +36,18 @@ class LinkedInAPIDemo:
         )
         self.auth_token = None
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close client connection."""
         await self.client.aclose()
     
-    async def authenticate(self):
+    async def authenticate(self) -> Any:
         """Authenticate and get token."""
         # Mock authentication
         self.auth_token = "mock_jwt_token"
         self.client.headers["Authorization"] = f"Bearer {self.auth_token}"
         print("✅ Authenticated successfully")
     
-    async def demo_health_checks(self):
+    async def demo_health_checks(self) -> Any:
         """Demonstrate health check endpoints."""
         print("\n🏥 Health Checks Demo")
         print("=" * 50)
@@ -63,7 +73,7 @@ class LinkedInAPIDemo:
             print(f"  - Avg Response Time: {perf.get('avg_response_time', 'N/A')}")
             print(f"  - Cache Hit Rate: {perf.get('cache_hit_rate', 0):.2%}")
     
-    async def demo_create_post(self):
+    async def demo_create_post(self) -> Any:
         """Demonstrate post creation with NLP enhancement."""
         print("\n✍️ Post Creation Demo")
         print("=" * 50)
@@ -97,7 +107,7 @@ class LinkedInAPIDemo:
             print(f"❌ Failed to create post: {response.status_code}")
             return None
     
-    async def demo_batch_operations(self):
+    async def demo_batch_operations(self) -> Any:
         """Demonstrate batch operations."""
         print("\n📦 Batch Operations Demo")
         print("=" * 50)
@@ -236,7 +246,7 @@ class LinkedInAPIDemo:
             if analysis.get('cached'):
                 print(f"  - Result was cached")
     
-    async def demo_performance_metrics(self):
+    async def demo_performance_metrics(self) -> Any:
         """Demonstrate performance monitoring."""
         print("\n📈 Performance Metrics Demo")
         print("=" * 50)
@@ -266,7 +276,7 @@ class LinkedInAPIDemo:
                 print(f"  - Total Requests: {system.get('total_requests', 0)}")
                 print(f"  - Cache Hit Rate: {system.get('cache_hit_rate', 0):.2%}")
     
-    async def demo_rate_limiting(self):
+    async def demo_rate_limiting(self) -> Any:
         """Demonstrate rate limiting."""
         print("\n🚦 Rate Limiting Demo")
         print("=" * 50)
@@ -294,7 +304,7 @@ class LinkedInAPIDemo:
             else:
                 print(f"  ✅ Request {i+1}: {elapsed:.3f}s (Remaining: {results[-1]['rate_limit']})")
     
-    async def demo_performance_optimization(self):
+    async def demo_performance_optimization(self) -> Any:
         """Demonstrate performance optimization."""
         print("\n⚡ Performance Optimization Demo")
         print("=" * 50)
@@ -328,7 +338,9 @@ class LinkedInAPIDemo:
         
         # Run concurrent requests
         async def make_request():
-            start = time.time()
+            
+    """make_request function."""
+start = time.time()
             response = await self.client.post("/linkedin-posts/", json=post_data)
             return time.time() - start, response.status_code
         
@@ -408,7 +420,6 @@ async def main():
 if __name__ == "__main__":
     # Run with uvloop for maximum performance
     try:
-        import uvloop
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
         print("Using uvloop for maximum performance")
     except ImportError:

@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader, Sampler, BatchSampler
@@ -15,6 +23,9 @@ import threading
 from queue import Queue
 import time
 
+            import psutil
+from typing import Any, List, Dict, Optional
+import asyncio
 logger = logging.getLogger(__name__)
 
 
@@ -41,21 +52,29 @@ class CachedDataset(Dataset):
         os.makedirs(cache_dir, exist_ok=True)
         self._load_cache_metadata()
     
-    def _load_cache_metadata(self):
+    def _load_cache_metadata(self) -> Any:
    oad cache metadata from disk.""     metadata_path = os.path.join(self.cache_dir, "metadata.pkl")
         if os.path.exists(metadata_path):
             with open(metadata_path, 'rb') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 self.cache = pickle.load(f)
     
-    def _save_cache_metadata(self):
+    def _save_cache_metadata(self) -> Any:
    ave cache metadata to disk.""     metadata_path = os.path.join(self.cache_dir, "metadata.pkl")
         with open(metadata_path, 'wb') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             pickle.dump(self.cache, f)
     
     def __len__(self) -> int:
         return len(self.dataset)
     
-    def __getitem__(self, idx: int) -> Any:
+    def __getitem__(self, idx: int) -> Optional[Dict[str, Any]]:
         cache_key = f"item_{idx}       
         if cache_key in self.cache:
             self.cache_hits += 1
@@ -84,7 +103,9 @@ class CachedDataset(Dataset):
 class PrefetchDataLoader(DataLoader):
   nhanced DataLoader with prefetching capabilities."   
     def __init__(self, dataset: Dataset, config: DataLoaderConfig, **kwargs):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             dataset=dataset,
             batch_size=config.batch_size,
             num_workers=config.num_workers,
@@ -104,19 +125,23 @@ class PrefetchDataLoader(DataLoader):
         self.prefetch_thread = None
         self._start_prefetching()
     
-    def _start_prefetching(self):
+    async def _start_prefetching(self) -> Any:
        Startprefetching thread.
         self.prefetch_thread = threading.Thread(target=self._prefetch_worker, daemon=True)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         self.prefetch_thread.start()
     
-    def _prefetch_worker(self):
+    async def _prefetch_worker(self) -> Any:
       Worker thread for prefetching data."""
         for batch in super().__iter__():
             if self.prefetch_queue.full():
                 self.prefetch_queue.get()  # Remove oldest item
             self.prefetch_queue.put(batch)
     
-    def __iter__(self):
+    def __iter__(self) -> Any:
       erator that yields prefetched batches."""
         while True:
             try:
@@ -136,7 +161,7 @@ class MemoryOptimizedDataset(Dataset):
     def __len__(self) -> int:
         return len(self.dataset)
     
-    def __getitem__(self, idx: int) -> Any:
+    def __getitem__(self, idx: int) -> Optional[Dict[str, Any]]:
         if idx in self.data_cache:
             return self.data_cache[idx]
         
@@ -165,7 +190,7 @@ class MemoryOptimizedDataset(Dataset):
         else:
             return 1024  # Default estimate
     
-    def _evict_oldest(self):
+    def _evict_oldest(self) -> Any:
      Evict oldest data from cache.       if not self.loaded_indices:
             return
         
@@ -180,7 +205,9 @@ class MemoryOptimizedDataset(Dataset):
 class CustomCollateFn:
    m collate function for handling variable-length sequences."   
     def __init__(self, pad_token_id: int = 0, max_length: Optional[int] = None):
-        self.pad_token_id = pad_token_id
+        
+    """__init__ function."""
+self.pad_token_id = pad_token_id
         self.max_length = max_length
     
     def __call__(self, batch: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
@@ -278,14 +305,16 @@ ctory for creating efficient data loaders."""
 class DataLoaderMonitor:
  onitor data loader performance and statistics."   
     def __init__(self, data_loader: DataLoader):
-        self.data_loader = data_loader
+        
+    """__init__ function."""
+self.data_loader = data_loader
         self.start_time = None
         self.batch_times =        self.batch_sizes =       self.memory_usage =   
-    def __enter__(self):
+    def __enter__(self) -> Any:
         self.start_time = time.time()
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> Any:
         pass
     
     def monitor_batch(self, batch: Any) -> Any:
@@ -303,7 +332,6 @@ class DataLoaderMonitor:
         
         # Record memory usage if available
         try:
-            import psutil
             process = psutil.Process()
             self.memory_usage.append(process.memory_info().rss / 1024**2)  # MB
         except ImportError:

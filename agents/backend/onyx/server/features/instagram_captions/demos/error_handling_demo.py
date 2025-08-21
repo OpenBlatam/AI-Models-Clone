@@ -1,16 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+from typing import Dict, Any
+from datetime import datetime, timezone
+from utils.error_handling import (
+from utils.validation import (
+from typing import Any, List, Dict, Optional
+import logging
 Error Handling and Validation Demo
 
 This script demonstrates the comprehensive error handling and validation system
 for the Instagram Captions API with practical examples.
 "
 
-import asyncio
-import json
-from typing import Dict, Any
-from datetime import datetime, timezone
 
 # Import our error handling and validation modules
-from utils.error_handling import (
     ErrorCode,
     InstagramCaptionsException,
     ValidationException,
@@ -27,7 +38,6 @@ from utils.error_handling import (
     NumericValidationConfig
 )
 
-from utils.validation import (
     ContentType,
     ToneType,
     CONTENT_LIMITS,
@@ -46,6 +56,8 @@ from utils.validation import (
 # ============================================================================
 
 def demo_custom_exceptions():
+
+    """demo_custom_exceptions function."""
 Demonstrate custom exception handling.    print(n=*60)
     print(CUSTOM EXCEPTIONS DEMO")
     print(= 
@@ -98,6 +110,8 @@ Demonstrate custom exception handling.    print(n=*60)
         print(f"Details: {e.details})
 
 def demo_error_response_creation():
+
+    """demo_error_response_creation function."""
 Demonstrate error response creation.    print(n="*60)
     print("ERROR RESPONSE CREATION DEMO")
     print(=
@@ -118,6 +132,8 @@ Demonstrate error response creation.    print(n="*60)
     print(json.dumps(error_response, indent=2default=str))
 
 def demo_input_validation():
+
+    """demo_input_validation function."""
 Demonstrate input validation utilities.    print(n="*60)
     print("INPUT VALIDATION DEMO")
     print(=
@@ -158,7 +174,9 @@ Demonstrate input validation utilities.    print(n="*60)
     username_result = validate_instagram_username(username="test_user_123print(f"\nUsername Validation: {json.dumps(username_result, indent=2)}")
 
 def demo_pydantic_validation():
-    monstrate Pydantic v2 validation.    print(n="*60
+    
+    """demo_pydantic_validation function."""
+monstrate Pydantic v2 validation.    print(n="*60
     print("PYDANTIC VALIDATION DEMO")
     print(=)
     
@@ -201,6 +219,8 @@ def demo_pydantic_validation():
         print(f"Batch Validation Error: {e}")
 
 def demo_content_validation():
+
+    """demo_content_validation function."""
 emonstrate content validation.    print(n="*60    print("CONTENT VALIDATION DEMO")
     print(=)
     
@@ -226,6 +246,8 @@ emonstrate content validation.    print(n="*60    print("CONTENT VALIDATION DEMO
     print(f"\nToo Many Hashtags Result: [object Object]json.dumps(result, indent=2)}")
 
 def demo_html_sanitization():
+
+    """demo_html_sanitization function."""
 nstrate HTML sanitization.    print(n="*60   print(HTML SANITIZATION DEMO")
     print(=0    # HTML content with allowed and disallowed tags
     html_content = 
@@ -243,7 +265,9 @@ nstrate HTML sanitization.    print(n="*60   print(HTML SANITIZATION DEMO")
 
 @handle_api_errors
 async def demo_api_error_handling():
-    onstrate API error handling decorator.    print(n="*60  print("API ERROR HANDLING DEMO")
+    
+    """demo_api_error_handling function."""
+onstrate API error handling decorator.    print(n="*60  print("API ERROR HANDLING DEMO")
     print(=60   
     # Simulate successful operation
     print("Simulating successful API call...")
@@ -252,6 +276,8 @@ async def demo_api_error_handling():
     # Note: The decorator will catch any exceptions and convert them to HTTPException
 
 async def demo_error_logging():
+
+    """demo_error_logging function."""
 Demonstrate error logging.    print(n="*60)
     print(ERROR LOGGING DEMO")
     print("=*60 
@@ -267,6 +293,8 @@ Demonstrate error logging.    print(n="*60)
         print(json.dumps(error_data, indent=2default=str))
 
 def demo_content_type_limits():
+
+    """demo_content_type_limits function."""
 emonstrate content type limits.    print(n="*60    print("CONTENT TYPE LIMITS DEMO")
     print("=*60)  
     for content_type, limit in CONTENT_LIMITS.items():
@@ -285,7 +313,9 @@ emonstrate content type limits.    print(n="*60    print("CONTENT TYPE LIMITS DE
 # ============================================================================
 
 async def run_all_demos():
-  all error handling and validation demos."    print("INSTAGRAM CAPTIONS API - ERROR HANDLING & VALIDATION DEMO")
+  
+    """run_all_demos function."""
+all error handling and validation demos."    print("INSTAGRAM CAPTIONS API - ERROR HANDLING & VALIDATION DEMO")
     print(=80    
     # Run all demos
     demo_custom_exceptions()
@@ -306,7 +336,9 @@ async def run_all_demos():
 # ============================================================================
 
 def show_usage_examples():
-   ow practical usage examples.    print(n="*60)
+   
+    """show_usage_examples function."""
+ow practical usage examples.    print(n="*60)
     print(USAGE EXAMPLES")
     print("="*60)
     
@@ -326,7 +358,9 @@ def show_usage_examples():
 3. Handling API Errors:
    @handle_api_errors
    async def generate_caption(request: CaptionRequest):
-       # Your logic here
+       
+    """generate_caption function."""
+# Your logic here
        pass
 
 4Creating Custom Exceptions:

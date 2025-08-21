@@ -1,9 +1,13 @@
-"""
-Instagram Captions API v8.0 - Deep Learning & Transformers Integration
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Revolutionary AI-powered caption generation using real transformer models,
-semantic analysis, and advanced deep learning techniques.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -11,37 +15,46 @@ import torch
 from typing import Dict, Any, List, Optional
 from contextlib import asynccontextmanager
 import logging
-
-# FastAPI and async
 from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 import uvloop
+from ai_models_v8 import (
+from pydantic import BaseModel, Field
+from enum import Enum
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+import structlog
+from dynaconf import Dynaconf
+    import orjson
+    import json
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v8.0 - Deep Learning & Transformers Integration
+
+Revolutionary AI-powered caption generation using real transformer models,
+semantic analysis, and advanced deep learning techniques.
+"""
+
+
+# FastAPI and async
 
 # AI and Deep Learning
-from ai_models_v8 import (
     AdvancedAIService, AIModelConfig, ModelSize,
     CaptionTransformer, SemanticAnalyzer
 )
 
 # Data models
-from pydantic import BaseModel, Field
-from enum import Enum
 
 # Performance and monitoring
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
-import structlog
 
 # Configuration
-from dynaconf import Dynaconf
 
 # Ultra-fast JSON
 try:
-    import orjson
     json_dumps = lambda obj: orjson.dumps(obj).decode()
     json_loads = orjson.loads
 except ImportError:
-    import json
     json_dumps = json.dumps
     json_loads = json.loads
 
@@ -205,11 +218,11 @@ class BatchAIRequest(BaseModel):
 class AIServiceManager:
     """Manages AI services with different model configurations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.services: Dict[ModelSize, AdvancedAIService] = {}
         self.initialization_complete = False
     
-    async def initialize_services(self):
+    async def initialize_services(self) -> Any:
         """Initialize AI services for different model sizes."""
         logger.info("🧠 Initializing AI services...")
         
@@ -410,7 +423,9 @@ async def generate_ai_batch(request: BatchAIRequest):
         semaphore = asyncio.Semaphore(config.ASYNC_WORKERS)
         
         async def process_single(req: AIGenerationRequest):
-            async with semaphore:
+            
+    """process_single function."""
+async with semaphore:
                 return await generate_ai_caption(req)
         
         # Execute batch with memory management
@@ -542,7 +557,6 @@ async def get_model_info():
 # =============================================================================
 
 if __name__ == "__main__":
-    import uvicorn
     
     print("="*80)
     print("🧠 INSTAGRAM CAPTIONS API v8.0 - DEEP LEARNING & TRANSFORMERS")

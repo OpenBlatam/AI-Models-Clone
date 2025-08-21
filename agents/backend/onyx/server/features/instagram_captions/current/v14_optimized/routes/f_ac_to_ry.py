@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import List, Dict, Any, Optional, Callable
+from fastapi import APIRouter, Depends, HTTPException
+from functools import wraps
+import logging
+from dependencies import (
+from core.blocking_operations_limiter import limit_blocking_operations, OperationType
+from core.exceptions import ValidationError, AIGenerationError, CacheError
+    import importlib
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Route Factory for Instagram Captions API v14.0
 
@@ -9,21 +21,14 @@ Factory system for creating well-structured routes with:
 - Performance monitoring
 """
 
-from typing import List, Dict, Any, Optional, Callable
-from fastapi import APIRouter, Depends, HTTPException
-from functools import wraps
-import logging
 
 # Import dependencies
-from dependencies import (
     ServiceDependencies, CoreDependencies, AdvancedDependencies,
     require_authentication, require_permission,
     validate_request_id, validate_content_length
 )
 
 # Import core components
-from core.blocking_operations_limiter import limit_blocking_operations, OperationType
-from core.exceptions import ValidationError, AIGenerationError, CacheError
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +36,7 @@ logger = logging.getLogger(__name__)
 class RouteFactory:
     """Factory for creating well-structured routes"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.routers: Dict[str, APIRouter] = {}
         self.route_configs: Dict[str, Dict[str, Any]] = {}
     
@@ -85,7 +90,7 @@ class RouteDecorator:
         """Decorator to add authentication to route"""
         def decorator(func: Callable) -> Callable:
             @wraps(func)
-            async def wrapper(*args, **kwargs):
+            async def wrapper(*args, **kwargs) -> Any:
                 # Authentication is handled by dependency injection
                 return await func(*args, **kwargs)
             return wrapper
@@ -105,7 +110,7 @@ class RouteDecorator:
                 user_id_param=user_id_param
             )
             @wraps(func)
-            async def wrapper(*args, **kwargs):
+            async def wrapper(*args, **kwargs) -> Any:
                 return await func(*args, **kwargs)
             return wrapper
         return decorator
@@ -115,7 +120,7 @@ class RouteDecorator:
         """Decorator to add validation to route"""
         def decorator(func: Callable) -> Callable:
             @wraps(func)
-            async def wrapper(*args, **kwargs):
+            async def wrapper(*args, **kwargs) -> Any:
                 # Apply validators
                 for validator in validators:
                     # Apply validator to appropriate parameters
@@ -129,7 +134,7 @@ class RouteDecorator:
         """Decorator to add comprehensive error handling"""
         def decorator(func: Callable) -> Callable:
             @wraps(func)
-            async def wrapper(*args, **kwargs):
+            async def wrapper(*args, **kwargs) -> Any:
                 try:
                     return await func(*args, **kwargs)
                 except ValidationError as e:
@@ -152,7 +157,9 @@ class RouteBuilder:
     """Builder pattern for creating complex routes"""
     
     def __init__(self, router: APIRouter):
-        self.router = router
+        
+    """__init__ function."""
+self.router = router
         self.dependencies: List = []
         self.decorators: List[Callable] = []
         self.tags: List[str] = []
@@ -330,7 +337,6 @@ class RouteTemplates:
 # Utility functions for route management
 def register_routes_from_module(module_path: str, router: APIRouter):
     """Register routes from a module"""
-    import importlib
     module = importlib.import_module(module_path)
     
     # Find route functions in module

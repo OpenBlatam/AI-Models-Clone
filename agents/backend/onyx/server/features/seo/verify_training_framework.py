@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+        import torch
+        import torch.nn as nn
+        from torch.utils.data import DataLoader, Dataset
+        import numpy as np
+        from model_training_evaluation import TrainingConfig
+        from model_training_evaluation import ModelTrainer
+        from model_training_evaluation import ModelEvaluator
+        from model_training_evaluation import EfficientDataLoader
+        import torch
+        import torch.nn as nn
+        from torch.utils.data import Dataset
+        from model_training_evaluation import TrainingConfig
+        from model_training_evaluation import EfficientDataLoader
+        from model_training_evaluation import ModelTrainer
+        from model_training_evaluation import ModelEvaluator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Verification script for the Model Training and Evaluation Framework
@@ -6,28 +26,20 @@ Verification script for the Model Training and Evaluation Framework
 def verify_imports():
     """Verify that all required modules can be imported"""
     try:
-        import torch
         print(f"✓ PyTorch imported successfully (version: {torch.__version__})")
         
-        import torch.nn as nn
         print("✓ torch.nn imported successfully")
         
-        from torch.utils.data import DataLoader, Dataset
         print("✓ torch.utils.data imported successfully")
         
-        import numpy as np
         print("✓ NumPy imported successfully")
         
-        from model_training_evaluation import TrainingConfig
         print("✓ TrainingConfig imported successfully")
         
-        from model_training_evaluation import ModelTrainer
         print("✓ ModelTrainer imported successfully")
         
-        from model_training_evaluation import ModelEvaluator
         print("✓ ModelEvaluator imported successfully")
         
-        from model_training_evaluation import EfficientDataLoader
         print("✓ EfficientDataLoader imported successfully")
         
         return True
@@ -42,36 +54,32 @@ def verify_imports():
 def verify_basic_functionality():
     """Verify basic functionality without training"""
     try:
-        import torch
-        import torch.nn as nn
-        from torch.utils.data import Dataset
         
         # Create a simple model
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.fc = nn.Linear(10, 2)
             
-            def forward(self, x):
+            def forward(self, x) -> Any:
                 return self.fc(x)
         
         # Create a simple dataset
         class SimpleDataset(Dataset):
-            def __init__(self, num_samples=10):
+            def __init__(self, num_samples=10) -> Any:
                 self.data = torch.randn(num_samples, 10)
                 self.labels = torch.randint(0, 2, (num_samples,))
             
-            def __len__(self):
+            def __len__(self) -> Any:
                 return len(self.data)
             
-            def __getitem__(self, idx):
+            def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
                 return {
                     'features': self.data[idx],
                     'labels': self.labels[idx]
                 }
         
         # Test configuration creation
-        from model_training_evaluation import TrainingConfig
         
         model = SimpleModel()
         train_dataset = SimpleDataset(10)
@@ -93,7 +101,6 @@ def verify_basic_functionality():
         print(f"  - Learning rate: {config.learning_rate}")
         
         # Test data loader creation
-        from model_training_evaluation import EfficientDataLoader
         
         data_loader = EfficientDataLoader(config)
         train_loader = data_loader.get_train_loader()
@@ -104,7 +111,6 @@ def verify_basic_functionality():
         print(f"  - Val batches: {len(val_loader)}")
         
         # Test trainer creation
-        from model_training_evaluation import ModelTrainer
         
         trainer = ModelTrainer(config)
         print("✓ ModelTrainer created successfully")
@@ -113,7 +119,6 @@ def verify_basic_functionality():
         print(f"  - Scheduler: {type(trainer.scheduler).__name__}")
         
         # Test evaluator creation
-        from model_training_evaluation import ModelEvaluator
         
         evaluator = ModelEvaluator(model)
         print("✓ ModelEvaluator created successfully")
@@ -156,5 +161,6 @@ def main():
     
     return imports_ok and functionality_ok
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

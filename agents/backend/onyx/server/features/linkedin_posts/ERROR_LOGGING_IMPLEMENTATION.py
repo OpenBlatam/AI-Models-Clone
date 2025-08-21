@@ -1,10 +1,5 @@
-"""
-Error Logging Implementation: Proper Error Logging and User-Friendly Messages
-
-This module demonstrates how to implement comprehensive error logging
-with user-friendly error messages for production systems.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import logging
 import traceback
@@ -15,6 +10,14 @@ from datetime import datetime, timedelta
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass
 from enum import Enum
+from typing import Any, List, Dict, Optional
+"""
+Error Logging Implementation: Proper Error Logging and User-Friendly Messages
+
+This module demonstrates how to implement comprehensive error logging
+with user-friendly error messages for production systems.
+"""
+
 
 # Configure structured logging
 logging.basicConfig(

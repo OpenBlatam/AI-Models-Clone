@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import logging
+import sys
+from typing import Optional
+from loguru import logger
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Shared Logging - LinkedIn Posts
 ==============================
@@ -5,11 +13,7 @@ Shared Logging - LinkedIn Posts
 This module provides logging functionality for the LinkedIn Posts system.
 """
 
-import logging
-import sys
-from typing import Optional
 
-from loguru import logger
 
 
 def get_logger(name: str) -> logger:
@@ -48,7 +52,7 @@ def setup_logging(
     
     # Intercept standard logging
     class InterceptHandler(logging.Handler):
-        def emit(self, record):
+        def emit(self, record) -> Any:
             try:
                 level = logger.level(record.levelname).name
             except ValueError:

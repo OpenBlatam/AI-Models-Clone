@@ -1,9 +1,13 @@
-#!/usr/bin/env python3
-"""
-Instagram Captions API v4.0 - PRODUCTION READY (Simplified)
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Enterprise-ready production API with all optimizations working out of the box.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -17,7 +21,6 @@ from typing import Dict, Any, List, Optional
 from functools import wraps
 from datetime import datetime, timezone
 from contextlib import asynccontextmanager
-
 from fastapi import FastAPI, Request, Response, HTTPException, Depends, Security, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -25,6 +28,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from pydantic import BaseModel, Field, validator
 import uvicorn
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Instagram Captions API v4.0 - PRODUCTION READY (Simplified)
+
+Enterprise-ready production API with all optimizations working out of the box.
+"""
+
+
 
 # Configure logging for production
 logging.basicConfig(
@@ -60,7 +72,7 @@ config = ProductionConfig()
 
 # Production metrics (simplified)
 class ProductionMetrics:
-    def __init__(self):
+    def __init__(self) -> Any:
         self.requests_total = 0
         self.requests_success = 0
         self.requests_error = 0
@@ -70,7 +82,9 @@ class ProductionMetrics:
         self.start_time = time.time()
     
     def record_request(self, success: bool, response_time: float):
-        self.requests_total += 1
+        
+    """record_request function."""
+self.requests_total += 1
         if success:
             self.requests_success += 1
         else:
@@ -82,10 +96,10 @@ class ProductionMetrics:
             self.requests_total
         )
     
-    def record_cache_hit(self):
+    def record_cache_hit(self) -> Any:
         self.cache_hits += 1
     
-    def record_cache_miss(self):
+    def record_cache_miss(self) -> Any:
         self.cache_misses += 1
     
     def get_stats(self) -> Dict[str, Any]:
@@ -124,7 +138,7 @@ class ProductionCaptionRequest(BaseModel):
     client_id: str = Field(..., min_length=1, max_length=100)
     
     @validator('content_description')
-    def validate_content(cls, v):
+    def validate_content(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Content description cannot be empty")
         dangerous_chars = ['<script>', '</script>', '<iframe>', '</iframe>']
@@ -176,7 +190,7 @@ def verify_api_key(credentials: HTTPAuthorizationCredentials = Security(security
 
 # Production cache
 class ProductionCache:
-    def __init__(self):
+    def __init__(self) -> Any:
         self._cache: Dict[str, Any] = {}
         self._cache_times: Dict[str, float] = {}
         self._lock = asyncio.Lock()
@@ -216,7 +230,7 @@ cache = ProductionCache()
 
 # Rate limiter
 class RateLimiter:
-    def __init__(self):
+    def __init__(self) -> Any:
         self._requests: Dict[str, List[float]] = {}
         self._lock = asyncio.Lock()
     
@@ -244,7 +258,7 @@ rate_limiter = RateLimiter()
 
 # AI Engine (Production-ready)
 class ProductionAIEngine:
-    def __init__(self):
+    def __init__(self) -> Any:
         self.style_templates = {
             "casual": "🌟 {content} What do you think? Let me know in the comments! 💭",
             "professional": "🎯 {content} Let's discuss the impact and opportunities ahead.",
@@ -277,9 +291,9 @@ class ProductionAIEngine:
             elif request.content_type == "reel":
                 content_enhanced = f"🎬 Reel alert: {content_enhanced}"
             elif request.content_type == "carousel":
-                content_enhanced = f"📸 Swipe to see: {content_enhanced}"
+                content_enhanced = f"📸 Swipe to see: {content_enhanced}"f"
             
-            caption = template.format(content=content_enhanced)
+            caption = template"
             
             # Generate quality hashtags
             hashtags = []
@@ -360,7 +374,9 @@ ai_engine = ProductionAIEngine()
 
 # Request middleware
 async def request_middleware(request: Request, call_next):
-    request_id = str(uuid.uuid4())
+    
+    """request_middleware function."""
+request_id = str(uuid.uuid4())
     start_time = time.time()
     
     request.state.request_id = request_id
@@ -391,7 +407,9 @@ async def request_middleware(request: Request, call_next):
 # Create production app
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    logger.info(f"🚀 Starting Instagram Captions API v{config.API_VERSION} - Production Ready")
+    
+    """lifespan function."""
+logger.info(f"🚀 Starting Instagram Captions API v{config.API_VERSION} - Production Ready")
     logger.info(f"Environment: {config.ENVIRONMENT}")
     logger.info(f"Server: {config.HOST}:{config.PORT}")
     
@@ -429,7 +447,9 @@ app = create_production_app()
 # Production endpoints
 @app.get("/")
 async def root():
-    return {
+    
+    """root function."""
+return {
         "name": "Instagram Captions API v4.0 - Production Ready",
         "version": config.API_VERSION,
         "environment": config.ENVIRONMENT,
@@ -505,7 +525,9 @@ async def generate_caption_production(
 
 @app.get("/health", response_model=HealthResponse)
 async def health_check():
-    current_time = datetime.now(timezone.utc)
+    
+    """health_check function."""
+current_time = datetime.now(timezone.utc)
     uptime = time.time() - metrics.start_time
     
     # Component health checks
@@ -563,7 +585,9 @@ async def health_check():
 
 @app.get("/ready")
 async def readiness_check():
-    try:
+    
+    """readiness_check function."""
+try:
         # Quick readiness test
         await cache.get("readiness_test")
         return {
@@ -575,7 +599,9 @@ async def readiness_check():
 
 @app.get("/metrics")
 async def get_metrics():
-    return {
+    
+    """get_metrics function."""
+return {
         "api_version": config.API_VERSION,
         "environment": config.ENVIRONMENT,
         "metrics": metrics.get_stats(),
@@ -603,7 +629,9 @@ async def clear_cache(api_key: str = Depends(verify_api_key)):
 # Exception handlers
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    request_id = getattr(request.state, 'request_id', 'unknown')
+    
+    """http_exception_handler function."""
+request_id = getattr(request.state, 'request_id', 'unknown')
     
     logger.warning(f"HTTP exception: {request_id} {exc.status_code} {exc.detail}")
     
@@ -621,7 +649,9 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
-    request_id = getattr(request.state, 'request_id', 'unknown')
+    
+    """general_exception_handler function."""
+request_id = getattr(request.state, 'request_id', 'unknown')
     
     logger.error(f"Unhandled exception: {request_id} {str(exc)}")
     
@@ -638,7 +668,9 @@ async def general_exception_handler(request: Request, exc: Exception):
     )
 
 def run_production():
-    print(f"""
+    
+    """run_production function."""
+print(f"""
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║              🚀 INSTAGRAM CAPTIONS API v{config.API_VERSION} - PRODUCTION READY 🚀            ║
 ║                                                                              ║
@@ -681,5 +713,6 @@ def run_production():
         date_header=False
     )
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     run_production() 

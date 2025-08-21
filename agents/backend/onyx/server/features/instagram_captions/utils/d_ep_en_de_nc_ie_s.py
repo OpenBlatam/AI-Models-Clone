@@ -1,22 +1,35 @@
-"""
-FastAPI Dependencies for Instagram Captions API.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Optimized dependency injection with caching, resource management, and error handling.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 from functools import lru_cache
 from typing import Optional, Dict, Any
 import logging
 from contextlib import asynccontextmanager
-
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPBearer
 import redis.asyncio as redis
-
 from core import InstagramCaptionsEngine
 from gmt_system import SimplifiedGMTSystem
 from service import InstagramCaptionsService
+    from config import config
+from typing import Any, List, Dict, Optional
+"""
+FastAPI Dependencies for Instagram Captions API.
+
+Optimized dependency injection with caching, resource management, and error handling.
+"""
+
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +44,6 @@ security = HTTPBearer(auto_error=False)
 @lru_cache()
 def get_settings():
     """Get application settings with caching."""
-    from config import config
     return config
 
 
@@ -120,7 +132,7 @@ async def get_captions_service() -> InstagramCaptionsService:
     return _instances_cache[cache_key]
 
 
-async def get_request_context(request: Request) -> Dict[str, Any]:
+async async def get_request_context(request: Request) -> Dict[str, Any]:
     """Extract and validate request context."""
     return {
         "method": request.method,
@@ -137,7 +149,9 @@ class CacheManager:
     """Centralized cache management for API responses."""
     
     def __init__(self, redis_client: Optional[redis.Redis] = None):
-        self.redis_client = redis_client
+        
+    """__init__ function."""
+self.redis_client = redis_client
         self.default_ttl = 300  # 5 minutes
     
     async def get(self, key: str) -> Optional[str]:
@@ -198,7 +212,9 @@ class RateLimiter:
     """Simple rate limiting for API endpoints."""
     
     def __init__(self, redis_client: Optional[redis.Redis] = None):
-        self.redis_client = redis_client
+        
+    """__init__ function."""
+self.redis_client = redis_client
         self.default_limit = 100  # requests per window
         self.default_window = 3600  # 1 hour
     
@@ -280,7 +296,7 @@ async def check_rate_limit(
 class HealthChecker:
     """System health checking for dependencies."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.checks = {}
     
     async def check_engine_health(self, engine: InstagramCaptionsEngine) -> Dict[str, Any]:
@@ -347,7 +363,7 @@ async def get_health_checker() -> HealthChecker:
     return HealthChecker()
 
 
-async def validate_request_size(request: Request) -> None:
+async async def validate_request_size(request: Request) -> None:
     """Validate request size to prevent abuse."""
     content_length = request.headers.get("content-length")
     

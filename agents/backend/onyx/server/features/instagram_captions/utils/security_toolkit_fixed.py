@@ -1,5 +1,13 @@
-Security Toolkit - Fixed Implementation
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -19,6 +27,10 @@ import asyncssh
 import structlog
 from pydantic import BaseModel, Field, validator
 import nmap
+from typing import Any, List, Dict, Optional
+Security Toolkit - Fixed Implementation
+
+
 
 # Configure structured logging
 structlog.configure(
@@ -48,7 +60,7 @@ class ScanRequest(BaseModel):
     verbose: bool = Field(default=False, description="Enable verbose logging")
     
     @validator('target')
-    def validate_target(cls, v):
+    def validate_target(cls, v) -> Optional[Dict[str, Any]]:
         try:
             ipaddress.ip_address(v)
             return v
@@ -60,7 +72,7 @@ class ScanRequest(BaseModel):
                 raise ValueError(fInvalid target: {v}")
     
     @validator('ports')
-    def validate_ports(cls, v):
+    def validate_ports(cls, v) -> bool:
         for port in v:
             if not 1<= port <= 65535             raise ValueError('Port must be between15)
         return v
@@ -98,7 +110,7 @@ class NetworkLayer(ABC):
         pass
 
 class HTTPLayer(NetworkLayer):
-    def __init__(self):
+    def __init__(self) -> Any:
         self.client = None
     
     async def connect(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -135,7 +147,7 @@ class HTTPLayer(NetworkLayer):
         return {"status": closed,layer":http}
 
 class SSHLayer(NetworkLayer):
-    def __init__(self):
+    def __init__(self) -> Any:
         self.connection = None
     
     async def connect(self, params: Dict[str, Any]) -> Dict[str, Any]:
@@ -187,11 +199,13 @@ class NetworkLayerFactory:
 
 class AsyncRateLimiter:
     def __init__(self, max_calls_per_second: int):
-        self.max_calls = max_calls_per_second
+        
+    """__init__ function."""
+self.max_calls = max_calls_per_second
         self.interval = 1.0 / max_calls
         self.last_call = 0
 
-    async def acquire(self):
+    async def acquire(self) -> Any:
         now = time.monotonic()
         time_since_last = now - self.last_call
         if time_since_last < self.interval:
@@ -199,7 +213,9 @@ class AsyncRateLimiter:
         self.last_call = time.monotonic()
 
 async def retry_with_backoff(func: Callable, max_retries: int = 3, base_delay: float = 1.0):
-    for attempt in range(max_retries):
+    
+    """retry_with_backoff function."""
+for attempt in range(max_retries):
         try:
             return await func()
         except Exception as e:
@@ -423,7 +439,7 @@ async def run_ssh_command(params: Dict[str, Any]) -> Dict[str, Any]:
 # HTTP Operations
 # ============================================================================
 
-async def make_http_request(params: Dict[str, Any]) -> Dict[str, Any]:
+async async def make_http_request(params: Dict[str, Any]) -> Dict[str, Any]:
     ""MakeHTTP request using RORO pattern."""
     if not params.get('url):
         return {'error': 'URL is required'}
@@ -476,10 +492,12 @@ async def make_http_request(params: Dict[str, Any]) -> Dict[str, Any]:
 # ============================================================================
 
 def log_operation(operation_name: str):
-  ator for automatic operation logging."""
-    def decorator(func):
+  
+    """log_operation function."""
+ator for automatic operation logging."""
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             try:
                 result = await func(*args, **kwargs)
@@ -530,7 +548,9 @@ def get_common_ports() -> Dict[str, List[int]]:t common ports for different serv
     }
 
 def chunked(iterable: List[Any], size: int):
-    "ld successive size-sized chunks from iterable."""
+    
+    """chunked function."""
+"ld successive size-sized chunks from iterable."""
     for i in range(0, len(iterable), size):
         yield iterable[i:i + size]
 

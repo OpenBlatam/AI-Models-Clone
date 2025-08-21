@@ -1,14 +1,16 @@
-"""
-Smart Cache for Instagram Captions API v14.0
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Advanced caching strategies:
-- Multi-level caching (L1, L2, L3)
-- Predictive prefetching
-- Intelligent eviction policies
-- Cache warming and preloading
-- Compression and optimization
-- Cache analytics and monitoring
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -24,27 +26,40 @@ import logging
 import threading
 from functools import lru_cache, wraps
 import weakref
+    import orjson
+    import json
+    import numba
+    from numba import jit, njit
+from typing import Any, List, Dict, Optional
+"""
+Smart Cache for Instagram Captions API v14.0
+
+Advanced caching strategies:
+- Multi-level caching (L1, L2, L3)
+- Predictive prefetching
+- Intelligent eviction policies
+- Cache warming and preloading
+- Compression and optimization
+- Cache analytics and monitoring
+"""
+
 
 # Performance libraries
 try:
-    import orjson
     json_dumps = lambda obj: orjson.dumps(obj).decode()
     json_loads = orjson.loads
     ULTRA_JSON = True
 except ImportError:
-    import json
     json_dumps = lambda obj: json.dumps(obj)
     json_loads = json.loads
     ULTRA_JSON = False
 
 try:
-    import numba
-    from numba import jit, njit
     NUMBA_AVAILABLE = True
 except ImportError:
     NUMBA_AVAILABLE = False
-    def jit(*args, **kwargs):
-        def decorator(func):
+    def jit(*args, **kwargs) -> Any:
+        def decorator(func) -> Any:
             return func
         return decorator
     njit = jit
@@ -113,7 +128,7 @@ class CacheEntry:
     compressed: bool = False
     level: CacheLevel = CacheLevel.L1_HOT
     
-    def update_access(self):
+    def update_access(self) -> Any:
         """Update access metadata"""
         self.accessed_at = time.time()
         self.access_count += 1
@@ -127,7 +142,9 @@ class SmartCache:
     """Advanced multi-level cache with intelligent strategies"""
     
     def __init__(self, config: CacheConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.l1_cache: Dict[str, CacheEntry] = {}
         self.l2_cache: Dict[str, CacheEntry] = {}
         self.l3_cache: Dict[str, CacheEntry] = {}
@@ -154,7 +171,7 @@ class SmartCache:
         # Start background tasks
         self._start_background_tasks()
     
-    def _start_background_tasks(self):
+    def _start_background_tasks(self) -> Any:
         """Start background maintenance tasks"""
         asyncio.create_task(self._cleanup_expired())
         asyncio.create_task(self._update_analytics())
@@ -395,7 +412,7 @@ class SmartCache:
         # Convert to 0-1 score (lower variance = higher score)
         return max(0.0, 1.0 - (variance / (mean_interval ** 2 + 1)))
     
-    async def _prefetch_predictive(self) -> None:
+    async async def _prefetch_predictive(self) -> None:
         """Predictive prefetching based on access patterns"""
         if not self.config.enable_prefetching:
             return
@@ -515,11 +532,11 @@ class SmartCache:
 # Cache decorators
 def smart_cache(ttl: int = 3600, level: CacheLevel = CacheLevel.L1_HOT):
     """Smart cache decorator with multi-level support"""
-    def decorator(func):
+    def decorator(func) -> Any:
         cache = SmartCache(CacheConfig())
         
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             cache_key = f"{func.__name__}:{hash(str(args) + str(kwargs))}"
             
@@ -542,7 +559,7 @@ def smart_cache(ttl: int = 3600, level: CacheLevel = CacheLevel.L1_HOT):
 
 def predictive_cache(ttl: int = 3600, prefetch_threshold: float = 0.8):
     """Predictive cache decorator with prefetching"""
-    def decorator(func):
+    def decorator(func) -> Any:
         config = CacheConfig(
             enable_prefetching=True,
             prefetch_threshold=prefetch_threshold
@@ -550,7 +567,7 @@ def predictive_cache(ttl: int = 3600, prefetch_threshold: float = 0.8):
         cache = SmartCache(config)
         
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             cache_key = f"{func.__name__}:{hash(str(args) + str(kwargs))}"
             
             # Try cache first

@@ -1,13 +1,12 @@
-"""
-Ultra-Fast HTTP Client
-Maximum Performance with Fastest Libraries
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
 from typing import Optional, Dict, Any
 from contextlib import asynccontextmanager
-
 import httpx
 import asyncio_throttle
 import pybreaker
@@ -15,6 +14,14 @@ import tenacity
 from shared.core.exceptions import HTTPClientError
 from shared.core.config import Settings
 from shared.core.logging import get_logger
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Ultra-Fast HTTP Client
+Maximum Performance with Fastest Libraries
+"""
+
+
 
 logger = get_logger(__name__)
 
@@ -184,7 +191,7 @@ class UltraFastHTTPClient:
                 )
                 raise HTTPClientError(f"Failed to post to URL {url}: {str(e)}")
     
-    async def _make_request(self, url: str, method: str, timeout: Optional[float] = None,
+    async async def _make_request(self, url: str, method: str, timeout: Optional[float] = None,
                            headers: Optional[Dict[str, str]] = None, data: Optional[Dict[str, Any]] = None,
                            json: Optional[Dict[str, Any]] = None) -> httpx.Response:
         """
@@ -236,7 +243,7 @@ class UltraFastHTTPClient:
             raise HTTPClientError(f"Unexpected error: {str(e)}")
     
     @asynccontextmanager
-    async def session(self):
+    async def session(self) -> Any:
         """
         Context manager for HTTP session
         

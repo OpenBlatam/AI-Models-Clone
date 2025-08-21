@@ -1,7 +1,7 @@
-"""
-Configuration loader for production environment.
-Supports YAML, environment variables, and secure secrets management.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import os
 import yaml
@@ -10,17 +10,29 @@ from typing import Dict, Any, Optional
 from pathlib import Path
 from loguru import logger
 import orjson
+                import boto3
+                from botocore.exceptions import ClientError
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Configuration loader for production environment.
+Supports YAML, environment variables, and secure secrets management.
+"""
+
 
 
 class ConfigLoader:
     """Production configuration loader with environment support."""
     
     def __init__(self, config_path: Optional[str] = None):
-        self.config_path = config_path or "config/production.yml"
+        
+    """__init__ function."""
+self.config_path = config_path or "config/production.yml"
         self.config: Dict[str, Any] = {}
         self._load_config()
     
-    def _load_config(self):
+    def _load_config(self) -> Any:
         """Load configuration from multiple sources."""
         # Load base config
         self._load_yaml_config()
@@ -36,12 +48,16 @@ class ConfigLoader:
         
         logger.info("Configuration loaded successfully")
     
-    def _load_yaml_config(self):
+    def _load_yaml_config(self) -> Any:
         """Load YAML configuration file."""
         try:
             config_file = Path(self.config_path)
             if config_file.exists():
                 with open(config_file, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     self.config = yaml.safe_load(f) or {}
                 logger.info(f"Loaded YAML config from {self.config_path}")
             else:
@@ -51,7 +67,7 @@ class ConfigLoader:
             logger.error(f"Failed to load YAML config: {e}")
             self.config = self._get_default_config()
     
-    def _load_env_overrides(self):
+    def _load_env_overrides(self) -> Any:
         """Override config with environment variables."""
         env_mappings = {
             # App settings
@@ -115,7 +131,7 @@ class ConfigLoader:
                 self._set_nested_value(self.config, config_path, self._parse_env_value(env_value))
                 logger.debug(f"Override {config_path} with {env_var}")
     
-    def _load_secrets(self):
+    def _load_secrets(self) -> Any:
         """Load secrets from secure sources."""
         # Load from Kubernetes secrets
         self._load_k8s_secrets()
@@ -126,7 +142,7 @@ class ConfigLoader:
         # Load from AWS Secrets Manager
         self._load_aws_secrets()
     
-    def _load_k8s_secrets(self):
+    def _load_k8s_secrets(self) -> Any:
         """Load secrets from Kubernetes."""
         k8s_secret_path = "/var/run/secrets/kubernetes.io/serviceaccount"
         if os.path.exists(k8s_secret_path):
@@ -143,7 +159,15 @@ class ConfigLoader:
                     secret_path = f"/var/run/secrets/kubernetes.io/serviceaccount/{secret_file}"
                     if os.path.exists(secret_path):
                         with open(secret_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                             secret_value = f.read().strip()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                             
                         # Map to config
                         if secret_file == "openai-api-key":
@@ -159,7 +183,7 @@ class ConfigLoader:
             except Exception as e:
                 logger.warning(f"Failed to load Kubernetes secrets: {e}")
     
-    def _load_docker_secrets(self):
+    def _load_docker_secrets(self) -> Any:
         """Load secrets from Docker secrets."""
         docker_secrets_path = "/run/secrets"
         if os.path.exists(docker_secrets_path):
@@ -168,7 +192,15 @@ class ConfigLoader:
                 for secret_file in secret_files:
                     secret_path = os.path.join(docker_secrets_path, secret_file)
                     with open(secret_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         secret_value = f.read().strip()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     
                     # Map to config based on filename
                     if secret_file == "openai_api_key":
@@ -184,13 +216,11 @@ class ConfigLoader:
             except Exception as e:
                 logger.warning(f"Failed to load Docker secrets: {e}")
     
-    def _load_aws_secrets(self):
+    def _load_aws_secrets(self) -> Any:
         """Load secrets from AWS Secrets Manager."""
         aws_secret_name = os.getenv('AWS_SECRET_NAME')
         if aws_secret_name:
             try:
-                import boto3
-                from botocore.exceptions import ClientError
                 
                 session = boto3.session.Session()
                 client = session.client(
@@ -251,7 +281,7 @@ class ConfigLoader:
             current = current[key]
         current[path[-1]] = value
     
-    def _validate_config(self):
+    def _validate_config(self) -> bool:
         """Validate configuration and set defaults."""
         # Ensure required sections exist
         required_sections = ['app', 'server', 'database', 'redis', 'openai']
@@ -402,7 +432,7 @@ class ConfigLoader:
             }
         }
     
-    def get(self, key: str, default: Any = None) -> Any:
+    def get(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Get configuration value by key (dot notation supported)."""
         keys = key.split('.')
         value = self.config

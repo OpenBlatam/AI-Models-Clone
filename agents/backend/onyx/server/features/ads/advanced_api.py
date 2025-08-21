@@ -1,57 +1,19 @@
 """
-Advanced Onyx API endpoints for ads module.
-"""
-from typing import List, Dict, Any, Optional
-from fastapi import APIRouter, Depends, HTTPException, Request
-from pydantic import BaseModel
+Deprecated module. Use `agents.backend.onyx.server.features.ads.api.advanced` instead.
 
-from onyx.core.auth import get_current_user
-from onyx.core.functions import format_response, handle_error
-from onyx.server.features.ads.advanced import (
-    AdvancedAdsService,
-    AITrainingData,
-    ContentOptimization,
-    AudienceInsights,
-    BrandVoiceAnalysis,
-    ContentPerformance
+This file now re-exports the unified advanced API router to maintain backward compatibility.
+"""
+
+import warnings
+from .api.advanced import router  # type: ignore
+
+warnings.warn(
+    "advanced_api is deprecated. Import from ads.api.advanced instead.",
+    DeprecationWarning,
+    stacklevel=2,
 )
 
-router = APIRouter(prefix="/ads/advanced", tags=["ads-advanced"])
-
-class TrainingDataRequest(BaseModel):
-    """Request model for AI training data."""
-    training_data: List[AITrainingData]
-
-class ContentOptimizationRequest(BaseModel):
-    """Request model for content optimization."""
-    content: str
-    optimization_type: str
-
-class BrandVoiceAnalysisRequest(BaseModel):
-    """Request model for brand voice analysis."""
-    content_samples: List[str]
-
-class CompetitorAnalysisRequest(BaseModel):
-    """Request model for competitor analysis."""
-    competitor_urls: List[str]
-
-class ContentVariationsRequest(BaseModel):
-    """Request model for content variations."""
-    content: str
-    variations: int = 3
-
-@router.post("/train-ai")
-async def train_ai_model(
-    request: TrainingDataRequest,
-    current_user: Dict[str, Any] = Depends(get_current_user)
-):
-    """Train AI model with provided data."""
-    try:
-        service = AdvancedAdsService(request.app.state.httpx_client)
-        result = await service.train_ai_model(request.training_data)
-        return format_response(result)
-    except Exception as e:
-        raise handle_error(e)
+__all__ = ["router"]
 
 @router.post("/optimize-content")
 async def optimize_content(

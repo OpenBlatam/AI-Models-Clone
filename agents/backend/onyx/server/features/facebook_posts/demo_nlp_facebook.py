@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+from datetime import datetime
+from typing import Dict, Any
+from services.nlp_engine import FacebookNLPEngine, NLPResult
+from utils.nlp_helpers import extract_features, calculate_sentiment_lexicon, detect_content_type
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 🧠 Demo - Sistema NLP para Facebook Posts
@@ -6,19 +21,14 @@
 Demostración completa del sistema NLP integrado.
 """
 
-import asyncio
-from datetime import datetime
-from typing import Dict, Any
 
 # Import NLP system
-from services.nlp_engine import FacebookNLPEngine, NLPResult
-from utils.nlp_helpers import extract_features, calculate_sentiment_lexicon, detect_content_type
 
 
 class FacebookNLPDemo:
     """Demo del sistema NLP para Facebook posts."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.nlp_engine = FacebookNLPEngine()
         self.demo_posts = [
             {
@@ -43,7 +53,7 @@ class FacebookNLPDemo:
             }
         ]
     
-    async def run_complete_demo(self):
+    async def run_complete_demo(self) -> Any:
         """Ejecutar demo completo del sistema NLP."""
         print("""
 🧠 FACEBOOK POSTS NLP SYSTEM DEMO 🧠
@@ -67,7 +77,7 @@ Demostrando capacidades avanzadas de NLP:
         
         print("\n🎯 Demo NLP completado exitosamente!")
     
-    async def demo_basic_nlp_analysis(self):
+    async def demo_basic_nlp_analysis(self) -> Any:
         """Demo de análisis NLP básico."""
         print("\n🔍 1. ANÁLISIS NLP BÁSICO")
         print("=" * 40)
@@ -91,7 +101,7 @@ Demostrando capacidades avanzadas de NLP:
             top_emotion = max(result.emotion_scores.items(), key=lambda x: x[1])
             print(f"   • Emoción dominante: {top_emotion[0]} ({top_emotion[1]:.2f})")
     
-    async def demo_sentiment_analysis(self):
+    async def demo_sentiment_analysis(self) -> Any:
         """Demo de análisis de sentimientos."""
         print("\n😊 2. ANÁLISIS DE SENTIMIENTOS AVANZADO")
         print("=" * 45)
@@ -123,7 +133,7 @@ Demostrando capacidades avanzadas de NLP:
                 if score > 0.1:
                     print(f"     - {emotion}: {score:.2f}")
     
-    async def demo_engagement_prediction(self):
+    async def demo_engagement_prediction(self) -> Any:
         """Demo de predicción de engagement."""
         print("\n📈 3. PREDICCIÓN DE ENGAGEMENT")
         print("=" * 35)
@@ -153,7 +163,7 @@ Demostrando capacidades avanzadas de NLP:
                 for rec in result.recommendations[:3]:
                     print(f"     - {rec}")
     
-    async def demo_content_optimization(self):
+    async def demo_content_optimization(self) -> Any:
         """Demo de optimización de contenido."""
         print("\n⚡ 4. OPTIMIZACIÓN DE CONTENIDO")
         print("=" * 35)
@@ -182,7 +192,7 @@ Demostrando capacidades avanzadas de NLP:
         engagement_improvement = optimized_analysis.engagement_score - original_analysis.engagement_score
         print(f"\n🚀 Mejora en engagement: +{engagement_improvement:.2f} ({engagement_improvement/original_analysis.engagement_score*100:.1f}% mejora)")
     
-    async def demo_hashtag_generation(self):
+    async def demo_hashtag_generation(self) -> Any:
         """Demo de generación de hashtags."""
         print("\n#️⃣ 5. GENERACIÓN INTELIGENTE DE HASHTAGS")
         print("=" * 45)
@@ -206,7 +216,7 @@ Demostrando capacidades avanzadas de NLP:
             print(f"📋 Topics detectados: {', '.join(result.topics)}")
             print(f"🔑 Keywords principales: {', '.join(result.keywords[:5])}")
     
-    async def demo_performance_metrics(self):
+    async def demo_performance_metrics(self) -> Any:
         """Demo de métricas de performance."""
         print("\n⚡ 6. MÉTRICAS DE PERFORMANCE NLP")
         print("=" * 35)

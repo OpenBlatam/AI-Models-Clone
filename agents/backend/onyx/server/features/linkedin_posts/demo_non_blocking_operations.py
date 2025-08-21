@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+import json
+import uuid
+from typing import Dict, Any, List
+import httpx
+from concurrent.futures import ThreadPoolExecutor
+import multiprocessing
+from BLOCKING_OPERATIONS_IMPLEMENTATION import (
+            import os
+            import traceback
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 LinkedIn Posts - Non-Blocking Operations Demo
@@ -8,17 +26,8 @@ in FastAPI routes with async patterns, background tasks, thread pools,
 and performance optimizations.
 """
 
-import asyncio
-import time
-import json
-import uuid
-from typing import Dict, Any, List
-import httpx
-from concurrent.futures import ThreadPoolExecutor
-import multiprocessing
 
 # Import the main implementation
-from BLOCKING_OPERATIONS_IMPLEMENTATION import (
     NonBlockingLinkedInPostsAPI,
     LinkedInPostRequest,
     PostOptimizationRequest,
@@ -53,12 +62,12 @@ DEMO_CONFIG = {
 }
 
 class NonBlockingOperationsDemo:
-    def __init__(self):
+    def __init__(self) -> Any:
         self.api = NonBlockingLinkedInPostsAPI()
         self.client = None
         self.thread_pool = ThreadPoolExecutor(max_workers=4)
     
-    async def setup(self):
+    async def setup(self) -> Any:
         """Setup the demo environment"""
         print("🚀 Setting up Non-Blocking Operations Demo...")
         
@@ -73,7 +82,7 @@ class NonBlockingOperationsDemo:
         
         print("✅ Demo setup complete!")
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup demo resources"""
         if self.client:
             await self.client.aclose()
@@ -83,7 +92,7 @@ class NonBlockingOperationsDemo:
         
         print("🧹 Demo cleanup complete!")
     
-    async def demo_health_check(self):
+    async def demo_health_check(self) -> Any:
         """Demo health check endpoint"""
         print("\n🏥 Testing Health Check Endpoint...")
         
@@ -96,7 +105,7 @@ class NonBlockingOperationsDemo:
             print(f"❌ Health check failed: {e}")
             return False
     
-    async def demo_create_posts(self):
+    async def demo_create_posts(self) -> Any:
         """Demo creating posts with background tasks"""
         print("\n📝 Testing Post Creation with Background Tasks...")
         
@@ -187,7 +196,7 @@ class NonBlockingOperationsDemo:
             except Exception as e:
                 print(f"❌ Error optimizing post: {e}")
     
-    async def demo_file_upload(self):
+    async async def demo_file_upload(self) -> Any:
         """Demo async file upload"""
         print("\n📁 Testing Async File Upload...")
         
@@ -197,12 +206,24 @@ class NonBlockingOperationsDemo:
             test_file_path = "test_upload.txt"
             
             with open(test_file_path, "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(test_content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             start_time = time.time()
             
             # Upload file
             with open(test_file_path, "rb") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 files = {"file": ("test_upload.txt", f, "text/plain")}
                 response = await self.client.post("/api/v1/upload", files=files)
             
@@ -218,13 +239,12 @@ class NonBlockingOperationsDemo:
                 print(f"❌ Failed to upload file: {response.status_code}")
             
             # Cleanup test file
-            import os
             os.remove(test_file_path)
             
         except Exception as e:
             print(f"❌ Error uploading file: {e}")
     
-    async def demo_external_api_call(self):
+    async async def demo_external_api_call(self) -> Any:
         """Demo async external API calls with circuit breaker"""
         print("\n🌐 Testing External API Calls with Circuit Breaker...")
         
@@ -246,7 +266,7 @@ class NonBlockingOperationsDemo:
         except Exception as e:
             print(f"❌ Error calling external API: {e}")
     
-    async def demo_text_analysis(self):
+    async def demo_text_analysis(self) -> Any:
         """Demo CPU-intensive text analysis using thread pools"""
         print("\n🔍 Testing CPU-Intensive Text Analysis with Thread Pools...")
         
@@ -281,13 +301,15 @@ class NonBlockingOperationsDemo:
             except Exception as e:
                 print(f"❌ Error analyzing text: {e}")
     
-    async def demo_concurrent_requests(self):
+    async async def demo_concurrent_requests(self) -> Any:
         """Demo handling concurrent requests"""
         print("\n⚡ Testing Concurrent Request Handling...")
         
         # Create multiple concurrent requests
         async def make_request(request_id: int):
-            try:
+            
+    """make_request function."""
+try:
                 start_time = time.time()
                 response = await self.client.get("/health")
                 duration = time.time() - start_time
@@ -325,7 +347,7 @@ class NonBlockingOperationsDemo:
             else:
                 print(f"  ❌ Request {result['request_id']}: {result.get('error', 'Unknown error')}")
     
-    async def demo_metrics(self):
+    async def demo_metrics(self) -> Any:
         """Demo Prometheus metrics"""
         print("\n📊 Testing Prometheus Metrics...")
         
@@ -361,7 +383,7 @@ class NonBlockingOperationsDemo:
         except Exception as e:
             print(f"❌ Error getting metrics: {e}")
     
-    async def demo_performance_comparison(self):
+    async def demo_performance_comparison(self) -> Any:
         """Demo performance comparison between blocking and non-blocking operations"""
         print("\n⚡ Performance Comparison Demo...")
         
@@ -407,7 +429,7 @@ class NonBlockingOperationsDemo:
         improvement = ((blocking_duration - non_blocking_duration) / blocking_duration) * 100
         print(f"🚀 Performance improvement: {improvement:.1f}%")
     
-    async def run_full_demo(self):
+    async def run_full_demo(self) -> Any:
         """Run the complete demo"""
         print("🎬 Starting Non-Blocking Operations Demo")
         print("=" * 50)
@@ -462,7 +484,6 @@ class NonBlockingOperationsDemo:
             
         except Exception as e:
             print(f"❌ Demo failed: {e}")
-            import traceback
             traceback.print_exc()
         
         finally:
@@ -475,5 +496,6 @@ async def main():
     demo = NonBlockingOperationsDemo()
     await demo.run_full_demo()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

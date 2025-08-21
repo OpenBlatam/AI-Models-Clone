@@ -1,5 +1,10 @@
-Security API - FastAPI implementation with OWASP/NIST best practices
-"
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from fastapi import FastAPI, Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -13,6 +18,11 @@ from typing import Dict, Any, Optional
 from pydantic import BaseModel
 import structlog
 from security_toolkit import (
+from typing import Any, List, Dict, Optional
+import asyncio
+Security API - FastAPI implementation with OWASP/NIST best practices
+"
+
     scan_ports_basic, run_ssh_command, make_http_request,
     log_operation, measure_scan_time, get_common_ports
 )
@@ -61,7 +71,9 @@ request_counts = {}
 
 @app.middleware("http")
 async def rate_limit_middleware(request: Request, call_next):
-    client_ip = request.client.host
+    
+    """rate_limit_middleware function."""
+client_ip = request.client.host
     current_time = time.time()
     
     # Clean old requests (older than 1 minute)
@@ -83,7 +95,9 @@ async def rate_limit_middleware(request: Request, call_next):
 # Request/Response logging
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    start_time = time.time()
+    
+    """log_requests function."""
+start_time = time.time()
     
     # Log request
     logger.info("API Request, extra={
@@ -158,7 +172,9 @@ class SSHAPIRequest(BaseModel):
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    return JSONResponse(
+    
+    """http_exception_handler function."""
+return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(
             error=exc.detail,
@@ -174,7 +190,9 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.get("/health")
 async def health_check():
-    return[object Object]
+    
+    """health_check function."""
+return[object Object]
         status": healthy",
        timestamp": time.strftime(%Y-%m-%d %H:%M:%S"),
     security: {
@@ -286,11 +304,15 @@ async def get_scan_status(
 
 @app.get("/common/ports")
 async def get_common_ports_api():
-    return get_common_ports()
+    
+    """get_common_ports_api function."""
+return get_common_ports()
 
 @app.get("/metrics")
 async def get_metrics():
-    return[object Object]  total_requests": sum(len(requests) for requests in request_counts.values()),
+    
+    """get_metrics function."""
+return[object Object]  total_requests": sum(len(requests) for requests in request_counts.values()),
        active_clients": len(request_counts),
         rate_limit": "10equests/minute per client"
     }
@@ -301,7 +323,9 @@ async def get_metrics():
 
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
-    response = await call_next(request)
+    
+    """add_security_headers function."""
+response = await call_next(request)
     response.headers["X-Content-Type-Options] = niff"
     response.headers[X-Frame-Options"] = "DENY"
     response.headers["X-XSS-Protection"] = "1lock"

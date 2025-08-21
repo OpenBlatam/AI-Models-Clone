@@ -1,11 +1,7 @@
-"""
-Factory for SEO Service with dependency injection.
-Creates and configures all dependencies for the SEO service.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, Any, Optional
 from loguru import logger
-
 from ..core.interfaces import HTMLParserInterface, CacheInterface, HTTPClientInterface, AnalyzerInterface
 from ..core.ultra_optimized_parser import UltraOptimizedParser
 from ..core.ultra_optimized_cache import UltraOptimizedCache
@@ -14,13 +10,24 @@ from ..core.ultra_optimized_analyzer import UltraOptimizedAnalyzer
 from ..services.selenium_service import SeleniumService
 from ..services.batch_service import BatchProcessingService
 from ..services.seo_service import UltraOptimizedSEOService
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Factory for SEO Service with dependency injection.
+Creates and configures all dependencies for the SEO service.
+"""
+
+
 
 
 class SEOServiceFactory:
     """Factory for creating SEO service with all dependencies."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self._dependencies = {}
         self._initialized = False
     
@@ -38,7 +45,7 @@ class SEOServiceFactory:
         logger.info("Cache Manager created")
         return cache
     
-    def create_http_client(self) -> HTTPClientInterface:
+    async def create_http_client(self) -> HTTPClientInterface:
         """Create HTTP client with configuration."""
         http_config = self.config.get('http_client', {})
         http_client = UltraOptimizedHTTPClient(http_config)
@@ -52,14 +59,14 @@ class SEOServiceFactory:
         logger.info("Analyzer created")
         return analyzer
     
-    def create_selenium_service(self):
+    def create_selenium_service(self) -> Any:
         """Create Selenium service with configuration."""
         selenium_config = self.config.get('selenium', {})
         selenium_service = SeleniumService(selenium_config)
         logger.info("Selenium Service created")
         return selenium_service
     
-    def create_batch_service(self):
+    def create_batch_service(self) -> Any:
         """Create batch processing service with configuration."""
         batch_config = self.config.get('batch_service', {})
         batch_service = BatchProcessingService(batch_config)
@@ -129,7 +136,7 @@ class SEOServiceFactory:
         """Get the cache manager."""
         return self.get_dependency('cache')
     
-    def get_http_client(self) -> HTTPClientInterface:
+    async def get_http_client(self) -> HTTPClientInterface:
         """Get the HTTP client."""
         return self.get_dependency('http_client')
     
@@ -141,15 +148,15 @@ class SEOServiceFactory:
         """Get the analyzer."""
         return self.get_dependency('analyzer')
     
-    def get_batch_service(self):
+    def get_batch_service(self) -> Optional[Dict[str, Any]]:
         """Get the batch processing service."""
         return self.get_dependency('batch_service')
     
-    def get_selenium_service(self):
+    def get_selenium_service(self) -> Optional[Dict[str, Any]]:
         """Get the Selenium service."""
         return self.get_dependency('selenium_service')
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup all dependencies."""
         if not self._initialized:
             return

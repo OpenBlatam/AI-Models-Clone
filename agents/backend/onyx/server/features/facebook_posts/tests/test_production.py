@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import pytest
+import asyncio
+from unittest.mock import Mock, patch
+from datetime import datetime
+import uuid
+from ..nlp.core.engine import ProductionNLPEngine, RequestContext
+from ..nlp.utils.cache import ProductionCache, generate_cache_key
+from typing import Any, List, Dict, Optional
+import logging
 """
 🧪 Production Tests
 ==================
@@ -5,29 +25,22 @@
 Tests comprehensivos para el sistema NLP de producción.
 """
 
-import pytest
-import asyncio
-from unittest.mock import Mock, patch
-from datetime import datetime
-import uuid
 
 # Import production modules
-from ..nlp.core.engine import ProductionNLPEngine, RequestContext
-from ..nlp.utils.cache import ProductionCache, generate_cache_key
 
 
 class TestProductionNLPEngine:
     """Tests para el motor NLP de producción."""
     
     @pytest.fixture
-    async def engine(self):
+    async def engine(self) -> Any:
         """Fixture del motor."""
         engine = ProductionNLPEngine()
         yield engine
         await engine.shutdown()
     
     @pytest.mark.asyncio
-    async def test_analyze_sentiment_success(self, engine):
+    async def test_analyze_sentiment_success(self, engine) -> Any:
         """Test análisis de sentimientos exitoso."""
         text = "I love this amazing product! It's fantastic!"
         
@@ -40,7 +53,7 @@ class TestProductionNLPEngine:
         assert result["sentiment"]["polarity"] > 0  # Texto positivo
     
     @pytest.mark.asyncio
-    async def test_analyze_engagement_success(self, engine):
+    async def test_analyze_engagement_success(self, engine) -> Any:
         """Test análisis de engagement exitoso."""
         text = "What do you think about this? Share your thoughts! 🤔"
         
@@ -51,7 +64,7 @@ class TestProductionNLPEngine:
         assert result["engagement"]["engagement_score"] > 0.5  # Tiene pregunta y emoji
     
     @pytest.mark.asyncio
-    async def test_multiple_analyzers(self, engine):
+    async def test_multiple_analyzers(self, engine) -> Any:
         """Test múltiples analizadores."""
         text = "Amazing product! What do you think? 😍"
         
@@ -63,13 +76,13 @@ class TestProductionNLPEngine:
         assert all(r["success"] for r in result.values() if isinstance(r, dict) and "success" in r)
     
     @pytest.mark.asyncio
-    async def test_empty_text_validation(self, engine):
+    async def test_empty_text_validation(self, engine) -> Any:
         """Test validación de texto vacío."""
         with pytest.raises(ValueError, match="Text cannot be empty"):
             await engine.analyze_text("", ["sentiment"])
     
     @pytest.mark.asyncio
-    async def test_text_too_long_validation(self, engine):
+    async def test_text_too_long_validation(self, engine) -> Any:
         """Test validación de texto muy largo."""
         long_text = "a" * 10001  # Más del límite
         
@@ -77,7 +90,7 @@ class TestProductionNLPEngine:
             await engine.analyze_text(long_text, ["sentiment"])
     
     @pytest.mark.asyncio
-    async def test_request_context_tracking(self, engine):
+    async async def test_request_context_tracking(self, engine) -> Any:
         """Test tracking de contexto de request."""
         context = RequestContext(user_id="test_user")
         
@@ -88,7 +101,7 @@ class TestProductionNLPEngine:
         assert "processing_time_ms" in result["_metadata"]
     
     @pytest.mark.asyncio
-    async def test_metrics_recording(self, engine):
+    async def test_metrics_recording(self, engine) -> Any:
         """Test registro de métricas."""
         initial_total = engine.metrics["total_requests"]
         initial_successful = engine.metrics["successful_requests"]
@@ -99,7 +112,7 @@ class TestProductionNLPEngine:
         assert engine.metrics["successful_requests"] == initial_successful + 1
     
     @pytest.mark.asyncio
-    async def test_error_handling_and_metrics(self, engine):
+    async def test_error_handling_and_metrics(self, engine) -> Any:
         """Test manejo de errores y métricas."""
         initial_failed = engine.metrics["failed_requests"]
         
@@ -111,7 +124,7 @@ class TestProductionNLPEngine:
         assert engine.metrics["failed_requests"] == initial_failed + 1
     
     @pytest.mark.asyncio
-    async def test_health_check(self, engine):
+    async def test_health_check(self, engine) -> Any:
         """Test health check."""
         health = await engine.health_check()
         
@@ -121,7 +134,7 @@ class TestProductionNLPEngine:
         assert health["status"] in ["healthy", "degraded", "unhealthy"]
     
     @pytest.mark.asyncio
-    async def test_get_metrics(self, engine):
+    async def test_get_metrics(self, engine) -> Optional[Dict[str, Any]]:
         """Test obtener métricas."""
         metrics = await engine.get_metrics()
         
@@ -137,12 +150,12 @@ class TestProductionCache:
     """Tests para el sistema de cache de producción."""
     
     @pytest.fixture
-    def cache(self):
+    def cache(self) -> Any:
         """Fixture del cache."""
         return ProductionCache(default_ttl=60, max_size=100)
     
     @pytest.mark.asyncio
-    async def test_cache_set_and_get(self, cache):
+    async def test_cache_set_and_get(self, cache) -> Optional[Dict[str, Any]]:
         """Test básico de set y get."""
         key = "test_key"
         value = {"test": "data"}
@@ -156,13 +169,13 @@ class TestProductionCache:
         assert retrieved == value
     
     @pytest.mark.asyncio
-    async def test_cache_miss(self, cache):
+    async def test_cache_miss(self, cache) -> Any:
         """Test cache miss."""
         result = await cache.get("nonexistent_key")
         assert result is None
     
     @pytest.mark.asyncio
-    async def test_cache_expiration(self, cache):
+    async def test_cache_expiration(self, cache) -> Any:
         """Test expiración del cache."""
         key = "expiring_key"
         value = "expiring_value"
@@ -180,7 +193,7 @@ class TestProductionCache:
         assert await cache.get(key) is None
     
     @pytest.mark.asyncio
-    async def test_cache_metrics(self, cache):
+    async def test_cache_metrics(self, cache) -> Any:
         """Test métricas del cache."""
         # Operaciones para generar métricas
         await cache.set("key1", "value1")
@@ -195,7 +208,7 @@ class TestProductionCache:
         assert stats["hit_rate"] > 0
     
     @pytest.mark.asyncio
-    async def test_cache_cleanup(self, cache):
+    async def test_cache_cleanup(self, cache) -> Any:
         """Test limpieza automática."""
         # Agregar entradas que expiran
         await cache.set("key1", "value1", ttl=1)
@@ -210,7 +223,7 @@ class TestProductionCache:
         assert removed >= 2
     
     @pytest.mark.asyncio
-    async def test_cache_eviction(self, cache):
+    async def test_cache_eviction(self, cache) -> Any:
         """Test eviction cuando se alcanza límite."""
         # Llenar cache hasta el límite
         for i in range(cache.max_size + 1):
@@ -220,7 +233,7 @@ class TestProductionCache:
         stats = cache.get_stats()
         assert stats["metrics"]["evictions"] > 0
     
-    def test_generate_cache_key(self):
+    def test_generate_cache_key(self) -> Any:
         """Test generación de claves de cache."""
         text = "Test text"
         analyzers = ["sentiment", "engagement"]
@@ -240,7 +253,7 @@ class TestIntegration:
     """Tests de integración del sistema completo."""
     
     @pytest.mark.asyncio
-    async def test_end_to_end_analysis(self):
+    async def test_end_to_end_analysis(self) -> Any:
         """Test end-to-end del análisis."""
         engine = ProductionNLPEngine()
         
@@ -267,7 +280,7 @@ class TestIntegration:
             await engine.shutdown()
     
     @pytest.mark.asyncio
-    async def test_performance_under_load(self):
+    async def test_performance_under_load(self) -> Any:
         """Test performance bajo carga."""
         engine = ProductionNLPEngine()
         
@@ -298,7 +311,7 @@ class TestPerformance:
     """Tests de performance del sistema."""
     
     @pytest.mark.asyncio
-    async def test_latency_benchmark(self):
+    async def test_latency_benchmark(self) -> Any:
         """Benchmark de latencia."""
         engine = ProductionNLPEngine()
         
@@ -317,7 +330,7 @@ class TestPerformance:
             await engine.shutdown()
     
     @pytest.mark.asyncio
-    async def test_throughput_benchmark(self):
+    async def test_throughput_benchmark(self) -> Any:
         """Benchmark de throughput."""
         engine = ProductionNLPEngine()
         

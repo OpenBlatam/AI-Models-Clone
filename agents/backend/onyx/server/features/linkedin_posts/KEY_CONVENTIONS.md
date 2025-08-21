@@ -1,348 +1,241 @@
-# Key Conventions
+# Key Conventions for LinkedIn Posts React Native/Expo Application
+
+## Code Style and Structure
+
+### General Principles
+- Write concise, technical TypeScript code with accurate examples
+- Use functional and declarative programming patterns; avoid classes
+- Prefer iteration and modularization over code duplication
+- Use descriptive variable names with auxiliary verbs (e.g., `isLoading`, `hasError`)
+- Structure files: exported component, subcomponents, helpers, static content, types
+- Avoid global variables to prevent unintended side effects
+- Use ES6+ features like arrow functions, destructuring, and template literals
+- Use PropTypes for type checking if not using TypeScript
+
+### Component Organization
+- Break down components into smaller, reusable pieces
+- Keep components focused on a single responsibility
+- Organize files by feature (e.g., `user-profile`, `chat-screen`)
+- Use the "function" keyword for pure functions
+- Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements
+- Use declarative JSX
+- Use Prettier for consistent code formatting
 
 ## Naming Conventions
 
 ### Variables and Functions
-- Use descriptive names with auxiliary verbs for boolean variables
-- Use lowercase with underscores for all names
-- Be specific and avoid abbreviations
+- Use camelCase for variables and functions (e.g., `isFetchingData`, `handleUserInput`)
+- Use PascalCase for component names (e.g., `UserProfile`, `ChatScreen`)
+- Use lowercase with dashes for directories (e.g., `components/auth-wizard`)
+- Favor named exports for components
 
-```python
-# Boolean variables with auxiliary verbs
-is_authenticated = True
-has_valid_permissions = False
-can_access_resource = True
-should_retry_operation = False
-needs_encryption = True
-was_processed_successfully = True
+## TypeScript Usage
 
-# Descriptive function names
-def validate_user_credentials(credentials: Dict[str, Any]) -> bool:
-    return credentials.get('is_valid', False)
+### Type Safety
+- Use TypeScript for all code; prefer interfaces over types
+- Avoid enums; use maps instead
+- Use functional components with TypeScript interfaces
+- Use strict mode in TypeScript for better type safety
 
-def has_required_permissions(user: User, resource: str) -> bool:
-    return resource in user.permissions
+## Performance Optimization
 
-def can_perform_action(user: User, action: str) -> bool:
-    return action in user.allowed_actions
+### State Management
+- Minimize the use of `useState` and `useEffect`; prefer context and reducers for state management
+- Optimize state management: avoid unnecessary state updates and use local state only when needed
+- Use React.memo() for functional components to prevent unnecessary re-renders
 
-def should_apply_rate_limiting(user_id: str) -> bool:
-    return get_user_request_count(user_id) > RATE_LIMIT_THRESHOLD
+### Rendering Optimization
+- Optimize FlatList with props like `removeClippedSubviews`, `maxToRenderPerBatch`, and `windowSize`
+- Avoid anonymous functions in `renderItem` or event handlers to prevent re-renders
+- Avoid unnecessary re-renders by memoizing components and using `useMemo` and `useCallback` hooks appropriately
 
-def needs_content_moderation(content: str) -> bool:
-    return any(word in content.lower() for word in SENSITIVE_WORDS)
+### App Performance
+- Use Expo's AppLoading and SplashScreen for optimized app startup experience
+- Optimize images: use WebP format where supported, include size data, implement lazy loading with expo-image
+- Implement code splitting and lazy loading for non-critical components with React's Suspense and dynamic imports
+- Profile and monitor performance using React Native's built-in tools and Expo's debugging features
 
-def was_operation_successful(result: Dict[str, Any]) -> bool:
-    return result.get('status') == 'success'
+## UI and Styling
+
+### Component Libraries
+- Use Expo's built-in components for common UI patterns and layouts
+- Implement responsive design with Flexbox and Expo's `useWindowDimensions` for screen size adjustments
+- Use styled-components or Tailwind CSS for component styling
+- Implement dark mode support using Expo's `useColorScheme`
+- Ensure high accessibility (a11y) standards using ARIA roles and native accessibility props
+- Leverage react-native-reanimated and react-native-gesture-handler for performant animations and gestures
+
+### Consistent Styling
+- Use StyleSheet.create() for consistent styling or Styled Components for dynamic styles
+- Responsive design: ensure your design adapts to various screen sizes and orientations
+- Consider using responsive units and libraries like react-native-responsive-screen
+- Optimize image handling: use optimized image libraries like react-native-fast-image to handle images efficiently
+
+## Safe Area Management
+
+### Global Safe Area Setup
+- Use SafeAreaProvider from react-native-safe-area-context to manage safe areas globally in your app
+- Wrap top-level components with SafeAreaView to handle notches, status bars, and other screen insets on both iOS and Android
+- Use SafeAreaScrollView for scrollable content to ensure it respects safe area boundaries
+- Avoid hardcoding padding or margins for safe areas; rely on SafeAreaView and context hooks
+
+## Navigation
+
+### Routing and Navigation
+- Use react-navigation for routing and navigation; follow its best practices for stack, tab, and drawer navigators
+- Leverage deep linking and universal links for better user engagement and navigation flow
+- Use dynamic routes with expo-router for better navigation handling
+
+## State Management
+
+### Global State
+- Use React Context and useReducer for managing global state
+- Leverage react-query for data fetching and caching; avoid excessive API calls
+- For complex state management, consider using Zustand or Redux Toolkit
+- Handle URL search parameters using libraries like expo-linking
+
+## Error Handling and Validation
+
+### Runtime Validation
+- Use Zod for runtime validation and error handling
+- Implement proper error logging using Sentry or a similar service
+
+### Error Handling Patterns
+- Prioritize error handling and edge cases:
+  - Handle errors at the beginning of functions
+  - Use early returns for error conditions to avoid deeply nested if statements
+  - Avoid unnecessary else statements; use if-return pattern instead
+  - Implement global error boundaries to catch and handle unexpected errors
+- Use expo-error-reporter for logging and reporting errors in production
+
+## Testing
+
+### Testing Strategy
+- Write unit tests using Jest and React Native Testing Library
+- Implement integration tests for critical user flows using Detox
+- Use Expo's testing tools for running tests in different environments
+- Consider snapshot testing for components to ensure UI consistency
+
+## Security
+
+### Input Security
+- Sanitize user inputs to prevent XSS attacks
+- Use react-native-encrypted-storage for secure storage of sensitive data
+- Ensure secure communication with APIs using HTTPS and proper authentication
+- Use Expo's Security guidelines to protect your app: https://docs.expo.dev/guides/security/
+
+## Internationalization (i18n)
+
+### Localization Support
+- Use react-native-i18n or expo-localization for internationalization and localization
+- Support multiple languages and RTL layouts
+- Ensure text scaling and font adjustments for accessibility
+
+## Expo Best Practices
+
+### Managed Workflow
+1. Rely on Expo's managed workflow for streamlined development and deployment
+2. Prioritize Mobile Web Vitals (Load Time, Jank, and Responsiveness)
+3. Use expo-constants for managing environment variables and configuration
+4. Use expo-permissions to handle device permissions gracefully
+5. Implement expo-updates for over-the-air (OTA) updates
+6. Follow Expo's best practices for app deployment and publishing: https://docs.expo.dev/distribution/introduction/
+7. Ensure compatibility with iOS and Android by testing extensively on both platforms
+
+### Documentation and Resources
+- Use Expo's official documentation for setting up and configuring your projects: https://docs.expo.dev/
+- Refer to Expo's documentation for detailed information on Views, Blueprints, and Extensions for best practices
+
+## Accessibility Features
+
+### Text Scaling and Font Adjustments
+- Implement comprehensive text scaling and font adjustments for accessibility
+- Use system font scale preferences
+- Support bold text preferences
+- Implement responsive font sizing based on device characteristics
+- Ensure minimum and maximum font size limits
+- Support screen reader compatibility (VoiceOver/TalkBack)
+- Implement high contrast mode support
+- Use WCAG-compliant contrast ratios
+- Ensure minimum touch target sizes (44pt for iOS, 48pt for Android)
+
+### Accessibility Components
+- AccessibleText: Enhanced Text component with built-in accessibility features
+- AccessibleButton: Touchable button with proper accessibility labels and states
+- AccessibleView: Container component with accessibility support
+- AccessibilityManager: Singleton class for managing accessibility settings
+- useAccessibility: React hook for accessing accessibility preferences
+- useScaledFontSize: Hook for reactive font size scaling
+- useResponsiveAccessibility: Hook for responsive accessibility features
+
+### Accessibility Utilities
+- AccessibilityUtils: WCAG-compliant contrast checking and color accessibility
+- accessibilityStyles: Pre-defined styles for touch targets and typography
+- Responsive accessibility with tablet and landscape support
+- Platform-specific optimizations for iOS and Android
+
+## API Documentation
+
+### Core Entities
+```typescript
+interface LinkedInPost {
+  readonly id: string;
+  readonly userId: string;
+  readonly title: string;
+  readonly content: PostContent;
+  readonly type: PostType;
+  readonly tone: PostTone;
+  readonly status: PostStatus;
+  readonly engagementMetrics: EngagementMetrics;
+  readonly createdAt: Date;
+  readonly updatedAt: Date;
+}
+
+interface PostContent {
+  readonly text: string;
+  readonly hashtags: string[];
+  readonly mentions: string[];
+  readonly mediaUrls?: string[];
+}
+
+interface EngagementMetrics {
+  readonly views: number;
+  readonly likes: number;
+  readonly comments: number;
+  readonly shares: number;
+  readonly clicks: number;
+}
 ```
 
-### Files and Directories
-- Use lowercase with underscores
-- Be descriptive and indicate purpose
-- Group related functionality
-
-```
-linkedin_posts/
-├── api/
-│   ├── posts_router.py
-│   ├── users_router.py
-│   └── analytics_router.py
-├── services/
-│   ├── post_service.py
-│   ├── user_service.py
-│   └── analytics_service.py
-├── models/
-│   ├── post_models.py
-│   ├── user_models.py
-│   └── response_models.py
-├── utils/
-│   ├── validation_utils.py
-│   ├── formatting_utils.py
-│   └── security_utils.py
-├── config/
-│   ├── database_config.py
-│   ├── api_config.py
-│   └── logging_config.py
-└── tests/
-    ├── test_post_service.py
-    ├── test_user_service.py
-    └── test_analytics_service.py
+### Service Layer
+```typescript
+class PostService {
+  async createPost(request: PostGenerationRequest): Promise<LinkedInPost>
+  async updatePost(postId: string, updates: Partial<LinkedInPost>): Promise<LinkedInPost>
+  async getPost(postId: string): Promise<LinkedInPost | null>
+  async listPosts(userId: string, filters?: PostFilters): Promise<LinkedInPost[]>
+  async deletePost(postId: string): Promise<boolean>
+  async optimizePost(postId: string): Promise<PostOptimizationResult>
+  async validatePostRequest(request: PostGenerationRequest): Promise<PostValidationResult>
+  async generatePostAnalytics(postId: string): Promise<ContentAnalysisResult>
+}
 ```
 
-### Classes and Modules
-- Use PascalCase for classes
-- Use descriptive names that indicate purpose
-- Group related functionality
+### State Management
+```typescript
+interface PostState {
+  posts: LinkedInPost[];
+  currentPost: LinkedInPost | null;
+  isLoading: boolean;
+  error: string | null;
+  filters: PostFilters;
+}
 
-```python
-# Classes with descriptive names
-class PostCreationService:
-    def __init__(self, database_client: DatabaseClient):
-        self.database_client = database_client
-
-class UserAuthenticationHandler:
-    def __init__(self, auth_service: AuthService):
-        self.auth_service = auth_service
-
-class ContentModerationProcessor:
-    def __init__(self, moderation_rules: List[str]):
-        self.moderation_rules = moderation_rules
-
-# Modules with clear purpose
-# post_validation.py
-def validate_post_content(content: str) -> bool:
-    return len(content.strip()) > 0
-
-# user_permissions.py
-def check_user_permissions(user_id: str, action: str) -> bool:
-    return has_permission(user_id, action)
-
-# rate_limiting.py
-def apply_rate_limiting(user_id: str) -> bool:
-    return is_within_rate_limit(user_id)
+const usePostStore = create<PostState>()(
+  immer((set, get) => ({
+    // State implementation
+  }))
+);
 ```
 
-### Constants and Configuration
-- Use UPPER_CASE with underscores
-- Group related constants
-- Use descriptive names
-
-```python
-# API Configuration
-API_BASE_URL = "https://api.linkedin.com/v2"
-API_TIMEOUT_SECONDS = 30
-API_RETRY_ATTEMPTS = 3
-
-# Database Configuration
-DATABASE_CONNECTION_POOL_SIZE = 20
-DATABASE_QUERY_TIMEOUT = 10
-DATABASE_MAX_RETRIES = 5
-
-# Security Configuration
-JWT_SECRET_KEY = "your-secret-key"
-JWT_ALGORITHM = "HS256"
-JWT_EXPIRATION_HOURS = 24
-
-# Rate Limiting
-RATE_LIMIT_REQUESTS_PER_MINUTE = 100
-RATE_LIMIT_BURST_SIZE = 10
-RATE_LIMIT_WINDOW_SECONDS = 60
-
-# Content Validation
-MAX_POST_LENGTH = 3000
-MIN_POST_LENGTH = 10
-ALLOWED_POST_TYPES = ["educational", "promotional", "personal"]
-SENSITIVE_WORDS = ["spam", "inappropriate", "blocked"]
-```
-
-### Function Parameters and Return Values
-- Use descriptive parameter names
-- Indicate data types in names when helpful
-- Use clear return value names
-
-```python
-def create_linkedin_post(
-    post_content: str,
-    user_id: str,
-    access_token: str,
-    should_publish_immediately: bool = True
-) -> Dict[str, Any]:
-    """Create a LinkedIn post with validation and publishing"""
-    pass
-
-def validate_user_permissions(
-    user_id: str,
-    required_permissions: List[str],
-    resource_id: str = None
-) -> bool:
-    """Validate if user has required permissions"""
-    pass
-
-def process_post_analytics(
-    post_id: str,
-    analytics_data: Dict[str, Any],
-    should_update_database: bool = True
-) -> Dict[str, Any]:
-    """Process and store post analytics"""
-    pass
-
-def check_rate_limit_status(
-    user_id: str,
-    current_timestamp: datetime,
-    window_size_minutes: int = 1
-) -> Dict[str, Any]:
-    """Check current rate limit status for user"""
-    pass
-```
-
-### Error Handling and Logging
-- Use descriptive error message names
-- Include context in error names
-- Use consistent error naming patterns
-
-```python
-# Error types with descriptive names
-class PostValidationError(Exception):
-    """Raised when post validation fails"""
-    pass
-
-class UserAuthenticationError(Exception):
-    """Raised when user authentication fails"""
-    pass
-
-class RateLimitExceededError(Exception):
-    """Raised when rate limit is exceeded"""
-    pass
-
-class DatabaseConnectionError(Exception):
-    """Raised when database connection fails"""
-    pass
-
-# Logging with descriptive context
-def log_post_creation_attempt(user_id: str, post_data: Dict[str, Any]):
-    logger.info(f"User {user_id} attempting to create post", 
-                extra={"user_id": user_id, "post_type": post_data.get("type")})
-
-def log_authentication_failure(user_id: str, failure_reason: str):
-    logger.warning(f"Authentication failed for user {user_id}: {failure_reason}",
-                   extra={"user_id": user_id, "failure_reason": failure_reason})
-
-def log_rate_limit_hit(user_id: str, current_requests: int, limit: int):
-    logger.warning(f"Rate limit hit for user {user_id}: {current_requests}/{limit}",
-                   extra={"user_id": user_id, "current_requests": current_requests, "limit": limit})
-```
-
-### Database and API Operations
-- Use descriptive names for database operations
-- Indicate operation type in function names
-- Use clear parameter names
-
-```python
-# Database operations
-async def create_post_in_database(post_data: Dict[str, Any]) -> str:
-    """Create a new post in the database"""
-    pass
-
-async def retrieve_post_by_id(post_id: str) -> Optional[Dict[str, Any]]:
-    """Retrieve a post by its ID"""
-    pass
-
-async def update_post_analytics(post_id: str, analytics: Dict[str, Any]) -> bool:
-    """Update post analytics in database"""
-    pass
-
-async def delete_post_from_database(post_id: str) -> bool:
-    """Delete a post from the database"""
-    pass
-
-# API operations
-async def publish_post_to_linkedin(post_data: Dict[str, Any], access_token: str) -> Dict[str, Any]:
-    """Publish post to LinkedIn API"""
-    pass
-
-async def fetch_user_profile_from_linkedin(user_id: str, access_token: str) -> Dict[str, Any]:
-    """Fetch user profile from LinkedIn API"""
-    pass
-
-async def retrieve_post_analytics_from_linkedin(post_id: str, access_token: str) -> Dict[str, Any]:
-    """Retrieve post analytics from LinkedIn API"""
-    pass
-```
-
-### Configuration and Environment
-- Use descriptive environment variable names
-- Group related configuration
-- Use clear default values
-
-```python
-# Environment variables
-LINKEDIN_API_BASE_URL = os.getenv("LINKEDIN_API_BASE_URL", "https://api.linkedin.com/v2")
-LINKEDIN_CLIENT_ID = os.getenv("LINKEDIN_CLIENT_ID", "")
-LINKEDIN_CLIENT_SECRET = os.getenv("LINKEDIN_CLIENT_SECRET", "")
-
-DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://localhost/linkedin_posts")
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379")
-
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "default-secret-key")
-JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
-
-# Configuration classes
-@dataclass
-class DatabaseConfig:
-    connection_url: str
-    pool_size: int = 20
-    max_retries: int = 3
-    timeout_seconds: int = 30
-
-@dataclass
-class APIConfig:
-    base_url: str
-    timeout_seconds: int = 30
-    max_retries: int = 3
-    rate_limit_per_minute: int = 100
-
-@dataclass
-class SecurityConfig:
-    jwt_secret_key: str
-    jwt_algorithm: str = "HS256"
-    jwt_expiration_hours: int = 24
-    password_min_length: int = 8
-```
-
-### Testing and Documentation
-- Use descriptive test function names
-- Include test scenario in names
-- Use clear documentation strings
-
-```python
-# Test functions with descriptive names
-def test_create_post_with_valid_data_should_succeed():
-    """Test that creating a post with valid data succeeds"""
-    pass
-
-def test_create_post_with_invalid_content_should_fail():
-    """Test that creating a post with invalid content fails"""
-    pass
-
-def test_user_without_permissions_cannot_create_post():
-    """Test that users without permissions cannot create posts"""
-    pass
-
-def test_rate_limiting_prevents_excessive_requests():
-    """Test that rate limiting prevents excessive API requests"""
-    pass
-
-# Documentation with clear descriptions
-def validate_post_content(content: str) -> bool:
-    """
-    Validate post content meets requirements.
-    
-    Args:
-        content: The post content to validate
-        
-    Returns:
-        True if content is valid, False otherwise
-        
-    Raises:
-        PostValidationError: If content validation fails
-    """
-    pass
-
-def authenticate_user_credentials(username: str, password: str) -> bool:
-    """
-    Authenticate user credentials against the database.
-    
-    Args:
-        username: The username to authenticate
-        password: The password to verify
-        
-    Returns:
-        True if credentials are valid, False otherwise
-        
-    Raises:
-        UserAuthenticationError: If authentication process fails
-    """
-    pass
-```
-
-These conventions ensure code is readable, maintainable, and follows Python best practices while providing clear context about the purpose and behavior of each component. 
+This comprehensive set of conventions ensures a professional, maintainable, and accessible React Native/Expo application following industry best practices. 

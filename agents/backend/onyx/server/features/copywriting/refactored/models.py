@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_RETRIES = 100
+
+from typing import Dict, List, Optional, Any, Union
+from datetime import datetime
+from enum import Enum
+from pydantic import BaseModel, Field, validator, root_validator
+import uuid
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Data Models
 ===========
@@ -5,11 +20,6 @@ Data Models
 Pydantic models for request/response validation and data serialization.
 """
 
-from typing import Dict, List, Optional, Any, Union
-from datetime import datetime
-from enum import Enum
-from pydantic import BaseModel, Field, validator, root_validator
-import uuid
 
 
 class LanguageEnum(str, Enum):
@@ -190,19 +200,19 @@ class CopywritingRequest(BaseModel):
     context: Optional[Dict[str, Any]] = Field(None, description="Additional context")
     
     @validator('keywords')
-    def validate_keywords(cls, v):
+    def validate_keywords(cls, v) -> bool:
         if v and len(v) > 20:
             raise ValueError("Maximum 20 keywords allowed")
         return v
     
     @validator('prompt')
-    def validate_prompt(cls, v):
+    def validate_prompt(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Prompt cannot be empty")
         return v.strip()
     
     @root_validator
-    def validate_translation(cls, values):
+    def validate_translation(cls, values) -> bool:
         translation_settings = values.get('translation_settings')
         if translation_settings and translation_settings.target_languages:
             language = values.get('language')
@@ -253,7 +263,8 @@ class CopywritingResponse(BaseModel):
     # Error handling
     warnings: Optional[List[str]] = Field(None, description="Non-critical warnings")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -266,7 +277,7 @@ class BatchCopywritingRequest(BaseModel):
     fail_fast: bool = Field(False, description="Stop on first error")
     
     @validator('requests')
-    def validate_requests(cls, v):
+    async def validate_requests(cls, v) -> bool:
         if len(v) > 50:
             raise ValueError("Maximum 50 requests per batch")
         return v
@@ -285,7 +296,8 @@ class BatchCopywritingResponse(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow, description="Batch creation time")
     completed_at: Optional[datetime] = Field(None, description="Batch completion time")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -307,7 +319,8 @@ class HealthCheckResponse(BaseModel):
     memory_usage: Dict[str, float] = Field(..., description="Memory usage statistics")
     cache_stats: Dict[str, Any] = Field(..., description="Cache statistics")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -336,7 +349,8 @@ class MetricsResponse(BaseModel):
     tone_distribution: Dict[str, int] = Field(..., description="Requests by tone")
     use_case_distribution: Dict[str, int] = Field(..., description="Requests by use case")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         } 

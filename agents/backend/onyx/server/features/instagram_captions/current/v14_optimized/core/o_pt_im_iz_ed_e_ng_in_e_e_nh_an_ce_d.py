@@ -1,7 +1,10 @@
-"""
-Instagram Captions API v14.0 - Enhanced Engine with Comprehensive Error Handling
-Ultra-fast caption generation with advanced error handling, validation, and security
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import hashlib
@@ -14,20 +17,26 @@ from transformers import AutoTokenizer, AutoModelForCausalLM
 from numba import jit
 import numpy as np
 import logging
-
 from ..types import OptimizedRequest, OptimizedResponse
 from ..utils.error_handling import (
+from ..config import config
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v14.0 - Enhanced Engine with Comprehensive Error Handling
+Ultra-fast caption generation with advanced error handling, validation, and security
+"""
+
+
     error_tracker, validation_engine, security_engine, performance_monitor,
     error_context, generate_request_id, ErrorType, ErrorSeverity
 )
-from ..config import config
 
 logger = logging.getLogger(__name__)
 
 class EnhancedAIEngine:
     """Ultra-fast AI engine with comprehensive error handling and validation"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize enhanced engine with error handling"""
         self.device = "cuda" if torch.cuda.is_available() and config.USE_GPU else "cpu"
         self.tokenizer = None
@@ -49,7 +58,7 @@ class EnhancedAIEngine:
         
         asyncio.create_task(self._initialize_models())
     
-    async def _initialize_models(self):
+    async def _initialize_models(self) -> Any:
         """Initialize models with comprehensive error handling"""
         with error_context("model_initialization", "system"):
             try:
@@ -462,7 +471,7 @@ enhanced_engine = EnhancedAIEngine()
 class EnhancedPerformanceMonitor:
     """Real-time performance monitoring with error tracking"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = {
             "response_times": [],
             "error_count": 0,

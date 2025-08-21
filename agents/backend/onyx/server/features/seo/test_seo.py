@@ -1,18 +1,27 @@
-#!/usr/bin/env python3
-"""
-Script de prueba para el servicio de análisis SEO con LangChain
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import os
 import sys
 import json
 from pathlib import Path
+from features.seo.service import SEOService
+from features.seo.models import SEOScrapeRequest
+        import traceback
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Script de prueba para el servicio de análisis SEO con LangChain
+"""
+
 
 # Agregar el directorio padre al path para importar los módulos
 sys.path.append(str(Path(__file__).parent.parent.parent))
 
-from features.seo.service import SEOService
-from features.seo.models import SEOScrapeRequest
 
 def test_seo_analysis():
     """Prueba el análisis SEO con una URL de ejemplo"""
@@ -119,7 +128,6 @@ def test_seo_analysis():
             
     except Exception as e:
         print(f"❌ Error durante la prueba: {str(e)}")
-        import traceback
         traceback.print_exc()
 
 def test_multiple_urls():

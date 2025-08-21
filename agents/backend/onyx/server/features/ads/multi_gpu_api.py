@@ -1,3 +1,31 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+from typing import Dict, Any, List, Optional
+from datetime import datetime
+import asyncio
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Query, Depends
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+import torch
+from onyx.utils.logger import setup_logger
+from onyx.server.features.ads.multi_gpu_training import (
+from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
+from onyx.server.features.ads.optimized_config import settings
+            import torch
+from typing import Any, List, Dict, Optional
+import logging
 """
 Multi-GPU Training API for Onyx Ads Backend
 
@@ -8,24 +36,13 @@ This module provides REST API endpoints for:
 - GPU resource management
 - Training performance monitoring
 """
-from typing import Dict, Any, List, Optional
-from datetime import datetime
-import asyncio
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Query, Depends
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-import torch
 
-from onyx.utils.logger import setup_logger
-from onyx.server.features.ads.multi_gpu_training import (
     MultiGPUTrainingManager,
     GPUConfig,
     DataParallelTrainer,
     DistributedDataParallelTrainer,
     GPUMonitor
 )
-from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
-from onyx.server.features.ads.optimized_config import settings
 
 logger = setup_logger()
 
@@ -464,7 +481,6 @@ async def manage_resources(
             details = {"gpu_stats": gpu_stats}
         elif request.action == "optimize":
             # Optimize GPU memory usage
-            import torch
             if torch.cuda.is_available():
                 torch.cuda.empty_cache()
             details = {"message": "GPU memory optimized"}

@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import sys
+import os
+from pathlib import Path
+from profiler_optimizer import LinkedInPostsProfiler
+        import uvloop
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 LinkedIn Posts Profiling Runner
@@ -6,15 +16,10 @@ LinkedIn Posts Profiling Runner
 Simple script to run the comprehensive profiling system and generate optimization reports.
 """
 
-import asyncio
-import sys
-import os
-from pathlib import Path
 
 # Add current directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from profiler_optimizer import LinkedInPostsProfiler
 
 async def main():
     """Run the profiling system"""
@@ -72,7 +77,6 @@ async def main():
 if __name__ == "__main__":
     # Configure uvloop for better performance
     try:
-        import uvloop
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
     except ImportError:
         print("⚠️  uvloop not available, using standard event loop")

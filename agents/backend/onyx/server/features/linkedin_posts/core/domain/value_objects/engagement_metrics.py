@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from dataclasses import dataclass, field
+from datetime import datetime
+from typing import Dict, List, Optional, Any
+from copy import copy
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Engagement Metrics Value Object
 ==============================
@@ -5,10 +20,6 @@ Engagement Metrics Value Object
 Value object for tracking post engagement metrics and analytics.
 """
 
-from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Dict, List, Optional, Any
-from copy import copy
 
 
 @dataclass
@@ -132,7 +143,8 @@ class EngagementMetrics:
         first_total = recent_engagement[0]["total_engagement"]
         last_total = recent_engagement[-1]["total_engagement"]
         
-        if first_total == 0:
+        match first_total:
+    case 0:
             growth_rate = 100.0 if last_total > 0 else 0.0
         else:
             growth_rate = ((last_total - first_total) / first_total) * 100

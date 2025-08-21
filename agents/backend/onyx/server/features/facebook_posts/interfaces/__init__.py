@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .repositories import (
+from .services import (
+from .external import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 Facebook Posts - Interfaces & Contracts
 ==========================================
@@ -5,20 +13,17 @@
 Definición de interfaces, protocolos y contratos para Clean Architecture.
 """
 
-from .repositories import (
     FacebookPostRepository,
     AnalysisRepository,
     CacheRepository
 )
 
-from .services import (
     ContentGeneratorInterface,
     ContentAnalyzerInterface,
     LangChainServiceInterface,
     NotificationServiceInterface
 )
 
-from .external import (
     FacebookAPIInterface,
     OnySIntegrationInterface,
     AIModelInterface

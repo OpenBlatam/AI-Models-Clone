@@ -1,7 +1,10 @@
-"""
-Ultra-Optimized HTML Parser v3.0
-Using the fastest parsing libraries available: Selectolax + LXML + Zstandard + Numba
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import asyncio
@@ -19,8 +22,16 @@ from urllib.parse import urljoin, urlparse
 import numba
 from concurrent.futures import ThreadPoolExecutor
 import threading
-
 from .interfaces import HTMLParserInterface, ParsedData
+        import hashlib
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Ultra-Optimized HTML Parser v3.0
+Using the fastest parsing libraries available: Selectolax + LXML + Zstandard + Numba
+"""
+
+
 
 
 @dataclass
@@ -40,7 +51,9 @@ class UltraOptimizedParserV3(HTMLParserInterface):
     """Parser ultra-optimizado v3 con las librerías más rápidas."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         
         # Configuraciones de parsing
         self.primary_parser = self.config.get('primary_parser', 'selectolax')
@@ -94,7 +107,7 @@ class UltraOptimizedParserV3(HTMLParserInterface):
         
         logger.info("Ultra-Optimized Parser v3.0 initialized")
     
-    def _init_compressors(self):
+    def _init_compressors(self) -> Any:
         """Inicializar compresores."""
         self.compressors = {
             'zstandard': {
@@ -111,10 +124,10 @@ class UltraOptimizedParserV3(HTMLParserInterface):
             }
         }
     
-    def _compile_numba_functions(self):
+    def _compile_numba_functions(self) -> Any:
         """Compilar funciones optimizadas con Numba."""
         @numba.jit(nopython=True, cache=True)
-        def fast_text_clean(text):
+        def fast_text_clean(text) -> Any:
             """Limpieza rápida de texto con Numba."""
             result = ""
             for char in text:
@@ -123,7 +136,7 @@ class UltraOptimizedParserV3(HTMLParserInterface):
             return result
         
         @numba.jit(nopython=True, cache=True)
-        def fast_word_count(text):
+        def fast_word_count(text) -> Any:
             """Conteo rápido de palabras con Numba."""
             count = 0
             in_word = False
@@ -618,7 +631,6 @@ class UltraOptimizedParserV3(HTMLParserInterface):
     
     def _generate_cache_key(self, html_content: str, url: Optional[str]) -> str:
         """Generar clave de cache."""
-        import hashlib
         content_hash = hashlib.md5(html_content.encode()).hexdigest()
         url_hash = hashlib.md5((url or '').encode()).hexdigest()
         return f"{content_hash}:{url_hash}"
@@ -696,7 +708,7 @@ class UltraOptimizedParserV3(HTMLParserInterface):
             'max_workers': self.max_workers
         }
     
-    def clear_cache(self):
+    def clear_cache(self) -> Any:
         """Limpiar cache."""
         with self.cache_lock:
             self.parsing_cache.clear()
@@ -715,7 +727,7 @@ class UltraOptimizedParserV3(HTMLParserInterface):
             'total_parses': self.stats['total_parses']
         }
     
-    def __del__(self):
+    def __del__(self) -> Any:
         """Cleanup al destruir el objeto."""
         if hasattr(self, 'thread_pool') and self.thread_pool:
             self.thread_pool.shutdown(wait=True) 

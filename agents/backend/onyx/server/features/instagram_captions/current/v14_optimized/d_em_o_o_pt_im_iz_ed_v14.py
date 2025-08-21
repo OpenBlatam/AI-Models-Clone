@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Instagram Captions API v14.0 - Optimized Demo
-Demonstrates ultra-fast performance and advanced features
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -10,12 +15,22 @@ import aiohttp
 import statistics
 from typing import List, Dict, Any
 import json
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Instagram Captions API v14.0 - Optimized Demo
+Demonstrates ultra-fast performance and advanced features
+"""
+
 
 class OptimizedDemo:
     """Comprehensive demonstration of v14.0 optimized features"""
     
     def __init__(self, base_url: str = "http://localhost:8140", api_key: str = "optimized-v14-key"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.api_key = api_key
         self.headers = {"Authorization": f"Bearer {api_key}"}
         self.demo_results = {
@@ -33,7 +48,7 @@ class OptimizedDemo:
         print(f"🚀 {title}")
         print("=" * 80)
     
-    async def test_api_health(self):
+    async async def test_api_health(self) -> Any:
         """Test API health and basic functionality"""
         print("\n1️⃣  API HEALTH CHECK")
         print("-" * 60)
@@ -55,7 +70,7 @@ class OptimizedDemo:
             print(f"❌ API Health Check: ERROR - {e}")
             return False
     
-    async def test_single_generation(self):
+    async def test_single_generation(self) -> Any:
         """Test single caption generation"""
         print("\n2️⃣  SINGLE CAPTION GENERATION")
         print("-" * 60)
@@ -102,7 +117,7 @@ class OptimizedDemo:
             self.demo_results["failed_requests"] += 1
             return False
     
-    async def test_batch_generation(self):
+    async def test_batch_generation(self) -> Any:
         """Test batch caption generation"""
         print("\n3️⃣  BATCH CAPTION GENERATION")
         print("-" * 60)
@@ -150,7 +165,7 @@ class OptimizedDemo:
             self.demo_results["failed_requests"] += len(batch_requests)
             return False
     
-    async def test_cache_performance(self):
+    async def test_cache_performance(self) -> Any:
         """Test cache performance with repeated requests"""
         print("\n4️⃣  CACHE PERFORMANCE TEST")
         print("-" * 60)
@@ -206,7 +221,7 @@ class OptimizedDemo:
                 self.demo_results["failed_requests"] += 2
                 return False
     
-    async def test_concurrent_requests(self):
+    async async def test_concurrent_requests(self) -> Any:
         """Test concurrent request handling"""
         print("\n5️⃣  CONCURRENT REQUEST TEST")
         print("-" * 60)
@@ -217,7 +232,9 @@ class OptimizedDemo:
         failed_requests = 0
         
         async def concurrent_worker(worker_id: int):
-            nonlocal response_times, successful_requests, failed_requests
+            
+    """concurrent_worker function."""
+nonlocal response_times, successful_requests, failed_requests
             
             request_data = {
                 "content_description": f"Concurrent test content {worker_id}",
@@ -265,7 +282,7 @@ class OptimizedDemo:
         
         return successful_requests > 0
     
-    async def get_performance_metrics(self):
+    async def get_performance_metrics(self) -> Optional[Dict[str, Any]]:
         """Get real-time performance metrics"""
         print("\n6️⃣  PERFORMANCE METRICS")
         print("-" * 60)
@@ -302,7 +319,7 @@ class OptimizedDemo:
             print(f"❌ Performance Metrics: ERROR - {e}")
             return False
     
-    def calculate_demo_results(self):
+    def calculate_demo_results(self) -> Any:
         """Calculate and display demo results"""
         print("\n" + "="*80)
         print("📊 DEMO RESULTS SUMMARY")
@@ -350,7 +367,7 @@ class OptimizedDemo:
         
         return overall_grade
     
-    async def run_optimized_demo(self):
+    async def run_optimized_demo(self) -> Any:
         """Run complete optimized demonstration"""
         self.print_header("INSTAGRAM CAPTIONS API v14.0 - OPTIMIZED DEMO")
         
@@ -394,5 +411,6 @@ async def main():
     demo = OptimizedDemo()
     await demo.run_optimized_demo()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .config import CopywritingConfig
+from .models import CopywritingRequest, CopywritingResponse, GenerationMetrics
+from .service import CopywritingService
+from .optimization import OptimizationManager
+from .cache import CacheManager
+from .monitoring import MetricsCollector
+from .api import create_app
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Refactored Copywriting Module
 ============================
@@ -14,13 +26,6 @@ Features:
 - Production-ready with comprehensive error handling
 """
 
-from .config import CopywritingConfig
-from .models import CopywritingRequest, CopywritingResponse, GenerationMetrics
-from .service import CopywritingService
-from .optimization import OptimizationManager
-from .cache import CacheManager
-from .monitoring import MetricsCollector
-from .api import create_app
 
 __version__ = "2.0.0"
 __author__ = "Blatam Academy"

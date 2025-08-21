@@ -1,9 +1,13 @@
-"""
-Instagram Captions API v11.0 - Enhanced Enterprise API
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Complete enterprise-grade API with advanced patterns, monitoring,
-and cutting-edge features for production environments.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import logging
@@ -15,14 +19,23 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import asyncio
 import json
+    from .core_enhanced_v11 import (
+    from .enhanced_service_v11 import enhanced_ai_service
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v11.0 - Enhanced Enterprise API
+
+Complete enterprise-grade API with advanced patterns, monitoring,
+and cutting-edge features for production environments.
+"""
+
 
 # Import enhanced components
 try:
-    from .core_enhanced_v11 import (
         config, EnhancedCaptionRequest, EnhancedCaptionResponse,
         CaptionStyle, AIProviderType, EnhancedUtils
     )
-    from .enhanced_service_v11 import enhanced_ai_service
     ENHANCED_AVAILABLE = True
 except ImportError:
     ENHANCED_AVAILABLE = False
@@ -90,7 +103,7 @@ class EnhancedCaptionsAPI:
     - Enterprise security patterns
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = self._create_app()
         self._setup_middleware()
         self._setup_routes()
@@ -112,7 +125,7 @@ class EnhancedCaptionsAPI:
             ]
         )
     
-    def _setup_middleware(self):
+    def _setup_middleware(self) -> Any:
         """Setup enhanced middleware stack."""
         
         # CORS with enhanced configuration
@@ -131,7 +144,7 @@ class EnhancedCaptionsAPI:
         # Enhanced rate limiting
         self.app.middleware("http")(EnhancedSecurityMiddleware.rate_limiting_middleware)
     
-    def _setup_monitoring(self):
+    def _setup_monitoring(self) -> Any:
         """Setup advanced monitoring and observability."""
         
         @self.app.middleware("http")
@@ -151,7 +164,7 @@ class EnhancedCaptionsAPI:
             
             return response
     
-    def _setup_routes(self):
+    def _setup_routes(self) -> Any:
         """Setup enhanced API routes."""
         
         @self.app.post(
@@ -406,7 +419,7 @@ class EnhancedCaptionsAPI:
             summary="Enhanced API Information",
             description="Comprehensive API information with enterprise features"
         )
-        async def get_enhanced_api_info() -> Dict[str, Any]:
+        async async def get_enhanced_api_info() -> Dict[str, Any]:
             """Get comprehensive enhanced API information."""
             
             return {
@@ -553,7 +566,6 @@ __all__ = ['app', 'enhanced_api']
 
 
 if __name__ == "__main__":
-    import uvicorn
     
     print("=" * 80)
     print("🚀 STARTING ENHANCED INSTAGRAM CAPTIONS API v11.0")

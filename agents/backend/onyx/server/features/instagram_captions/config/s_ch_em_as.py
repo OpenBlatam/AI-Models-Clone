@@ -1,15 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from datetime import datetime
+from typing import List, Optional, Dict, Any, Literal
+from pydantic import BaseModel, Field, ConfigDict, validator
+from enum import Enum
+from models import CaptionStyle, InstagramTarget, HashtagStrategy, ContentType
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Pydantic v2 schemas for Instagram Captions API.
 
 Optimized request/response models with comprehensive validation.
 """
 
-from datetime import datetime
-from typing import List, Optional, Dict, Any, Literal
-from pydantic import BaseModel, Field, ConfigDict, validator
-from enum import Enum
 
-from models import CaptionStyle, InstagramTarget, HashtagStrategy, ContentType
 
 
 class CaptionGenerationRequest(BaseModel):
@@ -222,7 +233,7 @@ class BatchOptimizationRequest(BaseModel):
     )
     
     @validator('captions')
-    def validate_captions(cls, v):
+    def validate_captions(cls, v) -> bool:
         """Validate individual captions in the list."""
         if not v:
             raise ValueError("At least one caption is required")

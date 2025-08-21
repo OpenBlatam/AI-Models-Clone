@@ -1,11 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import List, Optional, Dict, Any
+from pydantic import BaseModel, HttpUrl, Field, validator
+from datetime import datetime
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 API Schemas
 Pydantic schemas for request/response validation
 """
 
-from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, HttpUrl, Field, validator
-from datetime import datetime
 
 
 class AnalyzeURLSchema(BaseModel):
@@ -18,7 +34,7 @@ class AnalyzeURLSchema(BaseModel):
     include_errors: bool = Field(True, description="Include errors", example=True)
     
     @validator('url')
-    def validate_url(cls, v):
+    def validate_url(cls, v) -> bool:
         """Validate URL format"""
         if not v.startswith(('http://', 'https://')):
             raise ValueError('URL must start with http:// or https://')
@@ -34,7 +50,7 @@ class AnalyzeBatchSchema(BaseModel):
     force_refresh: bool = Field(False, description="Force refresh all analyses", example=False)
     
     @validator('urls')
-    def validate_urls(cls, v):
+    def validate_urls(cls, v) -> bool:
         """Validate all URLs"""
         for url in v:
             if not url.startswith(('http://', 'https://')):
@@ -61,7 +77,8 @@ class AnalyzeURLResponseSchema(BaseModel):
     created_at: datetime = Field(..., description="Analysis creation timestamp")
     updated_at: Optional[datetime] = Field(None, description="Analysis update timestamp")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "id": "analysis_123",
@@ -104,7 +121,8 @@ class AnalyzeBatchResponse(BaseModel):
     batch_time: float = Field(..., description="Total batch processing time", example=5.678)
     created_at: datetime = Field(..., description="Batch creation timestamp")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "batch_id": "batch_123",
@@ -127,7 +145,8 @@ class HealthResponse(BaseModel):
     uptime: float = Field(..., description="Service uptime in seconds", example=3600.0)
     checks: Dict[str, str] = Field(..., description="Health checks status")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "status": "healthy",
@@ -152,7 +171,8 @@ class ErrorResponse(BaseModel):
     timestamp: datetime = Field(..., description="Error timestamp")
     request_id: Optional[str] = Field(None, description="Request ID", example="req_123")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "error": "Analysis failed",
@@ -172,7 +192,8 @@ class StatsResponse(BaseModel):
     scoring: Dict[str, Any] = Field(..., description="Scoring service statistics")
     timestamp: float = Field(..., description="Statistics timestamp")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "repository": {
@@ -201,7 +222,8 @@ class CacheClearResponse(BaseModel):
     timestamp: datetime = Field(..., description="Clear timestamp")
     items_cleared: Optional[int] = Field(None, description="Number of items cleared", example=100)
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "message": "Cache cleared successfully",
@@ -217,7 +239,8 @@ class DeleteResponse(BaseModel):
     message: str = Field(..., description="Success message", example="Analysis deleted successfully")
     timestamp: datetime = Field(..., description="Delete timestamp")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "message": "Analysis deleted successfully",

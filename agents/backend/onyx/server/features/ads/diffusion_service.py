@@ -1,14 +1,51 @@
-"""
-Advanced diffusion models service for ads generation and image manipulation.
-Supports text-to-image, image-to-image, inpainting, and style transfer.
-Enhanced with comprehensive noise schedulers and sampling methods.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Dict, Any, List, Optional, Union, Tuple, Callable
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import Dataset, DataLoader
 from diffusers import (
+from transformers import CLIPTextModel, CLIPTokenizer
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+import cv2
+import json
+import os
+from datetime import datetime
+import asyncio
+from functools import lru_cache
+try:
+    import aioredis  # type: ignore
+except Exception:  # pragma: no cover - optional in tests
+    aioredis = None  # type: ignore[assignment]
+import hashlib
+import base64
+from io import BytesIO
+import requests
+from dataclasses import dataclass
+import logging
+import math
+from enum import Enum
+from onyx.utils.logger import setup_logger
+from onyx.server.features.ads.optimized_config import settings
+from onyx.server.features.ads.tokenization_service import TokenizationService
+from onyx.server.features.ads.training_logger import TrainingLogger, TrainingPhase, AsyncTrainingLogger
+from typing import Any, List, Dict, Optional
+"""
+Advanced diffusion models service for ads generation and image manipulation.
+Supports text-to-image, image-to-image, inpainting, and style transfer.
+Enhanced with comprehensive noise schedulers and sampling methods.
+"""
     StableDiffusionPipeline,
     StableDiffusionImg2ImgPipeline,
     StableDiffusionInpaintPipeline,
@@ -46,29 +83,7 @@ from diffusers import (
     DDPMWuerstchenScheduler,
     WuerstchenCombinedScheduler
 )
-from transformers import CLIPTextModel, CLIPTokenizer
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
-import cv2
-import json
-import os
-from datetime import datetime
-import asyncio
-from functools import lru_cache
-import aioredis
-import hashlib
-import base64
-from io import BytesIO
-import requests
-from dataclasses import dataclass
-import logging
-import math
-from enum import Enum
 
-from onyx.utils.logger import setup_logger
-from onyx.server.features.ads.optimized_config import settings
-from onyx.server.features.ads.tokenization_service import TokenizationService
-from onyx.server.features.ads.training_logger import TrainingLogger, TrainingPhase, AsyncTrainingLogger
 
 logger = setup_logger()
 
@@ -245,7 +260,7 @@ class AdvancedNoiseScheduler:
     
     def _cosine_beta_schedule(self) -> torch.Tensor:
         """Generate cosine beta schedule."""
-        def alpha_bar_fn(t):
+        def alpha_bar_fn(t) -> Any:
             return math.cos((t + 0.008) / 1.008 * math.pi * 0.5) ** 2
         
         betas = []
@@ -300,7 +315,7 @@ class AdvancedNoiseScheduler:
     def _betas_for_alpha_bar(self, num_diffusion_timesteps: int, alpha_transform_type: str = "cosine") -> torch.Tensor:
         """Generate betas for alpha bar schedule."""
         if alpha_transform_type == "cosine":
-            def alpha_bar_fn(t):
+            def alpha_bar_fn(t) -> Any:
                 return math.cos((t + 0.008) / 1.008 * math.pi * 0.5) ** 2
         else:
             raise ValueError(f"Unknown alpha transform type: {alpha_transform_type}")
@@ -530,7 +545,7 @@ class DiffusionProcessAnalyzer:
     def _betas_for_alpha_bar(self, num_diffusion_timesteps: int, alpha_transform_type: str = "cosine") -> torch.Tensor:
         """Generate betas for alpha bar schedule."""
         if alpha_transform_type == "cosine":
-            def alpha_bar_fn(t):
+            def alpha_bar_fn(t) -> Any:
                 return math.cos((t + 0.008) / 1.008 * math.pi * 0.5) ** 2
         else:
             raise ValueError(f"Unknown alpha transform type: {alpha_transform_type}")
@@ -936,7 +951,7 @@ class DiffusionSchedulerFactory:
 class DiffusionModelManager:
     """Manages multiple diffusion models and pipelines."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the diffusion model manager."""
         self._models = {}
         self._pipelines = {}
@@ -945,7 +960,7 @@ class DiffusionModelManager:
         self.tokenization_service = TokenizationService()
         
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         """Lazy initialization of Redis client."""
         if self._redis_client is None:
             self._redis_client = await aioredis.from_url(
@@ -1187,7 +1202,7 @@ class DiffusionModelManager:
 class ImageProcessor:
     """Handles image processing and manipulation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize image processor."""
         self.supported_formats = ['png', 'jpg', 'jpeg', 'webp']
         
@@ -1195,6 +1210,10 @@ class ImageProcessor:
         """Load image from path."""
         try:
             image = Image.open(image_path)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             if image.mode != 'RGB':
                 image = image.convert('RGB')
             return image
@@ -1208,6 +1227,10 @@ class ImageProcessor:
             response = requests.get(url, timeout=30)
             response.raise_for_status()
             image = Image.open(BytesIO(response.content))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             if image.mode != 'RGB':
                 image = image.convert('RGB')
             return image
@@ -1224,6 +1247,10 @@ class ImageProcessor:
             
             image_data = base64.b64decode(base64_string)
             image = Image.open(BytesIO(image_data))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             if image.mode != 'RGB':
                 image = image.convert('RGB')
             return image
@@ -1317,7 +1344,7 @@ class ImageProcessor:
 class DiffusionService:
     """Main diffusion service for ads generation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize diffusion service."""
         self.model_manager = DiffusionModelManager()
         self.image_processor = ImageProcessor()
@@ -1325,7 +1352,7 @@ class DiffusionService:
         self.training_logger = None
         
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         """Lazy initialization of Redis client."""
         if self._redis_client is None:
             self._redis_client = await aioredis.from_url(
@@ -1999,7 +2026,7 @@ class DiffusionService:
         logger.info(f"Cleaned up {deleted_count} cache entries")
         return {'deleted_entries': deleted_count}
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close Redis connection."""
         if self._redis_client:
             await self._redis_client.close()

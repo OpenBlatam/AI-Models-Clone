@@ -1,9 +1,13 @@
-"""
-LinkedIn Post API Router V2 - Ultra-Optimized
-=============================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-FastAPI router with advanced optimizations, best practices, and enterprise features.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from fastapi import APIRouter, HTTPException, Depends, Query, Response, BackgroundTasks, Request
 from fastapi.responses import StreamingResponse, ORJSONResponse
@@ -14,11 +18,24 @@ from functools import lru_cache
 import orjson
 from prometheus_client import Counter, Histogram, Gauge
 import time
-
 from ...core.domain.entities.linkedin_post import PostStatus, PostType, PostTone
 from ...application.use_cases.linkedin_post_use_cases import LinkedInPostUseCases
 from ...infrastructure.repositories.linkedin_post_repository import LinkedInPostRepository
 from ...shared.schemas.linkedin_post_schemas import (
+from ...shared.logging import get_logger
+from ...shared.dependencies import get_current_user, rate_limiter, User
+from ...shared.cache import cache_manager
+from ...shared.metrics import metrics_collector
+from typing import Any, List, Dict, Optional
+import logging
+"""
+LinkedIn Post API Router V2 - Ultra-Optimized
+=============================================
+
+FastAPI router with advanced optimizations, best practices, and enterprise features.
+"""
+
+
     LinkedInPostCreate,
     LinkedInPostUpdate,
     LinkedInPostResponse,
@@ -28,10 +45,6 @@ from ...shared.schemas.linkedin_post_schemas import (
     BatchOptimizationRequest,
     NLPPerformanceResponse,
 )
-from ...shared.logging import get_logger
-from ...shared.dependencies import get_current_user, rate_limiter, User
-from ...shared.cache import cache_manager
-from ...shared.metrics import metrics_collector
 
 logger = get_logger(__name__)
 
@@ -138,7 +151,9 @@ async def create_linkedin_post(
         # Stream response for large content
         if stream_response and len(post.content) > 1000:
             async def generate_response():
-                yield orjson.dumps({
+                
+    """generate_response function."""
+yield orjson.dumps({
                     "id": post.id,
                     "content": post.content[:500],
                     "streaming": True
@@ -751,7 +766,7 @@ async def batch_create_posts(
             # Parallel processing with semaphore to limit concurrency
             semaphore = asyncio.Semaphore(10)
             
-            async def create_with_semaphore(post_data):
+            async def create_with_semaphore(post_data) -> Any:
                 async with semaphore:
                     return await use_cases.generate_post(
                         content=post_data.content,

@@ -1,14 +1,17 @@
-"""
-Advanced Performance Optimization System for Onyx Ads Backend
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module provides comprehensive performance optimizations including:
-- Multi-level caching with intelligent eviction
-- Memory management and garbage collection
-- Async processing with worker pools
-- Performance monitoring and profiling
-- Database query optimization
-- Resource pooling and connection management
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 import asyncio
 import gc
 import time
@@ -26,7 +29,10 @@ import logging
 import json
 import hashlib
 from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-import aioredis
+try:
+    import aioredis  # type: ignore
+except Exception:  # pragma: no cover - optional in tests
+    aioredis = None  # type: ignore[assignment]
 import numpy as np
 import torch
 from cachetools import TTLCache, LRUCache
@@ -34,9 +40,21 @@ from prometheus_client import Counter, Histogram, Gauge, Summary
 import orjson
 import zstandard as zstd
 import msgpack
-
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.optimized_config import settings
+from typing import Any, List, Dict, Optional
+"""
+Advanced Performance Optimization System for Onyx Ads Backend
+
+This module provides comprehensive performance optimizations including:
+- Multi-level caching with intelligent eviction
+- Memory management and garbage collection
+- Async processing with worker pools
+- Performance monitoring and profiling
+- Database query optimization
+- Resource pooling and connection management
+"""
+
 
 logger = setup_logger()
 
@@ -93,7 +111,9 @@ class MemoryManager:
     """Advanced memory management with monitoring and optimization."""
     
     def __init__(self, config: PerformanceConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self._memory_history = deque(maxlen=1000)
         self._gc_counter = 0
         self._last_gc_time = time.time()
@@ -212,7 +232,9 @@ class AdvancedCache:
     """Multi-level cache with intelligent eviction and compression."""
     
     def __init__(self, config: PerformanceConfig, redis_client: Optional[aioredis.Redis] = None):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.redis_client = redis_client
         
         # Memory caches
@@ -360,7 +382,9 @@ class AsyncTaskManager:
     """Manages async tasks with worker pools and monitoring."""
     
     def __init__(self, config: PerformanceConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self._thread_pool = ThreadPoolExecutor(max_workers=config.max_workers)
         self._process_pool = ProcessPoolExecutor(max_workers=config.max_processes)
         self._task_queue = asyncio.Queue(maxsize=1000)
@@ -446,7 +470,7 @@ class AsyncTaskManager:
             }
         }
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Shutdown task manager."""
         self._thread_pool.shutdown(wait=True)
         self._process_pool.shutdown(wait=True)
@@ -461,7 +485,9 @@ class DatabaseOptimizer:
     """Database query optimization and connection management."""
     
     def __init__(self, config: PerformanceConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self._query_cache = TTLCache(maxsize=1000, ttl=config.query_cache_ttl)
         self._slow_queries = deque(maxlen=100)
         self._query_stats = defaultdict(lambda: {'count': 0, 'total_time': 0, 'avg_time': 0})
@@ -521,7 +547,9 @@ class PerformanceOptimizer:
     """Main performance optimization orchestrator."""
     
     def __init__(self, config: Optional[PerformanceConfig] = None):
-        self.config = config or PerformanceConfig()
+        
+    """__init__ function."""
+self.config = config or PerformanceConfig()
         self.memory_manager = MemoryManager(self.config)
         self.cache = AdvancedCache(self.config)
         self.task_manager = AsyncTaskManager(self.config)
@@ -531,7 +559,7 @@ class PerformanceOptimizer:
         self._cleanup_task = None
         self._started = False
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start the performance optimizer."""
         if self._started:
             return
@@ -546,7 +574,7 @@ class PerformanceOptimizer:
         
         logger.info("Performance optimizer started")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop the performance optimizer."""
         if not self._started:
             return
@@ -564,7 +592,7 @@ class PerformanceOptimizer:
         
         logger.info("Performance optimizer stopped")
     
-    async def _monitoring_loop(self):
+    async def _monitoring_loop(self) -> Any:
         """Main monitoring loop."""
         while self._started:
             try:
@@ -583,7 +611,7 @@ class PerformanceOptimizer:
                 logger.error(f"Monitoring loop error: {e}")
                 await asyncio.sleep(5)
     
-    async def _cleanup_loop(self):
+    async def _cleanup_loop(self) -> Any:
         """Periodic cleanup loop."""
         while self._started:
             try:
@@ -601,7 +629,7 @@ class PerformanceOptimizer:
                 logger.error(f"Cleanup loop error: {e}")
                 await asyncio.sleep(30)
     
-    def _update_resource_metrics(self):
+    def _update_resource_metrics(self) -> Any:
         """Update resource usage metrics."""
         try:
             # CPU usage
@@ -633,9 +661,9 @@ class PerformanceOptimizer:
 # Performance decorators and utilities
 def performance_monitor(operation_name: str = None):
     """Decorator for monitoring function performance."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             operation = operation_name or func.__name__
             
@@ -652,7 +680,7 @@ def performance_monitor(operation_name: str = None):
                 raise
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             operation = operation_name or func.__name__
             
@@ -671,9 +699,9 @@ def performance_monitor(operation_name: str = None):
 
 def cache_result(ttl: int = 3600, cache_type: str = "both"):
     """Decorator for caching function results."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             cache_key = f"{func.__name__}:{hash(str(args) + str(sorted(kwargs.items())))}"
             
@@ -691,7 +719,7 @@ def cache_result(ttl: int = 3600, cache_type: str = "both"):
             return result
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             cache_key = f"{func.__name__}:{hash(str(args) + str(sorted(kwargs.items())))}"
             

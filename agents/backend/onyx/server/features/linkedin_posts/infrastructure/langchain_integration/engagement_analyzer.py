@@ -1,9 +1,10 @@
-"""
-Engagement Analyzer for LinkedIn Posts
-=====================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-AI-powered engagement analysis and prediction using LangChain.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 from typing import Dict, List, Optional, Tuple
@@ -12,8 +13,21 @@ from langchain.chat_models import ChatOpenAI
 from langchain.prompts import PromptTemplate
 from langchain.chains import LLMChain
 from langchain.schema import HumanMessage
-
 from ...shared.logging import get_logger
+            import json
+            import json
+            import json
+            import re
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Engagement Analyzer for LinkedIn Posts
+=====================================
+
+AI-powered engagement analysis and prediction using LangChain.
+"""
+
+
 
 logger = get_logger(__name__)
 
@@ -31,7 +45,7 @@ class EngagementAnalyzer:
         self.llm = llm
         self._setup_analysis_chains()
     
-    def _setup_analysis_chains(self):
+    def _setup_analysis_chains(self) -> Any:
         """Setup analysis chains."""
         
         # Engagement prediction
@@ -128,7 +142,6 @@ Format as JSON with keys: resonance_score, segments, opportunities, recommendati
             )
             
             # Parse JSON result
-            import json
             try:
                 prediction_data = json.loads(result)
                 return prediction_data
@@ -145,7 +158,6 @@ Format as JSON with keys: resonance_score, segments, opportunities, recommendati
         try:
             result = await self.sentiment_chain.arun(content=content)
             
-            import json
             try:
                 sentiment_data = json.loads(result)
                 return sentiment_data
@@ -168,7 +180,6 @@ Format as JSON with keys: resonance_score, segments, opportunities, recommendati
                 target_audience=target_audience
             )
             
-            import json
             try:
                 audience_data = json.loads(result)
                 return audience_data
@@ -380,7 +391,6 @@ Format as JSON with keys: resonance_score, segments, opportunities, recommendati
         """Parse prediction result when JSON parsing fails."""
         try:
             # Extract score from text
-            import re
             score_match = re.search(r'(\d+)', result)
             score = int(score_match.group(1)) if score_match else 50
             

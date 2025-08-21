@@ -1,14 +1,10 @@
-"""
-Analyze URL Use Case
-Application use case for analyzing a single URL for SEO
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import time
 from typing import Optional
 from datetime import datetime
 from loguru import logger
-
 from domain.entities import SEOAnalysis
 from domain.value_objects import URL, SEOScore, AnalysisStatus
 from domain.services import SEOAnalyzer
@@ -16,6 +12,14 @@ from domain.repositories import SEOAnalysisRepository
 from application.dto import AnalyzeURLRequest, AnalyzeURLResponse
 from application.mappers import SEOAnalysisMapper
 from application.services import SEOScoringService
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Analyze URL Use Case
+Application use case for analyzing a single URL for SEO
+"""
+
+
 
 
 class AnalyzeURLUseCase:
@@ -28,7 +32,9 @@ class AnalyzeURLUseCase:
         mapper: SEOAnalysisMapper,
         scoring_service: SEOScoringService
     ):
-        self.seo_analyzer = seo_analyzer
+        
+    """__init__ function."""
+self.seo_analyzer = seo_analyzer
         self.repository = repository
         self.mapper = mapper
         self.scoring_service = scoring_service

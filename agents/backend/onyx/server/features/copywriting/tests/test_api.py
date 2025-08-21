@@ -1,4 +1,9 @@
-def test_generate_copywriting_variants(client):
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+def test_generate_copywriting_variants(client) -> Any:
     payload = {
         "product_description": "Zapatos deportivos de alta gama",
         "target_platform": "Instagram",
@@ -23,7 +28,7 @@ def test_generate_copywriting_variants(client):
     assert "generation_time" in data
     assert "extra_metadata" in data
 
-def test_batch_generate_copywriting(client):
+def test_batch_generate_copywriting(client) -> Any:
     payload = [
         {
             "product_description": "Zapatos deportivos de alta gama",
@@ -61,7 +66,7 @@ def test_batch_generate_copywriting(client):
             assert "headline" in variant
             assert "primary_text" in variant
 
-def test_list_models(client):
+def test_list_models(client) -> List[Any]:
     response = client.get("/copywriting/models")
     assert response.status_code == 200
     data = response.json()
@@ -69,7 +74,7 @@ def test_list_models(client):
     assert isinstance(data["available_models"], list)
     assert "gpt2" in data["available_models"]
 
-def test_task_status(client, monkeypatch):
+def test_task_status(client, monkeypatch) -> Any:
     # Simula un resultado de Celery
     class DummyResult:
         state = "SUCCESS"
@@ -82,7 +87,7 @@ def test_task_status(client, monkeypatch):
     assert data["status"] == "SUCCESS"
     assert data["result"] == {"foo": "bar"}
 
-def test_task_status_failure(client, monkeypatch):
+def test_task_status_failure(client, monkeypatch) -> Any:
     class DummyResult:
         state = "FAILURE"
         result = None
@@ -94,9 +99,9 @@ def test_task_status_failure(client, monkeypatch):
     assert data["status"] == "FAILURE"
     assert "error" in data
 
-def test_batch_task_status(client, monkeypatch):
+def test_batch_task_status(client, monkeypatch) -> Any:
     class DummyResult:
-        def __init__(self, state, result=None, info=None):
+        def __init__(self, state, result=None, info=None) -> Any:
             self.state = state
             self.result = result
             self.info = info
@@ -123,7 +128,7 @@ def test_batch_task_status(client, monkeypatch):
             assert task["result"] is None
             assert "Test error" in task["error"]
 
-def test_generate_invalid_model(client):
+def test_generate_invalid_model(client) -> Any:
     payload = {
         "product_description": "Zapatos deportivos de alta gama",
         "target_platform": "Instagram",
@@ -134,7 +139,7 @@ def test_generate_invalid_model(client):
     assert response.status_code == 400
     assert "Modelo" in response.json()["detail"]
 
-def test_batch_too_large(client):
+def test_batch_too_large(client) -> Any:
     payload = [{
         "product_description": f"Producto {i}",
         "target_platform": "Instagram",
@@ -145,7 +150,7 @@ def test_batch_too_large(client):
     assert response.status_code == 400
     assert "batch máximo" in response.json()["detail"]
 
-def test_generate_invalid_input(client):
+def test_generate_invalid_input(client) -> Any:
     # Falta campo obligatorio
     payload = {
         "target_platform": "Instagram",
@@ -155,7 +160,7 @@ def test_generate_invalid_input(client):
     response = client.post("/copywriting/generate?model_name=gpt2", json=payload)
     assert response.status_code == 422
 
-def test_feedback_endpoint(client):
+def test_feedback_endpoint(client) -> Any:
     feedback = {
         "type": "human",
         "score": 0.9,

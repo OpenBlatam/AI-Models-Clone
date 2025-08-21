@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import uvicorn
+import logging
+from pathlib import Path
+import sys
+from src.api.app import create_app
+from src.config.settings import get_api_config
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Production Copywriting System
@@ -6,16 +16,10 @@ Production Copywriting System
 Main entry point for the production copywriting system.
 """
 
-import uvicorn
-import logging
-from pathlib import Path
 
 # Add src to path
-import sys
 sys.path.append(str(Path(__file__).parent / "src"))
 
-from src.api.app import create_app
-from src.config.settings import get_api_config
 
 # Configure logging
 logging.basicConfig(
@@ -58,5 +62,6 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

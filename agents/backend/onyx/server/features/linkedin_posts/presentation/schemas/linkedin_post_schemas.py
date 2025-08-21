@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from datetime import datetime
+from typing import Dict, List, Optional
+from uuid import UUID
+from pydantic import BaseModel, Field
+from ...core.entities.linkedin_post import PostStatus, PostType, ContentTone
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 LinkedIn Post API Schemas
 ========================
@@ -5,13 +18,8 @@ LinkedIn Post API Schemas
 API schemas for LinkedIn post operations including generation, optimization, and analysis.
 """
 
-from datetime import datetime
-from typing import Dict, List, Optional
-from uuid import UUID
 
-from pydantic import BaseModel, Field
 
-from ...core.entities.linkedin_post import PostStatus, PostType, ContentTone
 
 
 class LinkedInPostCreateRequest(BaseModel):

@@ -1,11 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from dataclasses import dataclass
+from typing import Dict, List, Optional
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 SEO Score Value Object
 Domain-Driven Design with grading and analysis logic
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional
-from enum import Enum
 
 
 class ScoreGrade(Enum):
@@ -36,7 +47,7 @@ class SEOScore:
     
     value: int
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate SEO score after initialization"""
         if not isinstance(self.value, int):
             raise ValueError("Score must be an integer")

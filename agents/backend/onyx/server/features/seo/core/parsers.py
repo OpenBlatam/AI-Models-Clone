@@ -1,22 +1,31 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import time
+from typing import Dict, List, Any, Optional
+from loguru import logger
+import cchardet
+from .interfaces import HTMLParser
+            from selectolax.parser import HTMLParser as SelectolaxParser
+        from urllib.parse import urljoin, urlparse
+        import orjson
+            from lxml import html
+            from lxml import html
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 HTML Parsers ultra-optimizados para el servicio SEO.
 Implementaciones de máxima velocidad y eficiencia.
 """
 
-import time
-from typing import Dict, List, Any, Optional
-from loguru import logger
-import cchardet
 
-from .interfaces import HTMLParser
 
 
 class SelectolaxUltraParser(HTMLParser):
     """Parser ultra-rápido usando selectolax (más rápido que lxml)."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         try:
-            from selectolax.parser import HTMLParser as SelectolaxParser
             self.SelectolaxParser = SelectolaxParser
         except ImportError:
             logger.warning("Selectolax no disponible, usando fallback")
@@ -129,7 +138,6 @@ class SelectolaxUltraParser(HTMLParser):
     
     def _extract_links_selectolax(self, parser, seo_data: Dict[str, Any], url: str):
         """Extrae enlaces ultra-optimizados."""
-        from urllib.parse import urljoin, urlparse
         
         link_elements = parser.css('a[href]')[:30]  # Limitar a 30 enlaces
         base_domain = urlparse(url).netloc
@@ -170,7 +178,6 @@ class SelectolaxUltraParser(HTMLParser):
     
     def _extract_structured_data_selectolax(self, parser, seo_data: Dict[str, Any]):
         """Extrae datos estructurados usando selectolax."""
-        import orjson
         
         script_elements = parser.css('script[type="application/ld+json"]')
         for script in script_elements:
@@ -193,7 +200,6 @@ class SelectolaxUltraParser(HTMLParser):
     def _fallback_parse(self, html_content: str, url: str) -> Dict[str, Any]:
         """Fallback usando lxml si selectolax falla."""
         try:
-            from lxml import html
             tree = html.fromstring(html_content)
             return self._parse_with_lxml(tree, url)
         except:
@@ -217,7 +223,6 @@ class LXMLFallbackParser(HTMLParser):
     def parse(self, html_content: str, url: str) -> Dict[str, Any]:
         """Parsea HTML usando lxml como fallback."""
         try:
-            from lxml import html
             tree = html.fromstring(html_content)
             return self._parse_lxml(tree, url)
         except Exception as e:

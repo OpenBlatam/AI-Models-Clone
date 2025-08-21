@@ -1,9 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .validators import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v14.0 - Utilities Module
 Exports all utility functions for validation and helpers
 """
 
-from .validators import (
     generate_request_id,
     validate_api_key,
     sanitize_content,

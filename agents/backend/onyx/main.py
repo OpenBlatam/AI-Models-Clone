@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import logging
 import sys
 import traceback
@@ -8,6 +16,7 @@ from typing import Any, List, Dict
 import sentry_sdk
 import uvicorn
 from fastapi import APIRouter, FastAPI
+from fastapi.responses import ORJSONResponse
 from fastapi import HTTPException
 from fastapi import Request
 from fastapi import status
@@ -58,11 +67,7 @@ from onyx.server.documents.standard_oauth import router as standard_oauth_router
 from onyx.server.features.document_set.api import router as document_set_router
 from onyx.server.features.folder.api import router as folder_router
 from onyx.server.features.input_prompt.api import (
-    admin_router as admin_input_prompt_router,
-)
 from onyx.server.features.input_prompt.api import (
-    basic_router as input_prompt_router,
-)
 from onyx.server.features.notifications.api import router as notification_router
 from onyx.server.features.password.api import router as password_router
 from onyx.server.features.persona.api import admin_router as admin_persona_router
@@ -71,8 +76,6 @@ from onyx.server.features.tool.api import admin_router as admin_tool_router
 from onyx.server.features.tool.api import router as tool_router
 from onyx.server.gpts.api import router as gpts_router
 from onyx.server.long_term_logs.long_term_logs_api import (
-    router as long_term_logs_router,
-)
 from onyx.server.manage.administrative import router as admin_router
 from onyx.server.manage.embedding.api import admin_router as embedding_admin_router
 from onyx.server.manage.embedding.api import basic_router as embedding_router
@@ -88,18 +91,12 @@ from onyx.server.middleware.rate_limiting import get_auth_rate_limiters
 from onyx.server.middleware.rate_limiting import setup_auth_limiter
 from onyx.server.onyx_api.ingestion import router as onyx_api_router
 from onyx.server.openai_assistants_api.full_openai_assistants_api import (
-    get_full_openai_assistants_api_router,
-)
 from onyx.server.query_and_chat.chat_backend import router as chat_router
 from onyx.server.query_and_chat.query_backend import (
-    admin_router as admin_query_router,
-)
 from onyx.server.query_and_chat.query_backend import basic_router as query_router
 from onyx.server.settings.api import admin_router as settings_admin_router
 from onyx.server.settings.api import basic_router as settings_router
 from onyx.server.token_rate_limits.api import (
-    router as token_rate_limit_settings_router,
-)
 from onyx.server.user_documents.api import router as user_documents_router
 from onyx.server.utils import BasicAuthenticationError
 from onyx.setup import setup_multitenant_onyx
@@ -118,27 +115,49 @@ from shared_configs.configs import MULTI_TENANT
 from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 from shared_configs.configs import SENTRY_DSN
 from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
-
-# Import the ads router
 from onyx.server.features.ads import ads_router, ai_router, integrated_router
 from onyx.server.features.ads.api import router as ads_router
 from onyx.server.features.ads.advanced_api import router as advanced_ads_router
 from onyx.server.features.ads.langchain_api import router as langchain_router
 from onyx.server.features.ads.api.ai_api import router as ai_router
 from onyx.server.features.ads.api.integrated_api import router as integrated_ads_router
-
-# Import the key_messages router
 from onyx.server.features.key_messages import key_messages_router
-
-# Import the integrated router
 from onyx.server.features.integrated import integrated_router
 from onyx.server.features.integrated.api import router as integrated_router
-
-# Import the image_process router
 from onyx.server.features.image_process import image_process_router
-
+from onyx.server.features.blaze_ai import blaze_ai_router
 from onyx.core.config import settings
 from onyx.core.functions import format_response, handle_error
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi_limiter import FastAPILimiter
+from fastapi_limiter.depends import RateLimiter
+import aioredis
+from fastapi_cache2 import FastAPICache
+from fastapi_cache2.backends.redis import RedisBackend
+from fastapi_health import health
+from typing import Any, List, Dict, Optional
+import asyncio
+    admin_router as admin_input_prompt_router,
+)
+    basic_router as input_prompt_router,
+)
+    router as long_term_logs_router,
+)
+    get_full_openai_assistants_api_router,
+)
+    admin_router as admin_query_router,
+)
+    router as token_rate_limit_settings_router,
+)
+
+# Import the ads router
+
+# Import the key_messages router
+
+# Import the integrated router
+
+# Import the image_process router
+
 
 # Configure logging
 logging.basicConfig(
@@ -266,7 +285,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     await app.state.httpx_client.aclose()
 
 
-def log_http_error(request: Request, exc: Exception) -> JSONResponse:
+async def log_http_error(request: Request, exc: Exception) -> JSONResponse:
     status_code = getattr(exc, "status_code", 500)
 
     if isinstance(exc, BasicAuthenticationError):
@@ -294,28 +313,29 @@ def log_http_error(request: Request, exc: Exception) -> JSONResponse:
 # Sentry is already integrated above.
 
 # --- Security: CORS Middleware ---
-from fastapi.middleware.cors import CORSMiddleware
 
 # --- Rate Limiting ---
 # pip install fastapi-limiter aioredis
-from fastapi_limiter import FastAPILimiter
-from fastapi_limiter.depends import RateLimiter
-import aioredis
 
 # --- Caching ---
 # pip install fastapi-cache2 aioredis
-from fastapi_cache2 import FastAPICache
-from fastapi_cache2.backends.redis import RedisBackend
 
 # --- Health Check ---
 # pip install fastapi-health
-from fastapi_health import health
 
 def get_application(lifespan_override: Lifespan | None = None) -> FastAPI:
+    # Use uvloop if available for faster event loop
+    try:
+        import uvloop  # type: ignore
+        uvloop.install()
+    except Exception:
+        pass
+
     application = FastAPI(
         title="Onyx Backend",
         version=__version__,
         lifespan=lifespan_override or lifespan,
+        default_response_class=ORJSONResponse,
     )
     if SENTRY_DSN:
         sentry_sdk.init(
@@ -385,6 +405,7 @@ def get_application(lifespan_override: Lifespan | None = None) -> FastAPI:
     include_router_with_global_prefix_prepended(application, integrated_ads_router)
     include_router_with_global_prefix_prepended(application, key_messages_router)
     include_router_with_global_prefix_prepended(application, image_process_router)
+    include_router_with_global_prefix_prepended(application, blaze_ai_router)
 
     if AUTH_TYPE == AuthType.DISABLED:
         # Server logs this during auth setup verification step
@@ -480,7 +501,9 @@ def get_application(lifespan_override: Lifespan | None = None) -> FastAPI:
     # --- Rate Limiter Startup ---
     @application.on_event("startup")
     async def startup_event():
-        redis = await aioredis.create_redis_pool("redis://localhost")  # TODO: Use config/env var
+        
+    """startup_event function."""
+redis = await aioredis.create_redis_pool("redis://localhost")  # TODO: Use config/env var
         await FastAPILimiter.init(redis)
         FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
 
@@ -491,14 +514,18 @@ def get_application(lifespan_override: Lifespan | None = None) -> FastAPI:
     # from fastapi import Depends
     # @application.get("/limited-endpoint", dependencies=[Depends(RateLimiter(times=5, seconds=60))])
     # async def limited_endpoint():
-    #     return {"message": "Rate limited!"}
+    
+    """limited_endpoint function."""
+#     return {"message": "Rate limited!"}
 
     # --- Example: Add cache to a route ---
     # from fastapi_cache2.decorator import cache
     # @application.get("/cached-endpoint")
     # @cache(expire=60)
     # async def cached_endpoint():
-    #     return {"message": "Cached!"}
+    
+    """cached_endpoint function."""
+#     return {"message": "Cached!"}
 
     # --- TODO: Integrate MLflow for experiment tracking in service layer
     # import mlflow

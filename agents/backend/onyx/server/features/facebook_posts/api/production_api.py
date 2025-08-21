@@ -1,9 +1,15 @@
-"""
-🚀 Production REST API
-======================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
 
-API REST de producción para el sistema NLP con FastAPI.
-"""
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from fastapi import FastAPI, HTTPException, Depends, status, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,10 +21,19 @@ import asyncio
 import logging
 from datetime import datetime
 import uuid
-
-# Internal imports
 from ..nlp.core.engine import ProductionNLPEngine, RequestContext
 from ..nlp.utils.cache import get_global_cache
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+🚀 Production REST API
+======================
+
+API REST de producción para el sistema NLP con FastAPI.
+"""
+
+
+# Internal imports
 
 
 # Pydantic models for request/response
@@ -31,7 +46,7 @@ class AnalysisRequest(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(default=None, description="Metadatos adicionales")
     
     @validator('analyzers')
-    def validate_analyzers(cls, v):
+    def validate_analyzers(cls, v) -> bool:
         if v is not None:
             allowed = ['sentiment', 'engagement', 'emotion', 'readability', 'topics']
             invalid = [a for a in v if a not in allowed]
@@ -39,7 +54,8 @@ class AnalysisRequest(BaseModel):
                 raise ValueError(f'Invalid analyzers: {invalid}. Allowed: {allowed}')
         return v
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "text": "¡Esta es una publicación increíble! ¿Qué opinas? 😊 #marketing",
@@ -59,7 +75,8 @@ class AnalysisResponse(BaseModel):
     success: bool
     cached: bool = False
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "request_id": "abc123",
@@ -168,7 +185,7 @@ async def shutdown_event():
 
 # Exception handlers
 @app.exception_handler(ValueError)
-async def value_error_handler(request, exc):
+async def value_error_handler(request, exc) -> Any:
     return JSONResponse(
         status_code=400,
         content=ErrorResponse(
@@ -181,7 +198,7 @@ async def value_error_handler(request, exc):
 
 
 @app.exception_handler(HTTPException)
-async def http_exception_handler(request, exc):
+async async def http_exception_handler(request, exc) -> Any:
     return JSONResponse(
         status_code=exc.status_code,
         content=ErrorResponse(
@@ -418,7 +435,6 @@ async def debug_analyzers(engine: ProductionNLPEngine = Depends(get_engine)):
 
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(
         "production_api:app",
         host="0.0.0.0",

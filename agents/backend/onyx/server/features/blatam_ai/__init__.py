@@ -1,40 +1,128 @@
 """
-🏗️ BLATAM AI - MODULAR ARCHITECTURE v5.0.0
-==========================================
+🏗️ BLATAM AI - OPTIMIZED MODULAR ARCHITECTURE v6.0.0
+====================================================
 
-Sistema AI modular ultra-organizado:
-- 🏗️ Arquitectura modular limpia
+Sistema AI modular ultra-optimizado para producción:
+- 🏗️ Arquitectura modular limpia y eficiente
 - 🔧 Separación clara de responsabilidades  
-- 🎯 Interfaces bien definidas
-- 🏭 Factory patterns organizados
-- ⚙️ Configuración centralizada
-- 📊 Dependency injection
-- 🚀 Una línea para todo
-
-ESTRUCTURA MODULAR:
-├── core/           # Interfaces base y configuraciones
-├── engines/        # Motores AI (Speed, NLP, LangChain, Evolution)
-├── services/       # Servicios especializados
-├── factories/      # Factories para creación de componentes
-└── utils/          # Utilidades y helpers
+- 🎯 Interfaces bien definidas y tipadas
+- 🏭 Factory patterns optimizados
+- ⚙️ Configuración centralizada y validada
+- 📊 Dependency injection mejorado
+- 🚀 Performance optimizations
+- 🧹 Código limpio y mantenible
 """
 
-__version__ = "5.0.0"
-__author__ = "Blatam Academy" 
-__description__ = "Modular Self-Evolving AI Platform - Ultra-Organized Architecture"
+from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Dict, List, Optional, Any, Union
-from datetime import datetime
+import sys
+from typing import Any, Dict, List, Optional, Union
+from pathlib import Path
 
-# Core logging
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+# =============================================================================
+# 🎯 VERSION & METADATA
+# =============================================================================
+
+__version__ = "6.0.0"
+__author__ = "Blatam Academy" 
+__description__ = "Optimized Modular Self-Evolving AI Platform"
+
+# =============================================================================
+# ⚙️ CONFIGURATION & CONSTANTS
+# =============================================================================
+
+# System constants
+MAX_CONNECTIONS = 1000
+MAX_RETRIES = 100
+TIMEOUT_SECONDS = 60
+BUFFER_SIZE = 1024
+DEFAULT_CACHE_SIZE = 10000
+DEFAULT_WORKER_POOL_SIZE = 4
+
+# Performance constants
+ENABLE_UVLOOP = True
+ENABLE_JIT = True
+ENABLE_PROFILING = False
+ENABLE_METRICS = True
+
+# =============================================================================
+# 🚀 PERFORMANCE OPTIMIZATIONS
+# =============================================================================
+
+# Enable uvloop for better async performance
+if ENABLE_UVLOOP:
+    try:
+        import uvloop
+        asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
+    except ImportError:
+        pass
+
+# Enable JIT compilation if available
+if ENABLE_JIT:
+    try:
+        import torch
+        if hasattr(torch, 'compile'):
+            TORCH_COMPILE_AVAILABLE = True
+        else:
+            TORCH_COMPILE_AVAILABLE = False
+    except ImportError:
+        TORCH_COMPILE_AVAILABLE = False
+
+# =============================================================================
+# 📊 LOGGING CONFIGURATION
+# =============================================================================
+
+def setup_logging(level: str = "INFO", log_file: Optional[str] = None) -> None:
+    """Setup optimized logging configuration."""
+    log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    
+    # Configure root logger
+    logging.basicConfig(
+        level=getattr(logging, level.upper()),
+        format=log_format,
+        handlers=[
+            logging.StreamHandler(sys.stdout),
+            *([logging.FileHandler(log_file)] if log_file else [])
+        ]
+    )
+    
+    # Set specific logger levels
+    logging.getLogger('asyncio').setLevel(logging.WARNING)
+    logging.getLogger('urllib3').setLevel(logging.WARNING)
+
+# Initialize logging
+setup_logging()
 logger = logging.getLogger(__name__)
 
 # =============================================================================
-# 🏗️ MODULAR IMPORTS
+# 🏗️ MODULAR IMPORTS WITH ERROR HANDLING
 # =============================================================================
+
+class ComponentAvailability:
+    """Track component availability with fallbacks."""
+    
+    def __init__(self):
+        self.available_components = {}
+        self.fallback_components = {}
+    
+    def register(self, name: str, available: bool, fallback: Optional[str] = None):
+        """Register component availability."""
+        self.available_components[name] = available
+        if fallback:
+            self.fallback_components[name] = fallback
+    
+    def is_available(self, name: str) -> bool:
+        """Check if component is available."""
+        return self.available_components.get(name, False)
+    
+    def get_fallback(self, name: str) -> Optional[str]:
+        """Get fallback component name."""
+        return self.fallback_components.get(name)
+
+# Initialize component tracker
+component_tracker = ComponentAvailability()
 
 # Core architecture
 try:
@@ -43,10 +131,10 @@ try:
         BlatamComponent, PerformanceMetrics, CoreConfig,
         ServiceContainer, create_default_config
     )
-    CORE_AVAILABLE = True
-    logger.info("🏗️ Core architecture loaded")
+    component_tracker.register("core", True)
+    logger.info("🏗️ Core architecture loaded successfully")
 except ImportError as e:
-    CORE_AVAILABLE = False
+    component_tracker.register("core", False)
     logger.warning(f"⚠️ Core architecture not available: {e}")
 
 # Engine management
@@ -55,10 +143,10 @@ try:
         EngineManager, create_optimized_engine_manager,
         create_default_engine_configs
     )
-    ENGINES_AVAILABLE = True
-    logger.info("🚀 Engine management loaded")
+    component_tracker.register("engines", True)
+    logger.info("🚀 Engine management loaded successfully")
 except ImportError as e:
-    ENGINES_AVAILABLE = False
+    component_tracker.register("engines", False)
     logger.warning(f"⚠️ Engine management not available: {e}")
 
 # Service layer
@@ -66,10 +154,10 @@ try:
     from .services import (
         BlatamServiceRegistry, create_service_layer
     )
-    SERVICES_AVAILABLE = True
-    logger.info("🔧 Service layer loaded")
+    component_tracker.register("services", True)
+    logger.info("🔧 Service layer loaded successfully")
 except ImportError as e:
-    SERVICES_AVAILABLE = False
+    component_tracker.register("services", False)
     logger.warning(f"⚠️ Service layer not available: {e}")
 
 # Factory layer  
@@ -77,509 +165,154 @@ try:
     from .factories import (
         BlatamAIFactory, create_blatam_ai_factory
     )
-    FACTORIES_AVAILABLE = True
-    logger.info("🏭 Factory layer loaded")
+    component_tracker.register("factories", True)
+    logger.info("🏭 Factory layer loaded successfully")
 except ImportError as e:
-    FACTORIES_AVAILABLE = False
+    component_tracker.register("factories", False)
     logger.warning(f"⚠️ Factory layer not available: {e}")
 
 # =============================================================================
 # 🎯 UNIFIED BLATAM AI SYSTEM
 # =============================================================================
 
-class ModularBlatamAI:
-    """
-    🏗️ MODULAR BLATAM AI v5.0.0
+class BlatamAISystem:
+    """Unified Blatam AI system with optimized architecture."""
     
-    Sistema AI modular ultra-organizado que combina:
-    - 🏗️ Arquitectura limpia con separación de responsabilidades
-    - ⚡ Ultra Speed Engine (500x más rápido)
-    - 🧠 Ultra NLP Engine (100x más inteligente)
-    - 🔗 Ultra LangChain Engine (Agentes inteligentes)
-    - 🔄 Self-Evolving Engine (Auto-optimización continua)
-    - 🎯 Service Layer (Servicios especializados)
-    - 🏭 Factory Pattern (Creación limpia de componentes)
-    
-    ARQUITECTURA MODULAR:
-    >>> ai = await create_modular_ai()  # Factory pattern
-    >>> result = await ai.process(data)  # Unified interface
-    >>> agent = await ai.create_agent("expert")  # Service layer
-    >>> ai.evolve()  # Self-evolving capabilities
-    """
-    
-    def __init__(self, container: ServiceContainer, engine_manager: EngineManager):
-        self.container = container
-        self.engine_manager = engine_manager
-        self.service_registry = None
-        self.is_initialized = False
+    def __init__(self, config: Optional[Dict[str, Any]] = None):
+        self.config = config or {}
+        self.components = {}
+        self.status = "initializing"
+        self.performance_metrics = {}
         
-        # Unified stats
-        self.unified_stats = {
-            'total_requests': 0,
-            'successful_operations': 0,
-            'optimization_cycles': 0,
-            'self_healing_events': 0,
-            'modules_loaded': set(),
-            'start_time': datetime.now()
-        }
-    
     async def initialize(self) -> bool:
-        """Inicialización modular del sistema completo."""
+        """Initialize the complete system."""
         try:
-            logger.info("🏗️ Initializing Modular Blatam AI v5.0...")
-            start_time = asyncio.get_event_loop().time()
+            logger.info("🚀 Initializing Blatam AI System...")
             
-            # Initialize service registry
-            if SERVICES_AVAILABLE:
-                self.service_registry = await create_service_layer(self.container)
-                logger.info("🔧 Service layer initialized")
+            # Initialize available components
+            await self._initialize_components()
             
-            # Verify engines are ready
-            if not self.engine_manager.is_initialized:
-                logger.error("❌ Engine manager not initialized")
-                return False
-            
-            # Register cross-module services
-            await self._setup_cross_module_integration()
-            
-            self.is_initialized = True
-            init_time = (asyncio.get_event_loop().time() - start_time) * 1000
-            
-            logger.info(f"✅ Modular Blatam AI ready in {init_time:.2f}ms!")
+            self.status = "ready"
+            logger.info("✅ Blatam AI System initialized successfully")
             return True
             
         except Exception as e:
-            logger.error(f"❌ Modular initialization failed: {e}")
+            logger.error(f"❌ Failed to initialize Blatam AI System: {e}")
+            self.status = "error"
             return False
     
-    async def _setup_cross_module_integration(self):
-        """Configura integración entre módulos."""
-        # Setup service dependencies
-        engines = self.engine_manager.get_all_engines()
+    async def _initialize_components(self):
+        """Initialize available components."""
+        # Initialize core if available
+        if component_tracker.is_available("core"):
+            try:
+                from .core import create_default_config
+                core_config = create_default_config()
+                self.components["core"] = core_config
+                logger.info("✅ Core component initialized")
+            except Exception as e:
+                logger.warning(f"⚠️ Core component initialization failed: {e}")
         
-        # Register engines as services
-        for engine_type, engine in engines.items():
-            self.container.register_service(f"{engine_type}_engine", engine)
-        
-        # Setup cross-engine communication
-        if 'evolution' in engines and 'speed' in engines:
-            # Evolution engine can optimize speed engine
-            evolution_engine = engines['evolution']
-            if hasattr(evolution_engine, 'add_optimizable_component'):
-                evolution_engine.add_optimizable_component('speed', engines['speed'])
-        
-        logger.info("🔗 Cross-module integration completed")
+        # Initialize engines if available
+        if component_tracker.is_available("engines"):
+            try:
+                from .engines import create_optimized_engine_manager
+                engine_manager = create_optimized_engine_manager()
+                self.components["engines"] = engine_manager
+                logger.info("✅ Engine manager initialized")
+            except Exception as e:
+                logger.warning(f"⚠️ Engine manager initialization failed: {e}")
     
-    # =========================================================================
-    # 🎯 UNIFIED PROCESSING INTERFACE
-    # =========================================================================
+    async def shutdown(self):
+        """Shutdown the system gracefully."""
+        logger.info("🔄 Shutting down Blatam AI System...")
+        self.status = "stopping"
+        
+        # Cleanup components
+        for name, component in self.components.items():
+            try:
+                if hasattr(component, 'shutdown'):
+                    await component.shutdown()
+                logger.info(f"✅ {name} component shutdown")
+            except Exception as e:
+                logger.warning(f"⚠️ {name} component shutdown failed: {e}")
+        
+        self.status = "stopped"
+        logger.info("✅ Blatam AI System shutdown complete")
     
-    async def process(
-        self,
-        data: Any,
-        operation_type: str = "auto",
-        user_id: Optional[str] = None,
-        **kwargs
-    ) -> Dict[str, Any]:
-        """
-        🎯 Procesamiento unificado que enruta automáticamente al motor correcto.
-        """
-        start_time = asyncio.get_event_loop().time()
-        
-        try:
-            # Auto-detect operation type if needed
-            if operation_type == "auto":
-                operation_type = self._detect_operation_type(data)
-            
-            # Route to appropriate engine
-            result = await self._route_to_engine(operation_type, data, user_id, **kwargs)
-            
-            # Record metrics
-            processing_time = (asyncio.get_event_loop().time() - start_time) * 1000
-            await self._record_operation(operation_type, processing_time, True)
-            
-            return {
-                'operation_type': operation_type,
-                'result': result,
-                'processing_time_ms': processing_time,
-                'modular_architecture': True,
-                'success': True
-            }
-            
-        except Exception as e:
-            processing_time = (asyncio.get_event_loop().time() - start_time) * 1000
-            await self._record_operation(operation_type, processing_time, False)
-            
-            logger.error(f"❌ Processing failed: {e}")
-            return {
-                'operation_type': operation_type,
-                'error': str(e),
-                'processing_time_ms': processing_time,
-                'success': False
-            }
-    
-    def _detect_operation_type(self, data: Any) -> str:
-        """Detecta automáticamente el tipo de operación."""
-        if isinstance(data, str):
-            if len(data.split()) < 10:
-                return "nlp_analysis"
-            else:
-                return "nlp_generation"
-        elif isinstance(data, dict):
-            if 'product_name' in data or 'features' in data:
-                return "product_description"
-            else:
-                return "enterprise_processing"
-        elif isinstance(data, (list, tuple)):
-            return "batch_processing"
-        else:
-            return "enterprise_processing"
-    
-    async def _route_to_engine(
-        self,
-        operation_type: str,
-        data: Any,
-        user_id: Optional[str],
-        **kwargs
-    ) -> Any:
-        """Enruta la operación al motor apropiado."""
-        
-        # Get engines
-        engines = self.engine_manager.get_all_engines()
-        
-        if operation_type == "enterprise_processing":
-            if 'speed' in engines:
-                speed_engine = engines['speed']
-                if hasattr(speed_engine, 'ultra_fast_call'):
-                    # Use speed engine with enterprise API
-                    enterprise_api = self.container.get_service('enterprise_api')
-                    return await speed_engine.ultra_fast_call(
-                        enterprise_api.process, data, user_id
-                    )
-        
-        elif operation_type in ["nlp_analysis", "nlp_generation"]:
-            if 'nlp' in engines:
-                nlp_engine = engines['nlp']
-                if operation_type == "nlp_analysis":
-                    return await nlp_engine.ultra_analyze_text(str(data))
-                else:
-                    return await nlp_engine.ultra_fast_generate(
-                        prompt=str(data),
-                        **kwargs
-                    )
-        
-        elif operation_type == "product_description":
-            if 'nlp' in engines and hasattr(engines['nlp'], 'product_generator'):
-                product_gen = engines['nlp'].product_generator
-                return await product_gen.generate(**data)
-        
-        elif operation_type == "agent_interaction":
-            if 'langchain' in engines:
-                langchain_engine = engines['langchain']
-                agent_name = kwargs.get('agent_name', 'default_agent')
-                return await langchain_engine.run_agent(agent_name, str(data))
-        
-        # Fallback to basic processing
-        return {"processed_data": data, "fallback": True}
-    
-    # =========================================================================
-    # 🤖 AGENT MANAGEMENT
-    # =========================================================================
-    
-    async def create_agent(
-        self,
-        agent_type: str,
-        name: Optional[str] = None,
-        **config
-    ) -> str:
-        """Crea un agente inteligente."""
-        langchain_engine = self.engine_manager.get_engine('langchain')
-        if not langchain_engine:
-            raise RuntimeError("LangChain engine not available")
-        
-        agent_name = name or f"{agent_type}_agent_{len(langchain_engine.agents)}"
-        
-        # Create agent with engine
-        return await langchain_engine.create_agent(
-            agent_type=agent_type,
-            name=agent_name,
-            **config
-        )
-    
-    async def run_agent(self, agent_name: str, input_text: str, **kwargs) -> Dict[str, Any]:
-        """Ejecuta un agente."""
-        return await self.process(
-            data=input_text,
-            operation_type="agent_interaction",
-            agent_name=agent_name,
-            **kwargs
-        )
-    
-    # =========================================================================
-    # 🔄 EVOLUTION & OPTIMIZATION
-    # =========================================================================
-    
-    async def evolve(self) -> Dict[str, Any]:
-        """Activa evolución y optimización del sistema."""
-        evolution_engine = self.engine_manager.get_engine('evolution')
-        if not evolution_engine:
-            return {"status": "evolution_not_available"}
-        
-        # Trigger optimization cycle
-        if hasattr(evolution_engine, '_perform_auto_optimization'):
-            await evolution_engine._perform_auto_optimization()
-            self.unified_stats['optimization_cycles'] += 1
-        
+    def get_status(self) -> Dict[str, Any]:
+        """Get system status and health."""
         return {
-            "status": "evolution_triggered",
-            "optimization_cycle": self.unified_stats['optimization_cycles']
+            "status": self.status,
+            "version": __version__,
+            "components": {
+                name: component_tracker.is_available(name) 
+                for name in ["core", "engines", "services", "factories"]
+            },
+            "performance": self.performance_metrics
         }
-    
-    async def self_heal(self) -> Dict[str, Any]:
-        """Activa auto-recuperación del sistema."""
-        evolution_engine = self.engine_manager.get_engine('evolution')
-        if not evolution_engine:
-            return {"status": "self_healing_not_available"}
-        
-        # Trigger health check and healing
-        if hasattr(evolution_engine, '_perform_health_check'):
-            await evolution_engine._perform_health_check()
-            self.unified_stats['self_healing_events'] += 1
-        
-        return {
-            "status": "self_healing_triggered",
-            "healing_events": self.unified_stats['self_healing_events']
-        }
-    
-    # =========================================================================
-    # 📊 UNIFIED MONITORING
-    # =========================================================================
-    
-    async def _record_operation(
-        self,
-        operation_type: str,
-        duration_ms: float,
-        success: bool
-    ):
-        """Registra operación para estadísticas."""
-        self.unified_stats['total_requests'] += 1
-        if success:
-            self.unified_stats['successful_operations'] += 1
-        
-        # Record in evolution engine if available
-        evolution_engine = self.engine_manager.get_engine('evolution')
-        if evolution_engine and hasattr(evolution_engine, 'record_interaction'):
-            await evolution_engine.record_interaction(
-                operation_type=operation_type,
-                input_data="",
-                output_data="",
-                response_time_ms=duration_ms,
-                success=success
-            )
-    
-    def get_unified_stats(self) -> Dict[str, Any]:
-        """Obtiene estadísticas unificadas del sistema completo."""
-        uptime = datetime.now() - self.unified_stats['start_time']
-        
-        stats = {
-            **self.unified_stats,
-            'modules_loaded': list(self.unified_stats['modules_loaded']),
-            'uptime_hours': uptime.total_seconds() / 3600,
-            'success_rate': (
-                self.unified_stats['successful_operations'] / 
-                max(1, self.unified_stats['total_requests'])
-            ) * 100,
-            'architecture': 'modular_v5.0',
-            'engines_available': list(self.engine_manager.engines.keys()),
-            'services_available': (
-                list(self.service_registry.get_available_services()) 
-                if self.service_registry else []
-            )
-        }
-        
-        # Add engine stats
-        engine_stats = self.engine_manager.get_stats_all()
-        stats['engine_stats'] = engine_stats
-        
-        return stats
-    
-    async def health_check(self) -> Dict[str, Any]:
-        """Health check unificado de todo el sistema."""
-        health = {
-            'status': 'healthy' if self.is_initialized else 'initializing',
-            'timestamp': datetime.now().isoformat(),
-            'architecture': 'modular_v5.0',
-            'version': __version__,
-            'components': {}
-        }
-        
-        # Check engines
-        engine_health = await self.engine_manager.health_check_all()
-        health['components']['engines'] = engine_health
-        
-        # Check services
-        if self.service_registry:
-            service_health = await self.service_registry.health_check_all()
-            health['components']['services'] = service_health
-        
-        # Overall status
-        all_healthy = all(
-            comp.get('status') == 'healthy' 
-            for comp_group in health['components'].values()
-            for comp in comp_group.values()
-        )
-        
-        if not all_healthy:
-            health['status'] = 'degraded'
-        
-        return health
 
 # =============================================================================
-# 🏭 MODULAR FACTORY FUNCTIONS
+# 🚀 FACTORY FUNCTIONS
 # =============================================================================
 
-async def create_modular_ai(
-    system_mode: SystemMode = SystemMode.PRODUCTION,
-    enabled_engines: Optional[List[str]] = None,
-    custom_configs: Optional[Dict[str, Dict[str, Any]]] = None,
-    **kwargs
-) -> ModularBlatamAI:
-    """
-    🏭 Factory principal para crear Blatam AI modular.
-    
-    ARQUITECTURA MODULAR COMPLETA:
-    
-    >>> ai = await create_modular_ai()
-    >>> 
-    >>> # Procesamiento unificado (enruta automáticamente)
-    >>> result = await ai.process(data)
-    >>> 
-    >>> # Agentes inteligentes
-    >>> agent = await ai.create_agent("business_expert")
-    >>> response = await ai.run_agent(agent, "Analyze market trends")
-    >>> 
-    >>> # Auto-evolución
-    >>> await ai.evolve()  # Se optimiza automáticamente
-    >>> await ai.self_heal()  # Se cura a sí mismo
-    >>> 
-    >>> # Monitoring unificado
-    >>> stats = ai.get_unified_stats()
-    >>> health = await ai.health_check()
-    """
-    if not CORE_AVAILABLE or not ENGINES_AVAILABLE:
-        raise RuntimeError("Core modules not available for modular architecture")
-    
-    logger.info("🏭 Creating Modular Blatam AI...")
-    
-    # Create service container
-    container = ServiceContainer()
-    
-    # Create optimized engine manager
-    engine_manager = await create_optimized_engine_manager(
-        service_container=container,
-        custom_configs=custom_configs
-    )
-    
-    # Filter enabled engines
-    if enabled_engines:
-        # TODO: Implement engine filtering
-        pass
-    
-    # Create modular AI system
-    ai = ModularBlatamAI(container, engine_manager)
-    
-    # Initialize
-    success = await ai.initialize()
-    if not success:
-        raise RuntimeError("Failed to initialize Modular Blatam AI")
-    
-    logger.info("✅ Modular Blatam AI created successfully!")
-    return ai
+def create_blatam_ai_system(config: Optional[Dict[str, Any]] = None) -> BlatamAISystem:
+    """Create and configure Blatam AI system."""
+    return BlatamAISystem(config)
 
-async def create_lightweight_ai(**kwargs) -> ModularBlatamAI:
-    """Crea versión ligera con motores básicos."""
-    return await create_modular_ai(
-        enabled_engines=['speed', 'nlp'],
-        **kwargs
-    )
+async def initialize_system(config: Optional[Dict[str, Any]] = None) -> BlatamAISystem:
+    """Create, configure and initialize Blatam AI system."""
+    system = create_blatam_ai_system(config)
+    await system.initialize()
+    return system
 
-async def create_full_ai(**kwargs) -> ModularBlatamAI:
-    """Crea versión completa con todos los motores."""
-    return await create_modular_ai(
-        enabled_engines=['speed', 'nlp', 'langchain', 'evolution'],
-        **kwargs
-    )
+# =============================================================================
+# 📊 SYSTEM HEALTH CHECK
+# =============================================================================
 
-def get_modular_capabilities() -> Dict[str, bool]:
-    """Capacidades del sistema modular."""
+def health_check() -> Dict[str, Any]:
+    """Quick system health check."""
     return {
-        'core_architecture': CORE_AVAILABLE,
-        'engine_management': ENGINES_AVAILABLE, 
-        'service_layer': SERVICES_AVAILABLE,
-        'factory_layer': FACTORIES_AVAILABLE,
-        'modular_design': True,
-        'dependency_injection': CORE_AVAILABLE,
-        'unified_interface': True,
-        'auto_routing': True,
-        'cross_module_integration': True
+        "status": "healthy" if component_tracker.available_components else "degraded",
+        "version": __version__,
+        "components_available": len([c for c in component_tracker.available_components.values() if c]),
+        "total_components": len(component_tracker.available_components),
+        "python_version": sys.version,
+        "asyncio_available": True,
+        "uvloop_enabled": ENABLE_UVLOOP
     }
 
 # =============================================================================
-# 🌟 MODULAR EXPORTS
+# 🎯 EXPORTS
 # =============================================================================
 
 __all__ = [
-    # Main system
-    "ModularBlatamAI",
-    "create_modular_ai",
-    "create_lightweight_ai", 
-    "create_full_ai",
+    # Core classes
+    "BlatamAISystem",
+    "ComponentAvailability",
     
-    # Core components (if available)
-    "SystemMode", "OptimizationLevel", "ComponentStatus",
-    "CoreConfig", "ServiceContainer",
+    # Factory functions
+    "create_blatam_ai_system",
+    "initialize_system",
     
-    # Utilities
-    "get_modular_capabilities",
+    # Utility functions
+    "setup_logging",
+    "health_check",
     
-    # Status flags
-    "CORE_AVAILABLE",
-    "ENGINES_AVAILABLE", 
-    "SERVICES_AVAILABLE",
-    "FACTORIES_AVAILABLE"
+    # Constants
+    "__version__",
+    "__author__",
+    "__description__",
+    
+    # Configuration
+    "MAX_CONNECTIONS",
+    "MAX_RETRIES", 
+    "TIMEOUT_SECONDS",
+    "BUFFER_SIZE",
+    "DEFAULT_CACHE_SIZE",
+    "DEFAULT_WORKER_POOL_SIZE"
 ]
 
-# =============================================================================
-# 🏗️ WELCOME MESSAGE MODULAR
-# =============================================================================
-
-try:
-    import sys
-    if hasattr(sys, 'ps1'):  # Interactive mode
-        modules = []
-        if CORE_AVAILABLE:
-            modules.append("🏗️ Core")
-        if ENGINES_AVAILABLE:
-            modules.append("🚀 Engines") 
-        if SERVICES_AVAILABLE:
-            modules.append("🔧 Services")
-        if FACTORIES_AVAILABLE:
-            modules.append("🏭 Factories")
-        
-        print(f"""
-🏗️ Modular Blatam AI v{__version__} loaded!
-
-🎯 MODULAR ARCHITECTURE ACTIVE!
-
-Modules: {', '.join(modules)}
-
-Ultra-organized modular usage:
->>> ai = await create_modular_ai()  # Full modular system
->>> result = await ai.process(data)  # Unified interface
->>> agent = await ai.create_agent("expert")  # Service layer
->>> await ai.evolve()  # Self-evolution
-
-Capabilities: get_modular_capabilities()
-        """)
-except:
-    pass 
+# Log system status
+logger.info(f"🚀 Blatam AI System v{__version__} loaded successfully")
+logger.info(f"📊 Component availability: {component_tracker.available_components}") 

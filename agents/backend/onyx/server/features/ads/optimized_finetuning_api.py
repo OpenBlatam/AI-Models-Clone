@@ -1,17 +1,31 @@
-"""
-API endpoints for fine-tuning with LoRA and P-tuning techniques.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
 from typing import Dict, Any, Optional
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from pydantic import BaseModel, Field
 import asyncio
 import time
 from datetime import datetime
-
 from onyx.core.auth import get_current_user
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
 from onyx.server.features.ads.optimized_config import settings
+        import torch
+from typing import Any, List, Dict, Optional
+import logging
+"""
+API endpoints for fine-tuning with LoRA and P-tuning techniques.
+"""
+
 
 logger = setup_logger()
 
@@ -84,16 +98,16 @@ finetuning_service = OptimizedFineTuningService()
 
 # Background task queue for fine-tuning
 class FineTuningTaskQueue:
-    def __init__(self):
+    def __init__(self) -> Any:
         self._tasks = {}
         self._running = False
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start the task queue."""
         self._running = True
         logger.info("Fine-tuning task queue started")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop the task queue."""
         self._running = False
         logger.info("Fine-tuning task queue stopped")
@@ -386,7 +400,6 @@ async def health_check():
     """Health check for fine-tuning service."""
     try:
         # Check if CUDA is available
-        import torch
         cuda_available = torch.cuda.is_available()
         cuda_device_count = torch.cuda.device_count() if cuda_available else 0
         

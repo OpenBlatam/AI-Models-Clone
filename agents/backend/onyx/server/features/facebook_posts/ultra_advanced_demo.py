@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import os
+from ultra_advanced.ai_brain import create_ultra_advanced_ai_brain
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 🚀 Ultra-Advanced Demo - Next-Gen Facebook Posts System
@@ -6,15 +13,12 @@
 Demo ultra-avanzado con múltiples modelos de IA de vanguardia.
 """
 
-import asyncio
-import os
-from ultra_advanced.ai_brain import create_ultra_advanced_ai_brain
 
 
 class UltraAdvancedDemo:
     """Demo del sistema ultra-avanzado."""
     
-    async def run_demo(self):
+    async def run_demo(self) -> Any:
         """Ejecutar demo ultra-avanzado."""
         print("""
 🚀🚀🚀 DEMO ULTRA-AVANZADO 🚀🚀🚀
@@ -43,7 +47,7 @@ class UltraAdvancedDemo:
         
         print("\n🏆🏆🏆 DEMO COMPLETADO 🏆🏆🏆")
     
-    async def _demo_multi_model_generation(self, ai_brain):
+    async def _demo_multi_model_generation(self, ai_brain) -> Any:
         """Demo de generación multi-modelo."""
         print("\n🧠 1. GENERACIÓN MULTI-MODELO")
         print("-" * 31)
@@ -64,7 +68,7 @@ class UltraAdvancedDemo:
         print(f"🎯 Confianza: {result.confidence:.2f}")
         print(f"📊 Quality: {result.quality_score:.2f}")
     
-    async def _demo_advanced_analysis(self, ai_brain):
+    async def _demo_advanced_analysis(self, ai_brain) -> Any:
         """Demo de análisis avanzado."""
         print("\n🔍 2. ANÁLISIS ULTRA-AVANZADO")
         print("-" * 29)
@@ -80,7 +84,7 @@ class UltraAdvancedDemo:
         print(f"🎯 Engagement: {analysis['engagement_analysis']['engagement_score']:.3f}")
         print(f"🏆 Overall: {analysis['overall_score']:.3f}")
     
-    async def _demo_quality_comparison(self, ai_brain):
+    async def _demo_quality_comparison(self, ai_brain) -> Any:
         """Demo de comparación de calidad."""
         print("\n📊 3. COMPARACIÓN DE CALIDAD")
         print("-" * 28)

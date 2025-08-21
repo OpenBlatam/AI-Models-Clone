@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Dict, Any, List, Optional
+from fastapi import APIRouter, HTTPException, Depends, Request
+from pydantic import BaseModel, Field
+import logging
+import time
+from dependencies import (
+from .factory import RouteBuilder, RouteDecorator
+from core.blocking_operations_limiter import limit_blocking_operations, OperationType
+from core.exceptions import ValidationError, AIGenerationError
+from core.schemas import CaptionRequest, CaptionResponse, BatchRequest, BatchResponse
+        import asyncio
+from typing import Any, List, Dict, Optional
 """
 Structured Captions Routes for Instagram Captions API v14.0
 
@@ -9,25 +34,15 @@ Well-organized captions routes demonstrating:
 - Easy testing and maintenance
 """
 
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, HTTPException, Depends, Request
-from pydantic import BaseModel, Field
-import logging
-import time
 
 # Import dependencies
-from dependencies import (
     CoreDependencies, AdvancedDependencies,
     require_authentication, validate_content_length
 )
 
 # Import route factory components
-from .factory import RouteBuilder, RouteDecorator
 
 # Import core components
-from core.blocking_operations_limiter import limit_blocking_operations, OperationType
-from core.exceptions import ValidationError, AIGenerationError
-from core.schemas import CaptionRequest, CaptionResponse, BatchRequest, BatchResponse
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +62,8 @@ class StructuredCaptionRequest(BaseModel):
     hashtag_count: int = Field(default=15, ge=0, le=30, description="Number of hashtags")
     language: str = Field(default="en", description="Language code")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "content_description": "Beautiful sunset over mountains with golden light",
@@ -69,7 +85,8 @@ class StructuredCaptionResponse(BaseModel):
     model_used: str = Field(..., description="AI model used")
     confidence_score: float = Field(..., description="Confidence score")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "caption": "Golden hour magic ✨ Nature's perfect lighting show",
@@ -271,10 +288,9 @@ async def batch_generate_captions(
     
     try:
         # Process requests in batches
-        import asyncio
         semaphore = asyncio.Semaphore(max_concurrent)
         
-        async def process_single_request(req: StructuredCaptionRequest) -> StructuredCaptionResponse:
+        async async def process_single_request(req: StructuredCaptionRequest) -> StructuredCaptionResponse:
             async with semaphore:
                 return await generate_structured_caption(req, deps)
         

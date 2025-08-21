@@ -1,20 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import os
+import re
+import ast
+from pathlib import Path
+from typing import List, Dict, Tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Conditional Statement Validator - Instagram Captions API v14.0
 Validates that all conditional statements follow Python best practices
 """
 
-import os
-import re
-import ast
-from pathlib import Path
-from typing import List, Dict, Tuple
 
 class ConditionalValidator:
     """Validates conditional statements in Python code"""
     
     def __init__(self, root_dir: str):
-        self.root_dir = Path(root_dir)
+        
+    """__init__ function."""
+self.root_dir = Path(root_dir)
         self.issues = []
         self.stats = {
             "files_checked": 0,
@@ -28,7 +35,15 @@ class ConditionalValidator:
         
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Check for curly braces (should not exist in Python)
             curly_brace_pattern = r'if\s*\([^)]*\)\s*\{'
@@ -183,5 +198,6 @@ def main():
         print(f"\n🎉 All conditional statements are properly formatted!")
         exit(0)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

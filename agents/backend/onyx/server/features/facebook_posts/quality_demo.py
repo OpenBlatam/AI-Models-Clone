@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import os
+from quality.advanced_quality_engine import create_quality_engine, QualityLevel
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 🎯 Quality Enhancement Demo - Facebook Posts
@@ -12,15 +19,12 @@ Demo que muestra las mejoras de calidad usando librerías avanzadas:
 - LangChain para orquestación de LLMs
 """
 
-import asyncio
-import os
-from quality.advanced_quality_engine import create_quality_engine, QualityLevel
 
 
 class QualityDemoShowcase:
     """Demo de mejoras de calidad con librerías."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.test_posts = [
             # Post básico que necesita mejoras
             "new product is ok",
@@ -44,7 +48,7 @@ class QualityDemoShowcase:
             "Just tried this amazing coffee blend from local roastery it taste incredible"
         ]
     
-    async def run_quality_demo(self):
+    async def run_quality_demo(self) -> Any:
         """Ejecutar demo completo de calidad."""
         print("""
 🎯🎯🎯 DEMO DE CALIDAD AVANZADA 🎯🎯🎯
@@ -77,7 +81,7 @@ Librerías utilizadas:
         
         print("\n🏆🏆🏆 DEMO DE CALIDAD COMPLETADO 🏆🏆🏆")
     
-    async def _demo_quality_analysis(self):
+    async def _demo_quality_analysis(self) -> Any:
         """Demo de análisis de calidad."""
         print("\n🔍 1. ANÁLISIS DE CALIDAD CON LIBRERÍAS")
         print("-" * 42)
@@ -103,7 +107,7 @@ Librerías utilizadas:
                 for improvement in quality_metrics.suggested_improvements:
                     print(f"      • {improvement}")
     
-    async def _demo_quality_enhancement(self, quality_engine):
+    async def _demo_quality_enhancement(self, quality_engine) -> Any:
         """Demo de mejora de calidad."""
         print("\n⚡ 2. MEJORA AUTOMÁTICA DE CALIDAD")
         print("-" * 34)
@@ -127,7 +131,7 @@ Librerías utilizadas:
             
             print(f"   📊 Calidad: {original_quality.quality_level.value} → {final_quality.quality_level.value}")
     
-    async def _demo_quality_levels(self, quality_engine):
+    async def _demo_quality_levels(self, quality_engine) -> Any:
         """Demo de diferentes niveles de calidad."""
         print("\n🏆 3. DEMOSTRACIÓN DE NIVELES DE CALIDAD")
         print("-" * 39)
@@ -151,7 +155,7 @@ Librerías utilizadas:
             print(f"   🎯 Engagement: {quality_metrics.engagement_potential:.2f}")
             print(f"   💭 Sentimientos: {quality_metrics.sentiment_quality:.2f}")
     
-    async def _demo_library_features(self):
+    async def _demo_library_features(self) -> Any:
         """Demo de características específicas de librerías."""
         print("\n📚 4. CARACTERÍSTICAS DE LIBRERÍAS")
         print("-" * 33)

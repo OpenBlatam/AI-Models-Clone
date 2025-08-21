@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import logging
+from typing import Optional, List, Dict, Any
+from datetime import datetime
+import asyncio
+            import random
+from typing import Any, List, Dict, Optional
 """
 🎯 Facebook Posts - LangChain Service
 =====================================
@@ -5,10 +13,6 @@
 Servicio de integración con LangChain para generación y análisis de contenido.
 """
 
-import logging
-from typing import Optional, List, Dict, Any
-from datetime import datetime
-import asyncio
 
 # Simulated LangChain imports (en un entorno real, serían imports reales)
 # from langchain import LLMChain, PromptTemplate
@@ -22,7 +26,9 @@ class FacebookLangChainService:
     """
     
     def __init__(self, api_key: Optional[str] = None, model_name: str = "gpt-3.5-turbo"):
-        self.api_key = api_key
+        
+    """__init__ function."""
+self.api_key = api_key
         self.model_name = model_name
         self.logger = logging.getLogger(__name__)
         
@@ -37,7 +43,7 @@ class FacebookLangChainService:
             'average_analysis_time': 0.0
         }
     
-    def _initialize_chains(self):
+    def _initialize_chains(self) -> Any:
         """Inicializar cadenas de LangChain."""
         self.logger.info("Initializing LangChain chains...")
         
@@ -251,7 +257,6 @@ class FacebookLangChainService:
                 "Join the conversation in the comments! 🗣️",
                 "What's your experience? Tell us! 💭"
             ]
-            import random
             base += '\n\n' + random.choice(cta_options)
         
         return base
@@ -441,7 +446,7 @@ class FacebookLangChainService:
         """Obtener métricas del servicio."""
         return self.metrics.copy()
     
-    def reset_metrics(self):
+    def reset_metrics(self) -> Any:
         """Resetear métricas."""
         self.metrics = {
             'generation_count': 0,

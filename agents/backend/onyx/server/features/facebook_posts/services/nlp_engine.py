@@ -1,9 +1,10 @@
-"""
-🧠 Facebook Posts - NLP Engine
-==============================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Sistema NLP optimizado para análisis de Facebook posts.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import re
 import asyncio
@@ -12,6 +13,15 @@ from typing import Dict, List, Optional, Any
 from datetime import datetime
 from dataclasses import dataclass
 from enum import Enum
+        from collections import Counter
+from typing import Any, List, Dict, Optional
+"""
+🧠 Facebook Posts - NLP Engine
+==============================
+
+Sistema NLP optimizado para análisis de Facebook posts.
+"""
+
 
 
 @dataclass
@@ -31,7 +41,7 @@ class NLPResult:
 class FacebookNLPEngine:
     """Motor NLP para Facebook posts."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = logging.getLogger(__name__)
         self.cache = {}
         
@@ -216,7 +226,6 @@ class FacebookNLPEngine:
         keywords = [word for word in words if len(word) > 3 and word not in stop_words]
         
         # Get word frequency
-        from collections import Counter
         word_freq = Counter(keywords)
         
         return [word for word, count in word_freq.most_common(10)]

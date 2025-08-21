@@ -1,13 +1,17 @@
-"""
-Instagram Captions API v14.0 - HTTP Exceptions
-Comprehensive exception handling with specific HTTP status codes and structured responses
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, Any, Optional, List
 from fastapi import HTTPException, status
 from pydantic import BaseModel, Field
 from datetime import datetime
 import logging
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Instagram Captions API v14.0 - HTTP Exceptions
+Comprehensive exception handling with specific HTTP status codes and structured responses
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +56,9 @@ class ValidationError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        error_detail = ErrorDetail(
+        
+    """__init__ function."""
+error_detail = ErrorDetail(
             error_code=error_code,
             message=message,
             details=details,
@@ -78,7 +84,9 @@ class ContentValidationError(ValidationError):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message=message,
             error_code="CONTENT_VALIDATION_ERROR",
             details=details,
@@ -99,7 +107,9 @@ class StyleValidationError(ValidationError):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message=message,
             error_code="STYLE_VALIDATION_ERROR",
             details=details,
@@ -120,7 +130,9 @@ class HashtagCountError(ValidationError):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message=message,
             error_code="HASHTAG_COUNT_ERROR",
             details=details,
@@ -141,7 +153,9 @@ class BatchSizeError(ValidationError):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message=message,
             error_code="BATCH_SIZE_ERROR",
             details=details,
@@ -163,7 +177,9 @@ class UnauthorizedError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        error_detail = ErrorDetail(
+        
+    """__init__ function."""
+error_detail = ErrorDetail(
             error_code=error_code,
             message=message,
             details=details,
@@ -190,7 +206,9 @@ class ForbiddenError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        error_detail = ErrorDetail(
+        
+    """__init__ function."""
+error_detail = ErrorDetail(
             error_code=error_code,
             message=message,
             details=details,
@@ -217,7 +235,9 @@ class NotFoundError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        error_detail = ErrorDetail(
+        
+    """__init__ function."""
+error_detail = ErrorDetail(
             error_code=error_code,
             message=message,
             details=details,
@@ -244,7 +264,9 @@ class MethodNotAllowedError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        error_detail = ErrorDetail(
+        
+    """__init__ function."""
+error_detail = ErrorDetail(
             error_code=error_code,
             message=message,
             details=details,
@@ -271,7 +293,9 @@ class RequestTimeoutError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        error_detail = ErrorDetail(
+        
+    """__init__ function."""
+error_detail = ErrorDetail(
             error_code=error_code,
             message=message,
             details=details,
@@ -298,7 +322,9 @@ class ConflictError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        error_detail = ErrorDetail(
+        
+    """__init__ function."""
+error_detail = ErrorDetail(
             error_code=error_code,
             message=message,
             details=details,
@@ -326,7 +352,9 @@ class TooManyRequestsError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        if details is None:
+        
+    """__init__ function."""
+if details is None:
             details = {}
         if retry_after:
             details["retry_after"] = retry_after
@@ -362,7 +390,9 @@ class InternalServerError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        error_detail = ErrorDetail(
+        
+    """__init__ function."""
+error_detail = ErrorDetail(
             error_code=error_code,
             message=message,
             details=details,
@@ -388,7 +418,9 @@ class AIGenerationError(InternalServerError):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message=message,
             error_code="AI_GENERATION_ERROR",
             details=details,
@@ -409,7 +441,9 @@ class CacheError(InternalServerError):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message=message,
             error_code="CACHE_ERROR",
             details=details,
@@ -430,7 +464,9 @@ class ModelLoadingError(InternalServerError):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message=message,
             error_code="MODEL_LOADING_ERROR",
             details=details,
@@ -451,7 +487,9 @@ class DatabaseError(InternalServerError):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message=message,
             error_code="DATABASE_ERROR",
             details=details,
@@ -472,7 +510,9 @@ class ExternalServiceError(InternalServerError):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message=message,
             error_code="EXTERNAL_SERVICE_ERROR",
             details=details,
@@ -494,7 +534,9 @@ class NotImplementedError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        error_detail = ErrorDetail(
+        
+    """__init__ function."""
+error_detail = ErrorDetail(
             error_code=error_code,
             message=message,
             details=details,
@@ -522,7 +564,9 @@ class ServiceUnavailableError(HTTPException):
         path: Optional[str] = None,
         method: Optional[str] = None
     ):
-        if details is None:
+        
+    """__init__ function."""
+if details is None:
             details = {}
         if retry_after:
             details["retry_after"] = retry_after

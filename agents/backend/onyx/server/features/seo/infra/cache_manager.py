@@ -1,23 +1,33 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Dict, Any, Optional, List
+from loguru import logger
+from ..core.ultra_optimized_cache import UltraOptimizedCache as CoreCache
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Cache Manager adapter for infrastructure layer.
 Wraps the core cache manager with infrastructure-specific logic.
 """
 
-from typing import Dict, Any, Optional, List
-from loguru import logger
 
-from ..core.ultra_optimized_cache import UltraOptimizedCache as CoreCache
 
 
 class UltraOptimizedCache:
     """Cache Manager adapter for infrastructure layer."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self.core_cache = CoreCache(config)
         self._setup_infrastructure()
     
-    def _setup_infrastructure(self):
+    def _setup_infrastructure(self) -> Any:
         """Setup infrastructure-specific configurations."""
         # Configurar prefijos de infraestructura
         self.infrastructure_prefix = f"infra:{self.config.get('environment', 'production')}:"
@@ -109,7 +119,7 @@ class UltraOptimizedCache:
         logger.debug(f"Infrastructure cache SET_MANY: {len(infra_data)} items")
         return await self.core_cache.set_many(infra_data, ttl)
     
-    def get_stats(self):
+    def get_stats(self) -> Optional[Dict[str, Any]]:
         """Get stats with infrastructure context."""
         stats = self.core_cache.get_stats()
         stats['infrastructure_layer'] = True
@@ -117,20 +127,20 @@ class UltraOptimizedCache:
         stats['infrastructure_ttls'] = self.infrastructure_ttls
         return stats
     
-    async def health_check(self):
+    async def health_check(self) -> Any:
         """Health check with infrastructure context."""
         health = await self.core_cache.health_check()
         health['infrastructure'] = 'ok'
         return health
     
-    async def pipeline(self):
+    async def pipeline(self) -> Any:
         """Pipeline with infrastructure context."""
         return await self.core_cache.pipeline()
     
     def cache_decorator(self, ttl: int = 300, category: str = 'seo_data', key_prefix: str = ""):
         """Cache decorator with infrastructure context."""
-        def decorator(func):
-            async def wrapper(*args, **kwargs):
+        def decorator(func) -> Any:
+            async def wrapper(*args, **kwargs) -> Any:
                 # Generar clave única con contexto de infraestructura
                 key_parts = [key_prefix, func.__name__]
                 key_parts.extend([str(arg) for arg in args])

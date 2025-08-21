@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import torch
+from diffusers import DiffusionPipeline, DDPMScheduler, UNet2DConditionModel
+from diffusers.optimization import get_scheduler
+import torch.nn.functional as F
+from official_docs_reference import OfficialDocsReference
+from diffusers import DiffusionPipeline
+import torch
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Diffusers Example - Using Official Documentation References
@@ -6,11 +24,6 @@ Diffusers Example - Using Official Documentation References
 Ejemplo práctico de Diffusers usando las referencias de documentación oficial.
 """
 
-import torch
-from diffusers import DiffusionPipeline, DDPMScheduler, UNet2DConditionModel
-from diffusers.optimization import get_scheduler
-import torch.nn.functional as F
-from official_docs_reference import OfficialDocsReference
 
 def load_pipeline():
     """Cargar pipeline siguiendo las mejores prácticas."""
@@ -43,7 +56,7 @@ def load_pipeline():
     
     return pipeline
 
-def optimize_memory(pipeline):
+def optimize_memory(pipeline) -> Any:
     """Optimizar memoria siguiendo las mejores prácticas."""
     ref = OfficialDocsReference()
     
@@ -71,7 +84,7 @@ def optimize_memory(pipeline):
     
     print("✅ Optimizaciones de memoria aplicadas!")
 
-def generate_images(pipeline, prompts):
+def generate_images(pipeline, prompts) -> Any:
     """Generar imágenes siguiendo las mejores prácticas."""
     print(f"\n🎨 Generando {len(prompts)} imágenes...")
     
@@ -131,8 +144,6 @@ def validate_code():
     
     # Código de ejemplo
     code = """
-from diffusers import DiffusionPipeline
-import torch
 
 pipeline = DiffusionPipeline.from_pretrained(
     "runwayml/stable-diffusion-v1-5",
@@ -208,5 +219,6 @@ def main():
     print("\n🎉 ¡Ejemplo completado exitosamente!")
     print("El código sigue las mejores prácticas oficiales de Diffusers.")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

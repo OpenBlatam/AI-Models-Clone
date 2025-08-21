@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from pydantic import BaseModel, Field
+from typing import Dict, Any, Optional, List
+from datetime import datetime
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Entity Models
 ============
@@ -5,10 +22,6 @@ Entity Models
 Core entity models for the copywriting system.
 """
 
-from pydantic import BaseModel, Field
-from typing import Dict, Any, Optional, List
-from datetime import datetime
-from enum import Enum
 
 
 class ModelType(str, Enum):
@@ -81,7 +94,8 @@ class CopywritingVariant(BaseModel):
     generation_time: Optional[float] = Field(default=None, description="Generation time in seconds")
     model_used: Optional[str] = Field(default=None, description="Model used for generation")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "id": "variant_1",
@@ -140,7 +154,8 @@ class PerformanceMetrics(BaseModel):
     # Timestamp
     last_updated: datetime = Field(default_factory=datetime.utcnow, description="Last metrics update")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "total_requests": 1250,
@@ -195,7 +210,8 @@ class RequestLog(BaseModel):
     ip_address: Optional[str] = Field(default=None, description="IP address")
     session_id: Optional[str] = Field(default=None, description="Session identifier")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "request_id": "req_1234567890",
@@ -248,7 +264,8 @@ class SystemHealth(BaseModel):
     uptime_seconds: float = Field(..., description="System uptime in seconds")
     last_restart: Optional[datetime] = Field(default=None, description="Last restart timestamp")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "status": "healthy",

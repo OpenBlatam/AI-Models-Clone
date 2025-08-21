@@ -1,13 +1,21 @@
-"""
-Database service for ads functionality.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
-
 from onyx.db.ads import AdsGeneration, BackgroundRemoval, AdsAnalytics
 from onyx.db.engine import get_session_context_manager
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Database service for ads functionality.
+"""
+
 
 class AdsDBService:
     """Service for handling ads-related database operations."""

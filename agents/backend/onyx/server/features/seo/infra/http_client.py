@@ -1,23 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Dict, Any, Optional
+from loguru import logger
+from ..core.ultra_optimized_http_client import UltraOptimizedHTTPClient as CoreHTTPClient
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 HTTP Client adapter for infrastructure layer.
 Wraps the core HTTP client with infrastructure-specific logic.
 """
 
-from typing import Dict, Any, Optional
-from loguru import logger
 
-from ..core.ultra_optimized_http_client import UltraOptimizedHTTPClient as CoreHTTPClient
 
 
 class UltraOptimizedHTTPClient:
     """HTTP Client adapter for infrastructure layer."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self.core_client = CoreHTTPClient(config)
         self._setup_infrastructure()
     
-    def _setup_infrastructure(self):
+    def _setup_infrastructure(self) -> Any:
         """Setup infrastructure-specific configurations."""
         # Configurar headers específicos de infraestructura
         infrastructure_headers = {
@@ -66,27 +73,27 @@ class UltraOptimizedHTTPClient:
         logger.debug(f"Infrastructure file download: {url} -> {filepath}")
         return await self.core_client.download_file(url, filepath, chunk_size)
     
-    def get_stats(self):
+    def get_stats(self) -> Optional[Dict[str, Any]]:
         """Get stats with infrastructure context."""
         stats = self.core_client.get_stats()
         stats['infrastructure_layer'] = True
         return stats
     
-    async def health_check(self):
+    async def health_check(self) -> Any:
         """Health check with infrastructure context."""
         health = await self.core_client.health_check()
         health['infrastructure'] = 'ok'
         return health
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close with infrastructure cleanup."""
         logger.info("Closing infrastructure HTTP client")
         await self.core_client.close()
     
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Context manager entry."""
         return self
     
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
         """Context manager exit."""
         await self.close() 

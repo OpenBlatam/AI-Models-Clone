@@ -1,10 +1,10 @@
-"""
-🧠 Facebook Posts - Advanced NLP Service
-========================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Sistema NLP avanzado para análisis y optimización de Facebook posts.
-Integrado con Clean Architecture y optimizado para performance.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import re
 import asyncio
@@ -14,6 +14,15 @@ from datetime import datetime
 from dataclasses import dataclass, field
 from enum import Enum
 import hashlib
+from typing import Any, List, Dict, Optional
+"""
+🧠 Facebook Posts - Advanced NLP Service
+========================================
+
+Sistema NLP avanzado para análisis y optimización de Facebook posts.
+Integrado con Clean Architecture y optimizado para performance.
+"""
+
 
 # NLP Libraries (simulated imports - in production would be real)
 # import spacy
@@ -44,7 +53,7 @@ class NLPAnalysisResult:
     results: Dict[str, Any]
     metadata: Dict[str, Any] = field(default_factory=dict)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not 0 <= self.confidence <= 1:
             raise ValueError("Confidence must be between 0 and 1")
 
@@ -105,7 +114,9 @@ class FacebookPostsNLPService:
     """
     
     def __init__(self, model_cache_size: int = 100):
-        self.logger = logging.getLogger(__name__)
+        
+    """__init__ function."""
+self.logger = logging.getLogger(__name__)
         self.model_cache_size = model_cache_size
         
         # Initialize NLP models and pipelines
@@ -125,7 +136,7 @@ class FacebookPostsNLPService:
         
         self.logger.info("FacebookPostsNLPService initialized successfully")
     
-    def _initialize_nlp_models(self):
+    def _initialize_nlp_models(self) -> Any:
         """Inicializar modelos NLP."""
         self.logger.info("Initializing NLP models...")
         
@@ -147,7 +158,7 @@ class FacebookPostsNLPService:
         
         self.logger.info("NLP models initialized successfully")
     
-    def _initialize_text_patterns(self):
+    def _initialize_text_patterns(self) -> Any:
         """Inicializar patrones de texto."""
         self.patterns = {
             'questions': [r'\?', r'what\s+do\s+you\s+think', r'tell\s+us', r'share\s+your'],

@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import List
+from fastapi import APIRouter
+from .captions import captions_router
+from .performance import performance_router
+from .async_flow_routes import async_flow_router
+from .enhanced_async_routes import enhanced_async_router
+from .shared_resources_routes import shared_resources_router
+from .lazy_loading_routes import lazy_loading_router
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Routes Module for Instagram Captions API v14.0
 
@@ -8,22 +21,14 @@ Well-structured routing system with clear dependencies and organization:
 - Easy maintenance and testing
 """
 
-from typing import List
-from fastapi import APIRouter
 
 # Import all route modules
-from .captions import captions_router
-from .performance import performance_router
-from .async_flow_routes import async_flow_router
-from .enhanced_async_routes import enhanced_async_router
-from .shared_resources_routes import shared_resources_router
-from .lazy_loading_routes import lazy_loading_router
 
 # Create main router registry
 class RouterRegistry:
     """Central router registry for managing all application routes"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.routers: List[APIRouter] = []
         self.router_configs: dict = {}
     

@@ -1,13 +1,23 @@
-"""
-Comprehensive tests for the tokenization and sequence handling service.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 import asyncio
 import torch
 from unittest.mock import Mock, patch, AsyncMock
 from typing import Dict, Any, List
-
 from onyx.server.features.ads.tokenization_service import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Comprehensive tests for the tokenization and sequence handling service.
+"""
+
     TextPreprocessor,
     AdvancedTokenizer,
     SequenceManager,
@@ -18,11 +28,11 @@ from onyx.server.features.ads.tokenization_service import (
 class TestTextPreprocessor:
     """Test cases for TextPreprocessor class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         self.preprocessor = TextPreprocessor()
     
-    def test_normalize_text(self):
+    def test_normalize_text(self) -> Any:
         """Test text normalization."""
         # Test basic normalization
         text = "Hello World! Visit https://example.com"
@@ -44,7 +54,7 @@ class TestTextPreprocessor:
         assert self.preprocessor.normalize_text("") == ""
         assert self.preprocessor.normalize_text(None) == ""
     
-    def test_clean_ads_text(self):
+    def test_clean_ads_text(self) -> Any:
         """Test ads-specific text cleaning."""
         text = "Amazing product for sale! Call 555-1234"
         cleaned = self.preprocessor.clean_ads_text(text, remove_stopwords=False)
@@ -55,7 +65,7 @@ class TestTextPreprocessor:
         cleaned_no_stopwords = self.preprocessor.clean_ads_text(text, remove_stopwords=True)
         assert len(cleaned_no_stopwords.split()) < len(cleaned.split())
     
-    def test_extract_keywords(self):
+    def test_extract_keywords(self) -> Any:
         """Test keyword extraction."""
         text = "Our premium product offers amazing features and benefits"
         keywords = self.preprocessor.extract_keywords(text, max_keywords=5)
@@ -64,7 +74,7 @@ class TestTextPreprocessor:
         assert all(isinstance(k, str) for k in keywords)
         assert "premium" in keywords or "product" in keywords
     
-    def test_segment_text(self):
+    def test_segment_text(self) -> Any:
         """Test text segmentation."""
         # Test short text
         short_text = "Short text."
@@ -81,7 +91,7 @@ class TestTextPreprocessor:
 class TestAdvancedTokenizer:
     """Test cases for AdvancedTokenizer class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         with patch('transformers.AutoTokenizer.from_pretrained') as mock_tokenizer:
             mock_tokenizer.return_value.pad_token = None
@@ -91,7 +101,7 @@ class TestAdvancedTokenizer:
             
             self.tokenizer = AdvancedTokenizer("microsoft/DialoGPT-medium")
     
-    def test_tokenize_text(self):
+    def test_tokenize_text(self) -> Any:
         """Test basic text tokenization."""
         with patch.object(self.tokenizer.tokenizer, '__call__') as mock_call:
             mock_call.return_value = {
@@ -105,7 +115,7 @@ class TestAdvancedTokenizer:
             assert 'attention_mask' in result
             mock_call.assert_called_once()
     
-    def test_tokenize_ads_prompt(self):
+    def test_tokenize_ads_prompt(self) -> Any:
         """Test ads prompt tokenization."""
         with patch.object(self.tokenizer, 'tokenize_text') as mock_tokenize:
             mock_tokenize.return_value = {
@@ -123,7 +133,7 @@ class TestAdvancedTokenizer:
             assert result is not None
             mock_tokenize.assert_called_once()
     
-    def test_decode_tokens(self):
+    def test_decode_tokens(self) -> Any:
         """Test token decoding."""
         token_ids = [1, 2, 3, 4, 5]
         with patch.object(self.tokenizer.tokenizer, 'decode') as mock_decode:
@@ -134,11 +144,11 @@ class TestAdvancedTokenizer:
             assert result == "Decoded text"
             mock_decode.assert_called_once_with(token_ids, skip_special_tokens=True)
     
-    def test_get_vocab_size(self):
+    def test_get_vocab_size(self) -> Optional[Dict[str, Any]]:
         """Test vocabulary size retrieval."""
         assert self.tokenizer.get_vocab_size() == 50257
     
-    def test_get_special_tokens(self):
+    def test_get_special_tokens(self) -> Optional[Dict[str, Any]]:
         """Test special tokens retrieval."""
         with patch.object(self.tokenizer.tokenizer, 'pad_token_id', 0):
             with patch.object(self.tokenizer.tokenizer, 'eos_token_id', 1):
@@ -154,13 +164,13 @@ class TestAdvancedTokenizer:
 class TestSequenceManager:
     """Test cases for SequenceManager class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         with patch('onyx.server.features.ads.tokenization_service.AdvancedTokenizer'):
             self.tokenizer = Mock()
             self.sequence_manager = SequenceManager(self.tokenizer)
     
-    def test_create_training_sequences(self):
+    def test_create_training_sequences(self) -> Any:
         """Test training sequence creation."""
         prompts = ["Generate ad for product"]
         targets = ["Amazing product offers..."]
@@ -178,7 +188,7 @@ class TestSequenceManager:
             assert 'attention_mask' in sequences[0]
             assert 'labels' in sequences[0]
     
-    def test_create_inference_sequence(self):
+    def test_create_inference_sequence(self) -> Any:
         """Test inference sequence creation."""
         prompt = "Generate ad for product"
         
@@ -194,7 +204,7 @@ class TestSequenceManager:
             assert 'attention_mask' in sequence
             assert 'labels' not in sequence
     
-    def test_pad_sequences(self):
+    def test_pad_sequences(self) -> Any:
         """Test sequence padding."""
         sequences = [
             {'input_ids': torch.tensor([1, 2, 3]), 'attention_mask': torch.tensor([1, 1, 1])},
@@ -211,7 +221,7 @@ class TestSequenceManager:
 class TestOptimizedAdsDataset:
     """Test cases for OptimizedAdsDataset class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         self.data = [
             {
@@ -226,11 +236,11 @@ class TestOptimizedAdsDataset:
                 self.tokenizer = Mock()
                 self.dataset = OptimizedAdsDataset(self.data, self.tokenizer, max_length=512)
     
-    def test_len(self):
+    def test_len(self) -> Any:
         """Test dataset length."""
         assert len(self.dataset) == 1
     
-    def test_getitem(self):
+    def test_getitem(self) -> Optional[Dict[str, Any]]:
         """Test dataset item retrieval."""
         with patch.object(self.dataset.sequence_manager, 'create_training_sequences') as mock_create:
             mock_create.return_value = [{
@@ -248,7 +258,7 @@ class TestOptimizedAdsDataset:
 class TestTokenizationService:
     """Test cases for TokenizationService class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         with patch('onyx.server.features.ads.tokenization_service.AdvancedTokenizer'):
             with patch('onyx.server.features.ads.tokenization_service.SequenceManager'):
@@ -256,7 +266,7 @@ class TestTokenizationService:
                     self.service = TokenizationService()
     
     @pytest.mark.asyncio
-    async def test_tokenize_ads_data(self):
+    async def test_tokenize_ads_data(self) -> Any:
         """Test ads data tokenization."""
         ads_data = [
             {
@@ -278,7 +288,7 @@ class TestTokenizationService:
             assert 'input_ids' in result[0]
     
     @pytest.mark.asyncio
-    async def test_create_training_dataset(self):
+    async def test_create_training_dataset(self) -> Any:
         """Test training dataset creation."""
         ads_data = [
             {
@@ -303,7 +313,7 @@ class TestTokenizationService:
                 mock_tokenize.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_tokenize_for_inference(self):
+    async def test_tokenize_for_inference(self) -> Any:
         """Test inference tokenization."""
         prompt = "Generate ad for product"
         
@@ -319,7 +329,7 @@ class TestTokenizationService:
             assert 'attention_mask' in result
     
     @pytest.mark.asyncio
-    async def test_analyze_text_complexity(self):
+    async def test_analyze_text_complexity(self) -> Any:
         """Test text complexity analysis."""
         text = "This is a test text with multiple words."
         
@@ -340,7 +350,7 @@ class TestTokenizationService:
                     assert 'complexity_score' in result
     
     @pytest.mark.asyncio
-    async def test_optimize_sequence_length(self):
+    async def test_optimize_sequence_length(self) -> Any:
         """Test sequence length optimization."""
         texts = ["Short text", "Very long text " * 100]
         
@@ -358,7 +368,7 @@ class TestTokenizationService:
                 assert len(result) >= len(texts)
     
     @pytest.mark.asyncio
-    async def test_get_tokenization_stats(self):
+    async def test_get_tokenization_stats(self) -> Optional[Dict[str, Any]]:
         """Test tokenization statistics."""
         ads_data = [
             {
@@ -388,7 +398,7 @@ class TestIntegration:
     """Integration tests for tokenization service."""
     
     @pytest.mark.asyncio
-    async def test_full_tokenization_pipeline(self):
+    async def test_full_tokenization_pipeline(self) -> Any:
         """Test complete tokenization pipeline."""
         # Create test data
         ads_data = [
@@ -420,7 +430,7 @@ class TestIntegration:
             assert len(result) == 1
             assert all(key in result[0] for key in ['input_ids', 'attention_mask', 'labels'])
     
-    def test_text_preprocessing_pipeline(self):
+    def test_text_preprocessing_pipeline(self) -> Any:
         """Test complete text preprocessing pipeline."""
         preprocessor = TextPreprocessor()
         
@@ -444,5 +454,6 @@ class TestIntegration:
         assert len(segments) > 1
         assert all(len(seg) <= 200 for seg in segments)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

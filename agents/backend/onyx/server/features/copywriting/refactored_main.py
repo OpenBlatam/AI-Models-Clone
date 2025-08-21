@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import logging
+import signal
+import sys
+from pathlib import Path
+from typing import Dict, Any
+import uvicorn
+from contextlib import asynccontextmanager
+from refactored_architecture import RefactoredCopywritingAPI
+from pydantic_settings import BaseSettings
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Refactored Main Entry Point
@@ -11,20 +32,10 @@ Modern, clean main entry point with:
 - Health monitoring
 """
 
-import asyncio
-import logging
-import signal
-import sys
-from pathlib import Path
-from typing import Dict, Any
-import uvicorn
-from contextlib import asynccontextmanager
 
 # Add src to path
 sys.path.append(str(Path(__file__).parent / "src"))
 
-from refactored_architecture import RefactoredCopywritingAPI
-from pydantic_settings import BaseSettings
 
 # Configure logging
 logging.basicConfig(
@@ -46,7 +57,8 @@ class APIConfig(BaseSettings):
     reload: bool = False
     log_level: str = "info"
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_prefix = "API_"
 
@@ -59,7 +71,8 @@ class ModelConfig(BaseSettings):
     enable_distributed: bool = True
     gpu_memory_fraction: float = 0.8
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_prefix = "MODEL_"
 
@@ -69,7 +82,8 @@ class CacheConfig(BaseSettings):
     cache_size: int = 10000
     redis_url: str = "redis://localhost"
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_prefix = "CACHE_"
 
@@ -80,7 +94,8 @@ class PerformanceConfig(BaseSettings):
     max_workers: int = 8
     batch_size: int = 32
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_prefix = "PERF_"
 
@@ -127,7 +142,7 @@ async def lifespan_manager():
 
 def setup_signal_handlers():
     """Setup signal handlers for graceful shutdown"""
-    def signal_handler(signum, frame):
+    def signal_handler(signum, frame) -> Any:
         logger.info(f"Received signal {signum}, shutting down gracefully...")
         sys.exit(0)
     
@@ -184,5 +199,6 @@ def main():
         logger.error(f"Application failed to start: {e}")
         sys.exit(1)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

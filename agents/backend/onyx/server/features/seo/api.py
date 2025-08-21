@@ -1,6 +1,13 @@
-"""
-API SEO Ultra-Optimizada con arquitectura modular y refactorizada.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 from fastapi import APIRouter, HTTPException, Query, BackgroundTasks, Depends, Request
 from fastapi.responses import JSONResponse
@@ -18,9 +25,14 @@ import uvicorn
 from pydantic import ValidationError
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
-
 from .models import SEOScrapeRequest, SEOScrapeResponse, SEOAnalysis
 from .service import SEOService
+from typing import Any, List, Dict, Optional
+"""
+API SEO Ultra-Optimizada con arquitectura modular y refactorizada.
+"""
+
+
 
 # Configurar logging optimizado
 logging.basicConfig(
@@ -45,7 +57,7 @@ class APIMetrics:
 class MetricsCollector:
     """Recolector de métricas de la API."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.request_count = 0
         self.response_times = []
         self.error_count = 0
@@ -83,7 +95,7 @@ class MetricsCollector:
 class ServiceManager:
     """Gestor de servicios SEO."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._service_pool = []
         self._cache = TTLCache(maxsize=2000, ttl=3600)
         self._metrics_collector = MetricsCollector()
@@ -106,7 +118,7 @@ class ServiceManager:
         """Registra una solicitud."""
         self._metrics_collector.record_request(response_time, is_error, cache_hit)
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Limpia los recursos."""
         for service in self._service_pool:
             await service.close()
@@ -170,7 +182,9 @@ class HealthChecker:
     """Verificador de salud del sistema."""
     
     def __init__(self, service_manager: ServiceManager):
-        self.service_manager = service_manager
+        
+    """__init__ function."""
+self.service_manager = service_manager
     
     def check_health(self) -> Dict[str, Any]:
         """Verifica el estado del sistema."""
@@ -248,7 +262,7 @@ def get_seo_service() -> SEOService:
 
 
 @asynccontextmanager
-async def lifespan(app):
+async def lifespan(app) -> Any:
     """Gestión del ciclo de vida de la aplicación."""
     logger.info("🚀 Iniciando Servicio SEO Ultra-Optimizado")
     yield
@@ -257,7 +271,7 @@ async def lifespan(app):
 
 
 @retry(stop=stop_after_attempt(3), wait=wait_exponential(multiplier=1, min=4, max=10))
-async def _process_seo_request(request: SEOScrapeRequest, service: SEOService) -> SEOScrapeResponse:
+async async def _process_seo_request(request: SEOScrapeRequest, service: SEOService) -> SEOScrapeResponse:
     """Procesa request SEO con retry y optimizaciones."""
     return await service.scrape(request)
 

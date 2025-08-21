@@ -1,9 +1,13 @@
-"""
-🎯 Facebook Posts - Utilities & Helpers
-=======================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Funciones de utilidad y helpers para el sistema de Facebook posts.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import re
 import hashlib
@@ -12,6 +16,16 @@ from typing import List, Dict, Any, Optional, Tuple
 from datetime import datetime, timedelta
 import logging
 from urllib.parse import urlparse
+    from collections import Counter
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+🎯 Facebook Posts - Utilities & Helpers
+=======================================
+
+Funciones de utilidad y helpers para el sistema de Facebook posts.
+"""
+
 
 
 # ===== TEXT PROCESSING UTILITIES =====
@@ -299,17 +313,19 @@ class PerformanceTimer:
     """Timer para medir performance."""
     
     def __init__(self, operation_name: str):
-        self.operation_name = operation_name
+        
+    """__init__ function."""
+self.operation_name = operation_name
         self.start_time = None
         self.end_time = None
         self.logger = logging.getLogger(__name__)
     
-    def __enter__(self):
+    def __enter__(self) -> Any:
         self.start_time = datetime.now()
         self.logger.debug(f"Starting operation: {self.operation_name}")
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> Any:
         self.end_time = datetime.now()
         duration = (self.end_time - self.start_time).total_seconds() * 1000
         
@@ -356,7 +372,6 @@ def suggest_hashtags(text: str, max_suggestions: int = 5) -> List[str]:
     keywords = [word for word in words if len(word) > 3 and word not in stop_words]
     
     # Get top keywords by frequency
-    from collections import Counter
     word_freq = Counter(keywords)
     top_keywords = [word for word, _ in word_freq.most_common(max_suggestions)]
     
@@ -369,7 +384,7 @@ def suggest_hashtags(text: str, max_suggestions: int = 5) -> List[str]:
 
 # ===== ERROR HANDLING =====
 
-def safe_execute(func, *args, default=None, **kwargs):
+def safe_execute(func, *args, default=None, **kwargs) -> Any:
     """Ejecutar función de manera segura con valor por defecto."""
     try:
         return func(*args, **kwargs)

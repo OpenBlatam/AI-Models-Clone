@@ -1,17 +1,19 @@
-"""
-Advanced Integration Tests with Best Libraries
-=============================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Integration tests using TestContainers, aioresponses, responses, and other advanced libraries.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import pytest
 import asyncio
 import json
 from typing import List, Dict, Any
 from datetime import datetime, timedelta
-
-# Advanced integration testing libraries
 from testcontainers.core.container import DockerContainer
 from testcontainers.core.waiting_utils import wait_for_logs
 import aioresponses
@@ -19,19 +21,34 @@ import responses
 import httpretty
 from httpx import AsyncClient
 import redis.asyncio as redis
-
-# FastAPI testing
 from fastapi.testclient import TestClient
-
-# Our modules
 from ...core.domain.entities.linkedin_post import LinkedInPost, PostStatus, PostType, PostTone
 from ...application.use_cases.linkedin_post_use_cases import LinkedInPostUseCases
 from ...infrastructure.repositories.linkedin_post_repository import LinkedInPostRepository
 from ...shared.cache import CacheManager
 from ...shared.config import Settings
+from ..conftest_advanced import (
+        from fastapi import FastAPI
+        from ...presentation.api.linkedin_post_router_v2 import router
+        import psutil
+        import os
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Advanced Integration Tests with Best Libraries
+=============================================
+
+Integration tests using TestContainers, aioresponses, responses, and other advanced libraries.
+"""
+
+
+# Advanced integration testing libraries
+
+# FastAPI testing
+
+# Our modules
 
 # Import fixtures and factories
-from ..conftest_advanced import (
     LinkedInPostFactory,
     PostDataFactory,
     test_data_generator
@@ -42,7 +59,7 @@ class TestDatabaseIntegrationAdvanced:
     """Advanced database integration tests using TestContainers."""
     
     @pytest.fixture(scope="class")
-    def postgres_container(self):
+    def postgres_container(self) -> Any:
         """PostgreSQL container for integration testing."""
         with DockerContainer("postgres:15-alpine") as container:
             container.with_env("POSTGRES_DB", "test_db")
@@ -62,7 +79,7 @@ class TestDatabaseIntegrationAdvanced:
             yield database_url
     
     @pytest.fixture(scope="class")
-    def redis_container(self):
+    def redis_container(self) -> Any:
         """Redis container for integration testing."""
         with DockerContainer("redis:7-alpine") as container:
             container.with_exposed_ports(6379)
@@ -78,7 +95,7 @@ class TestDatabaseIntegrationAdvanced:
             yield redis_url
     
     @pytest.mark.asyncio
-    async def test_database_connection_integration(self, postgres_container):
+    async def test_database_connection_integration(self, postgres_container) -> Any:
         """Test database connection integration."""
         # This would test actual database operations
         # For now, we'll test the connection string format
@@ -86,7 +103,7 @@ class TestDatabaseIntegrationAdvanced:
         assert "test_db" in postgres_container
     
     @pytest.mark.asyncio
-    async def test_redis_connection_integration(self, redis_container):
+    async def test_redis_connection_integration(self, redis_container) -> Any:
         """Test Redis connection integration."""
         # Test actual Redis connection
         client = redis.from_url(redis_container, decode_responses=True)
@@ -113,10 +130,8 @@ class TestAPIIntegrationAdvanced:
     """Advanced API integration tests using aioresponses and responses."""
     
     @pytest.fixture
-    def test_app(self):
+    def test_app(self) -> Any:
         """Test FastAPI application."""
-        from fastapi import FastAPI
-        from ...presentation.api.linkedin_post_router_v2 import router
         
         app = FastAPI(title="LinkedIn Posts API Integration Test")
         app.include_router(router)
@@ -124,18 +139,18 @@ class TestAPIIntegrationAdvanced:
         return app
     
     @pytest.fixture
-    def test_client(self, test_app):
+    def test_client(self, test_app) -> Any:
         """Test client for FastAPI."""
         return TestClient(test_app)
     
     @pytest.fixture
-    async def async_client(self, test_app):
+    async def async_client(self, test_app) -> Any:
         """Async test client for FastAPI."""
         async with AsyncClient(app=test_app, base_url="http://test") as client:
             yield client
     
     @pytest.mark.asyncio
-    async def test_create_post_integration(self, async_client):
+    async def test_create_post_integration(self, async_client) -> Any:
         """Test post creation integration."""
         post_data = PostDataFactory()
         
@@ -154,7 +169,7 @@ class TestAPIIntegrationAdvanced:
         assert "id" in data
     
     @pytest.mark.asyncio
-    async def test_batch_create_posts_integration(self, async_client):
+    async def test_batch_create_posts_integration(self, async_client) -> Any:
         """Test batch post creation integration."""
         batch_data = PostDataFactory.build_batch(3)
         
@@ -172,7 +187,7 @@ class TestAPIIntegrationAdvanced:
             assert post["content"] == original_data["content"]
     
     @pytest.mark.asyncio
-    async def test_get_post_integration(self, async_client):
+    async def test_get_post_integration(self, async_client) -> Optional[Dict[str, Any]]:
         """Test get post integration."""
         # First create a post
         post_data = PostDataFactory()
@@ -197,7 +212,7 @@ class TestAPIIntegrationAdvanced:
         assert data["content"] == post_data["content"]
     
     @pytest.mark.asyncio
-    async def test_list_posts_integration(self, async_client):
+    async def test_list_posts_integration(self, async_client) -> List[Any]:
         """Test list posts integration."""
         # Create some posts first
         for _ in range(3):
@@ -221,7 +236,7 @@ class TestAPIIntegrationAdvanced:
         assert len(data["posts"]) >= 3
     
     @pytest.mark.asyncio
-    async def test_update_post_integration(self, async_client):
+    async def test_update_post_integration(self, async_client) -> Any:
         """Test update post integration."""
         # First create a post
         post_data = PostDataFactory()
@@ -248,7 +263,7 @@ class TestAPIIntegrationAdvanced:
         assert data["id"] == post_id
     
     @pytest.mark.asyncio
-    async def test_delete_post_integration(self, async_client):
+    async def test_delete_post_integration(self, async_client) -> Any:
         """Test delete post integration."""
         # First create a post
         post_data = PostDataFactory()
@@ -281,7 +296,7 @@ class TestExternalAPIIntegrationAdvanced:
     """Advanced external API integration tests using aioresponses."""
     
     @pytest.mark.asyncio
-    async def test_nlp_service_integration(self):
+    async def test_nlp_service_integration(self) -> Any:
         """Test NLP service integration with mocked responses."""
         with aioresponses() as m:
             # Mock NLP service responses
@@ -313,7 +328,7 @@ class TestExternalAPIIntegrationAdvanced:
                 assert "entities" in data
     
     @pytest.mark.asyncio
-    async def test_ai_service_integration(self):
+    async def test_ai_service_integration(self) -> Any:
         """Test AI service integration with mocked responses."""
         with aioresponses() as m:
             # Mock AI service responses
@@ -345,7 +360,7 @@ class TestExternalAPIIntegrationAdvanced:
                 assert "processing_time" in data
     
     @pytest.mark.asyncio
-    async def test_external_api_error_handling(self):
+    async async def test_external_api_error_handling(self) -> Any:
         """Test external API error handling."""
         with aioresponses() as m:
             # Mock service unavailable
@@ -371,14 +386,14 @@ class TestCacheIntegrationAdvanced:
     """Advanced cache integration tests."""
     
     @pytest.fixture
-    async def cache_manager(self):
+    async def cache_manager(self) -> Any:
         """Cache manager for testing."""
         manager = CacheManager(memory_size=100, memory_ttl=60)
         yield manager
         await manager.clear()
     
     @pytest.mark.asyncio
-    async def test_cache_integration(self, cache_manager):
+    async def test_cache_integration(self, cache_manager) -> Any:
         """Test cache integration."""
         # Test set/get
         await cache_manager.set("test_key", "test_value", expire=60)
@@ -405,7 +420,7 @@ class TestCacheIntegrationAdvanced:
         assert all(v is None for v in result.values())
     
     @pytest.mark.asyncio
-    async def test_cache_expiration_integration(self, cache_manager):
+    async def test_cache_expiration_integration(self, cache_manager) -> Any:
         """Test cache expiration integration."""
         # Set item with short expiration
         await cache_manager.set("expire_key", "expire_value", expire=1)
@@ -426,17 +441,19 @@ class TestPerformanceIntegrationAdvanced:
     """Advanced performance integration tests."""
     
     @pytest.fixture
-    async def async_client(self, test_app):
+    async def async_client(self, test_app) -> Any:
         """Async test client for FastAPI."""
         async with AsyncClient(app=test_app, base_url="http://test") as client:
             yield client
     
     @pytest.mark.asyncio
-    async def test_concurrent_requests_integration(self, async_client):
+    async async def test_concurrent_requests_integration(self, async_client) -> Any:
         """Test concurrent requests integration."""
         # Create multiple concurrent requests
         async def make_request():
-            post_data = PostDataFactory()
+            
+    """make_request function."""
+post_data = PostDataFactory()
             response = await async_client.post(
                 "/linkedin-posts/",
                 json=post_data,
@@ -452,7 +469,7 @@ class TestPerformanceIntegrationAdvanced:
         assert all(status == 201 for status in results)
     
     @pytest.mark.asyncio
-    async def test_batch_processing_integration(self, async_client):
+    async def test_batch_processing_integration(self, async_client) -> Any:
         """Test batch processing integration."""
         # Create large batch
         batch_data = PostDataFactory.build_batch(50)
@@ -475,10 +492,8 @@ class TestPerformanceIntegrationAdvanced:
         assert len(data["posts"]) == 50
     
     @pytest.mark.asyncio
-    async def test_memory_usage_integration(self, async_client):
+    async def test_memory_usage_integration(self, async_client) -> Any:
         """Test memory usage integration."""
-        import psutil
-        import os
         
         process = psutil.Process(os.getpid())
         initial_memory = process.memory_info().rss
@@ -503,13 +518,13 @@ class TestSecurityIntegrationAdvanced:
     """Advanced security integration tests."""
     
     @pytest.fixture
-    async def async_client(self, test_app):
+    async def async_client(self, test_app) -> Any:
         """Async test client for FastAPI."""
         async with AsyncClient(app=test_app, base_url="http://test") as client:
             yield client
     
     @pytest.mark.asyncio
-    async def test_authentication_integration(self, async_client):
+    async def test_authentication_integration(self, async_client) -> Any:
         """Test authentication integration."""
         post_data = PostDataFactory()
         
@@ -540,7 +555,7 @@ class TestSecurityIntegrationAdvanced:
         assert response.status_code == 201
     
     @pytest.mark.asyncio
-    async def test_rate_limiting_integration(self, async_client):
+    async def test_rate_limiting_integration(self, async_client) -> Any:
         """Test rate limiting integration."""
         post_data = PostDataFactory()
         
@@ -558,7 +573,7 @@ class TestSecurityIntegrationAdvanced:
         assert 429 in responses
     
     @pytest.mark.asyncio
-    async def test_input_validation_integration(self, async_client):
+    async def test_input_validation_integration(self, async_client) -> Any:
         """Test input validation integration."""
         # Test with invalid data
         invalid_data = {
@@ -593,13 +608,13 @@ class TestErrorHandlingIntegrationAdvanced:
     """Advanced error handling integration tests."""
     
     @pytest.fixture
-    async def async_client(self, test_app):
+    async def async_client(self, test_app) -> Any:
         """Async test client for FastAPI."""
         async with AsyncClient(app=test_app, base_url="http://test") as client:
             yield client
     
     @pytest.mark.asyncio
-    async def test_database_error_integration(self, async_client):
+    async def test_database_error_integration(self, async_client) -> Any:
         """Test database error handling integration."""
         # This would require mocking the database to throw errors
         # For now, we'll test the error response format
@@ -613,7 +628,7 @@ class TestErrorHandlingIntegrationAdvanced:
         assert response.status_code == 422
     
     @pytest.mark.asyncio
-    async def test_nlp_service_error_integration(self, async_client):
+    async def test_nlp_service_error_integration(self, async_client) -> Any:
         """Test NLP service error handling integration."""
         post_data = PostDataFactory()
         
@@ -637,7 +652,7 @@ class TestErrorHandlingIntegrationAdvanced:
             assert data["nlp_enhanced"] is False
     
     @pytest.mark.asyncio
-    async def test_timeout_error_integration(self, async_client):
+    async def test_timeout_error_integration(self, async_client) -> Any:
         """Test timeout error handling integration."""
         post_data = PostDataFactory()
         
@@ -662,13 +677,13 @@ class TestMonitoringIntegrationAdvanced:
     """Advanced monitoring integration tests."""
     
     @pytest.fixture
-    async def async_client(self, test_app):
+    async def async_client(self, test_app) -> Any:
         """Async test client for FastAPI."""
         async with AsyncClient(app=test_app, base_url="http://test") as client:
             yield client
     
     @pytest.mark.asyncio
-    async def test_metrics_integration(self, async_client):
+    async def test_metrics_integration(self, async_client) -> Any:
         """Test metrics integration."""
         # Make some requests
         post_data = PostDataFactory()
@@ -691,7 +706,7 @@ class TestMonitoringIntegrationAdvanced:
         assert "http_request_duration_seconds" in metrics_text
     
     @pytest.mark.asyncio
-    async def test_health_check_integration(self, async_client):
+    async def test_health_check_integration(self, async_client) -> Any:
         """Test health check integration."""
         response = await async_client.get("/health")
         
@@ -703,7 +718,7 @@ class TestMonitoringIntegrationAdvanced:
         assert "version" in data
     
     @pytest.mark.asyncio
-    async def test_logging_integration(self, async_client):
+    async def test_logging_integration(self, async_client) -> Any:
         """Test logging integration."""
         post_data = PostDataFactory()
         

@@ -1,12 +1,20 @@
-"""
-SEO Analysis Repository Interface
-Abstract repository for SEO analysis persistence
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 from abc import ABC, abstractmethod
 from typing import Optional, List, Dict, Any
 from domain.entities import SEOAnalysis
 from domain.value_objects import URL
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+SEO Analysis Repository Interface
+Abstract repository for SEO analysis persistence
+"""
+
 
 
 class SEOAnalysisRepository(ABC):

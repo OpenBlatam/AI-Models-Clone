@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import List, Dict, Any, Optional
+from ..domain.entities import CaptionRequest, CaptionResponse, BatchRequest, BatchResponse
+from ..domain.services import QualityAssessmentService, HashtagOptimizationService
+from ..domain.repositories import ICacheRepository, IMetricsRepository, IAuditRepository
+from ..interfaces.ai_providers import IAIProvider, IAIProviderRegistry
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v13.0 - Application Use Cases
 
@@ -5,11 +15,6 @@ Application layer use cases orchestrating business logic.
 Clean Architecture application services.
 """
 
-from typing import List, Dict, Any, Optional
-from ..domain.entities import CaptionRequest, CaptionResponse, BatchRequest, BatchResponse
-from ..domain.services import QualityAssessmentService, HashtagOptimizationService
-from ..domain.repositories import ICacheRepository, IMetricsRepository, IAuditRepository
-from ..interfaces.ai_providers import IAIProvider, IAIProviderRegistry
 
 
 class GenerateCaptionUseCase:
@@ -22,7 +27,9 @@ class GenerateCaptionUseCase:
         metrics_repository: IMetricsRepository,
         audit_repository: IAuditRepository
     ):
-        self.ai_provider = ai_provider
+        
+    """__init__ function."""
+self.ai_provider = ai_provider
         self.cache_repository = cache_repository
         self.metrics_repository = metrics_repository
         self.audit_repository = audit_repository
@@ -88,7 +95,9 @@ class GenerateBatchCaptionsUseCase:
         cache_repository: ICacheRepository,
         metrics_repository: IMetricsRepository
     ):
-        self.provider_registry = provider_registry
+        
+    """__init__ function."""
+self.provider_registry = provider_registry
         self.cache_repository = cache_repository
         self.metrics_repository = metrics_repository
     

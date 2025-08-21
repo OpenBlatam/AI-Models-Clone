@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import os
+from typing import List, Optional
+from pydantic import BaseSettings, validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Production Configuration
 ========================
@@ -5,9 +24,6 @@ Production Configuration
 Complete production configuration for LinkedIn Posts system.
 """
 
-import os
-from typing import List, Optional
-from pydantic import BaseSettings, validator
 
 
 class ProductionSettings(BaseSettings):
@@ -124,24 +140,25 @@ class ProductionSettings(BaseSettings):
     TESTING: bool = False
     
     @validator("DATABASE_URL")
-    def validate_database_url(cls, v):
+    def validate_database_url(cls, v) -> bool:
         if not v or v == "postgresql://user:password@localhost/linkedin_posts":
             raise ValueError("DATABASE_URL must be properly configured for production")
         return v
     
     @validator("SECRET_KEY")
-    def validate_secret_key(cls, v):
+    def validate_secret_key(cls, v) -> bool:
         if v == "your-secret-key-here":
             raise ValueError("SECRET_KEY must be properly configured for production")
         return v
     
     @validator("REDIS_URL")
-    def validate_redis_url(cls, v):
+    def validate_redis_url(cls, v) -> bool:
         if not v or v == "redis://localhost:6379/0":
             raise ValueError("REDIS_URL must be properly configured for production")
         return v
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         case_sensitive = True
 
@@ -161,15 +178,15 @@ class DevelopmentSettings(ProductionSettings):
     
     # Relaxed validation for development
     @validator("DATABASE_URL")
-    def validate_database_url(cls, v):
+    def validate_database_url(cls, v) -> bool:
         return v
     
     @validator("SECRET_KEY")
-    def validate_secret_key(cls, v):
+    def validate_secret_key(cls, v) -> bool:
         return v
     
     @validator("REDIS_URL")
-    def validate_redis_url(cls, v):
+    def validate_redis_url(cls, v) -> bool:
         return v
 
 
@@ -194,15 +211,15 @@ class TestingSettings(ProductionSettings):
     
     # Relaxed validation for testing
     @validator("DATABASE_URL")
-    def validate_database_url(cls, v):
+    def validate_database_url(cls, v) -> bool:
         return v
     
     @validator("SECRET_KEY")
-    def validate_secret_key(cls, v):
+    def validate_secret_key(cls, v) -> bool:
         return v
     
     @validator("REDIS_URL")
-    def validate_redis_url(cls, v):
+    def validate_redis_url(cls, v) -> bool:
         return v
 
 

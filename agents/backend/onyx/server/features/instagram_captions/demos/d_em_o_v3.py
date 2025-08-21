@@ -1,10 +1,13 @@
-#!/usr/bin/env python3
-"""
-Instagram Captions API v3.0 - Demo Refactorizada
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Una demostración simple de la arquitectura refactorizada sin dependencias complejas.
-Muestra los principios de la refactorización: simplicidad, cache inteligente, y limpieza.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -18,6 +21,18 @@ from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+    import httpx
+    import sys
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Instagram Captions API v3.0 - Demo Refactorizada
+
+Una demostración simple de la arquitectura refactorizada sin dependencias complejas.
+Muestra los principios de la refactorización: simplicidad, cache inteligente, y limpieza.
+"""
+
 
 # ===== MODELOS SIMPLES =====
 class CaptionRequest(BaseModel):
@@ -53,9 +68,9 @@ _metrics = {"requests": 0, "cache_hits": 0, "avg_time": 0.0}
 
 def smart_cache(ttl: int = 300):
     """Smart caching decorator con auto-cleanup."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate simple cache key
             cache_key = f"{func.__name__}:{hash(str(args) + str(kwargs))}"
             
@@ -92,10 +107,10 @@ def smart_cache(ttl: int = 300):
         return wrapper
     return decorator
 
-def handle_errors(func):
+def handle_errors(func) -> Any:
     """Error handling decorator simple."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         try:
             return await func(*args, **kwargs)
         except HTTPException:
@@ -111,7 +126,7 @@ def handle_errors(func):
 class SimpleInstagramEngine:
     """Motor simple de Instagram Captions para demo."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.style_templates = {
             "casual": "Hey! 🌟 {content} What do you think? 💭",
             "professional": "🎯 {content} Let's discuss the impact and opportunities ahead.",
@@ -130,8 +145,8 @@ class SimpleInstagramEngine:
         """Generar caption simple pero efectivo."""
         await asyncio.sleep(0.1)  # Simular procesamiento AI
         
-        template = self.style_templates.get(request.style, self.style_templates["casual"])
-        caption = template.format(content=request.content_description)
+        template = self.style_templates.get(request.style, self.style_templates["casual"f"])
+        caption = template"
         
         return caption
     
@@ -281,7 +296,9 @@ async def batch_optimize(captions: List[str]) -> StreamingResponse:
         raise ValueError("At least one caption is required")
     
     async def process_streaming():
-        yield f'{{"status": "processing", "total": {len(captions)}, "results": ['
+        
+    """process_streaming function."""
+yield f'{{"status": "processing", "total": {len(captions)}, "results": ['
         
         first = True
         
@@ -430,7 +447,6 @@ async def benchmark_demo():
     """Benchmark rápido de la demo."""
     print("🔥 Running benchmark demo...")
     
-    import httpx
     
     async with httpx.AsyncClient() as client:
         base_url = "http://localhost:8000"
@@ -471,7 +487,6 @@ async def benchmark_demo():
     print("🎉 Benchmark completed!")
 
 if __name__ == "__main__":
-    import sys
     
     if len(sys.argv) > 1 and sys.argv[1] == "benchmark":
         asyncio.run(benchmark_demo())

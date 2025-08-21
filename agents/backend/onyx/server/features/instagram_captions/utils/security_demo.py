@@ -1,8 +1,15 @@
-Security Toolkit Demo - Optimized Features
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
 from optimized_security import (
+from typing import Any, List, Dict, Optional
+import logging
+Security Toolkit Demo - Optimized Features
+
     scan_ports_basic, run_ssh_command, make_http_request,
     get_common_ports, chunked, AsyncRateLimiter, retry_with_backoff,
     process_batch_async, scan_ports_concurrent, scan_single_port_sync,
@@ -11,7 +18,9 @@ from optimized_security import (
 )
 
 async def demo_port_scanning():
-    print("🔍 Port Scanning Demo)
+    
+    """demo_port_scanning function."""
+print("🔍 Port Scanning Demo)
     print(= * 50)
     
     # Basic port scan
@@ -37,7 +46,9 @@ async def demo_port_scanning():
     print(f📈 Results: {len(concurrent_results)} ports)
 
 async def demo_ssh_operations():
-    print("\n🔐 SSH Operations Demo)
+    
+    """demo_ssh_operations function."""
+print("\n🔐 SSH Operations Demo)
     print(=0
     
     result = await run_ssh_command([object Object]       host": "1270     username:test
@@ -50,7 +61,9 @@ async def demo_ssh_operations():
     print(f"🔢 Exit code: {result['exit_code']})
 
 async def demo_http_operations():
-    print("\n🌐 HTTP Operations Demo)
+    
+    """demo_http_operations function."""
+print("\n🌐 HTTP Operations Demo)
     print(=0
     
     result = await make_http_request({
@@ -63,7 +76,9 @@ async def demo_http_operations():
     print(f"📄 Response length:[object Object]len(result['body'])} characters)
 
 async def demo_rate_limiting():
-    print("\n⏱️ Rate Limiting Demo)
+    
+    """demo_rate_limiting function."""
+print("\n⏱️ Rate Limiting Demo)
     print(=* 50)
     
     limiter = AsyncRateLimiter(max_calls_per_second=5)
@@ -79,13 +94,17 @@ async def demo_rate_limiting():
     print(f"⏱️ Total time: {end_time - start_time:0.3)
 
 async def demo_retry_with_backoff():
-    print("\n🔄 Retry with Backoff Demo)
+    
+    """demo_retry_with_backoff function."""
+print("\n🔄 Retry with Backoff Demo)
     print(=)
     
     attempt_count = 0
     
     async def failing_operation():
-        nonlocal attempt_count
+        
+    """failing_operation function."""
+nonlocal attempt_count
         attempt_count += 1
         if attempt_count < 3:
             raise Exception(fSimulated failure {attempt_count}")
@@ -98,11 +117,13 @@ async def demo_retry_with_backoff():
         print(f❌ Retry failed: {e})
 
 async def demo_batch_processing():
-    print("\n📦 Batch Processing Demo)
+    
+    """demo_batch_processing function."""
+print("\n📦 Batch Processing Demo)
     print(=50)
     
     items = list(range(20    
-    async def process_item(item):
+    async def process_item(item) -> Any:
         await asyncio.sleep(0.01)  # Simulate work
         return f"Processed item {item}"
     
@@ -113,7 +134,9 @@ async def demo_batch_processing():
     print(f"⚡ Batch processing completed in {end_time - start_time:.3f}s")
     print(f📊 Processed {len(results)} items")
     print(f📋 Sample results: {results[:3def demo_utilities():
-    print("\n🛠️ Utilities Demo)
+    
+    """demo_utilities function."""
+print("\n🛠️ Utilities Demo)
     print(= * 50)
     
     # Common ports
@@ -134,10 +157,12 @@ async def demo_batch_processing():
     print(f"🔍 Invalid port validation: 70000 -> {validate_port(700
 
 def demo_caching():
-    print(n💾 Caching Demo)
+    
+    """demo_caching function."""
+print(n💾 Caching Demo)
     print(=* 50)
     
-    def fetch_func(key):
+    async def fetch_func(key) -> Any:
         time.sleep(0.1)  # Simulate slow fetch
         return f"Data for {key} 
     # First call (slow)
@@ -155,7 +180,9 @@ def demo_caching():
 
 @log_operation(demo_operation")
 async def demo_logging():
-    print(n📝 Logging Demo)
+    
+    """demo_logging function."""
+print(n📝 Logging Demo)
     print(=50)
     
     print("🔍 Testing structured logging decorator...")
@@ -164,7 +191,9 @@ async def demo_logging():
 
 @measure_performance
 def demo_performance_measurement():
-    print("\n📊 Performance Measurement Demo)
+    
+    """demo_performance_measurement function."""
+print("\n📊 Performance Measurement Demo)
     print(=50)
     
     print("🔍 Testing performance measurement decorator...)
@@ -172,7 +201,9 @@ def demo_performance_measurement():
     return "Performance measured"
 
 async def demo_error_handling():
-    print("\n⚠️ Error Handling Demo)
+    
+    """demo_error_handling function."""
+print("\n⚠️ Error Handling Demo)
     print(= * 50    # Test missing target
     result = scan_ports_basic({})
     print(f❌ Missing target: {result['error']})    # Test invalid target
@@ -185,9 +216,11 @@ async def demo_error_handling():
        ports:[70000]
     })
     print(f❌ Invalid port: {result[error']})async def demo_concurrent_operations():
-    print("\n⚡ Concurrent Operations Demo)
+    
+    """demo_concurrent_operations function."""
+print("\n⚡ Concurrent Operations Demo)
     print(=50    
-    async def operation(delay):
+    async def operation(delay) -> Any:
         await asyncio.sleep(delay)
         return f"Completed in {delay}s"
     
@@ -207,7 +240,9 @@ async def demo_error_handling():
     print(f"📈 Sequential time: [object Object]sequential_time:.3f}s")
     print(f⚡ Concurrent time: [object Object]concurrent_time:.3f}s")
     print(f"🚀 Speed improvement: {sequential_time/concurrent_time:.1f}x faster)async def main():
-    print("🚀 Optimized Security Toolkit Demo)
+    
+    """main function."""
+print("🚀 Optimized Security Toolkit Demo)
     print(= *60    
     # Run all demos
     await demo_port_scanning()
@@ -225,5 +260,6 @@ async def demo_error_handling():
     
     print("\n" + "=" * 60)
     print("✅ All demos completed successfully!")
-    print("🎯 Toolkit is ready for production use)if __name__ == __main__:
+    print("🎯 Toolkit is ready for production use)match __name__:
+    case __main__:
     asyncio.run(main()) 

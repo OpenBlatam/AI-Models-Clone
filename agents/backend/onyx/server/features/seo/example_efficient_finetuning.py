@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Example script demonstrating efficient fine-tuning techniques
-Comprehensive examples of LoRA, P-tuning, AdaLoRA, and other PEFT methods
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import torch
 import torch.nn as nn
@@ -14,13 +19,21 @@ import time
 import json
 import os
 from pathlib import Path
+from efficient_finetuning import (
+from transformer_models import TransformerConfig, SEOSpecificTransformer, TransformerManager
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Example script demonstrating efficient fine-tuning techniques
+Comprehensive examples of LoRA, P-tuning, AdaLoRA, and other PEFT methods
+"""
+
 
 # Import our efficient fine-tuning modules
-from efficient_finetuning import (
     LoRAConfig, PEFTConfig, EfficientFineTuningManager, PEFTTrainer,
     create_peft_config, apply_peft_to_model
 )
-from transformer_models import TransformerConfig, SEOSpecificTransformer, TransformerManager
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +47,7 @@ class EfficientFineTuningDemo:
         self.transformer_manager = TransformerManager()
         logger.info(f"Using device: {self.device}")
     
-    def demonstrate_lora(self):
+    def demonstrate_lora(self) -> Any:
         """Demonstrate LoRA (Low-Rank Adaptation)"""
         logger.info("=== Demonstrating LoRA (Low-Rank Adaptation) ===")
         
@@ -89,7 +102,7 @@ class EfficientFineTuningDemo:
         
         return model, peft_manager
     
-    def demonstrate_p_tuning(self):
+    def demonstrate_p_tuning(self) -> Any:
         """Demonstrate P-tuning"""
         logger.info("\n=== Demonstrating P-tuning ===")
         
@@ -143,7 +156,7 @@ class EfficientFineTuningDemo:
         
         return model, peft_manager
     
-    def demonstrate_adalora(self):
+    def demonstrate_adalora(self) -> Any:
         """Demonstrate AdaLoRA (Adaptive LoRA)"""
         logger.info("\n=== Demonstrating AdaLoRA (Adaptive LoRA) ===")
         
@@ -195,7 +208,7 @@ class EfficientFineTuningDemo:
         
         return model, peft_manager
     
-    def demonstrate_prefix_tuning(self):
+    def demonstrate_prefix_tuning(self) -> Any:
         """Demonstrate Prefix Tuning"""
         logger.info("\n=== Demonstrating Prefix Tuning ===")
         
@@ -235,7 +248,7 @@ class EfficientFineTuningDemo:
         
         return model, peft_manager
     
-    def demonstrate_training(self):
+    def demonstrate_training(self) -> Any:
         """Demonstrate training with PEFT"""
         logger.info("\n=== Demonstrating PEFT Training ===")
         
@@ -298,7 +311,7 @@ class EfficientFineTuningDemo:
         
         return model, peft_manager, trainer
     
-    def demonstrate_save_load(self):
+    def demonstrate_save_load(self) -> Any:
         """Demonstrate saving and loading PEFT models"""
         logger.info("\n=== Demonstrating Save/Load Functionality ===")
         
@@ -354,7 +367,7 @@ class EfficientFineTuningDemo:
         
         return model, new_model, peft_manager
     
-    def demonstrate_performance_comparison(self):
+    def demonstrate_performance_comparison(self) -> Any:
         """Demonstrate performance comparison between different PEFT methods"""
         logger.info("\n=== Demonstrating Performance Comparison ===")
         
@@ -452,7 +465,7 @@ class EfficientFineTuningDemo:
         
         return results
     
-    def demonstrate_orthogonal_regularization(self):
+    def demonstrate_orthogonal_regularization(self) -> Any:
         """Demonstrate orthogonal regularization in AdaLoRA"""
         logger.info("\n=== Demonstrating Orthogonal Regularization ===")
         
@@ -510,7 +523,7 @@ class EfficientFineTuningDemo:
         
         return model, peft_manager, trainer
     
-    def run_comprehensive_demo(self):
+    def run_comprehensive_demo(self) -> Any:
         """Run comprehensive demonstration of all PEFT methods"""
         logger.info("Starting comprehensive efficient fine-tuning demo")
         
@@ -538,5 +551,6 @@ def main():
     # Run comprehensive demo
     demo.run_comprehensive_demo()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

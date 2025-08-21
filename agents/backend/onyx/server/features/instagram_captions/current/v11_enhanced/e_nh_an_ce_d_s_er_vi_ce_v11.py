@@ -1,9 +1,7 @@
-"""
-Instagram Captions API v11.0 - Enhanced AI Service
-
-Advanced AI service with enterprise patterns, performance optimizations,
-and cutting-edge features for production environments.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -14,10 +12,18 @@ from contextlib import asynccontextmanager
 import threading
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
+    from .core_enhanced_v11 import (
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v11.0 - Enhanced AI Service
+
+Advanced AI service with enterprise patterns, performance optimizations,
+and cutting-edge features for production environments.
+"""
+
 
 # Import enhanced core components
 try:
-    from .core_enhanced_v11 import (
         config, EnhancedCaptionRequest, EnhancedCaptionResponse,
         enhanced_ai_engine, EnhancedUtils, PerformanceMonitor
     )
@@ -53,7 +59,7 @@ class ServiceMetrics:
 class HealthStatus:
     """Advanced health status monitoring."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.status = "healthy"
         self.last_check = time.time()
         self.checks = {
@@ -64,7 +70,9 @@ class HealthStatus:
         }
     
     def update_check(self, component: str, status: bool):
-        self.checks[component] = status
+        
+    """update_check function."""
+self.checks[component] = status
         self.last_check = time.time()
         
         # Determine overall status
@@ -85,7 +93,7 @@ class EnhancedAIService:
     - Strategy pattern for different processing modes
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = ServiceMetrics()
         self.health = HealthStatus()
         self.executor = ThreadPoolExecutor(max_workers=config.AI_WORKERS)
@@ -171,7 +179,9 @@ class EnhancedAIService:
             semaphore = asyncio.Semaphore(config.AI_WORKERS)
             
             async def process_with_semaphore(req: EnhancedCaptionRequest):
-                async with semaphore:
+                
+    """process_with_semaphore function."""
+async with semaphore:
                     return await self.generate_single_caption(req)
             
             # Execute batch
@@ -407,7 +417,9 @@ class CircuitBreaker:
     """Circuit breaker pattern for fault tolerance."""
     
     def __init__(self, failure_threshold: int = 5, timeout: int = 60):
-        self.failure_threshold = failure_threshold
+        
+    """__init__ function."""
+self.failure_threshold = failure_threshold
         self.timeout = timeout
         self.failure_count = 0
         self.last_failure_time = None
@@ -425,12 +437,12 @@ class CircuitBreaker:
         else:  # half_open
             return True
     
-    def record_success(self):
+    def record_success(self) -> Any:
         """Record successful operation."""
         self.failure_count = 0
         self.state = "closed"
     
-    def record_failure(self):
+    def record_failure(self) -> Any:
         """Record failed operation."""
         self.failure_count += 1
         self.last_failure_time = time.time()

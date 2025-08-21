@@ -1,8 +1,13 @@
-"""
-Instagram Captions API v13.0 - Cache Repository Implementation
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Infrastructure layer implementation of cache repository.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import Optional, Dict, Any
 from ..domain.repositories import ICacheRepository
@@ -10,9 +15,18 @@ from ..domain.entities import CaptionResponse
 import asyncio
 import time
 import json
+    from cachetools import TTLCache, LRUCache
+        from ..domain.entities import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Instagram Captions API v13.0 - Cache Repository Implementation
+
+Infrastructure layer implementation of cache repository.
+"""
+
 
 try:
-    from cachetools import TTLCache, LRUCache
     ADVANCED_CACHE = True
 except ImportError:
     ADVANCED_CACHE = False
@@ -22,7 +36,9 @@ class InMemoryCacheRepository(ICacheRepository):
     """In-memory cache repository implementation."""
     
     def __init__(self, max_size: int = 10000, default_ttl: int = 3600):
-        self.max_size = max_size
+        
+    """__init__ function."""
+self.max_size = max_size
         self.default_ttl = default_ttl
         
         if ADVANCED_CACHE:
@@ -112,7 +128,6 @@ class InMemoryCacheRepository(ICacheRepository):
     def _dict_to_response(self, data: Dict[str, Any]) -> CaptionResponse:
         """Convert dict back to CaptionResponse."""
         # Simplified conversion - in real implementation would be more robust
-        from ..domain.entities import (
             RequestId, Hashtags, QualityMetrics, PerformanceMetrics
         )
         

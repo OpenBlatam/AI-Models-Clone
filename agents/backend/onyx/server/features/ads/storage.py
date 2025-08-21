@@ -1,27 +1,32 @@
-"""
-Storage service for handling file uploads and retrievals.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Optional, BinaryIO
 import os
 import uuid
 from datetime import datetime
 import aiofiles
 from fastapi import UploadFile
-
 from onyx.utils.logger import setup_logger
 from onyx.config import settings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Storage service for handling file uploads and retrievals.
+"""
+
 
 logger = setup_logger()
 
 class StorageService:
     """Service for handling file storage operations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the service."""
         self.base_path = settings.STORAGE_PATH
         self.ensure_storage_path()
     
-    def ensure_storage_path(self):
+    def ensure_storage_path(self) -> Any:
         """Ensure the storage path exists."""
         os.makedirs(self.base_path, exist_ok=True)
     
@@ -72,14 +77,22 @@ class StorageService:
             file_path = self._get_file_path(filename)
             
             async with aiofiles.open(file_path, 'wb') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 await f.write(await file.read())
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             return filename
         except Exception as e:
             logger.exception("Error saving file")
             raise
     
-    async def save_upload_file(
+    async async def save_upload_file(
         self,
         upload_file: UploadFile
     ) -> str:
@@ -97,8 +110,20 @@ class StorageService:
             file_path = self._get_file_path(filename)
             
             async with aiofiles.open(file_path, 'wb') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 content = await upload_file.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 await f.write(content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             return filename
         except Exception as e:
@@ -124,7 +149,15 @@ class StorageService:
                 return None
             
             async with aiofiles.open(file_path, 'rb') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 return await f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         except Exception as e:
             logger.exception("Error getting file")
             raise

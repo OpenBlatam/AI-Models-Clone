@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import random
+import time
+from concurrent.futures import ThreadPoolExecutor
+from typing import List, Dict, Any, Optional, Tuple
+    from .core_v6 import config, CaptionRequest, Utils, metrics
+    from core_v6 import config, CaptionRequest, Utils, metrics
+from typing import Any, List, Dict, Optional
+import logging
 """
 Instagram Captions API v6.0 - Consolidated AI Service
 
@@ -5,23 +25,18 @@ Refactored AI service combining AI engine and caching functionality
 for simplified architecture and maximum performance.
 """
 
-import asyncio
-import random
-import time
-from concurrent.futures import ThreadPoolExecutor
-from typing import List, Dict, Any, Optional, Tuple
 
 try:
-    from .core_v6 import config, CaptionRequest, Utils, metrics
 except ImportError:
-    from core_v6 import config, CaptionRequest, Utils, metrics
 
 
 class SimpleLRUCache:
     """Simplified LRU cache with automatic cleanup."""
     
     def __init__(self, max_size: int = None, ttl: int = None):
-        self.max_size = max_size or config.CACHE_MAX_SIZE
+        
+    """__init__ function."""
+self.max_size = max_size or config.CACHE_MAX_SIZE
         self.ttl = ttl or config.CACHE_TTL
         
         self._cache: Dict[str, Any] = {}
@@ -108,7 +123,7 @@ class SimpleLRUCache:
 class UltraAIEngine:
     """Ultra-fast AI engine with premium templates and smart processing."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.executor = ThreadPoolExecutor(max_workers=config.AI_PARALLEL_WORKERS)
         
         # Premium templates for ultra-high quality
@@ -243,7 +258,7 @@ class UltraAIEngine:
         style = request.style
         
         # Select premium template based on style
-        templates = self.premium_templates.get(style, self.premium_templates["casual"])
+        templates = self.premium_templates.get(style, self.premium_templates["casual"f"])
         template = random.choice(templates)
         
         # Add dynamic elements
@@ -251,11 +266,7 @@ class UltraAIEngine:
         cta = random.choice(self.ctas)
         
         # Generate caption with intelligence
-        caption = template.format(
-            content=content,
-            hook=hook,
-            cta=cta
-        )
+        caption = template"
         
         # Add emojis for engagement
         caption = self._add_premium_emojis(caption, request.audience)
@@ -371,7 +382,7 @@ class UltraAIEngine:
 class CachedAIService:
     """Cached AI service combining AI engine with intelligent caching."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.ai_engine = UltraAIEngine()
         self.cache = SimpleLRUCache()
     

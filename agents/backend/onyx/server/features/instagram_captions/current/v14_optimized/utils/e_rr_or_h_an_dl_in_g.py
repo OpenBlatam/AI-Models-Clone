@@ -1,7 +1,13 @@
-"""
-Instagram Captions API v14.0 - Comprehensive Error Handling and Validation
-Advanced error handling, validation, and security utilities
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import re
 import time
@@ -13,6 +19,13 @@ import logging
 import hashlib
 import secrets
 from contextlib import contextmanager
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Instagram Captions API v14.0 - Comprehensive Error Handling and Validation
+Advanced error handling, validation, and security utilities
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +79,7 @@ class PerformanceError:
 class ErrorTracker:
     """Comprehensive error tracking and monitoring"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.errors: List[Dict[str, Any]] = []
         self.error_counts: Dict[str, int] = {}
         self.security_incidents: List[SecurityError] = []
@@ -142,7 +155,7 @@ error_tracker = ErrorTracker()
 class ValidationEngine:
     """Advanced validation engine with comprehensive checks"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.validation_rules: Dict[str, Dict[str, Any]] = {
             "content_description": {
                 "min_length": 3,
@@ -167,7 +180,7 @@ class ValidationEngine:
             }
         }
     
-    def validate_request(self, request_data: Dict[str, Any], request_id: str) -> Tuple[bool, List[ValidationError]]:
+    async def validate_request(self, request_data: Dict[str, Any], request_id: str) -> Tuple[bool, List[ValidationError]]:
         """Comprehensive request validation"""
         errors = []
         
@@ -274,7 +287,7 @@ class ValidationEngine:
 class SecurityEngine:
     """Advanced security engine with threat detection"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.threat_patterns = {
             "sql_injection": [
                 r"(\b(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER|EXEC|UNION)\b)",
@@ -384,7 +397,7 @@ class SecurityEngine:
 class PerformanceMonitor:
     """Advanced performance monitoring with error detection"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.thresholds = {
             "response_time": {
                 "warning": 0.050,  # 50ms
@@ -461,13 +474,13 @@ def error_context(operation: str, request_id: str):
         duration = time.time() - start_time
         performance_monitor.check_performance("response_time", duration)
 
-def generate_request_id() -> str:
+async def generate_request_id() -> str:
     """Generate unique request ID with timestamp"""
     timestamp = int(time.time() * 1000)
     random_part = secrets.token_urlsafe(6)
     return f"v14-{timestamp}-{random_part}"
 
-def validate_api_key(api_key: str) -> bool:
+async def validate_api_key(api_key: str) -> bool:
     """Validate API key with enhanced security"""
     if not api_key or not isinstance(api_key, str):
         return False

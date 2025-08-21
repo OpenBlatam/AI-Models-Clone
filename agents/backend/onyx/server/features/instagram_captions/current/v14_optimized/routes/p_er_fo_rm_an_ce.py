@@ -1,14 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import APIRouter, HTTPException, Depends
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import sys
+import time
+from ..types import (
+from ..utils import validate_api_key, validate_performance_thresholds
+from ..core.optimized_engine import optimized_engine, performance_monitor
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v14.0 - Performance Monitoring Routes
 FastAPI router for performance monitoring and metrics endpoints
 """
 
-from fastapi import APIRouter, HTTPException, Depends
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import sys
-import time
 
-from ..types import (
     PerformanceStats,
     PerformanceSummary,
     HealthCheckResponse,
@@ -19,8 +26,6 @@ from ..types import (
     OptimizationResponse,
     ErrorResponse
 )
-from ..utils import validate_api_key, validate_performance_thresholds
-from ..core.optimized_engine import optimized_engine, performance_monitor
 
 # Router configuration
 router = APIRouter(

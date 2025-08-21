@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import uuid
+from typing import List, Optional
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from .enums import ToneType, LanguageType, UseCaseType
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # -*- coding: utf-8 -*-
 """
 Copywriting Models - Modelos de datos para copywriting
@@ -6,12 +22,7 @@ Copywriting Models - Modelos de datos para copywriting
 Modelos de datos estructurados para requests y responses.
 """
 
-import uuid
-from typing import List, Optional
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
 
-from .enums import ToneType, LanguageType, UseCaseType
 
 @dataclass
 class CopywritingRequest:
@@ -39,14 +50,14 @@ class CopywritingRequest:
     request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validación de datos post-inicialización"""
         self._validate_prompt()
         self._validate_tone()
         self._validate_language()
         self._validate_target_length()
     
-    def _validate_prompt(self):
+    def _validate_prompt(self) -> bool:
         """Validar que el prompt no esté vacío"""
         if not self.prompt or len(self.prompt.strip()) == 0:
             raise ValueError("Prompt cannot be empty")
@@ -54,19 +65,19 @@ class CopywritingRequest:
         if len(self.prompt) > 1000:
             raise ValueError("Prompt too long (max 1000 characters)")
     
-    def _validate_tone(self):
+    def _validate_tone(self) -> bool:
         """Validar que el tono sea válido"""
         valid_tones = [tone.value for tone in ToneType]
         if self.tone not in valid_tones:
             raise ValueError(f"Invalid tone '{self.tone}'. Must be one of: {valid_tones}")
     
-    def _validate_language(self):
+    def _validate_language(self) -> bool:
         """Validar que el idioma sea válido"""
         valid_languages = [lang.value for lang in LanguageType]
         if self.language not in valid_languages:
             raise ValueError(f"Invalid language '{self.language}'. Must be one of: {valid_languages}")
     
-    def _validate_target_length(self):
+    def _validate_target_length(self) -> Optional[Dict[str, Any]]:
         """Validar longitud objetivo"""
         if self.target_length is not None:
             if self.target_length <= 0:
@@ -114,7 +125,7 @@ class CopywritingResponse:
     compression_ratio: Optional[float] = None
     timestamp: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Calcular métricas automáticamente"""
         if self.word_count == 0:
             self.word_count = len(self.content.split())

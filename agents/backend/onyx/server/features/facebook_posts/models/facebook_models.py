@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Optional, List, Dict, Any, Union
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+import uuid
+import hashlib
+from pydantic import BaseModel, Field, validator, root_validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 Facebook Posts Models - Onyx Integration
 ==========================================
@@ -6,13 +18,6 @@ Modelos avanzados para el sistema de Facebook posts integrado con Onyx.
 Clean Architecture + LangChain + Performance Optimizations.
 """
 
-from typing import Optional, List, Dict, Any, Union
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
-import uuid
-import hashlib
-from pydantic import BaseModel, Field, validator, root_validator
 
 
 # ===== ENUMS =====
@@ -120,7 +125,7 @@ class PostSpecification:
     keywords: List[str]
     target_engagement: EngagementTier = EngagementTier.HIGH
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not self.topic.strip():
             raise ValueError("Topic cannot be empty")
         if len(self.topic) > 200:
@@ -138,7 +143,7 @@ class GenerationConfig:
     campaign_context: Optional[str] = None
     custom_instructions: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.max_length < 50 or self.max_length > 2000:
             raise ValueError("max_length must be between 50 and 2000")
 
@@ -155,13 +160,13 @@ class FacebookPostContent(BaseModel):
     call_to_action: Optional[str] = None
     
     @validator('hashtags', each_item=True)
-    def validate_hashtags(cls, v):
+    def validate_hashtags(cls, v) -> bool:
         if not v.replace('_', '').replace('-', '').isalnum():
             raise ValueError(f"Invalid hashtag format: {v}")
         return v.lower()
     
     @validator('text')
-    def validate_text(cls, v):
+    def validate_text(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Text content cannot be empty")
         return v.strip()
@@ -324,14 +329,15 @@ class FacebookPostEntity(BaseModel):
     actual_metrics: Optional[Dict[str, Any]] = None
     ab_test_group: Optional[str] = None
     
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
     
     @root_validator
-    def validate_consistency(cls, values):
+    def validate_consistency(cls, values) -> bool:
         """Validar consistencia entre campos."""
         content = values.get('content')
         config = values.get('generation_config')

@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from ..models.facebook_models import (
+        import uuid
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 Facebook Posts - Domain Entities
 ===================================
@@ -5,11 +16,6 @@
 Entidades del dominio core siguiendo Clean Architecture y DDD patterns.
 """
 
-from typing import List, Optional, Dict, Any
-from datetime import datetime
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from ..models.facebook_models import (
     ContentIdentifier, PostSpecification, GenerationConfig, 
     FacebookPostContent, FacebookPostAnalysis, ContentStatus,
     PostType, ContentTone, TargetAudience, EngagementTier
@@ -27,7 +33,7 @@ class PostMetrics:
     reach_prediction: int
     interaction_count: int
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not 0 <= self.engagement_rate <= 1:
             raise ValueError("Engagement rate must be between 0 and 1")
         if not 0 <= self.virality_score <= 1:
@@ -42,7 +48,7 @@ class PublicationWindow:
     optimal_time: datetime
     timezone: str = "UTC"
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.start_time >= self.end_time:
             raise ValueError("Start time must be before end time")
         if not (self.start_time <= self.optimal_time <= self.end_time):
@@ -151,7 +157,9 @@ class FacebookPostDomainEntity:
         content: FacebookPostContent,
         analysis: Optional[FacebookPostAnalysis] = None
     ):
-        # Validar invariantes del dominio
+        
+    """__init__ function."""
+# Validar invariantes del dominio
         self._validate_domain_invariants(identifier, specification, content)
         
         # Estado inmutable de identidad
@@ -517,7 +525,6 @@ class FacebookPostDomainEntity:
     
     def _add_domain_event(self, event_type: str, data: Dict[str, Any]) -> None:
         """Registrar evento del dominio."""
-        import uuid
         
         event = DomainEvent(
             event_id=str(uuid.uuid4()),

@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Dict, List, Optional
+from langchain.prompts import PromptTemplate, ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 LinkedIn Prompt Templates
 ========================
@@ -5,8 +18,6 @@ LinkedIn Prompt Templates
 Comprehensive prompt templates for LinkedIn post generation using LangChain.
 """
 
-from typing import Dict, List, Optional
-from langchain.prompts import PromptTemplate, ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 
 
 class LinkedInPromptTemplates:

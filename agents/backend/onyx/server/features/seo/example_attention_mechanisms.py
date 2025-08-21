@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Example script demonstrating advanced attention mechanisms and positional encodings
-Comprehensive examples of different attention types and positional encoding methods
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import torch
 import torch.nn as nn
@@ -13,14 +18,22 @@ import logging
 import time
 import matplotlib.pyplot as plt
 import seaborn as sns
+from attention_mechanisms import (
+from transformer_models import TransformerConfig, SEOSpecificTransformer, TransformerManager
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Example script demonstrating advanced attention mechanisms and positional encodings
+Comprehensive examples of different attention types and positional encoding methods
+"""
+
 
 # Import our attention mechanisms and transformer models
-from attention_mechanisms import (
     MultiHeadAttention, LocalAttention, SparseAttention, AttentionWithRelativePositions,
     PositionalEncoding, LearnedPositionalEncoding, RelativePositionalEncoding, RotaryPositionalEncoding,
     AttentionFactory, PositionalEncodingFactory, create_attention_mask, create_padding_mask
 )
-from transformer_models import TransformerConfig, SEOSpecificTransformer, TransformerManager
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +47,7 @@ class AttentionMechanismsDemo:
         self.transformer_manager = TransformerManager()
         logger.info(f"Using device: {self.device}")
     
-    def demonstrate_positional_encodings(self):
+    def demonstrate_positional_encodings(self) -> Any:
         """Demonstrate different types of positional encodings"""
         logger.info("=== Demonstrating Positional Encodings ===")
         
@@ -87,7 +100,7 @@ class AttentionMechanismsDemo:
             except Exception as e:
                 logger.error(f"Error with {encoding_type} encoding: {e}")
     
-    def demonstrate_attention_mechanisms(self):
+    def demonstrate_attention_mechanisms(self) -> Any:
         """Demonstrate different types of attention mechanisms"""
         logger.info("\n=== Demonstrating Attention Mechanisms ===")
         
@@ -155,7 +168,7 @@ class AttentionMechanismsDemo:
             except Exception as e:
                 logger.error(f"Error with {config['name']}: {e}")
     
-    def demonstrate_transformer_with_attention(self):
+    def demonstrate_transformer_with_attention(self) -> Any:
         """Demonstrate transformer models with different attention mechanisms"""
         logger.info("\n=== Demonstrating Transformer Models with Different Attention Types ===")
         
@@ -249,7 +262,7 @@ class AttentionMechanismsDemo:
             except Exception as e:
                 logger.error(f"Error with {config['name']}: {e}")
     
-    def demonstrate_attention_analysis(self):
+    def demonstrate_attention_analysis(self) -> Any:
         """Demonstrate attention analysis and visualization"""
         logger.info("\n=== Demonstrating Attention Analysis ===")
         
@@ -467,7 +480,7 @@ class AttentionMechanismsDemo:
         except Exception as e:
             logger.error(f"Error testing memory usage: {e}")
     
-    def run_comprehensive_demo(self):
+    def run_comprehensive_demo(self) -> Any:
         """Run comprehensive demonstration of all features"""
         logger.info("Starting comprehensive attention mechanisms and positional encodings demo")
         
@@ -491,5 +504,6 @@ def main():
     # Run comprehensive demo
     demo.run_comprehensive_demo()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

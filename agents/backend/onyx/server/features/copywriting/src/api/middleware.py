@@ -1,9 +1,10 @@
-"""
-API Middleware
-=============
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Custom middleware for the FastAPI application.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import logging
@@ -11,6 +12,18 @@ from typing import Callable
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
+            from fastapi import HTTPException
+            from fastapi.responses import JSONResponse
+            from fastapi.responses import JSONResponse
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+API Middleware
+=============
+
+Custom middleware for the FastAPI application.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +32,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     """Logging middleware for request/response logging"""
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
     
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         start_time = time.time()
@@ -46,7 +61,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     """Rate limiting middleware"""
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.rate_limit_store = {}
         self.rate_limit_window = 60  # 1 minute
         self.max_requests_per_window = 100
@@ -79,8 +96,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         client_id = request.client.host if request.client else "unknown"
         
         if not self.is_allowed(client_id):
-            from fastapi import HTTPException
-            from fastapi.responses import JSONResponse
             
             return JSONResponse(
                 status_code=429,
@@ -98,7 +113,9 @@ class SecurityMiddleware(BaseHTTPMiddleware):
     """Security middleware for additional security headers"""
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
     
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         response = await call_next(request)
@@ -116,7 +133,9 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
     """Error handling middleware"""
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
     
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         try:
@@ -124,7 +143,6 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             logger.error(f"Unhandled error: {e}", exc_info=True)
             
-            from fastapi.responses import JSONResponse
             
             return JSONResponse(
                 status_code=500,

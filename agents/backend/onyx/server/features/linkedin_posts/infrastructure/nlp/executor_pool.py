@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from concurrent.futures import ThreadPoolExecutor
+from functools import lru_cache
+import asyncio
+import os
+from typing import Any, List, Dict, Optional
+import logging
 """
 Executor Pool Singleton
 ======================
@@ -6,10 +14,6 @@ Provides a shared ThreadPoolExecutor and asyncio.Semaphore so that all NLP
 modules reuse the same worker threads, preventing thread explosion.
 """
 
-from concurrent.futures import ThreadPoolExecutor
-from functools import lru_cache
-import asyncio
-import os
 
 _DEFAULT_MAX_WORKERS = max(4, (os.cpu_count() or 4))
 

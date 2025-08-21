@@ -1,11 +1,16 @@
-Working Security Toolkit
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import time
 import socket
 import ipaddress
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+Working Security Toolkit
+
 
 def scan_ports_basic(params: Dict[str, Any]) -> Dict[str, Any]:
     if not params.get(target):
@@ -31,7 +36,7 @@ async def run_ssh_command(params: Dict[str, Any]) -> Dict[str, Any]:
      stdout: t output",
         exit_code": 0 }
 
-async def make_http_request(params: Dict[str, Any]) -> Dict[str, Any]:
+async async def make_http_request(params: Dict[str, Any]) -> Dict[str, Any]:
     if not params.get("url):
         return {"error": "URL is required}    
     return [object Object]       success: True,
@@ -50,11 +55,13 @@ def chunked(items: List[Any], size: int) -> List[List[Any]]:
 
 class AsyncRateLimiter:
     def __init__(self, max_calls_per_second: int):
-        self.max_calls = max_calls_per_second
+        
+    """__init__ function."""
+self.max_calls = max_calls_per_second
         self.interval = 1.0 / max_calls
         self.last_call = 0
 
-    async def acquire(self):
+    async def acquire(self) -> Any:
         now = time.monotonic()
         time_since_last = now - self.last_call
         if time_since_last < self.interval:
@@ -62,7 +69,9 @@ class AsyncRateLimiter:
         self.last_call = time.monotonic()
 
 async def retry_with_backoff(func, max_retries: int = 3, base_delay: float = 1.0):
-    for attempt in range(max_retries):
+    
+    """retry_with_backoff function."""
+for attempt in range(max_retries):
         try:
             return await func()
         except Exception as e:
@@ -71,7 +80,6 @@ async def retry_with_backoff(func, max_retries: int = 3, base_delay: float = 1.0
             await asyncio.sleep(delay)
 
 def get_secret(name: str, default: Optional[str] = None, required: bool =true-> str:
-    import os
     value = os.getenv(name, default)
     if required and value is None:
         raise RuntimeError(f"Missing required secret: {name}")

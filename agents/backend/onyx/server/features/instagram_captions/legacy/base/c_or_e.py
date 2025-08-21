@@ -1,9 +1,10 @@
-"""
-Instagram Captions Core Engine.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Consolidated system for high-quality Instagram caption generation with
-integrated optimization, hashtag intelligence, and GMT scheduling.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import re
 import asyncio
@@ -13,8 +14,16 @@ from enum import Enum
 import logging
 from collections import Counter
 from datetime import datetime
-
 from models import CaptionStyle, InstagramTarget, ContentType, HashtagStrategy
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions Core Engine.
+
+Consolidated system for high-quality Instagram caption generation with
+integrated optimization, hashtag intelligence, and GMT scheduling.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +54,7 @@ class QualityMetrics:
 class QualityAnalyzer:
     """Analyze and score caption quality."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.hook_patterns = [
             r'^(What if|Did you know|Here\'s|Ready to|Want to|Ever wondered)',
             r'^(This changed|Stop doing|Never again|The truth about)',
@@ -256,7 +265,7 @@ class HashtagData:
 class HashtagIntelligence:
     """Intelligent hashtag generation and optimization."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.hashtag_db = self._build_hashtag_database()
         self.audience_hashtags = self._build_audience_hashtags()
         self.style_hashtags = self._build_style_hashtags()
@@ -357,7 +366,7 @@ class HashtagIntelligence:
 class ContentOptimizer:
     """Optimize content for maximum engagement."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.quality_analyzer = QualityAnalyzer()
         self.hashtag_intelligence = HashtagIntelligence()
         
@@ -535,7 +544,7 @@ Generate a caption that drives real engagement, not just views."""
 class InstagramCaptionsEngine:
     """Main engine integrating all systems."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.optimizer = ContentOptimizer()
         self.quality_analyzer = QualityAnalyzer()
         self.hashtag_intelligence = HashtagIntelligence()

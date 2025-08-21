@@ -1,20 +1,36 @@
-"""
-FastAPI Middleware for Instagram Captions API.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Performance monitoring, logging, security, and error handling middleware.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import uuid
 import logging
 from typing import Callable, Dict, Any
 from datetime import datetime, timezone
-
 from fastapi import Request, Response, HTTPException
 from fastapi.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
-
 from .utils import create_error_response, format_duration_human_readable
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+FastAPI Middleware for Instagram Captions API.
+
+Performance monitoring, logging, security, and error handling middleware.
+"""
+
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +119,9 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
     """Middleware for performance monitoring and metrics collection."""
     
     def __init__(self, app, slow_request_threshold: float = 2.0):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.slow_request_threshold = slow_request_threshold
         self.metrics = {
             "total_requests": 0,
@@ -236,7 +254,9 @@ class CORSMiddleware(BaseHTTPMiddleware):
     """Custom CORS middleware with security considerations."""
     
     def __init__(self, app, allowed_origins: list = None, allow_credentials: bool = False):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.allowed_origins = allowed_origins or ["*"]
         self.allow_credentials = allow_credentials
     
@@ -305,7 +325,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
 class CacheHeaderMiddleware(BaseHTTPMiddleware):
     """Middleware to add appropriate cache headers."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
         self.cache_config = {
             "/health": {"max_age": 60, "public": True},

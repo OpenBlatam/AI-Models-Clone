@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import logging
+from contextlib import asynccontextmanager
+from typing import Optional
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from ..config.settings import get_settings, get_api_config, get_security_config
+from ..core.engine import CopywritingEngine
+from .routes import router
+from .middleware import RateLimitMiddleware, LoggingMiddleware
+from .exceptions import setup_exception_handlers
+        from ..core.engine import CopywritingEngine
+        from ..config.settings import get_engine_config
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 FastAPI Application Factory
 ==========================
@@ -5,21 +30,8 @@ FastAPI Application Factory
 Main application factory for the copywriting system.
 """
 
-import logging
-from contextlib import asynccontextmanager
-from typing import Optional
 
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
 
-from ..config.settings import get_settings, get_api_config, get_security_config
-from ..core.engine import CopywritingEngine
-from .routes import router
-from .middleware import RateLimitMiddleware, LoggingMiddleware
-from .exceptions import setup_exception_handlers
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -39,8 +51,6 @@ async def lifespan(app: FastAPI):
     
     try:
         # Initialize engine
-        from ..core.engine import CopywritingEngine
-        from ..config.settings import get_engine_config
         
         config = get_engine_config()
         engine = CopywritingEngine(config)
@@ -113,7 +123,9 @@ def create_app() -> FastAPI:
     # Add root endpoint
     @app.get("/")
     async def root():
-        return {
+        
+    """root function."""
+return {
             "message": "Copywriting System API",
             "version": settings.version,
             "status": "running",
@@ -123,7 +135,9 @@ def create_app() -> FastAPI:
     # Add health check endpoint
     @app.get("/health")
     async def health_check():
-        return {
+        
+    """health_check function."""
+return {
             "status": "healthy",
             "timestamp": "2024-01-15T10:30:00Z"
         }

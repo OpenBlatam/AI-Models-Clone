@@ -1,8 +1,9 @@
-"""
-Modular Configuration Management.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
 
-Clean configuration with environment variables and intelligent defaults.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import os
 import multiprocessing as mp
@@ -10,6 +11,15 @@ from typing import Dict, Any, Optional
 from functools import lru_cache
 from pydantic_settings import BaseSettings
 from pydantic import Field
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Modular Configuration Management.
+
+Clean configuration with environment variables and intelligent defaults.
+"""
+
 
 class ModularConfig(BaseSettings):
     """Modular configuration with clean defaults."""
@@ -94,7 +104,8 @@ class ModularConfig(BaseSettings):
         description="Logging level"
     )
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "COPYWRITING_"
         env_file = ".env"
         case_sensitive = False

@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import gradio as gr
+import requests
+import json
+import time
+from typing import Tuple, Dict, Any
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v8.0 - Simple Gradio Demo
 
@@ -5,18 +21,15 @@ Interactive demo for the CPU-optimized AI caption generator.
 Real transformers running efficiently on any hardware.
 """
 
-import gradio as gr
-import requests
-import json
-import time
-from typing import Tuple, Dict, Any
 
 
 class SimpleAIDemo:
     """Simple demo interface for AI caption generation."""
     
     def __init__(self, api_url: str = "http://localhost:8080"):
-        self.api_url = api_url
+        
+    """__init__ function."""
+self.api_url = api_url
         self.session_stats = {
             "total_requests": 0,
             "avg_quality": 0,
@@ -137,7 +150,7 @@ class SimpleAIDemo:
         
         return "\n".join(status_lines)
     
-    def check_api_health(self) -> str:
+    async def check_api_health(self) -> str:
         """Check API health status."""
         try:
             response = requests.get(f"{self.api_url}/ai/health", timeout=10)
@@ -386,5 +399,6 @@ def main():
     )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

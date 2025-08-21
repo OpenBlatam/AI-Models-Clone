@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+import time
+from datetime import datetime, timedelta
+from typing import Dict, List
+from uuid import uuid4
+from core.entities.linkedin_post import LinkedInPost, PostType, ContentTone, PostStatus
+from infrastructure.langchain_integration import LinkedInPostGenerator, ContentOptimizer, EngagementAnalyzer
+from application.use_cases.linkedin_post_use_cases import (
+from shared.config.settings import LinkedInPostSettings
+from shared.logging import setup_logging, get_logger
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 LinkedIn Posts System Demo
@@ -8,23 +29,12 @@ This demo demonstrates all major features including post generation, optimizatio
 analysis, and A/B testing.
 """
 
-import asyncio
-import json
-import time
-from datetime import datetime, timedelta
-from typing import Dict, List
-from uuid import uuid4
 
-from core.entities.linkedin_post import LinkedInPost, PostType, ContentTone, PostStatus
-from infrastructure.langchain_integration import LinkedInPostGenerator, ContentOptimizer, EngagementAnalyzer
-from application.use_cases.linkedin_post_use_cases import (
     GenerateLinkedInPostUseCase,
     OptimizeLinkedInPostUseCase,
     AnalyzeEngagementUseCase,
     CreateABTestUseCase,
 )
-from shared.config.settings import LinkedInPostSettings
-from shared.logging import setup_logging, get_logger
 
 # Setup logging
 setup_logging(level="INFO")
@@ -34,7 +44,7 @@ logger = get_logger(__name__)
 class LinkedInPostsDemo:
     """Demo class for LinkedIn Posts system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the demo."""
         self.settings = LinkedInPostSettings(
             openai_api_key="demo-api-key",  # Replace with actual key
@@ -60,7 +70,7 @@ class LinkedInPostsDemo:
         # Mock repository for demo
         self.posts = []
     
-    async def run_complete_demo(self):
+    async def run_complete_demo(self) -> Any:
         """Run the complete LinkedIn Posts demo."""
         logger.info("🚀 Starting LinkedIn Posts System Demo")
         logger.info("=" * 60)
@@ -96,7 +106,7 @@ class LinkedInPostsDemo:
             logger.error(f"❌ Demo failed: {e}")
             raise
     
-    async def demo_post_generation(self):
+    async def demo_post_generation(self) -> Any:
         """Demo LinkedIn post generation."""
         logger.info("\n📝 Demo: LinkedIn Post Generation")
         logger.info("-" * 40)
@@ -188,7 +198,7 @@ class LinkedInPostsDemo:
             except Exception as e:
                 logger.error(f"❌ Failed to generate {scenario['name']}: {e}")
     
-    async def demo_content_optimization(self):
+    async def demo_content_optimization(self) -> Any:
         """Demo content optimization."""
         logger.info("\n🔧 Demo: Content Optimization")
         logger.info("-" * 40)
@@ -235,7 +245,7 @@ class LinkedInPostsDemo:
         except Exception as e:
             logger.error(f"❌ Content optimization failed: {e}")
     
-    async def demo_engagement_analysis(self):
+    async def demo_engagement_analysis(self) -> Any:
         """Demo engagement analysis."""
         logger.info("\n📊 Demo: Engagement Analysis")
         logger.info("-" * 40)
@@ -285,7 +295,7 @@ class LinkedInPostsDemo:
         except Exception as e:
             logger.error(f"❌ Engagement analysis failed: {e}")
     
-    async def demo_ab_testing(self):
+    async def demo_ab_testing(self) -> Any:
         """Demo A/B testing."""
         logger.info("\n🧪 Demo: A/B Testing")
         logger.info("-" * 40)
@@ -344,7 +354,7 @@ class LinkedInPostsDemo:
         except Exception as e:
             logger.error(f"❌ A/B testing failed: {e}")
     
-    async def demo_industry_specific_posts(self):
+    async def demo_industry_specific_posts(self) -> Any:
         """Demo industry-specific post generation."""
         logger.info("\n🏭 Demo: Industry-Specific Posts")
         logger.info("-" * 40)
@@ -376,7 +386,7 @@ class LinkedInPostsDemo:
             except Exception as e:
                 logger.error(f"❌ Failed to generate {industry} post: {e}")
     
-    async def demo_tone_variations(self):
+    async def demo_tone_variations(self) -> Any:
         """Demo tone variations."""
         logger.info("\n🎭 Demo: Tone Variations")
         logger.info("-" * 40)
@@ -416,7 +426,7 @@ class LinkedInPostsDemo:
             except Exception as e:
                 logger.error(f"❌ Failed to generate {tone.value} post: {e}")
     
-    async def demo_bulk_operations(self):
+    async def demo_bulk_operations(self) -> Any:
         """Demo bulk operations."""
         logger.info("\n📦 Demo: Bulk Operations")
         logger.info("-" * 40)
@@ -469,7 +479,7 @@ class LinkedInPostsDemo:
         except Exception as e:
             logger.error(f"❌ Bulk operations failed: {e}")
     
-    async def demo_performance_metrics(self):
+    async def demo_performance_metrics(self) -> Any:
         """Demo performance metrics."""
         logger.info("\n📈 Demo: Performance Metrics")
         logger.info("-" * 40)

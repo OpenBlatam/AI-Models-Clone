@@ -1,14 +1,5 @@
-"""
-Version Control Manager for ML Projects
-
-This module provides comprehensive version control management for ML projects including:
-- Git integration for code and configuration tracking
-- Automated commit management for experiments
-- Configuration versioning and rollback
-- Experiment reproducibility through git commits
-- Branch management for different experiment versions
-- Integration with experiment tracking system
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import subprocess
 import json
@@ -22,10 +13,23 @@ from enum import Enum
 import shutil
 import tempfile
 from contextlib import contextmanager
-
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.config_manager import ConfigManager, ConfigType
 from onyx.server.features.ads.experiment_tracker import ExperimentTracker, ExperimentMetadata
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Version Control Manager for ML Projects
+
+This module provides comprehensive version control management for ML projects including:
+- Git integration for code and configuration tracking
+- Automated commit management for experiments
+- Configuration versioning and rollback
+- Experiment reproducibility through git commits
+- Branch management for different experiment versions
+- Integration with experiment tracking system
+"""
+
 
 logger = setup_logger()
 
@@ -78,7 +82,9 @@ class VersionControlManager:
     """Comprehensive version control manager for ML projects."""
     
     def __init__(self, project_root: str = ".", auto_commit: bool = True):
-        self.project_root = Path(project_root).resolve()
+        
+    """__init__ function."""
+self.project_root = Path(project_root).resolve()
         self.auto_commit = auto_commit
         self.logger = logger
         
@@ -94,7 +100,7 @@ class VersionControlManager:
         git_dir = self.project_root / ".git"
         return git_dir.exists() and git_dir.is_dir()
     
-    def _initialize_git_repository(self):
+    def _initialize_git_repository(self) -> Any:
         """Initialize a new git repository."""
         try:
             subprocess.run(
@@ -128,7 +134,7 @@ class VersionControlManager:
             self.logger.error(f"Failed to initialize git repository: {e}")
             raise
     
-    def _create_gitignore(self):
+    def _create_gitignore(self) -> Any:
         """Create a comprehensive .gitignore file for ML projects."""
         gitignore_content = """# ML Project .gitignore
 
@@ -233,7 +239,15 @@ profiles/
         
         gitignore_path = self.project_root / ".gitignore"
         with open(gitignore_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(gitignore_content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     
     def get_git_status(self) -> GitStatus:
         """Get the current git status."""
@@ -512,6 +526,10 @@ profiles/
         
         try:
             with open(version_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 data = json.load(f)
             
             return ExperimentVersion(
@@ -608,6 +626,10 @@ profiles/
         }
         
         with open(snapshot_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(snapshot_data, f, default_flow_style=False, indent=2)
         
         return str(snapshot_file)
@@ -616,6 +638,10 @@ profiles/
         """Restore configurations from a snapshot."""
         try:
             with open(snapshot_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 snapshot_data = yaml.safe_load(f)
             
             configs = snapshot_data.get('configs', {})
@@ -625,6 +651,10 @@ profiles/
                 if config_type in ['model', 'training', 'data', 'experiment', 'optimization', 'deployment']:
                     config_file = self.project_root / "configs" / f"{config_type}_config.yaml"
                     with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         yaml.dump(config, f, default_flow_style=False, indent=2)
             
             self.logger.info(f"Restored configurations from snapshot: {snapshot_file}")
@@ -704,6 +734,10 @@ profiles/
         
         version_file = version_dir / f"{experiment_id}.json"
         with open(version_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(asdict(version_info), f, indent=2, default=str)
     
     def _get_dependencies(self) -> Dict[str, str]:
@@ -714,6 +748,10 @@ profiles/
         requirements_file = self.project_root / "requirements.txt"
         if requirements_file.exists():
             with open(requirements_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 for line in f:
                     line = line.strip()
                     if line and not line.startswith("#"):
@@ -763,7 +801,9 @@ class ExperimentVersionControl:
     """High-level interface for experiment version control."""
     
     def __init__(self, project_root: str = ".", auto_commit: bool = True):
-        self.vc_manager = VersionControlManager(project_root, auto_commit)
+        
+    """__init__ function."""
+self.vc_manager = VersionControlManager(project_root, auto_commit)
         self.logger = logger
     
     def start_experiment(self, 

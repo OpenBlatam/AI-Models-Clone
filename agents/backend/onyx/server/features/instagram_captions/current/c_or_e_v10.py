@@ -1,9 +1,13 @@
-"""
-Instagram Captions API v10.0 - Refactored Core Module
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Consolidates ultra-advanced v9.0 capabilities into a clean, maintainable architecture.
-Essential libraries only, maximum performance, simplified deployment.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -15,52 +19,60 @@ from datetime import datetime
 from dataclasses import dataclass, asdict
 from enum import Enum
 import logging
+from pydantic import BaseModel, Field, field_validator
+    from pydantic_settings import BaseSettings
+    from pydantic import BaseSettings
+    import torch
+    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+    import orjson
+    import json
+    import numba
+    from numba import jit
+    from cachetools import LRUCache, TTLCache
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v10.0 - Refactored Core Module
+
+Consolidates ultra-advanced v9.0 capabilities into a clean, maintainable architecture.
+Essential libraries only, maximum performance, simplified deployment.
+"""
+
 
 # Core framework (essential only)
-from pydantic import BaseModel, Field, field_validator
 try:
-    from pydantic_settings import BaseSettings
 except ImportError:
-    from pydantic import BaseSettings
 
 # Essential AI libraries (curated from v9.0)
 try:
-    import torch
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
 
 try:
-    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
     TRANSFORMERS_AVAILABLE = True
 except ImportError:
     TRANSFORMERS_AVAILABLE = False
 
 try:
-    import orjson
     json_dumps = lambda obj: orjson.dumps(obj).decode()
     json_loads = orjson.loads
     ULTRA_JSON = True
 except ImportError:
-    import json
     json_dumps = json.dumps
     json_loads = json.loads
     ULTRA_JSON = False
 
 try:
-    import numba
-    from numba import jit
     NUMBA_AVAILABLE = True
 except ImportError:
     NUMBA_AVAILABLE = False
-    def jit(*args, **kwargs):
-        def decorator(func):
+    def jit(*args, **kwargs) -> Any:
+        def decorator(func) -> Any:
             return func
         return decorator
 
 # Performance optimization
 try:
-    from cachetools import LRUCache, TTLCache
     ADVANCED_CACHE = True
 except ImportError:
     ADVANCED_CACHE = False
@@ -222,7 +234,7 @@ class AICapabilities:
 class RefactoredAIEngine:
     """Consolidated AI engine with essential capabilities from v9.0."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.capabilities = AICapabilities()
         self.models = {}
         self.cache = self._init_cache()
@@ -235,7 +247,7 @@ class RefactoredAIEngine:
         # Models will be initialized on first use
         self._models_initialized = False
     
-    def _init_cache(self):
+    def _init_cache(self) -> Any:
         """Initialize intelligent caching using if-return pattern."""
         if ADVANCED_CACHE:
             return TTLCache(maxsize=config.CACHE_SIZE, ttl=config.CACHE_TTL)
@@ -243,7 +255,7 @@ class RefactoredAIEngine:
         # Fallback simple cache
         return {}
     
-    async def _init_models(self):
+    async def _init_models(self) -> Any:
         """Initialize AI models based on available capabilities."""
         
         if self._models_initialized:
@@ -582,7 +594,7 @@ class RefactoredUtils:
     """Essential utility functions for v10.0."""
     
     @staticmethod
-    def generate_request_id() -> str:
+    async def generate_request_id() -> str:
         """Generate unique request ID."""
         return f"v10-{int(time.time() * 1000) % 1000000:06d}"
     
@@ -604,7 +616,7 @@ class RefactoredUtils:
         return f"{seconds:.2f}s"
     
     @staticmethod
-    def validate_api_key(api_key: str) -> bool:
+    async def validate_api_key(api_key: str) -> bool:
         """Validate API key."""
         return api_key in config.VALID_API_KEYS
     
@@ -625,7 +637,7 @@ class RefactoredUtils:
 class RefactoredMetrics:
     """Simplified but effective metrics collection."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.requests_total = 0
         self.requests_success = 0
         self.avg_response_time = 0.0

@@ -616,3 +616,4 @@ async def shutdown_metrics_collector():
     if metrics_collector:
         await metrics_collector.shutdown()
         metrics_collector = None
+

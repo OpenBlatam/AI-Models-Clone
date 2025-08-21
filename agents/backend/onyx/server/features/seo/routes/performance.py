@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional
+from ..dependencies import (
+from ..core import PerformanceMetricsManager
+        from fastapi.responses import StreamingResponse
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Performance routes for Ultra-Optimized SEO Service v15.
 
@@ -9,14 +19,10 @@ This module contains performance monitoring endpoints including:
 - Threshold management
 """
 
-from fastapi import APIRouter, Depends, HTTPException
-from typing import Optional
 
-from ..dependencies import (
     get_performance_manager,
     get_logger
 )
-from ..core import PerformanceMetricsManager
 
 # Create router with prefix and tags
 router = APIRouter(
@@ -146,7 +152,6 @@ async def get_real_time_performance(
     Useful for live monitoring dashboards.
     """
     try:
-        from fastapi.responses import StreamingResponse
         
         async def generate_real_time_metrics():
             """Generate real-time performance metrics stream."""

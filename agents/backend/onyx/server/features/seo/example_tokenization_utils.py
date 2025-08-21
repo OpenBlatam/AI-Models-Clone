@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-"""
-Example Usage of Advanced Tokenization and Sequence Handling
-Demonstrates comprehensive tokenization utilities for SEO text processing
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import torch
 import numpy as np
@@ -10,8 +9,19 @@ import logging
 from typing import List, Dict, Any
 from pathlib import Path
 import json
-
 from tokenization_utils import (
+    from transformers import AutoTokenizer
+    from torch.utils.data import DataLoader
+    from transformers import AutoTokenizer
+    import asyncio
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Example Usage of Advanced Tokenization and Sequence Handling
+Demonstrates comprehensive tokenization utilities for SEO text processing
+"""
+
+
     AdvancedTokenizer, SequenceHandler, TokenizedDataset, TokenizationPipeline,
     TokenizationConfig, SequenceConfig, analyze_tokenization_quality,
     optimize_tokenization_config, create_data_collator
@@ -133,7 +143,6 @@ def example_sequence_handling():
     sequence_handler = SequenceHandler(sequence_config)
     
     # Load tokenizer for sequence handling
-    from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
     
     # Long text example
@@ -220,7 +229,6 @@ def example_tokenized_dataset():
     dataset.save_cache()
     
     # Create data loader
-    from torch.utils.data import DataLoader
     data_collator = create_data_collator(tokenizer.tokenizer, "sequence_classification")
     
     dataloader = DataLoader(
@@ -306,7 +314,6 @@ def example_quality_analysis():
     logger.info("\n=== Tokenization Quality Analysis Example ===")
     
     # Load tokenizer
-    from transformers import AutoTokenizer
     tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
     
     # Sample texts for analysis
@@ -503,5 +510,4 @@ async def main():
 
 if __name__ == "__main__":
     # Run the examples
-    import asyncio
     asyncio.run(main()) 

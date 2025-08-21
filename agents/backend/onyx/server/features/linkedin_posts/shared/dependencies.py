@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from fastapi import Depends, HTTPException, Header, Request
+from fastapi.security import OAuth2PasswordBearer
+from datetime import datetime, timedelta
+from typing import Optional
+import asyncio
+from typing import Any, List, Dict, Optional
+import logging
 """
 Shared Dependencies
 ===================
@@ -5,11 +17,6 @@ Shared Dependencies
 FastAPI dependencies for authentication, authorization, and rate limiting.
 """
 
-from fastapi import Depends, HTTPException, Header, Request
-from fastapi.security import OAuth2PasswordBearer
-from datetime import datetime, timedelta
-from typing import Optional
-import asyncio
 
 # OAuth2 Password Bearer (placeholder for real auth)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/token")
@@ -22,7 +29,9 @@ _RATE_LIMIT_WINDOW = timedelta(minutes=1)
 class User:
     """Simple user model for demonstration."""
     def __init__(self, user_id: str, username: str):
-        self.id = user_id
+        
+    """__init__ function."""
+self.id = user_id
         self.username = username
 
 # Fake user database (for demo only)

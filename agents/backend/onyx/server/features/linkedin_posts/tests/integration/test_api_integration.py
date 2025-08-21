@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import pytest
+import asyncio
+from typing import List, Dict, Any
+import time
+from datetime import datetime
+from fastapi.testclient import TestClient
+from httpx import AsyncClient
+from typing import Any, List, Dict, Optional
+import logging
 """
 Integration Tests for LinkedIn Posts API
 ========================================
@@ -5,21 +19,14 @@ Integration Tests for LinkedIn Posts API
 End-to-end integration tests for the complete API workflow.
 """
 
-import pytest
-import asyncio
-from typing import List, Dict, Any
-import time
-from datetime import datetime
 
-from fastapi.testclient import TestClient
-from httpx import AsyncClient
 
 
 class TestAPIIntegration:
     """Integration tests for the complete API workflow."""
     
     @pytest.mark.asyncio
-    async def test_complete_post_lifecycle(self, async_client, auth_headers, sample_post_data):
+    async def test_complete_post_lifecycle(self, async_client, auth_headers, sample_post_data) -> Any:
         """Test complete post lifecycle: create, read, update, delete."""
         print("\n🔄 Testing complete post lifecycle...")
         
@@ -126,7 +133,7 @@ class TestAPIIntegration:
         print("  ✅ Complete lifecycle test passed!")
     
     @pytest.mark.asyncio
-    async def test_batch_operations(self, async_client, auth_headers, sample_batch_data):
+    async def test_batch_operations(self, async_client, auth_headers, sample_batch_data) -> Any:
         """Test batch create and optimize operations."""
         print("\n📦 Testing batch operations...")
         
@@ -179,7 +186,7 @@ class TestAPIIntegration:
         print("  ✅ Batch operations test passed!")
     
     @pytest.mark.asyncio
-    async def test_caching_behavior(self, async_client, auth_headers, sample_post_data):
+    async def test_caching_behavior(self, async_client, auth_headers, sample_post_data) -> Any:
         """Test caching behavior and performance."""
         print("\n💾 Testing caching behavior...")
         
@@ -247,7 +254,7 @@ class TestAPIIntegration:
         print("  ✅ Caching behavior test passed!")
     
     @pytest.mark.asyncio
-    async def test_list_posts_with_filters(self, async_client, auth_headers, sample_post_data):
+    async def test_list_posts_with_filters(self, async_client, auth_headers, sample_post_data) -> List[Any]:
         """Test list posts with various filters and pagination."""
         print("\n📋 Testing list posts with filters...")
         
@@ -330,7 +337,7 @@ class TestAPIIntegration:
         print("  ✅ List posts with filters test passed!")
     
     @pytest.mark.asyncio
-    async def test_performance_metrics(self, async_client, auth_headers):
+    async def test_performance_metrics(self, async_client, auth_headers) -> Any:
         """Test performance metrics endpoint."""
         print("\n📈 Testing performance metrics...")
         
@@ -370,7 +377,7 @@ class TestAPIIntegration:
         print("  ✅ Performance metrics test passed!")
     
     @pytest.mark.asyncio
-    async def test_health_checks(self, async_client):
+    async def test_health_checks(self, async_client) -> Any:
         """Test all health check endpoints."""
         print("\n🏥 Testing health checks...")
         
@@ -419,7 +426,7 @@ class TestAPIIntegration:
         print("  ✅ Health checks test passed!")
     
     @pytest.mark.asyncio
-    async def test_error_handling(self, async_client, auth_headers):
+    async def test_error_handling(self, async_client, auth_headers) -> Any:
         """Test error handling scenarios."""
         print("\n⚠️ Testing error handling...")
         
@@ -470,7 +477,7 @@ class TestAPIIntegration:
         print("  ✅ Error handling test passed!")
     
     @pytest.mark.asyncio
-    async def test_concurrent_requests(self, async_client, auth_headers, sample_post_data):
+    async async def test_concurrent_requests(self, async_client, auth_headers, sample_post_data) -> Any:
         """Test handling of concurrent requests."""
         print("\n⚡ Testing concurrent requests...")
         
@@ -489,7 +496,9 @@ class TestAPIIntegration:
         start_time = time.time()
         
         async def make_request():
-            return await async_client.get(
+            
+    """make_request function."""
+return await async_client.get(
                 f"/linkedin-posts/{post_id}",
                 headers=auth_headers
             )
@@ -524,7 +533,7 @@ class TestAPIPerformance:
     """Performance-focused integration tests."""
     
     @pytest.mark.asyncio
-    async def test_bulk_operations_performance(self, async_client, auth_headers):
+    async def test_bulk_operations_performance(self, async_client, auth_headers) -> Any:
         """Test performance of bulk operations."""
         print("\n🚀 Testing bulk operations performance...")
         
@@ -589,7 +598,7 @@ class TestAPIPerformance:
         print("  ✅ Bulk operations performance test passed!")
     
     @pytest.mark.asyncio
-    async def test_cache_performance(self, async_client, auth_headers, sample_post_data):
+    async def test_cache_performance(self, async_client, auth_headers, sample_post_data) -> Any:
         """Test cache performance impact."""
         print("\n💾 Testing cache performance...")
         

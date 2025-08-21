@@ -1,14 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import sys
+import importlib.util
+from typing import Dict, Any, List, Tuple
+from functools import lru_cache
+from dataclasses import dataclass
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Modular Optimization Detection.
 
 Clean optimization detection and performance assessment.
 """
 
-import sys
-import importlib.util
-from typing import Dict, Any, List, Tuple
-from functools import lru_cache
-from dataclasses import dataclass
 
 @dataclass
 class OptimizationInfo:
@@ -23,7 +28,7 @@ class OptimizationInfo:
 class OptimizationDetector:
     """Clean optimization detection and assessment."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.optimizations: Dict[str, OptimizationInfo] = {}
         self.performance_level = "BASIC"
         self.total_speedup = 1.0
@@ -96,7 +101,7 @@ class OptimizationDetector:
             install_command=install_cmd
         )
     
-    def _calculate_performance_level(self):
+    def _calculate_performance_level(self) -> Any:
         """Calculate performance level and total speedup."""
         available_count = sum(1 for opt in self.optimizations.values() if opt.available)
         high_impact_count = sum(

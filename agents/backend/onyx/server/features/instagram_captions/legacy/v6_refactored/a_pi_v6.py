@@ -1,9 +1,10 @@
-"""
-Instagram Captions API v6.0 - Refactored Architecture
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Simplified and consolidated API architecture combining all functionality
-into a clean, maintainable, and high-performance system.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -16,21 +17,30 @@ from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer
+    from .core_v6 import (
+    from .ai_service_v6 import ai_service
+    from core_v6 import (
+    from ai_service_v6 import ai_service
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v6.0 - Refactored Architecture
+
+Simplified and consolidated API architecture combining all functionality
+into a clean, maintainable, and high-performance system.
+"""
+
 
 try:
-    from .core_v6 import (
         config, CaptionRequest, BatchRequest, CaptionResponse, 
         BatchResponse, HealthResponse, ErrorResponse, Utils, 
         ResponseBuilder, CacheKeyGenerator, metrics
     )
-    from .ai_service_v6 import ai_service
 except ImportError:
-    from core_v6 import (
         config, CaptionRequest, BatchRequest, CaptionResponse,
         BatchResponse, HealthResponse, ErrorResponse, Utils,
         ResponseBuilder, CacheKeyGenerator, metrics
     )
-    from ai_service_v6 import ai_service
 
 
 # Configure logging
@@ -53,11 +63,15 @@ class RefactoredAuthMiddleware(BaseHTTPMiddleware):
     """Simplified authentication middleware."""
     
     def __init__(self, app, excluded_paths: list = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.excluded_paths = excluded_paths or ["/health", "/docs", "/openapi.json", "/redoc"]
     
     async def dispatch(self, request: Request, call_next):
-        # Skip auth for excluded paths
+        
+    """dispatch function."""
+# Skip auth for excluded paths
         if any(request.url.path.startswith(path) for path in self.excluded_paths):
             return await call_next(request)
         
@@ -84,7 +98,9 @@ class RefactoredLoggingMiddleware(BaseHTTPMiddleware):
     """Simplified logging and metrics middleware."""
     
     async def dispatch(self, request: Request, call_next):
-        start_time = time.time()
+        
+    """dispatch function."""
+start_time = time.time()
         request_id = Utils.generate_request_id()
         
         # Log request start
@@ -141,7 +157,7 @@ class RefactoredLoggingMiddleware(BaseHTTPMiddleware):
 class RefactoredCaptionsAPI:
     """Refactored Instagram Captions API with consolidated architecture."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = self._create_app()
         self._setup_routes()
         self._setup_middleware()
@@ -157,13 +173,13 @@ class RefactoredCaptionsAPI:
             openapi_url="/openapi.json"
         )
     
-    def _setup_middleware(self):
+    def _setup_middleware(self) -> Any:
         """Setup middleware stack."""
         self.app.add_middleware(GZipMiddleware, minimum_size=500)
         self.app.add_middleware(RefactoredLoggingMiddleware)
         self.app.add_middleware(RefactoredAuthMiddleware)
     
-    def _setup_routes(self):
+    def _setup_routes(self) -> Any:
         """Setup API routes."""
         
         @self.app.post("/api/v6/generate", response_model=CaptionResponse)
@@ -406,7 +422,6 @@ __all__ = ['app', 'refactored_api']
 
 
 if __name__ == "__main__":
-    import uvicorn
     
     print("=" * 80)
     print(f"🚀 {config.API_NAME}")

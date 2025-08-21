@@ -1,9 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import Mock, patch, AsyncMock
 from typing import Dict, Any, List
 
-from agents.backend.onyx.server.features.ads.advanced_api import (
+from agents.backend.onyx.server.features.ads.api.advanced import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     router,
     TrainingDataRequest,
     ContentOptimizationRequest,
@@ -15,12 +26,16 @@ from agents.backend.onyx.server.features.ads.advanced_api import (
 # Test client fixture
 @pytest.fixture
 def client():
-    return TestClient(router)
+    
+    """client function."""
+return TestClient(router)
 
 # Mock user fixture
 @pytest.fixture
 def mock_user():
-    return {
+    
+    """mock_user function."""
+return {
         "id": "test_user_id",
         "email": "test@example.com",
         "role": "admin"
@@ -29,12 +44,14 @@ def mock_user():
 # Mock service fixture
 @pytest.fixture
 def mock_service():
-    return AsyncMock()
+    
+    """mock_service function."""
+return AsyncMock()
 
 # Test training data endpoint
-def test_train_ai_model(client, mock_user, mock_service):
+def test_train_ai_model(client, mock_user, mock_service) -> Any:
     """Test AI model training endpoint."""
-    with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
+    with patch('onyx.server.features.ads.api.advanced.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service
         mock_service.train_ai_model.return_value = {"status": "success"}
         
@@ -56,9 +73,9 @@ def test_train_ai_model(client, mock_user, mock_service):
         mock_service.train_ai_model.assert_called_once()
 
 # Test content optimization endpoint
-def test_optimize_content(client, mock_user, mock_service):
+def test_optimize_content(client, mock_user, mock_service) -> Any:
     """Test content optimization endpoint."""
-    with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
+    with patch('onyx.server.features.ads.api.advanced.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service
         mock_service.optimize_content.return_value = {"optimized_content": "Improved content"}
         
@@ -76,9 +93,9 @@ def test_optimize_content(client, mock_user, mock_service):
         mock_service.optimize_content.assert_called_once()
 
 # Test audience analysis endpoint
-def test_analyze_audience(client, mock_user, mock_service):
+def test_analyze_audience(client, mock_user, mock_service) -> Any:
     """Test audience analysis endpoint."""
-    with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
+    with patch('onyx.server.features.ads.api.advanced.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service
         mock_service.analyze_audience.return_value = {
             "demographics": {"age": "25-34"},
@@ -95,9 +112,9 @@ def test_analyze_audience(client, mock_user, mock_service):
         mock_service.analyze_audience.assert_called_once_with("test_segment")
 
 # Test brand voice analysis endpoint
-def test_analyze_brand_voice(client, mock_user, mock_service):
+def test_analyze_brand_voice(client, mock_user, mock_service) -> Any:
     """Test brand voice analysis endpoint."""
-    with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
+    with patch('onyx.server.features.ads.api.advanced.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service
         mock_service.analyze_brand_voice.return_value = {
             "tone": "professional",
@@ -117,9 +134,9 @@ def test_analyze_brand_voice(client, mock_user, mock_service):
         mock_service.analyze_brand_voice.assert_called_once()
 
 # Test content performance tracking endpoint
-def test_track_content_performance(client, mock_user, mock_service):
+def test_track_content_performance(client, mock_user, mock_service) -> Any:
     """Test content performance tracking endpoint."""
-    with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
+    with patch('onyx.server.features.ads.api.advanced.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service
         mock_service.track_content_performance.return_value = {
             "views": 1000,
@@ -136,9 +153,9 @@ def test_track_content_performance(client, mock_user, mock_service):
         mock_service.track_content_performance.assert_called_once_with("test_content")
 
 # Test AI recommendations endpoint
-def test_generate_ai_recommendations(client, mock_user, mock_service):
+def test_generate_ai_recommendations(client, mock_user, mock_service) -> Any:
     """Test AI recommendations endpoint."""
-    with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
+    with patch('onyx.server.features.ads.api.advanced.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service
         mock_service.generate_ai_recommendations.return_value = [
             "Recommendation 1",
@@ -159,9 +176,9 @@ def test_generate_ai_recommendations(client, mock_user, mock_service):
         mock_service.generate_ai_recommendations.assert_called_once()
 
 # Test content impact analysis endpoint
-def test_analyze_content_impact(client, mock_user, mock_service):
+def test_analyze_content_impact(client, mock_user, mock_service) -> Any:
     """Test content impact analysis endpoint."""
-    with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
+    with patch('onyx.server.features.ads.api.advanced.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service
         mock_service.analyze_content_impact.return_value = {
             "reach": 5000,
@@ -178,9 +195,9 @@ def test_analyze_content_impact(client, mock_user, mock_service):
         mock_service.analyze_content_impact.assert_called_once_with("test_content")
 
 # Test audience targeting optimization endpoint
-def test_optimize_audience_targeting(client, mock_user, mock_service):
+def test_optimize_audience_targeting(client, mock_user, mock_service) -> Optional[Dict[str, Any]]:
     """Test audience targeting optimization endpoint."""
-    with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
+    with patch('onyx.server.features.ads.api.advanced.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service
         mock_service.optimize_audience_targeting.return_value = {
             "optimized_segments": ["segment1", "segment2"]
@@ -196,9 +213,9 @@ def test_optimize_audience_targeting(client, mock_user, mock_service):
         mock_service.optimize_audience_targeting.assert_called_once_with("test_segment")
 
 # Test content variations endpoint
-def test_generate_content_variations(client, mock_user, mock_service):
+def test_generate_content_variations(client, mock_user, mock_service) -> Any:
     """Test content variations endpoint."""
-    with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
+    with patch('onyx.server.features.ads.api.advanced.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service
         mock_service.generate_content_variations.return_value = [
             "Variation 1",
@@ -220,7 +237,7 @@ def test_generate_content_variations(client, mock_user, mock_service):
         mock_service.generate_content_variations.assert_called_once()
 
 # Test competitor analysis endpoint
-def test_analyze_competitor_content(client, mock_user, mock_service):
+def test_analyze_competitor_content(client, mock_user, mock_service) -> Any:
     """Test competitor analysis endpoint."""
     with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service
@@ -245,7 +262,7 @@ def test_analyze_competitor_content(client, mock_user, mock_service):
         mock_service.analyze_competitor_content.assert_called_once()
 
 # Test error handling
-def test_error_handling(client, mock_user, mock_service):
+def test_error_handling(client, mock_user, mock_service) -> Any:
     """Test error handling in endpoints."""
     with patch('onyx.server.features.ads.advanced_api.AdvancedAdsService') as mock_service_class:
         mock_service_class.return_value = mock_service

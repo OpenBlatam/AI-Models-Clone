@@ -1,6 +1,5 @@
-"""
-Comprehensive tests for advanced Diffusers features.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 import asyncio
 import torch
@@ -9,14 +8,19 @@ from PIL import Image
 import numpy as np
 from io import BytesIO
 import base64
-
 from onyx.server.features.ads.diffusion_service import (
+from onyx.server.features.ads.diffusion_api import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Comprehensive tests for advanced Diffusers features.
+"""
+
     DiffusionService,
     DiffusionModelManager,
     DiffusionSchedulerFactory,
     GenerationParams
 )
-from onyx.server.features.ads.diffusion_api import (
     LCMRequest,
     TCDRequest,
     CustomSchedulerRequest,
@@ -37,13 +41,13 @@ def create_sample_image_base64():
 class TestDiffusionSchedulerFactory:
     """Test the DiffusionSchedulerFactory class."""
     
-    def test_create_scheduler_basic(self):
+    def test_create_scheduler_basic(self) -> Any:
         """Test basic scheduler creation."""
         scheduler = DiffusionSchedulerFactory.create_scheduler("DDIM")
         assert scheduler is not None
         assert hasattr(scheduler, 'step')
     
-    def test_create_scheduler_lcm(self):
+    def test_create_scheduler_lcm(self) -> Any:
         """Test LCM scheduler creation with optimized defaults."""
         scheduler = DiffusionSchedulerFactory.create_scheduler("LCM")
         assert scheduler is not None
@@ -51,7 +55,7 @@ class TestDiffusionSchedulerFactory:
         assert hasattr(scheduler, 'beta_start')
         assert hasattr(scheduler, 'beta_end')
     
-    def test_create_scheduler_tcd(self):
+    def test_create_scheduler_tcd(self) -> Any:
         """Test TCD scheduler creation with optimized defaults."""
         scheduler = DiffusionSchedulerFactory.create_scheduler("TCD")
         assert scheduler is not None
@@ -59,7 +63,7 @@ class TestDiffusionSchedulerFactory:
         assert hasattr(scheduler, 'beta_start')
         assert hasattr(scheduler, 'beta_end')
     
-    def test_create_scheduler_dpm_plus_plus(self):
+    def test_create_scheduler_dpm_plus_plus(self) -> Any:
         """Test DPM++ scheduler creation with optimized defaults."""
         scheduler = DiffusionSchedulerFactory.create_scheduler("DPM++")
         assert scheduler is not None
@@ -67,7 +71,7 @@ class TestDiffusionSchedulerFactory:
         assert hasattr(scheduler, 'algorithm_type')
         assert hasattr(scheduler, 'solver_type')
     
-    def test_get_optimal_scheduler_fast(self):
+    def test_get_optimal_scheduler_fast(self) -> Optional[Dict[str, Any]]:
         """Test optimal scheduler selection for fast generation."""
         scheduler = DiffusionSchedulerFactory.get_optimal_scheduler_for_task("text2img", "fast")
         assert scheduler == "LCM"
@@ -75,7 +79,7 @@ class TestDiffusionSchedulerFactory:
         scheduler = DiffusionSchedulerFactory.get_optimal_scheduler_for_task("img2img", "fast")
         assert scheduler == "TCD"
     
-    def test_get_optimal_scheduler_high_quality(self):
+    def test_get_optimal_scheduler_high_quality(self) -> Optional[Dict[str, Any]]:
         """Test optimal scheduler selection for high quality."""
         scheduler = DiffusionSchedulerFactory.get_optimal_scheduler_for_task("text2img", "high")
         assert scheduler == "DPM++"
@@ -83,7 +87,7 @@ class TestDiffusionSchedulerFactory:
         scheduler = DiffusionSchedulerFactory.get_optimal_scheduler_for_task("img2img", "high")
         assert scheduler == "Heun"
     
-    def test_get_optimal_scheduler_balanced(self):
+    def test_get_optimal_scheduler_balanced(self) -> Optional[Dict[str, Any]]:
         """Test optimal scheduler selection for balanced generation."""
         scheduler = DiffusionSchedulerFactory.get_optimal_scheduler_for_task("text2img", "balanced")
         assert scheduler == "Euler"
@@ -95,12 +99,12 @@ class TestDiffusionModelManager:
     """Test the DiffusionModelManager class."""
     
     @pytest.fixture
-    def model_manager(self):
+    def model_manager(self) -> Any:
         """Create a model manager instance."""
         return DiffusionModelManager()
     
     @patch('torch.cuda.is_available')
-    def test_get_text_to_image_pipeline_basic(self, mock_cuda, model_manager):
+    def test_get_text_to_image_pipeline_basic(self, mock_cuda, model_manager) -> Optional[Dict[str, Any]]:
         """Test basic text-to-image pipeline loading."""
         mock_cuda.return_value = False
         
@@ -114,7 +118,7 @@ class TestDiffusionModelManager:
             mock_load.assert_called_once()
     
     @patch('torch.cuda.is_available')
-    def test_get_text_to_image_pipeline_sdxl(self, mock_cuda, model_manager):
+    def test_get_text_to_image_pipeline_sdxl(self, mock_cuda, model_manager) -> Optional[Dict[str, Any]]:
         """Test SDXL text-to-image pipeline loading."""
         mock_cuda.return_value = True
         
@@ -128,7 +132,7 @@ class TestDiffusionModelManager:
             mock_load.assert_called_once()
     
     @patch('torch.cuda.is_available')
-    def test_get_image_to_image_pipeline_sdxl(self, mock_cuda, model_manager):
+    def test_get_image_to_image_pipeline_sdxl(self, mock_cuda, model_manager) -> Optional[Dict[str, Any]]:
         """Test SDXL image-to-image pipeline loading."""
         mock_cuda.return_value = True
         
@@ -142,7 +146,7 @@ class TestDiffusionModelManager:
             mock_load.assert_called_once()
     
     @patch('torch.cuda.is_available')
-    def test_get_lcm_pipeline(self, mock_cuda, model_manager):
+    def test_get_lcm_pipeline(self, mock_cuda, model_manager) -> Optional[Dict[str, Any]]:
         """Test LCM pipeline loading."""
         mock_cuda.return_value = True
         
@@ -161,7 +165,7 @@ class TestDiffusionModelManager:
                 mock_scheduler.assert_called_once()
     
     @patch('torch.cuda.is_available')
-    def test_get_tcd_pipeline(self, mock_cuda, model_manager):
+    def test_get_tcd_pipeline(self, mock_cuda, model_manager) -> Optional[Dict[str, Any]]:
         """Test TCD pipeline loading."""
         mock_cuda.return_value = True
         
@@ -180,7 +184,7 @@ class TestDiffusionModelManager:
                 mock_scheduler.assert_called_once()
     
     @patch('torch.cuda.is_available')
-    def test_get_controlnet_pipeline(self, mock_cuda, model_manager):
+    def test_get_controlnet_pipeline(self, mock_cuda, model_manager) -> Optional[Dict[str, Any]]:
         """Test ControlNet pipeline loading."""
         mock_cuda.return_value = True
         
@@ -202,12 +206,12 @@ class TestDiffusionService:
     """Test the DiffusionService class."""
     
     @pytest.fixture
-    def diffusion_service(self):
+    def diffusion_service(self) -> Any:
         """Create a diffusion service instance."""
         return DiffusionService()
     
     @pytest.fixture
-    def sample_params(self):
+    def sample_params(self) -> Any:
         """Create sample generation parameters."""
         return GenerationParams(
             prompt=SAMPLE_PROMPT,
@@ -221,7 +225,7 @@ class TestDiffusionService:
         )
     
     @patch('onyx.server.features.ads.diffusion_service.aioredis.from_url')
-    async def test_generate_with_lcm(self, mock_redis, diffusion_service, sample_params):
+    async def test_generate_with_lcm(self, mock_redis, diffusion_service, sample_params) -> Any:
         """Test LCM generation."""
         # Mock Redis
         mock_redis_client = AsyncMock()
@@ -240,7 +244,7 @@ class TestDiffusionService:
             mock_pipeline.assert_called_once()
     
     @patch('onyx.server.features.ads.diffusion_service.aioredis.from_url')
-    async def test_generate_with_tcd(self, mock_redis, diffusion_service, sample_params):
+    async def test_generate_with_tcd(self, mock_redis, diffusion_service, sample_params) -> Any:
         """Test TCD generation."""
         # Mock Redis
         mock_redis_client = AsyncMock()
@@ -259,7 +263,7 @@ class TestDiffusionService:
             mock_pipeline.assert_called_once()
     
     @patch('onyx.server.features.ads.diffusion_service.aioredis.from_url')
-    async def test_generate_with_custom_scheduler(self, mock_redis, diffusion_service, sample_params):
+    async def test_generate_with_custom_scheduler(self, mock_redis, diffusion_service, sample_params) -> Any:
         """Test custom scheduler generation."""
         # Mock Redis
         mock_redis_client = AsyncMock()
@@ -284,7 +288,7 @@ class TestDiffusionService:
                 mock_scheduler.assert_called_once_with("DPM++")
     
     @patch('onyx.server.features.ads.diffusion_service.aioredis.from_url')
-    async def test_generate_with_advanced_options(self, mock_redis, diffusion_service, sample_params):
+    async def test_generate_with_advanced_options(self, mock_redis, diffusion_service, sample_params) -> Any:
         """Test advanced options generation."""
         # Mock Redis
         mock_redis_client = AsyncMock()
@@ -316,7 +320,7 @@ class TestDiffusionService:
                 mock_pipeline.load_lora_weights.assert_called_once_with("/path/to/lora")
                 mock_pipeline.load_textual_inversion.assert_called_once_with("/path/to/ti")
     
-    def test_get_cache_key(self, diffusion_service, sample_params):
+    def test_get_cache_key(self, diffusion_service, sample_params) -> Optional[Dict[str, Any]]:
         """Test cache key generation."""
         cache_key = diffusion_service._get_cache_key(sample_params, "test-model", "lcm")
         
@@ -325,7 +329,7 @@ class TestDiffusionService:
         assert "lcm" in cache_key
         assert SAMPLE_PROMPT in cache_key
     
-    def test_encode_decode_images(self, diffusion_service):
+    def test_encode_decode_images(self, diffusion_service) -> Any:
         """Test image encoding and decoding for cache."""
         # Encode images
         encoded = diffusion_service._encode_images_for_cache([SAMPLE_IMAGE])
@@ -341,7 +345,7 @@ class TestDiffusionAPI:
     """Test the diffusion API endpoints."""
     
     @pytest.fixture
-    def lcm_request(self):
+    async def lcm_request(self) -> Any:
         """Create a sample LCM request."""
         return LCMRequest(
             prompt=SAMPLE_PROMPT,
@@ -355,7 +359,7 @@ class TestDiffusionAPI:
         )
     
     @pytest.fixture
-    def tcd_request(self):
+    async def tcd_request(self) -> Any:
         """Create a sample TCD request."""
         return TCDRequest(
             prompt=SAMPLE_PROMPT,
@@ -369,7 +373,7 @@ class TestDiffusionAPI:
         )
     
     @pytest.fixture
-    def custom_scheduler_request(self):
+    async def custom_scheduler_request(self) -> Any:
         """Create a sample custom scheduler request."""
         return CustomSchedulerRequest(
             prompt=SAMPLE_PROMPT,
@@ -384,7 +388,7 @@ class TestDiffusionAPI:
         )
     
     @pytest.fixture
-    def advanced_request(self):
+    async def advanced_request(self) -> Any:
         """Create a sample advanced request."""
         return AdvancedGenerationRequest(
             prompt=SAMPLE_PROMPT,
@@ -402,25 +406,25 @@ class TestDiffusionAPI:
             textual_inversion_path="/path/to/ti"
         )
     
-    def test_lcm_request_validation(self, lcm_request):
+    async def test_lcm_request_validation(self, lcm_request) -> Any:
         """Test LCM request validation."""
         assert lcm_request.prompt == SAMPLE_PROMPT
         assert lcm_request.num_inference_steps == 4
         assert lcm_request.model_name == "SimianLuo/LCM_Dreamshaper_v7"
     
-    def test_tcd_request_validation(self, tcd_request):
+    async def test_tcd_request_validation(self, tcd_request) -> Any:
         """Test TCD request validation."""
         assert tcd_request.prompt == SAMPLE_PROMPT
         assert tcd_request.num_inference_steps == 1
         assert tcd_request.model_name == "h1t/TCD-SD15"
     
-    def test_custom_scheduler_request_validation(self, custom_scheduler_request):
+    async def test_custom_scheduler_request_validation(self, custom_scheduler_request) -> Any:
         """Test custom scheduler request validation."""
         assert custom_scheduler_request.prompt == SAMPLE_PROMPT
         assert custom_scheduler_request.scheduler_type == "DPM++"
         assert custom_scheduler_request.model_name == "runwayml/stable-diffusion-v1-5"
     
-    def test_advanced_request_validation(self, advanced_request):
+    async def test_advanced_request_validation(self, advanced_request) -> Any:
         """Test advanced request validation."""
         assert advanced_request.prompt == SAMPLE_PROMPT
         assert advanced_request.use_lora is True
@@ -432,26 +436,26 @@ class TestIntegration:
     """Integration tests for the complete diffusion system."""
     
     @pytest.mark.asyncio
-    async def test_end_to_end_lcm_generation(self):
+    async def test_end_to_end_lcm_generation(self) -> Any:
         """Test end-to-end LCM generation."""
         # This would test the complete flow from API to service to model
         # Implementation would depend on the actual API framework being used
         pass
     
     @pytest.mark.asyncio
-    async def test_end_to_end_tcd_generation(self):
+    async def test_end_to_end_tcd_generation(self) -> Any:
         """Test end-to-end TCD generation."""
         # This would test the complete flow from API to service to model
         pass
     
     @pytest.mark.asyncio
-    async def test_cache_integration(self):
+    async def test_cache_integration(self) -> Any:
         """Test cache integration."""
         # This would test that caching works correctly across the system
         pass
     
     @pytest.mark.asyncio
-    async def test_error_handling(self):
+    async def test_error_handling(self) -> Any:
         """Test error handling across the system."""
         # This would test error handling for various failure scenarios
         pass
@@ -461,28 +465,29 @@ class TestPerformance:
     """Performance tests for the diffusion system."""
     
     @pytest.mark.asyncio
-    async def test_lcm_speed(self):
+    async def test_lcm_speed(self) -> Any:
         """Test LCM generation speed."""
         # This would measure the actual speed of LCM generation
         pass
     
     @pytest.mark.asyncio
-    async def test_tcd_speed(self):
+    async def test_tcd_speed(self) -> Any:
         """Test TCD generation speed."""
         # This would measure the actual speed of TCD generation
         pass
     
     @pytest.mark.asyncio
-    async def test_memory_usage(self):
+    async def test_memory_usage(self) -> Any:
         """Test memory usage of different models."""
         # This would measure memory usage of different models
         pass
     
     @pytest.mark.asyncio
-    async def test_concurrent_generation(self):
+    async def test_concurrent_generation(self) -> Any:
         """Test concurrent generation performance."""
         # This would test performance under concurrent load
         pass
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

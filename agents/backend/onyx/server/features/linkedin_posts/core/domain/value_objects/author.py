@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from dataclasses import dataclass
+from typing import Optional
+from uuid import UUID
+import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Author Value Object
 ==================
@@ -5,10 +17,6 @@ Author Value Object
 Value object for post author with validation and business rules.
 """
 
-from dataclasses import dataclass
-from typing import Optional
-from uuid import UUID
-import re
 
 
 @dataclass(frozen=True)
@@ -27,7 +35,7 @@ class Author:
     title: Optional[str] = None
     linkedin_profile: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate author data after initialization."""
         self._validate_author()
     

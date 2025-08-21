@@ -1,7 +1,13 @@
-"""
-Instagram Captions API v14.0 - Performance Tests
-Comprehensive load and stress testing
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -11,6 +17,13 @@ from typing import List, Dict, Any
 import json
 from dataclasses import dataclass
 import argparse
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Instagram Captions API v14.0 - Performance Tests
+Comprehensive load and stress testing
+"""
+
 
 @dataclass
 class TestResult:
@@ -31,12 +44,14 @@ class PerformanceTester:
     """Performance testing framework"""
     
     def __init__(self, base_url: str = "http://localhost:8140", api_key: str = "optimized-v14-key"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.api_key = api_key
         self.headers = {"Authorization": f"Bearer {api_key}"}
         self.results: List[TestResult] = []
     
-    async def single_request_test(self, num_requests: int = 100) -> TestResult:
+    async async def single_request_test(self, num_requests: int = 100) -> TestResult:
         """Test single request performance"""
         print(f"🧪 Running single request test with {num_requests} requests...")
         
@@ -92,7 +107,7 @@ class PerformanceTester:
             success_rate=successful_requests / num_requests * 100
         )
     
-    async def batch_request_test(self, num_batches: int = 10, batch_size: int = 10) -> TestResult:
+    async async def batch_request_test(self, num_batches: int = 10, batch_size: int = 10) -> TestResult:
         """Test batch request performance"""
         print(f"🧪 Running batch request test with {num_batches} batches of {batch_size} requests...")
         
@@ -161,7 +176,9 @@ class PerformanceTester:
         start_time = time.time()
         
         async def worker(worker_id: int):
-            nonlocal successful_requests, failed_requests
+            
+    """worker function."""
+nonlocal successful_requests, failed_requests
             async with aiohttp.ClientSession() as session:
                 while time.time() - start_time < duration:
                     request_data = {
@@ -222,7 +239,9 @@ class PerformanceTester:
         start_time = time.time()
         
         async def stress_worker(worker_id: int):
-            nonlocal successful_requests, failed_requests
+            
+    """stress_worker function."""
+nonlocal successful_requests, failed_requests
             async with aiohttp.ClientSession() as session:
                 while time.time() - start_time < ramp_up_time * 2:  # Run for 2x ramp-up time
                     request_data = {
@@ -335,7 +354,7 @@ class PerformanceTester:
             success_rate=successful_requests / num_requests * 100
         )
     
-    def print_results(self):
+    def print_results(self) -> Any:
         """Print test results"""
         print("\n" + "="*80)
         print("📊 PERFORMANCE TEST RESULTS")
@@ -374,6 +393,10 @@ class PerformanceTester:
             })
         
         with open(filename, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(results_dict, f, indent=2)
         
         print(f"\n💾 Results saved to {filename}")
@@ -415,5 +438,6 @@ async def main():
     tester.print_results()
     tester.save_results()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

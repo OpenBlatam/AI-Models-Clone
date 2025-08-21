@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Dict, Any, List, Optional
+from ..domain.entities import CaptionRequest, CaptionResponse, CaptionStyle
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v13.0 - AI Provider Interfaces
 
@@ -5,9 +13,6 @@ Interfaces for AI service providers following dependency inversion principle.
 Domain defines contracts, infrastructure implements them.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, Any, List, Optional
-from ..domain.entities import CaptionRequest, CaptionResponse, CaptionStyle
 
 
 class IAIProvider(ABC):
@@ -72,7 +77,7 @@ class IOpenAIProvider(IAIProvider):
     """Interface for OpenAI-based providers."""
     
     @abstractmethod
-    async def set_api_key(self, api_key: str) -> None:
+    async async def set_api_key(self, api_key: str) -> None:
         """Set OpenAI API key."""
         pass
     

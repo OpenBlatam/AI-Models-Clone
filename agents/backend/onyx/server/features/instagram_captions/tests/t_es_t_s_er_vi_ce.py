@@ -1,20 +1,24 @@
-"""
-Tests for Instagram Captions Service.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 import asyncio
 from unittest.mock import Mock, patch
 from datetime import datetime
-
 from ..models import (
+from ..service import InstagramCaptionsService, OpenAIProvider, LangChainProvider
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Tests for Instagram Captions Service.
+"""
+
+
     InstagramCaptionRequest,
     PostContent,
     CaptionStyle,
     TimeZone,
     InstagramTarget
 )
-from ..service import InstagramCaptionsService, OpenAIProvider, LangChainProvider
 
 
 @pytest.fixture
@@ -51,12 +55,12 @@ def mock_service():
 class TestInstagramCaptionsService:
     """Test Instagram Captions Service functionality."""
     
-    def test_service_initialization(self):
+    def test_service_initialization(self) -> Any:
         """Test service initializes correctly."""
         service = InstagramCaptionsService()
         assert isinstance(service.providers, dict)
     
-    def test_get_best_provider_langchain_preference(self, mock_service, sample_request):
+    def test_get_best_provider_langchain_preference(self, mock_service, sample_request) -> Optional[Dict[str, Any]]:
         """Test provider selection with LangChain preference."""
         sample_request.use_langchain = True
         sample_request.use_openai = False
@@ -64,7 +68,7 @@ class TestInstagramCaptionsService:
         provider = mock_service.get_best_provider(sample_request)
         assert provider.name == 'langchain'
     
-    def test_get_best_provider_openai_preference(self, mock_service, sample_request):
+    def test_get_best_provider_openai_preference(self, mock_service, sample_request) -> Optional[Dict[str, Any]]:
         """Test provider selection with OpenAI preference."""
         sample_request.use_langchain = False
         sample_request.use_openai = True
@@ -72,7 +76,7 @@ class TestInstagramCaptionsService:
         provider = mock_service.get_best_provider(sample_request)
         assert provider.name == 'openai'
     
-    def test_get_best_provider_no_available_providers(self, mock_service, sample_request):
+    def test_get_best_provider_no_available_providers(self, mock_service, sample_request) -> Optional[Dict[str, Any]]:
         """Test error when no providers are available."""
         mock_service.providers['openai'].is_available.return_value = False
         mock_service.providers['langchain'].is_available.return_value = False
@@ -81,7 +85,7 @@ class TestInstagramCaptionsService:
             mock_service.get_best_provider(sample_request)
     
     @pytest.mark.asyncio
-    async def test_generate_captions_success(self, mock_service, sample_request):
+    async def test_generate_captions_success(self, mock_service, sample_request) -> Any:
         """Test successful caption generation."""
         # Mock provider response
         mock_provider = mock_service.providers['openai']
@@ -96,7 +100,7 @@ class TestInstagramCaptionsService:
         assert response.generation_metrics.provider_used == 'openai'
     
     @pytest.mark.asyncio
-    async def test_generate_captions_provider_failure(self, mock_service, sample_request):
+    async def test_generate_captions_provider_failure(self, mock_service, sample_request) -> Any:
         """Test caption generation when provider fails."""
         mock_provider = mock_service.providers['openai']
         mock_provider.generate_caption.side_effect = Exception("Provider error")
@@ -109,7 +113,7 @@ class TestInstagramCaptionsService:
 class TestAIProviders:
     """Test AI provider classes."""
     
-    def test_openai_provider_initialization(self):
+    def test_openai_provider_initialization(self) -> Any:
         """Test OpenAI provider initialization."""
         with patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'}):
             with patch('agents.backend.onyx.server.features.instagram_captions.service.OPENAI_AVAILABLE', True):
@@ -117,19 +121,20 @@ class TestAIProviders:
                 assert provider.name == 'openai'
                 # Note: actual availability depends on import success
     
-    def test_langchain_provider_initialization(self):
+    def test_langchain_provider_initialization(self) -> Any:
         """Test LangChain provider initialization."""
         with patch.dict('os.environ', {'OPENAI_API_KEY': 'test-key'}):
             with patch('agents.backend.onyx.server.features.instagram_captions.service.LANGCHAIN_AVAILABLE', True):
                 provider = LangChainProvider()
                 assert provider.name == 'langchain'
     
-    def test_provider_unavailable_without_api_key(self):
+    async def test_provider_unavailable_without_api_key(self) -> Any:
         """Test provider is unavailable without API key."""
         with patch.dict('os.environ', {}, clear=True):
             provider = OpenAIProvider()
             assert not provider.is_available()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__]) 

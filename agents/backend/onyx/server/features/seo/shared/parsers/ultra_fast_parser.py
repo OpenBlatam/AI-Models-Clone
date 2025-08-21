@@ -1,20 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import re
+from typing import Dict, List, Optional, Any, Union
+from dataclasses import dataclass
+from urllib.parse import urljoin, urlparse
+from selectolax.parser import HTMLParser
+import lxml.etree as etree
+from lxml import html
+import orjson
+import structlog
+        import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Ultra-Fast HTML Parser v10
 Maximum Performance with Fastest Libraries
 """
 
-import re
-from typing import Dict, List, Optional, Any, Union
-from dataclasses import dataclass
-from urllib.parse import urljoin, urlparse
 
 # Ultra-fast imports
-from selectolax.parser import HTMLParser
-import lxml.etree as etree
-from lxml import html
-import orjson
-import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -54,7 +60,9 @@ class UltraFastHTMLParser:
     """Ultra-fast HTML parser with maximum performance optimizations"""
     
     def __init__(self, enable_cache: bool = True):
-        self.enable_cache = enable_cache
+        
+    """__init__ function."""
+self.enable_cache = enable_cache
         self.cache = {}
         
         # Pre-compiled regex patterns for maximum performance
@@ -71,7 +79,6 @@ class UltraFastHTMLParser:
     
     def parse_html(self, html_content: str, base_url: str = "") -> SEOData:
         """Parse HTML with maximum performance"""
-        import time
         start_time = time.time()
         
         # Use selectolax for maximum speed

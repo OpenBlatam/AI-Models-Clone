@@ -1,12 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from enum import Enum
+from dataclasses import dataclass
+from typing import Dict, Any, Optional
+from datetime import datetime
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Analysis Status Value Object
 Enum for SEO analysis status with additional metadata
 """
 
-from enum import Enum
-from dataclasses import dataclass
-from typing import Dict, Any, Optional
-from datetime import datetime
 
 
 class AnalysisStatus(Enum):
@@ -38,7 +43,7 @@ class AnalysisStatusInfo:
     created_at: datetime = None
     updated_at: datetime = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Set timestamps if not provided"""
         if self.created_at is None:
             object.__setattr__(self, 'created_at', datetime.utcnow())

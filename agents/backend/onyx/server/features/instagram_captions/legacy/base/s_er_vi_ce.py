@@ -1,8 +1,7 @@
-"""
-Instagram Captions Service.
-
-Main service for generating Instagram captions with AI provider integrations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import os
@@ -12,32 +11,43 @@ from typing import Dict, Any, List, Optional, Union
 import uuid
 import logging
 import re
-
-# AI Provider imports
-try:
     import openai
-    OPENAI_AVAILABLE = True
-except ImportError:
-    OPENAI_AVAILABLE = False
-
-try:
     from langchain.llms import OpenAI as LangChainOpenAI
     from langchain.chat_models import ChatOpenAI
     from langchain.prompts import PromptTemplate, ChatPromptTemplate
     from langchain.chains import LLMChain
     from langchain.schema import HumanMessage, SystemMessage
+    import requests
+from .models import (
+from .core import InstagramCaptionsEngine
+from .gmt_system import SimplifiedGMTSystem
+import requests
+        from collections import Counter
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions Service.
+
+Main service for generating Instagram captions with AI provider integrations.
+"""
+
+
+# AI Provider imports
+try:
+    OPENAI_AVAILABLE = True
+except ImportError:
+    OPENAI_AVAILABLE = False
+
+try:
     LANGCHAIN_AVAILABLE = True
 except ImportError:
     LANGCHAIN_AVAILABLE = False
 
 try:
-    import requests
     REQUESTS_AVAILABLE = True
 except ImportError:
     REQUESTS_AVAILABLE = False
 
 # Local imports
-from .models import (
     InstagramCaptionRequest,
     InstagramCaptionResponse,
     CaptionVariation,
@@ -50,8 +60,6 @@ from .models import (
     RegionalAdaptation,
     TimeZoneInfo
 )
-from .core import InstagramCaptionsEngine
-from .gmt_system import SimplifiedGMTSystem
 
 logger = logging.getLogger(__name__)
 
@@ -59,7 +67,9 @@ class AIProvider:
     """Base AI provider interface."""
     
     def __init__(self, name: str):
-        self.name = name
+        
+    """__init__ function."""
+self.name = name
         self.available = False
         
     async def generate_caption(self, prompt: str, **kwargs) -> str:
@@ -73,7 +83,7 @@ class AIProvider:
 class OpenAIProvider(AIProvider):
     """OpenAI provider implementation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         super().__init__("openai")
         self.client = None
         self.available = OPENAI_AVAILABLE and bool(os.getenv("OPENAI_API_KEY"))
@@ -94,6 +104,10 @@ class OpenAIProvider(AIProvider):
             
         try:
             response = await asyncio.to_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 self.client.ChatCompletion.create,
                 model=model,
                 messages=[
@@ -113,7 +127,7 @@ class OpenAIProvider(AIProvider):
 class LangChainProvider(AIProvider):
     """LangChain provider implementation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         super().__init__("langchain")
         self.llm = None
         self.chain = None
@@ -150,6 +164,10 @@ class LangChainProvider(AIProvider):
             
         try:
             result = await asyncio.to_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 self.chain.run,
                 prompt=prompt
             )
@@ -162,7 +180,7 @@ class LangChainProvider(AIProvider):
 class OpenRouterProvider(AIProvider):
     """OpenRouter provider implementation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         super().__init__("openrouter")
         self.api_key = os.getenv("OPENROUTER_API_KEY")
         self.base_url = "https://openrouter.ai/api/v1"
@@ -195,7 +213,8 @@ class OpenRouterProvider(AIProvider):
             }
             
             def make_request():
-                import requests
+                
+    """make_request function."""
                 response = requests.post(f"{self.base_url}/chat/completions", 
                                        headers=headers, 
                                        json=payload, 
@@ -204,6 +223,10 @@ class OpenRouterProvider(AIProvider):
                 return response.json()
             
             result = await asyncio.to_thread(make_request)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             return result['choices'][0]['message']['content'].strip()
             
         except Exception as e:
@@ -213,7 +236,7 @@ class OpenRouterProvider(AIProvider):
 class PromptBuilder:
     """Build optimized prompts for Instagram caption generation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.style_prompts = {
             CaptionStyle.CASUAL: "Write in a relaxed, conversational tone like talking to a friend",
             CaptionStyle.PROFESSIONAL: "Use professional, polished language suitable for business",
@@ -324,7 +347,7 @@ class PromptBuilder:
 class HashtagGenerator:
     """Generate relevant hashtags for Instagram posts."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.trending_hashtags = [
             "#trending", "#viral", "#explore", "#reels", "#instagram",
             "#love", "#instagood", "#photooftheday", "#beautiful", "#happy"
@@ -362,7 +385,7 @@ class HashtagGenerator:
 class InstagramCaptionsService:
     """Main Instagram Captions generation service."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.providers = {}
         self.prompt_builder = PromptBuilder()
         self.hashtag_generator = HashtagGenerator()
@@ -370,7 +393,7 @@ class InstagramCaptionsService:
         self.gmt_system = SimplifiedGMTSystem()
         self.initialize_providers()
     
-    def initialize_providers(self):
+    def initialize_providers(self) -> Any:
         """Initialize all AI providers."""
         # Initialize OpenAI
         if OPENAI_AVAILABLE:
@@ -581,6 +604,5 @@ class InstagramCaptionsService:
         keywords = [word for word in words if len(word) > 3 and word not in stop_words]
         
         # Return top keywords
-        from collections import Counter
         word_counts = Counter(keywords)
         return [word for word, count in word_counts.most_common(8)] 

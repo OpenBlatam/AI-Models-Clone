@@ -1,11 +1,25 @@
-"""
-Production configuration settings for LinkedIn Posts application.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import os
 from typing import List, Optional, Any
 from pydantic import BaseSettings, Field, validator
 from functools import lru_cache
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Production configuration settings for LinkedIn Posts application.
+"""
+
 
 
 class Settings(BaseSettings):
@@ -90,35 +104,35 @@ class Settings(BaseSettings):
     enable_batch_operations: bool = Field(default=True, env="ENABLE_BATCH_OPERATIONS")
     
     @validator('cors_origins', pre=True)
-    def assemble_cors_origins(cls, v):
+    def assemble_cors_origins(cls, v) -> Any:
         """Parse CORS origins from string or list."""
         if isinstance(v, str):
             return [i.strip() for i in v.split(",")]
         return v
     
     @validator('allowed_file_types', pre=True)
-    def assemble_allowed_file_types(cls, v):
+    def assemble_allowed_file_types(cls, v) -> Any:
         """Parse allowed file types from string or list."""
         if isinstance(v, str):
             return [i.strip() for i in v.split(",")]
         return v
     
     @validator('database_url')
-    def validate_database_url(cls, v):
+    def validate_database_url(cls, v) -> bool:
         """Validate database URL."""
         if not v:
             raise ValueError("DATABASE_URL is required")
         return v
     
     @validator('redis_url')
-    def validate_redis_url(cls, v):
+    def validate_redis_url(cls, v) -> bool:
         """Validate Redis URL."""
         if not v:
             raise ValueError("REDIS_URL is required")
         return v
     
     @validator('secret_key')
-    def validate_secret_key(cls, v):
+    def validate_secret_key(cls, v) -> bool:
         """Validate secret key."""
         if not v:
             raise ValueError("SECRET_KEY is required")
@@ -161,7 +175,7 @@ class ProductionSettings(Settings):
     cors_origins: List[str] = []  # Must be explicitly set
     
     @validator('cors_origins')
-    def validate_production_cors(cls, v):
+    def validate_production_cors(cls, v) -> bool:
         """Validate CORS origins in production."""
         if not v or v == ["*"]:
             raise ValueError("CORS_ORIGINS must be explicitly set in production")

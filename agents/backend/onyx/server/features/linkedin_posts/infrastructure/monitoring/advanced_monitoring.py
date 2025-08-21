@@ -1,10 +1,7 @@
-"""
-Advanced Monitoring System
-==========================
-
-Comprehensive monitoring and observability system for LinkedIn posts
-with Prometheus metrics, OpenTelemetry tracing, and advanced analytics.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -12,11 +9,7 @@ from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
 from functools import wraps
-
 from prometheus_client import (
-    Counter, Histogram, Gauge, Summary, Info,
-    generate_latest, CONTENT_TYPE_LATEST, CollectorRegistry
-)
 from opentelemetry import trace, metrics
 from opentelemetry.trace import Status, StatusCode
 from opentelemetry.metrics import Counter as OTelCounter, Histogram as OTelHistogram
@@ -31,8 +24,22 @@ import structlog
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
-
 from ...shared.logging import get_logger
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Advanced Monitoring System
+==========================
+
+Comprehensive monitoring and observability system for LinkedIn posts
+with Prometheus metrics, OpenTelemetry tracing, and advanced analytics.
+"""
+
+
+    Counter, Histogram, Gauge, Summary, Info,
+    generate_latest, CONTENT_TYPE_LATEST, CollectorRegistry
+)
+
 
 logger = get_logger(__name__)
 
@@ -90,7 +97,7 @@ class AdvancedMonitoring:
         # Console for rich output
         self.console = Console()
     
-    def _initialize_prometheus_metrics(self):
+    def _initialize_prometheus_metrics(self) -> Any:
         """Initialize Prometheus metrics."""
         # Request metrics
         self.request_counter = Counter(
@@ -202,7 +209,7 @@ class AdvancedMonitoring:
             'environment': 'production'
         })
     
-    def _initialize_opentelemetry_metrics(self):
+    def _initialize_opentelemetry_metrics(self) -> Any:
         """Initialize OpenTelemetry metrics."""
         # OpenTelemetry counters
         self.otel_posts_generated = meter.create_counter(
@@ -223,7 +230,7 @@ class AdvancedMonitoring:
             unit="operations"
         )
     
-    def _initialize_structured_logging(self):
+    def _initialize_structured_logging(self) -> Any:
         """Initialize structured logging."""
         structlog.configure(
             processors=[
@@ -367,7 +374,7 @@ class AdvancedMonitoring:
             "engagement_rate": self.business_metrics["engagement_rate"],
         }
     
-    def display_metrics_dashboard(self):
+    def display_metrics_dashboard(self) -> Any:
         """Display metrics dashboard using Rich."""
         # Create tables
         business_table = Table(title="Business Metrics")
@@ -426,9 +433,9 @@ class AdvancedMonitoring:
     
     def monitor_function(self, function_name: str, component: str = "general"):
         """Decorator for monitoring function performance."""
-        def decorator(func):
+        def decorator(func) -> Any:
             @wraps(func)
-            async def wrapper(*args, **kwargs):
+            async def wrapper(*args, **kwargs) -> Any:
                 start_time = time.time()
                 
                 with self.trace_operation(f"{component}.{function_name}") as span:
@@ -541,9 +548,11 @@ class MonitoringMiddleware:
     """FastAPI middleware for automatic monitoring."""
     
     def __init__(self, monitoring: AdvancedMonitoring):
-        self.monitoring = monitoring
+        
+    """__init__ function."""
+self.monitoring = monitoring
     
-    async def __call__(self, request, call_next):
+    async def __call__(self, request, call_next) -> Any:
         start_time = time.time()
         
         # Track request start

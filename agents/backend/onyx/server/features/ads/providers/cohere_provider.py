@@ -1,11 +1,15 @@
-"""
-Cohere provider implementation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import List, Dict, Any, Optional
 import logging
 import cohere
 from .base import BaseProvider
 from ..config.providers import CohereConfig
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Cohere provider implementation.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +17,9 @@ class CohereProvider(BaseProvider):
     """Cohere provider implementation."""
     
     def __init__(self, config: CohereConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.client = None
     
     async def initialize(self) -> None:

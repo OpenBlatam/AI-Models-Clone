@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import gradio as gr
 import torch
 import torch.nn as nn
@@ -16,6 +27,8 @@ from pathlib import Path
 import os
 import sys
 
+from typing import Any, List, Dict, Optional
+import asyncio
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -27,7 +40,7 @@ evaluation_results =[object Object]
 
 class GradioDemoManager:
     nager for all Gradio demo interfaces."   
-    def __init__(self):
+    def __init__(self) -> Any:
         self.model = None
         self.config = None
         self.training_history =   self.evaluation_results =[object Object]       self.sample_data = self._create_sample_data()
@@ -411,7 +424,8 @@ class GradioDemoManager:
             return f"Creative and artistic caption for: {text}"
         elif style == "Minimalist":
             return f"Simple and clean caption for: {text}"
-        elif style == "Engaging":
+        elmatch style:
+    case "Engaging":
             return f"Engaging and interactive caption for: {text}   else:  # Casual
             return f"Casual and fun caption for: {text}"
     

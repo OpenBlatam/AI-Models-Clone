@@ -1,11 +1,15 @@
-"""
-AI service for handling AI operations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import List, Dict, Any, Optional
 import logging
 from ..providers.factory import ProviderFactory
 from ..providers.base import BaseProvider
 from ..config.providers import ProvidersConfig
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+AI service for handling AI operations.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -13,7 +17,9 @@ class AIService:
     """Service for handling AI operations."""
     
     def __init__(self, config: Optional[ProvidersConfig] = None):
-        self.config = config or ProvidersConfig()
+        
+    """__init__ function."""
+self.config = config or ProvidersConfig()
         self.primary_provider = self.config.default_provider
         self.fallback_provider = self.config.fallback_provider
         self.logger = logger

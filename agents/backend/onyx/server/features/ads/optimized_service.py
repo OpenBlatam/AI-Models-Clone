@@ -1,6 +1,14 @@
-"""
-Optimized service for handling ads-related business logic.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 from typing import Dict, Any, Optional, List, Union
 import httpx
 import base64
@@ -13,29 +21,37 @@ from rembg import remove, new_session
 from uuid import UUID
 import asyncio
 from functools import lru_cache
-import aioredis
+try:
+    import aioredis  # type: ignore
+except Exception:  # pragma: no cover - optional in tests
+    aioredis = None  # type: ignore[assignment]
 from contextlib import asynccontextmanager
 import time
 import hashlib
 import json
-
 from onyx.llm.interface import (
-    generate_ads_lcel,
-    generate_brand_kit_lcel,
-    generate_custom_content_lcel
-)
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.storage import StorageService
 from onyx.server.features.ads.config import settings
 from .models import Ad
 from .schemas import AdCreate
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Optimized service for handling ads-related business logic.
+"""
+
+    generate_ads_lcel,
+    generate_brand_kit_lcel,
+    generate_custom_content_lcel
+)
 
 logger = setup_logger()
 
 class OptimizedAdsService:
     """Optimized service for handling ads-related business logic."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the service with optimized components."""
         self.rembg_session = new_session()
         self.storage_service = StorageService()
@@ -44,7 +60,7 @@ class OptimizedAdsService:
         self._semaphore = asyncio.Semaphore(10)  # Limit concurrent operations
         
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         """Lazy initialization of Redis client."""
         if self._redis_client is None:
             self._redis_client = await aioredis.from_url(
@@ -55,7 +71,7 @@ class OptimizedAdsService:
         return self._redis_client
     
     @property
-    async def http_client(self):
+    async async def http_client(self) -> Any:
         """Lazy initialization of HTTP client with connection pooling."""
         if self._http_client is None:
             limits = httpx.Limits(max_keepalive_connections=20, max_connections=100)
@@ -295,11 +311,19 @@ class OptimizedAdsService:
                 img_vips = img_vips.resize(scale)
             png_bytes = img_vips.write_to_buffer(".png")
             return Image.open(io.BytesIO(png_bytes))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         except Exception as e:
             logger.warning(f"pyvips failed: {e}, falling back to PIL")
             try:
                 # Use PIL directly for smaller images
                 img = Image.open(io.BytesIO(image_bytes))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 if img.size[0] > max_size or img.size[1] > max_size:
                     img.thumbnail((max_size, max_size), Image.Resampling.LANCZOS)
                 return img
@@ -356,7 +380,7 @@ class OptimizedAdsService:
         
         return valid_results
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup resources."""
         if self._http_client:
             await self._http_client.aclose()
@@ -366,11 +390,11 @@ class OptimizedAdsService:
 class OptimizedAdService:
     """Optimized service layer for Ad business logic and persistence."""
 
-    def __init__(self):
+    def __init__(self) -> Any:
         self._redis_client = None
     
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         """Lazy initialization of Redis client."""
         if self._redis_client is None:
             self._redis_client = await aioredis.from_url(

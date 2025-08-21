@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import os
+import sys
+import signal
+import logging
+from pathlib import Path
+from typing import Optional
+from optimized_core.ultra_fast_engine import UltraFastEngine, get_ultra_fast_engine
+from optimized_core.ultra_fast_api import UltraFastAPI, app
+import uvicorn
+        import uvloop
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Start Production Script - LinkedIn Posts Ultra Optimized
@@ -6,28 +20,18 @@ Start Production Script - LinkedIn Posts Ultra Optimized
 Script para iniciar el sistema ultra optimizado en producción.
 """
 
-import asyncio
-import os
-import sys
-import signal
-import logging
-from pathlib import Path
-from typing import Optional
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 # Import ultra fast components
-from optimized_core.ultra_fast_engine import UltraFastEngine, get_ultra_fast_engine
-from optimized_core.ultra_fast_api import UltraFastAPI, app
-import uvicorn
 
 
 class ProductionRunner:
     """Runner para producción ultra optimizado."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.engine = None
         self.api = None
         self.server = None
@@ -44,7 +48,7 @@ class ProductionRunner:
         )
         self.logger = logging.getLogger(__name__)
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Inicializar sistema para producción."""
         self.logger.info("🚀 Inicializando Sistema de Producción Ultra Optimizado...")
         
@@ -68,7 +72,7 @@ class ProductionRunner:
             self.logger.error(f"❌ Error en inicialización: {e}")
             return False
     
-    async def start_server(self):
+    async def start_server(self) -> Any:
         """Iniciar servidor de producción."""
         config = uvicorn.Config(
             app=app,
@@ -87,7 +91,7 @@ class ProductionRunner:
         self.server = uvicorn.Server(config)
         await self.server.serve()
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Apagar sistema de producción."""
         self.logger.info("🛑 Apagando sistema de producción...")
         
@@ -98,12 +102,12 @@ class ProductionRunner:
         
         self.logger.info("✅ Sistema apagado correctamente")
     
-    def signal_handler(self, signum, frame):
+    def signal_handler(self, signum, frame) -> Any:
         """Manejador de señales para apagado graceful."""
         self.logger.info(f"📡 Señal recibida: {signum}")
         asyncio.create_task(self.shutdown())
     
-    async def run(self):
+    async def run(self) -> Any:
         """Ejecutar sistema de producción."""
         # Setup signal handlers
         signal.signal(signal.SIGINT, self.signal_handler)
@@ -132,7 +136,6 @@ async def main():
 if __name__ == "__main__":
     # Set up asyncio with uvloop if available
     try:
-        import uvloop
         asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
         print("🚀 Usando uvloop para máxima performance")
     except ImportError:

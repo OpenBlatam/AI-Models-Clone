@@ -1,3 +1,36 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import pytest
+import torch
+import torch.nn as nn
+import asyncio
+import time
+import psutil
+import gc
+import os
+from unittest.mock import Mock, patch, MagicMock
+from typing import Dict, Any, List
+from onyx.server.features.ads.profiling_optimizer import (
+from onyx.server.features.ads.data_optimization import (
+from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
+        import tempfile
+        import pandas as pd
+        import tempfile
+        import numpy as np
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test suite for Profiling and Optimization System
 
@@ -13,18 +46,7 @@ This module provides comprehensive tests for:
 - Performance benchmarking
 - Error handling and edge cases
 """
-import pytest
-import torch
-import torch.nn as nn
-import asyncio
-import time
-import psutil
-import gc
-import os
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, Any, List
 
-from onyx.server.features.ads.profiling_optimizer import (
     ProfilingConfig,
     ProfilingOptimizer,
     ProfilingResult,
@@ -34,7 +56,6 @@ from onyx.server.features.ads.profiling_optimizer import (
     profile_function,
     profiling_context
 )
-from onyx.server.features.ads.data_optimization import (
     DataOptimizationConfig,
     OptimizedDataset,
     StreamingDataset,
@@ -45,7 +66,6 @@ from onyx.server.features.ads.data_optimization import (
     optimize_preprocessing,
     memory_optimization_context
 )
-from onyx.server.features.ads.optimized_finetuning import OptimizedFineTuningService
 
 # Test fixtures
 @pytest.fixture
@@ -54,16 +74,16 @@ def sample_data():
     return [torch.randn(100, 100) for _ in range(100)]
 
 @pytest.fixture
-def sample_dataset(sample_data):
+def sample_dataset(sample_data) -> Any:
     """Create a sample dataset for testing."""
     class MockDataset:
-        def __init__(self, data):
+        def __init__(self, data) -> Any:
             self.data = data
         
-        def __len__(self):
+        def __len__(self) -> Any:
             return len(self.data)
         
-        def __getitem__(self, idx):
+        def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
             return self.data[idx]
     
     return MockDataset(sample_data)
@@ -121,7 +141,7 @@ def data_optimization_config():
 class TestProfilingConfig:
     """Test profiling configuration."""
     
-    def test_basic_config_creation(self):
+    def test_basic_config_creation(self) -> Any:
         """Test basic configuration creation."""
         config = ProfilingConfig()
         
@@ -133,7 +153,7 @@ class TestProfilingConfig:
         assert config.min_time_threshold == 0.001
         assert config.min_memory_threshold == 1024 * 1024
     
-    def test_advanced_config_creation(self, profiling_config):
+    def test_advanced_config_creation(self, profiling_config) -> Any:
         """Test advanced configuration creation."""
         config = profiling_config
         
@@ -149,7 +169,7 @@ class TestProfilingConfig:
         assert config.auto_optimize == True
         assert config.real_time_monitoring == True
     
-    def test_config_validation(self):
+    def test_config_validation(self) -> Any:
         """Test configuration validation."""
         # Test invalid thresholds
         with pytest.raises(ValueError):
@@ -170,7 +190,7 @@ class TestProfilingConfig:
 class TestProfilingOptimizer:
     """Test profiling optimizer."""
     
-    def test_optimizer_initialization(self, profiling_config):
+    def test_optimizer_initialization(self, profiling_config) -> Any:
         """Test optimizer initialization."""
         optimizer = ProfilingOptimizer(profiling_config)
         
@@ -179,7 +199,7 @@ class TestProfilingOptimizer:
         assert optimizer.optimization_history == []
         assert optimizer.gpu_monitor is not None
     
-    def test_profile_function_context(self, profiling_config):
+    def test_profile_function_context(self, profiling_config) -> Any:
         """Test profile function context manager."""
         optimizer = ProfilingOptimizer(profiling_config)
         
@@ -190,12 +210,14 @@ class TestProfilingOptimizer:
         assert len(optimizer.profiling_results) == 0  # Context manager doesn't store results
     
     @pytest.mark.asyncio
-    async def test_profile_code(self, profiling_config):
+    async def test_profile_code(self, profiling_config) -> Any:
         """Test code profiling."""
         optimizer = ProfilingOptimizer(profiling_config)
         
         def sample_function():
-            time.sleep(0.01)
+            
+    """sample_function function."""
+time.sleep(0.01)
             return "result"
         
         result = optimizer.profile_code(sample_function)
@@ -205,12 +227,14 @@ class TestProfilingOptimizer:
         assert len(result.function_times) > 0
         assert len(result.recommendations) >= 0
     
-    def test_profile_cpu(self, profiling_config):
+    def test_profile_cpu(self, profiling_config) -> Any:
         """Test CPU profiling."""
         optimizer = ProfilingOptimizer(profiling_config)
         
         def cpu_intensive_function():
-            # Simulate CPU work
+            
+    """cpu_intensive_function function."""
+# Simulate CPU work
             result = 0
             for i in range(10000):
                 result += i
@@ -221,12 +245,14 @@ class TestProfilingOptimizer:
         assert isinstance(function_times, dict)
         assert len(function_times) > 0
     
-    def test_profile_memory(self, profiling_config):
+    def test_profile_memory(self, profiling_config) -> Any:
         """Test memory profiling."""
         optimizer = ProfilingOptimizer(profiling_config)
         
         def memory_intensive_function():
-            # Simulate memory usage
+            
+    """memory_intensive_function function."""
+# Simulate memory usage
             data = [0] * 1000000
             return len(data)
         
@@ -236,12 +262,14 @@ class TestProfilingOptimizer:
         assert "peak" in memory_usage
     
     @pytest.mark.skipif(not torch.cuda.is_available(), reason="CUDA not available")
-    def test_profile_gpu(self, profiling_config):
+    def test_profile_gpu(self, profiling_config) -> Any:
         """Test GPU profiling."""
         optimizer = ProfilingOptimizer(profiling_config)
         
         def gpu_intensive_function():
-            # Simulate GPU work
+            
+    """gpu_intensive_function function."""
+# Simulate GPU work
             tensor = torch.randn(1000, 1000).cuda()
             result = torch.mm(tensor, tensor)
             return result.sum().item()
@@ -252,7 +280,7 @@ class TestProfilingOptimizer:
         assert "utilization" in gpu_info
         assert "memory_usage" in gpu_info
     
-    def test_identify_bottlenecks(self, profiling_config):
+    def test_identify_bottlenecks(self, profiling_config) -> Any:
         """Test bottleneck identification."""
         optimizer = ProfilingOptimizer(profiling_config)
         
@@ -269,7 +297,7 @@ class TestProfilingOptimizer:
         assert len(bottlenecks) > 0
         assert "slow_function" in str(bottlenecks[0])
     
-    def test_generate_recommendations(self, profiling_config):
+    def test_generate_recommendations(self, profiling_config) -> Any:
         """Test recommendation generation."""
         optimizer = ProfilingOptimizer(profiling_config)
         
@@ -285,7 +313,7 @@ class TestProfilingOptimizer:
         assert isinstance(recommendations, list)
         assert len(recommendations) > 0
     
-    def test_estimate_improvements(self, profiling_config):
+    def test_estimate_improvements(self, profiling_config) -> Any:
         """Test improvement estimation."""
         optimizer = ProfilingOptimizer(profiling_config)
         
@@ -303,7 +331,7 @@ class TestProfilingOptimizer:
 class TestDataLoadingOptimizer:
     """Test data loading optimizer."""
     
-    def test_optimizer_initialization(self, data_optimization_config):
+    def test_optimizer_initialization(self, data_optimization_config) -> Any:
         """Test optimizer initialization."""
         optimizer = DataLoadingOptimizer(data_optimization_config)
         
@@ -312,7 +340,7 @@ class TestDataLoadingOptimizer:
         assert optimizer.optimization_stats == {}
         assert optimizer.bottleneck_analysis == {}
     
-    def test_analyze_dataset(self, data_optimization_config, sample_dataset):
+    def test_analyze_dataset(self, data_optimization_config, sample_dataset) -> Any:
         """Test dataset analysis."""
         optimizer = DataLoadingOptimizer(data_optimization_config)
         
@@ -326,7 +354,7 @@ class TestDataLoadingOptimizer:
         assert "complexity" in analysis
         assert analysis["size"] == 100
     
-    def test_estimate_sample_size(self, data_optimization_config):
+    def test_estimate_sample_size(self, data_optimization_config) -> Any:
         """Test sample size estimation."""
         optimizer = DataLoadingOptimizer(data_optimization_config)
         
@@ -345,7 +373,7 @@ class TestDataLoadingOptimizer:
         size = optimizer._estimate_sample_size(text)
         assert size > 0
     
-    def test_determine_optimal_params(self, data_optimization_config):
+    def test_determine_optimal_params(self, data_optimization_config) -> Any:
         """Test optimal parameter determination."""
         optimizer = DataLoadingOptimizer(data_optimization_config)
         
@@ -365,7 +393,7 @@ class TestDataLoadingOptimizer:
         assert params["num_workers"] > 0
     
     @pytest.mark.asyncio
-    async def test_optimize_dataloader(self, data_optimization_config, sample_dataset):
+    async def test_optimize_dataloader(self, data_optimization_config, sample_dataset) -> Any:
         """Test dataloader optimization."""
         optimizer = DataLoadingOptimizer(data_optimization_config)
         
@@ -379,7 +407,7 @@ class TestDataLoadingOptimizer:
         assert hasattr(dataloader, 'batch_size')
         assert dataloader.batch_size == 16
     
-    def test_identify_bottlenecks(self, data_optimization_config):
+    def test_identify_bottlenecks(self, data_optimization_config) -> Any:
         """Test bottleneck identification."""
         optimizer = DataLoadingOptimizer(data_optimization_config)
         
@@ -397,7 +425,7 @@ class TestDataLoadingOptimizer:
 class TestPreprocessingOptimizer:
     """Test preprocessing optimizer."""
     
-    def test_optimizer_initialization(self, data_optimization_config):
+    def test_optimizer_initialization(self, data_optimization_config) -> Any:
         """Test optimizer initialization."""
         optimizer = PreprocessingOptimizer(data_optimization_config)
         
@@ -406,17 +434,17 @@ class TestPreprocessingOptimizer:
         assert optimizer.preprocessing_cache == {}
         assert optimizer.optimization_stats == {}
     
-    def test_analyze_preprocessing_funcs(self, data_optimization_config):
+    def test_analyze_preprocessing_funcs(self, data_optimization_config) -> Any:
         """Test preprocessing function analysis."""
         optimizer = PreprocessingOptimizer(data_optimization_config)
         
-        def io_function(text):
+        def io_function(text) -> Any:
             return text.lower()
         
-        def cpu_function(text):
+        def cpu_function(text) -> Any:
             return text.split()
         
-        def memory_function(text):
+        def memory_function(text) -> Any:
             return text * 1000
         
         funcs = [io_function, cpu_function, memory_function]
@@ -431,14 +459,14 @@ class TestPreprocessingOptimizer:
         assert "cacheable" in analysis
         assert analysis["total_funcs"] == 3
     
-    def test_is_cacheable(self, data_optimization_config):
+    def test_is_cacheable(self, data_optimization_config) -> Any:
         """Test cacheable function detection."""
         optimizer = PreprocessingOptimizer(data_optimization_config)
         
-        def pure_function(x):
+        def pure_function(x) -> Any:
             return x * 2
         
-        def impure_function(x):
+        def impure_function(x) -> Any:
             global counter
             counter += 1
             return x * 2
@@ -446,14 +474,14 @@ class TestPreprocessingOptimizer:
         assert optimizer._is_cacheable(pure_function) == True
         # Note: Current implementation assumes all functions are cacheable
     
-    def test_create_simple_pipeline(self, data_optimization_config):
+    def test_create_simple_pipeline(self, data_optimization_config) -> Any:
         """Test simple pipeline creation."""
         optimizer = PreprocessingOptimizer(data_optimization_config)
         
-        def func1(x):
+        def func1(x) -> Any:
             return x + 1
         
-        def func2(x):
+        def func2(x) -> Any:
             return x * 2
         
         funcs = [func1, func2]
@@ -464,14 +492,14 @@ class TestPreprocessingOptimizer:
         result = pipeline(5)
         assert result == 12  # (5 + 1) * 2
     
-    def test_create_optimized_pipeline(self, data_optimization_config):
+    def test_create_optimized_pipeline(self, data_optimization_config) -> Any:
         """Test optimized pipeline creation."""
         optimizer = PreprocessingOptimizer(data_optimization_config)
         
-        def func1(x):
+        def func1(x) -> Any:
             return x + 1
         
-        def func2(x):
+        def func2(x) -> Any:
             return x * 2
         
         funcs = [func1, func2]
@@ -483,14 +511,14 @@ class TestPreprocessingOptimizer:
         result = pipeline(5)
         assert result == 12  # (5 + 1) * 2
     
-    def test_create_batch_pipeline(self, data_optimization_config):
+    def test_create_batch_pipeline(self, data_optimization_config) -> Any:
         """Test batch pipeline creation."""
         optimizer = PreprocessingOptimizer(data_optimization_config)
         
-        def func1(x):
+        def func1(x) -> Any:
             return x + 1
         
-        def func2(x):
+        def func2(x) -> Any:
             return x * 2
         
         funcs = [func1, func2]
@@ -504,14 +532,14 @@ class TestPreprocessingOptimizer:
         expected = [(x + 1) * 2 for x in data]
         assert results == expected
     
-    def test_create_parallel_pipeline(self, data_optimization_config):
+    def test_create_parallel_pipeline(self, data_optimization_config) -> Any:
         """Test parallel pipeline creation."""
         optimizer = PreprocessingOptimizer(data_optimization_config)
         
-        def func1(x):
+        def func1(x) -> Any:
             return x + 1
         
-        def func2(x):
+        def func2(x) -> Any:
             return x * 2
         
         funcs = [func1, func2]
@@ -526,14 +554,14 @@ class TestPreprocessingOptimizer:
         assert results == expected
     
     @pytest.mark.asyncio
-    async def test_optimize_preprocessing_pipeline(self, data_optimization_config):
+    async def test_optimize_preprocessing_pipeline(self, data_optimization_config) -> Any:
         """Test preprocessing pipeline optimization."""
         optimizer = PreprocessingOptimizer(data_optimization_config)
         
-        def func1(x):
+        def func1(x) -> Any:
             return x + 1
         
-        def func2(x):
+        def func2(x) -> Any:
             return x * 2
         
         funcs = [func1, func2]
@@ -549,14 +577,14 @@ class TestPreprocessingOptimizer:
 class TestMemoryOptimizer:
     """Test memory optimizer."""
     
-    def test_optimizer_initialization(self, data_optimization_config):
+    def test_optimizer_initialization(self, data_optimization_config) -> Any:
         """Test optimizer initialization."""
         optimizer = MemoryOptimizer(data_optimization_config)
         
         assert optimizer.config == data_optimization_config
         assert optimizer.memory_stats == {}
     
-    def test_memory_context(self, data_optimization_config):
+    def test_memory_context(self, data_optimization_config) -> Any:
         """Test memory context manager."""
         optimizer = MemoryOptimizer(data_optimization_config)
         
@@ -567,7 +595,7 @@ class TestMemoryOptimizer:
         
         assert "last_operation" in optimizer.memory_stats
     
-    def test_optimize_memory_usage(self, data_optimization_config):
+    def test_optimize_memory_usage(self, data_optimization_config) -> Any:
         """Test memory usage optimization."""
         optimizer = MemoryOptimizer(data_optimization_config)
         
@@ -596,21 +624,24 @@ class TestMemoryOptimizer:
 class TestIOOptimizer:
     """Test I/O optimizer."""
     
-    def test_optimizer_initialization(self, data_optimization_config):
+    def test_optimizer_initialization(self, data_optimization_config) -> Any:
         """Test optimizer initialization."""
         optimizer = IOOptimizer(data_optimization_config)
         
         assert optimizer.config == data_optimization_config
         assert optimizer.io_stats == {}
     
-    def test_optimize_file_reading(self, data_optimization_config):
+    def test_optimize_file_reading(self, data_optimization_config) -> Any:
         """Test file reading optimization."""
         optimizer = IOOptimizer(data_optimization_config)
         
         # Create a temporary file
-        import tempfile
         with tempfile.NamedTemporaryFile(mode='w', delete=False) as f:
             f.write("test content")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             temp_file = f.name
         
         try:
@@ -621,15 +652,13 @@ class TestIOOptimizer:
         finally:
             os.unlink(temp_file)
     
-    def test_optimize_data_storage(self, data_optimization_config):
+    def test_optimize_data_storage(self, data_optimization_config) -> Any:
         """Test data storage optimization."""
         optimizer = IOOptimizer(data_optimization_config)
         
         # Test DataFrame storage
-        import pandas as pd
         df = pd.DataFrame({"a": [1, 2, 3], "b": [4, 5, 6]})
         
-        import tempfile
         with tempfile.NamedTemporaryFile(delete=False) as f:
             temp_file = f.name
         
@@ -641,7 +670,6 @@ class TestIOOptimizer:
                 os.unlink(temp_file + ".parquet")
         
         # Test array storage
-        import numpy as np
         array = np.array([[1, 2, 3], [4, 5, 6]])
         
         with tempfile.NamedTemporaryFile(delete=False) as f:
@@ -657,7 +685,7 @@ class TestIOOptimizer:
 class TestRealTimeProfiler:
     """Test real-time profiler."""
     
-    def test_profiler_initialization(self, profiling_config):
+    def test_profiler_initialization(self, profiling_config) -> Any:
         """Test profiler initialization."""
         profiler = RealTimeProfiler(profiling_config)
         
@@ -667,7 +695,7 @@ class TestRealTimeProfiler:
         assert profiler.performance_metrics == []
         assert profiler.alert_callbacks == []
     
-    def test_start_stop_monitoring(self, profiling_config):
+    def test_start_stop_monitoring(self, profiling_config) -> Any:
         """Test monitoring start and stop."""
         profiler = RealTimeProfiler(profiling_config)
         
@@ -680,7 +708,7 @@ class TestRealTimeProfiler:
         profiler.stop_monitoring()
         assert profiler.monitoring_active == False
     
-    def test_collect_metrics(self, profiling_config):
+    def test_collect_metrics(self, profiling_config) -> Any:
         """Test metrics collection."""
         profiler = RealTimeProfiler(profiling_config)
         
@@ -694,14 +722,14 @@ class TestRealTimeProfiler:
         assert metrics["cpu_percent"] >= 0
         assert metrics["memory_percent"] >= 0
     
-    def test_check_alerts(self, profiling_config):
+    def test_check_alerts(self, profiling_config) -> Any:
         """Test alert checking."""
         profiler = RealTimeProfiler(profiling_config)
         
         # Mock alert callback
         alerts_received = []
         
-        def alert_callback(alert, metrics):
+        def alert_callback(alert, metrics) -> Any:
             alerts_received.append(alert)
         
         profiler.add_alert_callback(alert_callback)
@@ -716,7 +744,7 @@ class TestRealTimeProfiler:
         assert len(alerts_received) > 0
         assert "High CPU usage" in alerts_received[0]
     
-    def test_get_performance_summary(self, profiling_config):
+    def test_get_performance_summary(self, profiling_config) -> Optional[Dict[str, Any]]:
         """Test performance summary generation."""
         profiler = RealTimeProfiler(profiling_config)
         
@@ -739,7 +767,7 @@ class TestRealTimeProfiler:
 class TestOptimizedDataset:
     """Test optimized dataset."""
     
-    def test_dataset_initialization(self, data_optimization_config, sample_data):
+    def test_dataset_initialization(self, data_optimization_config, sample_data) -> Any:
         """Test dataset initialization."""
         dataset = OptimizedDataset(sample_data, data_optimization_config)
         
@@ -747,13 +775,13 @@ class TestOptimizedDataset:
         assert dataset.data == sample_data
         assert dataset.cache == {}
     
-    def test_dataset_length(self, data_optimization_config, sample_data):
+    def test_dataset_length(self, data_optimization_config, sample_data) -> Any:
         """Test dataset length."""
         dataset = OptimizedDataset(sample_data, data_optimization_config)
         
         assert len(dataset) == len(sample_data)
     
-    def test_dataset_getitem(self, data_optimization_config, sample_data):
+    def test_dataset_getitem(self, data_optimization_config, sample_data) -> Optional[Dict[str, Any]]:
         """Test dataset item access."""
         dataset = OptimizedDataset(sample_data, data_optimization_config)
         
@@ -761,7 +789,7 @@ class TestOptimizedDataset:
         assert item is not None
         assert item in sample_data
     
-    def test_dataset_caching(self, data_optimization_config, sample_data):
+    def test_dataset_caching(self, data_optimization_config, sample_data) -> Any:
         """Test dataset caching."""
         dataset = OptimizedDataset(sample_data, data_optimization_config)
         
@@ -777,19 +805,19 @@ class TestIntegrationWithFineTuning:
     """Test integration with fine-tuning service."""
     
     @pytest.mark.asyncio
-    async def test_profile_and_optimize_training(self):
+    async def test_profile_and_optimize_training(self) -> Any:
         """Test profile and optimize training."""
         service = OptimizedFineTuningService()
         
         # Mock dataset
         class MockDataset:
-            def __init__(self):
+            def __init__(self) -> Any:
                 self.data = ["sample text"] * 100
             
-            def __len__(self):
+            def __len__(self) -> Any:
                 return len(self.data)
             
-            def __getitem__(self, idx):
+            def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
                 return self.data[idx]
         
         dataset = MockDataset()
@@ -819,19 +847,19 @@ class TestIntegrationWithFineTuning:
         assert "recommendations" in result
     
     @pytest.mark.asyncio
-    async def test_optimize_dataset_loading(self):
+    async def test_optimize_dataset_loading(self) -> Any:
         """Test dataset loading optimization."""
         service = OptimizedFineTuningService()
         
         # Mock dataset
         class MockDataset:
-            def __init__(self):
+            def __init__(self) -> Any:
                 self.data = ["sample text"] * 100
             
-            def __len__(self):
+            def __len__(self) -> Any:
                 return len(self.data)
             
-            def __getitem__(self, idx):
+            def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
                 return self.data[idx]
         
         dataset = MockDataset()
@@ -842,14 +870,14 @@ class TestIntegrationWithFineTuning:
         assert hasattr(dataloader, 'batch_size')
     
     @pytest.mark.asyncio
-    async def test_optimize_preprocessing_pipeline(self):
+    async def test_optimize_preprocessing_pipeline(self) -> Any:
         """Test preprocessing pipeline optimization."""
         service = OptimizedFineTuningService()
         
-        def func1(x):
+        def func1(x) -> Any:
             return x + 1
         
-        def func2(x):
+        def func2(x) -> Any:
             return x * 2
         
         preprocessing_funcs = [func1, func2]
@@ -865,7 +893,7 @@ class TestIntegrationWithFineTuning:
         assert results == expected
     
     @pytest.mark.asyncio
-    async def test_get_performance_report(self):
+    async def test_get_performance_report(self) -> Optional[Dict[str, Any]]:
         """Test performance report generation."""
         service = OptimizedFineTuningService()
         
@@ -880,16 +908,16 @@ class TestIntegrationWithFineTuning:
 class TestUtilityFunctions:
     """Test utility functions."""
     
-    def test_optimize_dataset(self, data_optimization_config, sample_data):
+    def test_optimize_dataset(self, data_optimization_config, sample_data) -> Any:
         """Test dataset optimization utility."""
         class MockDataset:
-            def __init__(self, data):
+            def __init__(self, data) -> Any:
                 self.data = data
             
-            def __len__(self):
+            def __len__(self) -> Any:
                 return len(self.data)
             
-            def __getitem__(self, idx):
+            def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
                 return self.data[idx]
         
         dataset = MockDataset(sample_data)
@@ -898,16 +926,16 @@ class TestUtilityFunctions:
         assert isinstance(optimized_dataset, OptimizedDataset)
         assert len(optimized_dataset) == len(dataset)
     
-    def test_optimize_dataloader(self, data_optimization_config, sample_data):
+    def test_optimize_dataloader(self, data_optimization_config, sample_data) -> Any:
         """Test dataloader optimization utility."""
         class MockDataset:
-            def __init__(self, data):
+            def __init__(self, data) -> Any:
                 self.data = data
             
-            def __len__(self):
+            def __len__(self) -> Any:
                 return len(self.data)
             
-            def __getitem__(self, idx):
+            def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
                 return self.data[idx]
         
         dataset = MockDataset(sample_data)
@@ -917,12 +945,12 @@ class TestUtilityFunctions:
         assert hasattr(dataloader, 'batch_size')
         assert dataloader.batch_size == 16
     
-    def test_optimize_preprocessing(self, data_optimization_config):
+    def test_optimize_preprocessing(self, data_optimization_config) -> Any:
         """Test preprocessing optimization utility."""
-        def func1(x):
+        def func1(x) -> Any:
             return x + 1
         
-        def func2(x):
+        def func2(x) -> Any:
             return x * 2
         
         preprocessing_funcs = [func1, func2]
@@ -933,7 +961,7 @@ class TestUtilityFunctions:
         result = pipeline(5)
         assert result == 12  # (5 + 1) * 2
     
-    def test_memory_optimization_context(self, data_optimization_config):
+    def test_memory_optimization_context(self, data_optimization_config) -> Any:
         """Test memory optimization context."""
         with memory_optimization_context(data_optimization_config) as optimizer:
             assert isinstance(optimizer, MemoryOptimizer)
@@ -942,7 +970,7 @@ class TestUtilityFunctions:
 class TestErrorHandling:
     """Test error handling."""
     
-    def test_invalid_config_handling(self):
+    def test_invalid_config_handling(self) -> Any:
         """Test invalid configuration handling."""
         with pytest.raises(ValueError):
             ProfilingConfig(min_time_threshold=-1)
@@ -950,7 +978,7 @@ class TestErrorHandling:
         with pytest.raises(ValueError):
             ProfilingConfig(min_memory_threshold=-1)
     
-    def test_cuda_unavailable_handling(self):
+    def test_cuda_unavailable_handling(self) -> Any:
         """Test CUDA unavailable handling."""
         with patch('torch.cuda.is_available', return_value=False):
             config = ProfilingConfig(profile_gpu=True)
@@ -959,7 +987,7 @@ class TestErrorHandling:
             # Should gracefully handle no CUDA
             assert optimizer.gpu_monitor is not None
     
-    def test_missing_dependencies_handling(self):
+    def test_missing_dependencies_handling(self) -> Any:
         """Test missing dependencies handling."""
         with patch.dict('sys.modules', {'line_profiler': None}):
             config = ProfilingConfig()
@@ -971,12 +999,14 @@ class TestErrorHandling:
 class TestPerformanceBenchmarks:
     """Test performance benchmarks."""
     
-    def test_profiling_overhead(self, profiling_config):
+    def test_profiling_overhead(self, profiling_config) -> Any:
         """Test profiling overhead."""
         optimizer = ProfilingOptimizer(profiling_config)
         
         def simple_function():
-            return 42
+            
+    """simple_function function."""
+return 42
         
         # Time without profiling
         start_time = time.time()
@@ -994,7 +1024,7 @@ class TestPerformanceBenchmarks:
         overhead_ratio = time_with_profiling / time_without_profiling
         assert overhead_ratio < 10
     
-    def test_memory_optimization_effectiveness(self, data_optimization_config):
+    def test_memory_optimization_effectiveness(self, data_optimization_config) -> Any:
         """Test memory optimization effectiveness."""
         optimizer = MemoryOptimizer(data_optimization_config)
         
@@ -1013,5 +1043,6 @@ class TestPerformanceBenchmarks:
         assert memory_reduction > 0.4  # At least 40% reduction
 
 # Run tests
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

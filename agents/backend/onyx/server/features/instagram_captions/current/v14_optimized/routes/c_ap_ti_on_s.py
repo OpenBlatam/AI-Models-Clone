@@ -1,23 +1,34 @@
-"""
-Instagram Captions API v14.0 - Caption Generation Routes
-FastAPI router for caption generation endpoints with blocking operations limiting
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import time
 from typing import List, Optional
-
 from ..types import (
+from ..utils import validate_api_key, sanitize_content, generate_request_id
+from ..core.optimized_engine import optimized_engine, performance_monitor
+from ..core.blocking_operations_limiter import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Instagram Captions API v14.0 - Caption Generation Routes
+FastAPI router for caption generation endpoints with blocking operations limiting
+"""
+
+
     OptimizedRequest, 
     OptimizedResponse, 
     BatchRequest, 
     BatchResponse,
     ErrorResponse
 )
-from ..utils import validate_api_key, sanitize_content, generate_request_id
-from ..core.optimized_engine import optimized_engine, performance_monitor
-from ..core.blocking_operations_limiter import (
     blocking_limiter, limit_blocking_operations, limit_blocking_thread_operations,
     OperationType, rate_limit_context, concurrency_limit_context
 )

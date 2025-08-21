@@ -1,9 +1,13 @@
-"""
-Instagram Captions API v6.0 - Consolidated Core Module
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Refactored architecture combining configuration, schemas, and utilities 
-for maximum simplicity while maintaining all functionality.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import os
 import secrets
@@ -14,11 +18,21 @@ import uuid
 from typing import Any, Dict, List, Optional, Union
 from datetime import datetime, timezone
 from pydantic import BaseModel, Field, field_validator
+    from pydantic_settings import BaseSettings
+    from pydantic import BaseSettings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Instagram Captions API v6.0 - Consolidated Core Module
+
+Refactored architecture combining configuration, schemas, and utilities 
+for maximum simplicity while maintaining all functionality.
+"""
+
 
 try:
-    from pydantic_settings import BaseSettings
 except ImportError:
-    from pydantic import BaseSettings
 
 
 # =============================================================================
@@ -228,7 +242,7 @@ class Utils:
     """Consolidated utility functions for common operations."""
     
     @staticmethod
-    def generate_request_id(prefix: str = "req") -> str:
+    async def generate_request_id(prefix: str = "req") -> str:
         """Generate unique request ID for tracking."""
         timestamp = int(time.time() * 1000000)
         return f"{prefix}-{timestamp % 1000000:06d}"
@@ -385,7 +399,7 @@ class CacheKeyGenerator:
 class SimpleMetrics:
     """Simplified metrics collection for essential monitoring."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Request metrics
         self.requests_total = 0
         self.requests_success = 0
@@ -420,11 +434,11 @@ class SimpleMetrics:
             if len(self.quality_scores) > 1000:
                 self.quality_scores = self.quality_scores[-1000:]
     
-    def record_cache_hit(self):
+    def record_cache_hit(self) -> Any:
         """Record cache hit."""
         self.cache_hits += 1
     
-    def record_cache_miss(self):
+    def record_cache_miss(self) -> Any:
         """Record cache miss."""
         self.cache_misses += 1
     

@@ -1,9 +1,19 @@
-"""
-Monitoring configuration for the ads module.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+BUFFER_SIZE = 1024
+
 from typing import Optional
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Monitoring configuration for the ads module.
+"""
 
 class SentrySettings(BaseModel):
     """Sentry settings."""
@@ -46,7 +56,8 @@ class MonitoringSettings(BaseSettings):
     alert_threshold: float = Field(default=0.9)
     alert_cooldown: int = Field(default=300)  # 5 minutes
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "MONITORING_"
         env_file = ".env"
         env_file_encoding = "utf-8"

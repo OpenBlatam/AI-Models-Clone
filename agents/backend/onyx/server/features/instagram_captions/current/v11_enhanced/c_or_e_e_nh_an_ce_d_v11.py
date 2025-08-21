@@ -1,9 +1,13 @@
-"""
-Instagram Captions API v11.0 - Enhanced Refactor
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Advanced refactoring with enterprise-grade patterns, design principles,
-and cutting-edge optimizations. The ultimate evolution of the API.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -21,53 +25,61 @@ from contextlib import asynccontextmanager
 import threading
 from concurrent.futures import ThreadPoolExecutor
 import weakref
+    from pydantic import BaseModel, Field, field_validator, ConfigDict
+    from pydantic_settings import BaseSettings
+        from pydantic import BaseModel, Field, validator as field_validator, Config
+        from pydantic import BaseSettings
+    import orjson
+    import json
+    import numba
+    from numba import jit
+    from cachetools import TTLCache, LRUCache
+    import torch
+    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v11.0 - Enhanced Refactor
+
+Advanced refactoring with enterprise-grade patterns, design principles,
+and cutting-edge optimizations. The ultimate evolution of the API.
+"""
+
 
 # Enhanced imports with fallbacks
 try:
-    from pydantic import BaseModel, Field, field_validator, ConfigDict
-    from pydantic_settings import BaseSettings
     PYDANTIC_V2 = True
 except ImportError:
     try:
-        from pydantic import BaseModel, Field, validator as field_validator, Config
-        from pydantic import BaseSettings
         PYDANTIC_V2 = False
     except ImportError:
         PYDANTIC_V2 = False
 
 # Performance libraries
 try:
-    import orjson
     json_dumps = lambda obj: orjson.dumps(obj).decode()
     json_loads = orjson.loads
     ULTRA_JSON = True
 except ImportError:
-    import json
     json_dumps = json.dumps
     json_loads = json.loads
     ULTRA_JSON = False
 
 try:
-    import numba
-    from numba import jit
     NUMBA_AVAILABLE = True
 except ImportError:
     NUMBA_AVAILABLE = False
-    def jit(*args, **kwargs):
-        def decorator(func):
+    def jit(*args, **kwargs) -> Any:
+        def decorator(func) -> Any:
             return func
         return decorator
 
 try:
-    from cachetools import TTLCache, LRUCache
     ADVANCED_CACHE = True
 except ImportError:
     ADVANCED_CACHE = False
 
 # AI libraries
 try:
-    import torch
-    from transformers import AutoTokenizer, AutoModelForCausalLM, pipeline
     AI_AVAILABLE = True
 except ImportError:
     AI_AVAILABLE = False
@@ -88,7 +100,7 @@ class Singleton(type):
     _instances = {}
     _lock = threading.Lock()
     
-    def __call__(cls, *args, **kwargs):
+    def __call__(cls, *args, **kwargs) -> Any:
         if cls not in cls._instances:
             with cls._lock:
                 if cls not in cls._instances:
@@ -104,7 +116,7 @@ class Observer(Protocol):
 class Subject:
     """Subject class for observer pattern implementation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._observers: List[Observer] = []
     
     def attach(self, observer: Observer) -> None:
@@ -136,7 +148,7 @@ class AIProvider(ABC):
 class PerformanceMonitor:
     """Advanced performance monitoring with observer pattern."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = {
             'total_requests': 0,
             'success_rate': 0.0,
@@ -148,7 +160,9 @@ class PerformanceMonitor:
         self._lock = threading.Lock()
     
     def record_request(self, success: bool, response_time: float, cache_hit: bool = False):
-        with self._lock:
+        
+    """record_request function."""
+with self._lock:
             self.metrics['total_requests'] += 1
             
             # Update success rate
@@ -382,7 +396,7 @@ class EnhancedCaptionResponse(BaseModel):
 class TransformersAIProvider(AIProvider):
     """Transformers-based AI provider with optimizations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.models = {}
         self._initialized = False
         self.stats = {
@@ -391,7 +405,7 @@ class TransformersAIProvider(AIProvider):
             "success_rate": 1.0
         }
     
-    async def _initialize_models(self):
+    async def _initialize_models(self) -> Any:
         """Lazy model initialization."""
         if self._initialized or not AI_AVAILABLE:
             return
@@ -560,7 +574,7 @@ class AIProviderFactory:
 class EnhancedAIEngine(Subject):
     """Enhanced AI engine with enterprise patterns and optimizations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         super().__init__()
         self.provider_factory = AIProviderFactory()
         self.performance_monitor = PerformanceMonitor()
@@ -921,13 +935,13 @@ class EnhancedUtils:
     """Enhanced utility functions with enterprise features."""
     
     @staticmethod
-    def generate_request_id(prefix: str = "v11") -> str:
+    async def generate_request_id(prefix: str = "v11") -> str:
         """Generate enhanced request ID with prefix."""
         timestamp = int(time.time() * 1000000)
         return f"{prefix}-{timestamp % 10000000:07d}"
     
     @staticmethod
-    def validate_api_key(api_key: str) -> bool:
+    async def validate_api_key(api_key: str) -> bool:
         """Enhanced API key validation."""
         return api_key in config.VALID_API_KEYS
     

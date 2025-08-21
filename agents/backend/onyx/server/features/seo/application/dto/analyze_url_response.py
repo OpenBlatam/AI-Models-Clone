@@ -1,12 +1,20 @@
-"""
-Analyze URL Response DTO
-Data Transfer Object for analysis results
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Analyze URL Response DTO
+Data Transfer Object for analysis results
+"""
+
 
 
 class AnalyzeURLResponse(BaseModel):

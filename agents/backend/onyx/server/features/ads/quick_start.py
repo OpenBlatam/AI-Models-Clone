@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from official_docs_reference import OfficialDocsReference
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Quick Start - Official Documentation Reference System
@@ -7,10 +16,11 @@ Ejecuta este script para ver ejemplos prácticos del sistema de referencias
 de documentación oficial para PyTorch, Transformers, Diffusers y Gradio.
 """
 
-from official_docs_reference import OfficialDocsReference
 
 def main():
-    print("🚀 SISTEMA DE REFERENCIAS DE DOCUMENTACIÓN OFICIAL")
+    
+    """main function."""
+print("🚀 SISTEMA DE REFERENCIAS DE DOCUMENTACIÓN OFICIAL")
     print("=" * 60)
     
     ref = OfficialDocsReference()
@@ -69,5 +79,6 @@ def main():
     
     print("\n✅ ¡Sistema de referencias listo para usar!")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

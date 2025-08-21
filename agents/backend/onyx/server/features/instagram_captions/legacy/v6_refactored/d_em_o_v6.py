@@ -1,21 +1,33 @@
-"""
-Instagram Captions API v6.0 - Refactored Demo
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Demonstration script for the refactored and simplified architecture.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import aiohttp
 import json
 import time
 from typing import Dict, Any, List
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Instagram Captions API v6.0 - Refactored Demo
+
+Demonstration script for the refactored and simplified architecture.
+"""
+
 
 
 class RefactoredAPIDemo:
     """Demo client for the refactored Instagram Captions API v6.0."""
     
     def __init__(self, base_url: str = "http://localhost:8080", api_key: str = "ultra-key-123"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.headers = {
             "Authorization": f"Bearer {api_key}",
             "Content-Type": "application/json"
@@ -146,7 +158,7 @@ class RefactoredAPIDemo:
                 
                 return result
     
-    async def test_concurrent_requests(self, concurrent_count: int = 15) -> None:
+    async async def test_concurrent_requests(self, concurrent_count: int = 15) -> None:
         """Test concurrent request handling."""
         print(f"🔥 Testing {concurrent_count} concurrent requests...")
         
@@ -171,7 +183,7 @@ class RefactoredAPIDemo:
         print(f"📈 Throughput: {(successful * 1000 / total_time):.1f} RPS")
         print(f"💾 Cache hits: {cache_hits}/{successful} ({(cache_hits/max(1,successful)*100):.1f}%)")
     
-    async def _generate_single_request(self, content: str) -> Dict[str, Any]:
+    async async def _generate_single_request(self, content: str) -> Dict[str, Any]:
         """Helper method to generate a single request."""
         payload = {
             "content_description": content,
@@ -297,5 +309,6 @@ async def main():
     await demo.run_comprehensive_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

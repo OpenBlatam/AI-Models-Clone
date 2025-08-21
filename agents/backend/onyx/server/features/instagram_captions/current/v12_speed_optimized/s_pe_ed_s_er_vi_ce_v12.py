@@ -1,10 +1,13 @@
-"""
-Instagram Captions API v12.0 - Speed Optimized Service
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Ultra-high performance service with extreme speed optimizations,
-parallel processing, and advanced performance monitoring.
-Target: Maximum throughput with sub-20ms response times.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -13,10 +16,20 @@ from typing import Dict, Any, List, Optional
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import dataclass, field
 import weakref
+    from .core_speed_v12 import (
+import logging
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v12.0 - Speed Optimized Service
+
+Ultra-high performance service with extreme speed optimizations,
+parallel processing, and advanced performance monitoring.
+Target: Maximum throughput with sub-20ms response times.
+"""
+
 
 # Import speed-optimized core
 try:
-    from .core_speed_v12 import (
         speed_config, FastCaptionRequest, FastCaptionResponse,
         speed_ai_engine, SpeedCache
     )
@@ -25,7 +38,6 @@ except ImportError:
     SPEED_CORE_AVAILABLE = False
 
 # Ultra-fast logging (minimal for speed)
-import logging
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.ERROR)  # Only errors for maximum speed
 
@@ -128,7 +140,7 @@ class SpeedOptimizedService:
     - Memory-optimized operations
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = SpeedMetrics()
         self.executor = ThreadPoolExecutor(max_workers=speed_config.AI_WORKERS)
         self._lock = threading.Lock()
@@ -143,7 +155,7 @@ class SpeedOptimizedService:
         
         logger.info("🚀 Speed Optimized Service v12.0 initialized for maximum performance")
     
-    async def _warmup_service(self):
+    async def _warmup_service(self) -> Any:
         """Warm up the service for optimal performance."""
         try:
             # Warm up cache with common requests

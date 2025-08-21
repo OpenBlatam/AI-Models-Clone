@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import time
+import psutil
+import asyncio
+from typing import Any, Dict, List, Optional, Union
+from datetime import datetime, timedelta
+import logging
+        import os
+from typing import Any, List, Dict, Optional
 """
 🛠️ BLATAM AI UTILS MODULE v5.0.0
 ================================
@@ -9,12 +28,6 @@ Utilidades modulares y helpers:
 - ⚙️ Configuration utils
 """
 
-import time
-import psutil
-import asyncio
-from typing import Any, Dict, List, Optional, Union
-from datetime import datetime, timedelta
-import logging
 
 logger = logging.getLogger(__name__)
 
@@ -159,7 +172,6 @@ class ConfigMerger:
     @staticmethod
     def apply_environment_overrides(config: Dict[str, Any], env_prefix: str = "BLATAM_") -> Dict[str, Any]:
         """Aplica overrides de variables de entorno."""
-        import os
         
         updated_config = config.copy()
         

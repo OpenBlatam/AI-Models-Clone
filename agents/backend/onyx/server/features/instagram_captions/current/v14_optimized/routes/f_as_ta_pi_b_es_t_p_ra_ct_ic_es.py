@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import List, Optional, Dict, Any
+from fastapi import (
+from fastapi.responses import JSONResponse
+import logging
+import time
+import uuid
+from models.fastapi_best_practices import (
+from dependencies import CoreDependencies, AdvancedDependencies, require_authentication
+from core.blocking_operations_limiter import limit_blocking_operations, OperationType
+from core.exceptions import ValidationError, AIGenerationError, CacheError
+        import asyncio
+from typing import Any, List, Dict, Optional
 """
 FastAPI Best Practices - Path Operations
 
@@ -10,18 +33,11 @@ This module implements path operations following FastAPI best practices:
 - Security best practices
 """
 
-from typing import List, Optional, Dict, Any
-from fastapi import (
     APIRouter, HTTPException, Depends, Request, Response,
     status, Query, Path, Header, BackgroundTasks
 )
-from fastapi.responses import JSONResponse
-import logging
-import time
-import uuid
 
 # Import models
-from models.fastapi_best_practices import (
     CaptionGenerationRequest, CaptionGenerationResponse,
     BatchCaptionRequest, BatchCaptionResponse,
     UserPreferences, ErrorResponse, HealthResponse,
@@ -29,11 +45,8 @@ from models.fastapi_best_practices import (
 )
 
 # Import dependencies
-from dependencies import CoreDependencies, AdvancedDependencies, require_authentication
 
 # Import core components
-from core.blocking_operations_limiter import limit_blocking_operations, OperationType
-from core.exceptions import ValidationError, AIGenerationError, CacheError
 
 logger = logging.getLogger(__name__)
 
@@ -262,10 +275,9 @@ async def batch_generate_captions(
             )
         
         # Process requests with concurrency control
-        import asyncio
         semaphore = asyncio.Semaphore(batch_request.max_concurrent)
         
-        async def process_single_request(req: CaptionGenerationRequest) -> CaptionGenerationResponse:
+        async async def process_single_request(req: CaptionGenerationRequest) -> CaptionGenerationResponse:
             async with semaphore:
                 try:
                     return await generate_caption(req, background_tasks, deps, request_id)

@@ -1,3 +1,39 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import json
+import os
+import hashlib
+import logging
+import traceback
+from typing import Dict, Any, List, Optional, Union
+from functools import wraps, lru_cache
+from datetime import datetime, timezone
+from contextlib import asynccontextmanager
+import secrets
+import uuid
+from fastapi import FastAPI, Request, Response, HTTPException, Depends, Security, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from pydantic import BaseModel, Field, validator
+import uvicorn
+from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
+import structlog
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Instagram Captions API - PRODUCTION READY v4.0
@@ -13,32 +49,8 @@ Optimizada para producción con:
 - Configuración para contenedores
 """
 
-import asyncio
-import time
-import json
-import os
-import hashlib
-import logging
-import traceback
-from typing import Dict, Any, List, Optional, Union
-from functools import wraps, lru_cache
-from datetime import datetime, timezone
-from contextlib import asynccontextmanager
-import secrets
-import uuid
 
 # Production dependencies
-from fastapi import FastAPI, Request, Response, HTTPException, Depends, Security, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
-from pydantic import BaseModel, Field, validator
-import uvicorn
-from prometheus_client import Counter, Histogram, Gauge, generate_latest, CONTENT_TYPE_LATEST
-import structlog
 
 # Configure structured logging for production
 structlog.configure(
@@ -106,7 +118,7 @@ class ProductionCaptionRequest(BaseModel):
     client_id: str = Field(..., min_length=1, max_length=100, description="Client identifier")
     
     @validator('content_description')
-    def validate_content(cls, v):
+    def validate_content(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Content description cannot be empty")
         # Remove potential XSS
@@ -207,7 +219,7 @@ def verify_api_key(credentials: HTTPAuthorizationCredentials = Security(security
 class ProductionCache:
     """Thread-safe production cache with metrics."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._cache: Dict[str, Any] = {}
         self._cache_times: Dict[str, float] = {}
         self._access_counts: Dict[str, int] = {}
@@ -269,7 +281,7 @@ class ProductionCache:
 class RateLimiter:
     """Production rate limiter with Redis-like functionality."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._requests: Dict[str, List[float]] = {}
         self._lock = asyncio.Lock()
     
@@ -307,7 +319,7 @@ app_start_time = time.time()
 class ProductionInstagramEngine:
     """Production-grade Instagram caption engine."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.style_prompts = {
             "casual": "Create a relaxed, conversational Instagram caption like talking to a friend. Use natural language and 2-3 emojis.",
             "professional": "Write a polished, business-appropriate Instagram caption that maintains professionalism while being engaging.",
@@ -885,5 +897,6 @@ def run_production():
         logger.error("Failed to start production server", error=str(e))
         exit(1)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     run_production() 

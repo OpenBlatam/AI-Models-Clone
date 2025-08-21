@@ -774,3 +774,4 @@ async def shutdown_model_manager():
     if model_manager:
         await model_manager.shutdown()
         model_manager = None
+

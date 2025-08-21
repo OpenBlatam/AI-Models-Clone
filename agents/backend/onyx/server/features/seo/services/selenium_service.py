@@ -1,8 +1,5 @@
-"""
-Selenium Service para el servicio SEO ultra-optimizado.
-Integración con Selenium para páginas con JavaScript.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 from typing import Optional, Dict, Any
 from loguru import logger
@@ -14,19 +11,29 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.common.exceptions import TimeoutException, WebDriverException
-
 from ..core.interfaces import HTMLParser
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Selenium Service para el servicio SEO ultra-optimizado.
+Integración con Selenium para páginas con JavaScript.
+"""
+
+
 
 
 class SeleniumService:
     """Servicio Selenium ultra-optimizado para páginas con JavaScript."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self.driver = None
         self._setup_driver()
     
-    def _setup_driver(self):
+    def _setup_driver(self) -> Any:
         """Configura el driver de Chrome ultra-optimizado."""
         try:
             chrome_options = Options()
@@ -142,7 +149,7 @@ class SeleniumService:
             logger.error(f"Unexpected error loading {url}: {e}")
             return None
     
-    def _wait_for_elements(self):
+    def _wait_for_elements(self) -> Any:
         """Espera a que elementos específicos estén presentes."""
         wait = WebDriverWait(self.driver, self.config.get('element_wait_timeout', 10))
         
@@ -317,7 +324,7 @@ class SeleniumService:
             logger.error(f"Error getting sessionStorage: {e}")
             return {}
     
-    def restart_driver(self):
+    def restart_driver(self) -> Any:
         """Reinicia el driver de Selenium."""
         logger.info("Restarting Selenium driver")
         self.close()
@@ -342,7 +349,7 @@ class SeleniumService:
                 'error': str(e)
             }
     
-    def close(self):
+    def close(self) -> Any:
         """Cierra el driver de Selenium."""
         if self.driver:
             try:
@@ -353,10 +360,10 @@ class SeleniumService:
             finally:
                 self.driver = None
     
-    def __enter__(self):
+    def __enter__(self) -> Any:
         """Context manager entry."""
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> Any:
         """Context manager exit."""
         self.close() 

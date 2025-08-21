@@ -1,9 +1,10 @@
-"""
-Instagram Captions API v8.0 - Simplified Deep Learning
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-CPU-optimized version with real transformers and advanced AI capabilities.
-Designed to work perfectly without GPU while maintaining high quality.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -11,22 +12,31 @@ import json
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 from enum import Enum
-
-# FastAPI and web framework
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 import uvicorn
+from transformers import (
+import torch
+import structlog
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Instagram Captions API v8.0 - Simplified Deep Learning
+
+CPU-optimized version with real transformers and advanced AI capabilities.
+Designed to work perfectly without GPU while maintaining high quality.
+"""
+
+
+# FastAPI and web framework
 
 # AI and transformers (real ones!)
-from transformers import (
     AutoTokenizer, AutoModelForCausalLM,
     pipeline, set_seed
 )
-import torch
 
 # Performance monitoring
-import structlog
 
 # Configure logging
 logger = structlog.get_logger()
@@ -119,7 +129,7 @@ class CaptionResponse(BaseModel):
 class IntelligentCaptionGenerator:
     """Real AI caption generator using transformers."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.models = {}
         self.tokenizers = {}
         self.initialization_complete = False
@@ -132,7 +142,7 @@ class IntelligentCaptionGenerator:
             "style_usage": {}
         }
     
-    async def initialize_models(self):
+    async def initialize_models(self) -> Any:
         """Initialize transformer models."""
         logger.info("🧠 Initializing AI models...")
         

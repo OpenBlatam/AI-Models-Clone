@@ -1,15 +1,24 @@
-Advanced Security Toolkit Demo with High-Performance Libraries
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
 import json
 from advanced_security import (
+from typing import Any, List, Dict, Optional
+import logging
+Advanced Security Toolkit Demo with High-Performance Libraries
+
     AdvancedSecurityToolkit, create_advanced_toolkit,
     ScanRequest, PerformanceMetrics
 )
 
 async def demo_advanced_scanning():
-    print("🚀 Advanced Security Toolkit Demo)
+    
+    """demo_advanced_scanning function."""
+print("🚀 Advanced Security Toolkit Demo)
     print(= * 60)
     
     # Create advanced toolkit
@@ -104,7 +113,9 @@ async def demo_advanced_scanning():
             print(f📈 Cache Hit Rate: {hit_rate:.1%})
 
 async def demo_network_analysis():
-    print("\n🌐 Network Analysis Demo)
+    
+    """demo_network_analysis function."""
+print("\n🌐 Network Analysis Demo)
     print(=)
     
     toolkit = create_advanced_toolkit()
@@ -132,7 +143,9 @@ async def demo_network_analysis():
             
             for port_info in open_ports:
                 print(f"   🔓 Port {port_info['port']}: {port_info.get('services', ['unknown'])})             print(f     Confidence: {port_info.get(confidence', 0):.1%})             print(f"      Engines: {', '.join(port_info.get('engines', )async def demo_performance_monitoring():
-    print("\n📊 Performance Monitoring Demo)
+    
+    """demo_performance_monitoring function."""
+print("\n📊 Performance Monitoring Demo)
     print(=)
     
     toolkit = create_advanced_toolkit()
@@ -164,7 +177,9 @@ async def demo_network_analysis():
     print(f"   CPU Trend: {analysis.get('cpu_trend', [object Object]('trend',unknown)}")
     print(f"   Memory Trend: {analysis.get(memory_trend', [object Object]('trend',unknown)}")
     print(f"   Anomalies Detected:[object Object]len(analysis.get(anomalies', )async def main():
-    print("🚀 Advanced Security Toolkit - High Performance Demo)
+    
+    """main function."""
+print("🚀 Advanced Security Toolkit - High Performance Demo)
     print(=* 80 
     try:
         await demo_advanced_scanning()
@@ -184,5 +199,6 @@ async def demo_network_analysis():
         
     except Exception as e:
         print(f❌ Demo failed: {e})
-        print("💡 Make sure Redis is running for full functionality)if __name__ == __main__:
+        print("💡 Make sure Redis is running for full functionality)match __name__:
+    case __main__:
     asyncio.run(main()) 

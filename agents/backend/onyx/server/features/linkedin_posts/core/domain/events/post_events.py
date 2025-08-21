@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Optional, Dict, Any
+from uuid import UUID
+from enum import Enum
+        from uuid import uuid4
+        from uuid import uuid4
+        from uuid import uuid4
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Post Domain Events
 =================
@@ -5,11 +18,6 @@ Post Domain Events
 Domain events for LinkedIn posts following event sourcing patterns.
 """
 
-from dataclasses import dataclass
-from datetime import datetime
-from typing import Optional, Dict, Any
-from uuid import UUID
-from enum import Enum
 
 
 class EventType(Enum):
@@ -35,7 +43,7 @@ class DomainEvent:
     version: int
     metadata: Dict[str, Any]
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Set default values after initialization."""
         if not self.occurred_at:
             self.occurred_at = datetime.utcnow()
@@ -73,7 +81,7 @@ class PostCreatedEvent(DomainEvent):
     post_type: str
     tone: str
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize event with default values."""
         super().__post_init__()
         self.event_type = EventType.POST_CREATED
@@ -118,7 +126,7 @@ class PostPublishedEvent(DomainEvent):
     author_id: UUID
     published_at: datetime
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize event with default values."""
         super().__post_init__()
         self.event_type = EventType.POST_PUBLISHED
@@ -160,7 +168,7 @@ class PostOptimizedEvent(DomainEvent):
     nlp_processing_time: Optional[float] = None
     ai_model_used: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize event with default values."""
         super().__post_init__()
         self.event_type = EventType.POST_OPTIMIZED
@@ -208,7 +216,7 @@ class PostEngagementUpdatedEvent(DomainEvent):
     new_metrics: Dict[str, Any]
     updated_at: datetime
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize event with default values."""
         super().__post_init__()
         self.event_type = EventType.POST_ENGAGEMENT_UPDATED
@@ -255,7 +263,7 @@ class PostDeletedEvent(DomainEvent):
     deleted_at: datetime
     deletion_reason: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize event with default values."""
         super().__post_init__()
         self.event_type = EventType.POST_DELETED
@@ -294,7 +302,7 @@ class PostScheduledEvent(DomainEvent):
     scheduled_at: datetime
     scheduled_by: UUID
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize event with default values."""
         super().__post_init__()
         self.event_type = EventType.POST_SCHEDULED
@@ -335,7 +343,7 @@ class PostContentUpdatedEvent(DomainEvent):
     updated_by: UUID
     update_reason: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize event with default values."""
         super().__post_init__()
         self.event_type = EventType.POST_CONTENT_UPDATED
@@ -380,7 +388,6 @@ class EventFactory:
     def create_post_created_event(post_id: UUID, content: str, author_id: UUID, 
                                  post_type: str, tone: str) -> PostCreatedEvent:
         """Create a post created event."""
-        from uuid import uuid4
         return PostCreatedEvent(
             event_id=uuid4(),
             aggregate_id=post_id,
@@ -397,7 +404,6 @@ class EventFactory:
     def create_post_published_event(post_id: UUID, author_id: UUID, 
                                    published_at: datetime) -> PostPublishedEvent:
         """Create a post published event."""
-        from uuid import uuid4
         return PostPublishedEvent(
             event_id=uuid4(),
             aggregate_id=post_id,
@@ -413,7 +419,6 @@ class EventFactory:
                                    optimized_at: datetime, nlp_processing_time: Optional[float] = None,
                                    ai_model_used: Optional[str] = None) -> PostOptimizedEvent:
         """Create a post optimized event."""
-        from uuid import uuid4
         return PostOptimizedEvent(
             event_id=uuid4(),
             aggregate_id=post_id,

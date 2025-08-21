@@ -1,12 +1,17 @@
-"""
-User domain entity for LinkedIn Posts system.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from typing import Optional, List, Dict, Any
 from enum import Enum
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+User domain entity for LinkedIn Posts system.
+"""
+
 
 
 class UserRole(str, Enum):
@@ -110,7 +115,7 @@ class User:
     # Metadata
     metadata: Dict[str, Any] = field(default_factory=dict)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Post-initialization processing."""
         if isinstance(self.preferences, dict):
             self.preferences = UserPreferences(**self.preferences)

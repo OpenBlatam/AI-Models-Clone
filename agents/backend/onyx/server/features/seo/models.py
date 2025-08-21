@@ -1,6 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class SEOScrapeRequest(BaseModel):
     url: str = Field(..., description="URL a analizar o scrapear", example="https://ejemplo.com")
     options: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Opciones adicionales para el scraping")

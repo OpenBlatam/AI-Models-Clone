@@ -1,20 +1,28 @@
-"""
-Infrastructure - Repository Implementations
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 import json
 from abc import ABC, abstractmethod
-
 from ..models.facebook_models import FacebookPostEntity, FacebookPostAnalysis
 from ..domain.entities import FacebookPostDomainEntity
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Infrastructure - Repository Implementations
+"""
+
+
 
 
 class InMemoryPostRepository:
     """Repositorio en memoria para posts."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._posts: Dict[str, FacebookPostEntity] = {}
         self._analyses: Dict[str, FacebookPostAnalysis] = {}
     
@@ -90,7 +98,7 @@ class InMemoryPostRepository:
 class InMemoryCacheRepository:
     """Repositorio de cache en memoria."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._cache: Dict[str, Dict[str, Any]] = {}
     
     async def get(self, key: str) -> Optional[Any]:

@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import logging
+import traceback
+import uuid
+from typing import Any, Dict, List, Optional, Callable, TypeVar, Union
+from functools import wraps
+from datetime import datetime, timezone
+from enum import Enum
+import inspect
+from pydantic import BaseModel, Field, ValidationError, field_validator
+from fastapi import HTTPException, Request
+from fastapi.responses import JSONResponse
+        import re
+from typing import Any, List, Dict, Optional
+import asyncio
 omprehensive Error Handling and Validation System
 
 This module provides:
@@ -8,18 +27,7 @@ This module provides:
 - Error logging and monitoring capabilities
 "
 
-import logging
-import traceback
-import uuid
-from typing import Any, Dict, List, Optional, Callable, TypeVar, Union
-from functools import wraps
-from datetime import datetime, timezone
-from enum import Enum
-import inspect
 
-from pydantic import BaseModel, Field, ValidationError, field_validator
-from fastapi import HTTPException, Request
-from fastapi.responses import JSONResponse
 
 logger = logging.getLogger(__name__)
 
@@ -69,7 +77,9 @@ class InstagramCaptionsException(Exception):
         message: str,
         details: Optional[Dict[str, Any]] = None,
         status_code: int = 500   ):
-        self.error_code = error_code
+        
+    """__init__ function."""
+self.error_code = error_code
         self.message = message
         self.details = details or {}
         self.status_code = status_code
@@ -79,14 +89,18 @@ class InstagramCaptionsException(Exception):
 class ValidationException(InstagramCaptionsException):
 Raised when input validation fails."   
     def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             error_code=ErrorCode.VALIDATION_ERROR,
             message=message,
             details=details,
             status_code=400ass AuthenticationException(InstagramCaptionsException):
 hen authentication fails."   
     def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             error_code=ErrorCode.UNAUTHORIZED,
             message=message,
             details=details,
@@ -95,7 +109,9 @@ hen authentication fails."
 class ResourceNotFoundException(InstagramCaptionsException):
   d when a requested resource is not found."   
     def __init__(self, resource_type: str, resource_id: str):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             error_code=ErrorCode.NOT_FOUND,
             message=f"{resource_type} with id '{resource_id}' not found",
             details={"resource_type": resource_type, "resource_id": resource_id},
@@ -112,7 +128,9 @@ d when rate limits are exceeded."
 class AIProcessingException(InstagramCaptionsException):
    when AI processing fails."   
     def __init__(self, message: str, details: Optional[Dict[str, Any]] = None):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             error_code=ErrorCode.AI_PROCESSING_ERROR,
             message=message,
             details=details,
@@ -196,10 +214,12 @@ def log_error(
 # ============================================================================
 
 def validate_input(*, model_class: type):
- orator to validate input using Pydantic model."""
+ 
+    """validate_input function."""
+orator to validate input using Pydantic model."""
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             try:
                 # Extract the first argument as input data
                 if args and isinstance(args[0], dict):
@@ -225,10 +245,10 @@ def validate_input(*, model_class: type):
         return wrapper
     return decorator
 
-def handle_api_errors(func: Callable[..., T]) -> Callable[..., T]:
+async def handle_api_errors(func: Callable[..., T]) -> Callable[..., T]:
    for comprehensive API error handling (RORO)."
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         request_id = str(uuid.uuid4())
         
         try:
@@ -319,7 +339,6 @@ def validate_string(*, config: StringValidationConfig) -> Dict[str, Any]:
     
     # Check pattern
     if config.pattern:
-        import re
         if not re.match(config.pattern, value):
             return[object Object]
                is_valid": False,
@@ -456,7 +475,9 @@ __all__ = [
 class TimeoutError(InstagramCaptionsException):
     """Raised when an operation times out."""
     def __init__(self, message: str = "Operation timed out", details: Optional[Dict[str, Any]] = None):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             error_code=ErrorCode.TIMEOUT_ERROR,
             message=message,
             details=details,
@@ -466,7 +487,9 @@ class TimeoutError(InstagramCaptionsException):
 class InvalidTargetError(InstagramCaptionsException):
     """Raised when a target address or resource is invalid or malformed."""
     def __init__(self, message: str = "Invalid target address", details: Optional[Dict[str, Any]] = None):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             error_code=ErrorCode.INVALID_INPUT,
             message=message,
             details=details,

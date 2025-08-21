@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+import json
+import random
+from typing import List, Dict, Any, AsyncIterator
+from pathlib import Path
+from core.advanced_lazy_loader import (
+from types.optimized_schemas import (
+from core.optimized_engine import generate_caption_optimized
+import logging
+from typing import Any, List, Dict, Optional
 """
 Lazy Loading Demo for Instagram Captions API v14.0
 
@@ -10,29 +35,19 @@ This demo showcases advanced lazy loading techniques for:
 - Streaming response generation
 """
 
-import asyncio
-import time
-import json
-import random
-from typing import List, Dict, Any, AsyncIterator
-from pathlib import Path
 
 # Import lazy loading components
-from core.advanced_lazy_loader import (
     AdvancedLazyLoader, LargeDataConfig, DataSize, LoadStrategy,
     DataChunk, PageInfo, create_lazy_loader, lazy_load_large_dataset,
     stream_large_response, large_dataset_context
 )
 
 # Import schemas
-from types.optimized_schemas import (
     CaptionGenerationRequest, CaptionStyle, AudienceType, ContentType
 )
 
 # Import engine
-from core.optimized_engine import generate_caption_optimized
 
-import logging
 
 # Configure logging
 logging.basicConfig(
@@ -45,7 +60,7 @@ logger = logging.getLogger(__name__)
 class LazyLoadingDemo:
     """Demo class for showcasing lazy loading techniques"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Create different lazy loaders for different data sizes
         self.small_loader = create_lazy_loader(DataSize.SMALL)
         self.medium_loader = create_lazy_loader(DataSize.MEDIUM)
@@ -66,7 +81,7 @@ class LazyLoadingDemo:
             "Snowy mountain peak with dramatic clouds"
         ]
     
-    async def demo_streaming_captions(self):
+    async def demo_streaming_captions(self) -> Any:
         """Demo streaming caption generation"""
         logger.info("🚀 Demo: Streaming Caption Generation")
         
@@ -90,7 +105,9 @@ class LazyLoadingDemo:
         
         # Simulate streaming response
         async def stream_generator():
-            yield "["
+            
+    """stream_generator function."""
+yield "["
             first = True
             
             for i, request in enumerate(requests):
@@ -149,7 +166,7 @@ class LazyLoadingDemo:
         
         return stream_data
     
-    async def demo_paginated_data(self):
+    async def demo_paginated_data(self) -> Any:
         """Demo paginated data loading"""
         logger.info("📄 Demo: Paginated Data Loading")
         
@@ -223,7 +240,7 @@ class LazyLoadingDemo:
         
         return True
     
-    async def demo_chunked_loading(self):
+    async def demo_chunked_loading(self) -> Any:
         """Demo chunked data loading"""
         logger.info("🧩 Demo: Chunked Data Loading")
         
@@ -282,7 +299,7 @@ class LazyLoadingDemo:
         
         return True
     
-    async def demo_memory_management(self):
+    async def demo_memory_management(self) -> Any:
         """Demo memory management and cleanup"""
         logger.info("🧠 Demo: Memory Management")
         
@@ -346,7 +363,7 @@ class LazyLoadingDemo:
         
         return True
     
-    async def demo_batch_processing(self):
+    async def demo_batch_processing(self) -> Any:
         """Demo batch processing with lazy loading"""
         logger.info("⚡ Demo: Batch Processing with Lazy Loading")
         
@@ -422,7 +439,7 @@ class LazyLoadingDemo:
         
         return results
     
-    async def demo_performance_comparison(self):
+    async def demo_performance_comparison(self) -> Any:
         """Demo performance comparison between different approaches"""
         logger.info("📊 Demo: Performance Comparison")
         
@@ -441,7 +458,9 @@ class LazyLoadingDemo:
             
             # Test lazy loading
             async def lazy_loader(offset: int = 0, limit: int = None, **kwargs):
-                await asyncio.sleep(0.1)  # Simulate loading delay
+                
+    """lazy_loader function."""
+await asyncio.sleep(0.1)  # Simulate loading delay
                 return [f"item_{i}" for i in range(offset, offset + (limit or size))]
             
             start_time = time.time()
@@ -454,7 +473,9 @@ class LazyLoadingDemo:
             
             # Test streaming
             async def stream_loader(chunk_id: str, **kwargs):
-                await asyncio.sleep(0.1)
+                
+    """stream_loader function."""
+await asyncio.sleep(0.1)
                 return DataChunk(
                     id=chunk_id,
                     data=[f"item_{i}" for i in range(1000)],
@@ -498,7 +519,7 @@ class LazyLoadingDemo:
         
         return results
     
-    async def run_all_demos(self):
+    async def run_all_demos(self) -> Any:
         """Run all lazy loading demos"""
         logger.info("🎬 Starting Lazy Loading Demo Suite")
         logger.info("=" * 60)
@@ -574,6 +595,10 @@ async def main():
         # Save results to file
         output_file = Path("lazy_loading_demo_results.json")
         with open(output_file, "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(results, f, indent=2, default=str)
         
         logger.info(f"\n💾 Demo results saved to: {output_file}")
@@ -583,5 +608,6 @@ async def main():
         raise
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

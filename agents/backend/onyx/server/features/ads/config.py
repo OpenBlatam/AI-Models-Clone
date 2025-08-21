@@ -1,10 +1,22 @@
-"""
-Configuration for Onyx ads functionality.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from pydantic_settings import BaseSettings
 from typing import Optional, Dict, Any
 import os
 from functools import lru_cache
+    from langchain_openai import ChatOpenAI
+    from langchain_openai import OpenAIEmbeddings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Configuration for Onyx ads functionality.
+"""
 
 class Settings(BaseSettings):
     """Settings for Onyx ads functionality."""
@@ -32,7 +44,8 @@ class Settings(BaseSettings):
     # Cache Settings
     cache_ttl: int = 3600  # 1 hour
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         case_sensitive = True
 
@@ -43,7 +56,6 @@ def get_settings() -> Settings:
 
 def get_llm():
     """Get LLM instance."""
-    from langchain_openai import ChatOpenAI
     settings = get_settings()
     
     return ChatOpenAI(
@@ -55,7 +67,6 @@ def get_llm():
 
 def get_embeddings():
     """Get embeddings instance."""
-    from langchain_openai import OpenAIEmbeddings
     settings = get_settings()
     
     return OpenAIEmbeddings(

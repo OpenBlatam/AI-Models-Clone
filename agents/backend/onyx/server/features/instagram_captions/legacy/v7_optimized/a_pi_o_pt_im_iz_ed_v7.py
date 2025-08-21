@@ -1,3 +1,38 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import secrets
+from typing import Dict, Any, List, Optional
+from contextlib import asynccontextmanager
+    import orjson
+    import json
+from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse, Response
+import uvloop  # High-performance event loop
+import uvicorn
+import redis.asyncio as redis
+from cachetools import TTLCache
+from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
+from sentence_transformers import SentenceTransformer
+import numpy as np
+import httpx
+from loguru import logger
+import structlog
+from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings
+from typing import Any, List, Dict, Optional
+import logging
 """
 Instagram Captions API v7.0 - Ultra-Optimized with Specialized Libraries
 
@@ -10,50 +45,28 @@ Key optimizations:
 - asyncpg for database operations
 """
 
-import asyncio
-import time
-import secrets
-from typing import Dict, Any, List, Optional
-from contextlib import asynccontextmanager
 
 # Ultra-fast JSON processing (2-3x faster than standard json)
 try:
-    import orjson
     json_dumps = lambda obj: orjson.dumps(obj).decode()
     json_loads = orjson.loads
 except ImportError:
-    import json
     json_dumps = json.dumps
     json_loads = json.loads
 
 # High-performance framework and async
-from fastapi import FastAPI, HTTPException, Request, BackgroundTasks
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse, Response
-import uvloop  # High-performance event loop
-import uvicorn
 
 # Advanced caching with Redis
-import redis.asyncio as redis
-from cachetools import TTLCache
 
 # Monitoring with Prometheus
-from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 
 # AI/ML libraries
-from sentence_transformers import SentenceTransformer
-import numpy as np
 
 # HTTP client for external services
-import httpx
 
 # Advanced logging
-from loguru import logger
-import structlog
 
 # Configuration
-from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings
 
 
 # =============================================================================
@@ -101,11 +114,11 @@ cache_misses = Counter('captions_cache_misses_total', 'Cache misses')
 class UltraFastRedisCache:
     """Ultra-fast Redis cache with local fallback."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.redis_client = None
         self.local_cache = TTLCache(maxsize=1000, ttl=300)  # 5min local cache
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize Redis with connection pooling."""
         try:
             pool = redis.ConnectionPool.from_url(
@@ -163,7 +176,7 @@ class UltraFastRedisCache:
 class OptimizedAIEngine:
     """AI engine with sentence transformers for quality analysis."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.sentence_model = None
         self.premium_templates = {
             "casual": [
@@ -187,7 +200,7 @@ class OptimizedAIEngine:
             "motivation": ["#motivacion", "#objetivos", "#crecimiento", "#suenos"]
         }
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize AI models."""
         try:
             # Load sentence transformer for quality analysis
@@ -205,11 +218,11 @@ class OptimizedAIEngine:
         start_time = time.perf_counter()
         
         # Select template
-        templates = self.premium_templates.get(style, self.premium_templates["casual"])
+        templates = self.premium_templates.get(style, self.premium_templates["casual"f"])
         template = secrets.choice(templates)
         
         # Generate caption
-        caption = template.format(content=content)
+        caption = template"
         
         # Generate smart hashtags
         hashtags = self._generate_smart_hashtags(style, hashtag_count)
@@ -432,7 +445,7 @@ async def generate_batch_optimized(requests: List[OptimizedRequest]):
     # Process in parallel with semaphore for controlled concurrency
     semaphore = asyncio.Semaphore(config.AI_WORKERS)
     
-    async def process_single(req):
+    async def process_single(req) -> Any:
         async with semaphore:
             return await generate_optimized_caption(req)
     

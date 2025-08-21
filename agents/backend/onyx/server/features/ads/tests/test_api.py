@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 from fastapi.testclient import TestClient
 from unittest.mock import Mock, patch, AsyncMock
@@ -6,6 +14,9 @@ import httpx
 from datetime import datetime
 
 from agents.backend.onyx.server.features.ads.api import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     router,
     AdsGenerationRequest,
     BackgroundRemovalRequest,
@@ -21,12 +32,16 @@ from agents.backend.onyx.server.features.ads.api import (
 # Test client fixture
 @pytest.fixture
 def client():
-    return TestClient(router)
+    
+    """client function."""
+return TestClient(router)
 
 # Mock user fixture
 @pytest.fixture
 def mock_user():
-    return {
+    
+    """mock_user function."""
+return {
         "id": "test_user_id",
         "email": "test@example.com",
         "role": "admin"
@@ -35,10 +50,12 @@ def mock_user():
 # Mock service fixture
 @pytest.fixture
 def mock_ads_service():
-    return AsyncMock()
+    
+    """mock_ads_service function."""
+return AsyncMock()
 
 # Test ads generation
-def test_generate_ads(client, mock_user, mock_ads_service):
+def test_generate_ads(client, mock_user, mock_ads_service) -> Any:
     """Test ads generation endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         with patch('onyx.server.features.ads.api.AdsDBService') as mock_db:
@@ -71,7 +88,7 @@ def test_generate_ads(client, mock_user, mock_ads_service):
             mock_db.create_ads_generation.assert_called_once()
 
 # Test background removal
-def test_remove_background(client, mock_user, mock_ads_service):
+def test_remove_background(client, mock_user, mock_ads_service) -> Any:
     """Test background removal endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -93,7 +110,7 @@ def test_remove_background(client, mock_user, mock_ads_service):
         mock_ads_service.remove_background.assert_called_once()
 
 # Test analytics tracking
-def test_track_analytics(client, mock_user, mock_ads_service):
+def test_track_analytics(client, mock_user, mock_ads_service) -> Any:
     """Test analytics tracking endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -121,7 +138,7 @@ def test_track_analytics(client, mock_user, mock_ads_service):
         mock_ads_service.track_analytics.assert_called_once()
 
 # Test list ads
-def test_list_ads(client, mock_user, mock_ads_service):
+def test_list_ads(client, mock_user, mock_ads_service) -> List[Any]:
     """Test list ads endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -140,7 +157,7 @@ def test_list_ads(client, mock_user, mock_ads_service):
         mock_ads_service.list_ads.assert_called_once()
 
 # Test get ads
-def test_get_ads(client, mock_user, mock_ads_service):
+def test_get_ads(client, mock_user, mock_ads_service) -> Optional[Dict[str, Any]]:
     """Test get ads endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -160,7 +177,7 @@ def test_get_ads(client, mock_user, mock_ads_service):
         mock_ads_service.get_ads.assert_called_once_with(1)
 
 # Test delete ads
-def test_delete_ads(client, mock_user, mock_ads_service):
+def test_delete_ads(client, mock_user, mock_ads_service) -> Any:
     """Test delete ads endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -176,7 +193,7 @@ def test_delete_ads(client, mock_user, mock_ads_service):
         mock_ads_service.delete_ads.assert_called_once_with(1)
 
 # Test list background removals
-def test_list_background_removals(client, mock_user, mock_ads_service):
+def test_list_background_removals(client, mock_user, mock_ads_service) -> List[Any]:
     """Test list background removals endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -195,7 +212,7 @@ def test_list_background_removals(client, mock_user, mock_ads_service):
         mock_ads_service.list_background_removals.assert_called_once()
 
 # Test get background removal
-def test_get_background_removal(client, mock_user, mock_ads_service):
+def test_get_background_removal(client, mock_user, mock_ads_service) -> Optional[Dict[str, Any]]:
     """Test get background removal endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -214,7 +231,7 @@ def test_get_background_removal(client, mock_user, mock_ads_service):
         mock_ads_service.get_background_removal.assert_called_once_with(1)
 
 # Test delete background removal
-def test_delete_background_removal(client, mock_user, mock_ads_service):
+def test_delete_background_removal(client, mock_user, mock_ads_service) -> Any:
     """Test delete background removal endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -230,7 +247,7 @@ def test_delete_background_removal(client, mock_user, mock_ads_service):
         mock_ads_service.delete_background_removal.assert_called_once_with(1)
 
 # Test list analytics
-def test_list_analytics(client, mock_user, mock_ads_service):
+def test_list_analytics(client, mock_user, mock_ads_service) -> List[Any]:
     """Test list analytics endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -249,7 +266,7 @@ def test_list_analytics(client, mock_user, mock_ads_service):
         mock_ads_service.list_analytics.assert_called_once()
 
 # Test get analytics
-def test_get_analytics(client, mock_user, mock_ads_service):
+def test_get_analytics(client, mock_user, mock_ads_service) -> Optional[Dict[str, Any]]:
     """Test get analytics endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -268,7 +285,7 @@ def test_get_analytics(client, mock_user, mock_ads_service):
         mock_ads_service.get_analytics.assert_called_once_with(1)
 
 # Test stream ads
-def test_stream_ads(client, mock_user, mock_ads_service):
+def test_stream_ads(client, mock_user, mock_ads_service) -> Any:
     """Test stream ads endpoint."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service
@@ -293,7 +310,7 @@ def test_stream_ads(client, mock_user, mock_ads_service):
         mock_ads_service.stream_ads.assert_called_once()
 
 # Test error handling
-def test_error_handling(client, mock_user, mock_ads_service):
+def test_error_handling(client, mock_user, mock_ads_service) -> Any:
     """Test error handling in endpoints."""
     with patch('onyx.server.features.ads.api.AdsService') as mock_service_class:
         mock_service_class.return_value = mock_ads_service

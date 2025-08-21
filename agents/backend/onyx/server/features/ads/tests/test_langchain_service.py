@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 from unittest.mock import Mock, patch, AsyncMock
 from typing import List, Dict, Any
@@ -8,21 +16,28 @@ from langchain.tools import Tool
 
 from agents.backend.onyx.server.features.ads.langchain_service import LangChainService
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Mock LLM and embeddings
 @pytest.fixture
 def mock_llm():
-    return Mock()
+    
+    """mock_llm function."""
+return Mock()
 
 @pytest.fixture
 def mock_embeddings():
-    return Mock()
+    
+    """mock_embeddings function."""
+return Mock()
 
 @pytest.fixture
-def langchain_service(mock_llm, mock_embeddings):
+def langchain_service(mock_llm, mock_embeddings) -> Any:
     return LangChainService(mock_llm, mock_embeddings)
 
 # Test initialization
-def test_initialization(mock_llm):
+def test_initialization(mock_llm) -> Any:
     """Test LangChainService initialization."""
     service = LangChainService(mock_llm)
     assert service.llm == mock_llm
@@ -47,7 +62,7 @@ def test_initialize_embeddings():
 
 # Test vector store and retriever
 @pytest.mark.asyncio
-async def test_create_vector_store(langchain_service):
+async def test_create_vector_store(langchain_service) -> Any:
     """Test vector store creation."""
     documents = [
         Document(page_content="Test content 1"),
@@ -61,7 +76,7 @@ async def test_create_vector_store(langchain_service):
         mock_faiss.assert_called_once()
 
 @pytest.mark.asyncio
-async def test_create_retriever(langchain_service):
+async def test_create_retriever(langchain_service) -> Any:
     """Test retriever creation."""
     mock_vector_store = Mock()
     mock_vector_store.as_retriever.return_value = Mock()
@@ -75,7 +90,7 @@ async def test_create_retriever(langchain_service):
 
 # Test QA chain
 @pytest.mark.asyncio
-async def test_create_qa_chain(langchain_service):
+async def test_create_qa_chain(langchain_service) -> Any:
     """Test QA chain creation."""
     mock_retriever = Mock()
     
@@ -87,7 +102,7 @@ async def test_create_qa_chain(langchain_service):
 
 # Test agent creation
 @pytest.mark.asyncio
-async def test_create_agent(langchain_service):
+async def test_create_agent(langchain_service) -> Any:
     """Test agent creation."""
     tools = [Tool(name="test_tool", func=lambda x: x, description="Test tool")]
     
@@ -99,7 +114,7 @@ async def test_create_agent(langchain_service):
 
 # Test ad generation
 @pytest.mark.asyncio
-async def test_generate_ads(langchain_service):
+async def test_generate_ads(langchain_service) -> Any:
     """Test ad generation."""
     content = "Test content"
     num_ads = 3
@@ -111,7 +126,7 @@ async def test_generate_ads(langchain_service):
         mock_openai.assert_called_once_with(content, num_ads)
 
 @pytest.mark.asyncio
-async def test_generate_ads_fallback(langchain_service):
+async def test_generate_ads_fallback(langchain_service) -> Any:
     """Test ad generation fallback."""
     content = "Test content"
     num_ads = 3
@@ -126,7 +141,7 @@ async def test_generate_ads_fallback(langchain_service):
 
 # Test brand voice analysis
 @pytest.mark.asyncio
-async def test_analyze_brand_voice(langchain_service):
+async def test_analyze_brand_voice(langchain_service) -> Any:
     """Test brand voice analysis."""
     content = "Test content"
     
@@ -138,7 +153,7 @@ async def test_analyze_brand_voice(langchain_service):
 
 # Test content optimization
 @pytest.mark.asyncio
-async def test_optimize_content(langchain_service):
+async def test_optimize_content(langchain_service) -> Any:
     """Test content optimization."""
     content = "Test content"
     target_audience = "professionals"
@@ -151,7 +166,7 @@ async def test_optimize_content(langchain_service):
 
 # Test content variations
 @pytest.mark.asyncio
-async def test_generate_content_variations(langchain_service):
+async def test_generate_content_variations(langchain_service) -> Any:
     """Test content variation generation."""
     content = "Test content"
     num_variations = 3
@@ -164,7 +179,7 @@ async def test_generate_content_variations(langchain_service):
 
 # Test audience analysis
 @pytest.mark.asyncio
-async def test_analyze_audience(langchain_service):
+async def test_analyze_audience(langchain_service) -> Any:
     """Test audience analysis."""
     content = "Test content"
     
@@ -179,7 +194,7 @@ async def test_analyze_audience(langchain_service):
 
 # Test recommendations
 @pytest.mark.asyncio
-async def test_generate_recommendations(langchain_service):
+async def test_generate_recommendations(langchain_service) -> Any:
     """Test recommendation generation."""
     content = "Test content"
     context = {"platform": "social_media", "goal": "engagement"}
@@ -192,7 +207,7 @@ async def test_generate_recommendations(langchain_service):
 
 # Test competitor analysis
 @pytest.mark.asyncio
-async def test_analyze_competitor_content(langchain_service):
+async def test_analyze_competitor_content(langchain_service) -> Any:
     """Test competitor content analysis."""
     content = "Test content"
     competitor_urls = ["https://competitor1.com", "https://competitor2.com"]
@@ -208,7 +223,7 @@ async def test_analyze_competitor_content(langchain_service):
 
 # Test performance tracking
 @pytest.mark.asyncio
-async def test_track_content_performance(langchain_service):
+async def test_track_content_performance(langchain_service) -> Any:
     """Test content performance tracking."""
     content_id = "123"
     metrics = {

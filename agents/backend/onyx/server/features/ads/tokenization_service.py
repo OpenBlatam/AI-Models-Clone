@@ -1,20 +1,16 @@
-"""
-Advanced tokenization and sequence handling service for ads generation.
-Implements proper text preprocessing, tokenization strategies, and sequence management.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from typing import Dict, Any, List, Optional, Union, Tuple, Iterator
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from transformers import (
-    AutoTokenizer, 
-    PreTrainedTokenizer,
-    PreTrainedTokenizerFast,
-    BatchEncoding,
-    DataCollatorForLanguageModeling,
-    DataCollatorForSeq2SeqLM,
-    DataCollatorWithPadding
-)
 import numpy as np
 from datasets import Dataset as HFDataset
 import re
@@ -23,36 +19,71 @@ import os
 from datetime import datetime
 import asyncio
 from functools import lru_cache
-import aioredis
+try:
+    import aioredis  # type: ignore
+except Exception:  # pragma: no cover - optional in tests
+    aioredis = None  # type: ignore[assignment]
 import hashlib
 from collections import defaultdict, Counter
 import unicodedata
-from nltk.tokenize import word_tokenize, sent_tokenize
-from nltk.corpus import stopwords
-import nltk
-
-# Download required NLTK data
 try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
-try:
-    nltk.data.find('corpora/stopwords')
-except LookupError:
-    nltk.download('stopwords')
-
+    from nltk.tokenize import word_tokenize as _nltk_word_tokenize, sent_tokenize as _nltk_sent_tokenize  # type: ignore
+    from nltk.corpus import stopwords as _nltk_stopwords  # type: ignore
+    import nltk  # type: ignore
+    _NLTK_AVAILABLE = True
+except Exception:
+    _NLTK_AVAILABLE = False
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.optimized_config import settings
 from onyx.server.features.ads.training_logger import TrainingLogger, TrainingPhase, AsyncTrainingLogger
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Advanced tokenization and sequence handling service for ads generation.
+Implements proper text preprocessing, tokenization strategies, and sequence management.
+"""
+    AutoTokenizer, 
+    PreTrainedTokenizer,
+    PreTrainedTokenizerFast,
+    BatchEncoding,
+    DataCollatorForLanguageModeling,
+    DataCollatorForSeq2SeqLM,
+    DataCollatorWithPadding
+)
+
+def _safe_nltk_download() -> None:
+    if not _NLTK_AVAILABLE:
+        return
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        try:
+            nltk.download('punkt', quiet=True)
+        except Exception:
+            pass
+    try:
+        nltk.data.find('corpora/stopwords')
+    except LookupError:
+        try:
+            nltk.download('stopwords', quiet=True)
+        except Exception:
+            pass
+
 
 logger = setup_logger()
 
 class TextPreprocessor:
     """Advanced text preprocessing for ads content."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize text preprocessor."""
-        self.stop_words = set(stopwords.words('english'))
+        self.stop_words = set()
+        if _NLTK_AVAILABLE:
+            _safe_nltk_download()
+            try:
+                self.stop_words = set(_nltk_stopwords.words('english'))
+            except Exception:
+                self.stop_words = set()
         self.url_pattern = re.compile(r'http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+')
         self.email_pattern = re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b')
         self.phone_pattern = re.compile(r'\b\d{3}[-.]?\d{3}[-.]?\d{4}\b')
@@ -111,7 +142,13 @@ class TextPreprocessor:
         clean_text = self.normalize_text(text)
         
         # Tokenize and filter
-        words = word_tokenize(clean_text)
+        if _NLTK_AVAILABLE:
+            try:
+                words = _nltk_word_tokenize(clean_text)
+            except Exception:
+                words = clean_text.split()
+        else:
+            words = clean_text.split()
         words = [word for word in words if len(word) > 2 and word.lower() not in self.stop_words]
         
         # Count frequencies
@@ -126,7 +163,15 @@ class TextPreprocessor:
             return []
         
         # Split by sentences first
-        sentences = sent_tokenize(text)
+        if _NLTK_AVAILABLE:
+            try:
+                sentences = _nltk_sent_tokenize(text)
+            except Exception:
+                import re as _re
+                sentences = [s.strip() for s in _re.split(r"(?<=[.!?])\s+", text) if s.strip()]
+        else:
+            import re as _re
+            sentences = [s.strip() for s in _re.split(r"(?<=[.!?])\s+", text) if s.strip()]
         
         segments = []
         current_segment = ""
@@ -432,10 +477,10 @@ class OptimizedAdsDataset(Dataset):
         self.use_cache = use_cache
         self._cached_sequences = {}
         
-    def __len__(self):
+    def __len__(self) -> Any:
         return len(self.data)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         """Get item with caching."""
         if self.use_cache and idx in self._cached_sequences:
             return self._cached_sequences[idx]
@@ -488,7 +533,7 @@ class TokenizationService:
         self.training_logger = None
         
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         """Lazy initialization of Redis client."""
         if self._redis_client is None:
             self._redis_client = await aioredis.from_url(
@@ -702,7 +747,7 @@ class TokenizationService:
             'vocabulary_size': self.tokenizer.get_vocab_size()
         }
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close Redis connection."""
         if self._redis_client:
             await self._redis_client.close() 

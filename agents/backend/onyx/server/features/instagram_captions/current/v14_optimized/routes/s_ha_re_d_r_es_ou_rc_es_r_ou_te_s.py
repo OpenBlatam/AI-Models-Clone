@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+import json
+from typing import Dict, Any, List, Optional
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
+from fastapi.responses import JSONResponse
+import logging
+from core.shared_resources import (
+from types.optimized_schemas import (
+        import psutil
+from typing import Any, List, Dict, Optional
 """
 Shared Resources Routes for Instagram Captions API v14.0
 
@@ -10,23 +29,14 @@ Specialized routes for:
 - Performance metrics
 """
 
-import asyncio
-import time
-import json
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, HTTPException, Query, Depends, Request
-from fastapi.responses import JSONResponse
-import logging
 
 # Import shared resources components
-from core.shared_resources import (
     SharedResources, ResourceConfig, ResourceType, ResourceState,
     get_shared_resources, initialize_shared_resources, shutdown_shared_resources,
     database_session, http_client, redis_client, with_cache, with_ai_model
 )
 
 # Import schemas
-from types.optimized_schemas import (
     PerformanceMetrics, APIErrorResponse
 )
 
@@ -155,7 +165,7 @@ async def get_database_pool_status() -> Dict[str, Any]:
 
 
 @shared_resources_router.get("/pools/http/status")
-async def get_http_pool_status() -> Dict[str, Any]:
+async async def get_http_pool_status() -> Dict[str, Any]:
     """
     Get HTTP client pool status
     
@@ -416,7 +426,9 @@ async def load_ai_model(
         
         # Mock loader function - in real implementation, this would load actual models
         def mock_loader():
-            return {"model_name": model_name, "loaded_at": time.time()}
+            
+    """mock_loader function."""
+return {"model_name": model_name, "loaded_at": time.time()}
         
         model = await resources.get_ai_model(model_name, mock_loader)
         
@@ -482,7 +494,6 @@ async def get_resource_stats() -> Dict[str, Any]:
         stats = await resources.get_stats()
         
         # Add system metrics
-        import psutil
         memory_info = psutil.virtual_memory()
         cpu_percent = psutil.cpu_percent()
         

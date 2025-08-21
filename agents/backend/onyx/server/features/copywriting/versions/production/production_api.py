@@ -1,3 +1,34 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+import uuid
+from fastapi import (
+from fastapi.responses import JSONResponse
+from fastapi.security.api_key import APIKeyHeader
+    import orjson
+    import json as orjson
+    import redis.asyncio as aioredis
+    from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.util import get_remote_address
+    from slowapi.errors import RateLimitExceeded
+    from prometheus_client import Counter, Histogram, Gauge, generate_latest
+    from prometheus_fastapi_instrumentator import Instrumentator
+import structlog
+from .models import (
+from .optimized_service import get_optimized_service
+    from fastapi.responses import PlainTextResponse
+        from .models import CopyVariant
+from typing import Any, List, Dict, Optional
+import logging
 """
 Ultra-Optimized Production Copywriting API.
 
@@ -8,61 +39,42 @@ High-performance FastAPI with advanced features:
 - Prometheus metrics, structured logging
 """
 
-import asyncio
-import time
-from typing import List, Optional, Dict, Any
-from datetime import datetime
-import uuid
 
 # FastAPI imports
-from fastapi import (
     APIRouter, HTTPException, Query, Depends, Body, 
     status, Request, Security, BackgroundTasks
 )
-from fastapi.responses import JSONResponse
-from fastapi.security.api_key import APIKeyHeader
 
 # High-performance imports
 try:
-    import orjson
     JSON_AVAILABLE = True
 except ImportError:
-    import json as orjson
     JSON_AVAILABLE = False
 
 try:
-    import redis.asyncio as aioredis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
 
 # Rate limiting
 try:
-    from slowapi import Limiter, _rate_limit_exceeded_handler
-    from slowapi.util import get_remote_address
-    from slowapi.errors import RateLimitExceeded
     RATE_LIMIT_AVAILABLE = True
 except ImportError:
     RATE_LIMIT_AVAILABLE = False
 
 # Monitoring
 try:
-    from prometheus_client import Counter, Histogram, Gauge, generate_latest
-    from prometheus_fastapi_instrumentator import Instrumentator
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
 # Logging
-import structlog
 
 # Import models and service
-from .models import (
     CopywritingInput, CopywritingOutput, Language, CopyTone, 
     UseCase, CreativityLevel, WebsiteInfo, BrandVoice,
     TranslationSettings, VariantSettings
 )
-from .optimized_service import get_optimized_service
 
 logger = structlog.get_logger(__name__)
 
@@ -217,7 +229,6 @@ async def get_metrics():
             detail="Metrics not available. Install prometheus-client."
         )
     
-    from fastapi.responses import PlainTextResponse
     return PlainTextResponse(
         generate_latest(),
         media_type="text/plain; version=0.0.4; charset=utf-8"
@@ -409,7 +420,6 @@ async def translate_content(
         service = await get_optimized_service()
         
         # Convert dict variants to CopyVariant objects (simplified)
-        from .models import CopyVariant
         copy_variants = []
         
         for variant_data in variants:

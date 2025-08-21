@@ -1,7 +1,16 @@
-"""
-Production middleware for Ultra-Optimized SEO Service.
-Includes security, monitoring, rate limiting, and logging middleware.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import json
@@ -16,6 +25,14 @@ import prometheus_client
 from loguru import logger
 import orjson
 from tenacity import retry, stop_after_attempt, wait_exponential
+            import psutil
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Production middleware for Ultra-Optimized SEO Service.
+Includes security, monitoring, rate limiting, and logging middleware.
+"""
+
 
 # Prometheus metrics
 REQUEST_COUNT = prometheus_client.Counter(
@@ -61,7 +78,9 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """Middleware for structured request logging."""
     
     def __init__(self, app: ASGIApp, config: Optional[Dict[str, Any]] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config or {}
         self.log_requests = self.config.get('log_requests', True)
         self.log_responses = self.config.get('log_responses', True)
@@ -167,7 +186,9 @@ class MetricsMiddleware(BaseHTTPMiddleware):
     """Middleware for collecting metrics."""
     
     def __init__(self, app: ASGIApp, config: Optional[Dict[str, Any]] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config or {}
         self.enable_metrics = self.config.get('enable_metrics', True)
     
@@ -220,7 +241,6 @@ class MetricsMiddleware(BaseHTTPMiddleware):
         
         # Record memory usage
         try:
-            import psutil
             process = psutil.Process()
             memory_info = process.memory_info()
             MEMORY_USAGE.set(memory_info.rss)
@@ -249,7 +269,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     """Middleware for rate limiting."""
     
     def __init__(self, app: ASGIApp, config: Optional[Dict[str, Any]] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config or {}
         self.enabled = self.config.get('enabled', True)
         self.requests_per_minute = self.config.get('requests_per_minute', 100)
@@ -328,7 +350,9 @@ class SecurityMiddleware(BaseHTTPMiddleware):
     """Middleware for security headers and validation."""
     
     def __init__(self, app: ASGIApp, config: Optional[Dict[str, Any]] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config or {}
         self.enable_security_headers = self.config.get('enable_security_headers', True)
         self.enable_cors = self.config.get('enable_cors', True)
@@ -372,7 +396,9 @@ class CacheMiddleware(BaseHTTPMiddleware):
     """Middleware for response caching."""
     
     def __init__(self, app: ASGIApp, config: Optional[Dict[str, Any]] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config or {}
         self.enabled = self.config.get('enabled', True)
         self.cache_ttl = self.config.get('cache_ttl', 300)  # 5 minutes
@@ -456,7 +482,9 @@ class CircuitBreakerMiddleware(BaseHTTPMiddleware):
     """Middleware for circuit breaker pattern."""
     
     def __init__(self, app: ASGIApp, config: Optional[Dict[str, Any]] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config or {}
         self.enabled = self.config.get('enabled', True)
         self.failure_threshold = self.config.get('failure_threshold', 5)
@@ -507,7 +535,9 @@ class RetryMiddleware(BaseHTTPMiddleware):
     """Middleware for automatic retries."""
     
     def __init__(self, app: ASGIApp, config: Optional[Dict[str, Any]] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config or {}
         self.enabled = self.config.get('enabled', True)
         self.max_attempts = self.config.get('max_attempts', 3)
@@ -530,7 +560,7 @@ class RetryMiddleware(BaseHTTPMiddleware):
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=1, max=10)
     )
-    async def _retry_request(self, request: Request, call_next: Callable) -> Response:
+    async async def _retry_request(self, request: Request, call_next: Callable) -> Response:
         """Retry request with exponential backoff."""
         response = await call_next(request)
         

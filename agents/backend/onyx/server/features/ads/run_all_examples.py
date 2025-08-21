@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import subprocess
+import sys
+import os
+from pathlib import Path
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Run All Examples - Official Documentation Reference System
@@ -7,12 +19,8 @@ Script para ejecutar todos los ejemplos del sistema de referencias
 de documentación oficial.
 """
 
-import subprocess
-import sys
-import os
-from pathlib import Path
 
-def run_example(script_name, description):
+def run_example(script_name, description) -> Any:
     """Ejecutar un ejemplo específico."""
     print(f"\n{'='*60}")
     print(f"🚀 EJECUTANDO: {script_name}")
@@ -92,5 +100,6 @@ def main():
     
     print("\n🚀 ¡Sistema listo para usar en producción!")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

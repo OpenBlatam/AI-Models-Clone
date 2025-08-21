@@ -1,7 +1,13 @@
-"""
-HTTP Client ultra-optimizado para el servicio SEO.
-Implementación con connection pooling, throttling y retry inteligente.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import asyncio
@@ -11,15 +17,25 @@ import httpx
 import cchardet
 from tenacity import retry, stop_after_attempt, wait_exponential
 import asyncio_throttle
-
 from .interfaces import HTTPClient
+            import psutil
+from typing import Any, List, Dict, Optional
+import logging
+"""
+HTTP Client ultra-optimizado para el servicio SEO.
+Implementación con connection pooling, throttling y retry inteligente.
+"""
+
+
 
 
 class UltraFastHTTPClient(HTTPClient):
     """Cliente HTTP ultra-optimizado con connection pooling."""
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.session = None
+        
+    """__init__ function."""
+self.session = None
         self.config = config or {}
         self.throttler = asyncio_throttle.Throttler(
             rate_limit=self.config.get('rate_limit', 100),
@@ -27,7 +43,7 @@ class UltraFastHTTPClient(HTTPClient):
         )
         self._setup_session()
     
-    def _setup_session(self):
+    def _setup_session(self) -> Any:
         """Configura sesión HTTP ultra-optimizada."""
         limits = httpx.Limits(
             max_keepalive_connections=self.config.get('max_keepalive', 20),
@@ -55,7 +71,7 @@ class UltraFastHTTPClient(HTTPClient):
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=4, max=10)
     )
-    async def fetch(self, url: str) -> Optional[str]:
+    async async def fetch(self, url: str) -> Optional[str]:
         """Obtiene contenido HTML con throttling y retry."""
         async with self.throttler:
             try:
@@ -85,7 +101,7 @@ class UltraFastHTTPClient(HTTPClient):
             logger.error(f"Error measuring load time for {url}: {e}")
             return None
     
-    async def fetch_with_metrics(self, url: str) -> Dict[str, Any]:
+    async async def fetch_with_metrics(self, url: str) -> Dict[str, Any]:
         """Obtiene contenido HTML con métricas detalladas."""
         start_time = time.perf_counter()
         start_memory = self._get_memory_usage()
@@ -110,11 +126,11 @@ class UltraFastHTTPClient(HTTPClient):
                 'error': str(e)
             }
     
-    async def batch_fetch(self, urls: list, max_concurrent: int = 10) -> Dict[str, Any]:
+    async async def batch_fetch(self, urls: list, max_concurrent: int = 10) -> Dict[str, Any]:
         """Obtiene múltiples URLs en paralelo."""
         semaphore = asyncio.Semaphore(max_concurrent)
         
-        async def fetch_single(url: str) -> Dict[str, Any]:
+        async async def fetch_single(url: str) -> Dict[str, Any]:
             async with semaphore:
                 return await self.fetch_with_metrics(url)
         
@@ -143,12 +159,11 @@ class UltraFastHTTPClient(HTTPClient):
     def _get_memory_usage(self) -> float:
         """Obtiene el uso de memoria actual."""
         try:
-            import psutil
             return psutil.Process().memory_info().rss / 1024 / 1024  # MB
         except:
             return 0.0
     
-    async def close(self):
+    async def close(self) -> Any:
         """Cierra la sesión HTTP."""
         if self.session:
             await self.session.aclose()

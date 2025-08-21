@@ -1,6 +1,16 @@
-"""
-Utilidades refactorizadas para el Servicio SEO Ultra-Optimizado.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import hashlib
@@ -10,6 +20,13 @@ from urllib.parse import urlparse, urljoin
 import logging
 from dataclasses import dataclass
 from enum import Enum
+        from collections import Counter
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Utilidades refactorizadas para el Servicio SEO Ultra-Optimizado.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -133,7 +150,6 @@ class TextUtils:
         keywords = [word for word in words if len(word) > 2 and word not in stop_words]
         
         # Contar frecuencia
-        from collections import Counter
         word_counts = Counter(keywords)
         
         # Retornar las más frecuentes
@@ -168,9 +184,9 @@ class PerformanceUtils:
     """Utilidades para medición de rendimiento."""
     
     @staticmethod
-    def measure_time(func):
+    def measure_time(func) -> Any:
         """Decorator para medir tiempo de ejecución."""
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             result = func(*args, **kwargs)
             end_time = time.time()

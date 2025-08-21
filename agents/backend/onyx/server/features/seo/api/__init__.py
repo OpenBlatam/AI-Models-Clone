@@ -1,16 +1,24 @@
-"""
-API module for Ultra-Optimized SEO Service.
-Contains routes, middleware, and API-related components.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 import uvicorn
-
 from .routes import router as seo_router
 from .middleware import (
+    from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+    from fastapi.responses import Response
+    import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+API module for Ultra-Optimized SEO Service.
+Contains routes, middleware, and API-related components.
+"""
+
+
     RequestLoggingMiddleware,
     MetricsMiddleware,
     RateLimitMiddleware,
@@ -57,8 +65,6 @@ app.state.limiter = limiter
 @app.get("/metrics")
 async def metrics():
     """Endpoint para métricas Prometheus."""
-    from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
-    from fastapi.responses import Response
     
     return Response(
         content=generate_latest(),
@@ -85,7 +91,7 @@ async def root():
 
 # Manejo de errores global
 @app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
+async def global_exception_handler(request, exc) -> Any:
     """Manejo global de excepciones."""
     return JSONResponse(
         status_code=500,
@@ -118,6 +124,6 @@ def run_app(
         log_level=log_level
     )
 
-if __name__ == "__main__":
-    import time
+match __name__:
+    case "__main__":
     run_app() 

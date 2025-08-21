@@ -1,12 +1,17 @@
-"""
-Analyze URL Use Case
-Clean Architecture with Domain-Driven Design
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 from typing import Optional
 from abc import ABC, abstractmethod
-
 from domain.entities.seo_analysis import SEOAnalysis
 from domain.repositories.seo_repository import SEORepository
 from domain.services.html_parser_service import HTMLParserService
@@ -15,6 +20,17 @@ from application.dto.analyze_url_response import AnalyzeURLResponse
 from application.mappers.seo_mapper import SEOMapper
 from shared.core.exceptions import UseCaseError, ValidationError
 from shared.core.logging import get_logger
+                    import asyncio
+        import time
+        from shared.core.metrics import REQUEST_COUNTER, REQUEST_DURATION, ERROR_COUNTER
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Analyze URL Use Case
+Clean Architecture with Domain-Driven Design
+"""
+
+
 
 logger = get_logger(__name__)
 
@@ -125,7 +141,7 @@ class AnalyzeURLUseCaseImpl(AnalyzeURLUseCase):
             logger.error("Error in URL analysis", url=str(request.url), error=str(e))
             raise UseCaseError(f"Failed to analyze URL: {str(e)}")
     
-    def _validate_request(self, request: AnalyzeURLRequest) -> None:
+    async def _validate_request(self, request: AnalyzeURLRequest) -> None:
         """
         Validate analysis request
         
@@ -285,7 +301,6 @@ class AnalyzeURLUseCaseWithRetry(AnalyzeURLUseCase):
                 )
                 
                 if attempt < self.max_retries:
-                    import asyncio
                     await asyncio.sleep(self.retry_delay * (attempt + 1))
         
         # All retries failed
@@ -325,8 +340,6 @@ class AnalyzeURLUseCaseWithMetrics(AnalyzeURLUseCase):
         Returns:
             AnalyzeURLResponse: Analysis response
         """
-        import time
-        from shared.core.metrics import REQUEST_COUNTER, REQUEST_DURATION, ERROR_COUNTER
         
         start_time = time.time()
         
@@ -427,7 +440,7 @@ class AnalyzeURLUseCaseWithValidation(AnalyzeURLUseCase):
         if url.is_ip_address():
             raise ValidationError("IP address URLs are not supported")
     
-    def _validate_request_limits(self, request: AnalyzeURLRequest) -> None:
+    async def _validate_request_limits(self, request: AnalyzeURLRequest) -> None:
         """
         Validate request limits
         

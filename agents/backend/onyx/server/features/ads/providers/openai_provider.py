@@ -1,6 +1,5 @@
-"""
-OpenAI provider implementation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import List, Dict, Any, Optional
 import logging
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
@@ -8,6 +7,11 @@ from langchain.prompts import ChatPromptTemplate
 from langchain.output_parsers import StrOutputParser, JsonOutputParser
 from .base import BaseProvider
 from ..config.providers import OpenAIConfig
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+OpenAI provider implementation.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -15,7 +19,9 @@ class OpenAIProvider(BaseProvider):
     """OpenAI provider implementation."""
     
     def __init__(self, config: OpenAIConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.chat_model = None
         self.embeddings = None
     

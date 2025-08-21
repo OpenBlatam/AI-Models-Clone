@@ -1,12 +1,17 @@
-"""
-Analytics domain entity for LinkedIn Posts system.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 from dataclasses import dataclass, field
 from uuid import UUID, uuid4
 import json
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Analytics domain entity for LinkedIn Posts system.
+"""
+
 
 
 @dataclass
@@ -183,7 +188,7 @@ class Analytics:
     # Metadata
     metadata: Dict[str, Any] = field(default_factory=dict)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Post-initialization processing."""
         if isinstance(self.audience_insights, dict):
             self.audience_insights = AudienceInsights(**self.audience_insights)

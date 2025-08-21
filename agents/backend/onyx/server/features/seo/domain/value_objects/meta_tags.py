@@ -1,11 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Set
+from collections import defaultdict
+        import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Meta Tags Value Object
 Domain-Driven Design with SEO-specific business logic
 """
 
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Set
-from collections import defaultdict
 
 
 @dataclass(frozen=True)
@@ -19,7 +31,7 @@ class MetaTags:
     
     tags: Dict[str, str]
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate meta tags after initialization"""
         if not isinstance(self.tags, dict):
             raise ValueError("Tags must be a dictionary")
@@ -408,7 +420,7 @@ class MetaTags:
         """Check if meta tag exists"""
         return name in self.tags
     
-    def __iter__(self):
+    def __iter__(self) -> Any:
         """Iterate over meta tags"""
         return iter(self.tags.items())
     
@@ -464,7 +476,6 @@ class MetaTags:
         Returns:
             MetaTags: Meta tags extracted from HTML
         """
-        import re
         
         tags = {}
         

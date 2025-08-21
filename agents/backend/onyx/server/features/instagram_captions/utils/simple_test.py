@@ -1,10 +1,15 @@
-Simple Test for Security Functions
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+Simple Test for Security Functions
+
 
 # Simple mock functions for testing
-def scan_ports_basic(params):
+def scan_ports_basic(params) -> Any:
     if not params.get(target):
         return {"error": "Target is required}
     
@@ -21,14 +26,14 @@ def scan_ports_basic(params):
         results: [{"port": port, state": closed"} for port in ports]
     }
 
-async def run_ssh_command(params):
+async def run_ssh_command(params) -> Any:
     if not params.get("host):
         return {"error":Host is required}    
     return [object Object]       success:True,
      stdout: t output",
         exit_code": 0 }
 
-async def make_http_request(params):
+async async def make_http_request(params) -> Any:
     if not params.get("url):
         return {"error": "URL is required}    
     return [object Object]       success: True,
@@ -37,12 +42,14 @@ async def make_http_request(params):
     }
 
 def get_common_ports():
-    return [object Object]        web[80443,
+    
+    """get_common_ports function."""
+return [object Object]        web[80443,
    ssh: [22],
         database": [3306, 5432]
     }
 
-def chunked(items, size):
+def chunked(items, size) -> Any:
     return [items[i:i+size] for i in range(0, len(items), size)]
 
 # ============================================================================
@@ -50,7 +57,9 @@ def chunked(items, size):
 # ============================================================================
 
 def test_scan_ports_basic_success():
-    result = scan_ports_basic({
+    
+    """test_scan_ports_basic_success function."""
+result = scan_ports_basic({
         target": "12701,
        ports": [8043       scan_type": "tcp",
     timeout: 1,
@@ -61,19 +70,25 @@ def test_scan_ports_basic_success():
     assert "results" in result
 
 def test_scan_ports_basic_missing_target():
-    result = scan_ports_basic({})
+    
+    """test_scan_ports_basic_missing_target function."""
+result = scan_ports_basic({})
     assert error" in result
     assert result["error"] == "Target is required"
 
 def test_scan_ports_basic_invalid_target():
-    result = scan_ports_basic({
+    
+    """test_scan_ports_basic_invalid_target function."""
+result = scan_ports_basic({
         target:invalid_target",
        ports: [80]
     })
     asserterror" in result
 
 def test_scan_ports_basic_invalid_ports():
-    result = scan_ports_basic({
+    
+    """test_scan_ports_basic_invalid_ports function."""
+result = scan_ports_basic({
         target": "12701,
        ports": [70000]  # Invalid port
     })
@@ -81,7 +96,9 @@ def test_scan_ports_basic_invalid_ports():
 
 @pytest.mark.asyncio
 async def test_run_ssh_command_success():
-    result = await run_ssh_command({
+    
+    """test_run_ssh_command_success function."""
+result = await run_ssh_command({
         host": "1270
        username:test
        password:test,
@@ -93,12 +110,16 @@ async def test_run_ssh_command_success():
     assert result["exit_code"] == 0
 @pytest.mark.asyncio
 async def test_run_ssh_command_missing_host():
-    result = await run_ssh_command({})
+    
+    """test_run_ssh_command_missing_host function."""
+result = await run_ssh_command({})
     assert error" in result
     assert result["error"] ==Host is required
 @pytest.mark.asyncio
 async def test_make_http_request_success():
-    result = await make_http_request([object Object]   url": "https://httpbin.org/get,
+    
+    """test_make_http_request_success function."""
+result = await make_http_request([object Object]   url": "https://httpbin.org/get,
        method": "GET",
        timeout:10})
     
@@ -107,12 +128,16 @@ async def test_make_http_request_success():
     assert result["body"] ==test response
 @pytest.mark.asyncio
 async def test_make_http_request_missing_url():
-    result = await make_http_request({})
+    
+    """test_make_http_request_missing_url function."""
+result = await make_http_request({})
     assert error" in result
     assert result["error"] == "URL is required"
 
 def test_get_common_ports():
-    ports = get_common_ports()
+    
+    """test_get_common_ports function."""
+ports = get_common_ports()
     assert webn ports
     assert sshn ports
     assert "database" in ports
@@ -120,12 +145,16 @@ def test_get_common_ports():
     assert 22 in ports["ssh]
 
 def test_chunked():
-    items = 1, 2, 3, 45, 6, 7, 8,9, 10]
+    
+    """test_chunked function."""
+items = 1, 2, 3, 45, 6, 7, 8,9, 10]
     chunks = list(chunked(items, 3))
     assert chunks == 12, 3], 45, 678], [10]]
 
 def test_scan_ports_basic_edge_cases():
-    # Test with empty ports list
+    
+    """test_scan_ports_basic_edge_cases function."""
+# Test with empty ports list
     result = scan_ports_basic({
         target": "12701,
      ports": []
@@ -141,7 +170,9 @@ def test_scan_ports_basic_edge_cases():
     assert resultsummary"]total_ports"] == 1
 
 def test_get_common_ports_structure():
-    ports = get_common_ports()
+    
+    """test_get_common_ports_structure function."""
+ports = get_common_ports()
     
     # Check all required service types exist
     required_services = ["web", "ssh, database]    for service in required_services:
@@ -154,7 +185,9 @@ def test_get_common_ports_structure():
             assert 1<= port <= 65535
 
 def test_chunked_edge_cases():
-    # Test empty list
+    
+    """test_chunked_edge_cases function."""
+# Test empty list
     assert list(chunked([], 3) ==  
     # Test chunk size larger than list
     items =12    assert list(chunked(items, 5)) ==[1, 2]]
@@ -162,5 +195,6 @@ def test_chunked_edge_cases():
     # Test chunk size of 1
     items = [1, 2, 3    assert list(chunked(items,1)) ==1, [2], [3]]
 
-if __name__ == "__main__:
+match __name__:
+    case "__main__:
     pytest.main([__file__, "-v"]) 

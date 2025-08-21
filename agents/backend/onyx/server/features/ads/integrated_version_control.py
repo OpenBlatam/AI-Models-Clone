@@ -1,3 +1,291 @@
+from __future__ import annotations
+
+import argparse
+import os
+import subprocess
+from dataclasses import dataclass
+from pathlib import Path
+from typing import List, Optional, Tuple
+
+
+@dataclass
+class RepoConfig:
+    repo_root: Path = Path.cwd()
+    default_branch: str = "main"
+    git_bin: str = "git"
+
+
+class GitError(RuntimeError):
+    pass
+
+
+class GitRunner:
+    def __init__(self, cfg: RepoConfig) -> None:
+        self.cfg = cfg
+
+    def run(self, args: List[str], check: bool = True) -> subprocess.CompletedProcess:
+        proc = subprocess.run(
+            [self.cfg.git_bin, *args],
+            cwd=str(self.cfg.repo_root),
+            capture_output=True,
+            text=True,
+            shell=False,
+        )
+        if check and proc.returncode != 0:
+            raise GitError(
+                f"git {' '.join(args)} failed (code={proc.returncode})\nSTDOUT:\n{proc.stdout}\nSTDERR:\n{proc.stderr}"
+            )
+        return proc
+
+
+class GitManager:
+    def __init__(self, cfg: Optional[RepoConfig] = None) -> None:
+        self.cfg = cfg or RepoConfig()
+        self.git = GitRunner(self.cfg)
+
+    # -------------------------------
+    # Repo lifecycle
+    # -------------------------------
+    def is_repo(self) -> bool:
+        return (self.cfg.repo_root / ".git").exists()
+
+    def init_repo(self) -> None:
+        if self.is_repo():
+            return
+        self.git.run(["init", "-b", self.cfg.default_branch])
+        # Default .gitignore
+        self.ensure_gitignore()
+
+    def set_user(self, name: str, email: str) -> None:
+        self.git.run(["config", "user.name", name])
+        self.git.run(["config", "user.email", email])
+
+    # -------------------------------
+    # Ignore / hooks
+    # -------------------------------
+    def ensure_gitignore(self) -> None:
+        patterns = [
+            "__pycache__/",
+            "*.py[cod]",
+            "*.egg-info/",
+            ".pytest_cache/",
+            ".mypy_cache/",
+            ".venv/",
+            "env/",
+            "venv/",
+            ".DS_Store",
+            ".idea/",
+            ".vscode/",
+            "node_modules/",
+            "dist/",
+            "build/",
+            "*.log",
+            "*.cache",
+            ".cache/",
+        ]
+        gi = self.cfg.repo_root / ".gitignore"
+        existing = gi.read_text(encoding="utf-8").splitlines() if gi.exists() else []
+        merged = existing[:]
+        for p in patterns:
+            if p not in existing:
+                merged.append(p)
+        gi.write_text("\n".join(merged) + "\n", encoding="utf-8")
+
+    def install_precommit_hook(self) -> None:
+        hooks_dir = self.cfg.repo_root / ".git" / "hooks"
+        hooks_dir.mkdir(parents=True, exist_ok=True)
+        hook = hooks_dir / "pre-commit"
+        content = (
+            "#!/usr/bin/env bash\n"
+            "set -e\n"
+            "if command -v python -V >/dev/null 2>&1; then\n"
+            "  python -m py_compile $(git ls-files '*.py') || exit 1\n"
+            "fi\n"
+        )
+        hook.write_text(content, encoding="utf-8")
+        try:
+            os.chmod(hook, 0o755)
+        except Exception:
+            pass
+
+    # -------------------------------
+    # Basic ops
+    # -------------------------------
+    def add_all(self) -> None:
+        self.git.run(["add", "-A"])
+
+    def commit(self, message: str, allow_empty: bool = False) -> None:
+        args = ["commit", "-m", message]
+        if allow_empty:
+            args.insert(1, "--allow-empty")
+        self.git.run(args)
+
+    def create_branch(self, name: str, checkout: bool = True) -> None:
+        self.git.run(["branch", name])
+        if checkout:
+            self.checkout(name)
+
+    def checkout(self, name: str) -> None:
+        self.git.run(["checkout", name])
+
+    def tag(self, name: str, message: Optional[str] = None) -> None:
+        args = ["tag"]
+        if message:
+            args += ["-a", name, "-m", message]
+        else:
+            args += [name]
+        self.git.run(args)
+
+    def status_short(self) -> str:
+        return self.git.run(["status", "-sb"]).stdout.strip()
+
+    def log_pretty(self, n: int = 10) -> str:
+        fmt = "%h %ad %an %s"
+        out = self.git.run(["log", f"-{n}", "--date=relative", f"--pretty=format:{fmt}"]).stdout
+        return out.strip()
+
+    # -------------------------------
+    # Tracking configs
+    # -------------------------------
+    def diff_names_status(self, base: str = "HEAD") -> List[Tuple[str, str]]:
+        proc = self.git.run(["diff", "--name-status", base], check=False)
+        rows: List[Tuple[str, str]] = []
+        for line in proc.stdout.splitlines():
+            parts = line.split("\t", 1)
+            if len(parts) == 2:
+                rows.append((parts[0], parts[1]))
+        return rows
+
+    def config_changes_summary(self) -> List[Tuple[str, str]]:
+        rows = self.diff_names_status()
+        exts = {".yml", ".yaml", ".json"}
+        return [(st, p) for st, p in rows if Path(p).suffix.lower() in exts]
+
+
+def build_parser() -> argparse.ArgumentParser:
+    p = argparse.ArgumentParser(prog="git-mgr", add_help=True)
+    sub = p.add_subparsers(dest="cmd", required=True)
+
+    sub.add_parser("init")
+    sub.add_parser("ensure-ignore")
+    sub.add_parser("install-hook")
+
+    p_user = sub.add_parser("set-user")
+    p_user.add_argument("name")
+    p_user.add_argument("email")
+
+    sub.add_parser("add")
+    p_commit = sub.add_parser("commit")
+    p_commit.add_argument("-m", "--message", required=True)
+    p_commit.add_argument("--allow-empty", action="store_true")
+
+    p_branch = sub.add_parser("branch")
+    p_branch.add_argument("name")
+    p_branch.add_argument("--no-checkout", action="store_true")
+
+    p_checkout = sub.add_parser("checkout")
+    p_checkout.add_argument("name")
+
+    p_tag = sub.add_parser("tag")
+    p_tag.add_argument("name")
+    p_tag.add_argument("-m", "--message")
+
+    sub.add_parser("status")
+    p_log = sub.add_parser("log")
+    p_log.add_argument("-n", type=int, default=10)
+
+    sub.add_parser("config-diff")
+    return p
+
+
+def main() -> None:
+    args = build_parser().parse_args()
+    mgr = GitManager()
+
+    if args.cmd == "init":
+        mgr.init_repo()
+        print(mgr.status_short())
+        return
+
+    if args.cmd == "ensure-ignore":
+        mgr.ensure_gitignore()
+        print(".gitignore updated")
+        return
+
+    if args.cmd == "install-hook":
+        mgr.install_precommit_hook()
+        print("pre-commit hook installed")
+        return
+
+    if args.cmd == "set-user":
+        mgr.set_user(args.name, args.email)
+        return
+
+    if args.cmd == "add":
+        mgr.add_all()
+        return
+
+    if args.cmd == "commit":
+        mgr.commit(args.message, allow_empty=args.allow_empty)
+        return
+
+    if args.cmd == "branch":
+        mgr.create_branch(args.name, checkout=not args.no_checkout)
+        return
+
+    if args.cmd == "checkout":
+        mgr.checkout(args.name)
+        return
+
+    if args.cmd == "tag":
+        mgr.tag(args.name, message=args.message)
+        return
+
+    if args.cmd == "status":
+        print(mgr.status_short())
+        return
+
+    if args.cmd == "log":
+        print(mgr.log_pretty(n=args.__dict__.get("n", 10)))
+        return
+
+    if args.cmd == "config-diff":
+        for st, p in mgr.config_changes_summary():
+            print(f"{st}\t{p}")
+        return
+
+
+if __name__ == "__main__":
+    main()
+
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import os
+import json
+import yaml
+from pathlib import Path
+from datetime import datetime
+from typing import Dict, Any, List, Optional, Union, Tuple
+from dataclasses import dataclass, field, asdict
+import logging
+from contextlib import contextmanager
+from onyx.utils.logger import setup_logger
+from onyx.server.features.ads.config_manager import ConfigManager, ConfigType
+from onyx.server.features.ads.experiment_tracker import (
+from onyx.server.features.ads.version_control_manager import (
+        from onyx.server.features.ads.config_manager import ExperimentConfig
+import os
+import sys
+import subprocess
+from pathlib import Path
+    import json
+        import sys
+        import torch
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Integrated Version Control System
 
@@ -10,22 +298,9 @@ and experiment tracking systems. It enables:
 - Branch management for different experiment versions
 - Integration with experiment tracking backends
 """
-import os
-import json
-import yaml
-from pathlib import Path
-from datetime import datetime
-from typing import Dict, Any, List, Optional, Union, Tuple
-from dataclasses import dataclass, field, asdict
-import logging
-from contextlib import contextmanager
 
-from onyx.utils.logger import setup_logger
-from onyx.server.features.ads.config_manager import ConfigManager, ConfigType
-from onyx.server.features.ads.experiment_tracker import (
     ExperimentTracker, ExperimentMetadata, create_experiment_tracker
 )
-from onyx.server.features.ads.version_control_manager import (
     VersionControlManager, ExperimentVersionControl, GitCommit, ExperimentVersion
 )
 
@@ -53,7 +328,9 @@ class IntegratedVersionControl:
     """Integrated version control system combining git, config management, and experiment tracking."""
     
     def __init__(self, project_root: str = ".", auto_commit: bool = True):
-        self.project_root = Path(project_root).resolve()
+        
+    """__init__ function."""
+self.project_root = Path(project_root).resolve()
         self.auto_commit = auto_commit
         self.logger = logger
         
@@ -365,6 +642,10 @@ class IntegratedVersionControl:
             # Save experiment info
             snapshot_file = snapshot_dir / "experiment_snapshot.json"
             with open(snapshot_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(asdict(info), f, indent=2, default=str)
             
             # Copy configurations
@@ -374,6 +655,10 @@ class IntegratedVersionControl:
             for config_type, config in info.configs.items():
                 config_file = config_dir / f"{config_type}_config.yaml"
                 with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     yaml.dump(config, f, default_flow_style=False, indent=2)
             
             # Create reproduction script
@@ -394,6 +679,10 @@ class IntegratedVersionControl:
         for config_type, config in configs.items():
             config_file = config_dir / f"{config_type}_config.yaml"
             with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 yaml.dump(config, f, default_flow_style=False, indent=2)
     
     def _load_experiment_configs(self, experiment_id: str) -> Optional[Dict[str, Any]]:
@@ -407,6 +696,10 @@ class IntegratedVersionControl:
         for config_file in config_dir.glob("*_config.yaml"):
             config_type = config_file.stem.replace("_config", "")
             with open(config_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 configs[config_type] = yaml.safe_load(f)
         
         return configs
@@ -420,13 +713,16 @@ class IntegratedVersionControl:
         
         try:
             with open(metrics_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 return json.load(f)
         except Exception:
             return None
     
     def _create_experiment_config(self, experiment_id: str, experiment_name: str, tracking_backend: str):
         """Create experiment configuration for tracking."""
-        from onyx.server.features.ads.config_manager import ExperimentConfig
         
         return ExperimentConfig(
             experiment_name=experiment_name,
@@ -465,6 +761,10 @@ class IntegratedVersionControl:
         
         info_file = info_dir / f"{experiment_id}.json"
         with open(info_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(asdict(info), f, indent=2, default=str)
     
     def _compare_configurations(self, experiment_infos: List[IntegratedExperimentInfo]) -> Dict[str, Any]:
@@ -591,10 +891,6 @@ Reproduction script for experiment {experiment_id}
 Generated automatically by Integrated Version Control System
 """
 
-import os
-import sys
-import subprocess
-from pathlib import Path
 
 def reproduce_experiment():
     """Reproduce the experiment {experiment_id}."""
@@ -607,8 +903,11 @@ def reproduce_experiment():
     subprocess.run(["git", "checkout", "main"], cwd=project_root, check=True)
     
     # Load experiment info
-    import json
     with open("{snapshot_dir}/experiment_snapshot.json", 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         experiment_info = json.load(f)
     
     git_hash = experiment_info['git_hash']
@@ -627,7 +926,15 @@ if __name__ == "__main__":
         
         script_file = snapshot_dir / "reproduce.py"
         with open(script_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(script_content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         # Make script executable
         os.chmod(script_file, 0o755)
@@ -638,12 +945,10 @@ if __name__ == "__main__":
     
     def _get_python_version(self) -> str:
         """Get the current Python version."""
-        import sys
         return f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
     
     def _get_hardware_info(self) -> Dict[str, Any]:
         """Get hardware information."""
-        import torch
         
         info = {
             "python_version": self._get_python_version(),

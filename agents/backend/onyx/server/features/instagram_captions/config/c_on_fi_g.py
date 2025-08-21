@@ -1,14 +1,27 @@
-"""
-Configuration management for Instagram Captions API.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
 
-Centralized configuration with environment variables, validation, and type safety.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import os
 from typing import List, Optional, Dict, Any
 from functools import lru_cache
 from pydantic import BaseModel, Field, validator
 from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Configuration management for Instagram Captions API.
+
+Centralized configuration with environment variables, validation, and type safety.
+"""
+
 
 
 class Environment(str, Enum):
@@ -211,7 +224,7 @@ class Settings(BaseModel):
     )
     
     @validator('environment', pre=True)
-    def validate_environment(cls, v):
+    def validate_environment(cls, v) -> bool:
         """Validate environment setting."""
         if isinstance(v, str):
             try:
@@ -221,7 +234,7 @@ class Settings(BaseModel):
         return v
     
     @validator('log_level', pre=True)
-    def validate_log_level(cls, v):
+    def validate_log_level(cls, v) -> bool:
         """Validate log level setting."""
         if isinstance(v, str):
             try:
@@ -230,7 +243,8 @@ class Settings(BaseModel):
                 return LogLevel.INFO
         return v
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_nested_delimiter = "__"
 

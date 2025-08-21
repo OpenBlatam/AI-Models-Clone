@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+import json
+from typing import Dict, Any, List, Optional, AsyncIterator
+from fastapi import APIRouter, HTTPException, Query, Depends, Request
+from fastapi.responses import StreamingResponse, JSONResponse
+import logging
+from core.advanced_lazy_loader import (
+from types.optimized_schemas import (
+from core.optimized_engine import engine, generate_caption_optimized
+        import psutil
+from typing import Any, List, Dict, Optional
 """
 Lazy Loading Routes for Instagram Captions API v14.0
 
@@ -10,30 +33,20 @@ Specialized routes for:
 - Streaming response generation
 """
 
-import asyncio
-import time
-import json
-from typing import Dict, Any, List, Optional, AsyncIterator
-from fastapi import APIRouter, HTTPException, Query, Depends, Request
-from fastapi.responses import StreamingResponse, JSONResponse
-import logging
 
 # Import lazy loading components
-from core.advanced_lazy_loader import (
     AdvancedLazyLoader, LargeDataConfig, DataSize, LoadStrategy,
     DataChunk, PageInfo, create_lazy_loader, lazy_load_large_dataset,
     stream_large_response, large_dataset_context
 )
 
 # Import schemas and models
-from types.optimized_schemas import (
     CaptionGenerationRequest, CaptionGenerationResponse,
     BatchCaptionRequest, BatchCaptionResponse,
     PerformanceMetrics, APIErrorResponse
 )
 
 # Import engine components
-from core.optimized_engine import engine, generate_caption_optimized
 
 logger = logging.getLogger(__name__)
 
@@ -400,7 +413,6 @@ async def get_lazy_loading_stats() -> Dict[str, Any]:
         loader_stats = await lazy_loader.get_stats()
         
         # Get system memory info
-        import psutil
         memory_info = psutil.virtual_memory()
         
         return {

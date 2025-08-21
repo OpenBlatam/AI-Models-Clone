@@ -1,11 +1,56 @@
-"""
-Optimized fine-tuning service for ads generation using LoRA and P-tuning techniques.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 from typing import Dict, Any, List, Optional, Union, Tuple, Callable
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, DataLoader
 from transformers import (
+from peft import (
+import numpy as np
+from datasets import Dataset as HFDataset
+import json
+import os
+from datetime import datetime
+import asyncio
+from functools import lru_cache
+try:
+    import aioredis  # type: ignore
+except Exception:  # pragma: no cover - optional in tests
+    aioredis = None  # type: ignore[assignment]
+import hashlib
+import time
+import psutil
+from onyx.utils.logger import setup_logger
+from onyx.server.features.ads.optimized_config import settings
+from onyx.server.features.ads.optimized_db_service import OptimizedAdsDBService
+from onyx.server.features.ads.tokenization_service import TokenizationService, OptimizedAdsDataset
+from onyx.server.features.ads.training_logger import TrainingLogger, TrainingPhase, AsyncTrainingLogger
+from onyx.server.features.ads.performance_optimizer import (
+from onyx.server.features.ads.multi_gpu_training import (
+from onyx.server.features.ads.gradient_accumulation import (
+from onyx.server.features.ads.mixed_precision_training import (
+from onyx.server.features.ads.profiling_optimizer import (
+from onyx.server.features.ads.data_optimization import (
+            import glob
+            from datetime import datetime, timedelta
+                            import shutil
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Optimized fine-tuning service for ads generation using LoRA and P-tuning techniques.
+"""
     AutoTokenizer, 
     AutoModelForCausalLM, 
     AutoModelForSequenceClassification,
@@ -14,7 +59,6 @@ from transformers import (
     DataCollatorForLanguageModeling,
     DataCollatorForSeq2SeqLM
 )
-from peft import (
     LoraConfig, 
     get_peft_model, 
     TaskType, 
@@ -22,24 +66,7 @@ from peft import (
     PeftConfig,
     prepare_model_for_kbit_training
 )
-import numpy as np
-from datasets import Dataset as HFDataset
-import json
-import os
-from datetime import datetime
-import asyncio
-from functools import lru_cache
-import aioredis
-import hashlib
-import time
-import psutil
 
-from onyx.utils.logger import setup_logger
-from onyx.server.features.ads.optimized_config import settings
-from onyx.server.features.ads.optimized_db_service import OptimizedAdsDBService
-from onyx.server.features.ads.tokenization_service import TokenizationService, OptimizedAdsDataset
-from onyx.server.features.ads.training_logger import TrainingLogger, TrainingPhase, AsyncTrainingLogger
-from onyx.server.features.ads.performance_optimizer import (
     performance_monitor, 
     cache_result, 
     performance_context, 
@@ -47,7 +74,6 @@ from onyx.server.features.ads.performance_optimizer import (
     optimizer
 )
 
-from onyx.server.features.ads.multi_gpu_training import (
     MultiGPUTrainingManager,
     GPUConfig,
     DataParallelTrainer,
@@ -56,7 +82,6 @@ from onyx.server.features.ads.multi_gpu_training import (
     cleanup_gpu_memory
 )
 
-from onyx.server.features.ads.gradient_accumulation import (
     GradientAccumulationConfig,
     GradientAccumulator,
     AdaptiveGradientAccumulator,
@@ -67,7 +92,6 @@ from onyx.server.features.ads.gradient_accumulation import (
     gradient_accumulation_context
 )
 
-from onyx.server.features.ads.mixed_precision_training import (
     MixedPrecisionConfig,
     MixedPrecisionTrainer,
     AdaptiveMixedPrecisionTrainer,
@@ -78,13 +102,11 @@ from onyx.server.features.ads.mixed_precision_training import (
     mixed_precision_context
 )
 
-from onyx.server.features.ads.profiling_optimizer import (
     ProfilingConfig,
     ProfilingOptimizer,
     profile_function,
     profiling_context
 )
-from onyx.server.features.ads.data_optimization import (
     DataOptimizationConfig,
     DataLoadingOptimizer,
     PreprocessingOptimizer,
@@ -103,7 +125,7 @@ logger = setup_logger()
 class OptimizedFineTuningService:
     """Optimized fine-tuning service with LoRA and P-tuning techniques."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the fine-tuning service."""
         self._redis_client = None
         self.db_service = OptimizedAdsDBService()
@@ -152,7 +174,7 @@ class OptimizedFineTuningService:
         self.io_optimizer = IOOptimizer(self.data_optimization_config)
         
     @property
-    async def redis_client(self):
+    async def redis_client(self) -> Any:
         """Lazy initialization of Redis client."""
         if self._redis_client is None:
             self._redis_client = await aioredis.from_url(
@@ -578,7 +600,7 @@ class OptimizedFineTuningService:
                 return results
     
     @performance_monitor("cleanup_resources")
-    async def cleanup_resources(self):
+    async def cleanup_resources(self) -> Any:
         """Cleanup resources with performance optimization."""
         async with performance_context("resource_cleanup"):
             # Clear model cache
@@ -819,8 +841,6 @@ class OptimizedFineTuningService:
             Cleanup statistics
         """
         try:
-            import glob
-            from datetime import datetime, timedelta
             
             cutoff_date = datetime.now() - timedelta(days=days)
             cleaned_count = 0
@@ -838,7 +858,6 @@ class OptimizedFineTuningService:
                         # Check if directory is older than threshold
                         dir_time = datetime.fromtimestamp(os.path.getctime(path))
                         if dir_time < cutoff_date:
-                            import shutil
                             shutil.rmtree(path)
                             cleaned_count += 1
                             logger.info(f"Cleaned up old model: {path}")
@@ -854,7 +873,7 @@ class OptimizedFineTuningService:
             logger.exception("Error cleaning up old models")
             raise
     
-    async def close(self):
+    async def close(self) -> Any:
         """Cleanup resources."""
         if self._redis_client:
             await self._redis_client.close() 
@@ -1018,7 +1037,7 @@ class OptimizedFineTuningService:
         return self.multi_gpu_manager.get_gpu_stats()
     
     @performance_monitor("cleanup_gpu_resources")
-    async def cleanup_gpu_resources(self):
+    async def cleanup_gpu_resources(self) -> Any:
         """Cleanup GPU resources."""
         # Cleanup multi-GPU training
         self.multi_gpu_manager.cleanup()
@@ -1826,7 +1845,9 @@ class OptimizedFineTuningService:
         
         # Profile data loading
         def data_loading_operation():
-            total_time = 0
+            
+    """data_loading_operation function."""
+total_time = 0
             num_batches = 0
             
             for batch in sample_dataloader:
@@ -1865,13 +1886,13 @@ class OptimizedFineTuningService:
         """Profile preprocessing performance."""
         
         # Sample preprocessing functions
-        def tokenize_text(text):
+        def tokenize_text(text) -> Any:
             return self.tokenization_service.tokenize(text)
         
-        def normalize_text(text):
+        def normalize_text(text) -> Any:
             return text.lower().strip()
         
-        def augment_text(text):
+        def augment_text(text) -> Any:
             # Simple augmentation
             return text + " [AUGMENTED]"
         
@@ -1882,7 +1903,9 @@ class OptimizedFineTuningService:
         
         # Profile preprocessing pipeline
         def preprocessing_operation():
-            pipeline = self.preprocessing_optimizer.optimize_preprocessing_pipeline(
+            
+    """preprocessing_operation function."""
+pipeline = self.preprocessing_optimizer.optimize_preprocessing_pipeline(
                 preprocessing_funcs, sample_texts
             )
             return pipeline(sample_texts)
@@ -1924,7 +1947,9 @@ class OptimizedFineTuningService:
         
         # Profile training loop
         def training_operation():
-            # Setup optimizer
+            
+    """training_operation function."""
+# Setup optimizer
             optimizer = torch.optim.AdamW(
                 model.parameters(),
                 lr=training_config.get("learning_rate", 5e-5)
@@ -2162,7 +2187,9 @@ class OptimizedFineTuningService:
         
         # Profile optimized pipeline
         def optimized_operation():
-            return optimized_pipeline(sample_data)
+            
+    """optimized_operation function."""
+return optimized_pipeline(sample_data)
         
         optimized_results = self.profiler.profile_code(optimized_operation)
         

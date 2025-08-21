@@ -1,11 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Dict, Any, List
+from domain.entities.seo_analysis import SEOAnalysis
+from application.dto.analyze_url_response import AnalyzeURLResponse, AnalyzeURLResponseDomain
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 SEO Mapper
 Object mapper for converting between domain entities and DTOs
 """
 
-from typing import Dict, Any, List
-from domain.entities.seo_analysis import SEOAnalysis
-from application.dto.analyze_url_response import AnalyzeURLResponse, AnalyzeURLResponseDomain
 
 
 class SEOMapper:

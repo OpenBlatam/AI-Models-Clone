@@ -1,13 +1,25 @@
-"""
-Instagram Captions API v14.0 - Pydantic Schemas
-Comprehensive input/output validation and response schemas using Pydantic BaseModel
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 from typing import Dict, Any, List, Optional, Literal, Union
 from pydantic import BaseModel, Field, field_validator, ConfigDict, computed_field
 from datetime import datetime, timezone
 from enum import Enum
 import re
+        import hashlib
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Instagram Captions API v14.0 - Pydantic Schemas
+Comprehensive input/output validation and response schemas using Pydantic BaseModel
+"""
+
 
 
 # =============================================================================
@@ -271,9 +283,8 @@ class CaptionGenerationRequest(BaseModel):
     
     @computed_field
     @property
-    def request_hash(self) -> str:
+    async def request_hash(self) -> str:
         """Generate unique hash for request caching"""
-        import hashlib
         content = f"{self.content_description}:{self.style}:{self.audience}:{self.hashtag_count}"
         return hashlib.md5(content.encode()).hexdigest()
 
@@ -307,7 +318,7 @@ class BatchCaptionRequest(BaseModel):
     
     @field_validator('requests')
     @classmethod
-    def validate_requests(cls, v: List[CaptionGenerationRequest]) -> List[CaptionGenerationRequest]:
+    async def validate_requests(cls, v: List[CaptionGenerationRequest]) -> List[CaptionGenerationRequest]:
         """Validate batch requests"""
         if not v:
             raise ValueError("Batch must contain at least one request")
@@ -574,7 +585,7 @@ class BatchCaptionResponse(BaseModel):
     
     @field_validator('successful_requests')
     @classmethod
-    def validate_successful_requests(cls, v: int, info) -> int:
+    async def validate_successful_requests(cls, v: int, info) -> int:
         """Validate successful requests count"""
         total_requests = info.data.get('total_requests', 0)
         if v > total_requests:
@@ -583,7 +594,7 @@ class BatchCaptionResponse(BaseModel):
     
     @field_validator('failed_requests')
     @classmethod
-    def validate_failed_requests(cls, v: int, info) -> int:
+    async def validate_failed_requests(cls, v: int, info) -> int:
         """Validate failed requests count"""
         total_requests = info.data.get('total_requests', 0)
         successful_requests = info.data.get('successful_requests', 0)
@@ -843,7 +854,7 @@ def create_error_response(
     )
 
 
-def validate_request_data(data: Dict[str, Any], schema_class: type) -> BaseModel:
+async def validate_request_data(data: Dict[str, Any], schema_class: type) -> BaseModel:
     """Validate request data against schema"""
     try:
         return schema_class(**data)

@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import json
+from datetime import datetime, timedelta
+from typing import Dict, List, Any
+import random
+from core.entities.linkedin_post import LinkedInPost, PostStatus, PostType, PostTone
+from infrastructure.langchain_integration.linkedin_post_generator import LinkedInPostGenerator
+from infrastructure.langchain_integration.enhanced_content_analyzer import EnhancedContentAnalyzer
+from infrastructure.caching.advanced_cache_manager import AdvancedCacheManager, CacheAwareLinkedInPostGenerator
+from infrastructure.monitoring.advanced_monitoring import AdvancedMonitoring, get_monitoring
+from infrastructure.rate_limiting.advanced_rate_limiter import AdvancedRateLimiter, get_rate_limiter
+from application.use_cases.linkedin_post_use_cases import LinkedInPostUseCases
+from presentation.api.linkedin_post_router import LinkedInPostRouter
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Enhanced LinkedIn Posts System Demo
@@ -12,22 +36,8 @@ Comprehensive demo showcasing all enhanced features:
 - Business analytics
 """
 
-import asyncio
-import time
-import json
-from datetime import datetime, timedelta
-from typing import Dict, List, Any
-import random
 
 # Import our enhanced modules
-from core.entities.linkedin_post import LinkedInPost, PostStatus, PostType, PostTone
-from infrastructure.langchain_integration.linkedin_post_generator import LinkedInPostGenerator
-from infrastructure.langchain_integration.enhanced_content_analyzer import EnhancedContentAnalyzer
-from infrastructure.caching.advanced_cache_manager import AdvancedCacheManager, CacheAwareLinkedInPostGenerator
-from infrastructure.monitoring.advanced_monitoring import AdvancedMonitoring, get_monitoring
-from infrastructure.rate_limiting.advanced_rate_limiter import AdvancedRateLimiter, get_rate_limiter
-from application.use_cases.linkedin_post_use_cases import LinkedInPostUseCases
-from presentation.api.linkedin_post_router import LinkedInPostRouter
 
 
 class EnhancedLinkedInPostsDemo:
@@ -35,7 +45,7 @@ class EnhancedLinkedInPostsDemo:
     Comprehensive demo of the enhanced LinkedIn posts system.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the demo system."""
         self.monitoring = get_monitoring()
         self.rate_limiter = get_rate_limiter()
@@ -74,7 +84,7 @@ class EnhancedLinkedInPostsDemo:
             "News Commentary", "Personal Story", "How-to Guide", "Question"
         ]
     
-    async def run_comprehensive_demo(self):
+    async def run_comprehensive_demo(self) -> Any:
         """Run the comprehensive demo showcasing all features."""
         print("🚀 Starting Enhanced LinkedIn Posts System Demo")
         print("=" * 60)
@@ -109,7 +119,7 @@ class EnhancedLinkedInPostsDemo:
         print("\n✅ Enhanced LinkedIn Posts System Demo Completed!")
         print("=" * 60)
     
-    async def _setup_monitoring(self):
+    async def _setup_monitoring(self) -> Any:
         """Setup monitoring system."""
         print("\n📊 Setting up Advanced Monitoring System...")
         
@@ -130,7 +140,7 @@ class EnhancedLinkedInPostsDemo:
         
         print("✅ Monitoring system initialized")
     
-    async def _demo_content_analysis(self):
+    async def _demo_content_analysis(self) -> Any:
         """Demo advanced content analysis."""
         print("\n🔍 Demo 1: Advanced Content Analysis")
         print("-" * 40)
@@ -181,7 +191,7 @@ class EnhancedLinkedInPostsDemo:
         # Track metrics
         self.monitoring.track_post_optimization("content_analysis", 2.5)
     
-    async def _demo_caching_system(self):
+    async def _demo_caching_system(self) -> Any:
         """Demo multi-layer caching system."""
         print("\n💾 Demo 2: Multi-layer Caching System")
         print("-" * 40)
@@ -237,7 +247,7 @@ class EnhancedLinkedInPostsDemo:
         print(f"  Total Requests: {cache_stats['total_requests']}")
         print(f"  Memory Cache Size: {cache_stats['memory_cache_size']}")
     
-    async def _demo_rate_limiting(self):
+    async def _demo_rate_limiting(self) -> Any:
         """Demo advanced rate limiting."""
         print("\n🛡️ Demo 3: Advanced Rate Limiting")
         print("-" * 40)
@@ -285,7 +295,7 @@ class EnhancedLinkedInPostsDemo:
         print(f"  VIP Bypasses: {analytics['bypass_requests']}")
         print(f"  Custom Rules: {analytics['custom_rules_count']}")
     
-    async def _demo_enhanced_post_generation(self):
+    async def _demo_enhanced_post_generation(self) -> Any:
         """Demo enhanced post generation with all features."""
         print("\n🚀 Demo 4: Enhanced Post Generation")
         print("-" * 40)
@@ -368,7 +378,7 @@ class EnhancedLinkedInPostsDemo:
                 )
                 print(f"  📈 Content score: {analysis['overall_score']:.1f}")
     
-    async def _demo_performance_monitoring(self):
+    async def _demo_performance_monitoring(self) -> Any:
         """Demo performance monitoring and metrics."""
         print("\n📊 Demo 5: Performance Monitoring")
         print("-" * 40)
@@ -416,7 +426,7 @@ class EnhancedLinkedInPostsDemo:
         print(f"\n🎛️ Monitoring Dashboard:")
         self.monitoring.display_metrics_dashboard()
     
-    async def _demo_business_analytics(self):
+    async def _demo_business_analytics(self) -> Any:
         """Demo business analytics and insights."""
         print("\n📈 Demo 6: Business Analytics")
         print("-" * 40)
@@ -459,7 +469,7 @@ class EnhancedLinkedInPostsDemo:
         for insight in insights:
             print(f"  • {insight}")
     
-    async def _demo_error_handling(self):
+    async def _demo_error_handling(self) -> Any:
         """Demo error handling and resilience."""
         print("\n🛡️ Demo 7: Error Handling and Resilience")
         print("-" * 40)
@@ -527,7 +537,7 @@ class EnhancedLinkedInPostsDemo:
             )
             raise
     
-    async def _demo_system_health(self):
+    async def _demo_system_health(self) -> Any:
         """Demo system health and metrics."""
         print("\n🏥 Demo 8: System Health and Metrics")
         print("-" * 40)
@@ -578,7 +588,7 @@ class EnhancedLinkedInPostsDemo:
         for rec in recommendations:
             print(f"  • {rec}")
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup resources."""
         print(f"\n🧹 Cleaning up resources...")
         

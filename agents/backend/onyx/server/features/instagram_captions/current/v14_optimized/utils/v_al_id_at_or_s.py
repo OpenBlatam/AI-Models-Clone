@@ -1,17 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import re
+from typing import List, Optional
+import secrets
+    import hashlib
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions API v14.0 - Validation Utilities
 Utility functions for input validation and sanitization
 """
 
-import re
-from typing import List, Optional
-import secrets
 
-def generate_request_id() -> str:
+async def generate_request_id() -> str:
     """Generate unique request ID - pure function"""
     return f"v14-{secrets.token_urlsafe(8)}"
 
-def validate_api_key(api_key: str) -> bool:
+async def validate_api_key(api_key: str) -> bool:
     """Validate API key - pure function"""
     valid_keys = ["optimized-v14-key", "ultra-fast-key", "performance-key"]
     return api_key in valid_keys
@@ -56,7 +68,6 @@ def validate_batch_size(size: int) -> bool:
 
 def generate_cache_key(content: str, style: str, hashtag_count: int) -> str:
     """Generate cache key - pure function"""
-    import hashlib
     key_data = f"{content}:{style}:{hashtag_count}"
     return hashlib.md5(key_data.encode()).hexdigest()
 

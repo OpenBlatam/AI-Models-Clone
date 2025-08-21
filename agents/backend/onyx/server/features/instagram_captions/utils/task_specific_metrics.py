@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -10,6 +12,18 @@ import re
 from collections import Counter
 import math
 
+            from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+            from rouge_score import rouge_scorer
+            from nltk.translate.meteor_score import meteor_score
+            from nltk.tokenize import word_tokenize
+            from pycocoevalcap.cider.cider import Cider
+            from bert_score import score
+            from bleurt import score
+        from sklearn.metrics import (
+        from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+            from scipy.stats import pearsonr
+from typing import Any, List, Dict, Optional
+import asyncio
 logger = logging.getLogger(__name__)
 
 
@@ -29,7 +43,9 @@ class MetricsConfig:
 class CaptionGenerationMetrics:
   prehensive metrics for caption generation tasks."   
     def __init__(self, config: MetricsConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.metrics = {}
     
     def compute_all_metrics(self, generated_captions: List[str], reference_captions: Liststr]) -> Dict[str, float]:
@@ -100,7 +116,6 @@ class CaptionGenerationMetrics:
     def _compute_bleu_score(self, generated: List[str], references: List[str]) -> float:
      Compute BLEU score."""
         try:
-            from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
             smoothie = SmoothingFunction().method1
             
             scores =            for gen, ref in zip(generated, references):
@@ -116,7 +131,6 @@ class CaptionGenerationMetrics:
     def _compute_rouge_scores(self, generated: List[str], references: Liststr]) -> Dict[str, float]:
       mpute ROUGE scores."""
         try:
-            from rouge_score import rouge_scorer
             scorer = rouge_scorer.RougeScorer(['rouge1,rouge2rougeL'], use_stemmer=True)
             
             rouge1_scores = []
@@ -140,8 +154,6 @@ class CaptionGenerationMetrics:
     def _compute_meteor_score(self, generated: List[str], references: List[str]) -> float:
        mpute METEOR score."""
         try:
-            from nltk.translate.meteor_score import meteor_score
-            from nltk.tokenize import word_tokenize
             
             scores =            for gen, ref in zip(generated, references):
                 gen_tokens = word_tokenize(gen.lower())
@@ -156,7 +168,6 @@ class CaptionGenerationMetrics:
     def _compute_cider_score(self, generated: List[str], references: List[str]) -> float:
       ompute CIDEr score."""
         try:
-            from pycocoevalcap.cider.cider import Cider
             
             cider_scorer = Cider()
             scores = cider_scorer.compute_score(references, generated)
@@ -166,7 +177,6 @@ class CaptionGenerationMetrics:
     def _compute_bertscore(self, generated: List[str], references: List[str]) -> float:
      Compute BERTScore."""
         try:
-            from bert_score import score
             
             P, R, F1 = score(generated, references, lang=self.config.language, verbose=True)
             return F1.mean().item()
@@ -176,7 +186,6 @@ class CaptionGenerationMetrics:
     def _compute_bleurt_score(self, generated: List[str], references: List[str]) -> float:
        mpute BLEURT score."""
         try:
-            from bleurt import score
             
             checkpoint = bleurt-base-128"
             scorer = score.BleurtScorer(checkpoint)
@@ -203,13 +212,14 @@ Compute repetition ratio in generated captions."""
 class TextClassificationMetrics:
 ext classification tasks."   
     def __init__(self, config: MetricsConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.metrics = {}
     
     def compute_all_metrics(self, predictions: List[int], targets: List[int], 
                            class_names: OptionalList[str]] = None) -> Dict[str, float]:
     ext classification metrics."""
-        from sklearn.metrics import (
             accuracy_score, precision_recall_fscore_support,
             confusion_matrix, classification_report, roc_auc_score
         )
@@ -249,13 +259,14 @@ ext classification tasks."
 class SentimentAnalysisMetrics:
 rics for sentiment analysis tasks."   
     def __init__(self, config: MetricsConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.metrics = {}
     
     def compute_all_metrics(self, predictions: List[int], targets: List[int],
                            sentiment_scores: Optional[List[float]] = None) -> Dict[str, float]:
 Computesentiment analysis specific metrics."""
-        from sklearn.metrics import accuracy_score, precision_recall_fscore_support
         
         metrics = {}
         
@@ -279,7 +290,6 @@ Computesentiment analysis specific metrics."""
     def _compute_sentiment_correlation(self, predictions: List[int], sentiment_scores: List[float]) -> float:
 ompute correlation between predictions and sentiment scores."""
         try:
-            from scipy.stats import pearsonr
             correlation, _ = pearsonr(predictions, sentiment_scores)
             return correlation
         except ImportError:
@@ -314,7 +324,9 @@ Compute sentiment consistency."
 class InstagramCaptionMetrics:
 pecialized metrics for Instagram caption generation."   
     def __init__(self, config: MetricsConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.metrics = {}
     
     def compute_instagram_metrics(self, generated_captions: List[str], reference_captions: Liststr]) -> Dict[str, float]:
@@ -411,11 +423,13 @@ Compute engagement-related metrics."
 
 class MetricsAggregator:
   regate and compare multiple metric sets."   
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metric_sets = {}
     
     def add_metric_set(self, name: str, metrics: Dict[str, float]):
-     d a set of metrics.       self.metric_sets[name] = metrics
+     
+    """add_metric_set function."""
+d a set of metrics.       self.metric_sets[name] = metrics
     
     def compare_models(self) -> Dict[str, Any]:
 Compare different models based on their metrics.       if len(self.metric_sets) < 2:
@@ -444,13 +458,19 @@ Compare different models based on their metrics.       if len(self.metric_sets) 
         return comparison
     
     def generate_report(self, output_path: str =./metrics_comparison.json"):
-   te a comprehensive metrics report.       report = {
+   
+    """generate_report function."""
+te a comprehensive metrics report.       report = {
         metric_sets': self.metric_sets,
             comparison': self.compare_models(),
            summary': self._generate_summary()
         }
         
         with open(output_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(report, f, indent=2)
         
         return report

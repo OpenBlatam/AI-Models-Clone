@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Optional, List, Dict, Any
+from ..models.facebook_models import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 Service Interfaces - Clean Architecture
 ==========================================
@@ -5,10 +13,7 @@
 Interfaces para servicios de dominio y aplicación.
 """
 
-from abc import ABC, abstractmethod
-from typing import Optional, List, Dict, Any
 
-from ..models.facebook_models import (
     FacebookPostEntity, FacebookPostAnalysis, FacebookPostRequest,
     PostSpecification, FacebookPostContent
 )

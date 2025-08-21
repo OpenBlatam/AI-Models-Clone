@@ -1,80 +1,19 @@
 """
-API endpoints for LangChain integration with Onyx ads functionality.
+Deprecated module. Use `agents.backend.onyx.server.features.ads.api.ai` instead.
+
+This file re-exports the unified AI router to preserve backward compatibility.
 """
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
-from typing import List, Dict, Any, Optional
-from pydantic import BaseModel, Field
-import logging
-from datetime import datetime
 
-from .langchain_service import LangChainService
-from .db_service import AdsDBService
-from .storage_service import StorageService
-from .config import get_settings
+import warnings
+from .api.ai import router  # type: ignore
 
-logger = logging.getLogger(__name__)
-router = APIRouter(prefix="/langchain", tags=["langchain"])
+warnings.warn(
+    "langchain_api is deprecated. Import from ads.api.ai instead.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
-# Request/Response Models
-class ContentRequest(BaseModel):
-    content: str = Field(..., description="Content to process")
-    num_variations: Optional[int] = Field(3, description="Number of variations to generate")
-
-class AudienceRequest(BaseModel):
-    content: str = Field(..., description="Content to analyze")
-    target_audience: Optional[str] = Field(None, description="Target audience description")
-
-class CompetitorRequest(BaseModel):
-    content: str = Field(..., description="Content to analyze")
-    competitor_urls: List[str] = Field(..., description="List of competitor URLs")
-
-class PerformanceRequest(BaseModel):
-    content_id: str = Field(..., description="Content ID")
-    metrics: Dict[str, Any] = Field(..., description="Performance metrics")
-
-class RecommendationRequest(BaseModel):
-    content: str = Field(..., description="Content to analyze")
-    context: Dict[str, Any] = Field(..., description="Additional context")
-
-# Dependencies
-async def get_langchain_service() -> LangChainService:
-    settings = get_settings()
-    return LangChainService(
-        llm=settings.get_llm(),
-        embeddings=settings.get_embeddings()
-    )
-
-async def get_db_service() -> AdsDBService:
-    return AdsDBService()
-
-async def get_storage_service() -> StorageService:
-    return StorageService()
-
-# Endpoints
-@router.post("/generate-ads")
-async def generate_ads(
-    request: ContentRequest,
-    langchain_service: LangChainService = Depends(get_langchain_service),
-    db_service: AdsDBService = Depends(get_db_service)
-):
-    """Generate ads using LangChain."""
-    try:
-        ads = await langchain_service.generate_ads(
-            content=request.content,
-            num_ads=request.num_variations
-        )
-        
-        # Store in database
-        for ad in ads:
-            await db_service.create_ads_generation(
-                content=ad,
-                metadata={"source": "langchain", "original_content": request.content}
-            )
-        
-        return {"ads": ads}
-    except Exception as e:
-        logger.error(f"Error generating ads: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+__all__ = ["router"]
 
 @router.post("/analyze-brand-voice")
 async def analyze_brand_voice(

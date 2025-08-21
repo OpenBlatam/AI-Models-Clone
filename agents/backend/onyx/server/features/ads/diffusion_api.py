@@ -1,6 +1,14 @@
-"""
-API endpoints for diffusion models and image generation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
 from typing import Dict, Any, List, Optional, Union
 from fastapi import APIRouter, HTTPException, File, UploadFile, Depends, BackgroundTasks
 from fastapi.responses import JSONResponse, StreamingResponse
@@ -11,10 +19,15 @@ from datetime import datetime
 import base64
 from io import BytesIO
 from PIL import Image
-
 from onyx.utils.logger import setup_logger
 from onyx.server.features.ads.diffusion_service import DiffusionService, GenerationParams
 from onyx.server.features.ads.optimized_config import settings
+from typing import Any, List, Dict, Optional
+import logging
+"""
+API endpoints for diffusion models and image generation.
+"""
+
 
 logger = setup_logger()
 router = APIRouter(prefix="/diffusion", tags=["diffusion"])
@@ -198,6 +211,10 @@ def decode_base64_to_image(base64_string: str) -> Image.Image:
     
     image_data = base64.b64decode(base64_string)
     return Image.open(BytesIO(image_data))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
 # API Endpoints
 @router.post("/text-to-image", response_model=ImageGenerationResponse)
@@ -263,7 +280,15 @@ async def generate_image_to_image(
         
         # Load initial image
         image_data = await init_image.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         init_image_pil = Image.open(BytesIO(image_data))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         if init_image_pil.mode != 'RGB':
             init_image_pil = init_image_pil.convert('RGB')
@@ -327,7 +352,15 @@ async def inpaint_image(
         
         # Load image
         image_data = await image.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         image_pil = Image.open(BytesIO(image_data))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         if image_pil.mode != 'RGB':
             image_pil = image_pil.convert('RGB')
@@ -335,7 +368,15 @@ async def inpaint_image(
         # Load or create mask
         if mask:
             mask_data = await mask.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             mask_pil = Image.open(BytesIO(mask_data))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             if mask_pil.mode != 'L':
                 mask_pil = mask_pil.convert('L')
         else:
@@ -400,7 +441,15 @@ async def generate_with_controlnet(
         
         # Load control image
         image_data = await control_image.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         control_image_pil = Image.open(BytesIO(image_data))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         if control_image_pil.mode != 'RGB':
             control_image_pil = control_image_pil.convert('RGB')

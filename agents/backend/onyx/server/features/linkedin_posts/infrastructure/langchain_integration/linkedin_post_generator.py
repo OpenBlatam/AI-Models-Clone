@@ -1,14 +1,14 @@
-"""
-LinkedIn Post Generator with LangChain
-=====================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-AI-powered LinkedIn post generation using LangChain framework.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 from typing import Dict, List, Optional, Any
 from uuid import UUID
-
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.schema import HumanMessage, SystemMessage
@@ -17,11 +17,21 @@ from langchain.chains import LLMChain
 from langchain.memory import ConversationBufferMemory
 from langchain.tools import Tool
 from langchain.agents import initialize_agent, AgentType
-
 from pydantic import BaseModel, Field
-
 from ...core.entities.linkedin_post import LinkedInPost, PostType, ContentTone
 from ...shared.logging import get_logger
+from typing import Any, List, Dict, Optional
+import logging
+"""
+LinkedIn Post Generator with LangChain
+=====================================
+
+AI-powered LinkedIn post generation using LangChain framework.
+"""
+
+
+
+
 
 logger = get_logger(__name__)
 
@@ -62,7 +72,7 @@ class LinkedInPostGenerator:
         self._setup_prompts()
         self._setup_tools()
     
-    def _setup_prompts(self):
+    def _setup_prompts(self) -> Any:
         """Setup prompt templates."""
         
         # System prompt for LinkedIn post generation
@@ -112,7 +122,7 @@ class LinkedInPostGenerator:
         # Output parser
         self.output_parser = PydanticOutputParser(pydantic_object=GeneratedPost)
     
-    def _setup_tools(self):
+    def _setup_tools(self) -> Any:
         """Setup LangChain tools for enhanced generation."""
         
         # Hashtag research tool
@@ -217,7 +227,7 @@ class LinkedInPostGenerator:
                 "call_to_action": generated_post.call_to_action,
                 "estimated_engagement": engagement_prediction,
                 "langchain_data": {
-                    "prompt": self.prompt_template.format(**input_data),
+                    "prompt"f": self.prompt_template",
                     "model": self.llm.model_name,
                     "parameters": {
                         "temperature": self.llm.temperature,

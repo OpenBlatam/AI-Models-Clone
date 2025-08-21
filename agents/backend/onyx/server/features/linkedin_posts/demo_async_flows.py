@@ -1,11 +1,7 @@
-#!/usr/bin/env python3
-"""
-LinkedIn Posts - Async Flows Demo
-================================
-
-Demo script showcasing asynchronous and non-blocking flows
-with event-driven architecture, flow orchestration, and performance optimizations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -15,9 +11,22 @@ from typing import Dict, Any, List
 import httpx
 from concurrent.futures import ThreadPoolExecutor
 import multiprocessing
+from ASYNC_NON_BLOCKING_FLOWS_IMPLEMENTATION import (
+            from ASYNC_NON_BLOCKING_FLOWS_IMPLEMENTATION import AsyncPipeline
+            import traceback
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+LinkedIn Posts - Async Flows Demo
+================================
+
+Demo script showcasing asynchronous and non-blocking flows
+with event-driven architecture, flow orchestration, and performance optimizations.
+"""
+
 
 # Import the main implementation
-from ASYNC_NON_BLOCKING_FLOWS_IMPLEMENTATION import (
     AsyncLinkedInPostsAPI,
     LinkedInPostsFlowOrchestrator,
     FlowRequest,
@@ -66,13 +75,13 @@ DEMO_CONFIG = {
 }
 
 class AsyncFlowsDemo:
-    def __init__(self):
+    def __init__(self) -> Any:
         self.api = AsyncLinkedInPostsAPI()
         self.orchestrator = LinkedInPostsFlowOrchestrator()
         self.client = None
         self.thread_pool = ThreadPoolExecutor(max_workers=4)
     
-    async def setup(self):
+    async def setup(self) -> Any:
         """Setup the demo environment"""
         print("🚀 Setting up Async Flows Demo...")
         
@@ -87,7 +96,7 @@ class AsyncFlowsDemo:
         
         print("✅ Demo setup complete!")
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup demo resources"""
         if self.client:
             await self.client.aclose()
@@ -99,13 +108,12 @@ class AsyncFlowsDemo:
         
         print("🧹 Demo cleanup complete!")
     
-    async def demo_sequential_flow(self):
+    async def demo_sequential_flow(self) -> Any:
         """Demo sequential async flow"""
         print("\n📋 Testing Sequential Async Flow...")
         
         try:
             # Create a sequential flow using the pipeline
-            from ASYNC_NON_BLOCKING_FLOWS_IMPLEMENTATION import AsyncPipeline
             
             pipeline = AsyncPipeline("demo_sequential")
             pipeline.add_stage(self._validate_data)
@@ -123,7 +131,7 @@ class AsyncFlowsDemo:
         except Exception as e:
             print(f"❌ Sequential flow failed: {e}")
     
-    async def demo_parallel_flow(self):
+    async def demo_parallel_flow(self) -> Any:
         """Demo parallel async flow"""
         print("\n⚡ Testing Parallel Async Flow...")
         
@@ -152,7 +160,7 @@ class AsyncFlowsDemo:
         except Exception as e:
             print(f"❌ Parallel flow failed: {e}")
     
-    async def demo_conditional_flow(self):
+    async def demo_conditional_flow(self) -> Any:
         """Demo conditional async flow"""
         print("\n🔄 Testing Conditional Async Flow...")
         
@@ -177,7 +185,7 @@ class AsyncFlowsDemo:
         except Exception as e:
             print(f"❌ Conditional flow failed: {e}")
     
-    async def demo_event_driven_flow(self):
+    async def demo_event_driven_flow(self) -> Any:
         """Demo event-driven flow"""
         print("\n📡 Testing Event-Driven Flow...")
         
@@ -211,7 +219,7 @@ class AsyncFlowsDemo:
         except Exception as e:
             print(f"❌ Event-driven flow failed: {e}")
     
-    async def demo_resource_limited_flow(self):
+    async def demo_resource_limited_flow(self) -> Any:
         """Demo resource-limited flow"""
         print("\n🔒 Testing Resource-Limited Flow...")
         
@@ -237,7 +245,7 @@ class AsyncFlowsDemo:
         except Exception as e:
             print(f"❌ Resource-limited flow failed: {e}")
     
-    async def demo_create_post_flow(self):
+    async def demo_create_post_flow(self) -> Any:
         """Demo create post flow via API"""
         print("\n📝 Testing Create Post Flow via API...")
         
@@ -279,7 +287,7 @@ class AsyncFlowsDemo:
         
         return created_posts
     
-    async def demo_update_post_flow(self):
+    async def demo_update_post_flow(self) -> Any:
         """Demo update post flow via API"""
         print("\n✏️ Testing Update Post Flow via API...")
         
@@ -331,7 +339,7 @@ class AsyncFlowsDemo:
         except Exception as e:
             print(f"❌ Error updating post: {e}")
     
-    async def demo_batch_processing_flow(self):
+    async def demo_batch_processing_flow(self) -> Any:
         """Demo batch processing flow via API"""
         print("\n📦 Testing Batch Processing Flow via API...")
         
@@ -369,14 +377,16 @@ class AsyncFlowsDemo:
         except Exception as e:
             print(f"❌ Error processing batch: {e}")
     
-    async def demo_concurrent_flows(self):
+    async def demo_concurrent_flows(self) -> Any:
         """Demo handling concurrent flows"""
         print("\n⚡ Testing Concurrent Flows...")
         
         try:
             # Create multiple concurrent flow requests
             async def make_flow_request(flow_id: int):
-                try:
+                
+    """make_flow_request function."""
+try:
                     start_time = time.time()
                     
                     request = FlowRequest(
@@ -432,7 +442,7 @@ class AsyncFlowsDemo:
         except Exception as e:
             print(f"❌ Error testing concurrent flows: {e}")
     
-    async def demo_queue_status(self):
+    async def demo_queue_status(self) -> Any:
         """Demo queue status monitoring"""
         print("\n📊 Testing Queue Status Monitoring...")
         
@@ -452,7 +462,7 @@ class AsyncFlowsDemo:
         except Exception as e:
             print(f"❌ Error getting queue status: {e}")
     
-    async def demo_metrics(self):
+    async def demo_metrics(self) -> Any:
         """Demo Prometheus metrics"""
         print("\n📈 Testing Prometheus Metrics...")
         
@@ -486,7 +496,7 @@ class AsyncFlowsDemo:
         except Exception as e:
             print(f"❌ Error getting metrics: {e}")
     
-    async def demo_performance_comparison(self):
+    async def demo_performance_comparison(self) -> Any:
         """Demo performance comparison between different flow patterns"""
         print("\n⚡ Performance Comparison Demo...")
         
@@ -548,17 +558,17 @@ class AsyncFlowsDemo:
         data['notified'] = True
         return data
     
-    async def _fetch_user_data(self, user_id: str) -> Dict[str, Any]:
+    async async def _fetch_user_data(self, user_id: str) -> Dict[str, Any]:
         """Simulate fetching user data"""
         await asyncio.sleep(0.3)
         return {"user_id": user_id, "name": f"User {user_id}"}
     
-    async def _fetch_post_analytics(self, post_id: str) -> Dict[str, Any]:
+    async async def _fetch_post_analytics(self, post_id: str) -> Dict[str, Any]:
         """Simulate fetching post analytics"""
         await asyncio.sleep(0.2)
         return {"post_id": post_id, "engagement": 0.75}
     
-    async def _fetch_external_data(self, url: str) -> Dict[str, Any]:
+    async async def _fetch_external_data(self, url: str) -> Dict[str, Any]:
         """Simulate fetching external data"""
         await asyncio.sleep(0.4)
         return {"url": url, "data": "External data"}
@@ -583,7 +593,7 @@ class AsyncFlowsDemo:
         await asyncio.sleep(0.2)  # Simulate work
         return {"operation_id": operation_id, "result": "success"}
     
-    async def run_full_demo(self):
+    async def run_full_demo(self) -> Any:
         """Run the complete demo"""
         print("🎬 Starting Async Flows Demo")
         print("=" * 50)
@@ -626,7 +636,6 @@ class AsyncFlowsDemo:
             
         except Exception as e:
             print(f"❌ Demo failed: {e}")
-            import traceback
             traceback.print_exc()
         
         finally:
@@ -639,5 +648,6 @@ async def main():
     demo = AsyncFlowsDemo()
     await demo.run_full_demo()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

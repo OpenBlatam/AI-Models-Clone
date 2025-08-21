@@ -473,3 +473,4 @@ healthcheck-python>=0.1.0
 # - 16GB+ RAM recommended
 # - NVIDIA GPU with CUDA support (optional but recommended)
 # - 50GB+ disk space for models and cache
+

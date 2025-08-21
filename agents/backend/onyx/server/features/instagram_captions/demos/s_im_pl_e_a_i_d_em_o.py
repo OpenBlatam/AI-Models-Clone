@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import time
+import json
+from typing import List, Dict, Any
+from transformers import pipeline, set_seed
+import torch
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Instagram Captions AI v8.0 - Simple Working Demo
 
@@ -5,13 +21,8 @@ A simplified demonstration of real AI caption generation using transformers.
 This version is optimized to work with the installed dependencies.
 """
 
-import time
-import json
-from typing import List, Dict, Any
 
 # Core dependencies
-from transformers import pipeline, set_seed
-import torch
 
 # Set seed for reproducible results
 set_seed(42)
@@ -45,7 +56,7 @@ print("="*60)
 class SimpleAICaptions:
     """Simple AI caption generator using real transformers."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.generator = generator
         self.styles = {
             "casual": "Write a casual, friendly Instagram caption about",
@@ -291,5 +302,6 @@ def main():
         interactive_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

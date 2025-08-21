@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Dict, List, Optional, Any, Union
+from datetime import datetime
+from enum import Enum
+from uuid import UUID, uuid4
+from pydantic import BaseModel, Field, validator, root_validator
+import json
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Enterprise Data Models
 =====================
@@ -9,12 +31,6 @@ Comprehensive Pydantic models for:
 - API schema generation
 """
 
-from typing import Dict, List, Optional, Any, Union
-from datetime import datetime
-from enum import Enum
-from uuid import UUID, uuid4
-from pydantic import BaseModel, Field, validator, root_validator
-import json
 
 
 class LanguageEnum(str, Enum):
@@ -280,19 +296,19 @@ class CopywritingRequest(BaseModel):
     
     # Validation
     @validator('keywords')
-    def validate_keywords(cls, v):
+    def validate_keywords(cls, v) -> bool:
         if v and len(v) > 20:
             raise ValueError("Maximum 20 keywords allowed")
         return v
     
     @validator('prompt')
-    def validate_prompt(cls, v):
+    def validate_prompt(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Prompt cannot be empty")
         return v.strip()
     
     @root_validator
-    def validate_word_count(cls, values):
+    def validate_word_count(cls, values) -> bool:
         requirements = values.get('requirements')
         if requirements and requirements.word_count_min and requirements.word_count_max:
             if requirements.word_count_min > requirements.word_count_max:
@@ -300,7 +316,7 @@ class CopywritingRequest(BaseModel):
         return values
     
     @root_validator
-    def validate_translation(cls, values):
+    def validate_translation(cls, values) -> bool:
         translation_settings = values.get('translation_settings')
         if translation_settings and translation_settings.target_languages:
             language = values.get('language')
@@ -323,7 +339,7 @@ class BatchRequest(BaseModel):
     priority: str = Field("normal", description="Batch priority")
     
     @validator('requests')
-    def validate_batch_size(cls, v):
+    def validate_batch_size(cls, v) -> bool:
         if len(v) > 100:
             raise ValueError("Maximum 100 requests per batch")
         return v
@@ -447,7 +463,8 @@ class CopywritingResponse(BaseModel):
     warnings: Optional[List[str]] = Field(None, description="Non-critical warnings")
     processing_notes: Optional[List[str]] = Field(None, description="Processing notes")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)
@@ -479,7 +496,8 @@ class BatchResponse(BaseModel):
     status: str = Field("completed", description="Batch status")
     progress_percentage: float = Field(100.0, ge=0.0, le=100.0, description="Completion percentage")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)
@@ -513,7 +531,8 @@ class HealthCheckResponse(BaseModel):
     cache_hit_rate: float = Field(..., description="Current cache hit rate")
     optimization_score: float = Field(..., description="System optimization score")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -548,7 +567,8 @@ class MetricsResponse(BaseModel):
     tone_distribution: Dict[str, int] = Field(..., description="Requests by tone")
     use_case_distribution: Dict[str, int] = Field(..., description="Requests by use case")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         } 

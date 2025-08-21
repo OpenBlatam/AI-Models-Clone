@@ -1,4 +1,13 @@
-Performance Test Suite for Optimized Security Toolkit
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import pytest
 import asyncio
@@ -6,6 +15,11 @@ import time
 import statistics
 from typing import List, Dict, Any
 from optimized_security import (
+    import gc
+from typing import Any, List, Dict, Optional
+import logging
+Performance Test Suite for Optimized Security Toolkit
+
     scan_ports_basic, run_ssh_command, make_http_request,
     get_common_ports, chunked, AsyncRateLimiter, retry_with_backoff,
     process_batch_async, scan_ports_concurrent, scan_single_port_sync,
@@ -55,7 +69,9 @@ std_dev": statistics.stdev(times) if len(times) >1 else 0
 # ============================================================================
 
 def test_scan_ports_basic_performance():
-    "est performance of scan_ports_basic function."params =[object Object]
+    
+    """test_scan_ports_basic_performance function."""
+"est performance of scan_ports_basic function."params =[object Object]
         target": "12701,
         ports": [80,443, 22,21, 25 53110, 143, 99395       scan_type": "tcp",
     timeout: 1,
@@ -71,7 +87,9 @@ def test_scan_ports_basic_performance():
 
 @pytest.mark.asyncio
 async def test_run_ssh_command_performance():
-    "est performance of run_ssh_command function."params =[object Object]
+    
+    """test_run_ssh_command_performance function."""
+"est performance of run_ssh_command function."params =[object Object]
         host": "1270
        username:test
        password:test,
@@ -87,7 +105,9 @@ async def test_run_ssh_command_performance():
 
 @pytest.mark.asyncio
 async def test_make_http_request_performance():
-    "est performance of make_http_request function."params = [object Object]   url": "https://httpbin.org/get,
+    
+    """test_make_http_request_performance function."""
+"est performance of make_http_request function."params = [object Object]   url": "https://httpbin.org/get,
        method": "GET",
        timeout":10    
     benchmark = await benchmark_async_function(make_http_request,20, params)
@@ -101,14 +121,18 @@ async def test_make_http_request_performance():
 # ============================================================================
 
 def test_get_common_ports_performance():
-    "est performance of get_common_ports function."chmark = benchmark_function(get_common_ports, 1000)
+    
+    """test_get_common_ports_performance function."""
+"est performance of get_common_ports function."chmark = benchmark_function(get_common_ports, 1000)
     
     # Performance assertions - should be very fast due to LRU cache
     assert benchmark[mean] < 001der 1ms
     assert benchmark[max] < 0.1    # Max under10ms
 
 def test_chunked_performance():
-    "est performance of chunked function.""items = list(range(1000))
+    
+    """test_chunked_performance function."""
+"est performance of chunked function.""items = list(range(1000))
     benchmark = benchmark_function(chunked,100 items, 100)
     
     # Performance assertions
@@ -116,7 +140,9 @@ def test_chunked_performance():
     assert benchmark[max] < 0.1    # Max under 10ms
 
 def test_validation_functions_performance():
-    "est performance of validation functions."""
+    
+    """test_validation_functions_performance function."""
+"est performance of validation functions."""
     # Test IP validation
     ip_benchmark = benchmark_function(validate_ip_address, 1000192.168.1.1   assert ip_benchmark["mean"] < 0.01  
     # Test port validation
@@ -129,7 +155,9 @@ def test_validation_functions_performance():
 
 @pytest.mark.asyncio
 async def test_async_rate_limiter_performance():
-    "est performance of AsyncRateLimiter."""
+    
+    """test_async_rate_limiter_performance function."""
+"est performance of AsyncRateLimiter."""
     limiter = AsyncRateLimiter(max_calls_per_second=10   
     start_time = time.perf_counter()
     
@@ -145,9 +173,13 @@ async def test_async_rate_limiter_performance():
 
 @pytest.mark.asyncio
 async def test_retry_with_backoff_performance():
-    "est performance of retry_with_backoff function."""
+    
+    """test_retry_with_backoff_performance function."""
+"est performance of retry_with_backoff function."""
     async def failing_operation():
-        raise Exception(Simulated failure")
+        
+    """failing_operation function."""
+raise Exception(Simulated failure")
     
     start_time = time.perf_counter()
     
@@ -168,8 +200,10 @@ async def test_retry_with_backoff_performance():
 
 @pytest.mark.asyncio
 async def test_process_batch_async_performance():
-    "est performance of batch processing.""items = list(range(100    
-    async def process_item(item):
+    
+    """test_process_batch_async_performance function."""
+"est performance of batch processing.""items = list(range(100    
+    async def process_item(item) -> Any:
         await asyncio.sleep(0.001)  # Simulate work
         return item * 2
     
@@ -187,13 +221,17 @@ async def test_process_batch_async_performance():
 # ============================================================================
 
 def test_scan_single_port_sync_performance():
-    "est performance of single port scanning."chmark = benchmark_function(scan_single_port_sync,50, 1270.1,80
+    
+    """test_scan_single_port_sync_performance function."""
+"est performance of single port scanning."chmark = benchmark_function(scan_single_port_sync,50, 1270.1,80
     # Performance assertions
     assert benchmark["mean] < 0.1 # Should complete quickly
     assert benchmark["max"] < 0.5   # Max time reasonable
 
 def test_scan_ports_concurrent_performance():
-    "est performance of concurrent port scanning."
+    
+    """test_scan_ports_concurrent_performance function."""
+"est performance of concurrent port scanning."
     ports = [80,443, 22,21, 25 53110399395   
     start_time = time.perf_counter()
     results = scan_ports_concurrent(1271, ports, timeout=1max_workers=5)
@@ -209,8 +247,10 @@ def test_scan_ports_concurrent_performance():
 # ============================================================================
 
 def test_get_cached_data_performance():
-    "est performance of caching system."""
-    def fetch_func(key):
+    
+    """test_get_cached_data_performance function."""
+"est performance of caching system."""
+    async def fetch_func(key) -> Any:
         time.sleep(0.001)  # Simulate slow fetch
         return f"data_for_{key} 
     # First call should be slow
@@ -230,10 +270,14 @@ def test_get_cached_data_performance():
 
 @pytest.mark.asyncio
 async def test_log_operation_decorator_performance():
-    "performance impact of logging decorator."""
+    
+    """test_log_operation_decorator_performance function."""
+"performance impact of logging decorator."""
     @log_operation(test_operation")
     async def test_func():
-        await asyncio.sleep(0.01)
+        
+    """test_func function."""
+await asyncio.sleep(0.01)
         return success    
     benchmark = await benchmark_async_function(test_func, 50)
     
@@ -241,10 +285,14 @@ async def test_log_operation_decorator_performance():
     assert benchmark["mean] < 01 # Under 10ms
 
 def test_measure_performance_decorator():
-    "performance impact of performance measurement decorator.""
+    
+    """test_measure_performance_decorator function."""
+"performance impact of performance measurement decorator.""
     @measure_performance
     def test_func():
-        time.sleep(0.01)
+        
+    """test_func function."""
+time.sleep(0.01)
         return success    
     benchmark = benchmark_function(test_func, 50)
     
@@ -256,13 +304,14 @@ def test_measure_performance_decorator():
 # ============================================================================
 
 def test_memory_efficiency():
- memory efficiency of functions.  import sys
+ 
+    """test_memory_efficiency function."""
+memory efficiency of functions.  import sys
     
     # Test chunked function memory usage
     large_list = list(range(10
     
     # Memory usage before
-    import gc
     gc.collect()
     
     # Process in chunks
@@ -278,8 +327,10 @@ def test_memory_efficiency():
 
 @pytest.mark.asyncio
 async def test_concurrent_operations():
-    ncurrent execution of multiple operations."""
-    async def operation(delay):
+    
+    """test_concurrent_operations function."""
+ncurrent execution of multiple operations."""
+    async def operation(delay) -> Any:
         await asyncio.sleep(delay)
         return delay
     
@@ -301,9 +352,13 @@ async def test_concurrent_operations():
 
 @pytest.mark.asyncio
 async def test_load_testing():
+
+    """test_load_testing function."""
 Test system under load."""
     async def load_operation():
-        # Simulate a complex operation
+        
+    """load_operation function."""
+# Simulate a complex operation
         await asyncio.sleep(0.01)
         returncompleted"
     
@@ -335,5 +390,6 @@ def test_performance_regression():
     assert benchmark[p95] < 0.1     # 95th percentile under 100ms
     assert benchmark[max] < 0.2   # Max under 200ms
 
-if __name__ == "__main__:
+match __name__:
+    case "__main__:
     pytest.main([__file__,-v, 

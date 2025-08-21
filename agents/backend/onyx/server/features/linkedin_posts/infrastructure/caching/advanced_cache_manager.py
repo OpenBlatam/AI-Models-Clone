@@ -1,10 +1,16 @@
-"""
-Advanced Cache Manager
-======================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Multi-layer caching system using Redis with intelligent cache management,
-compression, and advanced features for LinkedIn posts system.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import json
@@ -16,14 +22,24 @@ from datetime import datetime, timedelta
 from functools import wraps
 import gzip
 import base64
-
 import redis.asyncio as redis
 import aioredis
 from cachetools import TTLCache, LRUCache
 import orjson
 import msgpack
-
 from ...shared.logging import get_logger
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Advanced Cache Manager
+======================
+
+Multi-layer caching system using Redis with intelligent cache management,
+compression, and advanced features for LinkedIn posts system.
+"""
+
+
+
 
 logger = get_logger(__name__)
 
@@ -83,7 +99,7 @@ class AdvancedCacheManager:
         # Initialize connection
         asyncio.create_task(self._initialize_redis())
     
-    async def _initialize_redis(self):
+    async def _initialize_redis(self) -> Any:
         """Initialize Redis connection."""
         try:
             self.redis_pool = redis.ConnectionPool.from_url(
@@ -412,7 +428,7 @@ class AdvancedCacheManager:
             logger.error(f"Error warming cache: {e}")
             return False
     
-    async def prefetch(self, keys: List[str], namespace: str = "linkedin_posts") -> bool:
+    async async def prefetch(self, keys: List[str], namespace: str = "linkedin_posts") -> bool:
         """Prefetch keys into L1 cache."""
         try:
             logger.info(f"Prefetching {len(keys)} keys into L1 cache")
@@ -483,7 +499,7 @@ class AdvancedCacheManager:
             logger.error(f"Error cleaning up expired entries: {e}")
             return 0
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close cache manager and connections."""
         try:
             if self.redis_client:
@@ -512,9 +528,9 @@ def cache_result(
         key_func: Function to generate cache key from function arguments
         cache_manager: Cache manager instance
     """
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             if key_func:
                 cache_key = key_func(*args, **kwargs)
@@ -549,7 +565,9 @@ class CacheAwareLinkedInPostGenerator:
     """
     
     def __init__(self, cache_manager: AdvancedCacheManager):
-        self.cache_manager = cache_manager
+        
+    """__init__ function."""
+self.cache_manager = cache_manager
     
     @cache_result(ttl=1800, namespace="linkedin_posts")
     async def generate_post_with_cache(

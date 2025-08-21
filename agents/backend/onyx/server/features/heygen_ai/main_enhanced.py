@@ -425,3 +425,4 @@ if __name__ == "__main__":
         workers=settings.api_workers if not settings.debug else 1,
         log_level=settings.log_level.lower()
     )
+

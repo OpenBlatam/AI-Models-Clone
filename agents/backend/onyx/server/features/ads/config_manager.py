@@ -1,13 +1,8 @@
-"""
-Configuration Manager for Onyx Ads Backend
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-This module provides comprehensive configuration management using YAML files for:
-- Hyperparameters and model settings
-- Training configurations
-- Data processing settings
-- Experiment configurations
-- Environment-specific settings
-"""
 from typing import Dict, Any, List, Optional, Union, Tuple
 import yaml
 import os
@@ -20,8 +15,20 @@ from datetime import datetime
 from enum import Enum
 import copy
 from contextlib import contextmanager
-
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Configuration Manager for Onyx Ads Backend
+
+This module provides comprehensive configuration management using YAML files for:
+- Hyperparameters and model settings
+- Training configurations
+- Data processing settings
+- Experiment configurations
+- Environment-specific settings
+"""
+
 
 logger = setup_logger()
 
@@ -191,7 +198,9 @@ class ConfigManager:
     """Comprehensive configuration manager for ML projects."""
     
     def __init__(self, config_dir: str = "./configs"):
-        self.config_dir = Path(config_dir)
+        
+    """__init__ function."""
+self.config_dir = Path(config_dir)
         self.config_dir.mkdir(parents=True, exist_ok=True)
         self.logger = logger
         self.configs = {}
@@ -309,6 +318,10 @@ class ConfigManager:
         
         # Save to YAML
         with open(config_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_dict, f, default_flow_style=False, indent=2)
         
         self.logger.info(f"Configuration saved to: {config_path}")
@@ -322,6 +335,10 @@ class ConfigManager:
             raise FileNotFoundError(f"Configuration file not found: {config_path}")
         
         with open(config_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             config_dict = yaml.safe_load(f)
         
         # Remove metadata
@@ -378,6 +395,10 @@ class ConfigManager:
         # Save updated config
         config_path = Path(config_path)
         with open(config_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_dict, f, default_flow_style=False, indent=2)
         
         self.logger.info(f"Configuration updated: {config_path}")

@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import List, Dict, Any
+import re
+import textstat
+from keybert import KeyBERT
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 SEO Analyser Module
 ===================
@@ -6,10 +21,6 @@ Provides utilities to analyse text for SEO purposes using textstat, keybert
 and other lightweight techniques. Outputs a composite SEO score (0-100).
 """
 
-from typing import List, Dict, Any
-import re
-import textstat
-from keybert import KeyBERT
 
 _kw_model: KeyBERT | None = None
 

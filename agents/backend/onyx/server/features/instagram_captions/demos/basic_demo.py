@@ -1,10 +1,18 @@
-Basic Error Handling and Validation Demo
-
-This script demonstrates basic error handling and validation features.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import json
 import re
 from typing import Dict, Any
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+Basic Error Handling and Validation Demo
+
+This script demonstrates basic error handling and validation features.
+
 
 # Simple error codes
 class ErrorCode:
@@ -18,7 +26,9 @@ class ErrorCode:
 # Base exception class
 class InstagramCaptionsException(Exception):
     def __init__(self, error_code: str, message: str, details: Dict[str, Any] = None, status_code: int = 500):
-        self.error_code = error_code
+        
+    """__init__ function."""
+self.error_code = error_code
         self.message = message
         self.details = details or {}
         self.status_code = status_code
@@ -27,15 +37,21 @@ class InstagramCaptionsException(Exception):
 # Specific exception classes
 class ValidationException(InstagramCaptionsException):
     def __init__(self, message: str, details: Dict[str, Any] = None):
-        super().__init__(ErrorCode.VALIDATION_ERROR, message, details, 400)
+        
+    """__init__ function."""
+super().__init__(ErrorCode.VALIDATION_ERROR, message, details, 400)
 
 class AuthenticationException(InstagramCaptionsException):
     def __init__(self, message: str, details: Dict[str, Any] = None):
-        super().__init__(ErrorCode.UNAUTHORIZED, message, details, 401)
+        
+    """__init__ function."""
+super().__init__(ErrorCode.UNAUTHORIZED, message, details, 401)
 
 class ResourceNotFoundException(InstagramCaptionsException):
     def __init__(self, resource_type: str, resource_id: str):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             ErrorCode.NOT_FOUND,
             f"{resource_type} with id '{resource_id}' not found",
             {"resource_type": resource_type, "resource_id": resource_id},
@@ -44,7 +60,9 @@ class ResourceNotFoundException(InstagramCaptionsException):
 
 class RateLimitException(InstagramCaptionsException):
     def __init__(self, retry_after: int = 60):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             ErrorCode.RATE_LIMIT_EXCEEDED,
             "Rate limit exceeded. Please try again later.",
             {"retry_after": retry_after},
@@ -53,7 +71,9 @@ class RateLimitException(InstagramCaptionsException):
 
 class AIProcessingException(InstagramCaptionsException):
     def __init__(self, message: str, details: Dict[str, Any] = None):
-        super().__init__(ErrorCode.AI_PROCESSING_ERROR, message, details, 422)
+        
+    """__init__ function."""
+super().__init__(ErrorCode.AI_PROCESSING_ERROR, message, details, 422)
 
 # Utility functions
 def create_error_response(error_code: str, message: str, details: Dict[str, Any] = None) -> Dict[str, Any]:
@@ -104,7 +124,7 @@ def sanitize_html(html_content: str) -> Dict[str, Any]:
     pattern = r'<(/?)([^>]+)>|<!--.*?-->'
     removed_tags = []
     
-    def replace_tag(match):
+    def replace_tag(match) -> Any:
         tag = match.group(2).split()[0].lower()
         if tag not in allowed_tags:
             removed_tags.append(tag)
@@ -281,5 +301,6 @@ def main():
     print("DEMO COMPLETED SUCCESSFULLY!")
     print("=" * 80)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

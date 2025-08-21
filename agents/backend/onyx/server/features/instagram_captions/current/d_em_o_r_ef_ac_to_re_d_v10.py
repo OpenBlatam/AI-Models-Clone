@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import json
+from typing import Dict, Any, List
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Instagram Captions API v10.0 - Refactored Demo
@@ -5,16 +19,12 @@ Instagram Captions API v10.0 - Refactored Demo
 Simple demonstration of refactoring benefits and capabilities.
 """
 
-import asyncio
-import time
-import json
-from typing import Dict, Any, List
 
 
 class RefactoredDemo:
     """Demonstration of v10.0 refactoring achievements."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.demo_results = {
             "architecture_comparison": {},
             "dependency_comparison": {},
@@ -28,7 +38,7 @@ class RefactoredDemo:
         print(f"🚀 {title}")
         print("=" * 80)
     
-    def demo_architecture_refactoring(self):
+    def demo_architecture_refactoring(self) -> Any:
         """Demonstrate architecture improvements."""
         
         print("\n1️⃣  ARCHITECTURE REFACTORING (v9.0 → v10.0)")
@@ -61,7 +71,7 @@ class RefactoredDemo:
         print("      • Easy to maintain and extend")
         print("      • Developer-friendly architecture")
     
-    def demo_dependency_optimization(self):
+    def demo_dependency_optimization(self) -> Any:
         """Demonstrate dependency optimization."""
         
         print("\n2️⃣  DEPENDENCY OPTIMIZATION")
@@ -108,7 +118,7 @@ class RefactoredDemo:
         reduction = ((len(v9_dependencies) + 40 - len(v10_dependencies)) / (len(v9_dependencies) + 40)) * 100
         print(f"   🎯 {reduction:.0f}% reduction in dependency complexity")
     
-    def demo_performance_improvements(self):
+    def demo_performance_improvements(self) -> Any:
         """Demonstrate performance improvements."""
         
         print("\n3️⃣  PERFORMANCE IMPROVEMENTS")
@@ -137,7 +147,7 @@ class RefactoredDemo:
         print("   ✅ 83% faster startup (60s → 10s)")
         print("   ✅ 70% fewer dependencies (50+ → 15)")
     
-    def demo_deployment_advantages(self):
+    def demo_deployment_advantages(self) -> Any:
         """Demonstrate deployment advantages."""
         
         print("\n4️⃣  DEPLOYMENT ADVANTAGES")
@@ -172,7 +182,7 @@ class RefactoredDemo:
         for env in environments:
             print(f"   ✅ {env}: Faster, lighter, more reliable")
     
-    def demo_developer_experience(self):
+    def demo_developer_experience(self) -> Any:
         """Demonstrate developer experience improvements."""
         
         print("\n5️⃣  DEVELOPER EXPERIENCE")
@@ -198,7 +208,7 @@ class RefactoredDemo:
         print("   v9.0: Days to understand and set up")
         print("   v10.0: Hours to become productive")
     
-    def demo_maintained_capabilities(self):
+    def demo_maintained_capabilities(self) -> Any:
         """Demonstrate that all advanced capabilities are maintained."""
         
         print("\n6️⃣  MAINTAINED ADVANCED CAPABILITIES")
@@ -227,7 +237,7 @@ class RefactoredDemo:
         print("   ✅ 100%+ reliability improvement")
         print("   ✅ 300%+ developer experience enhancement")
     
-    async def run_comprehensive_demo(self):
+    async def run_comprehensive_demo(self) -> Any:
         """Run complete refactoring demonstration."""
         
         self.print_header("INSTAGRAM CAPTIONS API v10.0 - REFACTORING DEMO")
@@ -288,5 +298,6 @@ async def main():
     await demo.run_comprehensive_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

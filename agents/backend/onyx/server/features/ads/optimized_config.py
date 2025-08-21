@@ -1,11 +1,32 @@
-"""
-Optimized configuration for Onyx ads functionality with production-ready settings.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 from pydantic_settings import BaseSettings
 from typing import Optional, Dict, Any, List
 import os
 from functools import lru_cache
 from enum import Enum
+    from langchain_openai import ChatOpenAI
+    from langchain_openai import OpenAIEmbeddings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Optimized configuration for Onyx ads functionality with production-ready settings.
+"""
 
 class Environment(str, Enum):
     DEVELOPMENT = "development"
@@ -118,7 +139,8 @@ class OptimizedSettings(BaseSettings):
     llm_temperature: float = 0.7
     llm_max_tokens: int = 2000
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         case_sensitive = True
         env_prefix = "ADS_"
@@ -130,7 +152,6 @@ def get_optimized_settings() -> OptimizedSettings:
 
 def get_llm_config():
     """Get LLM configuration with optimized settings."""
-    from langchain_openai import ChatOpenAI
     settings = get_optimized_settings()
     
     return ChatOpenAI(
@@ -144,7 +165,6 @@ def get_llm_config():
 
 def get_embeddings_config():
     """Get embeddings configuration with optimized settings."""
-    from langchain_openai import OpenAIEmbeddings
     settings = get_optimized_settings()
     
     return OpenAIEmbeddings(

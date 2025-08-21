@@ -1,8 +1,13 @@
-"""
-High-Performance Cache Manager for Copywriting Service.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Multi-level caching with Redis, memory, and disk storage.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import hashlib
@@ -10,38 +15,48 @@ import time
 from typing import Optional, Any, Dict, List
 from functools import wraps
 import logging
+    import orjson
+    import json as orjson
+    import redis.asyncio as aioredis
+    import diskcache
+from cachetools import TTLCache, LRUCache
+import structlog
+from .config import get_config
+                import json
+                            import json
+                import json
+from typing import Any, List, Dict, Optional
+"""
+High-Performance Cache Manager for Copywriting Service.
+
+Multi-level caching with Redis, memory, and disk storage.
+"""
+
 
 # High-performance imports
 try:
-    import orjson
     JSON_AVAILABLE = True
 except ImportError:
-    import json as orjson
     JSON_AVAILABLE = False
 
 try:
-    import redis.asyncio as aioredis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
 
 try:
-    import diskcache
     DISK_CACHE_AVAILABLE = True
 except ImportError:
     DISK_CACHE_AVAILABLE = False
 
-from cachetools import TTLCache, LRUCache
-import structlog
 
-from .config import get_config
 
 logger = structlog.get_logger(__name__)
 
 class CacheManager:
     """Ultra-optimized multi-level cache manager."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = get_config()
         self.redis_client: Optional[aioredis.Redis] = None
         self.memory_cache: Optional[TTLCache] = None
@@ -55,7 +70,7 @@ class CacheManager:
         # Initialize caches
         asyncio.create_task(self._initialize_caches())
     
-    async def _initialize_caches(self):
+    async def _initialize_caches(self) -> Any:
         """Initialize all cache layers."""
         try:
             # Memory cache
@@ -102,7 +117,6 @@ class CacheManager:
             if JSON_AVAILABLE:
                 key_data = orjson.dumps(data, sort_keys=True).decode()
             else:
-                import json
                 key_data = json.dumps(data, sort_keys=True)
         else:
             key_data = str(data)
@@ -111,7 +125,7 @@ class CacheManager:
         hash_obj = hashlib.md5(key_data.encode())
         return f"{prefix}:{hash_obj.hexdigest()}"
     
-    async def get(self, key: str, default: Any = None) -> Any:
+    async def get(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Get value from cache with multi-level fallback."""
         start_time = time.perf_counter()
         
@@ -134,7 +148,6 @@ class CacheManager:
                         if JSON_AVAILABLE:
                             deserialized = orjson.loads(value)
                         else:
-                            import json
                             deserialized = json.loads(value)
                         
                         # Promote to memory cache
@@ -219,7 +232,6 @@ class CacheManager:
             if JSON_AVAILABLE:
                 serialized = orjson.dumps(value)
             else:
-                import json
                 serialized = json.dumps(value)
             
             await self.redis_client.setex(key, ttl, serialized)
@@ -323,7 +335,7 @@ class CacheManager:
         
         return stats
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup cache resources."""
         try:
             if self.redis_client:
@@ -340,9 +352,9 @@ class CacheManager:
 # Cache decorators
 def cached(prefix: str = "default", ttl: Optional[int] = None):
     """Decorator for caching function results."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             cache_manager = get_cache_manager()
             
             # Generate cache key

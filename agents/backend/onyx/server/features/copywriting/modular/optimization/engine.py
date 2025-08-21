@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import logging
+import os
+from typing import Dict, Optional, Any
+from enum import Enum
+            import orjson
+            import msgspec
+            import json
+            import blake3
+            import xxhash
+            import mmh3
+            import hashlib
+            import lz4.frame
+            import zstandard as zstd
+            import gzip
+                import aioredis
+                import redis
+from typing import Any, List, Dict, Optional
+import asyncio
 # -*- coding: utf-8 -*-
 """
 Optimization Engine - Motor de optimización modular
@@ -7,10 +30,6 @@ Motor de optimización independiente que detecta y configura
 automáticamente las mejores librerías disponibles.
 """
 
-import logging
-import os
-from typing import Dict, Optional, Any
-from enum import Enum
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +119,6 @@ class OptimizationEngine:
         preferred = self.config.get("preferred_json", "auto")
         
         if preferred == "orjson" or (preferred == "auto" and self.libraries.get("orjson")):
-            import orjson
             return {
                 "dumps": lambda x: orjson.dumps(x, option=orjson.OPT_FAST).decode(),
                 "loads": orjson.loads,
@@ -108,7 +126,6 @@ class OptimizationEngine:
                 "speed_multiplier": 5.0
             }
         elif preferred == "msgspec" or (preferred == "auto" and self.libraries.get("msgspec")):
-            import msgspec
             encoder = msgspec.json.Encoder()
             decoder = msgspec.json.Decoder()
             return {
@@ -118,7 +135,6 @@ class OptimizationEngine:
                 "speed_multiplier": 6.0
             }
         else:
-            import json
             return {
                 "dumps": json.dumps,
                 "loads": json.loads,
@@ -131,28 +147,24 @@ class OptimizationEngine:
         preferred = self.config.get("preferred_hash", "auto")
         
         if preferred == "blake3" or (preferred == "auto" and self.libraries.get("blake3")):
-            import blake3
             return {
                 "hash": lambda x: blake3.blake3(x.encode()).hexdigest(),
                 "name": "blake3",
                 "speed_multiplier": 8.0
             }
         elif preferred == "xxhash" or (preferred == "auto" and self.libraries.get("xxhash")):
-            import xxhash
             return {
                 "hash": lambda x: xxhash.xxh64(x.encode()).hexdigest(),
                 "name": "xxhash",
                 "speed_multiplier": 6.0
             }
         elif preferred == "mmh3" or (preferred == "auto" and self.libraries.get("mmh3")):
-            import mmh3
             return {
                 "hash": lambda x: str(mmh3.hash128(x.encode())),
                 "name": "mmh3",
                 "speed_multiplier": 3.0
             }
         else:
-            import hashlib
             return {
                 "hash": lambda x: hashlib.sha256(x.encode()).hexdigest(),
                 "name": "sha256",
@@ -164,7 +176,6 @@ class OptimizationEngine:
         preferred = self.config.get("preferred_compression", "auto")
         
         if preferred == "lz4" or (preferred == "auto" and self.libraries.get("lz4")):
-            import lz4.frame
             return {
                 "compress": lz4.frame.compress,
                 "decompress": lz4.frame.decompress,
@@ -172,7 +183,6 @@ class OptimizationEngine:
                 "speed_multiplier": 10.0
             }
         elif preferred == "zstandard" or (preferred == "auto" and self.libraries.get("zstandard")):
-            import zstandard as zstd
             compressor = zstd.ZstdCompressor(level=1)
             decompressor = zstd.ZstdDecompressor()
             return {
@@ -182,7 +192,6 @@ class OptimizationEngine:
                 "speed_multiplier": 5.0
             }
         else:
-            import gzip
             return {
                 "compress": gzip.compress,
                 "decompress": gzip.decompress,
@@ -196,14 +205,12 @@ class OptimizationEngine:
         
         if self.libraries.get("aioredis"):
             try:
-                import aioredis
                 return aioredis.from_url(redis_url, decode_responses=True)
             except Exception as e:
                 logger.warning(f"aioredis setup failed: {e}")
         
         if self.libraries.get("redis"):
             try:
-                import redis
                 client = redis.from_url(redis_url, decode_responses=True, socket_timeout=5)
                 client.ping()
                 return client

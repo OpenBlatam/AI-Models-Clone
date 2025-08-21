@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import os
+import shutil
+from pathlib import Path
+import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Script to rename files and directories to follow lowercase with underscores convention.
@@ -5,12 +14,8 @@ This script will recursively process the instagram_captions directory and rename
 files and directories to use lowercase with underscores.
 """
 
-import os
-import shutil
-from pathlib import Path
-import re
 
-def to_snake_case(name):
+def to_snake_case(name) -> Any:
     """Convert a string to snake_case (lowercase with underscores)."""
     # Remove file extensions first
     name_without_ext = name
@@ -38,7 +43,7 @@ def to_snake_case(name):
     
     return snake_case
 
-def should_skip_directory(dir_name):
+def should_skip_directory(dir_name) -> Any:
     """Check if directory should be skipped (like __pycache__, .git, etc.)."""
     skip_dirs = {
         '__pycache__', '.git', '.vscode', '.idea', 'node_modules',
@@ -46,7 +51,7 @@ def should_skip_directory(dir_name):
     }
     return dir_name in skip_dirs
 
-def rename_files_and_directories(root_path):
+def rename_files_and_directories(root_path) -> Any:
     """Recursively rename files and directories to snake_case."""
     root_path = Path(root_path)
     
@@ -116,5 +121,6 @@ def main():
     except Exception as e:
         print(f"Error during renaming process: {e}")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

@@ -1,10 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import sys
+import logging
+        from tokenization_utils import (
+        from tokenization_utils import TokenizationConfig, SequenceConfig
+        from tokenization_utils import TokenizationConfig, AdvancedTokenizer
+        from tokenization_utils import TokenizationConfig, AdvancedTokenizer
+        from tokenization_utils import SequenceConfig, SequenceHandler
+        from transformers import AutoTokenizer
+        from tokenization_utils import analyze_tokenization_quality
+        from transformers import AutoTokenizer
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Simple test script for tokenization utilities
 """
 
-import sys
-import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -13,7 +31,6 @@ logger = logging.getLogger(__name__)
 def test_basic_imports():
     """Test basic imports"""
     try:
-        from tokenization_utils import (
             TokenizationConfig, SequenceConfig, TokenizationStats,
             AdvancedTokenizer, SequenceHandler, TokenizedDataset, TokenizationPipeline
         )
@@ -26,7 +43,6 @@ def test_basic_imports():
 def test_config_creation():
     """Test configuration creation"""
     try:
-        from tokenization_utils import TokenizationConfig, SequenceConfig
         
         # Create configurations
         token_config = TokenizationConfig(
@@ -52,7 +68,6 @@ def test_config_creation():
 def test_advanced_tokenizer():
     """Test advanced tokenizer creation"""
     try:
-        from tokenization_utils import TokenizationConfig, AdvancedTokenizer
         
         config = TokenizationConfig(
             model_name="bert-base-uncased",
@@ -71,7 +86,6 @@ def test_advanced_tokenizer():
 def test_basic_tokenization():
     """Test basic tokenization"""
     try:
-        from tokenization_utils import TokenizationConfig, AdvancedTokenizer
         
         config = TokenizationConfig(
             model_name="bert-base-uncased",
@@ -97,8 +111,6 @@ def test_basic_tokenization():
 def test_sequence_handler():
     """Test sequence handler"""
     try:
-        from tokenization_utils import SequenceConfig, SequenceHandler
-        from transformers import AutoTokenizer
         
         seq_config = SequenceConfig(
             max_sequence_length=100,
@@ -121,8 +133,6 @@ def test_sequence_handler():
 def test_quality_analysis():
     """Test quality analysis"""
     try:
-        from tokenization_utils import analyze_tokenization_quality
-        from transformers import AutoTokenizer
         
         tokenizer = AutoTokenizer.from_pretrained("bert-base-uncased")
         texts = [
@@ -175,5 +185,6 @@ def main():
         print("❌ Some tests failed. Please check the implementation.")
         return 1
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     sys.exit(main()) 

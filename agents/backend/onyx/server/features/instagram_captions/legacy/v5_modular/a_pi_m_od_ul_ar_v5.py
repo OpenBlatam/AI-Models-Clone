@@ -1,8 +1,10 @@
-"""
-Instagram Captions API v5.0 - Modular Architecture
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Ultra-fast modular API combining all specialized modules for maximum maintainability.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -10,19 +12,28 @@ from typing import Dict, Any, List
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
-
-# Import all modular components
 from .config_v5 import config
 from .schemas_v5 import (
-    UltraFastCaptionRequest, BatchCaptionRequest,
-    UltraFastCaptionResponse, BatchCaptionResponse,
-    UltraHealthResponse, MetricsResponse, ErrorResponse
-)
 from .ai_engine_v5 import ai_engine
 from .cache_v5 import cache_manager
 from .metrics_v5 import metrics, grader
 from .middleware_v5 import MiddlewareUtils
 from .utils_v5 import (
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Instagram Captions API v5.0 - Modular Architecture
+
+Ultra-fast modular API combining all specialized modules for maximum maintainability.
+"""
+
+
+# Import all modular components
+    UltraFastCaptionRequest, BatchCaptionRequest,
+    UltraFastCaptionResponse, BatchCaptionResponse,
+    UltraHealthResponse, MetricsResponse, ErrorResponse
+)
     UltraFastUtils, ResponseBuilder, CacheKeyGenerator, performance_tracker
 )
 
@@ -30,7 +41,7 @@ from .utils_v5 import (
 class ModularCaptionsAPI:
     """Modular Instagram Captions API with clean architecture separation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = self._create_app()
         self._setup_routes()
     
@@ -369,7 +380,6 @@ __all__ = ['app', 'modular_api']
 
 
 if __name__ == "__main__":
-    import uvicorn
     
     print("="*80)
     print(f"🚀 {config.API_NAME}")

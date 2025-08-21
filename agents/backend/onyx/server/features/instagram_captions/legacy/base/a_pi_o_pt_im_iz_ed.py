@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+from typing import List, Dict, Any, Optional
+import logging
+from fastapi import APIRouter, Depends, BackgroundTasks, Request
+from fastapi.responses import JSONResponse
+from .schemas import (
+from .dependencies import (
+from .utils import (
+from .speed_optimizations import (
+from .core import InstagramCaptionsEngine
+from .gmt_system import SimplifiedGMTSystem
+from typing import Any, List, Dict, Optional
 """
 Optimized Instagram Captions API v2.0
 
@@ -5,14 +25,8 @@ Modern FastAPI implementation with RORO pattern, dependency injection,
 caching, error handling, and performance optimization.
 """
 
-import asyncio
-from typing import List, Dict, Any, Optional
-import logging
 
-from fastapi import APIRouter, Depends, BackgroundTasks, Request
-from fastapi.responses import JSONResponse
 
-from .schemas import (
     CaptionGenerationRequest,
     CaptionGenerationResponse,
     QualityAnalysisRequest,
@@ -27,7 +41,6 @@ from .schemas import (
     QualityGuidelinesResponse,
     TimezoneInsightsResponse
 )
-from .dependencies import (
     get_captions_engine,
     get_gmt_system,
     get_cache_manager,
@@ -35,7 +48,6 @@ from .dependencies import (
     get_health_checker,
     validate_request_size
 )
-from .utils import (
     handle_api_errors,
     measure_execution_time,
     log_performance_metrics,
@@ -45,15 +57,12 @@ from .utils import (
     deserialize_from_cache,
     generate_cache_key
 )
-from .speed_optimizations import (
     ultra_fast_cache,
     parallel_process,
     batch_optimize_ultra_fast,
     get_performance_stats,
     format_response_fast
 )
-from .core import InstagramCaptionsEngine
-from .gmt_system import SimplifiedGMTSystem
 
 logger = logging.getLogger(__name__)
 
@@ -73,7 +82,7 @@ router = APIRouter(
 
 @router.get("/", response_model=Dict[str, Any])
 @handle_api_errors
-async def get_api_info() -> Dict[str, Any]:
+async async def get_api_info() -> Dict[str, Any]:
     """Get API information and capabilities."""
     return {
         "name": "Instagram Captions API",
@@ -619,7 +628,7 @@ async def get_timezone_insights(
 @router.get("/metrics")
 @handle_api_errors
 @ultra_fast_cache(ttl=60)
-async def get_api_metrics(request: Request) -> Dict[str, Any]:
+async async def get_api_metrics(request: Request) -> Dict[str, Any]:
     """Get API performance metrics with ultra-fast caching."""
     
     # Get performance middleware metrics if available

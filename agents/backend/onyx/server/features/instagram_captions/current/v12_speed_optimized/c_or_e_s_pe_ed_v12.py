@@ -1,10 +1,13 @@
-"""
-Instagram Captions API v12.0 - Speed Optimized Core
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Ultra-high performance core with extreme speed optimizations, 
-advanced caching strategies, and high-performance computing techniques.
-Target: Sub-20ms response times with maximum throughput.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -18,52 +21,61 @@ from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 import multiprocessing as mp
 from collections import defaultdict, deque
 import weakref
+    import orjson
+    import json
+    import numba
+    from numba import jit, njit, prange
+    import numpy as np
+    from cachetools import TTLCache, LRUCache
+    import psutil
+import logging
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v12.0 - Speed Optimized Core
+
+Ultra-high performance core with extreme speed optimizations, 
+advanced caching strategies, and high-performance computing techniques.
+Target: Sub-20ms response times with maximum throughput.
+"""
+
 
 # Ultra-fast imports with fallbacks
 try:
-    import orjson
     json_dumps = orjson.dumps
     json_loads = orjson.loads
     ULTRA_JSON = True
 except ImportError:
-    import json
     json_dumps = lambda obj: json.dumps(obj).encode()
     json_loads = json.loads
     ULTRA_JSON = False
 
 try:
-    import numba
-    from numba import jit, njit, prange
     NUMBA_AVAILABLE = True
 except ImportError:
     NUMBA_AVAILABLE = False
-    def jit(*args, **kwargs):
-        def decorator(func):
+    def jit(*args, **kwargs) -> Any:
+        def decorator(func) -> Any:
             return func
         return decorator
     njit = jit
     prange = range
 
 try:
-    import numpy as np
     NUMPY_AVAILABLE = True
 except ImportError:
     NUMPY_AVAILABLE = False
 
 try:
-    from cachetools import TTLCache, LRUCache
     ADVANCED_CACHE = True
 except ImportError:
     ADVANCED_CACHE = False
 
 try:
-    import psutil
     PSUTIL_AVAILABLE = True
 except ImportError:
     PSUTIL_AVAILABLE = False
 
 # High-performance logging
-import logging
 logging.basicConfig(level=logging.WARNING)  # Reduced logging for speed
 logger = logging.getLogger(__name__)
 
@@ -138,7 +150,7 @@ class FastCaptionRequest:
     priority: str = "speed"  # Always speed priority
     enable_cache: bool = True
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         # Minimal validation for speed
         if len(self.content_description) < 3:
             self.content_description = "speed optimized content"
@@ -167,7 +179,7 @@ class FastCaptionResponse:
 class SpeedCache:
     """Ultra-fast caching system with multiple optimization layers."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Multi-layer caching for maximum speed
         if ADVANCED_CACHE:
             self.l1_cache = LRUCache(maxsize=1000)      # Hot cache (RAM)
@@ -186,7 +198,7 @@ class SpeedCache:
         if speed_config.ENABLE_PRECOMPUTE:
             self._precompute_common_responses()
     
-    def _precompute_common_responses(self):
+    def _precompute_common_responses(self) -> Any:
         """Pre-compute responses for common content types."""
         common_contents = [
             "food photo", "selfie", "workout", "travel", "fashion",
@@ -277,7 +289,7 @@ class SpeedCache:
 class SpeedOptimizedAI:
     """Ultra-fast AI engine with aggressive speed optimizations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.speed_cache = SpeedCache()
         self.thread_pool = ThreadPoolExecutor(max_workers=speed_config.AI_WORKERS)
         if speed_config.PROCESS_POOL_SIZE > 0:
@@ -387,9 +399,8 @@ class SpeedOptimizedAI:
         )
         
         # Ultra-fast caption construction
-        hashtag_str = " ".join(hashtags[:5])  # Limit for speed
-        caption = template.format(
-            content=request.content_description.split()[0],  # First word only for speed
+        hashtag_str = " "f".join(hashtags[:5])  # Limit for speed
+        caption = template"[0],  # First word only for speed
             hashtags=hashtag_str
         )
         

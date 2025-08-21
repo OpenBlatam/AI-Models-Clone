@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import pytest
+import asyncio
+import time
+import json
+from typing import Dict, Any, List
+from unittest.mock import AsyncMock, patch
+from ..conftest_optimized import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Optimized Integration Tests
 ==========================
@@ -5,15 +16,8 @@ Optimized Integration Tests
 Clean, fast, and efficient integration tests with minimal dependencies.
 """
 
-import pytest
-import asyncio
-import time
-import json
-from typing import Dict, Any, List
-from unittest.mock import AsyncMock, patch
 
 # Import our optimized fixtures
-from ..conftest_optimized import (
     test_data_generator,
     performance_monitor,
     sample_post_data,
@@ -31,7 +35,7 @@ class TestOptimizedAPIIntegration:
     """Optimized API integration tests."""
     
     @pytest.mark.asyncio
-    async def test_create_post_integration(self, mock_repository, mock_cache_manager):
+    async def test_create_post_integration(self, mock_repository, mock_cache_manager) -> Any:
         """Test complete post creation flow."""
         # Simulate API request data
         post_data = test_data_generator.generate_post_data()
@@ -49,7 +53,7 @@ class TestOptimizedAPIIntegration:
             assert result["content"] == post_data["content"]
     
     @pytest.mark.asyncio
-    async def test_list_posts_integration(self, mock_repository, mock_cache_manager):
+    async def test_list_posts_integration(self, mock_repository, mock_cache_manager) -> List[Any]:
         """Test complete post listing flow."""
         # Generate test data
         posts_data = test_data_generator.generate_batch_data(5)
@@ -66,7 +70,7 @@ class TestOptimizedAPIIntegration:
             assert all("id" in post for post in result)
     
     @pytest.mark.asyncio
-    async def test_update_post_integration(self, mock_repository, mock_cache_manager):
+    async def test_update_post_integration(self, mock_repository, mock_cache_manager) -> Any:
         """Test complete post update flow."""
         # Generate test data
         original_post = test_data_generator.generate_post_data()
@@ -86,7 +90,7 @@ class TestOptimizedAPIIntegration:
             assert result["id"] == original_post["id"]
     
     @pytest.mark.asyncio
-    async def test_delete_post_integration(self, mock_repository, mock_cache_manager):
+    async def test_delete_post_integration(self, mock_repository, mock_cache_manager) -> Any:
         """Test complete post deletion flow."""
         post_id = test_data_generator.generate_post_data()["id"]
         
@@ -104,7 +108,7 @@ class TestOptimizedCacheIntegration:
     """Optimized cache integration tests."""
     
     @pytest.mark.asyncio
-    async def test_cache_set_get_integration(self, mock_cache_manager):
+    async def test_cache_set_get_integration(self, mock_cache_manager) -> Optional[Dict[str, Any]]:
         """Test cache set and get integration."""
         # Test data
         test_key = "test_cache_key"
@@ -119,7 +123,7 @@ class TestOptimizedCacheIntegration:
         assert cached_value == test_value
     
     @pytest.mark.asyncio
-    async def test_cache_batch_operations_integration(self, mock_cache_manager):
+    async def test_cache_batch_operations_integration(self, mock_cache_manager) -> Any:
         """Test cache batch operations integration."""
         # Test batch data
         batch_data = {
@@ -138,7 +142,7 @@ class TestOptimizedCacheIntegration:
         assert len(cached_values) == 3
     
     @pytest.mark.asyncio
-    async def test_cache_clear_integration(self, mock_cache_manager):
+    async def test_cache_clear_integration(self, mock_cache_manager) -> Any:
         """Test cache clear integration."""
         # Set some test data
         await mock_cache_manager.set("test_key", "test_value")
@@ -156,7 +160,7 @@ class TestOptimizedNLPIntegration:
     """Optimized NLP integration tests."""
     
     @pytest.mark.asyncio
-    async def test_nlp_text_processing_integration(self, mock_nlp_processor):
+    async def test_nlp_text_processing_integration(self, mock_nlp_processor) -> Any:
         """Test NLP text processing integration."""
         # Test text
         test_text = "This is a test post for LinkedIn. It should be analyzed for sentiment and readability."
@@ -179,7 +183,7 @@ class TestOptimizedNLPIntegration:
         assert isinstance(result["processing_time"], (int, float))
     
     @pytest.mark.asyncio
-    async def test_nlp_batch_processing_integration(self, mock_nlp_processor):
+    async def test_nlp_batch_processing_integration(self, mock_nlp_processor) -> Any:
         """Test NLP batch processing integration."""
         # Test texts
         test_texts = [
@@ -207,7 +211,7 @@ class TestOptimizedRepositoryIntegration:
     """Optimized repository integration tests."""
     
     @pytest.mark.asyncio
-    async def test_repository_crud_integration(self, mock_repository):
+    async def test_repository_crud_integration(self, mock_repository) -> Any:
         """Test repository CRUD operations integration."""
         # Test data
         post_data = test_data_generator.generate_post_data()
@@ -233,7 +237,7 @@ class TestOptimizedRepositoryIntegration:
         assert delete_result is True
     
     @pytest.mark.asyncio
-    async def test_repository_batch_operations_integration(self, mock_repository):
+    async def test_repository_batch_operations_integration(self, mock_repository) -> Any:
         """Test repository batch operations integration."""
         # Test batch data
         batch_data = test_data_generator.generate_batch_data(3)
@@ -256,7 +260,7 @@ class TestOptimizedPerformanceIntegration:
     """Optimized performance integration tests."""
     
     @pytest.mark.asyncio
-    async def test_end_to_end_performance(self, performance_monitor, mock_repository, mock_cache_manager):
+    async def test_end_to_end_performance(self, performance_monitor, mock_repository, mock_cache_manager) -> Any:
         """Test end-to-end performance of complete workflows."""
         # Monitor complete post creation flow
         performance_monitor.start_monitoring("end_to_end_create")
@@ -287,10 +291,12 @@ class TestOptimizedPerformanceIntegration:
         assert metrics["operations_per_second"] > 0
     
     @pytest.mark.asyncio
-    async def test_concurrent_operations_performance(self, test_utils, mock_repository):
+    async def test_concurrent_operations_performance(self, test_utils, mock_repository) -> Any:
         """Test performance of concurrent operations."""
         async def create_post_operation():
-            post_data = test_data_generator.generate_post_data()
+            
+    """create_post_operation function."""
+post_data = test_data_generator.generate_post_data()
             return await mock_repository.create(post_data)
         
         # Run concurrent operations
@@ -313,7 +319,7 @@ class TestOptimizedErrorHandlingIntegration:
     """Optimized error handling integration tests."""
     
     @pytest.mark.asyncio
-    async def test_repository_error_handling(self, mock_repository):
+    async def test_repository_error_handling(self, mock_repository) -> Any:
         """Test repository error handling integration."""
         # Mock repository to raise exception
         mock_repository.get_by_id.side_effect = Exception("Database error")
@@ -323,7 +329,7 @@ class TestOptimizedErrorHandlingIntegration:
             await mock_repository.get_by_id("non_existent_id")
     
     @pytest.mark.asyncio
-    async def test_cache_error_handling(self, mock_cache_manager):
+    async def test_cache_error_handling(self, mock_cache_manager) -> Any:
         """Test cache error handling integration."""
         # Mock cache to raise exception
         mock_cache_manager.get.side_effect = Exception("Cache error")
@@ -333,7 +339,7 @@ class TestOptimizedErrorHandlingIntegration:
             await mock_cache_manager.get("test_key")
     
     @pytest.mark.asyncio
-    async def test_nlp_error_handling(self, mock_nlp_processor):
+    async def test_nlp_error_handling(self, mock_nlp_processor) -> Any:
         """Test NLP error handling integration."""
         # Mock NLP to raise exception
         mock_nlp_processor.process_text.side_effect = Exception("NLP processing error")
@@ -347,7 +353,7 @@ class TestOptimizedDataFlowIntegration:
     """Optimized data flow integration tests."""
     
     @pytest.mark.asyncio
-    async def test_complete_data_flow(self, mock_repository, mock_cache_manager, mock_nlp_processor):
+    async def test_complete_data_flow(self, mock_repository, mock_cache_manager, mock_nlp_processor) -> Any:
         """Test complete data flow from creation to processing."""
         # 1. Create post
         post_data = test_data_generator.generate_post_data()
@@ -377,7 +383,7 @@ class TestOptimizedDataFlowIntegration:
         assert cached_post["nlp_analysis"] == nlp_result
     
     @pytest.mark.asyncio
-    async def test_batch_data_flow(self, mock_repository, mock_cache_manager, mock_nlp_processor):
+    async def test_batch_data_flow(self, mock_repository, mock_cache_manager, mock_nlp_processor) -> Any:
         """Test batch data flow."""
         # 1. Create batch posts
         batch_data = test_data_generator.generate_batch_data(3)

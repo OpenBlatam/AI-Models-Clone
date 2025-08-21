@@ -1,7 +1,10 @@
-"""
-Instagram Captions API v14.0 - Prioritized Engine with Advanced Error Handling
-Ultra-fast caption generation with prioritized error handling and comprehensive edge case coverage
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import hashlib
@@ -18,20 +21,26 @@ import gc
 import psutil
 from contextlib import asynccontextmanager
 import re
-
 from ..types import OptimizedRequest, OptimizedResponse
 from ..utils.prioritized_error_handling import (
+from ..config import config
+from typing import Any, List, Dict, Optional
+"""
+Instagram Captions API v14.0 - Prioritized Engine with Advanced Error Handling
+Ultra-fast caption generation with prioritized error handling and comprehensive edge case coverage
+"""
+
+
     prioritized_error_handler, prioritized_error_context, async_prioritized_error_context,
     ErrorCategory, ErrorPriority, PrioritizedError
 )
-from ..config import config
 
 logger = logging.getLogger(__name__)
 
 class PrioritizedAIEngine:
     """Ultra-fast AI engine with prioritized error handling and edge case management"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize prioritized engine with comprehensive error handling"""
         self.device = "cuda" if torch.cuda.is_available() and config.USE_GPU else "cpu"
         self.tokenizer = None
@@ -58,7 +67,7 @@ class PrioritizedAIEngine:
         # Start model initialization
         asyncio.create_task(self._initialize_models())
     
-    async def _initialize_models(self):
+    async def _initialize_models(self) -> Any:
         """Initialize models with comprehensive error handling"""
         async with async_prioritized_error_context(
             "model_initialization", 
@@ -274,7 +283,7 @@ class PrioritizedAIEngine:
             self._update_stats(response.processing_time, request_id)
             return response
     
-    async def _validate_request(self, request: OptimizedRequest, request_id: str) -> Tuple[bool, List[str]]:
+    async async def _validate_request(self, request: OptimizedRequest, request_id: str) -> Tuple[bool, List[str]]:
         """Validate request with comprehensive checks"""
         async with async_prioritized_error_context(
             "request_validation", 
@@ -799,7 +808,7 @@ class PrioritizedAIEngine:
 class ResourceMonitor:
     """Resource monitoring and management"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.memory_threshold = 0.9  # 90%
         self.cpu_threshold = 0.8     # 80%
         self.disk_threshold = 0.95   # 95%
@@ -890,7 +899,9 @@ class AIModelError(Exception):
 class CaptionAPIError(Exception):
     """Base exception for all caption API errors."""
     def __init__(self, message: str, user_message: str = None, code: str = None, request_id: str = None, context: dict = None):
-        super().__init__(message)
+        
+    """__init__ function."""
+super().__init__(message)
         self.user_message = user_message or "An error occurred."
         self.code = code or "error"
         self.request_id = request_id

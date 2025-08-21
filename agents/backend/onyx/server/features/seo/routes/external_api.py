@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import APIRouter, Depends, HTTPException
+from typing import List
+from ..dependencies import (
+from ..operations import AsyncExternalAPIOperations
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 External API routes for Ultra-Optimized SEO Service v15.
 
@@ -9,14 +18,10 @@ This module contains external API operation endpoints including:
 - Extract webpage metadata
 """
 
-from fastapi import APIRouter, Depends, HTTPException
-from typing import List
 
-from ..dependencies import (
     get_async_api_operations,
     get_logger
 )
-from ..operations import AsyncExternalAPIOperations
 
 # Create router with prefix and tags
 router = APIRouter(
