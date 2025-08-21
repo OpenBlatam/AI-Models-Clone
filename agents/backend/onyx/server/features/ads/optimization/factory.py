@@ -56,7 +56,6 @@ class OptimizationFactory:
             PerformanceOptimizer,
             {
                 'name': 'Performance Optimizer',
-                'strategy': OptimizationStrategy.PERFORMANCE,
                 'description': 'Optimizes general performance metrics',
                 'capabilities': ['cpu_optimization', 'memory_optimization', 'response_time_optimization']
             }
@@ -67,7 +66,6 @@ class OptimizationFactory:
             ProfilingOptimizer,
             {
                 'name': 'Profiling Optimizer',
-                'strategy': OptimizationStrategy.PERFORMANCE,
                 'description': 'Optimizes based on profiling data',
                 'capabilities': ['code_profiling', 'bottleneck_detection', 'performance_analysis']
             }
@@ -78,7 +76,6 @@ class OptimizationFactory:
             GPUOptimizer,
             {
                 'name': 'GPU Optimizer',
-                'strategy': OptimizationStrategy.GPU,
                 'description': 'Optimizes GPU-related operations',
                 'capabilities': ['gpu_memory_optimization', 'cuda_optimization', 'tensor_optimization']
             }
@@ -105,8 +102,9 @@ class OptimizationFactory:
         optimizer_class = self.registered_optimizers[optimizer_type]
         config = self.optimizer_configs[optimizer_type]
         
-        # Merge config with kwargs
-        creation_params = {**config, **kwargs}
+        # Only pass the 'name' parameter to the constructor
+        creation_params = {'name': config.get('name', optimizer_type.title())}
+        creation_params.update(kwargs)
         
         try:
             optimizer = optimizer_class(**creation_params)

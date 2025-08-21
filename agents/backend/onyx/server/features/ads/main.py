@@ -11,7 +11,8 @@ from typing import Dict, Any
 from uuid import uuid4
 
 from domain.entities import Ad, AdCampaign, AdGroup
-from domain.value_objects import AdStatus, AdType, Platform, Budget, TargetingCriteria
+from domain.value_objects import AdStatus, AdType, Platform, Budget, TargetingCriteria, AdSchedule
+from datetime import datetime, timezone, timedelta
 from optimization.factory import get_optimization_factory
 from optimization.base_optimizer import OptimizationContext, OptimizationStrategy, OptimizationLevel
 
@@ -91,6 +92,14 @@ class AdsSystemDemo:
             lifetime_limit=100.0
         )
         
+        # Create schedule (active from now for 30 days, 24/7 for testing)
+        schedule = AdSchedule(
+            start_date=datetime.now(timezone.utc),
+            end_date=datetime.now(timezone.utc) + timedelta(days=30),
+            # No time restrictions for testing
+            timezone="UTC"
+        )
+        
         # Create ad
         ad = Ad(
             name="Tech Startup Launch Ad",
@@ -103,6 +112,7 @@ class AdsSystemDemo:
             call_to_action="Learn More",
             targeting=targeting,
             budget=budget,
+            schedule=schedule,
             campaign_id=campaign_id
         )
         
@@ -162,6 +172,13 @@ class AdsSystemDemo:
         ad.status = AdStatus.PENDING_REVIEW
         ad.approve()
         logger.info(f"Ad approved. New status: {ad.status.value}")
+        
+        # Debug schedule information
+        logger.info(f"Ad schedule: {ad.schedule}")
+        if ad.schedule:
+            logger.info(f"Schedule start: {ad.schedule.start_date}")
+            logger.info(f"Schedule end: {ad.schedule.end_date}")
+            logger.info(f"Schedule active: {ad.schedule.is_active()}")
         
         # Activate ad
         ad.activate()
