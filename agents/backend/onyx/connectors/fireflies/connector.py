@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from collections.abc import Iterator
 from datetime import datetime
 from datetime import timezone
@@ -19,6 +30,9 @@ from onyx.connectors.models import ImageSection
 from onyx.connectors.models import TextSection
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 _FIREFLIES_ID_PREFIX = "FIREFLIES_"
@@ -126,7 +140,7 @@ class FirefliesConnector(PollConnector, LoadConnector):
 
         return None
 
-    def _fetch_transcripts(
+    async def _fetch_transcripts(
         self, start_datetime: str | None = None, end_datetime: str | None = None
     ) -> Iterator[List[dict]]:
         if self.api_key is None:

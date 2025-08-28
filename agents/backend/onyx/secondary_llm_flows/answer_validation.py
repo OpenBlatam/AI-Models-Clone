@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.llm.exceptions import GenAIDisabledException
 from onyx.llm.factory import get_default_llms
 from onyx.llm.utils import dict_based_prompt_to_langchain_prompt
@@ -6,6 +8,9 @@ from onyx.prompts.answer_validation import ANSWER_VALIDITY_PROMPT
 from onyx.utils.logger import setup_logger
 from onyx.utils.timing import log_function_time
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -30,9 +35,7 @@ def get_answer_validity(
         messages = [
             {
                 "role": "user",
-                "content": ANSWER_VALIDITY_PROMPT.format(
-                    user_query=query, llm_answer=answer
-                ),
+                "content"f": ANSWER_VALIDITY_PROMPT",
             },
         ]
 

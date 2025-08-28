@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import copy
 import time
 from collections.abc import Iterator
@@ -12,8 +23,6 @@ from typing_extensions import override
 from onyx.configs.app_configs import ZENDESK_CONNECTOR_SKIP_ARTICLE_LABELS
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import (
-    time_str_to_utc,
-)
 from onyx.connectors.exceptions import ConnectorValidationError
 from onyx.connectors.exceptions import CredentialExpiredError
 from onyx.connectors.exceptions import InsufficientPermissionsError
@@ -32,6 +41,12 @@ from onyx.connectors.models import TextSection
 from onyx.file_processing.html_utils import parse_html_page_basic
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.retry_wrapper import retry_builder
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    time_str_to_utc,
+)
 
 
 MAX_PAGE_SIZE = 30  # Zendesk API maximum
@@ -48,11 +63,13 @@ class ZendeskCredentialsNotSetUpError(PermissionError):
 
 class ZendeskClient:
     def __init__(self, subdomain: str, email: str, token: str):
-        self.base_url = f"https://{subdomain}.zendesk.com/api/v2"
+        
+    """__init__ function."""
+self.base_url = f"https://{subdomain}.zendesk.com/api/v2"
         self.auth = (f"{email}/token", token)
 
     @retry_builder()
-    def make_request(self, endpoint: str, params: dict[str, Any]) -> dict[str, Any]:
+    async def make_request(self, endpoint: str, params: dict[str, Any]) -> dict[str, Any]:
         response = requests.get(
             f"{self.base_url}/{endpoint}", auth=self.auth, params=params
         )
@@ -175,7 +192,7 @@ def _get_tickets_page(
     )
 
 
-def _fetch_author(
+async def _fetch_author(
     client: ZendeskClient, author_id: str | int
 ) -> BasicExpertInfo | None:
     # Skip fetching if author_id is invalid
@@ -620,7 +637,6 @@ class ZendeskConnector(
 
 
 if __name__ == "__main__":
-    import os
 
     connector = ZendeskConnector()
     connector.load_credentials(

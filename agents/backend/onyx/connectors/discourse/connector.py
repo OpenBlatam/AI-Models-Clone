@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import time
 import urllib.parse
 from datetime import datetime
@@ -13,8 +18,6 @@ from onyx.configs.app_configs import INDEX_BATCH_SIZE
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import time_str_to_utc
 from onyx.connectors.cross_connector_utils.rate_limit_wrapper import (
-    rate_limit_builder,
-)
 from onyx.connectors.interfaces import GenerateDocumentsOutput
 from onyx.connectors.interfaces import PollConnector
 from onyx.connectors.interfaces import SecondsSinceUnixEpoch
@@ -26,6 +29,12 @@ from onyx.connectors.models import TextSection
 from onyx.file_processing.html_utils import parse_html_page_basic
 from onyx.utils.logger import setup_logger
 from onyx.utils.retry_wrapper import retry_builder
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    rate_limit_builder,
+)
 
 logger = setup_logger()
 
@@ -36,7 +45,7 @@ class DiscoursePerms(BaseModel):
 
 
 @retry_builder()
-def discourse_request(
+async def discourse_request(
     endpoint: str, perms: DiscoursePerms, params: dict | None = None
 ) -> Response:
     headers = {"Api-Key": perms.api_key, "Api-Username": perms.api_username}
@@ -67,7 +76,7 @@ class DiscourseConnector(PollConnector):
         self.active_categories: set | None = None
 
     @rate_limit_builder(max_calls=50, period=60)
-    def _make_request(self, endpoint: str, params: dict | None = None) -> Response:
+    async def _make_request(self, endpoint: str, params: dict | None = None) -> Response:
         if not self.permissions:
             raise ConnectorMissingCredentialError("Discourse")
         return discourse_request(endpoint, self.permissions, params)
@@ -230,7 +239,6 @@ class DiscourseConnector(PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     connector = DiscourseConnector(base_url=os.environ["DISCOURSE_BASE_URL"])
     connector.load_credentials(

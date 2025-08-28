@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import gradio as gr
+import asyncio
+import logging
+from typing import List, Tuple, Dict, Any
+import json
+from ..core.generator import ProductDescriptionGenerator
+from ..core.config import ProductDescriptionConfig
+    import asyncio
+from typing import Any, List, Dict, Optional
 """
 Gradio Interface for Product Description Generator
 =================================================
@@ -5,14 +16,7 @@ Gradio Interface for Product Description Generator
 Interactive web interface using Gradio for easy testing and demonstration.
 """
 
-import gradio as gr
-import asyncio
-import logging
-from typing import List, Tuple, Dict, Any
-import json
 
-from ..core.generator import ProductDescriptionGenerator
-from ..core.config import ProductDescriptionConfig
 
 logger = logging.getLogger(__name__)
 
@@ -21,7 +25,9 @@ class ProductDescriptionGradioApp:
     """Gradio interface for Product Description Generator."""
     
     def __init__(self, generator: ProductDescriptionGenerator):
-        self.generator = generator
+        
+    """__init__ function."""
+self.generator = generator
         self.app = None
         
     def create_interface(self) -> gr.Interface:
@@ -203,7 +209,7 @@ class ProductDescriptionGradioApp:
         self.app = interface
         return interface
     
-    def launch(self, **kwargs):
+    def launch(self, **kwargs) -> Any:
         """Launch the Gradio interface."""
         if not self.app:
             self.create_interface()
@@ -214,7 +220,6 @@ class ProductDescriptionGradioApp:
 # Standalone function to create and launch app
 def create_gradio_app(config: ProductDescriptionConfig = None) -> ProductDescriptionGradioApp:
     """Create and initialize Gradio app."""
-    import asyncio
     
     # Initialize generator
     generator = ProductDescriptionGenerator(config)

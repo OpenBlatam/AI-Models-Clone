@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import re
 from collections.abc import Callable
@@ -22,16 +24,10 @@ from onyx.agents.agent_search.models import GraphSearchConfig
 from onyx.agents.agent_search.models import GraphTooling
 from onyx.agents.agent_search.shared_graph_utils.models import BaseMessage_Content
 from onyx.agents.agent_search.shared_graph_utils.models import (
-    EntityRelationshipTermExtraction,
-)
 from onyx.agents.agent_search.shared_graph_utils.models import PersonaPromptExpressions
 from onyx.agents.agent_search.shared_graph_utils.models import (
-    StructuredSubquestionDocuments,
-)
 from onyx.agents.agent_search.shared_graph_utils.models import SubQuestionAnswerResults
 from onyx.agents.agent_search.shared_graph_utils.operators import (
-    dedup_inference_section_list,
-)
 from onyx.chat.models import AnswerPacket
 from onyx.chat.models import AnswerStyleConfig
 from onyx.chat.models import CitationConfig
@@ -44,8 +40,6 @@ from onyx.chat.models import StreamType
 from onyx.chat.prompt_builder.answer_prompt_builder import AnswerPromptBuilder
 from onyx.configs.agent_configs import AGENT_MAX_TOKENS_HISTORY_SUMMARY
 from onyx.configs.agent_configs import (
-    AGENT_TIMEOUT_CONNECT_LLM_HISTORY_SUMMARY_GENERATION,
-)
 from onyx.configs.agent_configs import AGENT_TIMEOUT_LLM_HISTORY_SUMMARY_GENERATION
 from onyx.configs.chat_configs import CHAT_TARGET_CHUNK_PERCENTAGE
 from onyx.configs.chat_configs import MAX_CHUNKS_FED_TO_CHAT
@@ -64,26 +58,37 @@ from onyx.llm.chat_llm import LLMTimeoutError
 from onyx.llm.interfaces import LLM
 from onyx.llm.interfaces import LLMConfig
 from onyx.prompts.agent_search import (
-    ASSISTANT_SYSTEM_PROMPT_DEFAULT,
-)
 from onyx.prompts.agent_search import (
-    ASSISTANT_SYSTEM_PROMPT_PERSONA,
-)
 from onyx.prompts.agent_search import (
-    HISTORY_CONTEXT_SUMMARY_PROMPT,
-)
 from onyx.prompts.prompt_utils import handle_onyx_date_awareness
 from onyx.tools.force import ForceUseTool
 from onyx.tools.models import SearchToolOverrideKwargs
 from onyx.tools.tool_constructor import SearchToolConfig
 from onyx.tools.tool_implementations.search.search_tool import (
-    SEARCH_RESPONSE_SUMMARY_ID,
-)
 from onyx.tools.tool_implementations.search.search_tool import SearchResponseSummary
 from onyx.tools.tool_implementations.search.search_tool import SearchTool
 from onyx.tools.utils import explicit_tool_calling_supported
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    EntityRelationshipTermExtraction,
+)
+    StructuredSubquestionDocuments,
+)
+    dedup_inference_section_list,
+)
+    AGENT_TIMEOUT_CONNECT_LLM_HISTORY_SUMMARY_GENERATION,
+)
+    ASSISTANT_SYSTEM_PROMPT_DEFAULT,
+)
+    ASSISTANT_SYSTEM_PROMPT_PERSONA,
+)
+    HISTORY_CONTEXT_SUMMARY_PROMPT,
+)
+    SEARCH_RESPONSE_SUMMARY_ID,
+)
 
 logger = setup_logger()
 
@@ -272,7 +277,7 @@ def get_persona_agent_prompt_expressions(
     if persona is None or len(persona.prompts) == 0:
         # TODO base_prompt should be None, but no time to properly fix
         return PersonaPromptExpressions(
-            contextualized_prompt=ASSISTANT_SYSTEM_PROMPT_DEFAULT, base_prompt=""
+            contextualized_prompt=ASSISTANT_SYSTEM_PROMPT_DEFAULT, base_prompt=""f"
         )
 
     # Only a 1:1 mapping between personas and prompts currently
@@ -285,9 +290,7 @@ def get_persona_agent_prompt_expressions(
     )
 
     return PersonaPromptExpressions(
-        contextualized_prompt=ASSISTANT_SYSTEM_PROMPT_PERSONA.format(
-            persona_prompt=datetime_aware_system_prompt
-        ),
+        contextualized_prompt=ASSISTANT_SYSTEM_PROMPT_PERSONA",
         base_prompt=datetime_aware_system_prompt,
     )
 
@@ -386,7 +389,7 @@ def get_answer_citation_ids(answer_str: str) -> list[int]:
     """
     Extract citation numbers of format [D<number>] from the answer string.
     """
-    citation_ids = re.findall(r"\[D(\d+)\]", answer_str)
+    citation_ids = re.findall(r"\[D(\d+)\]"f", answer_str)
     return list(set([(int(id) - 1) for id in citation_ids]))
 
 
@@ -394,11 +397,7 @@ def summarize_history(
     history: str, question: str, persona_specification: str | None, llm: LLM
 ) -> str:
     history_context_prompt = remove_document_citations(
-        HISTORY_CONTEXT_SUMMARY_PROMPT.format(
-            persona_specification=persona_specification,
-            question=question,
-            history=history,
-        )
+        HISTORY_CONTEXT_SUMMARY_PROMPT"
     )
 
     try:

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import fnmatch
 import itertools
 from collections import deque
@@ -25,6 +27,10 @@ from onyx.connectors.models import Document
 from onyx.connectors.models import TextSection
 from onyx.utils.logger import setup_logger
 
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 T = TypeVar("T")
 
 
@@ -54,7 +60,7 @@ def get_author(author: Any) -> BasicExpertInfo:
     )
 
 
-def _convert_merge_request_to_document(mr: Any) -> Document:
+async def _convert_merge_request_to_document(mr: Any) -> Document:
     doc = Document(
         id=mr.web_url,
         sections=[TextSection(link=mr.web_url, text=mr.description or "")],
@@ -150,7 +156,7 @@ class GitlabConnector(LoadConnector, PollConnector):
         )
         return None
 
-    def _fetch_from_gitlab(
+    async def _fetch_from_gitlab(
         self, start: datetime | None = None, end: datetime | None = None
     ) -> GenerateDocumentsOutput:
         if self.gitlab_client is None:
@@ -245,7 +251,6 @@ class GitlabConnector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     connector = GitlabConnector(
         # gitlab_url="https://gitlab.com/api/v4",

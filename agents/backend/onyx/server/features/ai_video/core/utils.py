@@ -1,8 +1,13 @@
-"""
-AI Video System - Utilities
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Production-ready utility functions for the AI Video System.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import os
 import re
@@ -17,9 +22,33 @@ import time
 from datetime import datetime, timedelta
 import functools
 import threading
-
 from .exceptions import ValidationError, StorageError
 from .constants import VALIDATION_RULES, MAX_FILE_SIZE, DEFAULT_TIMEOUT
+    from .constants import LOG_FORMATS, LOG_LEVELS
+        import psutil
+        import psutil
+        import psutil
+        import platform
+        import json
+    import ipaddress
+        import requests
+        import psutil
+    import re
+    import re
+    import uuid
+    import secrets
+    import hashlib
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+    import os
+    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from typing import Any, List, Dict, Optional
+"""
+AI Video System - Utilities
+
+Production-ready utility functions for the AI Video System.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -573,7 +602,6 @@ def setup_logging(
         format_str: Log format
         log_file: Log file path
     """
-    from .constants import LOG_FORMATS, LOG_LEVELS
     
     # Get log level
     log_level = LOG_LEVELS.get(level.upper(), LOG_LEVELS["INFO"])
@@ -598,7 +626,7 @@ def setup_logging(
 
 
 # Performance utilities
-def measure_time(func):
+def measure_time(func) -> Any:
     """
     Decorator to measure function execution time.
     
@@ -608,7 +636,7 @@ def measure_time(func):
     Returns:
         Decorated function
     """
-    async def async_wrapper(*args, **kwargs):
+    async def async_wrapper(*args, **kwargs) -> Any:
         start_time = time.time()
         try:
             result = await func(*args, **kwargs)
@@ -617,7 +645,7 @@ def measure_time(func):
             duration = time.time() - start_time
             logger.debug(f"{func.__name__} took {duration:.3f}s")
     
-    def sync_wrapper(*args, **kwargs):
+    def sync_wrapper(*args, **kwargs) -> Any:
         start_time = time.time()
         try:
             result = func(*args, **kwargs)
@@ -640,7 +668,6 @@ def get_memory_usage() -> Dict[str, float]:
         Dict[str, float]: Memory usage information
     """
     try:
-        import psutil
         process = psutil.Process()
         memory_info = process.memory_info()
         
@@ -661,7 +688,6 @@ def get_cpu_usage() -> float:
         float: CPU usage percentage
     """
     try:
-        import psutil
         return psutil.cpu_percent(interval=1)
     except ImportError:
         return 0.0
@@ -675,8 +701,6 @@ def get_system_info() -> Dict[str, Any]:
         Dict[str, Any]: System information
     """
     try:
-        import psutil
-        import platform
         
         # Memory info
         memory = psutil.virtual_memory()
@@ -733,7 +757,6 @@ def validate_json(data: str) -> bool:
         bool: True if valid JSON
     """
     try:
-        import json
         json.loads(data)
         return True
     except (json.JSONDecodeError, TypeError):
@@ -750,7 +773,6 @@ def validate_ip_address(ip: str) -> bool:
     Returns:
         bool: True if valid IP address
     """
-    import ipaddress
     try:
         ipaddress.ip_address(ip)
         return True
@@ -770,7 +792,6 @@ def check_connectivity(url: str, timeout: float = 5.0) -> bool:
         bool: True if accessible
     """
     try:
-        import requests
         response = requests.head(url, timeout=timeout)
         return response.status_code < 400
     except Exception:
@@ -975,7 +996,6 @@ def get_disk_usage(path: Union[str, Path] = "/") -> Dict[str, Any]:
         Dict[str, Any]: Disk usage information
     """
     try:
-        import psutil
         usage = psutil.disk_usage(str(path))
         return {
             "total": usage.total,
@@ -999,7 +1019,6 @@ def validate_email(email: str) -> bool:
     Returns:
         bool: True if valid email
     """
-    import re
     email_regex = r"^[\w\.-]+@[\w\.-]+\.\w+$"
     return re.match(email_regex, email) is not None
 
@@ -1014,7 +1033,6 @@ def validate_phone(phone: str) -> bool:
     Returns:
         bool: True if valid phone number
     """
-    import re
     phone_regex = r"^\+?\d{7,15}$"
     return re.match(phone_regex, phone) is not None
 
@@ -1029,7 +1047,6 @@ def validate_uuid(uuid_str: str) -> bool:
     Returns:
         bool: True if valid UUID
     """
-    import uuid
     try:
         uuid.UUID(uuid_str)
         return True
@@ -1047,7 +1064,6 @@ def generate_secure_token(length: int = 32) -> str:
     Returns:
         str: Secure random token as hex string
     """
-    import secrets
     return secrets.token_hex(length)
 
 
@@ -1062,7 +1078,6 @@ def hash_password(password: str, salt: Optional[str] = None) -> str:
     Returns:
         str: Hexadecimal hash
     """
-    import hashlib
     if salt is None:
         salt = ''
     hash_obj = hashlib.sha256((password + salt).encode('utf-8'))
@@ -1095,8 +1110,6 @@ def encrypt_data(data: bytes, key: bytes) -> bytes:
     Returns:
         bytes: Encrypted data (nonce + tag + ciphertext)
     """
-    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-    import os
     if len(key) != 32:
         raise ValueError("Key must be 32 bytes for AES-256-GCM.")
     aesgcm = AESGCM(key)
@@ -1116,7 +1129,6 @@ def decrypt_data(token: bytes, key: bytes) -> bytes:
     Returns:
         bytes: Decrypted data
     """
-    from cryptography.hazmat.primitives.ciphers.aead import AESGCM
     if len(key) != 32:
         raise ValueError("Key must be 32 bytes for AES-256-GCM.")
     nonce = token[:12]
@@ -1135,12 +1147,12 @@ def cache_result(ttl: int = 60):
     Returns:
         Decorator for caching function results
     """
-    def decorator(func):
+    def decorator(func) -> Any:
         cache = {}
         timestamps = {}
         
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             key = (args, tuple(sorted(kwargs.items())))
             now = time.time()
             if key in cache and (now - timestamps[key]) < ttl:
@@ -1199,9 +1211,9 @@ def rate_limit(calls_per_second: float = 1.0):
     lock = threading.Lock()
     last_time = [0.0]
     
-    def decorator(func):
+    def decorator(func) -> Any:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             with lock:
                 now = time.time()
                 elapsed = now - last_time[0]

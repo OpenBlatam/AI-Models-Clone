@@ -1,14 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 
 from ee.onyx.db.connector_credential_pair import get_all_auto_sync_cc_pairs
 from ee.onyx.external_permissions.salesforce.postprocessing import (
-    censor_salesforce_chunks,
-)
 from onyx.configs.constants import DocumentSource
 from onyx.context.search.pipeline import InferenceChunk
 from onyx.db.engine import get_session_context_manager
 from onyx.db.models import User
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    censor_salesforce_chunks,
+)
 
 logger = setup_logger()
 
@@ -21,7 +26,7 @@ DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION: dict[
 }
 
 
-def _get_all_censoring_enabled_sources() -> set[DocumentSource]:
+async def _get_all_censoring_enabled_sources() -> set[DocumentSource]:
     """
     Returns the set of sources that have censoring enabled.
     This is based on if the access_type is set to sync and the connector
@@ -42,13 +47,18 @@ def _get_all_censoring_enabled_sources() -> set[DocumentSource]:
 
 
 # NOTE: This is only called if ee is enabled.
-def _post_query_chunk_censoring(
+async def _post_query_chunk_censoring(
     chunks: list[InferenceChunk],
     user: User | None,
 ) -> list[InferenceChunk]:
     """
     This function checks all chunks to see if they need to be sent to a censoring
     function. If they do, it sends them to the censoring function and returns the
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     censored chunks. If they don't, it returns the original chunks.
     """
     if user is None:

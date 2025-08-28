@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from datetime import datetime
 from datetime import timezone
 from unittest.mock import AsyncMock
@@ -15,6 +20,9 @@ from onyx.auth.oauth_refresher import refresh_oauth_token
 from onyx.db.models import OAuthAccount
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.mark.asyncio
 async def test_refresh_oauth_token_success(
     mock_user: MagicMock,

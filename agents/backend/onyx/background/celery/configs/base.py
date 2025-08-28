@@ -1,6 +1,9 @@
-# docs: https://docs.celeryq.dev/en/stable/userguide/configuration.html
-import urllib.parse
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
+import urllib.parse
 from onyx.configs.app_configs import CELERY_BROKER_POOL_LIMIT
 from onyx.configs.app_configs import CELERY_RESULT_EXPIRES
 from onyx.configs.app_configs import REDIS_DB_NUMBER_CELERY
@@ -14,6 +17,11 @@ from onyx.configs.app_configs import REDIS_SSL_CA_CERTS
 from onyx.configs.app_configs import REDIS_SSL_CERT_REQS
 from onyx.configs.constants import OnyxCeleryPriority
 from onyx.configs.constants import REDIS_SOCKET_KEEPALIVE_OPTIONS
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# docs: https://docs.celeryq.dev/en/stable/userguide/configuration.html
+
 
 CELERY_SEPARATOR = ":"
 
@@ -88,10 +96,10 @@ result_expires = CELERY_RESULT_EXPIRES  # 86400 seconds is the default
 
 # Option 2: this significantly reduces the size of the result for generator tasks since the list of children
 # can be large. small tasks change very little
-# def pickle_bz2_encoder(data):
+# def pickle_bz2_encoder(data) -> Any:
 #     return bz2.compress(pickle.dumps(data))
 
-# def pickle_bz2_decoder(data):
+# def pickle_bz2_decoder(data) -> Any:
 #     return pickle.loads(bz2.decompress(data))
 
 # from kombu import serialization  # To register custom serialization with Celery/Kombu

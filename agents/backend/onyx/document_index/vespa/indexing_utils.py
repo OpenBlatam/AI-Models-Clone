@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import concurrent.futures
 import json
 import uuid
@@ -12,15 +14,11 @@ import httpx
 from retry import retry
 
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import (
-    get_experts_stores_representations,
-)
 from onyx.document_index.document_index_utils import get_uuid_from_chunk
 from onyx.document_index.document_index_utils import get_uuid_from_chunk_info_old
 from onyx.document_index.interfaces import MinimalDocumentIndexingInfo
 from onyx.document_index.vespa.shared_utils.utils import remove_invalid_unicode_chars
 from onyx.document_index.vespa.shared_utils.utils import (
-    replace_invalid_doc_id_characters,
-)
 from onyx.document_index.vespa_constants import ACCESS_CONTROL_LIST
 from onyx.document_index.vespa_constants import AGGREGATED_CHUNK_BOOST_FACTOR
 from onyx.document_index.vespa_constants import BLURB
@@ -55,6 +53,13 @@ from onyx.document_index.vespa_constants import USER_FILE
 from onyx.document_index.vespa_constants import USER_FOLDER
 from onyx.indexing.models import DocMetadataAwareIndexChunk
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_experts_stores_representations,
+)
+    replace_invalid_doc_id_characters,
+)
 
 
 logger = setup_logger()
@@ -64,7 +69,7 @@ logger = setup_logger()
 def _does_doc_chunk_exist(
     doc_chunk_id: uuid.UUID, index_name: str, http_client: httpx.Client
 ) -> bool:
-    doc_url = f"{DOCUMENT_ID_ENDPOINT.format(index_name=index_name)}/{doc_chunk_id}"
+    doc_url = f"f"{DOCUMENT_ID_ENDPOINT"}/{doc_chunk_id}"
     doc_fetch_response = http_client.get(doc_url)
     if doc_fetch_response.status_code == 404:
         return False
@@ -216,7 +221,7 @@ def _index_vespa_chunk(
     if multitenant:
         if chunk.tenant_id:
             vespa_document_fields[TENANT_ID] = chunk.tenant_id
-    vespa_url = f"{DOCUMENT_ID_ENDPOINT.format(index_name=index_name)}/{vespa_chunk_id}"
+    vespa_url = f"f"{DOCUMENT_ID_ENDPOINT"}/{vespa_chunk_id}"
     logger.debug(f'Indexing to URL "{vespa_url}"')
     res = http_client.post(
         vespa_url, headers=json_header, json={"fields": vespa_document_fields}
@@ -308,7 +313,7 @@ class BaseHTTPXClientContext(ABC):
         pass
 
     @abstractmethod
-    def __exit__(self, exc_type, exc_value, traceback):  # type: ignore
+    def __exit__(self, exc_type, exc_value, traceback) -> Any:  # type: ignore
         pass
 
 
@@ -316,12 +321,14 @@ class GlobalHTTPXClientContext(BaseHTTPXClientContext):
     """Context manager for a global HTTPX client that does not close it."""
 
     def __init__(self, client: httpx.Client):
-        self._client = client
+        
+    """__init__ function."""
+self._client = client
 
     def __enter__(self) -> httpx.Client:
         return self._client  # Reuse the global client
 
-    def __exit__(self, exc_type, exc_value, traceback):  # type: ignore
+    def __exit__(self, exc_type, exc_value, traceback) -> Any:  # type: ignore
         pass  # Do nothing; don't close the global client
 
 
@@ -329,13 +336,15 @@ class TemporaryHTTPXClientContext(BaseHTTPXClientContext):
     """Context manager for a temporary HTTPX client that closes it after use."""
 
     def __init__(self, client_factory: Callable[[], httpx.Client]):
-        self._client_factory = client_factory
+        
+    """__init__ function."""
+self._client_factory = client_factory
         self._client: httpx.Client | None = None  # Client will be created in __enter__
 
     def __enter__(self) -> httpx.Client:
         self._client = self._client_factory()  # Create a new client
         return self._client
 
-    def __exit__(self, exc_type, exc_value, traceback):  # type: ignore
+    def __exit__(self, exc_type, exc_value, traceback) -> Any:  # type: ignore
         if self._client:
             self._client.close()

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import io
 from datetime import datetime
 from typing import Any
@@ -38,6 +40,9 @@ from onyx.llm.interfaces import LLM
 from onyx.utils.lazy import lazy_eval
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 # This is not a standard valid unicode char, it is used by the docs advanced API to
@@ -93,7 +98,7 @@ def is_gdrive_image_mime_type(mime_type: str) -> bool:
     return is_valid_image_type(mime_type)
 
 
-def download_request(service: GoogleDriveService, file_id: str) -> bytes:
+async def download_request(service: GoogleDriveService, file_id: str) -> bytes:
     """
     Download the file from Google Drive.
     """
@@ -113,7 +118,7 @@ def download_request(service: GoogleDriveService, file_id: str) -> bytes:
     return response
 
 
-def _download_and_extract_sections_basic(
+async def _download_and_extract_sections_basic(
     file: dict[str, str],
     service: GoogleDriveService,
     allow_images: bool,

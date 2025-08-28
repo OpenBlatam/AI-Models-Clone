@@ -1,17 +1,19 @@
-"""
-🎯 APPLICATION USE CASES - Casos de Uso de la Aplicación
-=======================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Use Cases que orquestan la lógica de dominio y coordinan
-las operaciones del sistema.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
 import uuid
 from typing import List, Dict, Any, Optional, AsyncGenerator
 import logging
-
 from ..core.entities import AnalysisResult, TextFingerprint, ProcessingMetrics
 from ..core.enums import AnalysisType, ProcessingTier, AnalysisStatus, ErrorType
 from ..core.domain_services import AnalysisOrchestrator, TextProcessor, ScoreValidator
@@ -20,6 +22,16 @@ from ..interfaces.cache import ICacheRepository
 from ..interfaces.metrics import IMetricsCollector, IStructuredLogger
 from ..interfaces.config import IConfigurationService
 from .dto import AnalysisRequest, AnalysisResponse, BatchAnalysisRequest
+from typing import Any, List, Dict, Optional
+"""
+🎯 APPLICATION USE CASES - Casos de Uso de la Aplicación
+=======================================================
+
+Use Cases que orquestan la lógica de dominio y coordinan
+las operaciones del sistema.
+"""
+
+
 
 
 class AnalyzeTextUseCase:
@@ -33,7 +45,9 @@ class AnalyzeTextUseCase:
         config_service: IConfigurationService,
         logger: Optional[IStructuredLogger] = None
     ):
-        self._analyzer_factory = analyzer_factory
+        
+    """__init__ function."""
+self._analyzer_factory = analyzer_factory
         self._cache_repository = cache_repository
         self._metrics_collector = metrics_collector
         self._config_service = config_service
@@ -302,7 +316,7 @@ class AnalyzeTextUseCase:
             }
         )
     
-    def _generate_request_id(self) -> str:
+    async def _generate_request_id(self) -> str:
         """Generar ID único de request."""
         return f"req_{int(time.time() * 1000)}_{str(uuid.uuid4())[:8]}"
     
@@ -344,7 +358,9 @@ class BatchAnalysisUseCase:
     """Use Case para análisis en lote."""
     
     def __init__(self, analyze_text_use_case: AnalyzeTextUseCase):
-        self._analyze_text_use_case = analyze_text_use_case
+        
+    """__init__ function."""
+self._analyze_text_use_case = analyze_text_use_case
         self._logger = logging.getLogger(self.__class__.__name__)
     
     async def execute(self, request: BatchAnalysisRequest) -> List[AnalysisResponse]:
@@ -415,7 +431,9 @@ class StreamAnalysisUseCase:
     """Use Case para análisis en streaming."""
     
     def __init__(self, analyze_text_use_case: AnalyzeTextUseCase):
-        self._analyze_text_use_case = analyze_text_use_case
+        
+    """__init__ function."""
+self._analyze_text_use_case = analyze_text_use_case
         self._logger = logging.getLogger(self.__class__.__name__)
     
     async def execute_stream(

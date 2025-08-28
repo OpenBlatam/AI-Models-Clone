@@ -1,9 +1,7 @@
-"""
-🎯 ASYNC EXAMPLES - HAPPY PATH LAST
-===================================
-
-Ejemplos asíncronos usando el patrón happy path last.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -11,13 +9,21 @@ import logging
 from typing import Dict, Any, Optional, List
 from pathlib import Path
 import psutil
-
 from ..core.patterns import happy_path_last
 from ..core.validators import (
+from ..core.error_handlers import (
+from typing import Any, List, Dict, Optional
+"""
+🎯 ASYNC EXAMPLES - HAPPY PATH LAST
+===================================
+
+Ejemplos asíncronos usando el patrón happy path last.
+"""
+
+
     validate_video_path, validate_batch_size, validate_quality,
     validate_model_config
 )
-from ..core.error_handlers import (
     handle_video_processing_errors, handle_model_loading_errors,
     _is_insufficient_resources, _is_system_overloaded
 )
@@ -167,7 +173,7 @@ async def async_process_video_decorated(video_path: str, batch_size: int, qualit
 class AsyncVideoProcessingPipeline:
     """Pipeline de procesamiento de video asíncrono usando happy path last."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.processing = False
         self.current_operations = 0
         self.loaded_models = set()

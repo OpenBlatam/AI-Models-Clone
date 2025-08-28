@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS: int = 60
+
+import sqlalchemy as sa
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Polling Document Count
 
 Revision ID: 3c5e35aa9af0
@@ -6,13 +16,11 @@ Create Date: 2023-06-14 23:45:51.760440
 
 """
 
-import sqlalchemy as sa
-from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision = "3c5e35aa9af0"
-down_revision = "27c6ecc08586"
+revision: str = "3c5e35aa9af0"
+down_revision: str = "27c6ecc08586"
 branch_labels: None = None
 depends_on: None = None
 
@@ -35,7 +43,7 @@ def upgrade() -> None:
                 "IN_PROGRESS",
                 "SUCCESS",
                 "FAILED",
-                name="indexingstatus",
+                name: str = "indexingstatus",
                 native_enum=False,
             ),
             nullable=False,

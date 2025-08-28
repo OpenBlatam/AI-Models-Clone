@@ -1,39 +1,22 @@
 """
-Core module for Blaze AI - Fundamental interfaces and configurations.
+Core module for Enhanced Blaze AI.
 
-This module provides the foundational building blocks for the entire Blaze AI system.
+This module contains the fundamental components including configuration,
+logging, exceptions, and base classes.
 """
 
-from .interfaces import (
-    CoreConfig,
-    ServiceContainer,
-    SystemMode,
-    LogLevel,
-    DatabaseConfig,
-    CacheConfig,
-    SecurityConfig,
-    MonitoringConfig,
-    ModelConfig,
-    APIConfig,
-    GradioConfig,
-    HealthStatus,
-    SystemHealth
-)
+from .config import AppConfig, load_config
+from .logging import setup_logging, get_logger
+from .exceptions import BlazeAIError, ServiceUnavailableError, ValidationError
 
 __all__ = [
-    "CoreConfig",
-    "ServiceContainer", 
-    "SystemMode",
-    "LogLevel",
-    "DatabaseConfig",
-    "CacheConfig",
-    "SecurityConfig",
-    "MonitoringConfig",
-    "ModelConfig",
-    "APIConfig",
-    "GradioConfig",
-    "HealthStatus",
-    "SystemHealth"
+    'AppConfig',
+    'load_config',
+    'setup_logging',
+    'get_logger',
+    'BlazeAIError',
+    'ServiceUnavailableError',
+    'ValidationError'
 ]
 
 

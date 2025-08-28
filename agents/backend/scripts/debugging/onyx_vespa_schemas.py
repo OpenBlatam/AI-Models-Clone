@@ -1,12 +1,17 @@
-"""Tool to generate all supported schema variations for Onyx Cloud's Vespa database."""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import argparse
-
 import jinja2
-
 from onyx.db.enums import EmbeddingPrecision
 from onyx.utils.logger import setup_logger
 from shared_configs.configs import SUPPORTED_EMBEDDING_MODELS
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""Tool to generate all supported schema variations for Onyx Cloud's Vespa database."""
+
+
+
 
 logger = setup_logger()
 
@@ -22,7 +27,15 @@ def write_schema(index_name: str, dim: int, template: jinja2.Template) -> None:
     )
 
     with open(index_filename, "w", encoding="utf-8") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         f.write(schema)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
     logger.info(f"Wrote {index_filename}")
 
@@ -35,7 +48,15 @@ def main() -> None:
     jinja_env = jinja2.Environment()
 
     with open(args.template, "r", encoding="utf-8") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         template_str = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
     template = jinja_env.from_string(template_str)
 
@@ -48,5 +69,6 @@ def main() -> None:
     logger.info(f"Wrote {num_indexes} indexes.")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main()

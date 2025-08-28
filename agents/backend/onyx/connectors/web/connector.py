@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import io
 import ipaddress
 import random
@@ -41,6 +43,10 @@ from onyx.utils.logger import setup_logger
 from onyx.utils.sitemap import list_pages_for_site
 from shared_configs.configs import MULTI_TENANT
 
+                    from the iframe based on the issue faced """
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -48,7 +54,9 @@ class ScrapeSessionContext:
     """Session level context for scraping"""
 
     def __init__(self, base_url: str, to_visit: list[str]):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.to_visit = to_visit
         self.visited_links: set[str] = set()
         self.content_hashes: set[int] = set()
@@ -374,6 +382,10 @@ def _ensure_valid_url(url: str) -> str:
 
 def _read_urls_file(location: str) -> list[str]:
     with open(location, "r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         urls = [_ensure_valid_url(line.strip()) for line in f if line.strip()]
     return urls
 
@@ -603,7 +615,6 @@ class WebConnector(LoadConnector):
                     )
                     document_text = "\n".join(iframe_texts)
                     """ 700 is the threshold value for the length of the text extracted
-                    from the iframe based on the issue faced """
                     if len(parsed_html.cleaned_text) < IFRAME_TEXT_LENGTH_THRESHOLD:
                         parsed_html.cleaned_text = document_text
                     else:

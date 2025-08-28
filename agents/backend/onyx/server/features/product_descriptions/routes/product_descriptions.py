@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi.responses import StreamingResponse
+import asyncio
+import logging
+from datetime import datetime
+from ..dependencies.core import get_db_session, get_cache_manager, get_performance_monitor
+from ..dependencies.auth import get_authenticated_user, require_permission
+from ..routes.base import get_request_context, log_route_access
+from ..schemas.base import BaseResponse, ErrorResponse
+from ..pydantic_schemas import (
+from ..api.enhanced_service import EnhancedProductDescriptionService
+from ..async_database_api_operations import AsyncDatabaseManager
+from typing import Any, List, Dict, Optional
 """
 Product Descriptions Router
 
@@ -6,21 +28,10 @@ management, and optimization. Uses clear dependency injection and
 follows RESTful API patterns.
 """
 
-from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-from fastapi.responses import StreamingResponse
-import asyncio
-import logging
-from datetime import datetime
 
 # Import dependencies
-from ..dependencies.core import get_db_session, get_cache_manager, get_performance_monitor
-from ..dependencies.auth import get_authenticated_user, require_permission
-from ..routes.base import get_request_context, log_route_access
 
 # Import schemas
-from ..schemas.base import BaseResponse, ErrorResponse
-from ..pydantic_schemas import (
     ProductDescriptionRequest,
     ProductDescriptionResponse,
     ProductDescriptionUpdate,
@@ -31,8 +42,6 @@ from ..pydantic_schemas import (
 )
 
 # Import services
-from ..api.enhanced_service import EnhancedProductDescriptionService
-from ..async_database_api_operations import AsyncDatabaseManager
 
 # Initialize router
 router = APIRouter(prefix="/product-descriptions", tags=["product-descriptions"])
@@ -386,7 +395,9 @@ async def stream_generate_description(
         log_route_access("stream_generate_description", product_name=request.product_name)
         
         async def generate_stream():
-            async for chunk in service.stream_generate_description(
+            
+    """generate_stream function."""
+async for chunk in service.stream_generate_description(
                 product_name=request.product_name,
                 category=request.category,
                 features=request.features,

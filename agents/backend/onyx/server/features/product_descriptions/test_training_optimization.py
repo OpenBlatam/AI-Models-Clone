@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import json
+import tempfile
+import time
+from pathlib import Path
+from typing import Dict, List, Any
+from unittest.mock import Mock, patch, MagicMock
+import numpy as np
+import pytest
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
+from training_optimization import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Tests for Training Optimization System
 
@@ -12,22 +36,8 @@ This test suite covers:
 - Error handling and edge cases
 """
 
-import asyncio
-import json
-import tempfile
-import time
-from pathlib import Path
-from typing import Dict, List, Any
-from unittest.mock import Mock, patch, MagicMock
 
-import numpy as np
-import pytest
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, TensorDataset
 
-from training_optimization import (
     EarlyStoppingConfig, LRSchedulerConfig, TrainingOptimizationConfig,
     EarlyStoppingMode, LRSchedulerType, EarlyStopping, LRSchedulerFactory,
     GradientOptimizer, TrainingMonitor, OptimizedTrainer, create_optimized_trainer,
@@ -39,7 +49,7 @@ class TestEarlyStopping:
     """Test early stopping functionality."""
     
     @pytest.fixture
-    def simple_model(self):
+    def simple_model(self) -> Any:
         """Create a simple model for testing."""
         model = nn.Sequential(
             nn.Linear(10, 5),
@@ -50,7 +60,7 @@ class TestEarlyStopping:
         return model
     
     @pytest.fixture
-    def early_stopping_config(self):
+    def early_stopping_config(self) -> Any:
         """Create early stopping configuration."""
         return EarlyStoppingConfig(
             mode=EarlyStoppingMode.MIN,
@@ -61,7 +71,7 @@ class TestEarlyStopping:
             verbose=True
         )
     
-    def test_early_stopping_initialization(self, early_stopping_config):
+    def test_early_stopping_initialization(self, early_stopping_config) -> Any:
         """Test early stopping initialization."""
         early_stopping = EarlyStopping(early_stopping_config)
         
@@ -71,7 +81,7 @@ class TestEarlyStopping:
         assert early_stopping.best_epoch == 0
         assert early_stopping.best_weights is None
     
-    def test_early_stopping_min_mode_improvement(self, early_stopping_config, simple_model):
+    def test_early_stopping_min_mode_improvement(self, early_stopping_config, simple_model) -> Any:
         """Test early stopping with min mode and improvement."""
         early_stopping = EarlyStopping(early_stopping_config)
         
@@ -93,7 +103,7 @@ class TestEarlyStopping:
         assert early_stopping.best_score == 0.3
         assert early_stopping.counter == 1
     
-    def test_early_stopping_max_mode_improvement(self, simple_model):
+    def test_early_stopping_max_mode_improvement(self, simple_model) -> Any:
         """Test early stopping with max mode and improvement."""
         config = EarlyStoppingConfig(
             mode=EarlyStoppingMode.MAX,
@@ -118,7 +128,7 @@ class TestEarlyStopping:
         assert early_stopping.best_score == 0.7
         assert early_stopping.counter == 1
     
-    def test_early_stopping_patience_exceeded(self, early_stopping_config, simple_model):
+    def test_early_stopping_patience_exceeded(self, early_stopping_config, simple_model) -> Any:
         """Test early stopping when patience is exceeded."""
         early_stopping = EarlyStopping(early_stopping_config)
         
@@ -133,7 +143,7 @@ class TestEarlyStopping:
             else:
                 assert result is True
     
-    def test_early_stopping_min_epochs(self, simple_model):
+    def test_early_stopping_min_epochs(self, simple_model) -> Any:
         """Test early stopping with minimum epochs."""
         config = EarlyStoppingConfig(
             patience=3,
@@ -146,7 +156,7 @@ class TestEarlyStopping:
             result = early_stopping(epoch, 0.6, simple_model)
             assert result is False
     
-    def test_early_stopping_max_epochs(self, simple_model):
+    def test_early_stopping_max_epochs(self, simple_model) -> Any:
         """Test early stopping with maximum epochs."""
         config = EarlyStoppingConfig(
             patience=10,
@@ -162,7 +172,7 @@ class TestEarlyStopping:
             else:
                 assert result is True
     
-    def test_early_stopping_baseline(self, simple_model):
+    def test_early_stopping_baseline(self, simple_model) -> Any:
         """Test early stopping with baseline value."""
         config = EarlyStoppingConfig(
             patience=3,
@@ -178,7 +188,7 @@ class TestEarlyStopping:
         assert result is False
         assert early_stopping.best_score == 0.2
     
-    def test_early_stopping_cooldown(self, simple_model):
+    def test_early_stopping_cooldown(self, simple_model) -> Any:
         """Test early stopping with cooldown period."""
         config = EarlyStoppingConfig(
             patience=3,
@@ -195,7 +205,7 @@ class TestEarlyStopping:
             assert result is False
             assert early_stopping.counter <= 1  # Should not exceed cooldown
     
-    def test_early_stopping_restore_weights(self, early_stopping_config, simple_model):
+    def test_early_stopping_restore_weights(self, early_stopping_config, simple_model) -> Any:
         """Test early stopping weight restoration."""
         early_stopping = EarlyStopping(early_stopping_config)
         
@@ -217,7 +227,7 @@ class TestEarlyStopping:
         if early_stopping.best_weights is not None:
             simple_model.load_state_dict(early_stopping.best_weights)
     
-    def test_early_stopping_training_history(self, early_stopping_config, simple_model):
+    def test_early_stopping_training_history(self, early_stopping_config, simple_model) -> Any:
         """Test early stopping training history."""
         early_stopping = EarlyStopping(early_stopping_config)
         
@@ -238,20 +248,20 @@ class TestLRSchedulerFactory:
     """Test learning rate scheduler factory."""
     
     @pytest.fixture
-    def optimizer(self):
+    def optimizer(self) -> Any:
         """Create optimizer for testing."""
         model = nn.Linear(10, 1)
         return optim.Adam(model.parameters(), lr=1e-3)
     
     @pytest.fixture
-    def dataloader(self):
+    def dataloader(self) -> Any:
         """Create dataloader for testing."""
         data = torch.randn(100, 10)
         targets = torch.randn(100, 1)
         dataset = TensorDataset(data, targets)
         return DataLoader(dataset, batch_size=32)
     
-    def test_step_lr_scheduler(self, optimizer):
+    def test_step_lr_scheduler(self, optimizer) -> Any:
         """Test step LR scheduler creation."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.STEP,
@@ -264,7 +274,7 @@ class TestLRSchedulerFactory:
         assert scheduler.step_size == 10
         assert scheduler.gamma == 0.5
     
-    def test_multi_step_lr_scheduler(self, optimizer):
+    def test_multi_step_lr_scheduler(self, optimizer) -> Any:
         """Test multi-step LR scheduler creation."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.MULTI_STEP,
@@ -277,7 +287,7 @@ class TestLRSchedulerFactory:
         assert scheduler.milestones == [10, 20, 30]
         assert scheduler.gamma == 0.5
     
-    def test_exponential_lr_scheduler(self, optimizer):
+    def test_exponential_lr_scheduler(self, optimizer) -> Any:
         """Test exponential LR scheduler creation."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.EXPONENTIAL,
@@ -288,7 +298,7 @@ class TestLRSchedulerFactory:
         assert isinstance(scheduler, torch.optim.lr_scheduler.ExponentialLR)
         assert scheduler.gamma == 0.95
     
-    def test_cosine_annealing_lr_scheduler(self, optimizer):
+    def test_cosine_annealing_lr_scheduler(self, optimizer) -> Any:
         """Test cosine annealing LR scheduler creation."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.COSINE_ANNEALING,
@@ -301,7 +311,7 @@ class TestLRSchedulerFactory:
         assert scheduler.T_max == 100
         assert scheduler.eta_min == 1e-6
     
-    def test_cosine_annealing_warm_restarts_lr_scheduler(self, optimizer):
+    def test_cosine_annealing_warm_restarts_lr_scheduler(self, optimizer) -> Any:
         """Test cosine annealing warm restarts LR scheduler creation."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.COSINE_ANNEALING_WARM_RESTARTS,
@@ -316,7 +326,7 @@ class TestLRSchedulerFactory:
         assert scheduler.T_mult == 2
         assert scheduler.eta_min == 1e-6
     
-    def test_reduce_on_plateau_lr_scheduler(self, optimizer):
+    def test_reduce_on_plateau_lr_scheduler(self, optimizer) -> Any:
         """Test reduce on plateau LR scheduler creation."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.REDUCE_ON_PLATEAU,
@@ -335,7 +345,7 @@ class TestLRSchedulerFactory:
         assert scheduler.factor == 0.5
         assert scheduler.patience == 10
     
-    def test_one_cycle_lr_scheduler(self, optimizer, dataloader):
+    def test_one_cycle_lr_scheduler(self, optimizer, dataloader) -> Any:
         """Test one cycle LR scheduler creation."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.ONE_CYCLE,
@@ -349,7 +359,7 @@ class TestLRSchedulerFactory:
         assert isinstance(scheduler, torch.optim.lr_scheduler.OneCycleLR)
         assert scheduler.max_lrs[0] == 1e-2
     
-    def test_cyclic_lr_scheduler(self, optimizer):
+    def test_cyclic_lr_scheduler(self, optimizer) -> Any:
         """Test cyclic LR scheduler creation."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.CYCLIC,
@@ -365,9 +375,9 @@ class TestLRSchedulerFactory:
         assert scheduler.base_lrs[0] == 1e-6
         assert scheduler.max_lrs[0] == 1e-3
     
-    def test_custom_lr_scheduler(self, optimizer):
+    def test_custom_lr_scheduler(self, optimizer) -> Any:
         """Test custom LR scheduler creation."""
-        def custom_scheduler_fn(opt):
+        def custom_scheduler_fn(opt) -> Any:
             return torch.optim.lr_scheduler.StepLR(opt, step_size=5, gamma=0.8)
         
         config = LRSchedulerConfig(
@@ -380,7 +390,7 @@ class TestLRSchedulerFactory:
         assert scheduler.step_size == 5
         assert scheduler.gamma == 0.8
     
-    def test_invalid_scheduler_type(self, optimizer):
+    def test_invalid_scheduler_type(self, optimizer) -> Any:
         """Test invalid scheduler type handling."""
         config = LRSchedulerConfig(
             scheduler_type="invalid_type"
@@ -389,7 +399,7 @@ class TestLRSchedulerFactory:
         with pytest.raises(ValueError, match="Unsupported scheduler type"):
             LRSchedulerFactory.create_scheduler(optimizer, config)
     
-    def test_one_cycle_missing_dataloader(self, optimizer):
+    def test_one_cycle_missing_dataloader(self, optimizer) -> Any:
         """Test one cycle scheduler without dataloader."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.ONE_CYCLE,
@@ -400,7 +410,7 @@ class TestLRSchedulerFactory:
         with pytest.raises(ValueError, match="DataLoader required"):
             LRSchedulerFactory.create_scheduler(optimizer, config)
     
-    def test_custom_scheduler_missing_function(self, optimizer):
+    def test_custom_scheduler_missing_function(self, optimizer) -> Any:
         """Test custom scheduler without function."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.CUSTOM
@@ -414,7 +424,7 @@ class TestGradientOptimizer:
     """Test gradient optimization functionality."""
     
     @pytest.fixture
-    def simple_model(self):
+    def simple_model(self) -> Any:
         """Create a simple model for testing."""
         return nn.Sequential(
             nn.Linear(10, 5),
@@ -423,14 +433,14 @@ class TestGradientOptimizer:
         )
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create gradient optimizer configuration."""
         return TrainingOptimizationConfig(
             gradient_clip_norm=1.0,
             gradient_clip_value=None
         )
     
-    def test_gradient_optimizer_initialization(self, config):
+    def test_gradient_optimizer_initialization(self, config) -> Any:
         """Test gradient optimizer initialization."""
         optimizer = GradientOptimizer(config)
         
@@ -438,7 +448,7 @@ class TestGradientOptimizer:
         assert optimizer.gradient_norms == []
         assert optimizer.clipped_gradients == 0
     
-    def test_gradient_clipping_by_norm(self, simple_model, config):
+    def test_gradient_clipping_by_norm(self, simple_model, config) -> Any:
         """Test gradient clipping by norm."""
         optimizer = GradientOptimizer(config)
         
@@ -453,7 +463,7 @@ class TestGradientOptimizer:
         assert len(optimizer.gradient_norms) == 1
         assert optimizer.gradient_norms[0] > 0
     
-    def test_gradient_clipping_by_value(self, simple_model):
+    def test_gradient_clipping_by_value(self, simple_model) -> Any:
         """Test gradient clipping by value."""
         config = TrainingOptimizationConfig(
             gradient_clip_norm=None,
@@ -471,7 +481,7 @@ class TestGradientOptimizer:
         # Check that gradients were processed
         assert len(optimizer.gradient_norms) == 0  # No norm tracking for value clipping
     
-    def test_gradient_clipping_exceeds_norm(self, simple_model, config):
+    def test_gradient_clipping_exceeds_norm(self, simple_model, config) -> Any:
         """Test gradient clipping when norm exceeds threshold."""
         optimizer = GradientOptimizer(config)
         
@@ -490,7 +500,7 @@ class TestGradientOptimizer:
         # Check that clipping occurred
         assert optimizer.clipped_gradients > 0
     
-    def test_gradient_stats(self, simple_model, config):
+    def test_gradient_stats(self, simple_model, config) -> Any:
         """Test gradient statistics calculation."""
         optimizer = GradientOptimizer(config)
         
@@ -516,7 +526,7 @@ class TestTrainingMonitor:
     """Test training monitoring functionality."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create training monitor configuration."""
         return TrainingOptimizationConfig(
             log_interval=5,
@@ -524,7 +534,7 @@ class TestTrainingMonitor:
             wandb_logging=False
         )
     
-    def test_training_monitor_initialization(self, config):
+    def test_training_monitor_initialization(self, config) -> Any:
         """Test training monitor initialization."""
         monitor = TrainingMonitor(config)
         
@@ -541,7 +551,7 @@ class TestTrainingMonitor:
         assert monitor.writer is None
         assert monitor.wandb is None
     
-    def test_log_metrics(self, config):
+    def test_log_metrics(self, config) -> Any:
         """Test metrics logging."""
         monitor = TrainingMonitor(config)
         
@@ -561,7 +571,7 @@ class TestTrainingMonitor:
         assert monitor.metrics_history['val_accuracy'] == [0.85]
         assert monitor.metrics_history['learning_rate'] == [1e-3]
     
-    def test_log_epoch_time(self, config):
+    def test_log_epoch_time(self, config) -> Any:
         """Test epoch time logging."""
         monitor = TrainingMonitor(config)
         
@@ -569,7 +579,7 @@ class TestTrainingMonitor:
         
         assert monitor.metrics_history['epoch_time'] == [1.5]
     
-    def test_get_training_summary(self, config):
+    def test_get_training_summary(self, config) -> Optional[Dict[str, Any]]:
         """Test training summary generation."""
         monitor = TrainingMonitor(config)
         
@@ -595,7 +605,7 @@ class TestTrainingMonitor:
         assert summary['final_val_accuracy'] == 0.95
         assert summary['best_val_accuracy'] == 0.95
     
-    def test_close(self, config):
+    def test_close(self, config) -> Any:
         """Test monitor closing."""
         monitor = TrainingMonitor(config)
         
@@ -607,7 +617,7 @@ class TestOptimizedTrainer:
     """Test optimized trainer functionality."""
     
     @pytest.fixture
-    def simple_model(self):
+    def simple_model(self) -> Any:
         """Create a simple model for testing."""
         return nn.Sequential(
             nn.Linear(10, 5),
@@ -616,19 +626,19 @@ class TestOptimizedTrainer:
         )
     
     @pytest.fixture
-    def simple_dataset(self):
+    def simple_dataset(self) -> Any:
         """Create a simple dataset for testing."""
         data = torch.randn(100, 10)
         targets = torch.randint(0, 2, (100,))
         return TensorDataset(data, targets)
     
     @pytest.fixture
-    def simple_dataloader(self, simple_dataset):
+    def simple_dataloader(self, simple_dataset) -> Any:
         """Create a simple dataloader for testing."""
         return DataLoader(simple_dataset, batch_size=16, shuffle=True)
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create trainer configuration."""
         return TrainingOptimizationConfig(
             early_stopping=EarlyStoppingConfig(patience=5),
@@ -643,13 +653,13 @@ class TestOptimizedTrainer:
         )
     
     @pytest.fixture
-    def temp_checkpoint_dir(self):
+    def temp_checkpoint_dir(self) -> Any:
         """Create temporary checkpoint directory."""
         with tempfile.TemporaryDirectory() as temp_dir:
             yield temp_dir
     
     @pytest.mark.asyncio
-    async def test_trainer_initialization(self, config):
+    async def test_trainer_initialization(self, config) -> Any:
         """Test trainer initialization."""
         trainer = OptimizedTrainer(config)
         
@@ -659,7 +669,7 @@ class TestOptimizedTrainer:
         assert isinstance(trainer.monitor, TrainingMonitor)
     
     @pytest.mark.asyncio
-    async def test_basic_training(self, simple_model, simple_dataloader, config, temp_checkpoint_dir):
+    async def test_basic_training(self, simple_model, simple_dataloader, config, temp_checkpoint_dir) -> Any:
         """Test basic training functionality."""
         config.checkpoint_dir = temp_checkpoint_dir
         trainer = OptimizedTrainer(config)
@@ -681,7 +691,7 @@ class TestOptimizedTrainer:
         assert 'early_stopping_history' in summary
     
     @pytest.mark.asyncio
-    async def test_early_stopping_triggered(self, simple_model, simple_dataloader, temp_checkpoint_dir):
+    async def test_early_stopping_triggered(self, simple_model, simple_dataloader, temp_checkpoint_dir) -> Any:
         """Test that early stopping is triggered."""
         config = TrainingOptimizationConfig(
             early_stopping=EarlyStoppingConfig(patience=3),
@@ -703,7 +713,7 @@ class TestOptimizedTrainer:
         assert summary['total_epochs'] <= 10
     
     @pytest.mark.asyncio
-    async def test_lr_scheduling(self, simple_model, simple_dataloader, temp_checkpoint_dir):
+    async def test_lr_scheduling(self, simple_model, simple_dataloader, temp_checkpoint_dir) -> Any:
         """Test learning rate scheduling."""
         config = TrainingOptimizationConfig(
             lr_scheduler=LRSchedulerConfig(
@@ -730,7 +740,7 @@ class TestOptimizedTrainer:
         assert len(lr_history) > 0
     
     @pytest.mark.asyncio
-    async def test_gradient_clipping(self, simple_model, simple_dataloader, temp_checkpoint_dir):
+    async def test_gradient_clipping(self, simple_model, simple_dataloader, temp_checkpoint_dir) -> Any:
         """Test gradient clipping."""
         config = TrainingOptimizationConfig(
             gradient_clip_norm=0.1,  # Very small norm to trigger clipping
@@ -753,7 +763,7 @@ class TestOptimizedTrainer:
         assert 'clipped_gradients_ratio' in gradient_stats
     
     @pytest.mark.asyncio
-    async def test_checkpoint_saving(self, simple_model, simple_dataloader, temp_checkpoint_dir):
+    async def test_checkpoint_saving(self, simple_model, simple_dataloader, temp_checkpoint_dir) -> Any:
         """Test checkpoint saving."""
         config = TrainingOptimizationConfig(
             save_checkpoints=True,
@@ -778,7 +788,7 @@ class TestOptimizedTrainer:
         assert len(checkpoint_files) > 0
     
     @pytest.mark.asyncio
-    async def test_training_analysis(self, simple_model, simple_dataloader, temp_checkpoint_dir):
+    async def test_training_analysis(self, simple_model, simple_dataloader, temp_checkpoint_dir) -> Any:
         """Test training analysis functionality."""
         config = TrainingOptimizationConfig(
             save_checkpoints=True,
@@ -799,7 +809,7 @@ class TestOptimizedTrainer:
         trainer.plot_training_analysis()
     
     @pytest.mark.asyncio
-    async def test_error_handling(self, simple_model, simple_dataloader, temp_checkpoint_dir):
+    async def test_error_handling(self, simple_model, simple_dataloader, temp_checkpoint_dir) -> Any:
         """Test error handling in training."""
         config = TrainingOptimizationConfig(
             save_checkpoints=True,
@@ -823,7 +833,7 @@ class TestOptimizedTrainer:
 class TestUtilityFunctions:
     """Test utility functions."""
     
-    def test_create_optimized_trainer(self):
+    def test_create_optimized_trainer(self) -> Any:
         """Test create_optimized_trainer function."""
         trainer = create_optimized_trainer(
             early_stopping_patience=10,
@@ -837,7 +847,7 @@ class TestUtilityFunctions:
         assert trainer.config.lr_scheduler.scheduler_type == LRSchedulerType.REDUCE_ON_PLATEAU
         assert trainer.config.gradient_clip_norm == 1.0
     
-    def test_load_checkpoint(self, temp_checkpoint_dir):
+    def test_load_checkpoint(self, temp_checkpoint_dir) -> Any:
         """Test load_checkpoint function."""
         # Create a simple model and optimizer
         model = nn.Linear(10, 1)
@@ -867,7 +877,7 @@ class TestIntegration:
     """Integration tests for the complete system."""
     
     @pytest.fixture
-    def integration_dataset(self):
+    def integration_dataset(self) -> Any:
         """Create dataset for integration testing."""
         # Create a larger, more realistic dataset
         data = torch.randn(500, 20)
@@ -875,12 +885,12 @@ class TestIntegration:
         return TensorDataset(data, targets)
     
     @pytest.fixture
-    def integration_dataloader(self, integration_dataset):
+    def integration_dataloader(self, integration_dataset) -> Any:
         """Create dataloader for integration testing."""
         return DataLoader(integration_dataset, batch_size=32, shuffle=True)
     
     @pytest.mark.asyncio
-    async def test_complete_training_pipeline(self, integration_dataloader, temp_checkpoint_dir):
+    async def test_complete_training_pipeline(self, integration_dataloader, temp_checkpoint_dir) -> Any:
         """Test complete training pipeline with all features."""
         # Create comprehensive configuration
         config = TrainingOptimizationConfig(
@@ -948,7 +958,7 @@ class TestIntegration:
         assert len(trainer.monitor.metrics_history['learning_rate']) > 0
     
     @pytest.mark.asyncio
-    async def test_performance_comparison(self, integration_dataloader, temp_checkpoint_dir):
+    async def test_performance_comparison(self, integration_dataloader, temp_checkpoint_dir) -> Any:
         """Test performance comparison between different configurations."""
         configurations = [
             ("Baseline", TrainingOptimizationConfig()),
@@ -1012,5 +1022,6 @@ class TestIntegration:
         assert best_config[1]["best_val_accuracy"] > 0
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

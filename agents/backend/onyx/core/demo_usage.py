@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+import time
+from datetime import datetime
+from typing import Dict, Any
+import httpx
+from rich.console import Console
+from rich.table import Table
+from rich.panel import Panel
+from rich.progress import Progress, TaskID
+from rich.live import Live
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 🚀 IMPROVED API DEMO SCRIPT
@@ -7,18 +25,7 @@ Demonstrates the improved FastAPI architecture with real examples.
 Shows best practices implementation and usage patterns.
 """
 
-import asyncio
-import json
-import time
-from datetime import datetime
-from typing import Dict, Any
 
-import httpx
-from rich.console import Console
-from rich.table import Table
-from rich.panel import Panel
-from rich.progress import Progress, TaskID
-from rich.live import Live
 
 console = Console()
 
@@ -76,7 +83,7 @@ async def demo_api_overview():
         title="🏗️ Architecture Overview"
     ))
 
-async def test_api_health() -> bool:
+async async def test_api_health() -> bool:
     """Test API health and connectivity."""
     console.print("\n[blue]🔍 Testing API Health & Connectivity...[/blue]")
     

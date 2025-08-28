@@ -1,10 +1,13 @@
-"""
-Structured FastAPI Application with Clear Route Organization and Dependencies
-- Modular architecture with separate concerns
-- Clear dependency injection patterns
-- Organized route structure by domain
-- Improved readability and maintainability
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -16,16 +19,12 @@ import json
 import hashlib
 from datetime import datetime
 from pathlib import Path
-
-# FastAPI and async dependencies
 from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request, Response
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field, validator, ConfigDict
 from enum import Enum
-
-# Async database and external operations
 import aiohttp
 import aiofiles
 import redis.asyncio as redis
@@ -33,9 +32,23 @@ from databases import Database
 from sqlalchemy import text
 import motor.motor_asyncio
 from bson import ObjectId
+from prometheus_client import Counter, Histogram, Gauge
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Structured FastAPI Application with Clear Route Organization and Dependencies
+- Modular architecture with separate concerns
+- Clear dependency injection patterns
+- Organized route structure by domain
+- Improved readability and maintainability
+"""
+
+
+# FastAPI and async dependencies
+
+# Async database and external operations
 
 # Performance monitoring
-from prometheus_client import Counter, Histogram, Gauge
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -48,7 +61,7 @@ logger = logging.getLogger(__name__)
 class AppConfig:
     """Application configuration with environment-based settings."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app_name: str = "notebooklm_ai"
         self.version: str = "1.0.0"
         self.debug: bool = False
@@ -75,7 +88,9 @@ class DependencyContainer:
     """Centralized dependency injection container."""
     
     def __init__(self, config: AppConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self._database_manager: Optional['AsyncDatabaseManager'] = None
         self._cache_manager: Optional['AsyncCacheManager'] = None
         self._api_manager: Optional['AsyncExternalAPIManager'] = None
@@ -94,7 +109,7 @@ class DependencyContainer:
             self._cache_manager = AsyncCacheManager(self.config.redis_url)
         return self._cache_manager
     
-    async def get_api_manager(self) -> 'AsyncExternalAPIManager':
+    async async def get_api_manager(self) -> 'AsyncExternalAPIManager':
         """Get or create external API manager."""
         if self._api_manager is None:
             self._api_manager = AsyncExternalAPIManager(
@@ -111,14 +126,14 @@ class DependencyContainer:
             self._diffusion_service = AsyncDiffusionService(db_manager, cache_manager)
         return self._diffusion_service
     
-    async def get_external_api_service(self) -> 'AsyncExternalAPIService':
+    async async def get_external_api_service(self) -> 'AsyncExternalAPIService':
         """Get or create external API service."""
         if self._external_api_service is None:
             api_manager = await self.get_api_manager()
             self._external_api_service = AsyncExternalAPIService(api_manager)
         return self._external_api_service
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup all resources."""
         if self._database_manager:
             await self._database_manager.close()
@@ -277,7 +292,9 @@ class AsyncDatabaseManager:
     """Dedicated async database manager for non-blocking operations."""
     
     def __init__(self, database_url: str):
-        self.database_url = database_url
+        
+    """__init__ function."""
+self.database_url = database_url
         self._database: Optional[Database] = None
         self._mongo_client: Optional[motor.motor_asyncio.AsyncIOMotorClient] = None
         
@@ -298,7 +315,7 @@ class AsyncDatabaseManager:
             logger.error(f"Database query error: {e}")
             raise
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close database connections."""
         if self._database:
             await self._database.disconnect()
@@ -309,7 +326,9 @@ class AsyncCacheManager:
     """Dedicated async cache manager for non-blocking operations."""
     
     def __init__(self, redis_url: str = "redis://localhost:6379"):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self._redis: Optional[redis.Redis] = None
         
     async def get_redis(self) -> redis.Redis:
@@ -336,7 +355,7 @@ class AsyncCacheManager:
             logger.error(f"Cache set error: {e}")
             return False
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close cache connection."""
         if self._redis:
             await self._redis.close()
@@ -345,7 +364,9 @@ class AsyncExternalAPIManager:
     """Dedicated async external API manager for non-blocking operations."""
     
     def __init__(self, timeout: int = 30, max_connections: int = 100):
-        self.timeout = timeout
+        
+    """__init__ function."""
+self.timeout = timeout
         self.max_connections = max_connections
         self._session: Optional[aiohttp.ClientSession] = None
         
@@ -365,7 +386,7 @@ class AsyncExternalAPIManager:
             )
         return self._session
     
-    async def make_request(self, method: str, url: str, **kwargs) -> Dict[str, Any]:
+    async async def make_request(self, method: str, url: str, **kwargs) -> Dict[str, Any]:
         """Make async HTTP request."""
         session = await self.get_session()
         start_time = time.time()
@@ -395,7 +416,7 @@ class AsyncExternalAPIManager:
             logger.error(f"External API error: {e}")
             raise HTTPException(status_code=502, detail="External API error")
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close HTTP session."""
         if self._session and not self._session.closed:
             await self._session.close()
@@ -408,7 +429,9 @@ class AsyncDiffusionService:
     """Business logic service for diffusion operations."""
     
     def __init__(self, db_manager: AsyncDatabaseManager, cache_manager: AsyncCacheManager):
-        self.db_manager = db_manager
+        
+    """__init__ function."""
+self.db_manager = db_manager
         self.cache_manager = cache_manager
     
     async def save_generation_result(self, user_id: str, prompt: str, result_url: str) -> str:
@@ -449,9 +472,11 @@ class AsyncExternalAPIService:
     """Business logic service for external API operations."""
     
     def __init__(self, api_manager: AsyncExternalAPIManager):
-        self.api_manager = api_manager
+        
+    """__init__ function."""
+self.api_manager = api_manager
     
-    async def call_diffusion_api(self, prompt: str, parameters: Dict) -> Dict:
+    async async def call_diffusion_api(self, prompt: str, parameters: Dict) -> Dict:
         """Call external diffusion API."""
         # Simulate external API call
         await asyncio.sleep(0.1)  # Simulate network delay
@@ -464,7 +489,7 @@ class AsyncExternalAPIService:
             }
         }
     
-    async def call_multiple_apis(self, requests: List[Dict]) -> List[Dict]:
+    async async def call_multiple_apis(self, requests: List[Dict]) -> List[Dict]:
         """Call multiple external APIs in parallel."""
         tasks = [self.api_manager.make_request(**req) for req in requests]
         return await asyncio.gather(*tasks, return_exceptions=True)
@@ -644,14 +669,14 @@ class HealthRoutes:
 class LoggingMiddleware:
     """Middleware for request/response logging."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         self.app = app
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         if scope["type"] == "http":
             start_time = time.time()
             
-            async def send_with_logging(message):
+            async def send_with_logging(message) -> Any:
                 if message["type"] == "http.response.start":
                     duration = time.time() - start_time
                     logger.info(
@@ -667,17 +692,17 @@ class LoggingMiddleware:
 class PerformanceMiddleware:
     """Middleware for performance monitoring."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         self.app = app
         self.request_counter = Counter('http_requests_total', 'Total HTTP requests')
         self.request_duration = Histogram('http_request_duration_seconds', 'HTTP request duration')
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         if scope["type"] == "http":
             self.request_counter.inc()
             start_time = time.time()
             
-            async def send_with_metrics(message):
+            async def send_with_metrics(message) -> Any:
                 if message["type"] == "http.response.start":
                     duration = time.time() - start_time
                     self.request_duration.observe(duration)
@@ -824,7 +849,6 @@ app = create_application()
 register_error_handlers(app)
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(
         "structured_routes_app:app",
         host="0.0.0.0",

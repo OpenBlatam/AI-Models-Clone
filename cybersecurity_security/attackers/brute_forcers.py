@@ -1,9 +1,7 @@
-"""
-Brute Force Attackers
-
-Provides brute force attack capabilities for various protocols and services.
-WARNING: This module is for authorized security testing only.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import socket
@@ -14,6 +12,15 @@ from typing import Dict, Any, List, Optional, Union
 from pydantic import BaseModel, Field, validator
 from enum import Enum
 import time
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Brute Force Attackers
+
+Provides brute force attack capabilities for various protocols and services.
+WARNING: This module is for authorized security testing only.
+"""
+
 
 class BruteForceType(str, Enum):
     """Enumeration of brute force attack types."""
@@ -36,7 +43,7 @@ class BruteForceRequest(BaseModel):
     delay_between_attempts: float = Field(default=1.0, ge=0.1, le=10.0, description="Delay between attempts")
     
     @validator('target_host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         if not v:
             raise ValueError("Target host cannot be empty")
         return v
@@ -64,7 +71,7 @@ class SSHBruteForceRequest(BaseModel):
     delay_between_attempts: float = Field(default=2.0, ge=0.1, le=10.0, description="Delay between attempts")
     
     @validator('target_host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         if not v:
             raise ValueError("Target host cannot be empty")
         return v
@@ -94,7 +101,7 @@ class HTTPBruteForceRequest(BaseModel):
     delay_between_attempts: float = Field(default=0.5, ge=0.1, le=5.0, description="Delay between attempts")
     
     @validator('target_url')
-    def validate_url(cls, v):
+    def validate_url(cls, v) -> bool:
         if not v.startswith(('http://', 'https://')):
             raise ValueError("Target URL must start with http:// or https://")
         return v
@@ -121,7 +128,7 @@ class FTPBruteForceRequest(BaseModel):
     delay_between_attempts: float = Field(default=1.0, ge=0.1, le=10.0, description="Delay between attempts")
     
     @validator('target_host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         if not v:
             raise ValueError("Target host cannot be empty")
         return v
@@ -240,7 +247,7 @@ def try_ssh_connection(host: str, port: int, username: str, password: str, timeo
     except Exception:
         return False
 
-async def perform_http_brute_force_async(data: HTTPBruteForceRequest) -> HTTPBruteForceResult:
+async async def perform_http_brute_force_async(data: HTTPBruteForceRequest) -> HTTPBruteForceResult:
     """Perform HTTP brute force attack asynchronously."""
     target_url = data.target_url
     usernames = data.username_list or COMMON_USERNAMES
@@ -260,7 +267,7 @@ async def perform_http_brute_force_async(data: HTTPBruteForceRequest) -> HTTPBru
     
     semaphore = asyncio.Semaphore(max_concurrent)
     
-    async def try_http_credentials(username: str, password: str) -> Optional[Dict[str, str]]:
+    async async def try_http_credentials(username: str, password: str) -> Optional[Dict[str, str]]:
         async with semaphore:
             nonlocal failed_attempts, successful_attempts, total_attempts
             

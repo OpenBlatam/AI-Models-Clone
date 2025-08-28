@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import gradio as gr
+import argparse
+import logging
+import sys
+from pathlib import Path
+from interactive_demos import InteractiveDemos
+from performance_monitoring_demo import PerformanceMonitoringDemo
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Comprehensive Demo Launcher
@@ -6,17 +23,10 @@ A unified launcher for all interactive demos showcasing the email sequence AI sy
 Provides easy access to all demonstration features through a single interface.
 """
 
-import gradio as gr
-import argparse
-import logging
-import sys
-from pathlib import Path
 
 # Add the parent directory to the path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from interactive_demos import InteractiveDemos
-from performance_monitoring_demo import PerformanceMonitoringDemo
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -26,7 +36,7 @@ logger = logging.getLogger(__name__)
 class ComprehensiveDemoLauncher:
     """Comprehensive demo launcher for all interactive demos"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.interactive_demos = InteractiveDemos()
         self.performance_demo = PerformanceMonitoringDemo()
         
@@ -144,7 +154,7 @@ class ComprehensiveDemoLauncher:
         
         return app
     
-    def _create_system_overview(self):
+    def _create_system_overview(self) -> Any:
         """Create system overview tab"""
         
         gr.Markdown("""
@@ -549,5 +559,6 @@ Examples:
     )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

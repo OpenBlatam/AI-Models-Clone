@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from pydantic import BaseModel, ConfigDict
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from onyx.llm.llm_provider_options import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Fix invalid model-configurations state
 
 Revision ID: 47a07e1a38f1
@@ -6,20 +16,35 @@ Create Date: 2025-04-23 15:39:43.159504
 
 """
 
-from alembic import op
-from pydantic import BaseModel, ConfigDict
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
-from onyx.llm.llm_provider_options import (
     fetch_model_names_for_provider_as_set,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     fetch_visible_model_names_for_provider_as_set,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 )
 
 
 # revision identifiers, used by Alembic.
-revision = "47a07e1a38f1"
-down_revision = "7a70b7664e37"
+revision: str = "47a07e1a38f1"
+down_revision: str = "7a70b7664e37"
 branch_labels = None
 depends_on = None
 
@@ -62,16 +87,56 @@ def upgrade() -> None:
             llm_provider_table.c.provider,
         )
     ).fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     for llm_provider in llm_providers:
         llm_provider_id, provider_name = llm_provider
 
         default_models = fetch_model_names_for_provider_as_set(provider_name)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         display_models = fetch_visible_model_names_for_provider_as_set(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             provider_name=provider_name
         )
 
         # if `fetch_model_names_for_provider_as_set` returns `None`, then
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         # that means that `provider_name` is not a well-known llm provider.
         if not default_models:
             continue
@@ -81,7 +146,7 @@ def upgrade() -> None:
                 "If `default_models` is non-None, `display_models` must be non-None too."
             )
 
-        model_configurations = [
+        model_configurations: List[Any] = [
             _SimpleModelConfiguration.model_validate(model_configuration)
             for model_configuration in connection.execute(
                 sa.select(
@@ -92,6 +157,16 @@ def upgrade() -> None:
                     model_configuration_table.c.max_input_tokens,
                 ).where(model_configuration_table.c.llm_provider_id == llm_provider_id)
             ).fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         ]
 
         if model_configurations:
@@ -130,8 +205,8 @@ def upgrade() -> None:
 
                 connection.execute(
                     insert_statement.on_conflict_do_update(
-                        index_elements=["llm_provider_id", "name"],
-                        set_={"is_visible": insert_statement.excluded.is_visible},
+                        index_elements: List[Any] = ["llm_provider_id", "name"],
+                        set_: Dict[str, Any] = {"is_visible": insert_statement.excluded.is_visible},
                     )
                 )
         else:

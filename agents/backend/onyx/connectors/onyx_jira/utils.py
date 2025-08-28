@@ -1,17 +1,22 @@
-"""Module with custom fields processing functions"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from typing import Any
 from typing import List
 from urllib.parse import urlparse
-
 from jira import JIRA
 from jira.resources import CustomFieldOption
 from jira.resources import Issue
 from jira.resources import User
-
 from onyx.connectors.models import BasicExpertInfo
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""Module with custom fields processing functions"""
+
+
+
 
 logger = setup_logger()
 
@@ -39,7 +44,7 @@ def best_effort_basic_expert_info(obj: Any) -> BasicExpertInfo | None:
     return BasicExpertInfo(display_name=display_name, email=email)
 
 
-def best_effort_get_field_from_issue(jira_issue: Issue, field: str) -> Any:
+def best_effort_get_field_from_issue(jira_issue: Issue, field: str) -> Optional[Dict[str, Any]]:
     if hasattr(jira_issue.fields, field):
         return getattr(jira_issue.fields, field)
 

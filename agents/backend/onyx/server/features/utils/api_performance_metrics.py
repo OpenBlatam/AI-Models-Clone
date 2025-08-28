@@ -1,3 +1,35 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import logging
+import statistics
+import threading
+from typing import Any, Dict, List, Optional, Callable, Union, Tuple, NamedTuple
+from dataclasses import dataclass, field
+from collections import defaultdict, deque
+from datetime import datetime, timedelta
+from enum import Enum
+import json
+import sqlite3
+from pathlib import Path
+import functools
+import weakref
+import structlog
+from pydantic import BaseModel, Field
+import numpy as np
+from prometheus_client import Counter, Histogram, Gauge, Summary, generate_latest
+import redis.asyncio as redis
+from typing import Any, List, Dict, Optional
 """
 🚀 API Performance Metrics System
 =================================
@@ -15,27 +47,7 @@ Comprehensive API performance metrics prioritization system with:
 - Performance dashboards
 """
 
-import asyncio
-import time
-import logging
-import statistics
-import threading
-from typing import Any, Dict, List, Optional, Callable, Union, Tuple, NamedTuple
-from dataclasses import dataclass, field
-from collections import defaultdict, deque
-from datetime import datetime, timedelta
-from enum import Enum
-import json
-import sqlite3
-from pathlib import Path
-import functools
-import weakref
 
-import structlog
-from pydantic import BaseModel, Field
-import numpy as np
-from prometheus_client import Counter, Histogram, Gauge, Summary, generate_latest
-import redis.asyncio as redis
 
 logger = structlog.get_logger(__name__)
 
@@ -97,7 +109,7 @@ class LatencyBreakdown:
     external_api_latency: float = 0.0
     total_latency: float = 0.0
     
-    def calculate_total(self):
+    def calculate_total(self) -> Any:
         """Calculate total latency"""
         self.total_latency = (
             self.network_latency +
@@ -172,7 +184,7 @@ class APIPerformanceMetrics:
 class PerformanceThresholds:
     """Configurable performance thresholds"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.response_time_thresholds = {
             MetricPriority.CRITICAL: {
                 PerformanceThreshold.EXCELLENT: 0.1,  # 100ms
@@ -272,7 +284,9 @@ class PerformanceAlert:
                  priority: MetricPriority,
                  severity: PerformanceThreshold,
                  message: str):
-        self.id = f"{endpoint}_{metric_type}_{int(time.time())}"
+        
+    """__init__ function."""
+self.id = f"{endpoint}_{metric_type}_{int(time.time())}"
         self.endpoint = endpoint
         self.metric_type = metric_type
         self.current_value = current_value
@@ -288,7 +302,9 @@ class APIPerformanceMonitor:
     """Main API performance monitoring system"""
     
     def __init__(self, redis_url: str = "redis://localhost:6379"):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.redis_client: Optional[redis.Redis] = None
         
         # Metrics storage
@@ -317,7 +333,7 @@ class APIPerformanceMonitor:
         
         logger.info("API Performance Monitor initialized")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the monitor"""
         try:
             self.redis_client = redis.from_url(self.redis_url)
@@ -576,7 +592,7 @@ class APIPerformanceMonitor:
         """Get Prometheus metrics"""
         return generate_latest()
     
-    async def store_metrics(self):
+    async def store_metrics(self) -> Any:
         """Store metrics to Redis"""
         if not self.redis_client:
             return
@@ -613,7 +629,7 @@ class APIPerformanceMonitor:
         except Exception as e:
             logger.error(f"Failed to store metrics to Redis: {e}")
     
-    async def load_metrics(self):
+    async def load_metrics(self) -> Any:
         """Load metrics from Redis"""
         if not self.redis_client:
             return
@@ -640,7 +656,7 @@ class APIPerformanceMonitor:
 # Global monitor instance
 _monitor: Optional[APIPerformanceMonitor] = None
 
-async def get_api_monitor() -> APIPerformanceMonitor:
+async async def get_api_monitor() -> APIPerformanceMonitor:
     """Get the global API performance monitor instance"""
     global _monitor
     if _monitor is None:
@@ -652,7 +668,7 @@ def monitor_api_performance(endpoint: str = None, method: str = "GET", priority:
     """Decorator to monitor API performance"""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Determine endpoint from function name if not provided
             actual_endpoint = endpoint or f"/{func.__name__}"
             
@@ -706,7 +722,7 @@ def track_latency(latency_type: LatencyType):
     """Decorator to track specific latency types"""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             try:
                 result = await func(*args, **kwargs)
@@ -734,17 +750,23 @@ async def example_usage():
     # Example API functions with monitoring
     @monitor_api_performance("/api/users", "GET", MetricPriority.HIGH)
     async def get_users():
-        await asyncio.sleep(0.1)  # Simulate processing
+        
+    """get_users function."""
+await asyncio.sleep(0.1)  # Simulate processing
         return {"users": []}
     
     @monitor_api_performance("/api/admin", "POST", MetricPriority.CRITICAL)
     async def create_admin():
-        await asyncio.sleep(0.05)  # Simulate processing
+        
+    """create_admin function."""
+await asyncio.sleep(0.05)  # Simulate processing
         return {"admin": "created"}
     
     @monitor_api_performance("/api/health", "GET", MetricPriority.LOW)
     async def health_check():
-        await asyncio.sleep(0.01)  # Simulate processing
+        
+    """health_check function."""
+await asyncio.sleep(0.01)  # Simulate processing
         return {"status": "healthy"}
     
     # Execute some requests
@@ -768,5 +790,6 @@ async def example_usage():
     prometheus_metrics = monitor.get_prometheus_metrics()
     print(f"\nPrometheus Metrics:\n{prometheus_metrics}")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(example_usage()) 

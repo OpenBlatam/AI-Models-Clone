@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import copy
 from typing import Any
 from unittest import mock
@@ -7,10 +9,13 @@ import requests
 from requests import HTTPError
 
 from onyx.connectors.confluence.onyx_confluence import (
-    _DEFAULT_PAGINATION_LIMIT,
-)
 from onyx.connectors.confluence.onyx_confluence import OnyxConfluence
 from onyx.connectors.interfaces import CredentialsProviderInterface
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    _DEFAULT_PAGINATION_LIMIT,
+)
 
 
 # Helper to create mock responses
@@ -30,7 +35,7 @@ def _create_mock_response(
 
 
 # Helper to create HTTPError
-def _create_http_error(
+async def _create_http_error(
     status_code: int,
     json_data: dict[str, Any] | None = None,
     url: str = "",

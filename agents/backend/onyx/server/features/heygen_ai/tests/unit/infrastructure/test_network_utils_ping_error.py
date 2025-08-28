@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
@@ -19,6 +19,7 @@ async def test_ping_host_process_failure(monkeypatch):
     stats = await u.ping_host("bad.host", count=1)
     assert stats["is_host_reachable"] is False
     assert "error_message" in stats or stats["packets_received"] == 0
+
 
 
 

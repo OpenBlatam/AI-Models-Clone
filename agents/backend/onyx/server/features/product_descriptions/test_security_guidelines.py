@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 import pytest
 import asyncio
 import hashlib
@@ -8,8 +22,11 @@ from datetime import datetime, timedelta
 from unittest.mock import patch, MagicMock
 from typing import Dict, Any, List
 
-# Import security components
 from security_guidelines import (
+        import jwt
+from typing import Any, List, Dict, Optional
+import logging
+# Import security components
     SecureInputValidator, SecurityAuthenticator, SecurityCrypto,
     SecurityLogger, SecurityHeaders, SecurityMiddleware,
     SecureScanRequest, SecureScanResponse, SecurityUtils,
@@ -19,11 +36,11 @@ from security_guidelines import (
 class TestSecureInputValidator:
     """Test cases for SecureInputValidator"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.validator = SecureInputValidator()
     
-    def test_validate_ip_address_ipv4_valid(self):
+    def test_validate_ip_address_ipv4_valid(self) -> bool:
         """Test valid IPv4 address validation"""
         valid_ips = [
             "192.168.1.1",
@@ -37,7 +54,7 @@ class TestSecureInputValidator:
         for ip in valid_ips:
             assert self.validator.validate_ip_address(ip) is True
     
-    def test_validate_ip_address_ipv4_invalid(self):
+    def test_validate_ip_address_ipv4_invalid(self) -> bool:
         """Test invalid IPv4 address validation"""
         invalid_ips = [
             "256.256.256.256",
@@ -51,7 +68,7 @@ class TestSecureInputValidator:
         for ip in invalid_ips:
             assert self.validator.validate_ip_address(ip) is False
     
-    def test_validate_ip_address_ipv6_valid(self):
+    def test_validate_ip_address_ipv6_valid(self) -> bool:
         """Test valid IPv6 address validation"""
         valid_ipv6 = [
             "2001:db8::1",
@@ -64,7 +81,7 @@ class TestSecureInputValidator:
         for ip in valid_ipv6:
             assert self.validator.validate_ip_address(ip) is True
     
-    def test_validate_ip_address_ipv6_invalid(self):
+    def test_validate_ip_address_ipv6_invalid(self) -> bool:
         """Test invalid IPv6 address validation"""
         invalid_ipv6 = [
             "2001:db8::1::1",  # Double colon
@@ -76,7 +93,7 @@ class TestSecureInputValidator:
         for ip in invalid_ipv6:
             assert self.validator.validate_ip_address(ip) is False
     
-    def test_validate_hostname_valid(self):
+    def test_validate_hostname_valid(self) -> bool:
         """Test valid hostname validation"""
         valid_hostnames = [
             "example.com",
@@ -90,7 +107,7 @@ class TestSecureInputValidator:
         for hostname in valid_hostnames:
             assert self.validator.validate_hostname(hostname) is True
     
-    def test_validate_hostname_invalid(self):
+    def test_validate_hostname_invalid(self) -> bool:
         """Test invalid hostname validation"""
         invalid_hostnames = [
             "invalid..hostname",
@@ -107,21 +124,21 @@ class TestSecureInputValidator:
         for hostname in invalid_hostnames:
             assert self.validator.validate_hostname(hostname) is False
     
-    def test_validate_port_range_valid(self):
+    def test_validate_port_range_valid(self) -> bool:
         """Test valid port range validation"""
         valid_ports = [1, 80, 443, 1024, 65535]
         
         for port in valid_ports:
             assert self.validator.validate_port_range(port) is True
     
-    def test_validate_port_range_invalid(self):
+    def test_validate_port_range_invalid(self) -> bool:
         """Test invalid port range validation"""
         invalid_ports = [0, -1, 65536, 99999]
         
         for port in invalid_ports:
             assert self.validator.validate_port_range(port) is False
     
-    def test_sanitize_command_input(self):
+    def test_sanitize_command_input(self) -> Any:
         """Test command input sanitization"""
         test_cases = [
             ("ls -la", "ls -la"),  # No dangerous chars
@@ -139,7 +156,7 @@ class TestSecureInputValidator:
             result = self.validator.sanitize_command_input(input_cmd)
             assert result == expected
     
-    def test_validate_file_path_valid(self):
+    def test_validate_file_path_valid(self) -> bool:
         """Test valid file path validation"""
         valid_paths = [
             "file.txt",
@@ -152,7 +169,7 @@ class TestSecureInputValidator:
         for path in valid_paths:
             assert self.validator.validate_file_path(path) is True
     
-    def test_validate_file_path_invalid(self):
+    def test_validate_file_path_invalid(self) -> bool:
         """Test invalid file path validation"""
         invalid_paths = [
             "../file.txt",  # Directory traversal
@@ -169,12 +186,12 @@ class TestSecureInputValidator:
 class TestSecurityAuthenticator:
     """Test cases for SecurityAuthenticator"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.secret_key = secrets.token_hex(32)
         self.authenticator = SecurityAuthenticator(self.secret_key)
     
-    def test_generate_secure_token(self):
+    def test_generate_secure_token(self) -> Any:
         """Test secure token generation"""
         user_id = "test_user"
         permissions = ["read", "write"]
@@ -185,7 +202,7 @@ class TestSecurityAuthenticator:
         assert len(token) > 0
         assert "." in token  # JWT format
     
-    def test_verify_token_valid(self):
+    def test_verify_token_valid(self) -> Any:
         """Test valid token verification"""
         user_id = "test_user"
         permissions = ["read", "write"]
@@ -200,17 +217,16 @@ class TestSecurityAuthenticator:
         assert "iat" in payload
         assert "jti" in payload
     
-    def test_verify_token_invalid(self):
+    def test_verify_token_invalid(self) -> Any:
         """Test invalid token verification"""
         invalid_token = "invalid.token.here"
         payload = self.authenticator.verify_token(invalid_token)
         
         assert payload is None
     
-    def test_verify_token_expired(self):
+    def test_verify_token_expired(self) -> Any:
         """Test expired token verification"""
         # Create expired token
-        import jwt
         payload = {
             'user_id': 'test_user',
             'permissions': ['read'],
@@ -223,7 +239,7 @@ class TestSecurityAuthenticator:
         result = self.authenticator.verify_token(expired_token)
         assert result is None
     
-    def test_verify_token_blacklisted(self):
+    def test_verify_token_blacklisted(self) -> List[Any]:
         """Test blacklisted token verification"""
         user_id = "test_user"
         permissions = ["read"]
@@ -241,7 +257,7 @@ class TestSecurityAuthenticator:
         payload = self.authenticator.verify_token(token)
         assert payload is None
     
-    def test_check_permission_valid(self):
+    def test_check_permission_valid(self) -> Any:
         """Test valid permission checking"""
         user_id = "test_user"
         permissions = ["read", "write", "admin"]
@@ -252,7 +268,7 @@ class TestSecurityAuthenticator:
         assert self.authenticator.check_permission(token, "write") is True
         assert self.authenticator.check_permission(token, "admin") is True
     
-    def test_check_permission_invalid(self):
+    def test_check_permission_invalid(self) -> Any:
         """Test invalid permission checking"""
         user_id = "test_user"
         permissions = ["read", "write"]
@@ -262,13 +278,13 @@ class TestSecurityAuthenticator:
         assert self.authenticator.check_permission(token, "admin") is False
         assert self.authenticator.check_permission(token, "delete") is False
     
-    def test_check_permission_invalid_token(self):
+    def test_check_permission_invalid_token(self) -> Any:
         """Test permission checking with invalid token"""
         invalid_token = "invalid.token.here"
         
         assert self.authenticator.check_permission(invalid_token, "read") is False
     
-    def test_check_rate_limit(self):
+    def test_check_rate_limit(self) -> Any:
         """Test rate limiting"""
         user_id = "test_user"
         action = "api_request"
@@ -281,7 +297,7 @@ class TestSecurityAuthenticator:
         # 6th request should be blocked
         assert self.authenticator.check_rate_limit(user_id, action, limit) is False
     
-    def test_rate_limit_reset(self):
+    def test_rate_limit_reset(self) -> Any:
         """Test rate limit reset after time period"""
         user_id = "test_user"
         action = "api_request"
@@ -306,11 +322,11 @@ class TestSecurityAuthenticator:
 class TestSecurityCrypto:
     """Test cases for SecurityCrypto"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.crypto = SecurityCrypto()
     
-    def test_encrypt_decrypt_data(self):
+    def test_encrypt_decrypt_data(self) -> Any:
         """Test data encryption and decryption"""
         test_data = "sensitive information"
         
@@ -323,7 +339,7 @@ class TestSecurityCrypto:
         decrypted = self.crypto.decrypt_sensitive_data(encrypted)
         assert decrypted == test_data
     
-    def test_encrypt_decrypt_empty_string(self):
+    def test_encrypt_decrypt_empty_string(self) -> Any:
         """Test encryption/decryption of empty string"""
         test_data = ""
         
@@ -332,7 +348,7 @@ class TestSecurityCrypto:
         
         assert decrypted == test_data
     
-    def test_encrypt_decrypt_special_characters(self):
+    def test_encrypt_decrypt_special_characters(self) -> Any:
         """Test encryption/decryption with special characters"""
         test_data = "!@#$%^&*()_+-=[]{}|;':\",./<>?"
         
@@ -341,7 +357,7 @@ class TestSecurityCrypto:
         
         assert decrypted == test_data
     
-    def test_hash_password_with_salt(self):
+    def test_hash_password_with_salt(self) -> Any:
         """Test password hashing with provided salt"""
         password = "test_password"
         salt = "test_salt"
@@ -353,7 +369,7 @@ class TestSecurityCrypto:
         assert result["salt"] == salt
         assert len(result["hash"]) > 0
     
-    def test_hash_password_without_salt(self):
+    def test_hash_password_without_salt(self) -> Any:
         """Test password hashing without salt (auto-generated)"""
         password = "test_password"
         
@@ -364,7 +380,7 @@ class TestSecurityCrypto:
         assert len(result["salt"]) > 0
         assert len(result["hash"]) > 0
     
-    def test_verify_password_correct(self):
+    def test_verify_password_correct(self) -> Any:
         """Test password verification with correct password"""
         password = "test_password"
         result = self.crypto.hash_password(password)
@@ -375,7 +391,7 @@ class TestSecurityCrypto:
         
         assert is_valid is True
     
-    def test_verify_password_incorrect(self):
+    def test_verify_password_incorrect(self) -> Any:
         """Test password verification with incorrect password"""
         password = "test_password"
         wrong_password = "wrong_password"
@@ -387,7 +403,7 @@ class TestSecurityCrypto:
         
         assert is_valid is False
     
-    def test_generate_secure_random_string(self):
+    def test_generate_secure_random_string(self) -> Any:
         """Test secure random string generation"""
         length = 32
         random_string = self.crypto.generate_secure_random_string(length)
@@ -402,7 +418,7 @@ class TestSecurityCrypto:
 class TestSecurityUtils:
     """Test cases for SecurityUtils"""
     
-    def test_generate_secure_filename(self):
+    def test_generate_secure_filename(self) -> Any:
         """Test secure filename generation"""
         test_cases = [
             ("file.txt", "file.txt_"),
@@ -419,7 +435,7 @@ class TestSecurityUtils:
             assert len(secure_name) > len(expected_prefix)  # Has random suffix
             assert re.match(r'^[a-zA-Z0-9._-]+$', secure_name)  # Only safe chars
     
-    def test_validate_file_upload_valid(self):
+    async def test_validate_file_upload_valid(self) -> bool:
         """Test valid file upload validation"""
         # Small text file
         valid_content = b"This is a valid text file content"
@@ -429,12 +445,12 @@ class TestSecurityUtils:
         large_content = b"x" * (5 * 1024 * 1024)  # 5MB
         assert SecurityUtils.validate_file_upload(large_content) is True
     
-    def test_validate_file_upload_invalid_size(self):
+    async def test_validate_file_upload_invalid_size(self) -> bool:
         """Test file upload validation with oversized file"""
         oversized_content = b"x" * (20 * 1024 * 1024)  # 20MB
         assert SecurityUtils.validate_file_upload(oversized_content, max_size=10*1024*1024) is False
     
-    def test_validate_file_upload_dangerous_signatures(self):
+    async def test_validate_file_upload_dangerous_signatures(self) -> bool:
         """Test file upload validation with dangerous file signatures"""
         # EXE signature
         exe_content = b'\x4D\x5A' + b"fake exe content"
@@ -448,7 +464,7 @@ class TestSecurityUtils:
         macho_content = b'\xFE\xED\xFA' + b"fake macho content"
         assert SecurityUtils.validate_file_upload(macho_content) is False
     
-    def test_sanitize_sql_query_safe(self):
+    def test_sanitize_sql_query_safe(self) -> Any:
         """Test SQL query sanitization with safe queries"""
         safe_queries = [
             "SELECT name FROM users",
@@ -461,7 +477,7 @@ class TestSecurityUtils:
             sanitized = SecurityUtils.sanitize_sql_query(query)
             assert sanitized == query
     
-    def test_sanitize_sql_query_dangerous(self):
+    def test_sanitize_sql_query_dangerous(self) -> Any:
         """Test SQL query sanitization with dangerous queries"""
         dangerous_queries = [
             "SELECT * FROM users; DROP TABLE users;",
@@ -478,11 +494,11 @@ class TestSecurityUtils:
 class TestSecurityConfig:
     """Test cases for SecurityConfig"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.config = SecurityConfig()
     
-    def test_security_config_defaults(self):
+    def test_security_config_defaults(self) -> Any:
         """Test security configuration defaults"""
         assert self.config.max_scan_duration == 300
         assert self.config.rate_limit_per_minute == 60
@@ -497,7 +513,7 @@ class TestSecurityConfig:
 class TestSecurityBestPractices:
     """Test cases for SecurityBestPractices"""
     
-    def test_implement_defense_in_depth(self):
+    def test_implement_defense_in_depth(self) -> Any:
         """Test defense in depth implementation"""
         result = SecurityBestPractices.implement_defense_in_depth()
         
@@ -510,7 +526,7 @@ class TestSecurityBestPractices:
         assert "Input validation" in result["application_layer"]
         assert "Encryption" in result["data_layer"]
     
-    def test_implement_least_privilege(self):
+    def test_implement_least_privilege(self) -> Any:
         """Test least privilege implementation"""
         result = SecurityBestPractices.implement_least_privilege()
         
@@ -522,7 +538,7 @@ class TestSecurityBestPractices:
         assert "Minimum required permissions" in result["user_permissions"]
         assert "Limited scope and access" in result["service_accounts"]
     
-    def test_implement_secure_by_default(self):
+    def test_implement_secure_by_default(self) -> Any:
         """Test secure by default implementation"""
         result = SecurityBestPractices.implement_secure_by_default()
         
@@ -537,7 +553,7 @@ class TestSecurityBestPractices:
 class TestSecurityHeaders:
     """Test cases for SecurityHeaders"""
     
-    def test_get_security_headers(self):
+    def test_get_security_headers(self) -> Optional[Dict[str, Any]]:
         """Test security headers retrieval"""
         headers = SecurityHeaders.get_security_headers()
         
@@ -559,7 +575,7 @@ class TestSecurityHeaders:
 class TestSecureScanRequest:
     """Test cases for SecureScanRequest model"""
     
-    def test_valid_scan_request(self):
+    async def test_valid_scan_request(self) -> Any:
         """Test valid scan request"""
         request = SecureScanRequest(
             target="192.168.1.1",
@@ -573,7 +589,7 @@ class TestSecureScanRequest:
         assert request.timeout == 30
         assert request.max_ports == 1000
     
-    def test_invalid_target(self):
+    def test_invalid_target(self) -> Optional[Dict[str, Any]]:
         """Test scan request with invalid target"""
         with pytest.raises(ValueError):
             SecureScanRequest(
@@ -581,7 +597,7 @@ class TestSecureScanRequest:
                 scan_type="port"
             )
     
-    def test_invalid_scan_type(self):
+    def test_invalid_scan_type(self) -> Any:
         """Test scan request with invalid scan type"""
         with pytest.raises(ValueError):
             SecureScanRequest(
@@ -589,7 +605,7 @@ class TestSecureScanRequest:
                 scan_type="invalid_type"
             )
     
-    def test_invalid_timeout(self):
+    def test_invalid_timeout(self) -> Any:
         """Test scan request with invalid timeout"""
         with pytest.raises(ValueError):
             SecureScanRequest(
@@ -598,7 +614,7 @@ class TestSecureScanRequest:
                 timeout=400  # Exceeds maximum
             )
     
-    def test_invalid_max_ports(self):
+    def test_invalid_max_ports(self) -> Any:
         """Test scan request with invalid max ports"""
         with pytest.raises(ValueError):
             SecureScanRequest(
@@ -607,5 +623,6 @@ class TestSecureScanRequest:
                 max_ports=70000  # Exceeds maximum
             )
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import csv
 import tempfile
 import uuid
@@ -23,6 +25,9 @@ from onyx.file_store.file_store import FileStore
 from onyx.file_store.file_store import get_default_file_store
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def generate_chat_messages_report(
     db_session: Session,
     file_store: FileStore,
@@ -130,6 +135,10 @@ def create_new_usage_report(
             zip_file.writestr(
                 "chat_messages.csv",
                 chat_messages_tmpfile.read(),
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             )
 
             # write users
@@ -137,6 +146,10 @@ def create_new_usage_report(
                 users_filename, mode="b", use_tempfile=True
             )
             zip_file.writestr("users.csv", users_tmpfile.read())
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
         zip_buffer.seek(0)
 

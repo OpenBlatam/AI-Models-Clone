@@ -1,22 +1,30 @@
-# TODO(rkuo): All of the downgrade_postgres and upgrade_postgres operations here
-# are vulnerable to deadlocks. We could deal with them similar to reset_postgres
-# where we retry out of process
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import json
-
 import pytest
 from sqlalchemy import text
-
 from onyx.configs.constants import DEFAULT_BOOST
 from onyx.db.engine import get_session_context_manager
 from tests.integration.common_utils.reset import downgrade_postgres
 from tests.integration.common_utils.reset import upgrade_postgres
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# TODO(rkuo): All of the downgrade_postgres and upgrade_postgres operations here
+# are vulnerable to deadlocks. We could deal with them similar to reset_postgres
+# where we retry out of process
+
+
+
 
 
 @pytest.mark.skip(
     reason="Migration test no longer needed - migration has been applied to production"
 )
-def test_fix_capitalization_migration() -> None:
+async def test_fix_capitalization_migration() -> None:
     """Test that the be2ab2aa50ee migration correctly lowercases external_user_group_ids"""
     # Reset the database and run migrations up to the second to last migration
     downgrade_postgres(

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from retry import retry
 
 from ee.onyx.external_permissions.google_drive.models import GoogleDrivePermission
@@ -5,6 +7,9 @@ from onyx.connectors.google_utils.google_utils import execute_paginated_retrieva
 from onyx.connectors.google_utils.resources import RefreshableDriveObject
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 

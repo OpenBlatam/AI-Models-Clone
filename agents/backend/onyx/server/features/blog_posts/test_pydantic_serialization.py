@@ -1,3 +1,33 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import pytest
+import asyncio
+import time
+import json
+import pickle
+from typing import Dict, List, Tuple, Any, Optional
+from unittest.mock import Mock, patch, AsyncMock, MagicMock
+import tempfile
+import os
+from pydantic import BaseModel, Field, ValidationError
+from datetime import datetime, timedelta
+from pydantic_serialization import (
+    from caching_system import CacheManager, CacheConfig, create_cache_manager
+        import gzip
+from typing import Any, List, Dict, Optional
+import logging
 """
 🧪 COMPREHENSIVE PYDANTIC SERIALIZATION TESTS
 ============================================
@@ -22,20 +52,8 @@ Features:
 - Configuration testing
 """
 
-import pytest
-import asyncio
-import time
-import json
-import pickle
-from typing import Dict, List, Tuple, Any, Optional
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
-import tempfile
-import os
 
-from pydantic import BaseModel, Field, ValidationError
-from datetime import datetime, timedelta
 
-from pydantic_serialization import (
     SerializationConfig, SerializationFormat, CompressionLevel,
     SerializationUtils, BaseSerializer, JSONSerializer, PickleSerializer,
     PydanticModelSerializer, CachedSerializationManager, SerializationProfiler,
@@ -46,7 +64,6 @@ from pydantic_serialization import (
 
 # Import caching system for integration tests
 try:
-    from caching_system import CacheManager, CacheConfig, create_cache_manager
     CACHING_AVAILABLE = True
 except ImportError:
     CACHING_AVAILABLE = False
@@ -107,7 +124,7 @@ def sample_models():
     }
 
 @pytest.fixture
-def sample_data(sample_models):
+def sample_data(sample_models) -> Any:
     """Create sample data for testing."""
     User = sample_models["User"]
     Post = sample_models["Post"]
@@ -144,7 +161,7 @@ def sample_data(sample_models):
 class TestSerializationConfig:
     """Test serialization configuration."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration values."""
         config = SerializationConfig()
         
@@ -158,7 +175,7 @@ class TestSerializationConfig:
         assert config.enable_validation is True
         assert config.enable_profiling is True
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration values."""
         config = SerializationConfig(
             default_format=SerializationFormat.PICKLE,
@@ -174,7 +191,7 @@ class TestSerializationConfig:
         assert config.cache_ttl == 1800
         assert config.enable_profiling is False
     
-    def test_config_validation(self):
+    def test_config_validation(self) -> Any:
         """Test configuration validation."""
         # Should not raise validation error
         config = SerializationConfig()
@@ -188,14 +205,14 @@ class TestSerializationConfig:
 class TestSerializationUtils:
     """Test serialization utilities."""
     
-    def test_get_compression_level(self):
+    def test_get_compression_level(self) -> Optional[Dict[str, Any]]:
         """Test compression level mapping."""
         assert SerializationUtils.get_compression_level(CompressionLevel.NONE) == 0
         assert SerializationUtils.get_compression_level(CompressionLevel.FAST) == 1
         assert SerializationUtils.get_compression_level(CompressionLevel.BALANCED) == 6
         assert SerializationUtils.get_compression_level(CompressionLevel.MAX) == 9
     
-    def test_should_compress(self, serialization_config):
+    def test_should_compress(self, serialization_config) -> Any:
         """Test compression decision logic."""
         # Should compress large data
         assert SerializationUtils.should_compress(2048, serialization_config) is True
@@ -211,7 +228,7 @@ class TestSerializationUtils:
         config_no_level = SerializationConfig(compression_level=CompressionLevel.NONE)
         assert SerializationUtils.should_compress(2048, config_no_level) is False
     
-    def test_compress_decompress(self, serialization_config):
+    def test_compress_decompress(self, serialization_config) -> Any:
         """Test compression and decompression."""
         original_data = b"x" * 2000  # Large enough to trigger compression
         
@@ -223,7 +240,7 @@ class TestSerializationUtils:
         decompressed = SerializationUtils.decompress_data(compressed)
         assert decompressed == original_data
     
-    def test_compress_small_data(self, serialization_config):
+    def test_compress_small_data(self, serialization_config) -> Any:
         """Test that small data is not compressed."""
         small_data = b"small data"
         
@@ -232,7 +249,7 @@ class TestSerializationUtils:
         assert result == small_data
         assert not result.startswith(b"gzip:")
     
-    def test_decompress_uncompressed_data(self):
+    def test_decompress_uncompressed_data(self) -> Any:
         """Test decompression of uncompressed data."""
         uncompressed_data = b"uncompressed data"
         
@@ -240,7 +257,7 @@ class TestSerializationUtils:
         result = SerializationUtils.decompress_data(uncompressed_data)
         assert result == uncompressed_data
     
-    def test_generate_hash(self):
+    def test_generate_hash(self) -> Any:
         """Test hash generation."""
         # String hash
         str_hash = SerializationUtils.generate_hash("test string")
@@ -267,7 +284,7 @@ class TestSerializationUtils:
 class TestBaseSerializer:
     """Test base serializer functionality."""
     
-    def test_base_serializer_initialization(self, serialization_config):
+    def test_base_serializer_initialization(self, serialization_config) -> Any:
         """Test base serializer initialization."""
         serializer = BaseSerializer(serialization_config)
         
@@ -277,7 +294,7 @@ class TestBaseSerializer:
         assert serializer.stats["errors"] == 0
         assert serializer.stats["total_time"] == 0.0
     
-    def test_base_serializer_stats(self, serialization_config):
+    def test_base_serializer_stats(self, serialization_config) -> Any:
         """Test base serializer statistics."""
         serializer = BaseSerializer(serialization_config)
         
@@ -311,14 +328,14 @@ class TestBaseSerializer:
 class TestJSONSerializer:
     """Test JSON serializer functionality."""
     
-    def test_json_serializer_initialization(self, serialization_config):
+    def test_json_serializer_initialization(self, serialization_config) -> Any:
         """Test JSON serializer initialization."""
         serializer = JSONSerializer(serialization_config)
         
         assert serializer.config == serialization_config
         assert isinstance(serializer, BaseSerializer)
     
-    def test_json_serialize_deserialize(self, serialization_config, sample_data):
+    def test_json_serialize_deserialize(self, serialization_config, sample_data) -> Any:
         """Test JSON serialization and deserialization."""
         serializer = JSONSerializer(serialization_config)
         
@@ -340,7 +357,7 @@ class TestJSONSerializer:
         deserialized = serializer.deserialize(serialized)
         assert deserialized == test_data
     
-    def test_json_serialize_pydantic_model(self, serialization_config, sample_data):
+    def test_json_serialize_pydantic_model(self, serialization_config, sample_data) -> Any:
         """Test JSON serialization of Pydantic models."""
         serializer = JSONSerializer(serialization_config)
         
@@ -356,7 +373,7 @@ class TestJSONSerializer:
         assert deserialized["name"] == user.name
         assert deserialized["email"] == user.email
     
-    def test_json_serialize_with_compression(self, serialization_config):
+    def test_json_serialize_with_compression(self, serialization_config) -> Any:
         """Test JSON serialization with compression."""
         serializer = JSONSerializer(serialization_config)
         
@@ -371,7 +388,7 @@ class TestJSONSerializer:
         deserialized = serializer.deserialize(serialized)
         assert deserialized == large_data
     
-    def test_json_serialize_error_handling(self, serialization_config):
+    def test_json_serialize_error_handling(self, serialization_config) -> Any:
         """Test JSON serialization error handling."""
         serializer = JSONSerializer(serialization_config)
         
@@ -384,7 +401,7 @@ class TestJSONSerializer:
         # Check error stats
         assert serializer.stats["errors"] == 1
     
-    def test_json_deserialize_error_handling(self, serialization_config):
+    def test_json_deserialize_error_handling(self, serialization_config) -> Any:
         """Test JSON deserialization error handling."""
         serializer = JSONSerializer(serialization_config)
         
@@ -404,14 +421,14 @@ class TestJSONSerializer:
 class TestPickleSerializer:
     """Test Pickle serializer functionality."""
     
-    def test_pickle_serializer_initialization(self, serialization_config):
+    def test_pickle_serializer_initialization(self, serialization_config) -> Any:
         """Test Pickle serializer initialization."""
         serializer = PickleSerializer(serialization_config)
         
         assert serializer.config == serialization_config
         assert isinstance(serializer, BaseSerializer)
     
-    def test_pickle_serialize_deserialize(self, serialization_config, sample_data):
+    def test_pickle_serialize_deserialize(self, serialization_config, sample_data) -> Any:
         """Test Pickle serialization and deserialization."""
         serializer = PickleSerializer(serialization_config)
         
@@ -441,7 +458,7 @@ class TestPickleSerializer:
         assert deserialized["set"] == test_data["set"]
         assert deserialized["tuple"] == test_data["tuple"]
     
-    def test_pickle_serialize_pydantic_model(self, serialization_config, sample_data):
+    def test_pickle_serialize_pydantic_model(self, serialization_config, sample_data) -> Any:
         """Test Pickle serialization of Pydantic models."""
         serializer = PickleSerializer(serialization_config)
         
@@ -457,7 +474,7 @@ class TestPickleSerializer:
         assert deserialized["name"] == user.name
         assert deserialized["email"] == user.email
     
-    def test_pickle_serialize_with_compression(self, serialization_config):
+    def test_pickle_serialize_with_compression(self, serialization_config) -> Any:
         """Test Pickle serialization with compression."""
         serializer = PickleSerializer(serialization_config)
         
@@ -479,7 +496,7 @@ class TestPickleSerializer:
 class TestPydanticModelSerializer:
     """Test Pydantic model serializer functionality."""
     
-    def test_model_serializer_initialization(self, serialization_config):
+    def test_model_serializer_initialization(self, serialization_config) -> Any:
         """Test model serializer initialization."""
         serializer = PydanticModelSerializer(serialization_config)
         
@@ -489,7 +506,7 @@ class TestPydanticModelSerializer:
         assert serializer.stats["model_serializations"] == 0
         assert serializer.stats["model_deserializations"] == 0
     
-    def test_serialize_model_json(self, serialization_config, sample_data):
+    def test_serialize_model_json(self, serialization_config, sample_data) -> Any:
         """Test model serialization with JSON format."""
         serializer = PydanticModelSerializer(serialization_config)
         
@@ -506,7 +523,7 @@ class TestPydanticModelSerializer:
         assert deserialized.name == user.name
         assert deserialized.email == user.email
     
-    def test_serialize_model_pickle(self, serialization_config, sample_data):
+    def test_serialize_model_pickle(self, serialization_config, sample_data) -> Any:
         """Test model serialization with Pickle format."""
         serializer = PydanticModelSerializer(serialization_config)
         
@@ -523,7 +540,7 @@ class TestPydanticModelSerializer:
         assert deserialized.name == user.name
         assert deserialized.email == user.email
     
-    def test_serialize_model_default_format(self, serialization_config, sample_data):
+    def test_serialize_model_default_format(self, serialization_config, sample_data) -> Any:
         """Test model serialization with default format."""
         serializer = PydanticModelSerializer(serialization_config)
         
@@ -538,7 +555,7 @@ class TestPydanticModelSerializer:
         assert isinstance(deserialized, type(user))
         assert deserialized.id == user.id
     
-    def test_serialize_model_fallback_format(self, serialization_config, sample_data):
+    def test_serialize_model_fallback_format(self, serialization_config, sample_data) -> Any:
         """Test model serialization with fallback format."""
         serializer = PydanticModelSerializer(serialization_config)
         
@@ -553,7 +570,7 @@ class TestPydanticModelSerializer:
         assert isinstance(deserialized, type(user))
         assert deserialized.id == user.id
     
-    def test_validation_caching(self, serialization_config, sample_data):
+    def test_validation_caching(self, serialization_config, sample_data) -> Any:
         """Test validation result caching."""
         config = SerializationConfig(cache_validation=True)
         serializer = PydanticModelSerializer(config)
@@ -572,7 +589,7 @@ class TestPydanticModelSerializer:
         # Check validation cache hits
         assert serializer.stats["validation_cache_hits"] > 0
     
-    def test_validation_error_handling(self, serialization_config):
+    def test_validation_error_handling(self, serialization_config) -> Any:
         """Test validation error handling."""
         serializer = PydanticModelSerializer(serialization_config)
         
@@ -591,7 +608,7 @@ class TestPydanticModelSerializer:
         # Check error stats
         assert serializer.stats["errors"] == 1
     
-    def test_get_stats(self, serialization_config, sample_data):
+    def test_get_stats(self, serialization_config, sample_data) -> Optional[Dict[str, Any]]:
         """Test model serializer statistics."""
         serializer = PydanticModelSerializer(serialization_config)
         
@@ -618,7 +635,7 @@ class TestCachedSerializationManager:
     """Test cached serialization manager functionality."""
     
     @pytest.mark.asyncio
-    async def test_manager_initialization(self, serialization_config):
+    async def test_manager_initialization(self, serialization_config) -> Any:
         """Test manager initialization."""
         manager = CachedSerializationManager(serialization_config)
         
@@ -629,7 +646,7 @@ class TestCachedSerializationManager:
         await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_serialize_model_cached(self, serialization_config, sample_data):
+    async def test_serialize_model_cached(self, serialization_config, sample_data) -> Any:
         """Test cached model serialization."""
         manager = CachedSerializationManager(serialization_config)
         await manager.start()
@@ -649,7 +666,7 @@ class TestCachedSerializationManager:
             await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_deserialize_model_cached(self, serialization_config, sample_data):
+    async def test_deserialize_model_cached(self, serialization_config, sample_data) -> Any:
         """Test cached model deserialization."""
         manager = CachedSerializationManager(serialization_config)
         await manager.start()
@@ -673,7 +690,7 @@ class TestCachedSerializationManager:
             await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_serialize_model_no_caching(self, basic_config, sample_data):
+    async def test_serialize_model_no_caching(self, basic_config, sample_data) -> Any:
         """Test serialization without caching."""
         manager = CachedSerializationManager(basic_config)
         await manager.start()
@@ -689,7 +706,7 @@ class TestCachedSerializationManager:
             await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_custom_cache_key(self, serialization_config, sample_data):
+    async def test_custom_cache_key(self, serialization_config, sample_data) -> Any:
         """Test serialization with custom cache key."""
         manager = CachedSerializationManager(serialization_config)
         await manager.start()
@@ -709,7 +726,7 @@ class TestCachedSerializationManager:
             await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_get_stats(self, serialization_config, sample_data):
+    async def test_get_stats(self, serialization_config, sample_data) -> Optional[Dict[str, Any]]:
         """Test manager statistics."""
         manager = CachedSerializationManager(serialization_config)
         await manager.start()
@@ -739,18 +756,18 @@ class TestCachedSerializationManager:
 class TestSerializationProfiler:
     """Test serialization profiler functionality."""
     
-    def test_profiler_initialization(self, serialization_config):
+    def test_profiler_initialization(self, serialization_config) -> Any:
         """Test profiler initialization."""
         profiler = SerializationProfiler(serialization_config)
         
         assert profiler.config == serialization_config
         assert profiler.profiles == {}
     
-    def test_profile_operation(self, serialization_config):
+    def test_profile_operation(self, serialization_config) -> Any:
         """Test operation profiling."""
         profiler = SerializationProfiler(serialization_config)
         
-        def test_function(x):
+        def test_function(x) -> Any:
             time.sleep(0.01)  # Simulate work
             return x * 2
         
@@ -765,11 +782,11 @@ class TestSerializationProfiler:
         assert profile["total_time"] > 0
         assert profile["avg_time"] > 0
     
-    def test_profile_operation_disabled(self, basic_config):
+    def test_profile_operation_disabled(self, basic_config) -> Any:
         """Test profiling when disabled."""
         profiler = SerializationProfiler(basic_config)
         
-        def test_function(x):
+        def test_function(x) -> Any:
             return x * 2
         
         # Profile operation (should not profile)
@@ -781,11 +798,11 @@ class TestSerializationProfiler:
         assert profile is None
     
     @pytest.mark.asyncio
-    async def test_profile_async_operation(self, serialization_config):
+    async def test_profile_async_operation(self, serialization_config) -> Any:
         """Test async operation profiling."""
         profiler = SerializationProfiler(serialization_config)
         
-        async def test_async_function(x):
+        async def test_async_function(x) -> Any:
             await asyncio.sleep(0.01)  # Simulate async work
             return x * 2
         
@@ -799,13 +816,15 @@ class TestSerializationProfiler:
         assert profile["count"] == 1
         assert profile["total_time"] > 0
     
-    def test_profile_slow_operation(self, serialization_config):
+    def test_profile_slow_operation(self, serialization_config) -> Any:
         """Test profiling of slow operations."""
         config = SerializationConfig(profile_threshold=0.001)  # Very low threshold
         profiler = SerializationProfiler(config)
         
         def slow_function():
-            time.sleep(0.01)  # Slow operation
+            
+    """slow_function function."""
+time.sleep(0.01)  # Slow operation
             return "result"
         
         # Profile slow operation
@@ -817,12 +836,14 @@ class TestSerializationProfiler:
         assert profile is not None
         assert profile["count"] == 1
     
-    def test_profile_error_handling(self, serialization_config):
+    def test_profile_error_handling(self, serialization_config) -> Any:
         """Test profiling error handling."""
         profiler = SerializationProfiler(serialization_config)
         
         def error_function():
-            raise ValueError("Test error")
+            
+    """error_function function."""
+raise ValueError("Test error")
         
         # Profile operation that raises error
         with pytest.raises(ValueError):
@@ -833,11 +854,11 @@ class TestSerializationProfiler:
         assert profile is not None
         assert profile["count"] == 1
     
-    def test_get_profiles(self, serialization_config):
+    def test_get_profiles(self, serialization_config) -> Optional[Dict[str, Any]]:
         """Test getting all profiles."""
         profiler = SerializationProfiler(serialization_config)
         
-        def test_function(x):
+        def test_function(x) -> Any:
             return x * 2
         
         # Profile multiple operations
@@ -851,11 +872,11 @@ class TestSerializationProfiler:
         assert "op2" in profiles
         assert len(profiles) == 2
     
-    def test_clear_profiles(self, serialization_config):
+    def test_clear_profiles(self, serialization_config) -> Any:
         """Test clearing profiles."""
         profiler = SerializationProfiler(serialization_config)
         
-        def test_function(x):
+        def test_function(x) -> Any:
             return x * 2
         
         # Profile operation
@@ -875,12 +896,14 @@ class TestDecorators:
     """Test serialization decorators."""
     
     @pytest.mark.asyncio
-    async def test_serialized_decorator(self, sample_data):
+    async def test_serialized_decorator(self, sample_data) -> Any:
         """Test serialized decorator."""
         
         @serialized(SerializationFormat.JSON)
         async def get_user_model(user_id: int):
-            return sample_data["user"]
+            
+    """get_user_model function."""
+return sample_data["user"]
         
         # Call decorated function
         result = await get_user_model(1)
@@ -889,7 +912,6 @@ class TestDecorators:
         assert isinstance(result, bytes)
         
         # Should be valid JSON
-        import gzip
         if result.startswith(b"gzip:"):
             decompressed = gzip.decompress(result[5:])
         else:
@@ -900,11 +922,11 @@ class TestDecorators:
         assert json_data["name"] == "John Doe"
     
     @pytest.mark.asyncio
-    async def test_deserialized_decorator(self, sample_data):
+    async def test_deserialized_decorator(self, sample_data) -> Any:
         """Test deserialized decorator."""
         
         @deserialized(type(sample_data["user"]), SerializationFormat.JSON)
-        async def process_user_model(user):
+        async def process_user_model(user) -> Any:
             return f"Processed: {user.name}"
         
         # Serialize user first
@@ -918,7 +940,7 @@ class TestDecorators:
         assert result == "Processed: John Doe"
     
     @pytest.mark.asyncio
-    async def test_serialized_decorator_with_manager(self, serialization_config, sample_data):
+    async def test_serialized_decorator_with_manager(self, serialization_config, sample_data) -> Any:
         """Test serialized decorator with custom manager."""
         manager = CachedSerializationManager(serialization_config)
         await manager.start()
@@ -926,7 +948,9 @@ class TestDecorators:
         try:
             @serialized(SerializationFormat.JSON, manager=manager)
             async def get_user_model(user_id: int):
-                return sample_data["user"]
+                
+    """get_user_model function."""
+return sample_data["user"]
             
             # Call decorated function
             result = await get_user_model(1)
@@ -945,7 +969,7 @@ class TestOptimizedSerializationManager:
     """Test optimized serialization manager functionality."""
     
     @pytest.mark.asyncio
-    async def test_manager_initialization(self, serialization_config):
+    async def test_manager_initialization(self, serialization_config) -> Any:
         """Test manager initialization."""
         manager = OptimizedSerializationManager(serialization_config)
         
@@ -957,7 +981,7 @@ class TestOptimizedSerializationManager:
         await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_serialize_model(self, serialization_config, sample_data):
+    async def test_serialize_model(self, serialization_config, sample_data) -> Any:
         """Test model serialization with profiling."""
         manager = OptimizedSerializationManager(serialization_config)
         await manager.start()
@@ -977,7 +1001,7 @@ class TestOptimizedSerializationManager:
             await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_deserialize_model(self, serialization_config, sample_data):
+    async def test_deserialize_model(self, serialization_config, sample_data) -> Any:
         """Test model deserialization with profiling."""
         manager = OptimizedSerializationManager(serialization_config)
         await manager.start()
@@ -1000,7 +1024,7 @@ class TestOptimizedSerializationManager:
         finally:
             await manager.stop()
     
-    def test_serialize_sync(self, serialization_config, sample_data):
+    def test_serialize_sync(self, serialization_config, sample_data) -> Any:
         """Test synchronous model serialization."""
         manager = OptimizedSerializationManager(serialization_config)
         
@@ -1014,7 +1038,7 @@ class TestOptimizedSerializationManager:
         profiles = manager.profiler.get_profiles()
         assert "serialize_sync" in profiles
     
-    def test_deserialize_sync(self, serialization_config, sample_data):
+    def test_deserialize_sync(self, serialization_config, sample_data) -> Any:
         """Test synchronous model deserialization."""
         manager = OptimizedSerializationManager(serialization_config)
         
@@ -1032,7 +1056,7 @@ class TestOptimizedSerializationManager:
         profiles = manager.profiler.get_profiles()
         assert "deserialize_sync" in profiles
     
-    def test_get_stats(self, serialization_config, sample_data):
+    def test_get_stats(self, serialization_config, sample_data) -> Optional[Dict[str, Any]]:
         """Test manager statistics."""
         manager = OptimizedSerializationManager(serialization_config)
         
@@ -1050,7 +1074,7 @@ class TestOptimizedSerializationManager:
         assert "profiler" in stats
         assert "config" in stats
     
-    def test_get_performance_report(self, serialization_config, sample_data):
+    def test_get_performance_report(self, serialization_config, sample_data) -> Optional[Dict[str, Any]]:
         """Test performance report generation."""
         manager = OptimizedSerializationManager(serialization_config)
         
@@ -1080,7 +1104,7 @@ class TestOptimizedSerializationManager:
 class TestUtilityFunctions:
     """Test utility functions."""
     
-    def test_create_serialization_config(self):
+    def test_create_serialization_config(self) -> Any:
         """Test serialization config creation."""
         config = create_serialization_config(
             default_format=SerializationFormat.PICKLE,
@@ -1090,14 +1114,14 @@ class TestUtilityFunctions:
         assert config.default_format == SerializationFormat.PICKLE
         assert config.enable_compression is False
     
-    def test_create_serialization_manager(self):
+    def test_create_serialization_manager(self) -> Any:
         """Test serialization manager creation."""
         manager = create_serialization_manager()
         
         assert isinstance(manager, OptimizedSerializationManager)
         assert manager.config is not None
     
-    def test_benchmark_serialization(self, sample_data):
+    def test_benchmark_serialization(self, sample_data) -> Any:
         """Test serialization benchmarking."""
         models = list(sample_data.values())
         
@@ -1126,7 +1150,7 @@ class TestIntegration:
     """Test integration scenarios."""
     
     @pytest.mark.asyncio
-    async def test_complete_workflow(self, serialization_config, sample_data):
+    async def test_complete_workflow(self, serialization_config, sample_data) -> Any:
         """Test complete serialization workflow."""
         manager = OptimizedSerializationManager(serialization_config)
         await manager.start()
@@ -1157,7 +1181,7 @@ class TestIntegration:
             await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_caching_integration(self, serialization_config, sample_data):
+    async def test_caching_integration(self, serialization_config, sample_data) -> Any:
         """Test integration with caching system."""
         if not CACHING_AVAILABLE:
             pytest.skip("Caching system not available")
@@ -1194,7 +1218,7 @@ class TestIntegration:
             await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_error_recovery(self, serialization_config):
+    async def test_error_recovery(self, serialization_config) -> Any:
         """Test error recovery scenarios."""
         manager = OptimizedSerializationManager(serialization_config)
         await manager.start()
@@ -1226,7 +1250,7 @@ class TestIntegration:
 class TestPerformance:
     """Test performance characteristics."""
     
-    def test_serialization_performance(self, serialization_config):
+    def test_serialization_performance(self, serialization_config) -> Any:
         """Test serialization performance."""
         manager = OptimizedSerializationManager(serialization_config)
         
@@ -1259,7 +1283,7 @@ class TestPerformance:
         assert deserialized.data == large_model.data
         assert deserialized.items == large_model.items
     
-    def test_compression_effectiveness(self, serialization_config):
+    def test_compression_effectiveness(self, serialization_config) -> Any:
         """Test compression effectiveness."""
         manager = OptimizedSerializationManager(serialization_config)
         
@@ -1281,7 +1305,7 @@ class TestPerformance:
         # Compressed should be smaller
         assert len(serialized_compressed) < len(serialized_uncompressed)
     
-    def test_cache_performance(self, serialization_config, sample_data):
+    def test_cache_performance(self, serialization_config, sample_data) -> Any:
         """Test cache performance."""
         manager = OptimizedSerializationManager(serialization_config)
         
@@ -1301,5 +1325,6 @@ class TestPerformance:
         assert second_time < first_time
         assert serialized1 == serialized2
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

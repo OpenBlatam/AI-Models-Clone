@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
@@ -5,6 +7,8 @@ from .models import BlogPost
 from pydantic import BaseModel, Field
 from .utils import find_post_index, not_found_error, conflict_error, bad_request_error
 
+from typing import Any, List, Dict, Optional
+import logging
 router = APIRouter()
 
 # Simulación de base de datos en memoria

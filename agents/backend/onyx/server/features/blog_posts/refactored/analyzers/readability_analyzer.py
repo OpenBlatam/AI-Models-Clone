@@ -1,19 +1,29 @@
-"""
-Analizador de legibilidad ultra-optimizado.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import logging
 import re
 from typing import Dict, Any, Optional
 from concurrent.futures import ThreadPoolExecutor
-
 from .base import BaseAnalyzer, CachedAnalyzerMixin
 from ..models import NLPAnalysisResult, ReadabilityMetrics
 from ..config import NLPConfig
+    import textstat
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Analizador de legibilidad ultra-optimizado.
+"""
+
+
 
 # Importaciones condicionales
 try:
-    import textstat
     TEXTSTAT_AVAILABLE = True
 except ImportError:
     TEXTSTAT_AVAILABLE = False
@@ -24,11 +34,13 @@ class ReadabilityAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
     """Analizador de legibilidad con múltiples métricas."""
     
     def __init__(self, config: NLPConfig, executor: Optional[ThreadPoolExecutor] = None):
-        super().__init__(config, executor)
+        
+    """__init__ function."""
+super().__init__(config, executor)
         self.target_grade = config.analysis.readability_target_grade
         self._initialize()
     
-    def _initialize(self):
+    def _initialize(self) -> Any:
         """Inicializar analizador."""
         if TEXTSTAT_AVAILABLE:
             self.logger.info("Textstat library available for advanced readability analysis")
@@ -66,7 +78,9 @@ class ReadabilityAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
     async def _analyze_with_textstat(self, text: str) -> ReadabilityMetrics:
         """Análisis avanzado con textstat."""
         def analyze():
-            try:
+            
+    """analyze function."""
+try:
                 # Múltiples métricas de legibilidad
                 flesch_ease = textstat.flesch_reading_ease(text)
                 flesch_grade = textstat.flesch_kincaid_grade(text)
@@ -106,7 +120,9 @@ class ReadabilityAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
     async def _basic_readability_analysis(self, text: str) -> ReadabilityMetrics:
         """Análisis básico sin dependencias externas."""
         def analyze():
-            return self._fallback_analysis(text)
+            
+    """analyze function."""
+return self._fallback_analysis(text)
         
         return await self._run_in_executor(analyze)
     

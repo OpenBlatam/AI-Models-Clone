@@ -1,9 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .core.entities import (
+from .core.value_objects import (
+from .core.repositories import (
+from .application.use_cases import (
+from .infrastructure.ai_engines import (
+from .presentation.api import (
+from .shared.config import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 NotebookLM AI - Advanced Document Intelligence System
 Inspired by Google's NotebookLM with latest AI libraries and optimizations.
 """
 
-from .core.entities import (
     Document,
     Notebook,
     Source,
@@ -14,7 +25,6 @@ from .core.entities import (
     User
 )
 
-from .core.value_objects import (
     DocumentId,
     NotebookId,
     SourceId,
@@ -26,7 +36,6 @@ from .core.value_objects import (
     QueryType
 )
 
-from .core.repositories import (
     DocumentRepository,
     NotebookRepository,
     SourceRepository,
@@ -34,7 +43,6 @@ from .core.repositories import (
     UserRepository
 )
 
-from .application.use_cases import (
     CreateNotebookUseCase,
     AddDocumentUseCase,
     QueryNotebookUseCase,
@@ -43,7 +51,6 @@ from .application.use_cases import (
     AnalyzeDocumentsUseCase
 )
 
-from .infrastructure.ai_engines import (
     AdvancedLLMEngine,
     DocumentProcessor,
     CitationGenerator,
@@ -51,12 +58,10 @@ from .infrastructure.ai_engines import (
     MultiModalProcessor
 )
 
-from .presentation.api import (
     NotebookLMRouter,
     create_notebooklm_app
 )
 
-from .shared.config import (
     NotebookLMConfig,
     AIEngineConfig,
     DatabaseConfig

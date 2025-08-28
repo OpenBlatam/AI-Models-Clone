@@ -1,13 +1,18 @@
-"""
-Redis Indexer Tests - Onyx Integration
-Tests for Redis indexer in Onyx.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 from datetime import datetime
 from pydantic import BaseModel
 import redis
 from ..redis_indexer import RedisIndexer
 from ..redis_config import RedisConfig
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Redis Indexer Tests - Onyx Integration
+Tests for Redis indexer in Onyx.
+"""
 
 # Test models
 class UserModel(BaseModel):
@@ -29,7 +34,7 @@ class TestRedisIndexer:
     """Tests for Redis indexer."""
     
     @pytest.fixture(autouse=True)
-    def setup_redis(self):
+    def setup_redis(self) -> Any:
         """Check Redis connection before tests."""
         try:
             redis_client = redis.Redis(host="localhost", port=6379, db=15)
@@ -41,12 +46,12 @@ class TestRedisIndexer:
             redis_client.close()
     
     @pytest.fixture
-    def redis_indexer(self, redis_config):
+    def redis_indexer(self, redis_config) -> Any:
         """Create Redis indexer instance."""
         return RedisIndexer(redis_config)
     
     @pytest.fixture
-    def test_users(self):
+    def test_users(self) -> Any:
         """Create test users."""
         return [
             UserModel(
@@ -62,7 +67,7 @@ class TestRedisIndexer:
         ]
     
     @pytest.fixture
-    def test_products(self):
+    def test_products(self) -> Any:
         """Create test products."""
         return [
             ProductModel(
@@ -79,7 +84,7 @@ class TestRedisIndexer:
             )
         ]
     
-    def test_index_model(self, redis_indexer, test_users):
+    def test_index_model(self, redis_indexer, test_users) -> Any:
         """Test indexing a single model."""
         # Index user
         redis_indexer.index_model(
@@ -101,7 +106,7 @@ class TestRedisIndexer:
         assert found_user.name == test_users[0].name
         assert found_user.email == test_users[0].email
     
-    def test_index_batch(self, redis_indexer, test_users):
+    def test_index_batch(self, redis_indexer, test_users) -> Any:
         """Test indexing multiple models."""
         # Index users
         redis_indexer.index_batch(
@@ -122,7 +127,7 @@ class TestRedisIndexer:
         assert found_users["john@example.com"].id == test_users[0].id
         assert found_users["jane@example.com"].id == test_users[1].id
     
-    def test_remove_index(self, redis_indexer, test_users):
+    def test_remove_index(self, redis_indexer, test_users) -> Any:
         """Test removing an index."""
         # Index user
         redis_indexer.index_model(
@@ -148,7 +153,7 @@ class TestRedisIndexer:
         
         assert found_user is None
     
-    def test_remove_model(self, redis_indexer, test_users):
+    def test_remove_model(self, redis_indexer, test_users) -> Any:
         """Test removing a model and its indexes."""
         # Index user
         redis_indexer.index_model(
@@ -173,7 +178,7 @@ class TestRedisIndexer:
         
         assert found_user is None
     
-    def test_update_index(self, redis_indexer, test_users):
+    def test_update_index(self, redis_indexer, test_users) -> Any:
         """Test updating a model's indexes."""
         # Index user
         redis_indexer.index_model(
@@ -201,7 +206,7 @@ class TestRedisIndexer:
         assert found_user is not None
         assert found_user.name == "John Updated"
     
-    def test_get_index_stats(self, redis_indexer, test_users, test_products):
+    def test_get_index_stats(self, redis_indexer, test_users, test_products) -> Optional[Dict[str, Any]]:
         """Test getting index statistics."""
         # Index users and products
         redis_indexer.index_batch(
@@ -224,7 +229,7 @@ class TestRedisIndexer:
         assert stats["user"]["count"] == 2
         assert stats["product"]["count"] == 2
     
-    def test_multiple_index_fields(self, redis_indexer, test_products):
+    def test_multiple_index_fields(self, redis_indexer, test_products) -> Any:
         """Test indexing multiple fields."""
         # Index product with multiple fields
         redis_indexer.index_model(
@@ -253,7 +258,7 @@ class TestRedisIndexer:
         assert found_by_price is not None
         assert found_by_price.id == test_products[0].id
     
-    def test_none_values(self, redis_indexer):
+    def test_none_values(self, redis_indexer) -> Any:
         """Test handling of None values."""
         # Create model with None value
         model = UserModel(
@@ -279,7 +284,7 @@ class TestRedisIndexer:
         
         assert found_user is None
     
-    def test_invalid_model_class(self, redis_indexer, test_users):
+    def test_invalid_model_class(self, redis_indexer, test_users) -> Any:
         """Test handling of invalid model class."""
         # Index user
         redis_indexer.index_model(

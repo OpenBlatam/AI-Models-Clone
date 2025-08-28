@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import time
+from .ultra_integration import ultra_app
+from .modular_fastapi import modular_app
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🌟 ULTRA-MODULAR INTEGRATION
 ===========================
@@ -5,14 +23,8 @@
 Integración final que combina la API ultra-avanzada con el sistema modular.
 """
 
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import time
 
 # Importar APIs
-from .ultra_integration import ultra_app
-from .modular_fastapi import modular_app
 
 # =============================================================================
 # ULTRA-MODULAR INTEGRATION
@@ -373,7 +385,6 @@ async def ultimate_capabilities():
 # =============================================================================
 
 if __name__ == "__main__":
-    import uvicorn
     
     print("""
     🌟 STARTING ULTIMATE MODULAR FASTAPI

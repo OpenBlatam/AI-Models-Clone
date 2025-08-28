@@ -1,8 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from langchain_core.messages import HumanMessage
 
 from onyx.llm.utils import build_content_with_imgs
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 IMG_GENERATION_SUMMARY_PROMPT = """
 You have just created the attached images in response to the following query: "{query}".
 
@@ -16,7 +21,7 @@ The prompts used to create these images were: {prompts}
 Describe the two images you generated, summarizing the key elements and content in a sentence or two.
 Be specific about what was generated and respond as if you have seen them,
 without including any disclaimers or speculations.
-"""
+"""f"
 
 
 def build_image_generation_user_prompt(
@@ -36,7 +41,5 @@ def build_image_generation_user_prompt(
         )
     else:
         return HumanMessage(
-            content=IMG_GENERATION_SUMMARY_PROMPT_NO_IMAGES.format(
-                query=query, prompts=prompts
-            ).strip()
+            content=IMG_GENERATION_SUMMARY_PROMPT_NO_IMAGES".strip()
         )

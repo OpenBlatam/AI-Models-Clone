@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import hashlib
+import time
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Any
+from .enums import AnalysisType, ProcessingTier, AnalysisStatus, ErrorType
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 DOMAIN ENTITIES - Entidades del Dominio NLP
 ==============================================
@@ -6,11 +19,6 @@ Entidades y Value Objects que representan los conceptos
 centrales del dominio NLP.
 """
 
-import hashlib
-import time
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
-from .enums import AnalysisType, ProcessingTier, AnalysisStatus, ErrorType
 
 
 @dataclass(frozen=True)
@@ -53,7 +61,7 @@ class AnalysisScore:
     method: str = "unknown"
     metadata: Dict[str, Any] = field(default_factory=dict)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validar reglas de dominio."""
         if not 0 <= self.value <= 100:
             raise ValueError(f"Score debe estar entre 0-100, recibido: {self.value}")

@@ -11,20 +11,20 @@ import logging
 from typing import Dict, List, Optional, Any, Union
 from pathlib import Path
 import json
-from langchain.llms import OpenRouter
-from langchain.chat_models import ChatOpenRouter
-from langchain.schema import HumanMessage, SystemMessage, AIMessage
-from langchain.prompts import PromptTemplate, ChatPromptTemplate
+from langchain_community.llms import OpenAI
+from langchain_community.chat_models import ChatOpenAI, GPTRouter
+from langchain_core.messages import HumanMessage, SystemMessage, AIMessage
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
 from langchain.chains import LLMChain, ConversationChain
 from langchain.memory import ConversationBufferMemory
-from langchain.output_parsers import PydanticOutputParser
+from langchain_core.output_parsers import PydanticOutputParser
 from langchain.tools import Tool
 from langchain.agents import initialize_agent, AgentType
 from langchain.callbacks import StreamingStdOutCallbackHandler
-from langchain.embeddings import OpenAIEmbeddings
-from langchain.vectorstores import FAISS
+from langchain_community.embeddings import OpenAIEmbeddings
+from langchain_community.vectorstores import FAISS
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader
 from typing import Any, List, Dict, Optional
 """
 LangChain Manager for HeyGen AI equivalent.
@@ -87,34 +87,29 @@ class LangChainManager:
         
         # Initialize different models for different tasks
         self.models = {
-            "gpt-4": ChatOpenRouter(
-                model="openai/gpt-4",
+            "gpt-4": ChatOpenAI(
+                model="gpt-4",
                 openai_api_key=self.openrouter_api_key,
-                openai_api_base="https://openrouter.ai/api/v1",
                 temperature=0.7
             ),
-            "gpt-3.5-turbo": ChatOpenRouter(
-                model="openai/gpt-3.5-turbo",
+            "gpt-3.5-turbo": ChatOpenAI(
+                model="gpt-3.5-turbo",
                 openai_api_key=self.openrouter_api_key,
-                openai_api_base="https://openrouter.ai/api/v1",
                 temperature=0.7
             ),
-            "claude-3": ChatOpenRouter(
+            "claude-3": GPTRouter(
                 model="anthropic/claude-3-sonnet",
-                openai_api_key=self.openrouter_api_key,
-                openai_api_base="https://openrouter.ai/api/v1",
+                api_key=self.openrouter_api_key,
                 temperature=0.7
             ),
-            "llama-2": ChatOpenRouter(
+            "llama-2": GPTRouter(
                 model="meta-llama/llama-2-70b-chat",
-                openai_api_key=self.openrouter_api_key,
-                openai_api_base="https://openrouter.ai/api/v1",
+                api_key=self.openrouter_api_key,
                 temperature=0.7
             ),
-            "gemini": ChatOpenRouter(
+            "gemini": GPTRouter(
                 model="google/gemini-pro",
-                openai_api_key=self.openrouter_api_key,
-                openai_api_base="https://openrouter.ai/api/v1",
+                api_key=self.openrouter_api_key,
                 temperature=0.7
             )
         }

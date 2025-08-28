@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 from typing import Any
 
@@ -19,6 +21,9 @@ from onyx.db.prompts import get_default_prompt
 from onyx.tools.built_in_tools import get_search_tool
 from onyx.utils.errors import EERequiredError
 from onyx.utils.variable_functionality import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     fetch_versioned_implementation_with_fallback,
 )
 
@@ -230,7 +235,7 @@ def remove_slack_channel_config(
     db_session.commit()
 
 
-def fetch_slack_channel_configs(
+async def fetch_slack_channel_configs(
     db_session: Session, slack_bot_id: int | None = None
 ) -> Sequence[SlackChannelConfig]:
     if not slack_bot_id:
@@ -243,7 +248,7 @@ def fetch_slack_channel_configs(
     ).all()
 
 
-def fetch_slack_channel_config(
+async def fetch_slack_channel_config(
     db_session: Session, slack_channel_config_id: int
 ) -> SlackChannelConfig | None:
     return db_session.scalar(
@@ -253,7 +258,7 @@ def fetch_slack_channel_config(
     )
 
 
-def fetch_slack_channel_config_for_channel_or_default(
+async def fetch_slack_channel_config_for_channel_or_default(
     db_session: Session, slack_bot_id: int, channel_name: str | None
 ) -> SlackChannelConfig | None:
     # attempt to find channel-specific config first

@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 import multiprocessing
 import os
 import time
@@ -32,8 +40,6 @@ from onyx.background.celery.tasks.indexing.utils import try_creating_indexing_ta
 from onyx.background.celery.tasks.indexing.utils import validate_indexing_fences
 from onyx.background.indexing.checkpointing_utils import cleanup_checkpoint
 from onyx.background.indexing.checkpointing_utils import (
-    get_index_attempts_with_old_checkpoints,
-)
 from onyx.background.indexing.job_client import SimpleJob
 from onyx.background.indexing.job_client import SimpleJobClient
 from onyx.background.indexing.job_client import SimpleJobException
@@ -82,6 +88,12 @@ from shared_configs.configs import INDEXING_MODEL_SERVER_HOST
 from shared_configs.configs import INDEXING_MODEL_SERVER_PORT
 from shared_configs.configs import MULTI_TENANT
 from shared_configs.configs import SENTRY_DSN
+    from the most recently pulled document ID list
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_index_attempts_with_old_checkpoints,
+)
 
 logger = setup_logger()
 
@@ -195,7 +207,9 @@ class ConnectorIndexingContext(BaseModel):
 
 class ConnectorIndexingLogBuilder:
     def __init__(self, ctx: ConnectorIndexingContext):
-        self.ctx = ctx
+        
+    """__init__ function."""
+self.ctx = ctx
 
     def build(self, msg: str, **kwargs: Any) -> str:
         msg_final = (
@@ -682,7 +696,6 @@ def connector_indexing_task(
 ) -> int | None:
     """Indexing task. For a cc pair, this task pulls all document IDs from the source
     and compares those IDs to locally stored documents and deletes all locally stored IDs missing
-    from the most recently pulled document ID list
 
     acks_late must be set to False. Otherwise, celery's visibility timeout will
     cause any task that runs longer than the timeout to be redispatched by the broker.

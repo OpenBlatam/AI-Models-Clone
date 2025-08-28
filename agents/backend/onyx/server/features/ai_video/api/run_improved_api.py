@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import sys
+from pathlib import Path
+import uvicorn
+import click
+    import os
+    import subprocess
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Run script for improved AI Video API
@@ -6,11 +17,6 @@ Run script for improved AI Video API
 Launch the improved FastAPI application with optimal settings.
 """
 
-import asyncio
-import sys
-from pathlib import Path
-import uvicorn
-import click
 
 
 def setup_path():
@@ -32,7 +38,6 @@ def run_api(host: str, port: int, workers: int, reload: bool, env: str):
     setup_path()
     
     # Set environment
-    import os
     os.environ["ENVIRONMENT"] = env
     
     print(f"🚀 Starting AI Video API (Improved)")
@@ -77,7 +82,6 @@ def run_api(host: str, port: int, workers: int, reload: bool, env: str):
 @click.command()
 def install_deps():
     """Install dependencies for the improved API."""
-    import subprocess
     
     print("📦 Installing improved API dependencies...")
     
@@ -103,5 +107,6 @@ cli.add_command(run_api, name="run")
 cli.add_command(install_deps, name="install")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     cli() 

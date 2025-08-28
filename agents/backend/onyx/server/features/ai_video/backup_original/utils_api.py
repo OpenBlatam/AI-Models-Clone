@@ -1,8 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import HTTPException, Depends
 from functools import wraps
 from typing import Callable, List, Optional
 import datetime
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # --- Constantes de producción ---
 MAX_BATCH_IDS = 50
 ERROR_INVALID_IDS = "IDs debe ser lista de strings (máx 50)"
@@ -32,12 +37,14 @@ def endpoint_protected(endpoint_name: str, logger, envelope):
     Devuelve EnvelopeResponse consistente en caso de error, incluyendo trace_id y timestamp.
     Uso:
         @endpoint_protected("/video/status/batch", logger, envelope)
-        async def endpoint(...): ...
+        async def endpoint(...) -> Any: ...
     """
     def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args, x_trace_id: Optional[str] = None, **kwargs):
-            trace_id = x_trace_id or "no-trace-id"
+            
+    """wrapper function."""
+trace_id = x_trace_id or "no-trace-id"
             user = kwargs.get("user") or (args[1] if len(args) > 1 else None)
             logger.info({"endpoint": endpoint_name, "event": "start", "trace_id": trace_id, "user": getattr(user, 'sub', None) if user else None})
             try:

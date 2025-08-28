@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -7,8 +9,6 @@ from sqlalchemy.orm import Session
 from onyx.auth.users import current_user
 from onyx.context.search.models import IndexFilters
 from onyx.context.search.preprocessing.access_filters import (
-    build_access_filters_for_user,
-)
 from onyx.db.engine import get_session
 from onyx.db.models import User
 from onyx.db.search_settings import get_current_search_settings
@@ -18,6 +18,11 @@ from onyx.natural_language_processing.utils import get_tokenizer
 from onyx.prompts.prompt_utils import build_doc_context_str
 from onyx.server.documents.models import ChunkInfo
 from onyx.server.documents.models import DocumentInfo
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    build_access_filters_for_user,
+)
 
 
 router = APIRouter(prefix="/document")

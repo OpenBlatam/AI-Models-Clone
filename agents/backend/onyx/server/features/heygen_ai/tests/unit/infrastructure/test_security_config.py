@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 
-from agents.backend.onyx.server.features.heygen_ai.security_config import SecurityConfigManager
+from security_config import SecurityConfigManager
 
 
 def test_load_defaults_and_save(tmp_path: Path):

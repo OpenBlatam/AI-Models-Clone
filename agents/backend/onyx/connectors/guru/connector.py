@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from datetime import datetime
 from datetime import timezone
@@ -20,6 +22,10 @@ from onyx.file_processing.html_utils import parse_html_page_basic
 from onyx.utils.logger import setup_logger
 
 
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 # Potential Improvements
@@ -154,7 +160,6 @@ class GuruConnector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     connector = GuruConnector()
     connector.load_credentials(

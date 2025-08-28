@@ -1,14 +1,24 @@
-"""
-Email Template Models
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
 
-This module contains models for email templates and template variables.
-"""
+# Constants
+MAX_RETRIES = 100
 
 from datetime import datetime
 from enum import Enum
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field, validator
 from uuid import UUID, uuid4
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Email Template Models
+
+This module contains models for email templates and template variables.
+"""
+
 
 
 class TemplateType(str, Enum):
@@ -66,7 +76,7 @@ class TemplateVariable(BaseModel):
     schema: Optional[Dict[str, Any]] = None
     
     @validator('name')
-    def validate_name(cls, v):
+    def validate_name(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Variable name cannot be empty")
         # Ensure valid variable name format
@@ -75,13 +85,13 @@ class TemplateVariable(BaseModel):
         return v.strip()
     
     @validator('max_length', 'min_length')
-    def validate_length(cls, v):
+    def validate_length(cls, v) -> bool:
         if v is not None and v < 0:
             raise ValueError("Length must be non-negative")
         return v
     
     @validator('min_value', 'max_value')
-    def validate_value(cls, v):
+    def validate_value(cls, v) -> bool:
         if v is not None and not isinstance(v, (int, float)):
             raise ValueError("Value must be a number")
         return v
@@ -129,25 +139,25 @@ class EmailTemplate(BaseModel):
     conversion_rate: Optional[float] = None
     
     @validator('name')
-    def validate_name(cls, v):
+    def validate_name(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Template name cannot be empty")
         return v.strip()
     
     @validator('subject')
-    def validate_subject(cls, v):
+    def validate_subject(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Subject cannot be empty")
         return v.strip()
     
     @validator('html_content')
-    def validate_html_content(cls, v):
+    def validate_html_content(cls, v) -> bool:
         if not v.strip():
             raise ValueError("HTML content cannot be empty")
         return v.strip()
     
     @validator('variables')
-    def validate_variable_names(cls, v):
+    def validate_variable_names(cls, v) -> bool:
         """Validate that variable names are unique"""
         names = [var.name for var in v]
         if len(names) != len(set(names)):
@@ -258,7 +268,8 @@ class EmailTemplate(BaseModel):
         self.usage_count += 1
         self.last_used_at = datetime.utcnow()
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)

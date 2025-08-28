@@ -1,16 +1,8 @@
-"""
-This file contains tests for the following:
-- Ensuring deletion of a connector also:
-    - deletes the documents in vespa for that connector
-    - updates the document sets and user groups to remove the connector
-- Ensure that deleting a connector that is part of an overlapping document set and/or user group works as expected
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from uuid import uuid4
-
 from sqlalchemy.orm import Session
-
 from onyx.connectors.models import ConnectorFailure
 from onyx.connectors.models import DocumentFailure
 from onyx.db.engine import get_sqlalchemy_engine
@@ -31,6 +23,19 @@ from tests.integration.common_utils.test_models import DATestAPIKey
 from tests.integration.common_utils.test_models import DATestUser
 from tests.integration.common_utils.test_models import DATestUserGroup
 from tests.integration.common_utils.vespa import vespa_fixture
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+This file contains tests for the following:
+- Ensuring deletion of a connector also:
+    - deletes the documents in vespa for that connector
+    - updates the document sets and user groups to remove the connector
+- Ensure that deleting a connector that is part of an overlapping document set and/or user group works as expected
+"""
+
+
+
 
 
 def test_connector_deletion(reset: None, vespa_client: vespa_fixture) -> None:

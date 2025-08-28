@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .brute_forcers import (
+from .exploiters import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Security Attackers Module
 
@@ -5,7 +12,6 @@ Provides offensive security testing capabilities including brute force attacks a
 WARNING: This module is for authorized security testing only.
 """
 
-from .brute_forcers import (
     BruteForceRequest,
     BruteForceResult,
     BruteForceType,
@@ -21,7 +27,6 @@ from .brute_forcers import (
     perform_generic_brute_force_async
 )
 
-from .exploiters import (
     ExploitRequest,
     ExploitResult,
     ExploitType,

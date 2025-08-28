@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import uuid
+import json
+from typing import Dict, List, Any, Optional
+import random
+from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
+from fastapi.responses import StreamingResponse
+from pydantic import BaseModel, Field
+from async_non_blocking_flows import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Asynchronous and Non-Blocking Flows Demo
 
@@ -12,18 +35,8 @@ This demo showcases:
 - Performance comparisons
 """
 
-import asyncio
-import time
-import uuid
-import json
-from typing import Dict, List, Any, Optional
-import random
 
-from fastapi import FastAPI, Request, Response, WebSocket, WebSocketDisconnect
-from fastapi.responses import StreamingResponse
-from pydantic import BaseModel, Field
 
-from async_non_blocking_flows import (
     AsyncFlowOrchestrator, EventBus, AsyncDataPipeline, ReactiveStream,
     AsyncMessageQueue, AsyncEvent, FlowContext, EventType, FlowType,
     DataValidationProcessor, DataEnrichmentProcessor, DataTransformationProcessor,
@@ -92,12 +105,12 @@ async def startup_event():
     stream = ReactiveStream("demo_stream")
     
     # Add stream transformers
-    async def uppercase_transformer(data):
+    async def uppercase_transformer(data) -> Any:
         if isinstance(data, dict) and "name" in data:
             data["name"] = data["name"].upper()
         return data
     
-    async def timestamp_transformer(data):
+    async def timestamp_transformer(data) -> Any:
         if isinstance(data, dict):
             data["processed_at"] = time.time()
         return data
@@ -109,11 +122,11 @@ async def startup_event():
     message_queue = AsyncMessageQueue("demo_queue")
     
     # Add consumers
-    async def demo_consumer(message):
+    async def demo_consumer(message) -> Any:
         await asyncio.sleep(0.05)
         print(f"Demo consumer processed: {message}")
     
-    async def analytics_consumer(message):
+    async def analytics_consumer(message) -> Any:
         await asyncio.sleep(0.03)
         print(f"Analytics processed: {message}")
     
@@ -267,7 +280,7 @@ async def demo_stream(request: FlowDemoRequest):
     # Subscribe to stream output
     output_queue = asyncio.Queue()
     
-    async def stream_subscriber(data):
+    async def stream_subscriber(data) -> Any:
         await output_queue.put(data)
     
     stream.subscribe(stream_subscriber)
@@ -358,12 +371,14 @@ async def demo_queue(request: FlowDemoRequest):
 async def stream_data_demo():
     """Demo: Real-time data streaming."""
     async def generate_stream():
-        stream = orchestrator.streams["demo_stream"]
+        
+    """generate_stream function."""
+stream = orchestrator.streams["demo_stream"]
         
         # Subscribe to stream output
         output_queue = asyncio.Queue()
         
-        async def stream_subscriber(data):
+        async def stream_subscriber(data) -> Any:
             await output_queue.put(data)
         
         stream.subscribe(stream_subscriber)
@@ -501,7 +516,9 @@ async def websocket_demo(websocket: WebSocket):
     
     # Subscribe to events
     async def event_handler(event: AsyncEvent):
-        await websocket.send_text(json.dumps({
+        
+    """event_handler function."""
+await websocket.send_text(json.dumps({
             "type": "event",
             "event_type": event.event_type.value,
             "data": event.data,
@@ -684,13 +701,19 @@ async def demonstrate_event_driven_architecture():
     
     # Create event handlers
     async def data_processed_handler(event: AsyncEvent):
-        print(f"   📊 Data processed: {event.data}")
+        
+    """data_processed_handler function."""
+print(f"   📊 Data processed: {event.data}")
     
     async def user_action_handler(event: AsyncEvent):
-        print(f"   👤 User action: {event.data}")
+        
+    """user_action_handler function."""
+print(f"   👤 User action: {event.data}")
     
     async def system_update_handler(event: AsyncEvent):
-        print(f"   🔧 System update: {event.data}")
+        
+    """system_update_handler function."""
+print(f"   🔧 System update: {event.data}")
     
     # Subscribe to events
     orchestrator.subscribe_to_event(EventType.DATA_PROCESSED, data_processed_handler)
@@ -727,7 +750,7 @@ async def demonstrate_reactive_streams():
     # Subscribe to stream output
     output_queue = asyncio.Queue()
     
-    async def stream_subscriber(data):
+    async def stream_subscriber(data) -> Any:
         await output_queue.put(data)
         print(f"   🔄 Stream processed: {data.get('name', 'Unknown')}")
     

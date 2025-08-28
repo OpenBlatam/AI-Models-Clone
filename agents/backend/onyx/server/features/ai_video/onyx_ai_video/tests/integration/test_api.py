@@ -1,6 +1,7 @@
-"""
-Integration tests for the main API module.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import pytest
 import asyncio
@@ -8,27 +9,39 @@ import tempfile
 import json
 from pathlib import Path
 from unittest.mock import Mock, AsyncMock, patch
-
 from ...api.main import (
+from ...core.models import VideoRequest, VideoResponse, VideoQuality, VideoFormat
+from ...config.config_manager import OnyxAIVideoConfig
+        import yaml
+        import yaml
+        import yaml
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Integration tests for the main API module.
+"""
+
+
     OnyxAIVideoSystem, initialize_system, shutdown_system,
     generate_video, generate_video_with_vision, get_system_status,
     get_metrics, get_active_requests, cancel_request, get_system_info,
     health_check, version_info, create_system_instance
 )
-from ...core.models import VideoRequest, VideoResponse, VideoQuality, VideoFormat
-from ...config.config_manager import OnyxAIVideoConfig
 
 
 class TestOnyxAIVideoSystem:
     """Test the main OnyxAIVideoSystem class."""
     
     @pytest.mark.integration
-    async def test_system_initialization(self, temp_dir, sample_config):
+    async def test_system_initialization(self, temp_dir, sample_config) -> Any:
         """Test complete system initialization."""
         # Create config file
         config_file = temp_dir / "test_config.yaml"
-        import yaml
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(sample_config, f)
         
         # Create system instance
@@ -47,7 +60,7 @@ class TestOnyxAIVideoSystem:
         assert system.plugin_manager is not None
     
     @pytest.mark.integration
-    async def test_system_shutdown(self, real_system):
+    async def test_system_shutdown(self, real_system) -> Any:
         """Test system shutdown."""
         await real_system.initialize()
         
@@ -58,7 +71,7 @@ class TestOnyxAIVideoSystem:
         assert real_system.shutdown_requested is True
     
     @pytest.mark.integration
-    async def test_generate_video_basic(self, real_system, sample_video_request):
+    async def test_generate_video_basic(self, real_system, sample_video_request) -> Any:
         """Test basic video generation."""
         await real_system.initialize()
         
@@ -80,7 +93,7 @@ class TestOnyxAIVideoSystem:
             assert response.processing_time == 5.0
     
     @pytest.mark.integration
-    async def test_generate_video_with_vision(self, real_system, sample_video_request):
+    async def test_generate_video_with_vision(self, real_system, sample_video_request) -> Any:
         """Test video generation with vision capabilities."""
         await real_system.initialize()
         
@@ -105,7 +118,7 @@ class TestOnyxAIVideoSystem:
             assert response.metadata["vision_used"] is True
     
     @pytest.mark.integration
-    async def test_get_system_status(self, real_system):
+    async def test_get_system_status(self, real_system) -> Optional[Dict[str, Any]]:
         """Test system status retrieval."""
         await real_system.initialize()
         
@@ -119,7 +132,7 @@ class TestOnyxAIVideoSystem:
         assert "security" in status
     
     @pytest.mark.integration
-    async def test_get_metrics(self, real_system):
+    async def test_get_metrics(self, real_system) -> Optional[Dict[str, Any]]:
         """Test metrics retrieval."""
         await real_system.initialize()
         
@@ -131,7 +144,7 @@ class TestOnyxAIVideoSystem:
         assert "error_metrics" in metrics
     
     @pytest.mark.integration
-    async def test_request_management(self, real_system, sample_video_request):
+    async async def test_request_management(self, real_system, sample_video_request) -> Any:
         """Test request management functionality."""
         await real_system.initialize()
         
@@ -155,7 +168,7 @@ class TestOnyxAIVideoSystem:
         assert sample_video_request.request_id not in active_requests
     
     @pytest.mark.integration
-    async def test_error_handling(self, real_system, sample_video_request):
+    async def test_error_handling(self, real_system, sample_video_request) -> Any:
         """Test error handling in video generation."""
         await real_system.initialize()
         
@@ -167,7 +180,7 @@ class TestOnyxAIVideoSystem:
                 await real_system.generate_video(sample_video_request)
     
     @pytest.mark.integration
-    async def test_concurrent_requests(self, real_system):
+    async async def test_concurrent_requests(self, real_system) -> Any:
         """Test handling of concurrent requests."""
         await real_system.initialize()
         
@@ -201,7 +214,7 @@ class TestOnyxAIVideoSystem:
                 assert response.status == "completed"
     
     @pytest.mark.integration
-    async def test_system_info(self, real_system):
+    async def test_system_info(self, real_system) -> Any:
         """Test system information retrieval."""
         await real_system.initialize()
         
@@ -215,7 +228,7 @@ class TestOnyxAIVideoSystem:
         assert "onyx_integration" in info
     
     @pytest.mark.integration
-    async def test_health_check(self, real_system):
+    async def test_health_check(self, real_system) -> Any:
         """Test health check functionality."""
         await real_system.initialize()
         
@@ -227,7 +240,7 @@ class TestOnyxAIVideoSystem:
         assert "performance" in health
     
     @pytest.mark.integration
-    async def test_version_info(self, real_system):
+    async def test_version_info(self, real_system) -> Any:
         """Test version information."""
         version = real_system.version_info()
         
@@ -241,11 +254,14 @@ class TestAPIFunctions:
     """Test API utility functions."""
     
     @pytest.mark.integration
-    async def test_initialize_system(self, temp_dir, sample_config):
+    async def test_initialize_system(self, temp_dir, sample_config) -> Any:
         """Test initialize_system function."""
         config_file = temp_dir / "test_config.yaml"
-        import yaml
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(sample_config, f)
         
         system = await initialize_system(str(config_file))
@@ -257,7 +273,7 @@ class TestAPIFunctions:
         await system.shutdown()
     
     @pytest.mark.integration
-    async def test_shutdown_system(self, real_system):
+    async def test_shutdown_system(self, real_system) -> Any:
         """Test shutdown_system function."""
         await real_system.initialize()
         
@@ -267,7 +283,7 @@ class TestAPIFunctions:
         assert real_system.shutdown_requested is True
     
     @pytest.mark.integration
-    async def test_generate_video_function(self, real_system, sample_video_request):
+    async def test_generate_video_function(self, real_system, sample_video_request) -> Any:
         """Test generate_video function."""
         await real_system.initialize()
         
@@ -285,7 +301,7 @@ class TestAPIFunctions:
             assert response.status == "completed"
     
     @pytest.mark.integration
-    async def test_generate_video_with_vision_function(self, real_system, sample_video_request):
+    async def test_generate_video_with_vision_function(self, real_system, sample_video_request) -> Any:
         """Test generate_video_with_vision function."""
         await real_system.initialize()
         
@@ -306,7 +322,7 @@ class TestAPIFunctions:
             assert response.status == "completed"
     
     @pytest.mark.integration
-    async def test_get_system_status_function(self, real_system):
+    async def test_get_system_status_function(self, real_system) -> Optional[Dict[str, Any]]:
         """Test get_system_status function."""
         await real_system.initialize()
         
@@ -316,7 +332,7 @@ class TestAPIFunctions:
         assert status["initialized"] is True
     
     @pytest.mark.integration
-    async def test_get_metrics_function(self, real_system):
+    async def test_get_metrics_function(self, real_system) -> Optional[Dict[str, Any]]:
         """Test get_metrics function."""
         await real_system.initialize()
         
@@ -326,7 +342,7 @@ class TestAPIFunctions:
         assert "performance_metrics" in metrics
     
     @pytest.mark.integration
-    async def test_get_active_requests_function(self, real_system, sample_video_request):
+    async async def test_get_active_requests_function(self, real_system, sample_video_request) -> Optional[Dict[str, Any]]:
         """Test get_active_requests function."""
         await real_system.initialize()
         
@@ -341,7 +357,7 @@ class TestAPIFunctions:
         assert sample_video_request.request_id in active_requests
     
     @pytest.mark.integration
-    async def test_cancel_request_function(self, real_system, sample_video_request):
+    async async def test_cancel_request_function(self, real_system, sample_video_request) -> Any:
         """Test cancel_request function."""
         await real_system.initialize()
         
@@ -360,7 +376,7 @@ class TestAPIFunctions:
         assert sample_video_request.request_id not in active_requests
     
     @pytest.mark.integration
-    async def test_get_system_info_function(self, real_system):
+    async def test_get_system_info_function(self, real_system) -> Optional[Dict[str, Any]]:
         """Test get_system_info function."""
         await real_system.initialize()
         
@@ -370,7 +386,7 @@ class TestAPIFunctions:
         assert info["version"] == "1.0.0"
     
     @pytest.mark.integration
-    async def test_health_check_function(self, real_system):
+    async def test_health_check_function(self, real_system) -> Any:
         """Test health_check function."""
         await real_system.initialize()
         
@@ -380,7 +396,7 @@ class TestAPIFunctions:
         assert "timestamp" in health
     
     @pytest.mark.integration
-    async def test_version_info_function(self, real_system):
+    async def test_version_info_function(self, real_system) -> Any:
         """Test version_info function."""
         version = version_info(real_system)
         
@@ -388,11 +404,14 @@ class TestAPIFunctions:
         assert "build_date" in version
     
     @pytest.mark.integration
-    async def test_create_system_instance(self, temp_dir, sample_config):
+    async def test_create_system_instance(self, temp_dir, sample_config) -> Any:
         """Test create_system_instance function."""
         config_file = temp_dir / "test_config.yaml"
-        import yaml
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(sample_config, f)
         
         system = create_system_instance(str(config_file))
@@ -406,14 +425,14 @@ class TestAPIErrorHandling:
     """Test API error handling scenarios."""
     
     @pytest.mark.integration
-    async def test_invalid_config_file(self):
+    async def test_invalid_config_file(self) -> Any:
         """Test handling of invalid config file."""
         with pytest.raises(FileNotFoundError):
             system = OnyxAIVideoSystem("nonexistent.yaml")
             await system.initialize()
     
     @pytest.mark.integration
-    async def test_invalid_video_request(self, real_system):
+    async async def test_invalid_video_request(self, real_system) -> Any:
         """Test handling of invalid video request."""
         await real_system.initialize()
         
@@ -430,7 +449,7 @@ class TestAPIErrorHandling:
             await real_system.generate_video(invalid_request)
     
     @pytest.mark.integration
-    async def test_workflow_failure(self, real_system, sample_video_request):
+    async def test_workflow_failure(self, real_system, sample_video_request) -> Any:
         """Test handling of workflow failure."""
         await real_system.initialize()
         
@@ -442,7 +461,7 @@ class TestAPIErrorHandling:
                 await real_system.generate_video(sample_video_request)
     
     @pytest.mark.integration
-    async def test_system_not_initialized(self, real_system, sample_video_request):
+    async def test_system_not_initialized(self, real_system, sample_video_request) -> Any:
         """Test handling when system is not initialized."""
         # Don't initialize the system
         
@@ -450,7 +469,7 @@ class TestAPIErrorHandling:
             await real_system.generate_video(sample_video_request)
     
     @pytest.mark.integration
-    async def test_shutdown_during_operation(self, real_system, sample_video_request):
+    async def test_shutdown_during_operation(self, real_system, sample_video_request) -> Any:
         """Test handling when system is shutdown during operation."""
         await real_system.initialize()
         
@@ -465,7 +484,7 @@ class TestAPIPerformance:
     """Test API performance characteristics."""
     
     @pytest.mark.integration
-    async def test_request_tracking(self, real_system, sample_video_request):
+    async async def test_request_tracking(self, real_system, sample_video_request) -> Any:
         """Test request tracking and metrics."""
         await real_system.initialize()
         
@@ -487,7 +506,7 @@ class TestAPIPerformance:
             assert metrics["request_metrics"]["successful_requests"] >= 1
     
     @pytest.mark.integration
-    async def test_concurrent_request_limits(self, real_system):
+    async async def test_concurrent_request_limits(self, real_system) -> Any:
         """Test concurrent request limits."""
         await real_system.initialize()
         
@@ -507,7 +526,7 @@ class TestAPIPerformance:
             requests.append(request)
         
         # Mock video generation with delay
-        async def delayed_generate(request):
+        async def delayed_generate(request) -> Any:
             await asyncio.sleep(0.1)  # Simulate processing time
             return VideoResponse(
                 request_id=request.request_id,
@@ -527,7 +546,7 @@ class TestAPIPerformance:
                 assert response.status == "completed"
     
     @pytest.mark.integration
-    async def test_memory_usage_tracking(self, real_system):
+    async def test_memory_usage_tracking(self, real_system) -> Any:
         """Test memory usage tracking."""
         await real_system.initialize()
         
@@ -561,7 +580,7 @@ class TestAPISecurity:
     """Test API security features."""
     
     @pytest.mark.integration
-    async def test_input_validation(self, real_system):
+    async def test_input_validation(self, real_system) -> Any:
         """Test input validation security."""
         await real_system.initialize()
         
@@ -587,7 +606,7 @@ class TestAPISecurity:
             assert response.status == "completed"
     
     @pytest.mark.integration
-    async def test_rate_limiting(self, real_system):
+    async def test_rate_limiting(self, real_system) -> Any:
         """Test rate limiting functionality."""
         await real_system.initialize()
         
@@ -629,7 +648,7 @@ class TestAPISecurity:
                 await real_system.generate_video(requests[2])
     
     @pytest.mark.integration
-    async def test_access_control(self, real_system, sample_video_request):
+    async def test_access_control(self, real_system, sample_video_request) -> Any:
         """Test access control functionality."""
         await real_system.initialize()
         
@@ -641,7 +660,7 @@ class TestAPISecurity:
                 await real_system.generate_video(sample_video_request)
     
     @pytest.mark.integration
-    async def test_security_event_logging(self, real_system):
+    async def test_security_event_logging(self, real_system) -> Any:
         """Test security event logging."""
         await real_system.initialize()
         

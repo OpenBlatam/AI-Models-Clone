@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 
 import pytest
@@ -10,6 +12,9 @@ from onyx.chat.stream_processing.utils import DocumentIdOrderMapping
 from onyx.configs.constants import DocumentSource
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 This module contains tests for the citation extraction functionality in Onyx,
 specifically the substitution of the number of document cited in the UI. (The LLM

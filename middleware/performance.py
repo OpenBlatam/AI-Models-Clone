@@ -1,7 +1,10 @@
-"""
-Performance monitoring middleware for caching, database optimization, and metrics.
-Uses functional programming patterns and RORO pattern.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import functools
@@ -11,12 +14,22 @@ from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 import json
 import hashlib
-
 import redis.asyncio as redis
 from fastapi import Request, Response
 import structlog
-
 from .core import (
+            import psutil
+            import psutil
+    import psutil
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Performance monitoring middleware for caching, database optimization, and metrics.
+Uses functional programming patterns and RORO pattern.
+"""
+
+
+
     LogContext, create_log_context, log_operation, LogLevel,
     MetricContext, create_metric_context, record_metric, MetricType,
     with_logging, with_metrics, with_exception_handling
@@ -61,7 +74,9 @@ class CacheManager:
     """Redis-based cache manager with async operations."""
     
     def __init__(self, redis_url: str = "redis://localhost:6379"):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.redis_client: Optional[redis.Redis] = None
         self.logger = structlog.get_logger()
     
@@ -178,7 +193,7 @@ cache_manager = CacheManager()
 class DatabaseProfiler:
     """Database query profiler and optimizer."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.queries: List[Dict[str, Any]] = []
         self.logger = structlog.get_logger()
     
@@ -262,7 +277,7 @@ def with_caching(
     """
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             cache_mgr = cache_manager_instance or cache_manager
             
             # Generate cache key
@@ -316,7 +331,7 @@ def with_caching(
             return result
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # For sync functions, we can't use async cache operations
             # This is a limitation - sync functions should be wrapped differently
             return func(*args, **kwargs)
@@ -330,7 +345,7 @@ def with_database_profiling():
     """Decorator for database query profiling."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             
             try:
@@ -355,7 +370,7 @@ def with_database_profiling():
                 raise
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             
             try:
@@ -396,11 +411,10 @@ def with_performance_monitoring(
     """
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             
             # Record memory usage before
-            import psutil
             process = psutil.Process()
             memory_before = process.memory_info().rss / 1024 / 1024  # MB
             
@@ -452,10 +466,9 @@ def with_performance_monitoring(
                 raise
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             
-            import psutil
             process = psutil.Process()
             memory_before = process.memory_info().rss / 1024 / 1024
             
@@ -522,7 +535,6 @@ async def performance_monitoring_middleware(request: Request, call_next):
     )
     
     # Monitor memory usage
-    import psutil
     process = psutil.Process()
     memory_before = process.memory_info().rss / 1024 / 1024
     

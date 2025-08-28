@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import cast
 from uuid import uuid4
 
@@ -16,8 +18,6 @@ from onyx.agents.agent_search.shared_graph_utils.models import QueryExpansionTyp
 from onyx.chat.prompt_builder.answer_prompt_builder import AnswerPromptBuilder
 from onyx.chat.tool_handling.tool_response_handler import get_tool_by_name
 from onyx.chat.tool_handling.tool_response_handler import (
-    get_tool_call_for_non_tool_calling_llm_impl,
-)
 from onyx.configs.chat_configs import USE_SEMANTIC_KEYWORD_EXPANSIONS_BASIC_SEARCH
 from onyx.context.search.preprocessing.preprocessing import query_analysis
 from onyx.context.search.retrieval.search_runner import get_query_embedding
@@ -36,6 +36,11 @@ from onyx.utils.threadpool_concurrency import TimeoutThread
 from onyx.utils.threadpool_concurrency import wait_on_background
 from onyx.utils.timing import log_function_time
 from shared_configs.model_server_models import Embedding
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_tool_call_for_non_tool_calling_llm_impl,
+)
 
 logger = setup_logger()
 
@@ -51,7 +56,7 @@ def _create_history_str(prompt_builder: AnswerPromptBuilder) -> str:
         else:
             continue
         history_segments.append(f"{role}:\n {msg.content}\n\n")
-    return "\n".join(history_segments)
+    return "\n"f".join(history_segments)
 
 
 def _expand_query(
@@ -73,7 +78,7 @@ def _expand_query(
             base_prompt = QUERY_KEYWORD_EXPANSION_WITHOUT_HISTORY_PROMPT
         else:
             base_prompt = QUERY_SEMANTIC_EXPANSION_WITHOUT_HISTORY_PROMPT
-        expansion_prompt = base_prompt.format(question=query)
+        expansion_prompt = base_prompt"
 
     msg = HumanMessage(content=expansion_prompt)
     primary_llm, _ = get_default_llms()

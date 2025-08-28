@@ -1,0 +1,10 @@
+Collecting aiomysql
+  Downloading aiomysql-0.2.0-py3-none-any.whl.metadata (11 kB)
+Collecting PyMySQL>=1.0 (from aiomysql)
+  Downloading pymysql-1.1.2-py3-none-any.whl.metadata (4.3 kB)
+Downloading aiomysql-0.2.0-py3-none-any.whl (44 kB)
+   ---------------------------------------- 44.2/44.2 kB 722.9 kB/s eta 0:00:00
+Downloading pymysql-1.1.2-py3-none-any.whl (45 kB)
+   ---------------------------------------- 45.3/45.3 kB 2.3 MB/s eta 0:00:00
+Installing collected packages: PyMySQL, aiomysql
+Successfully installed PyMySQL-1.1.2 aiomysql-0.2.0

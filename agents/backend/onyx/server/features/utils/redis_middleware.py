@@ -1,7 +1,8 @@
-"""
-Redis Middleware - Onyx Integration
-Middleware for Redis caching in Onyx.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Any, Callable, Dict, List, Optional, Union
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
@@ -12,6 +13,14 @@ import time
 import logging
 from .redis_utils import RedisUtils
 from .redis_config import get_config
+from fastapi import FastAPI
+from .redis_middleware import RedisMiddleware
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Redis Middleware - Onyx Integration
+Middleware for Redis caching in Onyx.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -167,8 +176,6 @@ class RedisMiddleware(BaseHTTPMiddleware):
 
 # Example usage:
 """
-from fastapi import FastAPI
-from .redis_middleware import RedisMiddleware
 
 app = FastAPI()
 
@@ -185,11 +192,15 @@ app.add_middleware(
 
 @app.get("/api/v1/users")
 async def get_users():
-    # This response will be cached
+    
+    """get_users function."""
+# This response will be cached
     return {"users": [...]}
 
 @app.post("/api/v1/users")
 async def create_user():
-    # This response won't be cached
+    
+    """create_user function."""
+# This response won't be cached
     return {"user": {...}}
 """ 

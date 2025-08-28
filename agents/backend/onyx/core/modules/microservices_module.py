@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+from typing import Dict, Any, Optional, List
+from ..modular_architecture import (
+import structlog
+from typing import Any, List, Dict, Optional
+import logging
 """
 🏗️ MICROSERVICES MODULE
 ======================
@@ -5,13 +16,9 @@
 Módulo modular para funcionalidades de microservices.
 """
 
-import asyncio
-from typing import Dict, Any, Optional, List
-from ..modular_architecture import (
     ModuleInterface, ModuleMetadata, ServiceInterface, 
     MiddlewareInterface, modular_service, modular_middleware
 )
-import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -42,7 +49,9 @@ class MicroservicesModule(ModuleInterface):
         )
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.service_discovery = None
         self.circuit_breaker = None
         self.cache_service = None
@@ -116,10 +125,12 @@ class ServiceDiscoveryService(ServiceInterface):
     """Servicio de descubrimiento de servicios."""
     
     def __init__(self, config: Dict[str, Any] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self.services_registry: Dict[str, List[Dict]] = {}
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Inicializa el servicio."""
         logger.info("Service discovery initialized")
     
@@ -194,7 +205,7 @@ class ServiceDiscoveryService(ServiceInterface):
             "total_instances": sum(len(instances) for instances in self.services_registry.values())
         }
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Cierra el servicio."""
         self.services_registry.clear()
         logger.info("Service discovery shutdown")
@@ -204,12 +215,14 @@ class CircuitBreakerService(ServiceInterface):
     """Servicio de circuit breaker."""
     
     def __init__(self, config: Dict[str, Any] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self.circuit_states: Dict[str, Dict] = {}
         self.failure_threshold = self.config.get("failure_threshold", 5)
         self.recovery_timeout = self.config.get("recovery_timeout", 30)
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Inicializa el servicio."""
         logger.info("Circuit breaker service initialized")
     
@@ -226,6 +239,10 @@ class CircuitBreakerService(ServiceInterface):
             return await self._record_failure(service_name)
         elif action == "force_open":
             return await self._force_open(service_name)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         elif action == "force_close":
             return await self._force_close(service_name)
         
@@ -289,6 +306,10 @@ class CircuitBreakerService(ServiceInterface):
         return {"failure_count": circuit["failure_count"]}
     
     async def _force_open(self, service_name: str) -> Dict:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         """Fuerza apertura del circuito."""
         if service_name not in self.circuit_states:
             self.circuit_states[service_name] = {
@@ -323,7 +344,7 @@ class CircuitBreakerService(ServiceInterface):
             "states": {name: state["state"] for name, state in self.circuit_states.items()}
         }
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Cierra el servicio."""
         self.circuit_states.clear()
         logger.info("Circuit breaker service shutdown")
@@ -333,11 +354,13 @@ class MicroservicesCacheService(ServiceInterface):
     """Servicio de cache para microservices."""
     
     def __init__(self, config: Dict[str, Any] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self.cache: Dict[str, Dict] = {}
         self.default_ttl = self.config.get("default_ttl", 3600)
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Inicializa el servicio."""
         logger.info("Microservices cache service initialized")
     
@@ -431,7 +454,7 @@ class MicroservicesCacheService(ServiceInterface):
             "cache_size": len(self.cache)
         }
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Cierra el servicio."""
         self.cache.clear()
         logger.info("Microservices cache service shutdown")
@@ -444,7 +467,7 @@ class MicroservicesCacheService(ServiceInterface):
 class ServiceDiscoveryMiddleware(MiddlewareInterface):
     """Middleware para integración con service discovery."""
     
-    async def process_request(self, request: Any, call_next: Callable) -> Any:
+    async async def process_request(self, request: Any, call_next: Callable) -> Any:
         """Procesa request con service discovery."""
         # Aquí podrías agregar headers de service discovery,
         # logging de requests entre servicios, etc.
@@ -479,7 +502,7 @@ class ServiceDiscoveryMiddleware(MiddlewareInterface):
 class CircuitBreakerMiddleware(MiddlewareInterface):
     """Middleware para circuit breaker."""
     
-    async def process_request(self, request: Any, call_next: Callable) -> Any:
+    async async def process_request(self, request: Any, call_next: Callable) -> Any:
         """Procesa request con circuit breaker."""
         # En implementación real, verificarías el estado del circuit breaker
         # para el servicio de destino

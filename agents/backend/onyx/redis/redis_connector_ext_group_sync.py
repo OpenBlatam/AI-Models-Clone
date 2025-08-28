@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from datetime import datetime
 from typing import cast
 
@@ -11,6 +16,9 @@ from onyx.configs.constants import OnyxRedisConstants
 from onyx.redis.redis_pool import SCAN_ITER_COUNT_DEFAULT
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class RedisConnectorExternalGroupSyncPayload(BaseModel):
     id: str
     submitted: datetime

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import abc
 from collections.abc import Iterator
 from typing import Literal
@@ -13,6 +15,9 @@ from onyx.configs.app_configs import LOG_INDIVIDUAL_MODEL_TOKENS
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 ToolChoiceOptions = Literal["required"] | Literal["auto"] | Literal["none"]
@@ -68,7 +73,7 @@ class LLM(abc.ABC):
         return False
 
     @property
-    def requires_api_key(self) -> bool:
+    async def requires_api_key(self) -> bool:
         return True
 
     @property

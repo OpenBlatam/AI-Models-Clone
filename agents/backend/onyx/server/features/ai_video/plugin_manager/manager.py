@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import importlib
+import inspect
+from typing import Any, Dict, List, Optional
+from pathlib import Path
+from datetime import datetime
+from onyx.utils.logger import setup_logger
+from onyx.utils.threadpool_concurrency import ThreadSafeDict
+from onyx.utils.telemetry import TelemetryLogger
+from onyx.utils.gpu_utils import get_gpu_info, is_gpu_available
+from onyx.utils.retry_wrapper import retry_wrapper
+from .core.models import OnyxPluginInfo, OnyxPluginContext, PluginStatus, PluginManagerStatus
+from .core.base import OnyxPluginBase
+from .core.exceptions import PluginError, AIVideoError
+from .core.onyx_integration import onyx_integration
+from typing import Any, List, Dict, Optional
+import logging
 """
 Onyx Plugin Manager - Main Manager Class
 
@@ -5,25 +24,10 @@ Main plugin manager class that handles plugin lifecycle, execution,
 and integration with Onyx's infrastructure for optimal performance.
 """
 
-import asyncio
-import importlib
-import inspect
-from typing import Any, Dict, List, Optional
-from pathlib import Path
-from datetime import datetime
 
 # Onyx imports
-from onyx.utils.logger import setup_logger
-from onyx.utils.threadpool_concurrency import ThreadSafeDict
-from onyx.utils.telemetry import TelemetryLogger
-from onyx.utils.gpu_utils import get_gpu_info, is_gpu_available
-from onyx.utils.retry_wrapper import retry_wrapper
 
 # Local imports
-from .core.models import OnyxPluginInfo, OnyxPluginContext, PluginStatus, PluginManagerStatus
-from .core.base import OnyxPluginBase
-from .core.exceptions import PluginError, AIVideoError
-from .core.onyx_integration import onyx_integration
 
 
 class OnyxPluginManager:
@@ -34,7 +38,7 @@ class OnyxPluginManager:
     infrastructure for optimal performance and reliability.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = setup_logger("onyx_plugin_manager")
         self.telemetry = TelemetryLogger()
         self.plugins: ThreadSafeDict[str, OnyxPluginBase] = ThreadSafeDict()

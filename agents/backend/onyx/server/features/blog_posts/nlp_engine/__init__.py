@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from nlp_engine import NLPEngine
+from nlp_engine.core.enums import AnalysisType, ProcessingTier
+from .core.entities import (
+from .core.enums import (
+from .core.domain_services import (
+from .application.dto import (
+from .application.use_cases import (
+from .application.services import (
+from .interfaces import (
+            from .demo_infrastructure import MockAnalyzerFactory
+            from .demo_infrastructure import MockCacheRepository
+            from .demo_infrastructure import MockMetricsCollector
+            from .demo_infrastructure import MockConfigurationService
+            from .demo_infrastructure import MockStructuredLogger
+            from .core.entities import TextFingerprint
+                from .core.entities import TextFingerprint
+                from .core.entities import TextFingerprint
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 NLP ENGINE - Sistema Modular Enterprise
 =========================================
@@ -28,8 +50,6 @@ Características:
 Ejemplo de uso:
 
 ```python
-from nlp_engine import NLPEngine
-from nlp_engine.core.enums import AnalysisType, ProcessingTier
 
 # Crear motor
 engine = NLPEngine()
@@ -53,7 +73,6 @@ __author__ = "Enterprise NLP Team"
 __description__ = "Modular NLP Engine with Clean Architecture"
 
 # Core exports
-from .core.entities import (
     AnalysisResult, 
     TextFingerprint, 
     AnalysisScore, 
@@ -61,7 +80,6 @@ from .core.entities import (
     AnalysisError
 )
 
-from .core.enums import (
     AnalysisType,
     ProcessingTier, 
     CacheStrategy,
@@ -72,14 +90,12 @@ from .core.enums import (
     MetricType
 )
 
-from .core.domain_services import (
     AnalysisOrchestrator,
     TextProcessor,
     ScoreValidator
 )
 
 # Application exports
-from .application.dto import (
     AnalysisRequest,
     AnalysisResponse,
     BatchAnalysisRequest,
@@ -87,13 +103,11 @@ from .application.dto import (
     serialize_response
 )
 
-from .application.use_cases import (
     AnalyzeTextUseCase,
     BatchAnalysisUseCase,
     StreamAnalysisUseCase
 )
 
-from .application.services import (
     AnalysisService,
     CacheService,
     MetricsService,
@@ -101,7 +115,6 @@ from .application.services import (
 )
 
 # Interface exports (for implementations)
-from .interfaces import (
     # Analyzer interfaces
     IAnalyzer,
     IAnalyzerFactory,
@@ -161,23 +174,18 @@ class NLPEngine:
         """
         # Usar implementaciones mock por defecto si no se proporcionan
         if not analyzer_factory:
-            from .demo_infrastructure import MockAnalyzerFactory
             analyzer_factory = MockAnalyzerFactory()
         
         if not cache_repository:
-            from .demo_infrastructure import MockCacheRepository
             cache_repository = MockCacheRepository()
         
         if not metrics_collector:
-            from .demo_infrastructure import MockMetricsCollector
             metrics_collector = MockMetricsCollector()
         
         if not config_service:
-            from .demo_infrastructure import MockConfigurationService
             config_service = MockConfigurationService()
         
         if not logger:
-            from .demo_infrastructure import MockStructuredLogger
             logger = MockStructuredLogger()
         
         # Infrastructure
@@ -252,7 +260,6 @@ class NLPEngine:
         
         if response.success:
             # Convertir response a AnalysisResult para API simplificada
-            from .core.entities import TextFingerprint
             fingerprint = TextFingerprint.create(text)
             result = AnalysisResult(fingerprint=fingerprint)
             
@@ -311,7 +318,6 @@ class NLPEngine:
         results = []
         for i, response in enumerate(responses):
             if response.success:
-                from .core.entities import TextFingerprint
                 fingerprint = TextFingerprint.create(texts[i])
                 result = AnalysisResult(fingerprint=fingerprint)
                 
@@ -328,7 +334,6 @@ class NLPEngine:
                 results.append(result)
             else:
                 # Crear resultado de error
-                from .core.entities import TextFingerprint
                 fingerprint = TextFingerprint.create(texts[i])
                 result = AnalysisResult(fingerprint=fingerprint)
                 

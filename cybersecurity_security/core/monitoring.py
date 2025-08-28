@@ -1,8 +1,13 @@
-"""
-Monitoring System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive monitoring for the cybersecurity toolkit.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -15,8 +20,17 @@ from datetime import datetime, timedelta
 import statistics
 from collections import defaultdict, deque
 import json
-
 from .logging import SecurityLogger, LogContext, LogMetadata
+import functools 
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Monitoring System
+
+Comprehensive monitoring for the cybersecurity toolkit.
+"""
+
+
 
 # ============================================================================
 # MONITORING TYPES
@@ -80,7 +94,9 @@ class PerformanceMonitor:
     """Performance monitoring system."""
     
     def __init__(self, max_history: int = 1000):
-        self.max_history = max_history
+        
+    """__init__ function."""
+self.max_history = max_history
         self.metrics: Dict[str, deque] = defaultdict(lambda: deque(maxlen=max_history))
         self.counters: Dict[str, int] = defaultdict(int)
         self.gauges: Dict[str, float] = defaultdict(float)
@@ -245,7 +261,7 @@ class HealthStatus:
 class HealthChecker:
     """Health checking system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.health_checks: Dict[str, HealthCheck] = {}
         self.health_status: Dict[str, HealthStatus] = {}
         self.running = False
@@ -432,7 +448,9 @@ class MetricsCollector:
     """System metrics collector."""
     
     def __init__(self, collection_interval: float = 60.0):
-        self.collection_interval = collection_interval
+        
+    """__init__ function."""
+self.collection_interval = collection_interval
         self.running = False
         self.monitor = PerformanceMonitor()
         self.logger = SecurityLogger("metrics_collector")
@@ -555,7 +573,7 @@ class Alert:
 class AlertManager:
     """Alert management system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.alerts: List[Alert] = []
         self.alert_handlers: Dict[AlertChannel, Callable] = {}
         self.alert_rules: Dict[str, Dict[str, Any]] = {}
@@ -642,9 +660,9 @@ class AlertManager:
 
 def track_performance(operation: str, **kwargs):
     """Decorator for tracking performance."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             monitor = PerformanceMonitor()
             start_time = time.time()
             
@@ -661,7 +679,7 @@ def track_performance(operation: str, **kwargs):
                 raise
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             monitor = PerformanceMonitor()
             start_time = time.time()
             
@@ -686,7 +704,7 @@ def track_performance(operation: str, **kwargs):
 
 def check_health(name: str, check_function: Callable, **kwargs):
     """Decorator for health checks."""
-    def decorator(func):
+    def decorator(func) -> Any:
         checker = HealthChecker()
         checker.add_health_check(name, check_function, **kwargs)
         return func
@@ -694,7 +712,7 @@ def check_health(name: str, check_function: Callable, **kwargs):
 
 def collect_metrics(interval: float = 60.0):
     """Decorator for metrics collection."""
-    def decorator(func):
+    def decorator(func) -> Any:
         collector = MetricsCollector(interval)
         return func
     return decorator
@@ -706,9 +724,9 @@ def send_alert(title: str, message: str, level: AlertLevel = AlertLevel.INFO, **
 
 def monitor_operation(operation: str, **kwargs):
     """Decorator for comprehensive operation monitoring."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             monitor = PerformanceMonitor()
             start_time = time.time()
             
@@ -748,7 +766,7 @@ def monitor_operation(operation: str, **kwargs):
                 raise
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             monitor = PerformanceMonitor()
             start_time = time.time()
             
@@ -797,5 +815,3 @@ def monitor_operation(operation: str, **kwargs):
 # ============================================================================
 # IMPORTS FOR DECORATORS
 # ============================================================================
-
-import functools 

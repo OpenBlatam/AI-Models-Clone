@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import pytest
+import asyncio
+import signal
+import sys
+from unittest.mock import Mock, AsyncMock, patch, MagicMock
+from typing import Dict, Any, List
+from datetime import datetime
+from fastapi import FastAPI, HTTPException
+from fastapi.testclient import TestClient
+import redis.asyncio as redis
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+from .lifespan_management import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 🧪 Test Suite for FastAPI Lifespan Management
 ============================================
@@ -14,20 +33,8 @@ Comprehensive tests for:
 - Application state management
 """
 
-import pytest
-import asyncio
-import signal
-import sys
-from unittest.mock import Mock, AsyncMock, patch, MagicMock
-from typing import Dict, Any, List
-from datetime import datetime
 
-from fastapi import FastAPI, HTTPException
-from fastapi.testclient import TestClient
-import redis.asyncio as redis
-from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from .lifespan_management import (
     # Core classes
     AppState,
     HealthStatus,
@@ -94,7 +101,7 @@ SAMPLE_CONFIG = AppConfig(
 class TestConfiguration:
     """Test configuration management."""
     
-    def test_load_config(self):
+    def test_load_config(self) -> Any:
         """Test configuration loading."""
         config = load_config()
         
@@ -104,7 +111,7 @@ class TestConfiguration:
         assert isinstance(config.database, DatabaseConfig)
         assert isinstance(config.redis, RedisConfig)
     
-    def test_database_config(self):
+    def test_database_config(self) -> Any:
         """Test database configuration."""
         db_config = DatabaseConfig(
             url="postgresql+asyncpg://user:pass@localhost/db",
@@ -118,7 +125,7 @@ class TestConfiguration:
         assert db_config.pool_pre_ping is True
         assert db_config.echo is False
     
-    def test_redis_config(self):
+    def test_redis_config(self) -> Any:
         """Test Redis configuration."""
         redis_config = RedisConfig(
             url="redis://localhost:6379",
@@ -130,7 +137,7 @@ class TestConfiguration:
         assert redis_config.decode_responses is True
         assert redis_config.health_check_interval == 30
     
-    def test_app_config(self):
+    def test_app_config(self) -> Any:
         """Test application configuration."""
         config = SAMPLE_CONFIG
         
@@ -153,7 +160,7 @@ class TestConfiguration:
 class TestAppState:
     """Test application state management."""
     
-    def test_app_state_initialization(self):
+    def test_app_state_initialization(self) -> Any:
         """Test AppState initialization."""
         app_state = AppState()
         
@@ -167,7 +174,7 @@ class TestAppState:
         assert isinstance(app_state.config, dict)
         assert isinstance(app_state.metrics, dict)
     
-    def test_app_state_with_config(self):
+    def test_app_state_with_config(self) -> Any:
         """Test AppState with configuration."""
         config = SAMPLE_CONFIG
         app_state = AppState(
@@ -178,7 +185,7 @@ class TestAppState:
         assert app_state.config == config.__dict__
         assert isinstance(app_state.shutdown_event, asyncio.Event)
     
-    def test_app_state_health_status(self):
+    def test_app_state_health_status(self) -> Any:
         """Test AppState health status management."""
         app_state = AppState()
         
@@ -201,7 +208,7 @@ class TestDatabaseManagement:
     """Test database management functionality."""
     
     @pytest.mark.asyncio
-    async def test_initialize_database_pool_success(self):
+    async def test_initialize_database_pool_success(self) -> Any:
         """Test successful database pool initialization."""
         config = DatabaseConfig(
             url="postgresql+asyncpg://test:test@localhost/testdb",
@@ -229,7 +236,7 @@ class TestDatabaseManagement:
                 mock_session_maker.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_initialize_database_pool_failure(self):
+    async def test_initialize_database_pool_failure(self) -> Any:
         """Test database pool initialization failure."""
         config = DatabaseConfig(
             url="invalid://url",
@@ -241,7 +248,7 @@ class TestDatabaseManagement:
             await initialize_database_pool(config)
     
     @pytest.mark.asyncio
-    async def test_close_database_pool(self):
+    async def test_close_database_pool(self) -> Any:
         """Test database pool closure."""
         mock_session_maker = Mock()
         mock_engine = Mock()
@@ -253,7 +260,7 @@ class TestDatabaseManagement:
         mock_engine.dispose.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_check_database_health_success(self):
+    async def test_check_database_health_success(self) -> Any:
         """Test successful database health check."""
         mock_session_maker = Mock()
         mock_session = AsyncMock()
@@ -266,7 +273,7 @@ class TestDatabaseManagement:
         mock_session.execute.assert_called_once_with("SELECT 1")
     
     @pytest.mark.asyncio
-    async def test_check_database_health_failure(self):
+    async def test_check_database_health_failure(self) -> Any:
         """Test database health check failure."""
         mock_session_maker = Mock()
         mock_session = AsyncMock()
@@ -286,7 +293,7 @@ class TestRedisManagement:
     """Test Redis management functionality."""
     
     @pytest.mark.asyncio
-    async def test_initialize_redis_client_success(self):
+    async def test_initialize_redis_client_success(self) -> Any:
         """Test successful Redis client initialization."""
         config = RedisConfig(
             url="redis://localhost:6379",
@@ -309,7 +316,7 @@ class TestRedisManagement:
             mock_client.ping.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_initialize_redis_client_failure(self):
+    async def test_initialize_redis_client_failure(self) -> Any:
         """Test Redis client initialization failure."""
         config = RedisConfig(
             url="redis://invalid:6379",
@@ -325,7 +332,7 @@ class TestRedisManagement:
                 await initialize_redis_client(config)
     
     @pytest.mark.asyncio
-    async def test_close_redis_client(self):
+    async def test_close_redis_client(self) -> Any:
         """Test Redis client closure."""
         mock_client = AsyncMock()
         
@@ -334,7 +341,7 @@ class TestRedisManagement:
         mock_client.close.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_check_redis_health_success(self):
+    async def test_check_redis_health_success(self) -> Any:
         """Test successful Redis health check."""
         mock_client = AsyncMock()
         
@@ -344,7 +351,7 @@ class TestRedisManagement:
         mock_client.ping.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_check_redis_health_failure(self):
+    async def test_check_redis_health_failure(self) -> Any:
         """Test Redis health check failure."""
         mock_client = AsyncMock()
         mock_client.ping.side_effect = Exception("Redis error")
@@ -361,7 +368,7 @@ class TestCacheManager:
     """Test cache manager functionality."""
     
     @pytest.mark.asyncio
-    async def test_cache_manager_initialization(self):
+    async def test_cache_manager_initialization(self) -> Any:
         """Test cache manager initialization."""
         mock_redis_client = AsyncMock()
         cache_manager = CacheManager(mock_redis_client)
@@ -370,7 +377,7 @@ class TestCacheManager:
         assert cache_manager.logger is not None
     
     @pytest.mark.asyncio
-    async def test_cache_get_success(self):
+    async def test_cache_get_success(self) -> Optional[Dict[str, Any]]:
         """Test successful cache get operation."""
         mock_redis_client = AsyncMock()
         mock_redis_client.get.return_value = "test_value"
@@ -382,7 +389,7 @@ class TestCacheManager:
         mock_redis_client.get.assert_called_once_with("test_key")
     
     @pytest.mark.asyncio
-    async def test_cache_get_failure(self):
+    async def test_cache_get_failure(self) -> Optional[Dict[str, Any]]:
         """Test cache get operation failure."""
         mock_redis_client = AsyncMock()
         mock_redis_client.get.side_effect = Exception("Redis error")
@@ -393,7 +400,7 @@ class TestCacheManager:
         assert result is None
     
     @pytest.mark.asyncio
-    async def test_cache_set_success(self):
+    async def test_cache_set_success(self) -> Any:
         """Test successful cache set operation."""
         mock_redis_client = AsyncMock()
         cache_manager = CacheManager(mock_redis_client)
@@ -404,7 +411,7 @@ class TestCacheManager:
         mock_redis_client.set.assert_called_once_with("test_key", "test_value", ex=3600)
     
     @pytest.mark.asyncio
-    async def test_cache_set_failure(self):
+    async def test_cache_set_failure(self) -> Any:
         """Test cache set operation failure."""
         mock_redis_client = AsyncMock()
         mock_redis_client.set.side_effect = Exception("Redis error")
@@ -415,7 +422,7 @@ class TestCacheManager:
         assert result is False
     
     @pytest.mark.asyncio
-    async def test_cache_delete_success(self):
+    async def test_cache_delete_success(self) -> Any:
         """Test successful cache delete operation."""
         mock_redis_client = AsyncMock()
         cache_manager = CacheManager(mock_redis_client)
@@ -426,7 +433,7 @@ class TestCacheManager:
         mock_redis_client.delete.assert_called_once_with("test_key")
     
     @pytest.mark.asyncio
-    async def test_cache_delete_failure(self):
+    async def test_cache_delete_failure(self) -> Any:
         """Test cache delete operation failure."""
         mock_redis_client = AsyncMock()
         mock_redis_client.delete.side_effect = Exception("Redis error")
@@ -437,7 +444,7 @@ class TestCacheManager:
         assert result is False
     
     @pytest.mark.asyncio
-    async def test_cache_health_check_success(self):
+    async def test_cache_health_check_success(self) -> Any:
         """Test successful cache health check."""
         mock_redis_client = AsyncMock()
         cache_manager = CacheManager(mock_redis_client)
@@ -448,7 +455,7 @@ class TestCacheManager:
         mock_redis_client.ping.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_cache_health_check_failure(self):
+    async def test_cache_health_check_failure(self) -> Any:
         """Test cache health check failure."""
         mock_redis_client = AsyncMock()
         mock_redis_client.ping.side_effect = Exception("Redis error")
@@ -466,7 +473,7 @@ class TestCacheManagerInitialization:
     """Test cache manager initialization."""
     
     @pytest.mark.asyncio
-    async def test_initialize_cache_manager_success(self):
+    async def test_initialize_cache_manager_success(self) -> Any:
         """Test successful cache manager initialization."""
         mock_redis_client = AsyncMock()
         
@@ -481,7 +488,7 @@ class TestCacheManagerInitialization:
         mock_redis_client.delete.assert_called_once_with("health_check")
     
     @pytest.mark.asyncio
-    async def test_initialize_cache_manager_failure(self):
+    async def test_initialize_cache_manager_failure(self) -> Any:
         """Test cache manager initialization failure."""
         mock_redis_client = AsyncMock()
         mock_redis_client.set.side_effect = Exception("Redis error")
@@ -490,7 +497,7 @@ class TestCacheManagerInitialization:
             await initialize_cache_manager(mock_redis_client)
     
     @pytest.mark.asyncio
-    async def test_close_cache_manager(self):
+    async def test_close_cache_manager(self) -> Any:
         """Test cache manager closure."""
         mock_redis_client = AsyncMock()
         cache_manager = CacheManager(mock_redis_client)
@@ -508,7 +515,7 @@ class TestBackgroundTasks:
     """Test background task management."""
     
     @pytest.mark.asyncio
-    async def test_start_background_tasks(self):
+    async def test_start_background_tasks(self) -> Any:
         """Test starting background tasks."""
         app_state = AppState(shutdown_event=asyncio.Event())
         
@@ -520,7 +527,7 @@ class TestBackgroundTasks:
                 assert all(isinstance(task, asyncio.Task) for task in app_state.background_tasks)
     
     @pytest.mark.asyncio
-    async def test_stop_background_tasks(self):
+    async def test_stop_background_tasks(self) -> Any:
         """Test stopping background tasks."""
         app_state = AppState(shutdown_event=asyncio.Event())
         
@@ -542,7 +549,7 @@ class TestBackgroundTasks:
         mock_task2.cancel.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_health_monitor_task(self):
+    async def test_health_monitor_task(self) -> Any:
         """Test health monitor background task."""
         app_state = AppState(shutdown_event=asyncio.Event())
         
@@ -569,7 +576,7 @@ class TestBackgroundTasks:
                     assert app_state.metrics["overall_healthy"] is True
     
     @pytest.mark.asyncio
-    async def test_metrics_collector_task(self):
+    async def test_metrics_collector_task(self) -> Any:
         """Test metrics collector background task."""
         app_state = AppState(shutdown_event=asyncio.Event())
         app_state.cache_manager = Mock()
@@ -599,7 +606,7 @@ class TestHealthChecks:
     """Test health check functionality."""
     
     @pytest.mark.asyncio
-    async def test_perform_health_check_success(self):
+    async def test_perform_health_check_success(self) -> Any:
         """Test successful health check."""
         app_state = AppState()
         app_state.database_pool = Mock()
@@ -614,7 +621,7 @@ class TestHealthChecks:
                     assert app_state.is_healthy is True
     
     @pytest.mark.asyncio
-    async def test_perform_health_check_failure(self):
+    async def test_perform_health_check_failure(self) -> Any:
         """Test health check failure."""
         app_state = AppState()
         app_state.database_pool = Mock()
@@ -629,7 +636,7 @@ class TestHealthChecks:
                     assert app_state.is_healthy is False
     
     @pytest.mark.asyncio
-    async def test_collect_system_metrics(self):
+    async def test_collect_system_metrics(self) -> Any:
         """Test system metrics collection."""
         with patch('lifespan_management.psutil') as mock_psutil:
             mock_psutil.cpu_percent.return_value = 50.0
@@ -651,7 +658,7 @@ class TestHealthChecks:
 class TestSignalHandling:
     """Test signal handling functionality."""
     
-    def test_setup_signal_handlers(self):
+    def test_setup_signal_handlers(self) -> Any:
         """Test signal handler setup."""
         shutdown_event = asyncio.Event()
         
@@ -671,7 +678,7 @@ class TestSignalHandling:
 class TestLogging:
     """Test logging setup."""
     
-    def test_setup_logging(self):
+    def test_setup_logging(self) -> Any:
         """Test logging setup."""
         with patch('lifespan_management.structlog.configure') as mock_configure:
             with patch('lifespan_management.logging.basicConfig') as mock_basic_config:
@@ -687,7 +694,7 @@ class TestLogging:
 class TestApplicationFactory:
     """Test application factory functionality."""
     
-    def test_create_app(self):
+    def test_create_app(self) -> Any:
         """Test application creation."""
         with patch('lifespan_management.load_config') as mock_load_config:
             mock_load_config.return_value = SAMPLE_CONFIG
@@ -699,7 +706,7 @@ class TestApplicationFactory:
             assert app.version == "1.0.0"
             assert app.debug is True
     
-    def test_setup_middleware(self):
+    def test_setup_middleware(self) -> Any:
         """Test middleware setup."""
         app = FastAPI()
         config = SAMPLE_CONFIG
@@ -709,7 +716,7 @@ class TestApplicationFactory:
         # Verify middleware was added (check by looking at middleware stack)
         assert len(app.user_middleware) > 0
     
-    def test_setup_routes(self):
+    def test_setup_routes(self) -> Any:
         """Test route setup."""
         app = FastAPI()
         
@@ -722,7 +729,7 @@ class TestApplicationFactory:
         assert "/metrics" in routes
         assert "/analyze" in routes
     
-    def test_setup_exception_handlers(self):
+    def test_setup_exception_handlers(self) -> Any:
         """Test exception handler setup."""
         app = FastAPI()
         
@@ -738,7 +745,7 @@ class TestApplicationFactory:
 class TestDependencyInjection:
     """Test dependency injection functionality."""
     
-    def test_get_app_state(self):
+    def test_get_app_state(self) -> Optional[Dict[str, Any]]:
         """Test getting application state."""
         app_state = AppState()
         request = Mock()
@@ -748,7 +755,7 @@ class TestDependencyInjection:
         
         assert result == app_state
     
-    def test_get_database_session_success(self):
+    def test_get_database_session_success(self) -> Optional[Dict[str, Any]]:
         """Test getting database session successfully."""
         app_state = AppState()
         app_state.database_pool = Mock()
@@ -763,7 +770,7 @@ class TestDependencyInjection:
         assert result == mock_session
         app_state.database_pool.assert_called_once()
     
-    def test_get_database_session_unavailable(self):
+    def test_get_database_session_unavailable(self) -> Optional[Dict[str, Any]]:
         """Test getting database session when unavailable."""
         app_state = AppState()
         app_state.database_pool = None
@@ -777,7 +784,7 @@ class TestDependencyInjection:
         assert exc_info.value.status_code == 503
         assert "Database not available" in str(exc_info.value.detail)
     
-    def test_get_cache_manager_success(self):
+    def test_get_cache_manager_success(self) -> Optional[Dict[str, Any]]:
         """Test getting cache manager successfully."""
         app_state = AppState()
         cache_manager = CacheManager(Mock())
@@ -790,7 +797,7 @@ class TestDependencyInjection:
         
         assert result == cache_manager
     
-    def test_get_cache_manager_unavailable(self):
+    def test_get_cache_manager_unavailable(self) -> Optional[Dict[str, Any]]:
         """Test getting cache manager when unavailable."""
         app_state = AppState()
         app_state.cache_manager = None
@@ -812,7 +819,7 @@ class TestIntegration:
     """Integration tests for lifespan management."""
     
     @pytest.mark.asyncio
-    async def test_lifespan_context_manager(self):
+    async def test_lifespan_context_manager(self) -> Any:
         """Test lifespan context manager functionality."""
         app = FastAPI()
         
@@ -839,7 +846,7 @@ class TestIntegration:
                                                             mock_redis.assert_called_once()
                                                             mock_cache.assert_called_once()
     
-    def test_fastapi_app_with_lifespan(self):
+    async def test_fastapi_app_with_lifespan(self) -> Any:
         """Test FastAPI app with lifespan integration."""
         with patch('lifespan_management.load_config', return_value=SAMPLE_CONFIG):
             app = create_app()
@@ -856,7 +863,7 @@ class TestIntegration:
             assert response.json()["status"] == "running"
     
     @pytest.mark.asyncio
-    async def test_graceful_shutdown(self):
+    async def test_graceful_shutdown(self) -> Any:
         """Test graceful shutdown process."""
         app_state = AppState(shutdown_event=asyncio.Event())
         
@@ -890,7 +897,7 @@ class TestPerformance:
     """Performance tests for lifespan management."""
     
     @pytest.mark.asyncio
-    async def test_lifespan_startup_performance(self):
+    async def test_lifespan_startup_performance(self) -> Any:
         """Test lifespan startup performance."""
         app = FastAPI()
         
@@ -914,7 +921,7 @@ class TestPerformance:
         assert duration < 1.0
     
     @pytest.mark.asyncio
-    async def test_background_task_performance(self):
+    async def test_background_task_performance(self) -> Any:
         """Test background task performance."""
         app_state = AppState(shutdown_event=asyncio.Event())
         
@@ -948,7 +955,7 @@ class TestErrorHandling:
     """Test error handling in lifespan management."""
     
     @pytest.mark.asyncio
-    async def test_lifespan_startup_failure(self):
+    async def test_lifespan_startup_failure(self) -> Any:
         """Test lifespan startup failure handling."""
         app = FastAPI()
         
@@ -960,7 +967,7 @@ class TestErrorHandling:
                             pass
     
     @pytest.mark.asyncio
-    async def test_lifespan_shutdown_failure(self):
+    async def test_lifespan_shutdown_failure(self) -> Any:
         """Test lifespan shutdown failure handling."""
         app = FastAPI()
         

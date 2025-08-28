@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+import json
+import time
+from typing import Dict, Any, List, Optional, Callable
+from datetime import datetime
+from contextlib import asynccontextmanager
+import redis.asyncio as redis
+import orjson
+import structlog
+from prometheus_client import Counter, Histogram, Gauge
+from src.core.config import EventSettings
+from src.core.exceptions import BusinessException
+from typing import Any, List, Dict, Optional
 """
 📡 Ultra-Optimized Event Publisher
 ==================================
@@ -10,21 +32,8 @@ Production-grade event publishing with:
 - Performance monitoring
 """
 
-import asyncio
-import logging
-import json
-import time
-from typing import Dict, Any, List, Optional, Callable
-from datetime import datetime
-from contextlib import asynccontextmanager
 
-import redis.asyncio as redis
-import orjson
-import structlog
-from prometheus_client import Counter, Histogram, Gauge
 
-from src.core.config import EventSettings
-from src.core.exceptions import BusinessException
 
 
 class EventPublisher:
@@ -34,7 +43,9 @@ class EventPublisher:
     """
     
     def __init__(self, config: EventSettings):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.logger = structlog.get_logger(__name__)
         
         # Redis connection
@@ -104,7 +115,7 @@ class EventPublisher:
         
         self.logger.info("Event Publisher initialized")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize event publisher"""
         
         self.logger.info("Initializing Event Publisher...")
@@ -138,7 +149,7 @@ class EventPublisher:
             self.logger.error(f"Failed to initialize Event Publisher: {e}")
             raise BusinessException(f"Event Publisher initialization failed: {e}")
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup event publisher"""
         
         self.logger.info("Cleaning up Event Publisher...")
@@ -287,7 +298,7 @@ class EventPublisher:
             self.logger.error(f"Failed to unsubscribe from {event_type}: {e}")
             return False
     
-    async def _publisher_loop(self):
+    async def _publisher_loop(self) -> Any:
         """Background task for publishing events"""
         
         while True:
@@ -399,7 +410,7 @@ class EventPublisher:
         except Exception as e:
             self.logger.error(f"Handler error: {e}")
     
-    async def _batch_processor(self):
+    async def _batch_processor(self) -> Any:
         """Background task for batch processing"""
         
         while True:
@@ -506,7 +517,7 @@ class EventPublisher:
         except Exception as e:
             self.logger.error(f"Failed to store event for retry: {e}")
     
-    async def _retry_processor(self):
+    async def _retry_processor(self) -> Any:
         """Background task for processing retry events"""
         
         while True:
@@ -539,7 +550,7 @@ class EventPublisher:
                 self.logger.error(f"Retry processor error: {e}")
                 await asyncio.sleep(60)  # Wait 1 minute on error
     
-    async def _test_connection(self):
+    async def _test_connection(self) -> Any:
         """Test Redis connection"""
         
         try:

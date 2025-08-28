@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from typing import List, Optional
+from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, status
+from fastapi.responses import StreamingResponse
+import structlog
+from .schemas import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Enhanced API Routers
 ===================
@@ -6,15 +26,8 @@ Modular router system with clean separation of concerns,
 comprehensive validation, and proper error handling.
 """
 
-import asyncio
-import time
-from typing import List, Optional
 
-from fastapi import APIRouter, Depends, HTTPException, Query, BackgroundTasks, status
-from fastapi.responses import StreamingResponse
-import structlog
 
-from .schemas import (
     ContentGenerationRequest, ContentGenerationResponse,
     BulkContentRequest, DataResponse, PaginatedResponse,
     PaginationParams, SearchRequest, BaseResponse
@@ -517,7 +530,7 @@ async def _log_bulk_generation(successful: int, failed: int, execution_time: flo
 # ROUTER COLLECTION
 # =============================================================================
 
-def get_api_routers() -> List[APIRouter]:
+async def get_api_routers() -> List[APIRouter]:
     """Get all API routers for inclusion in the main app."""
     return [
         content_router,

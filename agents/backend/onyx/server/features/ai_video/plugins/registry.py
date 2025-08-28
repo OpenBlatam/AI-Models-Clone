@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+import time
+from typing import Dict, List, Optional, Any, Type, Set, Callable
+from dataclasses import dataclass, field
+from enum import Enum
+from collections import defaultdict
+from ..core.exceptions import PluginError, DependencyError, ValidationError
+from ..core.types import PluginInfo
+from .base import BasePlugin
+from .loader import PluginLoader
+from .validator import PluginValidator, ValidationLevel
+from typing import Any, List, Dict, Optional
 """
 Plugin Registry - Production-Ready Plugin Management System
 
@@ -9,19 +24,7 @@ This module provides a comprehensive plugin registry with:
 - Performance monitoring
 """
 
-import asyncio
-import logging
-import time
-from typing import Dict, List, Optional, Any, Type, Set, Callable
-from dataclasses import dataclass, field
-from enum import Enum
-from collections import defaultdict
 
-from ..core.exceptions import PluginError, DependencyError, ValidationError
-from ..core.types import PluginInfo
-from .base import BasePlugin
-from .loader import PluginLoader
-from .validator import PluginValidator, ValidationLevel
 
 logger = logging.getLogger(__name__)
 
@@ -70,7 +73,9 @@ class PluginRegistry:
         auto_load: bool = False,
         validation_level: ValidationLevel = ValidationLevel.STANDARD
     ):
-        self.auto_discover = auto_discover
+        
+    """__init__ function."""
+self.auto_discover = auto_discover
         self.auto_load = auto_load
         self.validation_level = validation_level
         
@@ -530,7 +535,7 @@ class PluginRegistry:
                 except Exception as e:
                     logger.error(f"Event handler error for '{event}': {e}")
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Shutdown the registry and all plugins."""
         logger.info("🔄 Shutting down plugin registry...")
         

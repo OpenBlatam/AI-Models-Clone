@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add Total Docs for Index Attempt
 
 Revision ID: d61e513bef0a
@@ -6,8 +13,6 @@ Create Date: 2023-10-27 23:02:43.369964
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "d61e513bef0a"

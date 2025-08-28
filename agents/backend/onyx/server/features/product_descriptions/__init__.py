@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .core.model import ProductDescriptionModel
+from .core.generator import ProductDescriptionGenerator
+from .api.service import ProductDescriptionService
+from .interfaces.api_interface import ProductDescriptionAPI
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Product Descriptions Generator Module
 ====================================
@@ -18,10 +27,6 @@ __version__ = "1.0.0"
 __author__ = "Blatam Academy"
 __description__ = "AI Product Descriptions Generator with Transformers"
 
-from .core.model import ProductDescriptionModel
-from .core.generator import ProductDescriptionGenerator
-from .api.service import ProductDescriptionService
-from .interfaces.api_interface import ProductDescriptionAPI
 
 __all__ = [
     "ProductDescriptionModel",

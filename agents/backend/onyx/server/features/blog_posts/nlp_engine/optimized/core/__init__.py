@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .entities.models import (
+from .interfaces.contracts import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 CORE - Domain Layer
 ======================
@@ -5,7 +12,6 @@
 Capa de dominio con entidades e interfaces del sistema NLP.
 """
 
-from .entities.models import (
     TextInput,
     AnalysisResult,
     BatchResult,
@@ -14,7 +20,6 @@ from .entities.models import (
     PerformanceMetrics
 )
 
-from .interfaces.contracts import (
     IOptimizer,
     ICache,
     INLPAnalyzer

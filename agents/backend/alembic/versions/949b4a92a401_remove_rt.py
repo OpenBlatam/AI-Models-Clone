@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from sqlalchemy.orm import Session
+from sqlalchemy import text
+from onyx.db.models import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """remove rt
 
 Revision ID: 949b4a92a401
@@ -6,12 +15,8 @@ Create Date: 2024-10-26 13:06:06.937969
 
 """
 
-from alembic import op
-from sqlalchemy.orm import Session
-from sqlalchemy import text
 
 # Import your models and constants
-from onyx.db.models import (
     Connector,
     ConnectorCredentialPair,
     Credential,
@@ -34,6 +39,16 @@ def upgrade() -> None:
     # Get connectors using raw SQL
     result = bind.execute(
         text("SELECT id FROM connector WHERE source = 'requesttracker'")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     )
     connector_ids = [row[0] for row in result]
 

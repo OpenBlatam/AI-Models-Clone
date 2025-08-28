@@ -1,3 +1,31 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+import time
+from pathlib import Path
+from typing import Dict, Any, List
+from onyx.utils.logger import setup_logger
+from onyx.utils.timing import time_function
+from onyx.utils.telemetry import TelemetryLogger
+from onyx.utils.gpu_utils import get_gpu_info, is_gpu_available
+from onyx.core.functions import format_response, handle_error
+from ..onyx_main import get_system, OnyxAIVideoSystem
+from ..onyx_config import get_config, validate_config, get_config_summary
+from ..onyx_video_workflow import onyx_video_generator
+from ..onyx_plugin_manager import onyx_plugin_manager
+from ..core.onyx_integration import onyx_integration
+from ..models import VideoRequest, VideoResponse
+            from ..onyx_plugin_manager import OnyxPluginContext
+            from onyx.utils.threadpool_concurrency import run_functions_in_parallel, FunctionCall
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Onyx AI Video System - Usage Examples
@@ -6,26 +34,10 @@ Comprehensive examples demonstrating how to use the Onyx-adapted AI Video system
 with various features, configurations, and integrations.
 """
 
-import asyncio
-import json
-import time
-from pathlib import Path
-from typing import Dict, Any, List
 
 # Onyx imports
-from onyx.utils.logger import setup_logger
-from onyx.utils.timing import time_function
-from onyx.utils.telemetry import TelemetryLogger
-from onyx.utils.gpu_utils import get_gpu_info, is_gpu_available
-from onyx.core.functions import format_response, handle_error
 
 # Local imports
-from ..onyx_main import get_system, OnyxAIVideoSystem
-from ..onyx_config import get_config, validate_config, get_config_summary
-from ..onyx_video_workflow import onyx_video_generator
-from ..onyx_plugin_manager import onyx_plugin_manager
-from ..core.onyx_integration import onyx_integration
-from ..models import VideoRequest, VideoResponse
 
 logger = setup_logger(__name__)
 
@@ -38,7 +50,7 @@ class OnyxAIVideoExamples:
     with the Onyx ecosystem.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = setup_logger("onyx_ai_video_examples")
         self.telemetry = TelemetryLogger()
         self.system: Optional[OnyxAIVideoSystem] = None
@@ -412,7 +424,6 @@ class OnyxAIVideoExamples:
             
             # Test plugin execution
             print("\nTesting plugin execution...")
-            from ..onyx_plugin_manager import OnyxPluginContext
             
             test_request = VideoRequest(
                 input_text="Test plugin execution",
@@ -464,9 +475,8 @@ class OnyxAIVideoExamples:
             
             # Test Onyx threading
             print("Testing Onyx threading...")
-            from onyx.utils.threadpool_concurrency import run_functions_in_parallel, FunctionCall
             
-            def test_function(x):
+            def test_function(x) -> Any:
                 return x * 2
             
             function_calls = [FunctionCall(test_function, i) for i in range(5)]
@@ -701,6 +711,10 @@ class OnyxAIVideoExamples:
         try:
             result_file = self.examples_dir / f"{example_name}_result.json"
             with open(result_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(result, f, indent=2, default=str)
             
             self.logger.info(f"Example result saved: {result_file}")
@@ -746,5 +760,6 @@ async def main() -> None:
         raise
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

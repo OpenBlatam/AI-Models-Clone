@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import torch
+from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
+from typing import List, Dict
+    from transformers import pipelines
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Simple Transformers Demo for Email Sequence AI System
@@ -6,9 +21,6 @@ This script demonstrates basic Transformers functionality that works
 with limited disk space and CPU-only setup.
 """
 
-import torch
-from transformers import pipeline, AutoTokenizer, AutoModelForCausalLM
-from typing import List, Dict
 
 
 def demo_text_generation():
@@ -184,7 +196,6 @@ def demo_model_info():
     print(f"Device being used: {'cuda' if torch.cuda.is_available() else 'cpu'}")
     
     # Show available pipelines
-    from transformers import pipelines
     print(f"\nAvailable pipeline tasks: {len(pipelines.SUPPORTED_TASKS)}")
     
     # List some key tasks
@@ -232,5 +243,6 @@ def main():
     print("4. Experiment with different model sizes and configurations")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

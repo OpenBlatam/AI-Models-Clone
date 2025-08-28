@@ -1,7 +1,11 @@
-"""
-Status Mixin - Onyx Integration
-Status handling functionality for models.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Callable
 from dataclasses import dataclass, field
@@ -9,8 +13,15 @@ from datetime import datetime
 from .base_types import StatusType, StatusCategory
 import msgspec
 import numpy as np
-try:
     import pandas as pd
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Status Mixin - Onyx Integration
+Status handling functionality for models.
+"""
+try:
 except ImportError:
     pd = None
 
@@ -53,18 +64,24 @@ class Status(msgspec.Struct, frozen=True, slots=True):
 
     @staticmethod
     def batch_to_numpy(items: List["Status"]):
-        arr = np.array([item.as_tuple() for item in items], dtype=object)
+        
+    """batch_to_numpy function."""
+arr = np.array([item.as_tuple() for item in items], dtype=object)
         return arr
 
     @staticmethod
     def batch_to_pandas(items: List["Status"]):
-        if pd is None:
+        
+    """batch_to_pandas function."""
+if pd is None:
             raise ImportError("pandas is not installed")
         return pd.DataFrame(Status.batch_to_dicts(items))
 
     @staticmethod
     def batch_to_parquet(items: List["Status"], path: str):
-        if pd is None:
+        
+    """batch_to_parquet function."""
+if pd is None:
             raise ImportError("pandas is not installed")
         Status.batch_to_pandas(items).to_parquet(path)
 

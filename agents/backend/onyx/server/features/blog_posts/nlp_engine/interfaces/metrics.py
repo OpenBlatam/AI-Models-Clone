@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Dict, List, Any, Optional, Union
+from ..core.entities import AnalysisResult, AnalysisError
+from ..core.enums import MetricType, ErrorType
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🔌 METRICS INTERFACES - Contratos para Métricas y Monitoreo
 ==========================================================
@@ -5,10 +14,6 @@
 Interfaces para sistemas de métricas, logging y monitoreo.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Any, Optional, Union
-from ..core.entities import AnalysisResult, AnalysisError
-from ..core.enums import MetricType, ErrorType
 
 
 class IMetricsCollector(ABC):
@@ -300,7 +305,7 @@ class IStructuredLogger(ABC):
         pass
     
     @abstractmethod
-    def log_analysis_request(
+    async def log_analysis_request(
         self,
         request_id: str,
         text_length: int,

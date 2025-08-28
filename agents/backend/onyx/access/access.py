@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy.orm import Session
 
 from onyx.access.models import DocumentAccess
@@ -9,6 +11,9 @@ from onyx.db.models import User
 from onyx.utils.variable_functionality import fetch_versioned_implementation
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _get_access_for_document(
     document_id: str,
     db_session: Session,

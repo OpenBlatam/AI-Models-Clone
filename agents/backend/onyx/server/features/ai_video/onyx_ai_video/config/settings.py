@@ -1,15 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+from typing import Any, Dict, List, Optional
+from dataclasses import dataclass, field
+from pathlib import Path
+from pydantic import BaseModel, Field, validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Onyx AI Video System - Settings
 
 Onyx-specific settings and configuration for the AI Video system.
 """
 
-import os
-from typing import Any, Dict, List, Optional
-from dataclasses import dataclass, field
-from pathlib import Path
 
-from pydantic import BaseModel, Field, validator
 
 
 @dataclass
@@ -49,7 +57,7 @@ class OnyxSettings:
     onyx_cache_enabled: bool = True
     onyx_metrics_enabled: bool = True
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Post-initialization setup."""
         # Set default paths if not provided
         if not self.onyx_root_path:
@@ -427,7 +435,15 @@ ONYX_USE_GPU=true
     
     try:
         with open(env_path, 'w', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(env_content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         print(f"Onyx environment file created: {env_path}")
     except Exception as e:
         print(f"Failed to create Onyx environment file: {e}")

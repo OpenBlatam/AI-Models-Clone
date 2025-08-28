@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import io
 from typing import cast
 
@@ -5,8 +7,6 @@ from PIL import Image
 
 from onyx.background.celery.tasks.beat_schedule import CLOUD_BEAT_MULTIPLIER_DEFAULT
 from onyx.background.celery.tasks.beat_schedule import (
-    CLOUD_DOC_PERMISSION_SYNC_MULTIPLIER_DEFAULT,
-)
 from onyx.configs.constants import CLOUD_BUILD_FENCE_LOOKUP_TABLE_INTERVAL_DEFAULT
 from onyx.configs.constants import ONYX_CLOUD_REDIS_RUNTIME
 from onyx.configs.constants import ONYX_CLOUD_TENANT_ID
@@ -17,6 +17,11 @@ from onyx.redis.redis_pool import get_redis_replica_client
 from onyx.utils.file import FileWithMimeType
 from onyx.utils.file import OnyxStaticFileManager
 from onyx.utils.variable_functionality import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    CLOUD_DOC_PERMISSION_SYNC_MULTIPLIER_DEFAULT,
+)
     fetch_ee_implementation_or_noop,
 )
 
@@ -70,6 +75,10 @@ class OnyxRuntime:
 
         # check dimensions and resize downwards if necessary or if not PNG
         image = Image.open(io.BytesIO(onyx_file.data))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         if (
             image.size[0] > ONYX_EMAILABLE_LOGO_MAX_DIM
             or image.size[1] > ONYX_EMAILABLE_LOGO_MAX_DIM

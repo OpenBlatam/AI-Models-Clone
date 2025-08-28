@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 import gc
 import os
 import sys
@@ -30,6 +35,10 @@ from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.logger import setup_logger
 from shared_configs.configs import MULTI_TENANT
 
+    import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -110,7 +119,7 @@ class SalesforceConnector(LoadConnector, PollConnector, SlimConnector):
         return dict(object_types)
 
     @staticmethod
-    def _download_object_csvs(
+    async def _download_object_csvs(
         all_types_to_filter: dict[str, bool],
         directory: str,
         sf_client: Salesforce,
@@ -176,7 +185,7 @@ class SalesforceConnector(LoadConnector, PollConnector, SlimConnector):
         # gc.collect()
         return all_types
 
-    def _fetch_from_salesforce(
+    async def _fetch_from_salesforce(
         self,
         temp_dir: str,
         start: SecondsSinceUnixEpoch | None = None,
@@ -377,7 +386,6 @@ class SalesforceConnector(LoadConnector, PollConnector, SlimConnector):
 
 
 if __name__ == "__main__":
-    import time
 
     connector = SalesforceConnector(requested_objects=["Account"])
 

@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Adapted from original image-processo/validation.py
 
 def validate_image_url(image_url: str, validation_type: str = "default") -> tuple:

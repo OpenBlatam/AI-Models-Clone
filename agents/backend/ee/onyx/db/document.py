@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from datetime import timezone
 
@@ -10,6 +12,9 @@ from onyx.configs.constants import DocumentSource
 from onyx.db.models import Document as DbDocument
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def upsert_document_external_perms__no_commit(
     db_session: Session,
     doc_id: str,

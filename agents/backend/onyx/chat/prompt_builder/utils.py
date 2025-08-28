@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from langchain.schema.messages import AIMessage
 from langchain.schema.messages import BaseMessage
 from langchain.schema.messages import HumanMessage
@@ -9,6 +11,9 @@ from onyx.llm.models import PreviousMessage
 from onyx.llm.utils import build_content_with_imgs
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def translate_onyx_msg_to_langchain(
     msg: ChatMessage | PreviousMessage,
     exclude_images: bool = False,

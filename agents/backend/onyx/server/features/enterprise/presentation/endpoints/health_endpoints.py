@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from fastapi import APIRouter
+from ...core.interfaces.health_interface import IHealthService
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Health Check Endpoints
 =====================
@@ -5,19 +12,19 @@ Health Check Endpoints
 Health check API endpoints.
 """
 
-from fastapi import APIRouter
-from ...core.interfaces.health_interface import IHealthService
 
 
 class HealthEndpoints:
     """Health check endpoints."""
     
     def __init__(self, health_service: IHealthService):
-        self.health_service = health_service
+        
+    """__init__ function."""
+self.health_service = health_service
         self.router = APIRouter()
         self._setup_routes()
     
-    def _setup_routes(self):
+    def _setup_routes(self) -> Any:
         """Setup health check routes."""
         
         @self.router.get("/health")

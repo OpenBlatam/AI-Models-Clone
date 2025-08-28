@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import fastapi_users_db_sqlalchemy
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add support for custom tools
 
 Revision ID: 48d14957fe80
@@ -6,14 +25,10 @@ Create Date: 2024-06-09 14:58:19.946509
 
 """
 
-from alembic import op
-import fastapi_users_db_sqlalchemy
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "48d14957fe80"
-down_revision = "b85f02ec1308"
+revision: str = "48d14957fe80"
+down_revision: str = "b85f02ec1308"
 branch_labels: None = None
 depends_on: None = None
 
@@ -23,6 +38,16 @@ def upgrade() -> None:
         "tool",
         sa.Column(
             "openapi_schema",
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             postgresql.JSONB(astext_type=sa.Text()),
             nullable=True,
         ),
@@ -32,6 +57,16 @@ def upgrade() -> None:
         sa.Column(
             "user_id",
             fastapi_users_db_sqlalchemy.generics.GUID(),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             nullable=True,
         ),
     )
@@ -49,7 +84,7 @@ def upgrade() -> None:
             "tool_result", postgresql.JSONB(astext_type=sa.Text()), nullable=False
         ),
         sa.Column(
-            "message_id", sa.Integer(), sa.ForeignKey("chat_message.id"), nullable=False
+            "message_id", sa.Integer(), sa.ForeignKey("chat_message.id"), nullable: bool = False
         ),
     )
 
@@ -57,6 +92,16 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_table("tool_call")
 
-    op.drop_constraint("tool_user_fk", "tool", type_="foreignkey")
+    op.drop_constraint("tool_user_fk", "tool", type_: str = "foreignkey")
     op.drop_column("tool", "user_id")
     op.drop_column("tool", "openapi_schema")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import contextlib
 import secrets
 import string
@@ -34,6 +36,9 @@ from onyx.db.models import User
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 router = APIRouter(prefix="/auth/saml")
 
@@ -109,7 +114,7 @@ async def upsert_saml_user(email: str) -> User:
                 return user
 
 
-async def prepare_from_fastapi_request(request: Request) -> dict[str, Any]:
+async async def prepare_from_fastapi_request(request: Request) -> dict[str, Any]:
     form_data = await request.form()
     if request.client is None:
         raise ValueError("Invalid request for SAML")

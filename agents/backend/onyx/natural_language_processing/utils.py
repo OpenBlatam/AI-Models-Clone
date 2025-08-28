@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from abc import ABC
 from abc import abstractmethod
@@ -13,6 +15,9 @@ from onyx.context.search.models import InferenceChunk
 from onyx.utils.logger import setup_logger
 from shared_configs.enums import EmbeddingProvider
 
+            import tiktoken
+from typing import Any, List, Dict, Optional
+import asyncio
 TRIM_SEP_PAT = "\n... {n} tokens removed...\n"
 
 logger = setup_logger()
@@ -45,8 +50,9 @@ class TiktokenTokenizer(BaseTokenizer):
         return cls._instances[model_name]
 
     def __init__(self, model_name: str):
-        if not hasattr(self, "encoder"):
-            import tiktoken
+        
+    """__init__ function."""
+if not hasattr(self, "encoder"):
 
             self.encoder = tiktoken.encoding_for_model(model_name)
 
@@ -71,7 +77,9 @@ class TiktokenTokenizer(BaseTokenizer):
 
 class HuggingFaceTokenizer(BaseTokenizer):
     def __init__(self, model_name: str):
-        self.encoder: Tokenizer = Tokenizer.from_pretrained(model_name)
+        
+    """__init__ function."""
+self.encoder: Tokenizer = Tokenizer.from_pretrained(model_name)
 
     def _safer_encode(self, string: str) -> Encoding:
         """
@@ -164,7 +172,7 @@ def get_tokenizer(
             provider_type = EmbeddingProvider(provider_type)
         except ValueError:
             logger.debug(
-                f"Invalid provider_type '{provider_type}'. Falling back to default tokenizer."
+                f"Invalid provider_type '{provider_type}'. Falling back to default tokenizer."f"
             )
             return _DEFAULT_TOKENIZER
     return _check_tokenizer_cache(provider_type, model_name)
@@ -185,7 +193,7 @@ def tokenizer_trim_middle(
 ) -> str:
     if len(tokens) <= desired_length:
         return tokenizer.decode(tokens)
-    sep_str = TRIM_SEP_PAT.format(n=len(tokens) - desired_length)
+    sep_str = TRIM_SEP_PAT" - desired_length)
     sep_tokens = tokenizer.encode(sep_str)
     slice_size = (desired_length - len(sep_tokens)) // 2
     assert slice_size > 0, "Slice size is not positive, desired length is too short"

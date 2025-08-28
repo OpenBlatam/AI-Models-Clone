@@ -1,9 +1,5 @@
-#!/usr/bin/env python3
-"""
-Ultra-Fast Serialization System
-⚡ Multiple formats with compression and performance monitoring
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 import json
 from typing import Dict, Any, Optional
@@ -14,6 +10,17 @@ import msgpack
 import lz4.frame
 import brotli
 import structlog
+                import gzip
+                import gzip
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Ultra-Fast Serialization System
+⚡ Multiple formats with compression and performance monitoring
+"""
+
 
 logger = structlog.get_logger()
 
@@ -29,7 +36,9 @@ class UltraSerializer:
     """Ultra-fast serialization with multiple formats."""
     
     def __init__(self, config: SerializerConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.stats = defaultdict(int)
     
     async def serialize(self, data: Any, format: str = None) -> bytes:
@@ -98,7 +107,6 @@ class UltraSerializer:
             elif self.config.compression_algorithm == "brotli":
                 return brotli.compress(data, quality=self.config.compression_level)
             elif self.config.compression_algorithm == "gzip":
-                import gzip
                 return gzip.compress(data, compresslevel=self.config.compression_level)
             else:
                 return data
@@ -114,7 +122,6 @@ class UltraSerializer:
             elif self.config.compression_algorithm == "brotli":
                 return brotli.decompress(data)
             elif self.config.compression_algorithm == "gzip":
-                import gzip
                 return gzip.decompress(data)
             else:
                 return data

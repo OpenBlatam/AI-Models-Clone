@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .video_processing import (
+from .data_processing import (
+from .async_examples import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 HAPPY PATH LAST - EXAMPLES MODULE
 ====================================
@@ -6,7 +14,6 @@ Módulo de ejemplos que muestra cómo usar el patrón happy path last en diferen
 escenarios: procesamiento de video, procesamiento de datos y operaciones asíncronas.
 """
 
-from .video_processing import (
     process_video_happy_path_last,
     load_model_happy_path_last,
     process_video_decorated,
@@ -15,7 +22,6 @@ from .video_processing import (
     process_video_happy_path_last_clean
 )
 
-from .data_processing import (
     process_data_happy_path_last,
     process_batch_data_happy_path_last,
     process_data_decorated,
@@ -28,7 +34,6 @@ from .data_processing import (
     process_data_happy_path_last_clean
 )
 
-from .async_examples import (
     async_process_video_happy_path_last,
     async_load_model_happy_path_last,
     async_load_model_decorated,

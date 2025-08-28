@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """assistant_rework
 
 Revision ID: 55546a7967ee
@@ -6,9 +14,6 @@ Create Date: 2024-09-18 17:00:23.755399
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 
 # revision identifiers, used by Alembic.

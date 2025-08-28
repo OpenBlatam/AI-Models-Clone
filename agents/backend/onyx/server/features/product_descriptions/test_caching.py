@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from typing import Dict, Any
+from caching_manager import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test script for the caching system
 
@@ -10,11 +27,7 @@ This script tests:
 - Monitoring
 """
 
-import asyncio
-import time
-from typing import Dict, Any
 
-from caching_manager import (
     CacheManager, CacheConfig, CacheStrategy, EvictionPolicy,
     StaticDataCache, CacheWarmingService, CacheMonitor,
     get_cache_manager, close_cache_manager
@@ -217,7 +230,9 @@ async def test_cache_warming():
     try:
         # Mock data source
         async def mock_data_source():
-            return {
+            
+    """mock_data_source function."""
+return {
                 "product_1": {"name": "Product 1", "price": 100},
                 "product_2": {"name": "Product 2", "price": 200},
                 "product_3": {"name": "Product 3", "price": 300}

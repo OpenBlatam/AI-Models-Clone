@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import List, Optional, Dict, Any, Protocol
+from datetime import datetime
+from .entities import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Domain Interfaces
 =================
@@ -5,11 +14,7 @@ Domain Interfaces
 Core interfaces for the copywriting system following clean architecture principles.
 """
 
-from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Any, Protocol
-from datetime import datetime
 
-from .entities import (
     CopywritingRequest,
     CopywritingResponse,
     PerformanceMetrics,
@@ -22,7 +27,7 @@ class CopywritingRepository(ABC):
     """Repository interface for copywriting data persistence."""
     
     @abstractmethod
-    async def save_request(self, request: CopywritingRequest) -> CopywritingRequest:
+    async async def save_request(self, request: CopywritingRequest) -> CopywritingRequest:
         """Save a copywriting request."""
         pass
     
@@ -32,7 +37,7 @@ class CopywritingRepository(ABC):
         pass
     
     @abstractmethod
-    async def get_request_by_id(self, request_id: str) -> Optional[CopywritingRequest]:
+    async async def get_request_by_id(self, request_id: str) -> Optional[CopywritingRequest]:
         """Get request by ID."""
         pass
     
@@ -42,12 +47,12 @@ class CopywritingRepository(ABC):
         pass
     
     @abstractmethod
-    async def get_responses_by_request_id(self, request_id: str) -> List[CopywritingResponse]:
+    async async def get_responses_by_request_id(self, request_id: str) -> List[CopywritingResponse]:
         """Get all responses for a request."""
         pass
     
     @abstractmethod
-    async def update_request_status(self, request_id: str, status: RequestStatus) -> bool:
+    async async def update_request_status(self, request_id: str, status: RequestStatus) -> bool:
         """Update request status."""
         pass
     
@@ -57,12 +62,12 @@ class CopywritingRepository(ABC):
         pass
     
     @abstractmethod
-    async def get_requests_by_status(self, status: RequestStatus) -> List[CopywritingRequest]:
+    async async def get_requests_by_status(self, status: RequestStatus) -> List[CopywritingRequest]:
         """Get requests by status."""
         pass
     
     @abstractmethod
-    async def delete_request(self, request_id: str) -> bool:
+    async async def delete_request(self, request_id: str) -> bool:
         """Delete a request."""
         pass
     
@@ -256,7 +261,7 @@ class SecurityService(ABC):
         pass
     
     @abstractmethod
-    async def authorize_request(self, user: User, resource: str, action: str) -> bool:
+    async async def authorize_request(self, user: User, resource: str, action: str) -> bool:
         """Authorize user action on resource."""
         pass
     
@@ -280,12 +285,12 @@ class FileStorageService(ABC):
     """File storage service interface for document management."""
     
     @abstractmethod
-    async def upload_file(self, file_data: bytes, filename: str, content_type: str) -> str:
+    async async def upload_file(self, file_data: bytes, filename: str, content_type: str) -> str:
         """Upload file and return file ID."""
         pass
     
     @abstractmethod
-    async def download_file(self, file_id: str) -> Optional[bytes]:
+    async async def download_file(self, file_id: str) -> Optional[bytes]:
         """Download file by ID."""
         pass
     

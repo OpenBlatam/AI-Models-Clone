@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import base64
 from typing import Any
 from typing import Dict
@@ -14,6 +19,9 @@ from urllib3.util.retry import Retry
 
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 PAGE_SIZE = 100
 
@@ -22,7 +30,9 @@ class HighspotClientError(Exception):
     """Base exception for Highspot API client errors."""
 
     def __init__(self, message: str, status_code: Optional[int] = None):
-        self.message = message
+        
+    """__init__ function."""
+self.message = message
         self.status_code = status_code
         super().__init__(self.message)
 
@@ -35,7 +45,9 @@ class HighspotRateLimitError(HighspotClientError):
     """Exception raised when rate limit is exceeded."""
 
     def __init__(self, message: str, retry_after: Optional[str] = None):
-        self.retry_after = retry_after
+        
+    """__init__ function."""
+self.retry_after = retry_after
         super().__init__(message)
 
 
@@ -106,7 +118,7 @@ class HighspotClient:
             }
         )
 
-    def _make_request(
+    async def _make_request(
         self,
         method: str,
         endpoint: str,

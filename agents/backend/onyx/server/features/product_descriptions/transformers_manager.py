@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import os
+import time
+from contextlib import asynccontextmanager
+from dataclasses import dataclass, field
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing_extensions import TypedDict
+import torch
+import numpy as np
+from transformers import (
+from transformers.utils import logging as transformers_logging
+import psutil
+import gc
+                from transformers import BitsAndBytesConfig
+                from transformers import BitsAndBytesConfig
+from typing import Any, List, Dict, Optional
 """
 Transformers Library Manager for Pre-trained Models and Tokenizers
 ================================================================
@@ -20,28 +44,12 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import logging
-import os
-import time
-from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
-from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
-from typing_extensions import TypedDict
 
-import torch
-import numpy as np
-from transformers import (
     AutoTokenizer, AutoModel, AutoModelForSequenceClassification,
     AutoModelForTokenClassification, AutoModelForQuestionAnswering,
     AutoModelForCausalLM, AutoModelForSeq2SeqLM, pipeline,
     PreTrainedTokenizer, PreTrainedModel, Pipeline
 )
-from transformers.utils import logging as transformers_logging
-import psutil
-import gc
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -267,12 +275,10 @@ class TransformersManager:
         """Apply quantization to the model."""
         try:
             if config.load_in_8bit:
-                from transformers import BitsAndBytesConfig
                 quantization_config = BitsAndBytesConfig(load_in_8bit=True)
                 return model.quantize(quantization_config)
             
             elif config.load_in_4bit:
-                from transformers import BitsAndBytesConfig
                 quantization_config = BitsAndBytesConfig(
                     load_in_4bit=True,
                     bnb_4bit_compute_dtype=config.bnb_4bit_compute_dtype,

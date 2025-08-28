@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import logging
 import os
 from typing import Any
@@ -19,8 +21,6 @@ import onyx.background.celery.apps.app_base as app_base
 from onyx.background.celery.apps.app_base import task_logger
 from onyx.background.celery.celery_utils import celery_is_worker_primary
 from onyx.background.celery.tasks.indexing.utils import (
-    get_unfenced_index_attempt_ids,
-)
 from onyx.configs.constants import CELERY_PRIMARY_WORKER_LOCK_TIMEOUT
 from onyx.configs.constants import OnyxRedisConstants
 from onyx.configs.constants import OnyxRedisLocks
@@ -30,8 +30,6 @@ from onyx.db.engine import SqlEngine
 from onyx.db.index_attempt import get_index_attempt
 from onyx.db.index_attempt import mark_attempt_canceled
 from onyx.redis.redis_connector_credential_pair import (
-    RedisGlobalConnectorCredentialPair,
-)
 from onyx.redis.redis_connector_delete import RedisConnectorDelete
 from onyx.redis.redis_connector_doc_perm_sync import RedisConnectorPermissionSync
 from onyx.redis.redis_connector_ext_group_sync import RedisConnectorExternalGroupSync
@@ -44,6 +42,12 @@ from onyx.redis.redis_usergroup import RedisUserGroup
 from onyx.utils.logger import setup_logger
 from shared_configs.configs import MULTI_TENANT
 from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
+from typing import Any, List, Dict, Optional
+import asyncio
+    get_unfenced_index_attempt_ids,
+)
+    RedisGlobalConnectorCredentialPair,
+)
 
 logger = setup_logger()
 

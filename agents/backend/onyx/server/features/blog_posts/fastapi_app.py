@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -10,6 +15,9 @@ import json
 from datetime import datetime
 
 from model_training import (
+from config_loader import (
+    import uvicorn
+from typing import Any, List, Dict, Optional
     create_model_trainer, 
     DeviceManager,
     quick_train_transformer,
@@ -17,7 +25,6 @@ from model_training import (
     multi_gpu_train_transformer,
     ultra_optimized_train_transformer
 )
-from config_loader import (
     load_config_from_yaml,
     create_experiment_config,
     save_experiment_config,
@@ -356,6 +363,6 @@ async def run_config_training(experiment_id: str, config):
         })
         logger.error(f"Config training failed for {experiment_id}: {e}")
 
-if __name__ == "__main__":
-    import uvicorn
+match __name__:
+    case "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 

@@ -1,7 +1,5 @@
-"""
-Redis Indexer - Onyx Integration
-Indexing system for Onyx models using Redis.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any, Dict, List, Optional, Union, TypeVar, Generic
 from datetime import datetime
 import json
@@ -10,6 +8,14 @@ from pydantic import BaseModel
 from .redis_utils import RedisUtils
 from .redis_config import get_config
 import logging
+from pydantic import BaseModel
+from datetime import datetime
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Redis Indexer - Onyx Integration
+Indexing system for Onyx models using Redis.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -298,8 +304,6 @@ redis_indexer = RedisIndexer()
 
 # Example usage:
 """
-from pydantic import BaseModel
-from datetime import datetime
 
 # Define a model
 class UserModel(BaseModel):

@@ -1,9 +1,7 @@
-"""
-Onyx Video Workflow
-
-Adapted video workflow that leverages Onyx's LLM infrastructure,
-threading utilities, and performance optimizations for AI video generation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -12,8 +10,6 @@ from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-
-# Onyx imports
 from onyx.llm.factory import get_default_llms, get_default_llm_with_vision
 from onyx.llm.interfaces import LLM
 from onyx.llm.utils import get_max_input_tokens_from_llm_provider
@@ -27,11 +23,22 @@ from onyx.utils.gpu_utils import get_gpu_info, is_gpu_available
 from onyx.utils.file import get_file_extension, get_file_size
 from onyx.core.functions import process_document, format_response, handle_error
 from onyx.db.engine import get_session_with_current_tenant
-
-# Local imports
 from .models import VideoRequest, VideoResponse, PluginConfig
 from .core.exceptions import AIVideoError, PluginError, ValidationError
 from .core.onyx_integration import OnyxIntegrationManager, onyx_integration
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Onyx Video Workflow
+
+Adapted video workflow that leverages Onyx's LLM infrastructure,
+threading utilities, and performance optimizations for AI video generation.
+"""
+
+
+# Onyx imports
+
+# Local imports
 
 logger = setup_logger(__name__)
 
@@ -67,7 +74,7 @@ class OnyxVideoWorkflow:
     optimizations for efficient video generation.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = setup_logger("onyx_video_workflow")
         self.telemetry = TelemetryLogger()
         self.cache: ThreadSafeDict[str, Any] = ThreadSafeDict()
@@ -133,7 +140,7 @@ class OnyxVideoWorkflow:
             raise AIVideoError(f"Workflow initialization failed: {e}")
     
     @retry_wrapper(max_attempts=3, backoff_factor=2)
-    async def process_request(self, request: VideoRequest) -> VideoResponse:
+    async async def process_request(self, request: VideoRequest) -> VideoResponse:
         """Process video request using Onyx workflow."""
         try:
             self.logger.info(f"Processing video request: {request.request_id}")
@@ -255,7 +262,9 @@ class OnyxVideoWorkflow:
             # Execute with retry
             @retry_wrapper(max_attempts=step.retry_attempts, backoff_factor=2)
             async def execute_with_timeout():
-                return await asyncio.wait_for(
+                
+    """execute_with_timeout function."""
+return await asyncio.wait_for(
                     self._execute_llm_step(prompt, context),
                     timeout=step.timeout
                 )
@@ -397,7 +406,7 @@ class OnyxVideoGenerator:
     with support for different video types and styles.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = setup_logger("onyx_video_generator")
         self.workflow = OnyxVideoWorkflow()
         self.telemetry = TelemetryLogger()
@@ -451,7 +460,7 @@ class OnyxVideoGenerator:
             self.logger.error(f"Vision video generation failed: {e}")
             raise AIVideoError(f"Vision video generation failed: {e}")
     
-    async def _validate_request(self, request: VideoRequest) -> None:
+    async async def _validate_request(self, request: VideoRequest) -> None:
         """Validate video request."""
         if not request.input_text.strip():
             raise ValidationError("Input text cannot be empty")

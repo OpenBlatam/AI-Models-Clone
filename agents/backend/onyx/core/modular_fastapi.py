@@ -1,10 +1,5 @@
-"""
-🚀 MODULAR FASTAPI APPLICATION
-==============================
-
-FastAPI modular que integra el sistema de módulos ultra-avanzado.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 from contextlib import asynccontextmanager
 from typing import AsyncGenerator, Dict, Any, Optional
@@ -12,9 +7,19 @@ from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-
 from .modular_architecture import ModuleOrchestrator, module_registry
 import structlog
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+"""
+🚀 MODULAR FASTAPI APPLICATION
+==============================
+
+FastAPI modular que integra el sistema de módulos ultra-avanzado.
+"""
+
+
 
 logger = structlog.get_logger(__name__)
 
@@ -45,7 +50,9 @@ class ModularFastAPI:
                  title: str = "Modular FastAPI",
                  modules_path: str = "modules",
                  config_path: str = "config"):
-        self.orchestrator = ModuleOrchestrator(modules_path, config_path)
+        
+    """__init__ function."""
+self.orchestrator = ModuleOrchestrator(modules_path, config_path)
         self.app = None
         
     @asynccontextmanager
@@ -126,9 +133,11 @@ class ModularFastAPI:
         for middleware in middleware_stack:
             @app.middleware("http")
             async def modular_middleware(request: Request, call_next):
-                return await middleware.process_request(request, call_next)
+                
+    """modular_middleware function."""
+return await middleware.process_request(request, call_next)
     
-    def _add_modular_routes(self):
+    def _add_modular_routes(self) -> Any:
         """Agrega rutas modulares."""
         
         @self.app.get("/", tags=["🧩 Modular Root"])
@@ -283,7 +292,6 @@ modular_app = create_modular_app(
 )
 
 if __name__ == "__main__":
-    import uvicorn
     
     uvicorn.run(
         "modular_fastapi:modular_app",

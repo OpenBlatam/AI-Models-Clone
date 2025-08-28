@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import logging
+from typing import Any, Optional, Dict, List, Tuple
+from pathlib import Path
+import numpy as np
+        import psutil
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🎯 HAPPY PATH VALIDATORS - CORE MODULE
 ======================================
@@ -6,10 +18,6 @@ Módulo que contiene todas las funciones de validación utilizadas en el patrón
 happy path last.
 """
 
-import logging
-from typing import Any, Optional, Dict, List, Tuple
-from pathlib import Path
-import numpy as np
 
 # =============================================================================
 # VALIDATION FUNCTIONS
@@ -37,7 +45,6 @@ def _validate_inputs(*args, **kwargs) -> bool:
 def _validate_resources(*args, **kwargs) -> bool:
     """Validar recursos del sistema."""
     try:
-        import psutil
         
         # Verificar memoria disponible
         available_memory = psutil.virtual_memory().available / (1024 * 1024 * 1024)
@@ -213,7 +220,7 @@ def create_validation_chain(*validators) -> callable:
 
 def validate_with_context(validator: callable, context: Dict[str, Any]) -> callable:
     """Aplicar validador con contexto adicional."""
-    def contextual_validator(*args, **kwargs):
+    def contextual_validator(*args, **kwargs) -> Any:
         # Agregar contexto a kwargs
         kwargs.update(context)
         return validator(*args, **kwargs)

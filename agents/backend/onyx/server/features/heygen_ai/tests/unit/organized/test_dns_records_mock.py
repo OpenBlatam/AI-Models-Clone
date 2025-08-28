@@ -1,6 +1,6 @@
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
@@ -15,7 +15,7 @@ async def test_get_dns_records_mocked(monkeypatch):
         def resolve(self, hostname, record_type):
             return FakeAnswers(["1.2.3.4", "5.6.7.8"])
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod.dns.resolver, "Resolver", lambda: FakeResolver())
 
     u = NetworkUtils()
@@ -23,6 +23,7 @@ async def test_get_dns_records_mocked(monkeypatch):
     assert info.is_resolution_successful is True
     assert info.ttl_value == 300
     assert info.resolved_addresses == ["1.2.3.4", "5.6.7.8"]
+
 
 
 

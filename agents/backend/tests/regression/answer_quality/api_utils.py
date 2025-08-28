@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import requests
 from retry import retry
 
@@ -13,10 +15,13 @@ from onyx.db.enums import IndexingStatus
 from onyx.server.documents.models import ConnectorBase
 from tests.regression.answer_quality.cli_utils import get_api_server_host_port
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 GENERAL_HEADERS = {"Content-Type": "application/json"}
 
 
-def _api_url_builder(env_name: str, api_path: str) -> str:
+async def _api_url_builder(env_name: str, api_path: str) -> str:
     if env_name:
         return f"http://localhost:{get_api_server_host_port(env_name)}" + api_path
     else:
@@ -190,9 +195,13 @@ def create_credential(env_name: str) -> int:
 
 
 @retry(tries=10, delay=2, backoff=2)
-def upload_file(env_name: str, zip_file_path: str) -> list[str]:
+async def upload_file(env_name: str, zip_file_path: str) -> list[str]:
     files = [
         ("files", open(zip_file_path, "rb")),
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     ]
 
     api_path = _api_url_builder(env_name, "/manage/admin/connector/file/upload")

@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Used for creating embeddings of images for vector search
 DEFAULT_IMAGE_SUMMARIZATION_SYSTEM_PROMPT = """
 You are an assistant for summarizing images for retrieval.

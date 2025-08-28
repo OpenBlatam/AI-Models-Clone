@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any
 
 from sqlalchemy import exists
@@ -12,8 +14,6 @@ from onyx.auth.schemas import UserRole
 from onyx.configs.app_configs import DISABLE_AUTH
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.google_utils.shared_constants import (
-    DB_CREDENTIALS_DICT_SERVICE_ACCOUNT_KEY,
-)
 from onyx.db.enums import ConnectorCredentialPairStatus
 from onyx.db.models import ConnectorCredentialPair
 from onyx.db.models import Credential
@@ -23,6 +23,11 @@ from onyx.db.models import User
 from onyx.db.models import User__UserGroup
 from onyx.server.documents.models import CredentialBase
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    DB_CREDENTIALS_DICT_SERVICE_ACCOUNT_KEY,
+)
 
 
 logger = setup_logger()
@@ -139,7 +144,7 @@ def _relate_credential_to_user_groups__no_commit(
     db_session.add_all(credential_user_groups)
 
 
-def fetch_credentials_for_user(
+async def fetch_credentials_for_user(
     db_session: Session,
     user: User | None,
     get_editable: bool = True,
@@ -150,7 +155,7 @@ def fetch_credentials_for_user(
     return list(results.all())
 
 
-def fetch_credential_by_id_for_user(
+async def fetch_credential_by_id_for_user(
     credential_id: int,
     user: User | None,
     db_session: Session,
@@ -168,7 +173,7 @@ def fetch_credential_by_id_for_user(
     return credential
 
 
-def fetch_credential_by_id(
+async def fetch_credential_by_id(
     credential_id: int,
     db_session: Session,
 ) -> Credential | None:
@@ -179,7 +184,7 @@ def fetch_credential_by_id(
     return credential
 
 
-def fetch_credentials_by_source_for_user(
+async def fetch_credentials_by_source_for_user(
     db_session: Session,
     user: User | None,
     document_source: DocumentSource | None = None,
@@ -191,7 +196,7 @@ def fetch_credentials_by_source_for_user(
     return list(credentials)
 
 
-def fetch_credentials_by_source(
+async def fetch_credentials_by_source(
     db_session: Session,
     document_source: DocumentSource | None = None,
 ) -> list[Credential]:

@@ -1,18 +1,31 @@
-"""
-Comprehensive example showing how to use all middleware together.
-Demonstrates logging, metrics, exception handling, security, and performance monitoring.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
 from typing import Dict, Any, List
 from dataclasses import dataclass
-
 from fastapi import FastAPI, Request, HTTPException, Depends
 from fastapi.responses import JSONResponse
 import structlog
-
 from middleware.core import (
+from middleware.security import (
+from middleware.performance import (
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Comprehensive example showing how to use all middleware together.
+Demonstrates logging, metrics, exception handling, security, and performance monitoring.
+"""
+
+
+
     setup_structured_logging, create_log_context, log_operation, LogLevel,
     create_metric_context, record_metric, MetricType,
     create_exception_context, handle_exception,
@@ -20,14 +33,12 @@ from middleware.core import (
     setup_middleware_stack, operation_context
 )
 
-from middleware.security import (
     create_security_context, validate_jwt_token, hash_password, verify_password,
     require_authentication, require_permission, require_role, rate_limit,
     setup_security_middleware, generate_jwt_token, sanitize_input,
     validate_email, validate_password_strength
 )
 
-from middleware.performance import (
     CacheManager, DatabaseProfiler,
     with_caching, with_database_profiling, with_performance_monitoring,
     setup_performance_middleware, initialize_cache, cleanup_cache,
@@ -632,7 +643,6 @@ async def demonstrate_middleware_usage():
 
 
 if __name__ == "__main__":
-    import uvicorn
     
     print("Starting FastAPI application with comprehensive middleware...")
     print("Access the API at: http://localhost:8000")

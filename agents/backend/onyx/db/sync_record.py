@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy import and_
 from sqlalchemy import desc
 from sqlalchemy import func
@@ -10,6 +12,9 @@ from onyx.db.enums import SyncType
 from onyx.db.models import SyncRecord
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -79,7 +84,7 @@ def _create_sync_record(
     return sync_record
 
 
-def fetch_latest_sync_record(
+async def fetch_latest_sync_record(
     db_session: Session,
     entity_id: int,
     sync_type: SyncType,

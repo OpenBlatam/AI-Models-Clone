@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Callable
+from ..entities.health import HealthStatus
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Health Service Interface
 =======================
@@ -5,9 +13,6 @@ Health Service Interface
 Abstract interface for health checking operations.
 """
 
-from abc import ABC, abstractmethod
-from typing import Callable
-from ..entities.health import HealthStatus
 
 
 class IHealthService(ABC):

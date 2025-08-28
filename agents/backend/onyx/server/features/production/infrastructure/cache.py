@@ -1,9 +1,16 @@
-"""
-Cache Infrastructure
-===================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Redis cache service implementation with advanced caching features.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import json
@@ -11,9 +18,19 @@ import logging
 import pickle
 from typing import Any, Optional, Dict, List
 from datetime import datetime, timedelta
-
 import redis.asyncio as redis
 from redis.asyncio import ConnectionPool
+                import gzip
+                import gzip
+from typing import Any, List, Dict, Optional
+"""
+Cache Infrastructure
+===================
+
+Redis cache service implementation with advanced caching features.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -30,7 +47,9 @@ class RedisCacheService:
         max_size: int = 10000,
         compression_threshold: int = 1024
     ):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.pool_size = pool_size
         self.max_connections = max_connections
         self.default_ttl = ttl
@@ -46,7 +65,7 @@ class RedisCacheService:
             "deletes": 0
         }
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize Redis connection pool and client."""
         if self._initialized:
             return
@@ -72,7 +91,7 @@ class RedisCacheService:
             logger.error(f"Failed to initialize Redis cache service: {e}")
             raise
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup Redis connections."""
         if self.client:
             await self.client.close()
@@ -297,7 +316,6 @@ class RedisCacheService:
             
             # Compress if above threshold
             if len(json_data) > self.compression_threshold:
-                import gzip
                 compressed = gzip.compress(json_data.encode('utf-8'))
                 # Add compression marker
                 return b"GZIP:" + compressed
@@ -314,7 +332,6 @@ class RedisCacheService:
         try:
             # Check if compressed
             if value.startswith(b"GZIP:"):
-                import gzip
                 compressed_data = value[5:]  # Remove "GZIP:" prefix
                 json_data = gzip.decompress(compressed_data).decode('utf-8')
             else:

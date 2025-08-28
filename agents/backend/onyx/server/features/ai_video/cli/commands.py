@@ -1,22 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import argparse
+import signal
+import json
+from typing import Dict, Any
+from onyx.utils.gpu_utils import is_gpu_available
+from ..onyx_config import get_config, save_config, validate_config, get_config_summary, create_default_config
+from ..onyx_plugin_manager import onyx_plugin_manager
+from .display import (
+        from ..models import VideoRequest
+            from ..models import VideoRequest
+from typing import Any, List, Dict, Optional
+import logging
 """
 Onyx AI Video System - CLI Commands
 
 Individual command implementations for the Onyx AI Video CLI.
 """
 
-import asyncio
-import argparse
-import signal
-import json
-from typing import Dict, Any
 
 # Onyx imports
-from onyx.utils.gpu_utils import is_gpu_available
 
 # Local imports
-from ..onyx_config import get_config, save_config, validate_config, get_config_summary, create_default_config
-from ..onyx_plugin_manager import onyx_plugin_manager
-from .display import (
     show_startup_info, print_status_table, print_metrics_table,
     print_config_table, print_plugins_table, print_plugin_status_table
 )
@@ -34,7 +40,7 @@ async def start_system(cli, args: argparse.Namespace) -> int:
         cli.logger.info("System is running. Press Ctrl+C to stop.")
         
         # Setup signal handlers
-        def signal_handler(signum, frame):
+        def signal_handler(signum, frame) -> Any:
             cli.logger.info(f"Received signal {signum}, shutting down...")
             asyncio.create_task(cli.shutdown())
         
@@ -145,7 +151,6 @@ async def handle_config(cli, args: argparse.Namespace) -> int:
 async def generate_video(cli, args: argparse.Namespace) -> int:
     """Generate video."""
     try:
-        from ..models import VideoRequest
         
         # Create video request
         request = VideoRequest(
@@ -254,7 +259,6 @@ async def run_tests(cli, args: argparse.Namespace) -> int:
         
         # Test 4: Video generation (if requested)
         if args.test_generation:
-            from ..models import VideoRequest
             
             test_request = VideoRequest(
                 input_text="Test video generation",

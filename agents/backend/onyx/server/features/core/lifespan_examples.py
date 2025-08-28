@@ -1,8 +1,7 @@
-"""
-Lifespan Examples - Migration from app.on_event() to Lifespan Context Managers
-Demonstrates how to migrate from @app.on_event("startup") and @app.on_event("shutdown")
-to modern lifespan context managers for better resource management.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -12,12 +11,20 @@ import time
 import redis.asyncio as redis
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
-
 from fastapi import FastAPI, Depends
 from pydantic import BaseModel
 import structlog
-
 from ..utils.lifespan_manager import (
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Lifespan Examples - Migration from app.on_event() to Lifespan Context Managers
+Demonstrates how to migrate from @app.on_event("startup") and @app.on_event("shutdown")
+to modern lifespan context managers for better resource management.
+"""
+
+
+
     LifespanManager,
     EventPriority,
     create_database_lifespan,
@@ -35,12 +42,16 @@ logger = structlog.get_logger(__name__)
 """
 @app.on_event("startup")
 async def startup_event():
-    logger.info("Application starting up")
+    
+    """startup_event function."""
+logger.info("Application starting up")
     # Initialize resources
     
 @app.on_event("shutdown")
 async def shutdown_event():
-    logger.info("Application shutting down")
+    
+    """shutdown_event function."""
+logger.info("Application shutting down")
     # Cleanup resources
 """
 
@@ -143,18 +154,18 @@ cache_lifespan = create_cache_lifespan(
 class BackgroundService:
     """Example background service."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.running = False
         self.task = None
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start the background service."""
         logger.info("Starting background service")
         self.running = True
         self.task = asyncio.create_task(self._run())
         logger.info("Background service started")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop the background service."""
         logger.info("Stopping background service")
         self.running = False
@@ -166,7 +177,7 @@ class BackgroundService:
                 pass
         logger.info("Background service stopped")
     
-    async def _run(self):
+    async def _run(self) -> Any:
         """Background service main loop."""
         while self.running:
             try:
@@ -244,7 +255,7 @@ class UserModel(BaseModel):
 class UserService:
     """User service with database dependency."""
     
-    def __init__(self, session_factory):
+    def __init__(self, session_factory) -> Any:
         self.session_factory = session_factory
     
     async def get_user(self, user_id: int) -> Optional[UserModel]:
@@ -396,12 +407,16 @@ async def test_lifespan_events():
     shutdown_called = False
     
     async def test_startup():
-        nonlocal startup_called
+        
+    """test_startup function."""
+nonlocal startup_called
         startup_called = True
         logger.info("Test startup called")
     
     async def test_shutdown():
-        nonlocal shutdown_called
+        
+    """test_shutdown function."""
+nonlocal shutdown_called
         shutdown_called = True
         logger.info("Test shutdown called")
     
@@ -477,8 +492,9 @@ if __name__ == "__main__":
     # Add routes
     @app.get("/health")
     async def health_check():
-        return {"status": "healthy", "timestamp": time.time()}
+        
+    """health_check function."""
+return {"status": "healthy", "timestamp": time.time()}
     
     # Run the app
-    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000) 

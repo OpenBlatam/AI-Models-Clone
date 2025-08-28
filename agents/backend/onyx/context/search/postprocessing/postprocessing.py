@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import base64
 from collections.abc import Callable
 from collections.abc import Iterator
@@ -27,8 +29,6 @@ from onyx.context.search.models import RerankMetricsContainer
 from onyx.context.search.models import SearchQuery
 from onyx.db.engine import get_session_with_current_tenant
 from onyx.document_index.document_index_utils import (
-    translate_boost_count_to_multiplier,
-)
 from onyx.file_store.file_store import get_default_file_store
 from onyx.llm.interfaces import LLM
 from onyx.llm.utils import message_to_string
@@ -38,6 +38,11 @@ from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import FunctionCall
 from onyx.utils.threadpool_concurrency import run_functions_in_parallel
 from onyx.utils.timing import log_function_time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    translate_boost_count_to_multiplier,
+)
 
 
 def update_image_sections_with_query(
@@ -78,6 +83,10 @@ def update_image_sections_with_query(
                     logger.error(f"Image file not found: {chunk.image_file_name}")
                     raise Exception("File not found")
                 file_content = file_record.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 image_base64 = base64.b64encode(file_content).decode()
                 logger.debug(
                     f"Successfully loaded image data for {chunk.image_file_name}"

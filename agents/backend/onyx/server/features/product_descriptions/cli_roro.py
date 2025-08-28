@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import sys
 import json
 import yaml
@@ -10,13 +12,14 @@ from rate_limiting_network_scans import NetworkScanner, RateLimitConfig, RateLim
 from decorators.centralized import centralized_logging_metrics_exception
 from datetime import datetime
 
+    import asyncio
+from typing import Any, List, Dict, Optional
 app = typer.Typer()
 
 logging.basicConfig(level=logging.INFO)
 
 @centralized_logging_metrics_exception
 def run_scan_from_obj(scan_request: ScanRequestObj) -> ScanResponseObj:
-    import asyncio
     config = RateLimitConfig()
     scanner = NetworkScanner(config, RateLimitType[scan_request.rate_limit_type.upper()])
     for target in scan_request.targets:
@@ -50,6 +53,10 @@ def scan(
     """Run a network scan using the RORO pattern (CLI interface)."""
     if input_file:
         with open(input_file, "r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             if input_file.suffix in [".yaml", ".yml"]:
                 data = yaml.safe_load(f)
             else:
@@ -61,9 +68,18 @@ def scan(
     output = json.dumps(response.__dict__, default=str, indent=2) if format == "json" else yaml.safe_dump(response.__dict__, default_flow_style=False)
     if output_file:
         with open(output_file, "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(output)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     else:
         print(output)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     app() 

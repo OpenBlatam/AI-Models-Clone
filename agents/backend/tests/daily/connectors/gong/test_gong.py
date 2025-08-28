@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import time
 from unittest.mock import MagicMock
@@ -9,6 +11,9 @@ from onyx.connectors.gong.connector import GongConnector
 from onyx.connectors.models import Document
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def gong_connector() -> GongConnector:
     connector = GongConnector()

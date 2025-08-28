@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import os
 from datetime import datetime
@@ -19,6 +21,9 @@ from tests.integration.common_utils.test_models import DATestUser
 from tests.integration.common_utils.vespa import vespa_fixture
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # This is a placeholder - you'll need to create this zip file with actual test files
 TEST_FILES_BASE = "tests/integration/tests/indexing/file_connector/test_files"
 TEST_META_ZIP_PATH = f"{TEST_FILES_BASE}/with_meta.zip"
@@ -105,6 +110,10 @@ def test_zip_metadata_handling(
 
     # Expected metadata from the .onyx_metadata.json file
     with open(TEST_METADATA_FILE, "r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         expected_metadata = json.load(f)
 
     # Verify each document has the correct metadata

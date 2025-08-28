@@ -1,15 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from typing import Dict, Any
+from ..reporting import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Reporting Examples
 
 Demonstrates how to use the comprehensive reporting modules.
 """
 
-import asyncio
-import time
-from typing import Dict, Any
 
 # Import reporting modules
-from ..reporting import (
     # Console Reporter
     ConsoleReportRequest, ConsoleReportLevel, generate_console_report_async,
     
@@ -572,5 +582,6 @@ async def main():
         print(f"❌ Error running reporting examples: {e}")
         raise
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

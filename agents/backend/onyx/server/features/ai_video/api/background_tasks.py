@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+from typing import Optional
+from typing import Any, List, Dict, Optional
 """
 🚀 BACKGROUND TASKS - AI VIDEO SYSTEM
 =====================================
@@ -5,9 +11,6 @@
 Background tasks and utilities for the AI Video system.
 """
 
-import asyncio
-import logging
-from typing import Optional
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -172,7 +175,7 @@ async def database_cleanup_task():
 # UTILITY FUNCTIONS
 # ============================================================================
 
-def create_background_task(task_func, *args, **kwargs):
+def create_background_task(task_func, *args, **kwargs) -> Any:
     """
     Create a background task with error handling.
     
@@ -185,7 +188,9 @@ def create_background_task(task_func, *args, **kwargs):
         asyncio.Task: Background task
     """
     async def wrapped_task():
-        try:
+        
+    """wrapped_task function."""
+try:
             await task_func(*args, **kwargs)
         except Exception as e:
             logger.error(f"Background task failed: {e}")
@@ -204,7 +209,9 @@ def schedule_periodic_task(task_func, interval_seconds: int):
         asyncio.Task: Periodic task
     """
     async def periodic_task():
-        while True:
+        
+    """periodic_task function."""
+while True:
             try:
                 await task_func()
                 await asyncio.sleep(interval_seconds)

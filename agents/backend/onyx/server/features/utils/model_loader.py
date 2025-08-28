@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Optional, Tuple
 import os
 import time
@@ -5,13 +7,16 @@ import threading
 from transformers import AutoModelForCausalLM, AutoTokenizer
 import torch
 from .logging_utils import logger
-try:
     from optimum.bettertransformer import BetterTransformer
     from accelerate import infer_auto_device_map, dispatch_model
+import orjson
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+try:
     ACCEL_AVAILABLE = True
 except ImportError:
     ACCEL_AVAILABLE = False
-import orjson
 
 MODEL_PATH: str = './fine_tuned_model'
 CHECK_INTERVAL: int = 10  # segundos
@@ -81,3 +86,7 @@ def startup_event() -> None:
     global model, tokenizer
     model, tokenizer = load_model()
     threading.Thread(target=background_reloader, daemon=True).start() 
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")

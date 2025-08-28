@@ -1,14 +1,22 @@
-"""
-Message routes for Key Messages feature with concise conditionals.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Request
 from typing import Dict, Any
 import time
 import structlog
-
 from ..models import KeyMessageRequest, KeyMessageResponse
 from ..service import OptimizedKeyMessageService
 from ..utils import is_valid_message, calculate_processing_time, monitor_performance
+    from ..api import service
+    from ..models import MessageType
+    from ..models import MessageTone
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Message routes for Key Messages feature with concise conditionals.
+"""
+
 
 logger = structlog.get_logger(__name__)
 router = APIRouter()
@@ -16,7 +24,6 @@ router = APIRouter()
 # Dependency
 async def get_service() -> OptimizedKeyMessageService:
     """Get service instance."""
-    from ..api import service
     if not service:
         raise HTTPException(status_code=503, detail="Service not available")
     return service
@@ -88,7 +95,6 @@ async def analyze_message(
 @router.get("/types")
 async def get_message_types() -> Dict[str, Any]:
     """Get available message types."""
-    from ..models import MessageType
     
     return {
         "success": True,
@@ -99,7 +105,6 @@ async def get_message_types() -> Dict[str, Any]:
 @router.get("/tones")
 async def get_tones() -> Dict[str, Any]:
     """Get available tones."""
-    from ..models import MessageTone
     
     return {
         "success": True,

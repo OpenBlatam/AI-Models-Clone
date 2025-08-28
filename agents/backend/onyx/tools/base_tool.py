@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import cast
 from typing import TYPE_CHECKING
 
@@ -6,13 +8,16 @@ from langchain_core.messages import HumanMessage
 from onyx.llm.utils import message_to_prompt_and_imgs
 from onyx.tools.tool import Tool
 
-if TYPE_CHECKING:
     from onyx.chat.prompt_builder.answer_prompt_builder import AnswerPromptBuilder
     from onyx.tools.tool_implementations.custom.custom_tool import (
-        CustomToolCallSummary,
-    )
     from onyx.tools.message import ToolCallSummary
     from onyx.tools.models import ToolResponse
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+if TYPE_CHECKING:
+        CustomToolCallSummary,
+    )
 
 
 def build_user_message_for_non_tool_calling_llm(

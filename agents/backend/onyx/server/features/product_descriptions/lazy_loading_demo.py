@@ -1,7 +1,10 @@
-"""
-Lazy Loading Demo
-Demonstrates lazy loading of heavy modules like exploit databases, vulnerability databases, and ML models
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -10,9 +13,18 @@ import tempfile
 from pathlib import Path
 from typing import Dict, Any, List
 import logging
+from lazy_loading_exploit_modules import (
+        import shutil
+        import shutil
+        import shutil
+from typing import Any, List, Dict, Optional
+"""
+Lazy Loading Demo
+Demonstrates lazy loading of heavy modules like exploit databases, vulnerability databases, and ML models
+"""
+
 
 # Import lazy loading components
-from lazy_loading_exploit_modules import (
     LazyModuleManager, ModuleConfig, ModuleType, LoadingStrategy,
     ExploitDatabaseModule, VulnerabilityDatabaseModule, MachineLearningModelModule
 )
@@ -101,9 +113,17 @@ async def create_sample_data():
     vulns_file = temp_dir / "vulnerabilities.json"
     
     with open(exploits_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         json.dump(exploits_data, f, indent=2)
     
     with open(vulns_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         json.dump(vulnerabilities_data, f, indent=2)
     
     return temp_dir, str(exploits_file), str(vulns_file)
@@ -257,7 +277,6 @@ async def demo_lazy_loading_performance():
         await manager.cleanup_all()
         
         # Remove temporary files
-        import shutil
         shutil.rmtree(temp_dir)
     
     print("\n=== Lazy Loading Performance Demo Completed! ===")
@@ -340,7 +359,6 @@ async def demo_lazy_loading_strategies():
         await manager.cleanup_all()
         
         # Remove temporary files
-        import shutil
         shutil.rmtree(temp_dir)
     
     print("\n=== Lazy Loading Strategies Demo Completed! ===")
@@ -440,7 +458,6 @@ async def demo_caching_behavior():
         await manager.cleanup_all()
         
         # Remove temporary files
-        import shutil
         shutil.rmtree(temp_dir)
     
     print("\n=== Caching Behavior Demo Completed! ===")
@@ -464,5 +481,6 @@ async def main():
     print("\n" + "=" * 50)
     print("All Lazy Loading Demos Completed!")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

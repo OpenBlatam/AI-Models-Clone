@@ -1,7 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import os
 
 
+        from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 IMAGE_GENERATION_OUTPUT_FORMAT = os.environ.get("IMAGE_GENERATION_OUTPUT_FORMAT", "url")
 
 # if specified, will pass through request headers to the call to API calls made by custom tools
@@ -16,7 +22,6 @@ if _CUSTOM_TOOL_PASS_THROUGH_HEADERS_RAW:
         )
     except Exception:
         # need to import here to avoid circular imports
-        from onyx.utils.logger import setup_logger
 
         logger = setup_logger()
         logger.error(

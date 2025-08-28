@@ -1,8 +1,15 @@
-"""
-Pydantic Models
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
 
-Core data models for the cybersecurity toolkit.
-"""
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import Dict, Any, List, Optional, Union, Tuple
 from pydantic import BaseModel, Field, validator, root_validator
@@ -10,6 +17,15 @@ from enum import Enum
 from datetime import datetime
 import ipaddress
 import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Pydantic Models
+
+Core data models for the cybersecurity toolkit.
+"""
+
 
 # ============================================================================
 # BASE MODELS
@@ -22,7 +38,8 @@ class BaseRequest(BaseModel):
     source: Optional[str] = Field(None, description="Request source")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -36,7 +53,8 @@ class BaseResult(BaseModel):
     error_message: Optional[str] = Field(None, description="Error message if failed")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -81,7 +99,7 @@ class ScanRequest(BaseRequest):
     scan_config: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Scan configuration")
     
     @validator('targets')
-    def validate_targets(cls, v):
+    def validate_targets(cls, v) -> Optional[Dict[str, Any]]:
         """Validate target format."""
         for target in v:
             if not re.match(r'^[a-zA-Z0-9.-]+$', target) and not cls._is_valid_ip(target):
@@ -89,7 +107,7 @@ class ScanRequest(BaseRequest):
         return v
     
     @validator('ports')
-    def validate_ports(cls, v):
+    def validate_ports(cls, v) -> bool:
         """Validate port numbers."""
         if v:
             for port in v:
@@ -168,7 +186,8 @@ class Vulnerability(BaseModel):
     discovered_at: datetime = Field(default_factory=datetime.now, description="Discovery timestamp")
     references: List[str] = Field(default_factory=list, description="Reference links")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -184,7 +203,7 @@ class VulnerabilityReport(BaseModel):
     risk_score: float = Field(default=0.0, ge=0.0, le=10.0, description="Overall risk score")
     
     @root_validator
-    def calculate_summary(cls, values):
+    def calculate_summary(cls, values) -> Any:
         """Calculate vulnerability summary."""
         vulnerabilities = values.get('vulnerabilities', [])
         summary = {}
@@ -194,7 +213,8 @@ class VulnerabilityReport(BaseModel):
         values['summary'] = summary
         return values
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -213,7 +233,7 @@ class NetworkTarget(BaseModel):
     os_info: Optional[Dict[str, Any]] = Field(None, description="Operating system information")
     
     @validator('host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         """Validate host format."""
         if not re.match(r'^[a-zA-Z0-9.-]+$', v) and not cls._is_valid_ip(v):
             raise ValueError(f"Invalid host format: {v}")
@@ -258,7 +278,8 @@ class NetworkHost(BaseModel):
     scan_time: float = Field(..., description="Time taken to scan host")
     last_seen: datetime = Field(default_factory=datetime.now, description="Last scan timestamp")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -274,7 +295,8 @@ class NetworkScan(BaseModel):
     duration: Optional[float] = Field(None, description="Total scan duration")
     status: ScanStatus = Field(default=ScanStatus.PENDING, description="Scan status")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -305,7 +327,7 @@ class AttackRequest(BaseRequest):
     attack_config: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Attack configuration")
     
     @validator('target')
-    def validate_target(cls, v):
+    def validate_target(cls, v) -> Optional[Dict[str, Any]]:
         """Validate target format."""
         if not re.match(r'^[a-zA-Z0-9.-:]+$', v):
             raise ValueError(f"Invalid target format: {v}")
@@ -333,7 +355,8 @@ class AttackSession(BaseModel):
     successful_attempts: int = Field(default=0, ge=0, description="Successful attempts")
     payloads_used: List[AttackPayload] = Field(default_factory=list, description="Payloads used")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -396,7 +419,8 @@ class ReportResult(BaseResult):
     sections_included: List[ReportSection] = Field(default_factory=list, description="Sections included in report")
     generated_at: datetime = Field(default_factory=datetime.now, description="Report generation timestamp")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -431,7 +455,8 @@ class PortInfo(BaseModel):
     service: Optional[ServiceInfo] = Field(None, description="Service information")
     last_checked: datetime = Field(default_factory=datetime.now, description="Last check timestamp")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -553,7 +578,8 @@ class FileInfo(BaseModel):
     created_at: Optional[datetime] = Field(None, description="File creation time")
     modified_at: Optional[datetime] = Field(None, description="File modification time")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -568,7 +594,8 @@ class ProcessInfo(BaseModel):
     cpu_usage: Optional[float] = Field(None, ge=0.0, le=100.0, description="CPU usage percentage")
     start_time: Optional[datetime] = Field(None, description="Process start time")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -584,7 +611,8 @@ class SystemInfo(BaseModel):
     uptime: float = Field(..., ge=0, description="System uptime in seconds")
     boot_time: Optional[datetime] = Field(None, description="System boot time")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -601,7 +629,8 @@ class LogEntry(BaseModel):
     exception: Optional[str] = Field(None, description="Exception information")
     context: Dict[str, Any] = Field(default_factory=dict, description="Additional context")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -617,7 +646,8 @@ class ErrorInfo(BaseModel):
     context: Dict[str, Any] = Field(default_factory=dict, description="Error context")
     severity: str = Field(default="medium", regex="^(low|medium|high|critical)$", description="Error severity")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         } 

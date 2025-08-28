@@ -1,805 +1,410 @@
 #!/usr/bin/env python3
 """
-Comprehensive Test Suite for Comprehensive Logging System
-Tests all logging functionality, error handling, and integration
+Test script for Comprehensive Logging System
+Tests the enhanced logging capabilities for training progress and errors
 """
 
 import unittest
-import tempfile
-import shutil
-import os
 import sys
-import time
+import os
+import tempfile
 import json
-import pandas as pd
-from pathlib import Path
-from unittest.mock import patch, MagicMock
-import warnings
+import time
+from unittest.mock import Mock, patch, MagicMock
+import numpy as np
+import torch
+from torch.utils.data import DataLoader, Dataset
+import logging
 
-# Suppress warnings for cleaner test output
-warnings.filterwarnings("ignore")
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Add the current directory to the path to import the logging module
-sys.path.append(str(Path(__file__).parent))
+from advanced_llm_seo_engine import (
+    AdvancedLLMSEOEngine,
+    SEODataset,
+    DataLoaderManager,
+    DataLoaderConfig,
+    EarlyStopping
+)
 
 class TestComprehensiveLogging(unittest.TestCase):
-    """Test suite for the comprehensive logging system."""
-    
     def setUp(self):
         """Set up test environment."""
-        # Create temporary directory for test logs
-        self.test_dir = tempfile.mkdtemp()
-        self.log_dir = Path(self.test_dir) / "logs"
-        self.log_dir.mkdir(exist_ok=True)
+        self.temp_dir = tempfile.mkdtemp()
+        self.config = Mock()
+        self.config.debug_mode = True
+        self.config.batch_size = 32
+        self.config.learning_rate = 1e-4
+        self.config.weight_decay = 1e-5
+        self.config.num_epochs = 10
+        self.config.use_mixed_precision = False
+        self.config.max_grad_norm = 1.0
+        self.config.early_stopping_patience = 5
+        self.config.early_stopping_min_delta = 1e-4
+        self.config.early_stopping_monitor = "val_loss"
+        self.config.early_stopping_mode = "min"
+        self.config.lr_scheduler = "cosine"
+        self.config.warmup_steps = 100
+        self.config.lr_scheduler_params = {
+            "cosine": {},
+            "linear": {}
+        }
         
-        # Import the logging module
-        try:
-            from comprehensive_logging import (
-                setup_logging, LoggingConfig, ComprehensiveLogger,
-                TrainingMetricsLogger, ErrorTracker, SystemMonitor
-            )
-            self.setup_logging = setup_logging
-            self.LoggingConfig = LoggingConfig
-            self.ComprehensiveLogger = ComprehensiveLogger
-            self.TrainingMetricsLogger = TrainingMetricsLogger
-            self.ErrorTracker = ErrorTracker
-            self.SystemMonitor = SystemMonitor
-        except ImportError as e:
-            self.skipTest(f"Could not import comprehensive_logging: {e}")
-    
+        # Mock device
+        self.device = torch.device("cpu")
+        
+        # Create mock model and optimizer
+        self.mock_model = Mock()
+        self.mock_optimizer = Mock()
+        self.mock_optimizer.param_groups = [{'lr': 1e-4}]
+        self.mock_scheduler = Mock()
+        self.mock_scaler = Mock()
+        
+        # Create sample data
+        self.texts = ["Sample text 1", "Sample text 2", "Sample text 3"]
+        self.labels = [0, 1, 0]
+        
     def tearDown(self):
         """Clean up test environment."""
-        # Remove temporary directory
-        if os.path.exists(self.test_dir):
-            shutil.rmtree(self.test_dir)
+        import shutil
+        shutil.rmtree(self.temp_dir, ignore_errors=True)
+        
+        # Clean up log files
+        if os.path.exists("logs"):
+            shutil.rmtree("logs", ignore_errors=True)
     
-    def test_logging_config_defaults(self):
-        """Test LoggingConfig default values."""
-        config = self.LoggingConfig()
-        
-        self.assertEqual(config.log_level, "INFO")
-        self.assertEqual(config.log_dir, "./logs")
-        self.assertEqual(config.max_file_size, 10 * 1024 * 1024)
-        self.assertEqual(config.backup_count, 5)
-        self.assertTrue(config.enable_console)
-        self.assertTrue(config.enable_file)
-        self.assertTrue(config.enable_json)
-        self.assertTrue(config.log_training_metrics)
-        self.assertTrue(config.log_system_metrics)
-        self.assertTrue(config.enable_async_logging)
-        self.assertTrue(config.enable_thread_safety)
+    def test_logging_setup(self):
+        """Test that the comprehensive logging system is properly set up."""
+        with patch('torch.device', return_value=self.device):
+            with patch('advanced_llm_seo_engine.CustomSEOModel', return_value=self.mock_model):
+                with patch('advanced_llm_seo_engine.AdvancedTokenizer', return_value=Mock()):
+                    with patch('advanced_llm_seo_engine.pipeline', return_value=Mock()):
+                        engine = AdvancedLLMSEOEngine(self.config)
+                        
+                        # Check that specialized loggers are created
+                        self.assertIsNotNone(logging.getLogger("training_progress"))
+                        self.assertIsNotNone(logging.getLogger("model_performance"))
+                        self.assertIsNotNone(logging.getLogger("data_loading"))
+                        self.assertIsNotNone(logging.getLogger("error_tracker"))
+                        
+                        # Check that logs directory is created
+                        self.assertTrue(os.path.exists("logs"))
     
-    def test_logging_config_custom(self):
-        """Test LoggingConfig with custom values."""
-        config = self.LoggingConfig(
-            log_level="DEBUG",
-            log_dir=self.log_dir,
-            enable_console=False,
-            enable_file=True,
-            log_training_metrics=False
-        )
-        
-        self.assertEqual(config.log_level, "DEBUG")
-        self.assertEqual(config.log_dir, self.log_dir)
-        self.assertFalse(config.enable_console)
-        self.assertTrue(config.enable_file)
-        self.assertFalse(config.log_training_metrics)
+    def test_log_training_progress(self):
+        """Test training progress logging functionality."""
+        with patch('torch.device', return_value=self.device):
+            with patch('advanced_llm_seo_engine.CustomSEOModel', return_value=self.mock_model):
+                with patch('advanced_llm_seo_engine.AdvancedTokenizer', return_value=Mock()):
+                    with patch('advanced_llm_seo_engine.pipeline', return_value=Mock()):
+                        engine = AdvancedLLMSEOEngine(self.config)
+                        
+                        # Test basic training progress logging
+                        engine.log_training_progress(
+                            epoch=1,
+                            step=100,
+                            loss=0.5,
+                            learning_rate=1e-4
+                        )
+                        
+                        # Test with validation loss
+                        engine.log_training_progress(
+                            epoch=1,
+                            step=100,
+                            loss=0.5,
+                            learning_rate=1e-4,
+                            validation_loss=0.6
+                        )
+                        
+                        # Test with additional metrics
+                        engine.log_training_progress(
+                            epoch=1,
+                            step=100,
+                            loss=0.5,
+                            learning_rate=1e-4,
+                            validation_loss=0.6,
+                            metrics={"accuracy": 0.85, "f1_score": 0.82}
+                        )
+                        
+                        # Verify logs were created
+                        log_files = os.listdir("logs")
+                        self.assertTrue(any("training_progress" in f for f in log_files))
+                        self.assertTrue(any("training_detailed" in f for f in log_files))
     
-    def test_comprehensive_logger_initialization(self):
-        """Test ComprehensiveLogger initialization."""
-        config = self.LoggingConfig(log_dir=self.log_dir)
-        logger = self.ComprehensiveLogger("test_logger", config)
-        
-        self.assertIsNotNone(logger)
-        self.assertEqual(logger.name, "test_logger")
-        self.assertEqual(logger.config, config)
-        self.assertIsNotNone(logger.logger)
-        self.assertIsNotNone(logger.training_logger)
-        self.assertIsNotNone(logger.error_tracker)
-        self.assertIsNotNone(logger.system_monitor)
-        
-        # Cleanup
-        logger.cleanup()
+    def test_log_model_performance(self):
+        """Test model performance logging functionality."""
+        with patch('torch.device', return_value=self.device):
+            with patch('advanced_llm_seo_engine.CustomSEOModel', return_value=self.mock_model):
+                with patch('advanced_llm_seo_engine.AdvancedTokenizer', return_value=Mock()):
+                    with patch('advanced_llm_seo_engine.pipeline', return_value=Mock()):
+                        engine = AdvancedLLMSEOEngine(self.config)
+                        
+                        # Test basic performance logging
+                        engine.log_model_performance(
+                            operation="forward_pass",
+                            duration=0.1
+                        )
+                        
+                        # Test with memory usage
+                        engine.log_model_performance(
+                            operation="forward_pass",
+                            duration=0.1,
+                            memory_usage=512.5
+                        )
+                        
+                        # Test with GPU utilization
+                        engine.log_model_performance(
+                            operation="forward_pass",
+                            duration=0.1,
+                            memory_usage=512.5,
+                            gpu_utilization=75.2
+                        )
+                        
+                        # Test with additional metrics
+                        engine.log_model_performance(
+                            operation="forward_pass",
+                            duration=0.1,
+                            memory_usage=512.5,
+                            gpu_utilization=75.2,
+                            additional_metrics={"batch_size": 32, "sequence_length": 512}
+                        )
+                        
+                        # Verify logs were created
+                        log_files = os.listdir("logs")
+                        self.assertTrue(any("model_performance" in f for f in log_files))
     
-    def test_basic_logging_functionality(self):
-        """Test basic logging functionality."""
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            enable_console=False,  # Disable console for testing
-            enable_file=True,
-            enable_json=True
-        )
-        logger = self.ComprehensiveLogger("test_basic", config)
-        
-        # Test different log levels
-        logger.log_info("Test info message", {"context": "test"})
-        logger.log_warning("Test warning message", {"context": "test"})
-        logger.log_debug("Test debug message", {"context": "test"})
-        
-        # Check that log files were created
-        log_file = self.log_dir / "application.log"
-        json_file = self.log_dir / "application.jsonl"
-        
-        self.assertTrue(log_file.exists())
-        self.assertTrue(json_file.exists())
-        
-        # Cleanup
-        logger.cleanup()
+    def test_log_data_loading(self):
+        """Test data loading logging functionality."""
+        with patch('torch.device', return_value=self.device):
+            with patch('advanced_llm_seo_engine.CustomSEOModel', return_value=self.mock_model):
+                with patch('advanced_llm_seo_engine.AdvancedTokenizer', return_value=Mock()):
+                    with patch('advanced_llm_seo_engine.pipeline', return_value=Mock()):
+                        engine = AdvancedLLMSEOEngine(self.config)
+                        
+                        # Test basic data loading logging
+                        engine.log_data_loading(
+                            operation="dataset_creation",
+                            dataset_size=1000,
+                            batch_size=32,
+                            duration=0.5
+                        )
+                        
+                        # Test with memory usage
+                        engine.log_data_loading(
+                            operation="dataset_creation",
+                            dataset_size=1000,
+                            batch_size=32,
+                            duration=0.5,
+                            memory_usage=256.0
+                        )
+                        
+                        # Verify logs were created
+                        log_files = os.listdir("logs")
+                        self.assertTrue(any("data_loading" in f for f in log_files))
     
-    def test_training_metrics_logging(self):
-        """Test training metrics logging functionality."""
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            log_training_metrics=True
-        )
-        logger = self.ComprehensiveLogger("test_training", config)
-        
-        # Log training steps
-        for epoch in range(2):
-            for step in range(3):
-                logger.log_training_step(
-                    epoch=epoch,
-                    step=step,
-                    loss=0.5 + epoch * 0.1 + step * 0.01,
-                    accuracy=0.8 - epoch * 0.05 - step * 0.01,
-                    learning_rate=0.001,
-                    gradient_norm=1.0 + step * 0.1
-                )
-        
-        # Log epoch summaries
-        for epoch in range(2):
-            logger.log_epoch_summary(
-                epoch=epoch,
-                train_loss=0.5 + epoch * 0.1,
-                val_loss=0.6 + epoch * 0.1,
-                train_accuracy=0.8 - epoch * 0.05,
-                val_accuracy=0.75 - epoch * 0.05
-            )
-        
-        # Check that training metrics files were created
-        metrics_file = self.log_dir / "training_metrics.jsonl"
-        progress_file = self.log_dir / "training_progress.csv"
-        
-        self.assertTrue(metrics_file.exists())
-        self.assertTrue(progress_file.exists())
-        
-        # Check CSV format
-        df = pd.read_csv(progress_file)
-        self.assertEqual(len(df), 6)  # 2 epochs * 3 steps
-        self.assertIn('epoch', df.columns)
-        self.assertIn('step', df.columns)
-        self.assertIn('loss', df.columns)
-        self.assertIn('accuracy', df.columns)
-        
-        # Check metrics summary
-        summary = logger.training_logger.get_metrics_summary()
-        self.assertEqual(summary['total_epochs'], 1)  # 0-indexed
-        self.assertEqual(summary['total_steps'], 2)   # 0-indexed
-        self.assertEqual(summary['metrics_count'], 8)  # 6 steps + 2 summaries
-        
-        # Cleanup
-        logger.cleanup()
+    def test_log_error(self):
+        """Test error logging functionality."""
+        with patch('torch.device', return_value=self.device):
+            with patch('advanced_llm_seo_engine.CustomSEOModel', return_value=self.mock_model):
+                with patch('advanced_llm_seo_engine.AdvancedTokenizer', return_value=Mock()):
+                    with patch('advanced_llm_seo_engine.pipeline', return_value=Mock()):
+                        engine = AdvancedLLMSEOEngine(self.config)
+                        
+                        # Test basic error logging
+                        test_error = ValueError("Test error message")
+                        engine.log_error(
+                            error=test_error,
+                            context="Test context",
+                            operation="test_operation"
+                        )
+                        
+                        # Test with additional info
+                        engine.log_error(
+                            error=test_error,
+                            context="Test context",
+                            operation="test_operation",
+                            additional_info={"param1": "value1", "param2": 42}
+                        )
+                        
+                        # Verify logs were created
+                        log_files = os.listdir("logs")
+                        self.assertTrue(any("errors" in f for f in log_files))
+                        self.assertTrue(any("error_tracking" in f for f in log_files))
     
-    def test_error_tracking(self):
-        """Test error tracking functionality."""
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            log_errors=True
-        )
-        logger = self.ComprehensiveLogger("test_errors", config)
-        
-        # Test error logging
-        test_error = ValueError("Test error message")
-        logger.log_error(
-            error=test_error,
-            context={"operation": "test", "step": 1},
-            severity="ERROR",
-            recovery_attempted=False
-        )
-        
-        # Test another error
-        test_error2 = RuntimeError("Another test error")
-        logger.log_error(
-            error=test_error2,
-            context={"operation": "test2", "step": 2},
-            severity="WARNING",
-            recovery_attempted=True
-        )
-        
-        # Test recovery success
-        logger.error_tracker.track_recovery_success(
-            error_type="ValueError",
-            recovery_method="automatic_restart"
-        )
-        
-        # Check that error files were created
-        errors_file = self.log_dir / "errors.jsonl"
-        error_summary_file = self.log_dir / "error_summary.json"
-        
-        self.assertTrue(errors_file.exists())
-        self.assertTrue(error_summary_file.exists())
-        
-        # Check error analysis
-        analysis = logger.error_tracker.get_error_analysis()
-        self.assertEqual(analysis['total_errors'], 2)
-        self.assertEqual(analysis['error_counts']['ValueError'], 1)
-        self.assertEqual(analysis['error_counts']['RuntimeError'], 1)
-        self.assertEqual(len(analysis['most_common_errors']), 2)
-        
-        # Check recovery rate
-        self.assertGreater(analysis['recovery_success_rate'], 0)
-        
-        # Cleanup
-        logger.cleanup()
+    def test_log_training_summary(self):
+        """Test training summary logging functionality."""
+        with patch('torch.device', return_value=self.device):
+            with patch('advanced_llm_seo_engine.CustomSEOModel', return_value=self.mock_model):
+                with patch('advanced_llm_seo_engine.AdvancedTokenizer', return_value=Mock()):
+                    with patch('advanced_llm_seo_engine.pipeline', return_value=Mock()):
+                        engine = AdvancedLLMSEOEngine(self.config)
+                        
+                        # Test training summary logging
+                        engine.log_training_summary(
+                            total_epochs=10,
+                            total_steps=1000,
+                            final_loss=0.1,
+                            best_loss=0.05,
+                            training_duration=3600.0,
+                            early_stopping_triggered=False
+                        )
+                        
+                        # Test with early stopping
+                        engine.log_training_summary(
+                            total_epochs=5,
+                            total_steps=500,
+                            final_loss=0.2,
+                            best_loss=0.1,
+                            training_duration=1800.0,
+                            early_stopping_triggered=True
+                        )
+                        
+                        # Verify logs were created
+                        log_files = os.listdir("logs")
+                        self.assertTrue(any("training_progress" in f for f in log_files))
     
-    def test_system_monitoring(self):
-        """Test system monitoring functionality."""
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            log_system_metrics=True
-        )
-        logger = self.ComprehensiveLogger("test_system", config)
-        
-        # Start monitoring
-        logger.system_monitor.start_monitoring(interval=0.1)
-        
-        # Wait for some metrics to be collected
-        time.sleep(0.5)
-        
-        # Stop monitoring
-        logger.system_monitor.stop_monitoring()
-        
-        # Check that system metrics file was created
-        metrics_file = self.log_dir / "system_metrics.jsonl"
-        self.assertTrue(metrics_file.exists())
-        
-        # Check that metrics contain expected data
-        with open(metrics_file, 'r') as f:
-            lines = f.readlines()
-            self.assertGreater(len(lines), 0)
-            
-            # Parse first line
-            first_metrics = json.loads(lines[0])
-            self.assertIn('timestamp', first_metrics)
-            self.assertIn('cpu_percent', first_metrics)
-            self.assertIn('memory_percent', first_metrics)
-        
-        # Cleanup
-        logger.cleanup()
+    def test_log_hyperparameters(self):
+        """Test hyperparameters logging functionality."""
+        with patch('torch.device', return_value=self.device):
+            with patch('advanced_llm_seo_engine.CustomSEOModel', return_value=self.mock_model):
+                with patch('advanced_llm_seo_engine.AdvancedTokenizer', return_value=Mock()):
+                    with patch('advanced_llm_seo_engine.pipeline', return_value=Mock()):
+                        engine = AdvancedLLMSEOEngine(self.config)
+                        
+                        # Test hyperparameters logging
+                        test_config = {
+                            "learning_rate": 1e-4,
+                            "batch_size": 32,
+                            "num_epochs": 100,
+                            "use_mixed_precision": True,
+                            "max_grad_norm": 1.0
+                        }
+                        
+                        engine.log_hyperparameters(test_config)
+                        
+                        # Verify logs were created
+                        log_files = os.listdir("logs")
+                        self.assertTrue(any("training_progress" in f for f in log_files))
     
-    def test_performance_tracking(self):
-        """Test performance tracking functionality."""
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            log_performance=True
-        )
-        logger = self.ComprehensiveLogger("test_performance", config)
-        
-        # Test context manager
-        with logger.performance_tracking("test_operation"):
-            time.sleep(0.1)  # Simulate work
-        
-        # Test manual performance logging
-        logger.log_performance(
-            "manual_operation",
-            0.2,
-            operation_type="test",
-            data_size=1000
-        )
-        
-        # Check that performance was logged
-        # This would be in the main log files
-        log_file = self.log_dir / "application.log"
-        self.assertTrue(log_file.exists())
-        
-        # Cleanup
-        logger.cleanup()
+    def test_log_file_rotation(self):
+        """Test that log files are properly rotated."""
+        with patch('torch.device', return_value=self.device):
+            with patch('advanced_llm_seo_engine.CustomSEOModel', return_value=self.mock_model):
+                with patch('advanced_llm_seo_engine.AdvancedTokenizer', return_value=Mock()):
+                    with patch('advanced_llm_seo_engine.pipeline', return_value=Mock()):
+                        engine = AdvancedLLMSEOEngine(self.config)
+                        
+                        # Generate many log entries to trigger rotation
+                        for i in range(1000):
+                            engine.log_training_progress(
+                                epoch=i // 100,
+                                step=i,
+                                loss=0.1 + (i % 10) * 0.01,
+                                learning_rate=1e-4
+                            )
+                        
+                        # Verify log files exist
+                        log_files = os.listdir("logs")
+                        self.assertTrue(len(log_files) > 0)
+                        
+                        # Check for different log types
+                        log_types = ["training_progress", "model_performance", "data_loading", "errors"]
+                        for log_type in log_types:
+                            self.assertTrue(any(log_type in f for f in log_files))
     
-    def test_logging_summary(self):
-        """Test logging summary functionality."""
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            log_training_metrics=True,
-            log_errors=True,
-            log_system_metrics=True
-        )
-        logger = self.ComprehensiveLogger("test_summary", config)
-        
-        # Generate some logs
-        logger.log_training_step(epoch=0, step=0, loss=0.5)
-        logger.log_info("Test message")
-        
-        try:
-            raise ValueError("Test error")
-        except Exception as e:
-            logger.log_error(e, context={"test": True})
-        
-        # Get summary
-        summary = logger.get_logging_summary()
-        
-        # Check summary structure
-        self.assertIn('training_metrics', summary)
-        self.assertIn('error_analysis', summary)
-        self.assertIn('log_files', summary)
-        self.assertIn('config', summary)
-        
-        # Check log files
-        log_files = summary['log_files']
-        self.assertIn('application_log', log_files)
-        self.assertIn('training_metrics', log_files)
-        self.assertIn('errors', log_files)
-        self.assertIn('system_metrics', log_files)
-        
-        # Cleanup
-        logger.cleanup()
+    def test_logging_performance(self):
+        """Test that logging doesn't significantly impact performance."""
+        with patch('torch.device', return_value=self.device):
+            with patch('advanced_llm_seo_engine.CustomSEOModel', return_value=self.mock_model):
+                with patch('advanced_llm_seo_engine.AdvancedTokenizer', return_value=Mock()):
+                    with patch('advanced_llm_seo_engine.pipeline', return_value=Mock()):
+                        engine = AdvancedLLMSEOEngine(self.config)
+                        
+                        # Measure time without logging
+                        start_time = time.time()
+                        for i in range(100):
+                            pass  # Do nothing
+                        baseline_time = time.time() - start_time
+                        
+                        # Measure time with logging
+                        start_time = time.time()
+                        for i in range(100):
+                            engine.log_training_progress(
+                                epoch=1,
+                                step=i,
+                                loss=0.1,
+                                learning_rate=1e-4
+                            )
+                        logging_time = time.time() - start_time
+                        
+                        # Logging should not take more than 10x the baseline
+                        self.assertLess(logging_time, baseline_time * 10)
     
-    def test_async_logging(self):
-        """Test async logging functionality."""
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            enable_async_logging=True,
-            max_queue_size=100
-        )
-        logger = self.ComprehensiveLogger("test_async", config)
-        
-        # Log many messages quickly
-        for i in range(50):
-            logger.log_info(f"Message {i}", {"index": i})
-        
-        # Wait for async processing
-        time.sleep(0.5)
-        
-        # Check that logs were written
-        log_file = self.log_dir / "application.log"
-        self.assertTrue(log_file.exists())
-        
-        # Cleanup
-        logger.cleanup()
-    
-    def test_thread_safety(self):
-        """Test thread safety functionality."""
-        import threading
-        
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            enable_thread_safety=True
-        )
-        logger = self.ComprehensiveLogger("test_threads", config)
-        
-        # Create multiple threads logging simultaneously
-        def log_from_thread(thread_id):
-            for i in range(10):
-                logger.log_info(f"Thread {thread_id} message {i}", {"thread": thread_id, "message": i})
-                time.sleep(0.01)
-        
-        threads = []
-        for i in range(5):
-            thread = threading.Thread(target=log_from_thread, args=(i,))
-            threads.append(thread)
-            thread.start()
-        
-        # Wait for all threads to complete
-        for thread in threads:
-            thread.join()
-        
-        # Wait for async processing
-        time.sleep(0.5)
-        
-        # Check that logs were written
-        log_file = self.log_dir / "application.log"
-        self.assertTrue(log_file.exists())
-        
-        # Cleanup
-        logger.cleanup()
-    
-    def test_log_rotation(self):
-        """Test log rotation functionality."""
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            max_file_size=1024,  # 1KB for testing
-            backup_count=3
-        )
-        logger = self.ComprehensiveLogger("test_rotation", config)
-        
-        # Write enough logs to trigger rotation
-        large_message = "X" * 100  # 100 character message
-        
-        for i in range(20):  # This should trigger rotation
-            logger.log_info(f"{large_message} - Message {i}", {"index": i})
-        
-        # Wait for async processing
-        time.sleep(0.5)
-        
-        # Check that rotation occurred
-        log_files = list(self.log_dir.glob("application.log*"))
-        self.assertGreater(len(log_files), 1)  # Should have rotated files
-        
-        # Cleanup
-        logger.cleanup()
-    
-    def test_integration_with_seo_system(self):
-        """Test integration with SEO evaluation system."""
-        # Mock the SEO system components
-        with patch('comprehensive_logging.torch') as mock_torch:
-            mock_torch.cuda.is_available.return_value = True
-            mock_torch.cuda.device_count.return_value = 2
-            mock_torch.cuda.get_device_name.return_value = "Test GPU"
-            mock_torch.cuda.memory_allocated.return_value = 1024 * 1024 * 1024  # 1GB
-            
-            config = self.LoggingConfig(
-                log_dir=self.log_dir,
-                log_gpu_metrics=True
-            )
-            logger = self.ComprehensiveLogger("test_seo", config)
-            
-            # Simulate SEO training
-            logger.log_training_step(
-                epoch=0,
-                step=0,
-                loss=0.5,
-                accuracy=0.8,
-                learning_rate=0.001,
-                gradient_norm=1.0,
-                memory_usage=1.0  # 1GB
-            )
-            
-            # Check that GPU metrics were collected
-            system_metrics = logger.system_monitor._collect_system_metrics()
-            self.assertIn('gpu_count', system_metrics)
-            self.assertEqual(system_metrics['gpu_count'], 2)
-            
-            # Cleanup
-            logger.cleanup()
-    
-    def test_error_recovery_scenarios(self):
-        """Test various error recovery scenarios."""
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            log_errors=True
-        )
-        logger = self.ComprehensiveLogger("test_recovery", config)
-        
-        # Test different error types
-        error_types = [
-            (ValueError("Invalid input"), "ERROR"),
-            (RuntimeError("Runtime issue"), "WARNING"),
-            (MemoryError("Out of memory"), "CRITICAL"),
-            (FileNotFoundError("File not found"), "ERROR")
-        ]
-        
-        for error, severity in error_types:
-            logger.log_error(
-                error=error,
-                context={"operation": "test", "error_type": type(error).__name__},
-                severity=severity,
-                recovery_attempted=True
-            )
-            
-            # Simulate recovery
-            logger.error_tracker.track_recovery_success(
-                error_type=type(error).__name__,
-                recovery_method="automatic_recovery"
-            )
-        
-        # Check recovery statistics
-        analysis = logger.error_tracker.get_error_analysis()
-        self.assertEqual(analysis['total_errors'], 4)
-        self.assertEqual(analysis['recovery_success_rate'], 1.0)  # All recovered
-        
-        # Cleanup
-        logger.cleanup()
-    
-    def test_configuration_validation(self):
-        """Test configuration validation and edge cases."""
-        # Test with minimal configuration
-        minimal_config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            enable_console=False,
-            enable_file=False,
-            enable_json=False,
-            log_training_metrics=False,
-            log_system_metrics=False
-        )
-        
-        logger = self.ComprehensiveLogger("test_minimal", minimal_config)
-        
-        # Should still work with minimal config
-        self.assertIsNotNone(logger)
-        
-        # Test logging (should not fail)
-        logger.log_info("Test message")
-        
-        # Cleanup
-        logger.cleanup()
-    
-    def test_cleanup_functionality(self):
-        """Test cleanup functionality."""
-        config = self.LoggingConfig(
-            log_dir=self.log_dir,
-            log_system_metrics=True
-        )
-        logger = self.ComprehensiveLogger("test_cleanup", config)
-        
-        # Start monitoring
-        logger.system_monitor.start_monitoring(interval=0.1)
-        
-        # Verify monitoring is running
-        self.assertTrue(logger.system_monitor.monitoring)
-        
-        # Cleanup
-        logger.cleanup()
-        
-        # Verify monitoring stopped
-        self.assertFalse(logger.system_monitor.monitoring)
+    def test_logging_error_recovery(self):
+        """Test that logging system recovers from errors gracefully."""
+        with patch('torch.device', return_value=self.device):
+            with patch('advanced_llm_seo_engine.CustomSEOModel', return_value=self.mock_model):
+                with patch('advanced_llm_seo_engine.AdvancedTokenizer', return_value=Mock()):
+                    with patch('advanced_llm_seo_engine.pipeline', return_value=Mock()):
+                        engine = AdvancedLLMSEOEngine(self.config)
+                        
+                        # Test logging with invalid data
+                        try:
+                            engine.log_training_progress(
+                                epoch="invalid",
+                                step="invalid",
+                                loss="invalid",
+                                learning_rate="invalid"
+                            )
+                            # Should not raise exception
+                            self.assertTrue(True)
+                        except Exception as e:
+                            self.fail(f"Logging should handle invalid data gracefully: {e}")
+                        
+                        # Test logging with None values
+                        try:
+                            engine.log_model_performance(
+                                operation=None,
+                                duration=None,
+                                memory_usage=None
+                            )
+                            # Should not raise exception
+                            self.assertTrue(True)
+                        except Exception as e:
+                            self.fail(f"Logging should handle None values gracefully: {e}")
 
-class TestTrainingMetricsLogger(unittest.TestCase):
-    """Test suite for TrainingMetricsLogger."""
-    
-    def setUp(self):
-        """Set up test environment."""
-        self.test_dir = tempfile.mkdtemp()
-        self.log_dir = Path(self.test_dir) / "logs"
-        self.log_dir.mkdir(exist_ok=True)
-        
-        try:
-            from comprehensive_logging import LoggingConfig, TrainingMetricsLogger
-            self.LoggingConfig = LoggingConfig
-            self.TrainingMetricsLogger = TrainingMetricsLogger
-        except ImportError as e:
-            self.skipTest(f"Could not import TrainingMetricsLogger: {e}")
-    
-    def tearDown(self):
-        """Clean up test environment."""
-        if os.path.exists(self.test_dir):
-            shutil.rmtree(self.test_dir)
-    
-    def test_training_metrics_logger_initialization(self):
-        """Test TrainingMetricsLogger initialization."""
-        config = self.LoggingConfig(log_dir=self.log_dir)
-        metrics_logger = self.TrainingMetricsLogger(str(self.log_dir), config)
-        
-        self.assertIsNotNone(metrics_logger)
-        self.assertEqual(metrics_logger.current_epoch, 0)
-        self.assertEqual(metrics_logger.current_step, 0)
-        self.assertEqual(len(metrics_logger.metrics_history), 0)
-    
-    def test_training_step_logging(self):
-        """Test training step logging."""
-        config = self.LoggingConfig(log_dir=self.log_dir)
-        metrics_logger = self.TrainingMetricsLogger(str(self.log_dir), config)
-        
-        # Log training steps
-        for i in range(5):
-            metrics_logger.log_training_step(
-                epoch=0,
-                step=i,
-                loss=0.5 + i * 0.1,
-                accuracy=0.8 - i * 0.05,
-                learning_rate=0.001,
-                gradient_norm=1.0 + i * 0.1
-            )
-        
-        # Check metrics history
-        self.assertEqual(len(metrics_logger.metrics_history), 5)
-        self.assertEqual(metrics_logger.current_epoch, 0)
-        self.assertEqual(metrics_logger.current_step, 4)
-        
-        # Check files
-        metrics_file = self.log_dir / "training_metrics.jsonl"
-        progress_file = self.log_dir / "training_progress.csv"
-        
-        self.assertTrue(metrics_file.exists())
-        self.assertTrue(progress_file.exists())
-    
-    def test_epoch_summary_logging(self):
-        """Test epoch summary logging."""
-        config = self.LoggingConfig(log_dir=self.log_dir)
-        metrics_logger = self.TrainingMetricsLogger(str(self.log_dir), config)
-        
-        # Log epoch summaries
-        for epoch in range(3):
-            metrics_logger.log_epoch_summary(
-                epoch=epoch,
-                train_loss=0.5 + epoch * 0.1,
-                val_loss=0.6 + epoch * 0.1,
-                train_accuracy=0.8 - epoch * 0.05,
-                val_accuracy=0.75 - epoch * 0.05
-            )
-        
-        # Check metrics history
-        self.assertEqual(len(metrics_logger.metrics_history), 3)
-        
-        # Check summary
-        summary = metrics_logger.get_metrics_summary()
-        self.assertEqual(summary['total_epochs'], 2)  # 0-indexed
-        self.assertEqual(summary['metrics_count'], 3)
-
-class TestErrorTracker(unittest.TestCase):
-    """Test suite for ErrorTracker."""
-    
-    def setUp(self):
-        """Set up test environment."""
-        self.test_dir = tempfile.mkdtemp()
-        self.log_dir = Path(self.test_dir) / "logs"
-        self.log_dir.mkdir(exist_ok=True)
-        
-        try:
-            from comprehensive_logging import LoggingConfig, ErrorTracker
-            self.LoggingConfig = LoggingConfig
-            self.ErrorTracker = ErrorTracker
-        except ImportError as e:
-            self.skipTest(f"Could not import ErrorTracker: {e}")
-    
-    def tearDown(self):
-        """Clean up test environment."""
-        if os.path.exists(self.test_dir):
-            shutil.rmtree(self.test_dir)
-    
-    def test_error_tracker_initialization(self):
-        """Test ErrorTracker initialization."""
-        config = self.LoggingConfig(log_dir=self.log_dir)
-        error_tracker = self.ErrorTracker(str(self.log_dir), config)
-        
-        self.assertIsNotNone(error_tracker)
-        self.assertEqual(error_tracker.error_counts, {})
-        self.assertEqual(len(error_tracker.error_timeline), 0)
-        self.assertEqual(len(error_tracker.critical_errors), 0)
-        self.assertEqual(len(error_tracker.recovery_attempts), 0)
-    
-    def test_error_tracking(self):
-        """Test error tracking functionality."""
-        config = self.LoggingConfig(log_dir=self.log_dir)
-        error_tracker = self.ErrorTracker(str(self.log_dir), config)
-        
-        # Track errors
-        test_error = ValueError("Test error")
-        error_tracker.track_error(
-            error=test_error,
-            context={"operation": "test"},
-            severity="ERROR",
-            recovery_attempted=False
-        )
-        
-        # Check error counts
-        self.assertEqual(error_tracker.error_counts['ValueError'], 1)
-        self.assertEqual(len(error_tracker.error_timeline), 1)
-        
-        # Track another error
-        test_error2 = RuntimeError("Another error")
-        error_tracker.track_error(
-            error=test_error2,
-            context={"operation": "test2"},
-            severity="WARNING",
-            recovery_attempted=True
-        )
-        
-        # Check updated counts
-        self.assertEqual(error_tracker.error_counts['ValueError'], 1)
-        self.assertEqual(error_tracker.error_counts['RuntimeError'], 1)
-        self.assertEqual(len(error_tracker.error_timeline), 2)
-    
-    def test_recovery_tracking(self):
-        """Test recovery tracking functionality."""
-        config = self.LoggingConfig(log_dir=self.log_dir)
-        error_tracker = self.ErrorTracker(str(self.log_dir), config)
-        
-        # Track error with recovery
-        test_error = ValueError("Test error")
-        error_tracker.track_error(
-            error=test_error,
-            context={"operation": "test"},
-            severity="ERROR",
-            recovery_attempted=True
-        )
-        
-        # Track successful recovery
-        error_tracker.track_recovery_success(
-            error_type="ValueError",
-            recovery_method="automatic_restart"
-        )
-        
-        # Check recovery attempts
-        self.assertEqual(len(error_tracker.recovery_attempts), 2)  # Error + recovery
-        
-        # Check analysis
-        analysis = error_tracker.get_error_analysis()
-        self.assertEqual(analysis['total_errors'], 1)
-        self.assertEqual(analysis['recovery_success_rate'], 1.0)
-
-def run_performance_tests():
-    """Run performance tests for the logging system."""
-    print("\n=== Performance Tests ===")
-    
-    # Test high-volume logging
-    test_dir = tempfile.mkdtemp()
-    log_dir = Path(test_dir) / "logs"
-    log_dir.mkdir(exist_ok=True)
-    
-    try:
-        from comprehensive_logging import setup_logging
-        
-        logger = setup_logging(
-            "performance_test",
-            log_dir=str(log_dir),
-            enable_console=False,
-            enable_file=True,
-            enable_json=True,
-            log_training_metrics=True,
-            enable_async_logging=True,
-            max_queue_size=10000
-        )
-        
-        # High-volume logging test
-        start_time = time.time()
-        
-        for i in range(1000):
-            logger.log_training_step(
-                epoch=i // 100,
-                step=i % 100,
-                loss=0.5 + (i % 10) * 0.1,
-                accuracy=0.8 - (i % 10) * 0.05
-            )
-        
-        end_time = time.time()
-        duration = end_time - start_time
-        
-        print(f"Logged 1000 training steps in {duration:.4f}s")
-        print(f"Average: {1000/duration:.0f} logs/second")
-        
-        # Check file sizes
-        metrics_file = log_dir / "training_metrics.jsonl"
-        if metrics_file.exists():
-            size_kb = metrics_file.stat().st_size / 1024
-            print(f"Training metrics file size: {size_kb:.1f} KB")
-        
-        logger.cleanup()
-        
-    except Exception as e:
-        print(f"Performance test failed: {e}")
-    finally:
-        if os.path.exists(test_dir):
-            shutil.rmtree(test_dir)
-
-if __name__ == "__main__":
-    # Run unit tests
-    print("Running Comprehensive Logging System Tests...")
+def run_comprehensive_tests():
+    """Run all comprehensive logging tests."""
+    print("🧪 Running Comprehensive Logging Tests...")
     
     # Create test suite
-    test_suite = unittest.TestSuite()
-    
-    # Add test classes
-    test_suite.addTest(unittest.makeSuite(TestComprehensiveLogging))
-    test_suite.addTest(unittest.makeSuite(TestTrainingMetricsLogger))
-    test_suite.addTest(unittest.makeSuite(TestErrorTracker))
+    suite = unittest.TestLoader().loadTestsFromTestCase(TestComprehensiveLogging)
     
     # Run tests
     runner = unittest.TextTestRunner(verbosity=2)
-    result = runner.run(test_suite)
-    
-    # Run performance tests
-    if result.wasSuccessful():
-        run_performance_tests()
+    result = runner.run(suite)
     
     # Print summary
-    print(f"\n=== Test Summary ===")
-    print(f"Tests run: {result.testsRun}")
-    print(f"Failures: {len(result.failures)}")
-    print(f"Errors: {len(result.errors)}")
+    print(f"\n📊 Test Results:")
+    print(f"   Tests run: {result.testsRun}")
+    print(f"   Failures: {len(result.failures)}")
+    print(f"   Errors: {len(result.errors)}")
+    
+    if result.failures:
+        print(f"\n❌ Failures:")
+        for test, traceback in result.failures:
+            print(f"   {test}: {traceback}")
+    
+    if result.errors:
+        print(f"\n🚨 Errors:")
+        for test, traceback in result.errors:
+            print(f"   {test}: {traceback}")
     
     if result.wasSuccessful():
-        print("✅ All tests passed!")
+        print("\n✅ All tests passed!")
     else:
-        print("❌ Some tests failed!")
-        
-        if result.failures:
-            print("\nFailures:")
-            for test, traceback in result.failures:
-                print(f"  - {test}: {traceback}")
-        
-        if result.errors:
-            print("\nErrors:")
-            for test, traceback in result.errors:
-                print(f"  - {test}: {traceback}")
+        print("\n❌ Some tests failed!")
     
-    # Exit with appropriate code
-    sys.exit(0 if result.wasSuccessful() else 1)
+    return result.wasSuccessful()
+
+if __name__ == "__main__":
+    success = run_comprehensive_tests()
+    sys.exit(0 if success else 1)

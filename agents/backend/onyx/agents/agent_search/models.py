@@ -1,3 +1,7 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
 from uuid import UUID
 
 from pydantic import BaseModel
@@ -14,6 +18,9 @@ from onyx.tools.tool import Tool
 from onyx.tools.tool_implementations.search.search_tool import SearchTool
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class GraphInputs(BaseModel):
     """Input data required for the graph execution"""
 
@@ -23,7 +30,8 @@ class GraphInputs(BaseModel):
     files: list[InMemoryChatFile] | None = None
     structured_response_format: dict | None = None
 
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
 
 
@@ -39,7 +47,8 @@ class GraphTooling(BaseModel):
     force_use_tool: ForceUseTool
     using_tool_calling_llm: bool = False
 
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
 
 
@@ -55,7 +64,8 @@ class GraphPersistence(BaseModel):
     # message were flushed to; only needed for agentic search
     db_session: Session
 
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
 
 
@@ -89,5 +99,6 @@ class GraphConfig(BaseModel):
             raise ValueError("search_tool must be provided for agentic search")
         return self
 
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True

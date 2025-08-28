@@ -1,3 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+import os
+import tempfile
+import time
+from unittest.mock import Mock, patch, MagicMock
+from typing import Dict, List, Optional
+import numpy as np
+import pytest
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+from advanced_code_profiling_optimization import (
+        import concurrent.futures
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Tests for Advanced Code Profiling and Optimization System
 
@@ -11,21 +38,8 @@ This test suite covers:
 - Integration testing
 """
 
-import asyncio
-import json
-import os
-import tempfile
-import time
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, List, Optional
 
-import numpy as np
-import pytest
-import torch
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
 
-from advanced_code_profiling_optimization import (
     ProfilingConfig, ProfilingLevel, OptimizationTarget, BottleneckType,
     PerformanceMetrics, CPUMemoryProfiler, GPUProfiler, DataLoadingProfiler,
     AdvancedProfiler, CodeOptimizer, PerformanceMonitor,
@@ -37,13 +51,15 @@ class TestDataset(Dataset):
     """Test dataset for unit testing."""
     
     def __init__(self, num_samples: int = 100, input_dim: int = 64):
-        self.data = torch.randn(num_samples, input_dim)
+        
+    """__init__ function."""
+self.data = torch.randn(num_samples, input_dim)
         self.labels = torch.randint(0, 5, (num_samples,))
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return len(self.data)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         return self.data[idx], self.labels[idx]
 
 
@@ -51,17 +67,19 @@ class TestModel(nn.Module):
     """Test model for unit testing."""
     
     def __init__(self, input_dim: int = 64, num_classes: int = 5):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.linear = nn.Linear(input_dim, num_classes)
     
-    def forward(self, x):
+    def forward(self, x) -> Any:
         return self.linear(x)
 
 
 class TestProfilingConfig:
     """Test ProfilingConfig class."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration."""
         config = ProfilingConfig()
         
@@ -77,7 +95,7 @@ class TestProfilingConfig:
         assert config.save_profiles is True
         assert config.generate_reports is True
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration."""
         config = ProfilingConfig(
             enabled=False,
@@ -101,7 +119,7 @@ class TestProfilingConfig:
         assert config.auto_optimize is False
         assert config.enable_monitoring is False
     
-    def test_post_init(self):
+    def test_post_init(self) -> Any:
         """Test post-initialization setup."""
         config = ProfilingConfig()
         
@@ -112,7 +130,7 @@ class TestProfilingConfig:
 class TestPerformanceMetrics:
     """Test PerformanceMetrics class."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test metrics initialization."""
         metrics = PerformanceMetrics()
         
@@ -126,7 +144,7 @@ class TestPerformanceMetrics:
         assert metrics.bottleneck_type is None
         assert metrics.bottleneck_severity == 0.0
     
-    def test_custom_metrics(self):
+    def test_custom_metrics(self) -> Any:
         """Test custom metrics."""
         metrics = PerformanceMetrics(
             execution_time=1.5,
@@ -148,7 +166,7 @@ class TestPerformanceMetrics:
         assert metrics.bottleneck_type == BottleneckType.CPU_BOUND
         assert metrics.bottleneck_severity == 0.8
     
-    def test_to_dict(self):
+    def test_to_dict(self) -> Any:
         """Test conversion to dictionary."""
         metrics = PerformanceMetrics(
             execution_time=1.0,
@@ -172,7 +190,7 @@ class TestCPUMemoryProfiler:
     """Test CPUMemoryProfiler class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return ProfilingConfig(
             enabled=True,
@@ -180,11 +198,11 @@ class TestCPUMemoryProfiler:
         )
     
     @pytest.fixture
-    def profiler(self, config):
+    def profiler(self, config) -> Any:
         """Create test profiler."""
         return CPUMemoryProfiler(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test profiler initialization."""
         profiler = CPUMemoryProfiler(config)
         
@@ -194,7 +212,7 @@ class TestCPUMemoryProfiler:
         assert profiler.start_cpu_times is None
         assert profiler.start_memory_info is None
     
-    def test_start_profiling(self, profiler):
+    def test_start_profiling(self, profiler) -> Any:
         """Test start profiling."""
         profiler.start_profiling()
         
@@ -202,7 +220,7 @@ class TestCPUMemoryProfiler:
         assert profiler.start_memory_info is not None
         assert profiler.start_io_counters is not None
     
-    def test_stop_profiling(self, profiler):
+    def test_stop_profiling(self, profiler) -> Any:
         """Test stop profiling."""
         profiler.start_profiling()
         
@@ -218,7 +236,7 @@ class TestCPUMemoryProfiler:
         assert metrics.disk_read_bytes >= 0.0
         assert metrics.disk_write_bytes >= 0.0
     
-    def test_get_bottlenecks_no_bottlenecks(self, profiler):
+    def test_get_bottlenecks_no_bottlenecks(self, profiler) -> Optional[Dict[str, Any]]:
         """Test bottleneck identification with no bottlenecks."""
         # Set low usage metrics
         profiler.current_metrics = PerformanceMetrics(
@@ -229,7 +247,7 @@ class TestCPUMemoryProfiler:
         bottlenecks = profiler.get_bottlenecks()
         assert len(bottlenecks) == 0
     
-    def test_get_bottlenecks_cpu_bound(self, profiler):
+    def test_get_bottlenecks_cpu_bound(self, profiler) -> Optional[Dict[str, Any]]:
         """Test CPU bottleneck identification."""
         # Set high CPU usage
         profiler.current_metrics = PerformanceMetrics(
@@ -244,7 +262,7 @@ class TestCPUMemoryProfiler:
         assert 'High CPU usage' in bottlenecks[0]['description']
         assert len(bottlenecks[0]['suggestions']) > 0
     
-    def test_get_bottlenecks_memory_bound(self, profiler):
+    def test_get_bottlenecks_memory_bound(self, profiler) -> Optional[Dict[str, Any]]:
         """Test memory bottleneck identification."""
         # Set high memory usage
         profiler.current_metrics = PerformanceMetrics(
@@ -264,7 +282,7 @@ class TestGPUProfiler:
     """Test GPUProfiler class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return ProfilingConfig(
             enabled=True,
@@ -272,11 +290,11 @@ class TestGPUProfiler:
         )
     
     @pytest.fixture
-    def profiler(self, config):
+    def profiler(self, config) -> Any:
         """Create test profiler."""
         return GPUProfiler(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test profiler initialization."""
         profiler = GPUProfiler(config)
         
@@ -285,13 +303,13 @@ class TestGPUProfiler:
         assert profiler.start_time is None
         assert profiler.gpu_available == torch.cuda.is_available()
     
-    def test_start_profiling(self, profiler):
+    def test_start_profiling(self, profiler) -> Any:
         """Test start profiling."""
         profiler.start_profiling()
         
         assert profiler.start_time is not None
     
-    def test_stop_profiling(self, profiler):
+    def test_stop_profiling(self, profiler) -> Any:
         """Test stop profiling."""
         profiler.start_profiling()
         
@@ -304,7 +322,7 @@ class TestGPUProfiler:
         assert metrics.execution_time >= 0.0
     
     @patch('torch.cuda.is_available', return_value=False)
-    def test_stop_profiling_no_gpu(self, mock_cuda, profiler):
+    def test_stop_profiling_no_gpu(self, mock_cuda, profiler) -> Any:
         """Test stop profiling without GPU."""
         profiler.start_profiling()
         metrics = profiler.stop_profiling()
@@ -312,7 +330,7 @@ class TestGPUProfiler:
         assert isinstance(metrics, PerformanceMetrics)
         assert metrics.execution_time == 0.0
     
-    def test_get_bottlenecks_no_bottlenecks(self, profiler):
+    def test_get_bottlenecks_no_bottlenecks(self, profiler) -> Optional[Dict[str, Any]]:
         """Test bottleneck identification with no bottlenecks."""
         # Set low usage metrics
         profiler.current_metrics = PerformanceMetrics(
@@ -323,7 +341,7 @@ class TestGPUProfiler:
         bottlenecks = profiler.get_bottlenecks()
         assert len(bottlenecks) == 0
     
-    def test_get_bottlenecks_gpu_bound(self, profiler):
+    def test_get_bottlenecks_gpu_bound(self, profiler) -> Optional[Dict[str, Any]]:
         """Test GPU bottleneck identification."""
         # Set high GPU usage
         profiler.current_metrics = PerformanceMetrics(
@@ -338,7 +356,7 @@ class TestGPUProfiler:
         assert 'High GPU usage' in bottlenecks[0]['description']
         assert len(bottlenecks[0]['suggestions']) > 0
     
-    def test_get_bottlenecks_gpu_memory_bound(self, profiler):
+    def test_get_bottlenecks_gpu_memory_bound(self, profiler) -> Optional[Dict[str, Any]]:
         """Test GPU memory bottleneck identification."""
         # Set high GPU memory usage
         profiler.current_metrics = PerformanceMetrics(
@@ -358,16 +376,16 @@ class TestDataLoadingProfiler:
     """Test DataLoadingProfiler class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return ProfilingConfig(enabled=True)
     
     @pytest.fixture
-    def profiler(self, config):
+    def profiler(self, config) -> Any:
         """Create test profiler."""
         return DataLoadingProfiler(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test profiler initialization."""
         profiler = DataLoadingProfiler(config)
         
@@ -376,12 +394,12 @@ class TestDataLoadingProfiler:
         assert len(profiler.preprocessing_metrics) == 0
         assert profiler.start_time is None
     
-    def test_start_profiling(self, profiler):
+    def test_start_profiling(self, profiler) -> Any:
         """Test start profiling."""
         profiler.start_profiling()
         assert profiler.start_time is not None
     
-    def test_stop_profiling(self, profiler):
+    def test_stop_profiling(self, profiler) -> Any:
         """Test stop profiling."""
         profiler.start_profiling()
         
@@ -398,7 +416,7 @@ class TestDataLoadingProfiler:
         assert metrics.samples_per_second > 0.0
         assert metrics.data_processed > 0.0
     
-    def test_profile_dataloader(self, profiler):
+    def test_profile_dataloader(self, profiler) -> Any:
         """Test data loader profiling."""
         dataset = TestDataset(100)
         dataloader = DataLoader(dataset, batch_size=16, shuffle=False)
@@ -408,9 +426,9 @@ class TestDataLoadingProfiler:
         assert len(profiler.dataloader_metrics['time']) == 3
         assert len(profiler.dataloader_metrics['samples']) == 3
     
-    def test_profile_preprocessing(self, profiler):
+    def test_profile_preprocessing(self, profiler) -> Any:
         """Test preprocessing profiling."""
-        def test_preprocessing(data):
+        def test_preprocessing(data) -> Any:
             time.sleep(0.01)  # Simulate work
             return data * 2
         
@@ -420,7 +438,7 @@ class TestDataLoadingProfiler:
         assert result is not None
         assert len(profiler.preprocessing_metrics['time']) == 1
     
-    def test_get_bottlenecks_no_bottlenecks(self, profiler):
+    def test_get_bottlenecks_no_bottlenecks(self, profiler) -> Optional[Dict[str, Any]]:
         """Test bottleneck identification with no bottlenecks."""
         # Set fast metrics
         profiler.dataloader_metrics['time'] = [0.01, 0.02, 0.01]
@@ -429,7 +447,7 @@ class TestDataLoadingProfiler:
         bottlenecks = profiler.get_bottlenecks()
         assert len(bottlenecks) == 0
     
-    def test_get_bottlenecks_data_loading_bound(self, profiler):
+    def test_get_bottlenecks_data_loading_bound(self, profiler) -> Optional[Dict[str, Any]]:
         """Test data loading bottleneck identification."""
         # Set slow data loading
         profiler.dataloader_metrics['time'] = [0.2, 0.3, 0.25]  # Slow
@@ -441,7 +459,7 @@ class TestDataLoadingProfiler:
         assert 'Slow data loading' in bottlenecks[0]['description']
         assert len(bottlenecks[0]['suggestions']) > 0
     
-    def test_get_bottlenecks_preprocessing_bound(self, profiler):
+    def test_get_bottlenecks_preprocessing_bound(self, profiler) -> Optional[Dict[str, Any]]:
         """Test preprocessing bottleneck identification."""
         # Set slow preprocessing
         profiler.preprocessing_metrics['time'] = [0.1, 0.15, 0.12]  # Slow
@@ -458,7 +476,7 @@ class TestAdvancedProfiler:
     """Test AdvancedProfiler class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return ProfilingConfig(
             enabled=True,
@@ -467,11 +485,11 @@ class TestAdvancedProfiler:
         )
     
     @pytest.fixture
-    def profiler(self, config):
+    def profiler(self, config) -> Any:
         """Create test profiler."""
         return AdvancedProfiler(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test profiler initialization."""
         profiler = AdvancedProfiler(config)
         
@@ -482,7 +500,7 @@ class TestAdvancedProfiler:
         assert len(profiler.profiling_history) == 0
         assert len(profiler.optimization_suggestions) == 0
     
-    def test_start_profiling(self, profiler):
+    def test_start_profiling(self, profiler) -> Any:
         """Test start profiling."""
         profiler.start_profiling()
         
@@ -491,7 +509,7 @@ class TestAdvancedProfiler:
         assert profiler.gpu_profiler.start_time is not None
         assert profiler.data_loading_profiler.start_time is not None
     
-    def test_stop_profiling(self, profiler):
+    def test_stop_profiling(self, profiler) -> Any:
         """Test stop profiling."""
         profiler.start_profiling()
         
@@ -515,7 +533,7 @@ class TestAdvancedProfiler:
         assert isinstance(results['bottlenecks'], list)
         assert isinstance(results['suggestions'], list)
     
-    def test_profile_dataloader(self, profiler):
+    def test_profile_dataloader(self, profiler) -> Any:
         """Test data loader profiling."""
         dataset = TestDataset(100)
         dataloader = DataLoader(dataset, batch_size=16, shuffle=False)
@@ -525,9 +543,9 @@ class TestAdvancedProfiler:
         # Check that metrics were collected
         assert len(profiler.data_loading_profiler.dataloader_metrics['time']) == 3
     
-    def test_profile_preprocessing(self, profiler):
+    def test_profile_preprocessing(self, profiler) -> Any:
         """Test preprocessing profiling."""
-        def test_preprocessing(data):
+        def test_preprocessing(data) -> Any:
             time.sleep(0.01)
             return data * 2
         
@@ -537,7 +555,7 @@ class TestAdvancedProfiler:
         assert result is not None
         assert len(profiler.data_loading_profiler.preprocessing_metrics['time']) == 1
     
-    def test_get_profiling_summary(self, profiler):
+    def test_get_profiling_summary(self, profiler) -> Optional[Dict[str, Any]]:
         """Test profiling summary."""
         # Add some profiling history
         profiler.profiling_history = [
@@ -576,28 +594,28 @@ class TestCodeOptimizer:
     """Test CodeOptimizer class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return ProfilingConfig(enabled=True)
     
     @pytest.fixture
-    def profiler(self, config):
+    def profiler(self, config) -> Any:
         """Create test profiler."""
         return AdvancedProfiler(config)
     
     @pytest.fixture
-    def optimizer(self, profiler):
+    def optimizer(self, profiler) -> Any:
         """Create test optimizer."""
         return CodeOptimizer(profiler)
     
-    def test_initialization(self, profiler):
+    def test_initialization(self, profiler) -> Any:
         """Test optimizer initialization."""
         optimizer = CodeOptimizer(profiler)
         
         assert optimizer.profiler == profiler
         assert len(optimizer.optimizations_applied) == 0
     
-    def test_optimize_data_loading(self, optimizer):
+    def test_optimize_data_loading(self, optimizer) -> Any:
         """Test data loader optimization."""
         dataset = TestDataset(100)
         dataloader = DataLoader(
@@ -618,9 +636,9 @@ class TestCodeOptimizer:
         assert optimized_dataloader != dataloader
         assert len(optimizer.optimizations_applied) > 0
     
-    def test_optimize_preprocessing(self, optimizer):
+    def test_optimize_preprocessing(self, optimizer) -> Any:
         """Test preprocessing optimization."""
-        def test_preprocessing(data):
+        def test_preprocessing(data) -> Any:
             time.sleep(0.01)
             return data * 2
         
@@ -635,7 +653,7 @@ class TestCodeOptimizer:
         assert optimized_preprocessing != test_preprocessing
         assert len(optimizer.optimizations_applied) > 0
     
-    def test_get_optimization_report(self, optimizer):
+    def test_get_optimization_report(self, optimizer) -> Optional[Dict[str, Any]]:
         """Test optimization report."""
         # Add some optimizations
         optimizer.optimizations_applied = [
@@ -663,7 +681,7 @@ class TestPerformanceMonitor:
     """Test PerformanceMonitor class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return ProfilingConfig(
             enabled=True,
@@ -672,11 +690,11 @@ class TestPerformanceMonitor:
         )
     
     @pytest.fixture
-    def monitor(self, config):
+    def monitor(self, config) -> Any:
         """Create test monitor."""
         return PerformanceMonitor(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test monitor initialization."""
         monitor = PerformanceMonitor(config)
         
@@ -685,7 +703,7 @@ class TestPerformanceMonitor:
         assert len(monitor.metrics_history) == 0
         assert len(monitor.alert_callbacks) == 0
     
-    def test_start_stop_monitoring(self, monitor):
+    def test_start_stop_monitoring(self, monitor) -> Any:
         """Test start and stop monitoring."""
         monitor.start_monitoring()
         assert monitor.monitoring_active is True
@@ -693,7 +711,7 @@ class TestPerformanceMonitor:
         monitor.stop_monitoring()
         assert monitor.monitoring_active is False
     
-    def test_collect_current_metrics(self, monitor):
+    def test_collect_current_metrics(self, monitor) -> Any:
         """Test current metrics collection."""
         metrics = monitor._collect_current_metrics()
         
@@ -702,7 +720,7 @@ class TestPerformanceMonitor:
         assert metrics.memory_usage >= 0.0
         assert metrics.gpu_usage >= 0.0
     
-    def test_check_alerts_no_alerts(self, monitor):
+    def test_check_alerts_no_alerts(self, monitor) -> Any:
         """Test alert checking with no alerts."""
         metrics = PerformanceMetrics(
             cpu_usage=50.0,
@@ -713,7 +731,7 @@ class TestPerformanceMonitor:
         alerts = monitor._check_alerts(metrics)
         assert len(alerts) == 0
     
-    def test_check_alerts_high_cpu(self, monitor):
+    def test_check_alerts_high_cpu(self, monitor) -> Any:
         """Test alert checking with high CPU usage."""
         metrics = PerformanceMetrics(
             cpu_usage=90.0  # Above threshold
@@ -726,7 +744,7 @@ class TestPerformanceMonitor:
         assert alerts[0]['severity'] == 0.9
         assert 'High CPU usage' in alerts[0]['message']
     
-    def test_check_alerts_high_memory(self, monitor):
+    def test_check_alerts_high_memory(self, monitor) -> Any:
         """Test alert checking with high memory usage."""
         metrics = PerformanceMetrics(
             memory_usage=90.0  # Above threshold
@@ -739,7 +757,7 @@ class TestPerformanceMonitor:
         assert alerts[0]['severity'] == 0.9
         assert 'High memory usage' in alerts[0]['message']
     
-    def test_check_alerts_high_gpu(self, monitor):
+    def test_check_alerts_high_gpu(self, monitor) -> Any:
         """Test alert checking with high GPU usage."""
         metrics = PerformanceMetrics(
             gpu_usage=95.0  # Above threshold
@@ -752,16 +770,16 @@ class TestPerformanceMonitor:
         assert alerts[0]['severity'] == 0.95
         assert 'High GPU usage' in alerts[0]['message']
     
-    def test_add_alert_callback(self, monitor):
+    def test_add_alert_callback(self, monitor) -> Any:
         """Test adding alert callback."""
-        async def test_callback(alert):
+        async def test_callback(alert) -> Any:
             pass
         
         monitor.add_alert_callback(test_callback)
         assert len(monitor.alert_callbacks) == 1
         assert monitor.alert_callbacks[0] == test_callback
     
-    def test_get_monitoring_summary(self, monitor):
+    def test_get_monitoring_summary(self, monitor) -> Optional[Dict[str, Any]]:
         """Test monitoring summary."""
         # Add some metrics history
         monitor.metrics_history = deque([
@@ -785,20 +803,22 @@ class TestPerformanceMonitor:
 class TestDecorators:
     """Test profiling decorators."""
     
-    def test_profile_function_decorator(self):
+    def test_profile_function_decorator(self) -> Any:
         """Test profile_function decorator."""
         config = ProfilingConfig(enabled=True)
         
         @profile_function(config)
         def test_function():
-            time.sleep(0.01)
+            
+    """test_function function."""
+time.sleep(0.01)
             return "test"
         
         result = test_function()
         assert result == "test"
     
     @pytest.mark.asyncio
-    async def test_profile_context_manager(self):
+    async def test_profile_context_manager(self) -> Any:
         """Test profile_context context manager."""
         config = ProfilingConfig(enabled=True)
         
@@ -811,7 +831,7 @@ class TestIntegration:
     """Integration tests for the advanced code profiling and optimization system."""
     
     @pytest.mark.asyncio
-    async def test_end_to_end_profiling(self):
+    async def test_end_to_end_profiling(self) -> Any:
         """Test end-to-end profiling workflow."""
         config = ProfilingConfig(
             enabled=True,
@@ -833,7 +853,7 @@ class TestIntegration:
         optimized_dataloader = optimizer.optimize_data_loading(dataloader)
         
         # Profile preprocessing
-        def test_preprocessing(data):
+        def test_preprocessing(data) -> Any:
             time.sleep(0.01)
             return data * 2
         
@@ -852,7 +872,7 @@ class TestIntegration:
         assert profiling_summary['total_executions'] > 0
         assert optimization_report['total_optimizations'] > 0
     
-    def test_profiling_with_real_model(self):
+    def test_profiling_with_real_model(self) -> Any:
         """Test profiling with a real model."""
         config = ProfilingConfig(
             enabled=True,
@@ -893,7 +913,7 @@ class TestIntegration:
         assert 'suggestions' in results
     
     @pytest.mark.asyncio
-    async def test_monitoring_integration(self):
+    async def test_monitoring_integration(self) -> Any:
         """Test monitoring integration."""
         config = ProfilingConfig(
             enabled=True,
@@ -906,7 +926,7 @@ class TestIntegration:
         # Add alert callback
         alerts_received = []
         
-        async def alert_callback(alert):
+        async def alert_callback(alert) -> Any:
             alerts_received.append(alert)
         
         monitor.add_alert_callback(alert_callback)
@@ -932,7 +952,7 @@ class TestIntegration:
 class TestEdgeCases:
     """Test edge cases and error conditions."""
     
-    def test_profiling_with_disabled_config(self):
+    def test_profiling_with_disabled_config(self) -> Any:
         """Test profiling with disabled configuration."""
         config = ProfilingConfig(enabled=False)
         profiler = AdvancedProfiler(config)
@@ -943,7 +963,7 @@ class TestEdgeCases:
         
         assert isinstance(results, dict)
     
-    def test_profiling_with_empty_dataset(self):
+    def test_profiling_with_empty_dataset(self) -> Any:
         """Test profiling with empty dataset."""
         config = ProfilingConfig(enabled=True)
         profiler = AdvancedProfiler(config)
@@ -957,13 +977,15 @@ class TestEdgeCases:
         
         assert len(profiler.data_loading_profiler.dataloader_metrics['time']) == 0
     
-    def test_profiling_with_exception(self):
+    def test_profiling_with_exception(self) -> Any:
         """Test profiling with exceptions."""
         config = ProfilingConfig(enabled=True)
         profiler = AdvancedProfiler(config)
         
         def failing_function():
-            raise ValueError("Test exception")
+            
+    """failing_function function."""
+raise ValueError("Test exception")
         
         # Should handle exceptions gracefully
         try:
@@ -974,7 +996,7 @@ class TestEdgeCases:
         # Profiler should still be functional
         assert profiler is not None
     
-    def test_optimization_with_no_bottlenecks(self):
+    def test_optimization_with_no_bottlenecks(self) -> Any:
         """Test optimization when no bottlenecks are detected."""
         config = ProfilingConfig(enabled=True)
         profiler = AdvancedProfiler(config)
@@ -1001,7 +1023,7 @@ class TestEdgeCases:
 class TestPerformance:
     """Performance tests."""
     
-    def test_profiling_overhead(self):
+    def test_profiling_overhead(self) -> Any:
         """Test profiling overhead."""
         config = ProfilingConfig(
             enabled=True,
@@ -1029,7 +1051,7 @@ class TestPerformance:
         overhead = (time_with_profiling - time_without_profiling) / time_without_profiling
         assert overhead < 0.5
     
-    def test_memory_profiling_efficiency(self):
+    def test_memory_profiling_efficiency(self) -> Any:
         """Test memory profiling efficiency."""
         config = ProfilingConfig(
             enabled=True,
@@ -1049,18 +1071,19 @@ class TestPerformance:
         # Should detect memory usage
         assert results['combined'].memory_usage > 0.0
     
-    def test_concurrent_profiling(self):
+    def test_concurrent_profiling(self) -> Any:
         """Test concurrent profiling."""
         config = ProfilingConfig(enabled=True)
         
         def profile_workload():
-            profiler = AdvancedProfiler(config)
+            
+    """profile_workload function."""
+profiler = AdvancedProfiler(config)
             profiler.start_profiling()
             time.sleep(0.01)
             return profiler.stop_profiling()
         
         # Run multiple profiling sessions concurrently
-        import concurrent.futures
         
         with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
             futures = [executor.submit(profile_workload) for _ in range(4)]

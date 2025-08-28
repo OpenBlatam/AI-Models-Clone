@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 import asyncio
 import logging
 import uuid
@@ -55,6 +60,7 @@ from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
 from shared_configs.enums import EmbeddingProvider
 
 
+from typing import Any, List, Dict, Optional
 logger = logging.getLogger(__name__)
 
 
@@ -264,7 +270,7 @@ async def rollback_tenant_provisioning(tenant_id: str) -> None:
         logger.info(f"Tenant rollback completed successfully for tenant {tenant_id}")
 
 
-def configure_default_api_keys(db_session: Session) -> None:
+async def configure_default_api_keys(db_session: Session) -> None:
     if ANTHROPIC_DEFAULT_API_KEY:
         anthropic_provider = LLMProviderUpsertRequest(
             name="Anthropic",

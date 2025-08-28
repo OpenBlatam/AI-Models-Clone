@@ -1,10 +1,20 @@
-"""
-Configuration Management - Pydantic Settings
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from functools import lru_cache
 from typing import List
 from pydantic import BaseSettings, Field
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Configuration Management - Pydantic Settings
+"""
+
 
 
 class CacheSettings(BaseSettings):
@@ -38,7 +48,8 @@ class Settings(BaseSettings):
     cors: CORSSettings = CORSSettings()
     monitoring: MonitoringSettings = MonitoringSettings()
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         case_sensitive = False
 

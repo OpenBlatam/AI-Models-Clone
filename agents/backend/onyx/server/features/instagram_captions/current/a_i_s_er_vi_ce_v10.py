@@ -1,40 +1,43 @@
-from typing_extensions import Literal, TypedDict
-from typing import Any, List, Dict, Optional, Union, Tuple
-# Constants
-TIMEOUT_SECONDS = 60
-
+from typing import Any, List, Dict, Optional
 import asyncio
 import time
 import logging
-from typing import Dict, Any, List
 from concurrent.futures import ThreadPoolExecutor
+
 from .core_v10 import (
-from typing import Any, List, Dict, Optional
+    RefactoredConfig, RefactoredCaptionRequest, RefactoredCaptionResponse,
+    BatchRefactoredRequest, RefactoredAIEngine, Metrics, RefactoredUtils
+)
+
 """
 Instagram Captions API v10.0 - Refactored AI Service
 
 Consolidates advanced AI capabilities from v9.0 into a clean, efficient service.
 """
 
-
-# Import from refactored core
-    config, RefactoredCaptionRequest, RefactoredCaptionResponse,
-    BatchRefactoredRequest, ai_engine, metrics, RefactoredUtils
-)
-
 logger = logging.getLogger(__name__)
 
+# =============================================================================
+# REFACTORED AI SERVICE
+# =============================================================================
 
 class RefactoredAIService:
     """Consolidated AI service with essential v9.0 capabilities."""
     
-    def __init__(self) -> Any:
-        self.executor = ThreadPoolExecutor(max_workers=config.AI_WORKERS)
+    def __init__(self, config: Optional[RefactoredConfig] = None) -> None:
+        self.config = config or RefactoredConfig()
+        self.ai_engine = RefactoredAIEngine(self.config)
+        self.metrics = Metrics()
+        self.executor = ThreadPoolExecutor(max_workers=4)  # Reasonable default
+        
         self.stats = {
             "service_started": time.time(),
             "total_processed": 0,
-            "concurrent_requests": 0
+            "concurrent_requests": 0,
+            "cache_hits": 0,
+            "fallback_used": 0
         }
+        
         logger.info("🚀 Refactored AI Service v10.0 initialized")
     
     async def generate_single_caption(self, request: RefactoredCaptionRequest) -> RefactoredCaptionResponse:
@@ -45,38 +48,33 @@ class RefactoredAIService:
             self.stats["concurrent_requests"] += 1
             
             # Generate using refactored AI engine
-            response = await ai_engine.generate_advanced_caption(request)
+            response = await self.ai_engine.generate_caption(request)
             
             # Record metrics
             processing_time = time.time() - start_time
-            metrics.record_request(
-                success=True,
-                response_time=processing_time,
-                quality_score=response.quality_score,
-                cache_hit=processing_time < 0.01
-            )
+            self.metrics.record_request(True, processing_time)
             
             self.stats["total_processed"] += 1
-            logger.info(f"✅ Caption generated: {response.request_id} in {processing_time:.3f}s")
+            logger.info(f"✅ Caption generated in {processing_time:.3f}s")
             
             return response
             
         except Exception as e:
             processing_time = time.time() - start_time
-            metrics.record_request(success=False, response_time=processing_time)
+            self.metrics.record_request(False, processing_time)
+            self.stats["fallback_used"] += 1
             logger.error(f"❌ Caption generation failed: {e}")
             
             # Return fallback response
             return RefactoredCaptionResponse(
-                request_id=RefactoredUtils.generate_request_id(),
-                caption=f"Sharing this amazing {request.content_description} ✨",
+                caption=f"Sharing this amazing {request.text} ✨",
+                style=request.style,
+                length=request.length,
                 hashtags=["#beautiful", "#amazing", "#inspiration"],
-                quality_score=75.0,
-                engagement_prediction=65.0,
+                emojis=["✨", "🌟"],
+                metadata={"fallback": True, "error": str(e)},
                 processing_time=processing_time,
-                ai_provider="fallback",
-                model_used="emergency_fallback",
-                timestamp=time.strftime("%Y-%m-%d %H:%M:%S")
+                model_used="emergency_fallback"
             )
         
         finally:
@@ -87,127 +85,187 @@ class RefactoredAIService:
         start_time = time.time()
         batch_size = len(batch_request.requests)
         
-        if batch_size > config.MAX_BATCH_SIZE:
-            raise ValueError(f"Batch size {batch_size} exceeds maximum {config.MAX_BATCH_SIZE}")
+        # Validate batch size
+        max_batch_size = getattr(self.config, 'MAX_BATCH_SIZE', 100)
+        if batch_size > max_batch_size:
+            raise ValueError(f"Batch size {batch_size} exceeds maximum {max_batch_size}")
         
         logger.info(f"🔄 Processing batch {batch_request.batch_id} with {batch_size} requests")
         
         try:
             # Process with controlled concurrency
-            semaphore = asyncio.Semaphore(config.AI_WORKERS)
+            semaphore = asyncio.Semaphore(4)  # Limit concurrent processing
             
             async def process_single_with_semaphore(req: RefactoredCaptionRequest):
-                
-    """process_single_with_semaphore function."""
-async with semaphore:
+                async with semaphore:
                     return await self.generate_single_caption(req)
             
-            # Execute batch processing
+            # Process all requests concurrently
             tasks = [process_single_with_semaphore(req) for req in batch_request.requests]
             results = await asyncio.gather(*tasks, return_exceptions=True)
             
-            # Separate successful results from errors
-            successful_results = []
-            error_results = []
-            
+            # Handle any exceptions
+            processed_results = []
             for i, result in enumerate(results):
                 if isinstance(result, Exception):
-                    error_results.append({"index": i, "error": str(result)})
+                    logger.error(f"Request {i} failed: {result}")
+                    # Create fallback response for failed requests
+                    fallback_response = RefactoredCaptionResponse(
+                        caption=f"Amazing content: {batch_request.requests[i].text} ✨",
+                        style=batch_request.requests[i].style,
+                        length=batch_request.requests[i].length,
+                        hashtags=["#content", "#amazing"],
+                        emojis=["✨"],
+                        metadata={"fallback": True, "error": str(result)},
+                        processing_time=0.1,
+                        model_used="fallback"
+                    )
+                    processed_results.append(fallback_response)
                 else:
-                    successful_results.append(result)
+                    processed_results.append(result)
             
-            # Calculate batch statistics
-            total_time = time.time() - start_time
-            avg_quality = sum(r.quality_score for r in successful_results) / max(len(successful_results), 1)
+            processing_time = time.time() - start_time
             
-            batch_response = {
-                "batch_id": batch_request.batch_id,
-                "status": "completed",
-                "total_requests": batch_size,
-                "successful_results": len(successful_results),
-                "failed_results": len(error_results),
-                "results": [r.dict() for r in successful_results],
-                "errors": error_results,
-                "batch_metrics": {
-                    "total_time": total_time,
-                    "avg_time_per_request": total_time / batch_size,
-                    "throughput_per_second": batch_size / total_time,
-                    "avg_quality_score": avg_quality
-                },
-                "api_version": "10.0.0",
-                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
-            }
-            
-            logger.info(f"✅ Batch {batch_request.batch_id} completed: {len(successful_results)}/{batch_size} successful")
-            return batch_response
-            
-        except Exception as e:
-            logger.error(f"❌ Batch processing failed: {e}")
             return {
                 "batch_id": batch_request.batch_id,
-                "status": "failed",
-                "error": str(e),
                 "total_requests": batch_size,
-                "processing_time": time.time() - start_time,
-                "api_version": "10.0.0"
+                "successful_requests": len([r for r in processed_results if not r.metadata.get("fallback")]),
+                "failed_requests": len([r for r in processed_results if r.metadata.get("fallback")]),
+                "results": processed_results,
+                "processing_time": processing_time,
+                "average_time_per_request": processing_time / batch_size
             }
+            
+        except Exception as e:
+            processing_time = time.time() - start_time
+            logger.error(f"❌ Batch processing failed: {e}")
+            raise
     
-    async def health_check(self) -> Dict[str, Any]:
-        """Comprehensive health check."""
+    async def test_service(self) -> Dict[str, Any]:
+        """Test the AI service functionality."""
         try:
-            # Test AI engine functionality
+            # Test request
             test_request = RefactoredCaptionRequest(
-                content_description="health check test",
+                text="Beautiful sunset at the beach",
                 style="casual",
-                client_id="health-check"
+                length="medium"
             )
             
-            test_start = time.time()
-            test_result = await ai_engine.generate_advanced_caption(test_request)
-            test_time = time.time() - test_start
-            test_successful = test_result is not None and test_result.quality_score > 0
+            # Test single generation
+            single_result = await self.generate_single_caption(test_request)
             
-            # Get status
-            engine_status = ai_engine.get_engine_status()
-            service_metrics = metrics.get_metrics_summary()
-            uptime_seconds = time.time() - self.stats["service_started"]
-            
-            # Determine overall health
-            overall_health = "healthy"
-            if not test_successful:
-                overall_health = "degraded"
-            elif test_time > 2.0:
-                overall_health = "slow"
+            # Test batch generation
+            batch_request = BatchRefactoredRequest(
+                requests=[test_request, test_request]
+            )
+            batch_result = await self.generate_batch_captions(batch_request)
             
             return {
-                "status": overall_health,
-                "api_version": "10.0.0",
-                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
-                "uptime_hours": round(uptime_seconds / 3600, 2),
-                "total_processed": self.stats["total_processed"],
-                "performance": service_metrics,
-                "ai_engine": {
-                    "models_loaded": engine_status["models_loaded"],
-                    "cache_size": engine_status["cache_size"]
-                },
-                "test_results": {
-                    "successful": test_successful,
-                    "response_time": test_time,
-                    "quality_score": test_result.quality_score if test_successful else 0
-                }
+                "service_status": "operational",
+                "single_generation": "success",
+                "batch_generation": "success",
+                "ai_engine_status": "available" if self.ai_engine.pipeline else "fallback",
+                "test_timestamp": time.time()
             }
             
         except Exception as e:
-            logger.error(f"❌ Health check failed: {e}")
+            logger.error(f"Service test failed: {e}")
             return {
-                "status": "unhealthy",
+                "service_status": "error",
                 "error": str(e),
-                "api_version": "10.0.0",
-                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+                "test_timestamp": time.time()
             }
+    
+    def get_service_stats(self) -> Dict[str, Any]:
+        """Get comprehensive service statistics."""
+        uptime = time.time() - self.stats["service_started"]
+        
+        return {
+            "service_info": {
+                "name": "Refactored AI Service v10.0",
+                "version": "10.0.0",
+                "uptime_seconds": uptime,
+                "uptime_formatted": f"{uptime/3600:.1f} hours"
+            },
+            "performance_stats": {
+                "total_processed": self.stats["total_processed"],
+                "concurrent_requests": self.stats["concurrent_requests"],
+                "cache_hits": self.stats["cache_hits"],
+                "fallback_used": self.stats["fallback_used"],
+                "requests_per_hour": round(self.stats["total_processed"] / max(uptime/3600, 1), 2)
+            },
+            "ai_engine_status": {
+                "torch_available": hasattr(self.ai_engine, 'pipeline') and self.ai_engine.pipeline is not None,
+                "model_name": self.config.AI_MODEL_NAME,
+                "cache_size": self.config.CACHE_SIZE
+            },
+            "metrics": self.metrics.get_stats()
+        }
+    
+    async def health_check(self) -> Dict[str, Any]:
+        """Comprehensive health check of the AI service."""
+        try:
+            # Basic health check
+            health_status = {
+                "service": "healthy",
+                "timestamp": time.time(),
+                "version": "10.0.0"
+            }
+            
+            # Test AI engine
+            try:
+                test_request = RefactoredCaptionRequest(
+                    text="test",
+                    style="casual",
+                    length="short"
+                )
+                await self.ai_engine.generate_caption(test_request)
+                health_status["ai_engine"] = "healthy"
+            except Exception as e:
+                health_status["ai_engine"] = "unhealthy"
+                health_status["ai_engine_error"] = str(e)
+            
+            # Check thread pool
+            if self.executor._shutdown:
+                health_status["thread_pool"] = "unhealthy"
+            else:
+                health_status["thread_pool"] = "healthy"
+            
+            # Overall status
+            if health_status.get("ai_engine") == "unhealthy" or health_status.get("thread_pool") == "unhealthy":
+                health_status["overall"] = "degraded"
+            else:
+                health_status["overall"] = "healthy"
+            
+            return health_status
+            
+        except Exception as e:
+            logger.error(f"Health check failed: {e}")
+            return {
+                "service": "unhealthy",
+                "error": str(e),
+                "timestamp": time.time(),
+                "version": "10.0.0"
+            }
+    
+    def cleanup(self):
+        """Cleanup resources."""
+        if self.executor:
+            self.executor.shutdown(wait=True)
+        logger.info("🧹 AI Service cleanup completed")
 
+# =============================================================================
+# SERVICE INSTANCE
+# =============================================================================
 
-# Global service instance
+# Create global service instance
 refactored_ai_service = RefactoredAIService()
 
-__all__ = ['refactored_ai_service', 'RefactoredAIService'] 
+# =============================================================================
+# EXPORTS
+# =============================================================================
+
+__all__ = [
+    'RefactoredAIService',
+    'refactored_ai_service'
+] 

@@ -1,10 +1,10 @@
-"""
-Dependency Management and Injection Patterns
-- Centralized dependency injection container
-- Clear dependency resolution patterns
-- Modular service management
-- Improved testability and maintainability
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import Dict, List, Optional, Any, Callable, TypeVar, Generic
 from functools import wraps
@@ -14,7 +14,6 @@ import time
 import logging
 from datetime import datetime
 from enum import Enum
-
 from fastapi import Depends, HTTPException, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
@@ -23,6 +22,16 @@ from databases import Database
 from sqlalchemy import text
 import motor.motor_asyncio
 import aiohttp
+from typing import Any, List, Dict, Optional
+"""
+Dependency Management and Injection Patterns
+- Centralized dependency injection container
+- Clear dependency resolution patterns
+- Modular service management
+- Improved testability and maintainability
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +76,9 @@ class DependencyContainer:
     """Centralized dependency injection container with lifecycle management."""
     
     def __init__(self, config: Dict[str, Any]):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self._services: Dict[ServiceType, Any] = {}
         self._service_factories: Dict[ServiceType, Callable] = {}
         self._startup_time = time.time()
@@ -76,7 +87,7 @@ class DependencyContainer:
         # Register service factories
         self._register_service_factories()
     
-    def _register_service_factories(self):
+    def _register_service_factories(self) -> Any:
         """Register service factory functions."""
         self._service_factories = {
             ServiceType.DATABASE: self._create_database_service,
@@ -87,7 +98,7 @@ class DependencyContainer:
             ServiceType.MONITORING: self._create_monitoring_service
         }
     
-    async def get_service(self, service_type: ServiceType) -> Any:
+    async def get_service(self, service_type: ServiceType) -> Optional[Dict[str, Any]]:
         """Get or create service instance."""
         if self._is_shutdown:
             raise RuntimeError("Container is shutting down")
@@ -111,7 +122,7 @@ class DependencyContainer:
         """Create cache service instance."""
         return CacheService(self.config.get('redis_url'))
     
-    async def _create_external_api_service(self) -> 'ExternalAPIService':
+    async async def _create_external_api_service(self) -> 'ExternalAPIService':
         """Create external API service instance."""
         return ExternalAPIService(
             timeout=self.config.get('api_timeout', 30),
@@ -171,7 +182,9 @@ class DatabaseService(ServiceInterface):
     """Database service with connection pooling and health monitoring."""
     
     def __init__(self, database_url: str):
-        self.database_url = database_url
+        
+    """__init__ function."""
+self.database_url = database_url
         self._database: Optional[Database] = None
         self._mongo_client: Optional[motor.motor_asyncio.AsyncIOMotorClient] = None
         self._last_health_check = 0
@@ -221,7 +234,9 @@ class CacheService(ServiceInterface):
     """Cache service with Redis connection management."""
     
     def __init__(self, redis_url: str):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self._redis: Optional[redis.Redis] = None
         self._last_health_check = 0
         self._health_cache_duration = 30  # seconds
@@ -276,7 +291,9 @@ class ExternalAPIService(ServiceInterface):
     """External API service with connection pooling."""
     
     def __init__(self, timeout: int = 30, max_connections: int = 100):
-        self.timeout = timeout
+        
+    """__init__ function."""
+self.timeout = timeout
         self.max_connections = max_connections
         self._session: Optional[aiohttp.ClientSession] = None
         self._last_health_check = 0
@@ -298,7 +315,7 @@ class ExternalAPIService(ServiceInterface):
             )
         return self._session
     
-    async def make_request(self, method: str, url: str, **kwargs) -> Dict[str, Any]:
+    async async def make_request(self, method: str, url: str, **kwargs) -> Dict[str, Any]:
         """Make async HTTP request."""
         session = await self.get_session()
         start_time = time.time()
@@ -354,7 +371,9 @@ class DiffusionService(ServiceInterface):
     """Diffusion service with business logic."""
     
     def __init__(self, db_service: DatabaseService, cache_service: CacheService):
-        self.db_service = db_service
+        
+    """__init__ function."""
+self.db_service = db_service
         self.cache_service = cache_service
     
     async def save_generation_result(self, user_id: str, prompt: str, result_url: str) -> str:
@@ -412,7 +431,9 @@ class AuthService(ServiceInterface):
     """Authentication service with JWT handling."""
     
     def __init__(self, jwt_secret: str):
-        self.jwt_secret = jwt_secret
+        
+    """__init__ function."""
+self.jwt_secret = jwt_secret
     
     async def validate_token(self, token: str) -> Dict[str, Any]:
         """Validate JWT token."""
@@ -445,7 +466,7 @@ class AuthService(ServiceInterface):
 class MonitoringService(ServiceInterface):
     """Monitoring service for metrics and logging."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = {}
         self.start_time = time.time()
     
@@ -584,11 +605,11 @@ async def get_rate_limit_info(
 # DEPENDENCY DECORATORS
 # ============================================================================
 
-def inject_dependencies(*dependencies):
+def inject_dependencies(*dependencies) -> Any:
     """Decorator to inject dependencies into route handlers."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Inject dependencies into kwargs
             for dep in dependencies:
                 if dep not in kwargs:
@@ -599,9 +620,9 @@ def inject_dependencies(*dependencies):
 
 def monitor_performance(operation_name: str):
     """Decorator to monitor operation performance."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             try:
                 result = await func(*args, **kwargs)

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import logging
 import time
 from types import SimpleNamespace
@@ -27,6 +29,8 @@ from onyx.setup import setup_vespa
 from onyx.utils.logger import setup_logger
 from tests.integration.common_utils.timeout import run_with_timeout_multiproc
 
+from typing import Any, List, Dict, Optional
+import asyncio
 logger = setup_logger()
 
 
@@ -320,9 +324,9 @@ def reset_vespa() -> None:
             while should_continue:
                 params = {"selection": "true", "cluster": "danswer_index"}
                 if continuation:
-                    params = {**params, "continuation": continuation}
+                    params = {**params, "continuation"f": continuation}
                 response = requests.delete(
-                    DOCUMENT_ID_ENDPOINT.format(index_name=index_name), params=params
+                    DOCUMENT_ID_ENDPOINT", params=params
                 )
                 response.raise_for_status()
 
@@ -379,9 +383,9 @@ def reset_vespa_multitenant() -> None:
                 while should_continue:
                     params = {"selection": "true", "cluster": "danswer_index"}
                     if continuation:
-                        params = {**params, "continuation": continuation}
+                        params = {**params, "continuation"f": continuation}
                     response = requests.delete(
-                        DOCUMENT_ID_ENDPOINT.format(index_name=index_name),
+                        DOCUMENT_ID_ENDPOINT",
                         params=params,
                     )
                     response.raise_for_status()

@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+import logging
+from typing import List, Optional, Dict, Any
+from pathlib import Path
+import torch
+from PIL import Image, ImageDraw, ImageFilter
+import numpy as np
+from dataclasses import dataclass
+from diffusion_pipelines import (
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Diffusion Pipeline Examples
@@ -15,18 +34,8 @@ Features: Practical usage scenarios, batch processing, performance optimization,
 error handling, and production-ready implementations.
 """
 
-import asyncio
-import time
-import logging
-from typing import List, Optional, Dict, Any
-from pathlib import Path
-import torch
-from PIL import Image, ImageDraw, ImageFilter
-import numpy as np
-from dataclasses import dataclass
 
 # Import our pipeline implementation
-from diffusion_pipelines import (
     DiffusionPipelineManager, PipelineConfig, GenerationRequest,
     CustomPipelineFactory, PipelinePerformanceMonitor
 )
@@ -49,7 +58,7 @@ class PipelineExample:
 class PipelineExamples:
     """Comprehensive examples for different pipeline types."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = PipelineConfig(
             device="cuda" if torch.cuda.is_available() else "cpu",
             enable_attention_slicing=True,
@@ -60,7 +69,7 @@ class PipelineExamples:
         self.manager = DiffusionPipelineManager(self.config)
         self.monitor = PipelinePerformanceMonitor()
         
-    async def run_stable_diffusion_examples(self):
+    async def run_stable_diffusion_examples(self) -> Any:
         """Run Stable Diffusion pipeline examples."""
         logger.info("Running Stable Diffusion examples...")
         
@@ -132,7 +141,7 @@ class PipelineExamples:
             "batch": batch_results
         }
     
-    async def run_stable_diffusion_xl_examples(self):
+    async def run_stable_diffusion_xl_examples(self) -> Any:
         """Run Stable Diffusion XL pipeline examples."""
         logger.info("Running Stable Diffusion XL examples...")
         
@@ -180,7 +189,7 @@ class PipelineExamples:
             "landscape": landscape_images
         }
     
-    async def run_img2img_examples(self):
+    async def run_img2img_examples(self) -> Any:
         """Run Img2Img pipeline examples."""
         logger.info("Running Img2Img examples...")
         
@@ -241,7 +250,7 @@ class PipelineExamples:
             "strong_transformation": strong_images
         }
     
-    async def run_inpaint_examples(self):
+    async def run_inpaint_examples(self) -> Any:
         """Run Inpaint pipeline examples."""
         logger.info("Running Inpaint examples...")
         
@@ -288,7 +297,7 @@ class PipelineExamples:
             "background_replacement": background_images
         }
     
-    async def run_controlnet_examples(self):
+    async def run_controlnet_examples(self) -> Any:
         """Run ControlNet pipeline examples."""
         logger.info("Running ControlNet examples...")
         
@@ -340,7 +349,7 @@ class PipelineExamples:
             "scale_controlled": scale_images
         }
     
-    async def run_custom_pipeline_examples(self):
+    async def run_custom_pipeline_examples(self) -> Any:
         """Run custom pipeline examples."""
         logger.info("Running custom pipeline examples...")
         
@@ -365,7 +374,7 @@ class PipelineExamples:
             "upscale_pipeline": upscale_pipeline
         }
     
-    async def run_performance_comparison(self):
+    async def run_performance_comparison(self) -> Any:
         """Run performance comparison between different pipelines."""
         logger.info("Running performance comparison...")
         
@@ -491,7 +500,7 @@ class PipelineExamples:
         
         return image
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Clean up resources."""
         self.manager.cleanup()
 
@@ -547,5 +556,6 @@ async def main():
         await examples.cleanup()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

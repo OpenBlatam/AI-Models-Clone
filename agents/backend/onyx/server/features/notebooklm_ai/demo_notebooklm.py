@@ -1,8 +1,16 @@
-#!/usr/bin/env python3
-"""
-NotebookLM AI Demo - Advanced Document Intelligence System
-Inspired by Google's NotebookLM with latest AI libraries and optimizations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -11,7 +19,19 @@ import logging
 from typing import List, Dict, Any, Optional
 from pathlib import Path
 import torch
+import torch.nn as nn
+import torch.optim as optim
 import numpy as np
+    from core.entities import (
+    from infrastructure.ai_engines import (
+        import traceback
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+NotebookLM AI Demo - Advanced Document Intelligence System
+Inspired by Google's NotebookLM with latest AI libraries and optimizations.
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -19,11 +39,9 @@ logger = logging.getLogger(__name__)
 
 # Import our NotebookLM components
 try:
-    from core.entities import (
         Document, Notebook, Source, Citation, Query, Response, Conversation, User,
         DocumentType, SourceType, QueryType
     )
-    from infrastructure.ai_engines import (
         AdvancedLLMEngine, DocumentProcessor, CitationGenerator, 
         ResponseOptimizer, MultiModalProcessor, AIEngineConfig
     )
@@ -32,9 +50,9 @@ except ImportError as e:
     logger.warning(f"⚠️ Some components not available: {e}")
     # Create mock classes for demo
     class MockEngine:
-        def __init__(self, *args, **kwargs):
+        def __init__(self, *args, **kwargs) -> Any:
             pass
-        async def generate_response(self, *args, **kwargs):
+        async def generate_response(self, *args, **kwargs) -> Any:
             return "This is a mock response from the AI engine."
     
     AdvancedLLMEngine = MockEngine
@@ -49,7 +67,7 @@ class NotebookLMDemo:
     Comprehensive demo for NotebookLM AI system.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.engines = {}
         self.results = {}
         self.performance_metrics = {}
@@ -59,7 +77,7 @@ class NotebookLMDemo:
         
         logger.info("🚀 NotebookLM AI Demo initialized")
     
-    def _initialize_engines(self):
+    def _initialize_engines(self) -> Any:
         """Initialize all AI engines."""
         try:
             # LLM Engine
@@ -732,8 +750,12 @@ if __name__ == "__main__":
         # Save results to file
         output_file = "notebooklm_ai_demo_results.json"
         with open(output_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             # Convert to JSON-serializable format
-            def convert_for_json(obj):
+            def convert_for_json(obj) -> Any:
                 if hasattr(obj, 'to_dict'):
                     return obj.to_dict()
                 elif isinstance(obj, dict):
@@ -749,5 +771,4 @@ if __name__ == "__main__":
         
     except Exception as e:
         print(f"❌ Demo failed: {e}")
-        import traceback
         traceback.print_exc() 

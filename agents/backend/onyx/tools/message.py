@@ -1,3 +1,7 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
 import json
 from typing import Any
 
@@ -8,6 +12,9 @@ from pydantic import BaseModel
 
 from onyx.natural_language_processing.utils import BaseTokenizer
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Langchain has their own version of pydantic which is version 1
 
 
@@ -27,7 +34,8 @@ class ToolCallSummary(BaseModel):
 
     # This is a workaround to allow arbitrary types in the model
     # TODO: Remove this once we have a better solution
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
 
 

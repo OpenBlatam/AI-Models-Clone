@@ -1,9 +1,13 @@
-"""
-Redis Rate Limit Implementation
-===============================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Concrete implementation of rate limiting using Redis.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 from typing import Optional
@@ -12,6 +16,15 @@ from ...core.interfaces.rate_limit_interface import IRateLimitService
 from ...core.entities.rate_limit import RateLimitInfo
 from ...shared.constants import RATE_LIMIT_KEY_PREFIX
 import logging
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Redis Rate Limit Implementation
+===============================
+
+Concrete implementation of rate limiting using Redis.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -20,12 +33,14 @@ class RedisRateLimitService(IRateLimitService):
     """Redis-based rate limiting service."""
     
     def __init__(self, redis_url: str, requests_per_window: int = 1000, window_size: int = 3600):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.requests_per_window = requests_per_window
         self.window_size = window_size
         self.redis_client: Optional[redis.Redis] = None
         
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize Redis connection."""
         try:
             self.redis_client = redis.from_url(
@@ -102,7 +117,7 @@ class RedisRateLimitService(IRateLimitService):
             logger.warning(f"Failed to reset rate limit for {identifier}: {e}")
             return False
     
-    async def get_remaining_requests(self, identifier: str) -> int:
+    async async def get_remaining_requests(self, identifier: str) -> int:
         """Get remaining requests for identifier."""
         if not self.redis_client:
             return self.requests_per_window

@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+from typing import List
+import httpx
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Demo Script for Template-based Video Generation with AI Avatars
@@ -11,22 +22,20 @@ Demonstrates the complete workflow:
 5. Final video composition
 """
 
-import asyncio
-import json
-from typing import List
-import httpx
 
 
 class TemplateVideoDemo:
     def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.client = None
         
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         self.client = httpx.AsyncClient(base_url=self.base_url)
         return self
         
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
         if self.client:
             await self.client.aclose()
 
@@ -129,7 +138,7 @@ class TemplateVideoDemo:
         )
         return response.json()
 
-    async def demo_complete_workflow(self):
+    async def demo_complete_workflow(self) -> Any:
         """Demo the complete template video workflow."""
         print("🎬 Template Video Demo - Complete Workflow")
         print("=" * 60)
@@ -229,5 +238,6 @@ async def main():
         await demo.demo_complete_workflow()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

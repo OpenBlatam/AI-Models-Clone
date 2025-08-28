@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Any, Dict
+from datetime import datetime
+from onyx.utils.timing import time_function
+from onyx.utils.text_processing import extract_keywords
+from onyx.utils.gpu_utils import get_gpu_info
+from ..core.base import OnyxPluginBase
+from ..core.models import OnyxPluginContext
+from ..core.exceptions import PluginError
+from ..core.onyx_integration import onyx_integration
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Onyx Plugin Manager - Example Plugins
 
@@ -5,19 +22,10 @@ Example plugins demonstrating how to use the Onyx plugin system
 for video processing and analysis.
 """
 
-from typing import Any, Dict
-from datetime import datetime
 
 # Onyx imports
-from onyx.utils.timing import time_function
-from onyx.utils.text_processing import extract_keywords
-from onyx.utils.gpu_utils import get_gpu_info
 
 # Local imports
-from ..core.base import OnyxPluginBase
-from ..core.models import OnyxPluginContext
-from ..core.exceptions import PluginError
-from ..core.onyx_integration import onyx_integration
 
 
 class OnyxContentAnalyzerPlugin(OnyxPluginBase):

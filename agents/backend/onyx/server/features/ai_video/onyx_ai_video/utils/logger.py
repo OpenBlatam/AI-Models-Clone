@@ -1,9 +1,7 @@
-"""
-Onyx AI Video System - Logger Utility
-
-Logging utilities for the Onyx AI Video system with integration
-with Onyx's logging patterns and structured logging support.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
 
 import logging
 import logging.handlers
@@ -13,8 +11,17 @@ from typing import Any, Dict, Optional, Union
 from datetime import datetime
 from pathlib import Path
 import json
-
 from ..core.exceptions import ConfigurationError
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Onyx AI Video System - Logger Utility
+
+Logging utilities for the Onyx AI Video system with integration
+with Onyx's logging patterns and structured logging support.
+"""
+
+
 
 
 class OnyxLogger:
@@ -34,7 +41,9 @@ class OnyxLogger:
         max_size: int = 10,
         backup_count: int = 5
     ):
-        self.name = name
+        
+    """__init__ function."""
+self.name = name
         self.level = getattr(logging, level.upper())
         self.use_onyx_logging = use_onyx_logging
         self.log_file = log_file
@@ -116,7 +125,7 @@ class OnyxLogger:
         self._user_id = user_id
         self._session_id = session_id
     
-    def clear_request_context(self):
+    async def clear_request_context(self) -> Any:
         """Clear request context."""
         self._request_id = None
         self._user_id = None
@@ -222,7 +231,9 @@ class OnyxLoggingAdapter:
     """
     
     def __init__(self, logger: OnyxLogger):
-        self.logger = logger
+        
+    """__init__ function."""
+self.logger = logger
     
     def log_function_call(self, function_name: str, args: tuple, kwargs: dict, result: Any, duration: float):
         """Log function call with Onyx format."""
@@ -268,7 +279,9 @@ class PerformanceLogger:
     """
     
     def __init__(self, logger: OnyxLogger):
-        self.logger = logger
+        
+    """__init__ function."""
+self.logger = logger
         self.metrics = {}
     
     def start_operation(self, operation: str, **kwargs):
@@ -321,7 +334,9 @@ class RequestLogger:
     """
     
     def __init__(self, logger: OnyxLogger):
-        self.logger = logger
+        
+    """__init__ function."""
+self.logger = logger
     
     def log_request_start(self, request_id: str, user_id: str, method: str, path: str, **kwargs):
         """Log request start."""
@@ -398,7 +413,7 @@ def get_performance_logger() -> PerformanceLogger:
     return _performance_logger
 
 
-def get_request_logger() -> RequestLogger:
+async def get_request_logger() -> RequestLogger:
     """Get request logger instance."""
     global _request_logger
     if _request_logger is None:
@@ -423,8 +438,8 @@ def configure_logging_from_config(config: Dict[str, Any]) -> OnyxLogger:
 # Logging decorators
 def log_function_call(logger: Optional[OnyxLogger] = None):
     """Decorator to log function calls."""
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func) -> Any:
+        def wrapper(*args, **kwargs) -> Any:
             log = logger or get_logger()
             log.start_timer(func.__name__)
             
@@ -442,8 +457,8 @@ def log_function_call(logger: Optional[OnyxLogger] = None):
 
 def log_performance(operation_name: str, logger: Optional[OnyxLogger] = None):
     """Decorator to log performance metrics."""
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func) -> Any:
+        def wrapper(*args, **kwargs) -> Any:
             log = logger or get_logger()
             log.start_timer(operation_name)
             

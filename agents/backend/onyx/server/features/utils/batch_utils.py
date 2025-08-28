@@ -1,7 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import List, Dict, Any, Type, TypeVar
 import numpy as np
 import pandas as pd
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 T = TypeVar('T')
 
 class BatchMethodsMixin:
@@ -15,12 +20,16 @@ class BatchMethodsMixin:
 
     @classmethod
     def batch_to_numpy(cls: Type[T], objs: List[T]):
-        dicts = cls.batch_to_dicts(objs)
+        
+    """batch_to_numpy function."""
+dicts = cls.batch_to_dicts(objs)
         return np.array(dicts)
 
     @classmethod
     def batch_to_pandas(cls: Type[T], objs: List[T]):
-        dicts = cls.batch_to_dicts(objs)
+        
+    """batch_to_pandas function."""
+dicts = cls.batch_to_dicts(objs)
         return pd.DataFrame(dicts)
 
     @classmethod

@@ -1,10 +1,25 @@
-"""
-Network target API schemas for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from enum import Enum
+            import ipaddress
+            import ipaddress
+            import re
+            import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Network target API schemas for cybersecurity tools.
+"""
 
 class TargetType(str, Enum):
     """Types of network targets."""
@@ -72,21 +87,19 @@ class CreateNetworkTargetRequest(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
     @field_validator('name')
-    def validate_name(cls, v):
+    def validate_name(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Name cannot be empty or whitespace only")
         return v.strip()
     
     @field_validator('ip_address', 'ip_addresses')
-    def validate_ip_addresses(cls, v):
+    def validate_ip_addresses(cls, v) -> bool:
         if isinstance(v, str):
-            import ipaddress
             try:
                 ipaddress.ip_address(v)
             except ValueError:
                 raise ValueError(f"Invalid IP address: {v}")
         elif isinstance(v, list):
-            import ipaddress
             for ip in v:
                 try:
                     ipaddress.ip_address(ip)
@@ -95,18 +108,16 @@ class CreateNetworkTargetRequest(BaseModel):
         return v
     
     @field_validator('mac_address')
-    def validate_mac_address(cls, v):
+    def validate_mac_address(cls, v) -> bool:
         if v is not None:
-            import re
             mac_pattern = r'^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$'
             if not re.match(mac_pattern, v):
                 raise ValueError(f"Invalid MAC address format: {v}")
         return v
     
     @field_validator('url')
-    def validate_url(cls, v):
+    def validate_url(cls, v) -> bool:
         if v is not None:
-            import re
             url_pattern = r'^https?://[^\s/$.?#].[^\s]*$'
             if not re.match(url_pattern, v):
                 raise ValueError(f"Invalid URL format: {v}")

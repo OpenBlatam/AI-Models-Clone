@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import time
+from typing import Dict, Any
+from .performance_optimizer import (
+    from .performance_optimizer import validate_optimization_config
+    import torch
+    from .performance_optimizer import calculate_memory_usage, get_optimal_batch_size
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Test Performance Optimizer
@@ -6,13 +29,8 @@ Test script to demonstrate the performance optimizer functionality
 with proper async/await patterns and functional programming approach.
 """
 
-import asyncio
-import logging
-import time
-from typing import Dict, Any
 
 # Import the performance optimizer
-from .performance_optimizer import (
     PerformanceOptimizer,
     OptimizationConfig,
     create_performance_optimizer,
@@ -68,7 +86,9 @@ async def test_async_utilities():
     
     # Test retry operation
     async def failing_operation():
-        raise Exception("Simulated failure")
+        
+    """failing_operation function."""
+raise Exception("Simulated failure")
     
     try:
         await retry_operation(failing_operation, max_retries=2, delay=0.1)
@@ -97,7 +117,6 @@ async def test_configuration_validation():
         cache_ttl=3600
     )
     
-    from .performance_optimizer import validate_optimization_config
     is_valid = validate_optimization_config(valid_config)
     logger.info(f"Valid config validation: {is_valid}")
     
@@ -117,8 +136,6 @@ async def test_memory_utilities():
     """Test memory utility functions."""
     logger.info("Testing memory utilities...")
     
-    import torch
-    from .performance_optimizer import calculate_memory_usage, get_optimal_batch_size
     
     # Test memory calculation
     tensor = torch.randn(100, 100)
@@ -163,5 +180,6 @@ async def main():
     logger.info("All tests completed!")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add docs_indexed_column + time_started to index_attempt table
 
 Revision ID: 5e84129c8be3
@@ -6,8 +13,6 @@ Create Date: 2023-08-10 21:43:09.069523
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.

@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+import numpy as np
+from pathlib import Path
+import logging
+from typing import Dict, Any, List, Optional
+from .error_handling import (
+from .edge_case_handler import (
+        import psutil
+from typing import Any, List, Dict, Optional
 """
 🚨 ERROR HANDLING & EDGE CASE EXAMPLES
 =====================================
@@ -7,14 +28,7 @@ Incluye escenarios reales de procesamiento de video, carga de modelos,
 y operaciones del sistema.
 """
 
-import asyncio
-import time
-import numpy as np
-from pathlib import Path
-import logging
-from typing import Dict, Any, List, Optional
 
-from .error_handling import (
     AIVideoError, ErrorCategory, ErrorSeverity, ErrorContext,
     ModelLoadingError, ModelInferenceError, MemoryError, 
     VideoProcessingError, DataValidationError, ConfigurationError,
@@ -22,7 +36,6 @@ from .error_handling import (
     safe_execute, safe_execute_async, get_error_handler
 )
 
-from .edge_case_handler import (
     EdgeCaseHandler, ResourceMonitor, BoundaryConditionHandler,
     MemoryLeakDetector, TimeoutHandler, DataValidator,
     with_edge_case_protection, validate_system_requirements
@@ -53,7 +66,6 @@ def load_ai_model(model_path: str, model_type: str = "diffusion") -> Dict[str, A
             )
         
         # Verificar memoria disponible
-        import psutil
         available_memory = psutil.virtual_memory().available / (1024 * 1024 * 1024)  # GB
         if available_memory < 2.0:  # Mínimo 2GB
             raise MemoryError(
@@ -205,7 +217,7 @@ def memory_intensive_operation(data_size: int = 1000) -> np.ndarray:
 class VideoProcessor:
     """Procesador de video con manejo de concurrencia."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.race_handler = RaceConditionHandler()
         self.processing_locks: Dict[str, bool] = {}
     

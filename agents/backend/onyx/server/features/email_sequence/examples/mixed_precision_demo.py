@@ -1,9 +1,16 @@
-"""
-Mixed Precision Training Demo
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive demonstration of mixed precision training with PyTorch's Automatic Mixed Precision (AMP)
-using torch.cuda.amp for improved training speed and reduced memory usage.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import torch
 import torch.nn as nn
@@ -16,23 +23,33 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from pathlib import Path
 import asyncio
-
 from core.mixed_precision_training import (
-    MixedPrecisionConfig, MixedPrecisionTrainer, MixedPrecisionOptimizer,
-    create_mixed_precision_trainer, create_mixed_precision_optimizer,
-    check_amp_compatibility
-)
 from core.training_logger import create_training_logger
 from core.optimized_training_optimizer import create_optimized_training_optimizer
 from core.performance_optimization import PerformanceConfig
 from core.multi_gpu_training import MultiGPUConfig
 from core.gradient_accumulation import GradientAccumulationConfig
+        import traceback
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Mixed Precision Training Demo
+
+Comprehensive demonstration of mixed precision training with PyTorch's Automatic Mixed Precision (AMP)
+using torch.cuda.amp for improved training speed and reduced memory usage.
+"""
+
+
+    MixedPrecisionConfig, MixedPrecisionTrainer, MixedPrecisionOptimizer,
+    create_mixed_precision_trainer, create_mixed_precision_optimizer,
+    check_amp_compatibility
+)
 
 
 class EmailSequenceModel(nn.Module):
     """Simple email sequence model for demonstration"""
     
-    def __init__(self, vocab_size=1000, embedding_dim=128, hidden_dim=256, num_classes=2):
+    def __init__(self, vocab_size=1000, embedding_dim=128, hidden_dim=256, num_classes=2) -> Any:
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
         self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True, bidirectional=True)
@@ -40,7 +57,7 @@ class EmailSequenceModel(nn.Module):
         self.classifier = nn.Linear(hidden_dim * 2, num_classes)
         self.loss_fn = nn.CrossEntropyLoss()
     
-    def forward(self, x):
+    def forward(self, x) -> Any:
         embedded = self.embedding(x)
         lstm_out, _ = self.lstm(embedded)
         # Use the last output
@@ -50,7 +67,7 @@ class EmailSequenceModel(nn.Module):
         return output
 
 
-def create_dummy_dataset(num_samples=1000, seq_length=50, vocab_size=1000):
+def create_dummy_dataset(num_samples=1000, seq_length=50, vocab_size=1000) -> Any:
     """Create dummy dataset for demonstration"""
     
     # Generate random sequences
@@ -65,7 +82,7 @@ def create_dummy_dataset(num_samples=1000, seq_length=50, vocab_size=1000):
     return dataset
 
 
-def benchmark_training_speeds(model, train_loader, device, num_iterations=100):
+def benchmark_training_speeds(model, train_loader, device, num_iterations=100) -> Any:
     """Benchmark training speeds with and without mixed precision"""
     
     print("\n" + "="*60)
@@ -164,7 +181,7 @@ def benchmark_training_speeds(model, train_loader, device, num_iterations=100):
     }
 
 
-def benchmark_memory_usage(model, train_loader, device, num_iterations=50):
+def benchmark_memory_usage(model, train_loader, device, num_iterations=50) -> Any:
     """Benchmark memory usage with and without mixed precision"""
     
     print("\n" + "="*60)
@@ -398,6 +415,10 @@ def demonstrate_mixed_precision_training():
     
     # Save results
     with open("logs/mixed_precision_demo/demo_results.json", 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         json.dump(results, f, indent=2)
     
     print(f"\nDemo completed! Results saved to logs/mixed_precision_demo/")
@@ -479,7 +500,7 @@ def demonstrate_integrated_training():
     print("Integrated training demonstration completed!")
 
 
-def create_visualizations(results):
+def create_visualizations(results) -> Any:
     """Create visualizations for mixed precision training results"""
     
     print("\nCreating visualizations...")
@@ -610,7 +631,6 @@ async def main():
         
     except Exception as e:
         print(f"Demo failed with error: {e}")
-        import traceback
         traceback.print_exc()
 
 

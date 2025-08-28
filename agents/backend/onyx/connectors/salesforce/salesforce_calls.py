@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import gc
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -13,6 +15,9 @@ from simple_salesforce.bulk2 import SFBulk2Type
 from onyx.connectors.interfaces import SecondsSinceUnixEpoch
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -42,7 +47,7 @@ def _build_created_date_time_filter_for_salesforce(
     )
 
 
-def _get_sf_type_object_json(sf_client: Salesforce, type_name: str) -> Any:
+def _get_sf_type_object_json(sf_client: Salesforce, type_name: str) -> Optional[Dict[str, Any]]:
     sf_object = SFType(type_name, sf_client.session_id, sf_client.sf_instance)
     return sf_object.describe()
 
@@ -199,7 +204,7 @@ def _bulk_retrieve_from_salesforce(
     return sf_type, all_download_paths
 
 
-def fetch_all_csvs_in_parallel(
+async def fetch_all_csvs_in_parallel(
     sf_client: Salesforce,
     all_types_to_filter: dict[str, bool],
     start: SecondsSinceUnixEpoch | None,

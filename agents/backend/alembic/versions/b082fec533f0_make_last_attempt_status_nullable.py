@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Make 'last_attempt_status' nullable
 
 Revision ID: b082fec533f0
@@ -6,8 +13,6 @@ Create Date: 2023-08-06 12:05:47.087325
 
 """
 
-from alembic import op
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "b082fec533f0"

@@ -1,10 +1,7 @@
-"""
-Deep Learning Models for Blog Analysis
-=====================================
-
-Advanced deep learning architectures and training pipelines for blog content analysis.
-Implements state-of-the-art models with proper GPU utilization and mixed precision training.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import torch
 import torch.nn as nn
@@ -15,7 +12,6 @@ from torch.optim.lr_scheduler import CosineAnnealingLR, ReduceLROnPlateau
 from torch.cuda.amp import autocast, GradScaler
 import torch.distributed as dist
 from torch.nn.parallel import DataParallel, DistributedDataParallel
-
 import numpy as np
 import pandas as pd
 from typing import Dict, List, Optional, Tuple, Union, Any
@@ -25,10 +21,29 @@ import logging
 import time
 import json
 from enum import Enum
+    from transformers import (
+    import sentence_transformers
+    from sentence_transformers import SentenceTransformer, losses
+                    import bitsandbytes as bnb
+                    from transformers import BitsAndBytesConfig
+            import torch
+        from torch.cuda.amp import autocast
+            import torch
+        from torch.cuda.amp import autocast
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Deep Learning Models for Blog Analysis
+=====================================
+
+Advanced deep learning architectures and training pipelines for blog content analysis.
+Implements state-of-the-art models with proper GPU utilization and mixed precision training.
+"""
+
+
 
 # Transformers and NLP libraries
 try:
-    from transformers import (
         AutoTokenizer, AutoModel, AutoModelForSequenceClassification,
         AutoModelForTokenClassification, AutoConfig, Trainer, TrainingArguments,
         DataCollatorWithPadding, EarlyStoppingCallback
@@ -38,8 +53,6 @@ except ImportError:
     TRANSFORMERS_AVAILABLE = False
 
 try:
-    import sentence_transformers
-    from sentence_transformers import SentenceTransformer, losses
     SENTENCE_TRANSFORMERS_AVAILABLE = True
 except ImportError:
     SENTENCE_TRANSFORMERS_AVAILABLE = False
@@ -111,7 +124,7 @@ class ModelConfig:
     cnn_filters: List[int] = field(default_factory=lambda: [64, 128, 256])
     cnn_kernel_sizes: List[int] = field(default_factory=lambda: [3, 4, 5])
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate and set default values."""
         if self.num_gpus > 1 and torch.cuda.is_available():
             self.use_distributed_training = True
@@ -126,7 +139,9 @@ class BlogDataset(Dataset):
     
     def __init__(self, texts: List[str], labels: Optional[List[Union[int, float]]] = None,
                  tokenizer=None, max_length: int = 512, task_type: TaskType = TaskType.SENTIMENT_CLASSIFICATION):
-        self.texts = texts
+        
+    """__init__ function."""
+self.texts = texts
         self.labels = labels
         self.tokenizer = tokenizer
         self.max_length = max_length
@@ -179,7 +194,9 @@ class AttentionMechanism(nn.Module):
     """Multi-head attention mechanism for custom models."""
     
     def __init__(self, hidden_size: int, num_heads: int = 8, dropout: float = 0.1):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.hidden_size = hidden_size
         self.num_heads = num_heads
         self.head_size = hidden_size // num_heads
@@ -225,7 +242,9 @@ class AttentionMechanism(nn.Module):
 class CustomTransformerModel(nn.Module):
     """Custom transformer model for blog analysis, now optimized to use HuggingFace Transformers if available and bitsandbytes for quantization if available."""
     def __init__(self, config: ModelConfig):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.config = config
         self.use_hf = False
         self.use_bnb = False
@@ -234,8 +253,6 @@ class CustomTransformerModel(nn.Module):
             try:
                 # bitsandbytes para cuantización 8-bit
                 try:
-                    import bitsandbytes as bnb
-                    from transformers import BitsAndBytesConfig
                     bnb_config = BitsAndBytesConfig(load_in_8bit=True)
                     self.transformer = AutoModel.from_pretrained(config.model_name, quantization_config=bnb_config)
                     self.tokenizer = AutoTokenizer.from_pretrained(config.model_name)
@@ -300,7 +317,9 @@ class CustomTransformerModel(nn.Module):
 class LSTMAttentionModel(nn.Module):
     """LSTM with attention mechanism for blog analysis. Optimized con torch.compile y autocast."""
     def __init__(self, config: ModelConfig):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.config = config
         self.embedding = nn.Embedding(30000, config.hidden_size)
         self.lstm = nn.LSTM(
@@ -326,14 +345,12 @@ class LSTMAttentionModel(nn.Module):
             self.readability_regressor = nn.Linear(lstm_output_size, 1)
         # torch.compile para acelerar si está disponible
         try:
-            import torch
             if hasattr(torch, 'compile'):
                 self.forward = torch.compile(self.forward)
         except Exception:
             pass
 
     def forward(self, input_ids: torch.Tensor, attention_mask: Optional[torch.Tensor] = None) -> Dict[str, torch.Tensor]:
-        from torch.cuda.amp import autocast
         with autocast(enabled=torch.cuda.is_available()):
             embeddings = self.embedding(input_ids)
             lstm_output, (hidden, cell) = self.lstm(embeddings)
@@ -360,12 +377,15 @@ class LSTMAttentionModel(nn.Module):
 class CNNLSTMModel(nn.Module):
     """CNN-LSTM hybrid model for blog analysis. Optimized con torch.compile y autocast."""
     def __init__(self, config: ModelConfig):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.config = config
         self.embedding = nn.Embedding(30000, config.hidden_size)
         self.conv_layers = nn.ModuleList()
         for i, (filters, kernel_size) in enumerate(zip(config.cnn_filters, config.cnn_kernel_sizes)):
-            in_channels = config.hidden_size if i == 0 else config.cnn_filters[i-1]
+            in_channels = config.hidden_size match i:
+    case 0 else config.cnn_filters[i-1]
             conv = nn.Conv1d(in_channels, filters, kernel_size, padding=kernel_size//2)
             self.conv_layers.append(conv)
         lstm_input_size = config.cnn_filters[-1]
@@ -392,14 +412,12 @@ class CNNLSTMModel(nn.Module):
             self.readability_regressor = nn.Linear(lstm_output_size, 1)
         # torch.compile para acelerar si está disponible
         try:
-            import torch
             if hasattr(torch, 'compile'):
                 self.forward = torch.compile(self.forward)
         except Exception:
             pass
 
     def forward(self, input_ids: torch.Tensor, attention_mask: Optional[torch.Tensor] = None) -> Dict[str, torch.Tensor]:
-        from torch.cuda.amp import autocast
         with autocast(enabled=torch.cuda.is_available()):
             embeddings = self.embedding(input_ids)
             # Conv1d espera (batch, channels, seq_len)
@@ -483,7 +501,9 @@ class MultiTaskTransformerModel(nn.Module):
     """Multi-task transformer model wrapper."""
     
     def __init__(self, base_model: nn.Module, config: ModelConfig):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.base_model = base_model
         self.config = config
         
@@ -511,7 +531,9 @@ class DeepLearningTrainer:
     """Advanced trainer for deep learning models."""
     
     def __init__(self, config: ModelConfig, model: nn.Module, tokenizer=None):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.model = model
         self.tokenizer = tokenizer
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -540,13 +562,13 @@ class DeepLearningTrainer:
         
         logger.info(f"Trainer initialized on device: {self.device}")
     
-    def _setup_distributed_training(self):
+    def _setup_distributed_training(self) -> Any:
         """Setup distributed training."""
         if torch.cuda.device_count() > 1:
             self.model = DataParallel(self.model)
             logger.info(f"Using DataParallel with {torch.cuda.device_count()} GPUs")
     
-    def _setup_optimizer_and_scheduler(self):
+    def _setup_optimizer_and_scheduler(self) -> Any:
         """Setup optimizer and learning rate scheduler."""
         # Optimizer
         no_decay = ['bias', 'LayerNorm.weight']
@@ -801,5 +823,6 @@ def main():
     print("\n✅ Deep learning model training completed!")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

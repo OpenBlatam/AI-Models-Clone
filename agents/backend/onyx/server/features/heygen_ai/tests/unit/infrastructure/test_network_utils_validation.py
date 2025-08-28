@@ -1,7 +1,7 @@
 import types
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 def test_is_valid_hostname_various_cases():
@@ -17,7 +17,7 @@ def test_is_valid_hostname_various_cases():
 @pytest.mark.asyncio
 async def test_get_dns_records_error(monkeypatch):
     import socket as std_socket
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
 
     # Make resolver.resolve raise
     class FakeResolver:
@@ -31,6 +31,7 @@ async def test_get_dns_records_error(monkeypatch):
     assert info.is_resolution_successful is False
     assert info.resolved_addresses == []
     assert info.error_message is not None
+
 
 
 

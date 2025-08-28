@@ -1,15 +1,19 @@
-"""
-Security Testing Framework
-
-Provides security testing and penetration testing capabilities.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import requests
 import time
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel, Field, validator
 import asyncio
 import aiohttp
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Security Testing Framework
+
+Provides security testing and penetration testing capabilities.
+"""
+
 
 class SecurityTestRequest(BaseModel):
     """Pydantic model for security test request."""
@@ -18,7 +22,7 @@ class SecurityTestRequest(BaseModel):
     test_types: List[str] = Field(default_factory=lambda: ["sql_injection", "xss"], description="Types of tests to run")
     
     @validator('base_url')
-    def validate_url(cls, v):
+    def validate_url(cls, v) -> bool:
         if not v.startswith(('http://', 'https://')):
             raise ValueError("URL must start with http:// or https://")
         return v
@@ -41,7 +45,7 @@ class PenetrationTestRequest(BaseModel):
     max_concurrent_requests: int = Field(default=10, ge=1, le=50)
     
     @validator('target_url')
-    def validate_target_url(cls, v):
+    def validate_target_url(cls, v) -> Optional[Dict[str, Any]]:
         if not v.startswith(('http://', 'https://')):
             raise ValueError("Target URL must start with http:// or https://")
         return v

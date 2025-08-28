@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import hashlib
 import secrets
 import uuid
@@ -13,6 +15,9 @@ from onyx.configs.app_configs import API_KEY_HASH_ROUNDS
 from shared_configs.configs import MULTI_TENANT
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 _API_KEY_HEADER_NAME = "Authorization"
 # NOTE for others who are curious: In the context of a header, "X-" often refers
 # to non-standard, experimental, or custom headers in HTTP or other protocols. It
@@ -35,7 +40,7 @@ class ApiKeyDescriptor(BaseModel):
     user_id: uuid.UUID
 
 
-def generate_api_key(tenant_id: str | None = None) -> str:
+async def generate_api_key(tenant_id: str | None = None) -> str:
     if not MULTI_TENANT or not tenant_id:
         return _API_KEY_PREFIX + secrets.token_urlsafe(_API_KEY_LEN)
 
@@ -43,7 +48,7 @@ def generate_api_key(tenant_id: str | None = None) -> str:
     return f"{_API_KEY_PREFIX}{encoded_tenant}.{secrets.token_urlsafe(_API_KEY_LEN)}"
 
 
-def extract_tenant_from_api_key_header(request: Request) -> str | None:
+async def extract_tenant_from_api_key_header(request: Request) -> str | None:
     """Extract tenant ID from request. Returns None if auth is disabled or invalid format."""
     raw_api_key_header = request.headers.get(
         _API_KEY_HEADER_ALTERNATIVE_NAME
@@ -67,11 +72,11 @@ def extract_tenant_from_api_key_header(request: Request) -> str | None:
     return unquote(tenant_id) if tenant_id else None
 
 
-def _deprecated_hash_api_key(api_key: str) -> str:
+async def _deprecated_hash_api_key(api_key: str) -> str:
     return sha256_crypt.hash(api_key, salt="", rounds=API_KEY_HASH_ROUNDS)
 
 
-def hash_api_key(api_key: str) -> str:
+async def hash_api_key(api_key: str) -> str:
     # NOTE: no salt is needed, as the API key is randomly generated
     # and overlaps are impossible
     if api_key.startswith(_API_KEY_PREFIX):
@@ -83,14 +88,14 @@ def hash_api_key(api_key: str) -> str:
     raise ValueError(f"Invalid API key prefix: {api_key[:3]}")
 
 
-def build_displayable_api_key(api_key: str) -> str:
+async def build_displayable_api_key(api_key: str) -> str:
     if api_key.startswith(_API_KEY_PREFIX):
         api_key = api_key[len(_API_KEY_PREFIX) :]
 
     return _API_KEY_PREFIX + api_key[:4] + "********" + api_key[-4:]
 
 
-def get_hashed_api_key_from_request(request: Request) -> str | None:
+async def get_hashed_api_key_from_request(request: Request) -> str | None:
     raw_api_key_header = request.headers.get(
         _API_KEY_HEADER_ALTERNATIVE_NAME
     ) or request.headers.get(_API_KEY_HEADER_NAME)

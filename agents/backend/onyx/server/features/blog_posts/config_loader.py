@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+import yaml
+import json
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union
+import structlog
+from configuration_management import (
+        from configuration_management import ConfigurationTemplates
+        from configuration_management import ConfigurationTemplates
+        from configuration_management import ConfigurationTemplates
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Configuration Loader Utility
 ============================
@@ -7,13 +25,6 @@ in the modular architecture system. It integrates with the configuration managem
 system and provides easy access to experiment configurations.
 """
 
-import os
-import yaml
-import json
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union
-import structlog
-from configuration_management import (
     ExperimentConfig, ModelConfig, DataConfig, TrainingConfig, EvaluationConfig,
     ConfigurationManager, EnvironmentConfigManager, ConfigurationValidator
 )
@@ -25,7 +36,9 @@ class ConfigLoader:
     """Utility class for loading and managing configuration files."""
     
     def __init__(self, config_dir: str = "configs"):
-        self.config_dir = Path(config_dir)
+        
+    """__init__ function."""
+self.config_dir = Path(config_dir)
         self.config_manager = ConfigurationManager(config_dir)
         self.env_manager = EnvironmentConfigManager(config_dir)
         self.validator = ConfigurationValidator()
@@ -301,13 +314,14 @@ class ConfigTemplateGenerator:
     """Generator for configuration templates."""
     
     def __init__(self, config_dir: str = "configs"):
-        self.config_dir = Path(config_dir)
+        
+    """__init__ function."""
+self.config_dir = Path(config_dir)
         self.config_dir.mkdir(parents=True, exist_ok=True)
         self.logger = structlog.get_logger(__name__)
     
     def generate_transformer_template(self, experiment_name: str, **kwargs) -> ExperimentConfig:
         """Generate transformer classification template."""
-        from configuration_management import ConfigurationTemplates
         
         config = ConfigurationTemplates.get_transformer_classification_template()
         config.experiment_name = experiment_name
@@ -334,7 +348,6 @@ class ConfigTemplateGenerator:
     
     def generate_cnn_template(self, experiment_name: str, **kwargs) -> ExperimentConfig:
         """Generate CNN image classification template."""
-        from configuration_management import ConfigurationTemplates
         
         config = ConfigurationTemplates.get_cnn_image_classification_template()
         config.experiment_name = experiment_name
@@ -361,7 +374,6 @@ class ConfigTemplateGenerator:
     
     def generate_diffusion_template(self, experiment_name: str, **kwargs) -> ExperimentConfig:
         """Generate diffusion model template."""
-        from configuration_management import ConfigurationTemplates
         
         config = ConfigurationTemplates.get_diffusion_generation_template()
         config.experiment_name = experiment_name
@@ -489,5 +501,6 @@ def main():
         print("Example configurations created successfully!")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

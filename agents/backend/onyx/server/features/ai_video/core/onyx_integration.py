@@ -1,10 +1,10 @@
-"""
-AI Video System - Onyx Integration
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Integration module that adapts the AI Video system to use Onyx's existing
-functions, utilities, and infrastructure for seamless operation within
-the Onyx ecosystem.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -12,8 +12,6 @@ from typing import Any, Dict, List, Optional, Union, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 import logging
-
-# Onyx imports
 from onyx.core.functions import process_document, validate_user_access, format_response, handle_error
 from onyx.utils.logger import setup_logger, OnyxLoggingAdapter
 from onyx.utils.threadpool_concurrency import ThreadSafeDict, run_functions_in_parallel, FunctionCall
@@ -30,10 +28,25 @@ from onyx.llm.interfaces import LLM
 from onyx.llm.utils import get_max_input_tokens_from_llm_provider
 from onyx.db.engine import get_session_with_current_tenant
 from onyx.db.models import Persona
-
-# Local imports
 from .exceptions import AIVideoError, PluginError, ValidationError
 from .models import VideoRequest, VideoResponse, PluginConfig
+            from onyx.llm.factory import get_llms_for_persona
+            import base64
+            from onyx.utils.threadpool_concurrency import run_with_timeout as onyx_timeout
+            from onyx.utils.threadpool_concurrency import run_in_background as onyx_background
+from typing import Any, List, Dict, Optional
+"""
+AI Video System - Onyx Integration
+
+Integration module that adapts the AI Video system to use Onyx's existing
+functions, utilities, and infrastructure for seamless operation within
+the Onyx ecosystem.
+"""
+
+
+# Onyx imports
+
+# Local imports
 
 logger = setup_logger(__name__)
 
@@ -62,7 +75,9 @@ class OnyxLogger:
     """
     
     def __init__(self, name: str = "ai_video"):
-        self.logger = setup_logger(name)
+        
+    """__init__ function."""
+self.logger = setup_logger(name)
         self.telemetry = TelemetryLogger() if OnyxIntegrationConfig().use_onyx_telemetry else None
     
     def info(self, message: str, **kwargs):
@@ -100,7 +115,7 @@ class OnyxLLMManager:
     default models, vision models, and persona-specific models.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = OnyxIntegrationConfig()
         self._llm_cache: ThreadSafeDict[str, LLM] = ThreadSafeDict()
         self.logger = OnyxLogger("ai_video.llm")
@@ -125,7 +140,6 @@ class OnyxLLMManager:
     async def get_persona_llm(self, persona: Persona, temperature: Optional[float] = None) -> LLM:
         """Get LLM configured for specific persona."""
         try:
-            from onyx.llm.factory import get_llms_for_persona
             llms = get_llms_for_persona(persona, temperature=temperature)
             return llms[0]  # Return main LLM
         except Exception as e:
@@ -152,7 +166,6 @@ class OnyxLLMManager:
         
         try:
             # Convert image to base64 or use appropriate format
-            import base64
             image_b64 = base64.b64encode(image_data).decode('utf-8')
             
             # Create vision prompt
@@ -172,7 +185,7 @@ class OnyxTaskManager:
     task management using Onyx's threadpool concurrency utilities.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = OnyxIntegrationConfig()
         self.logger = OnyxLogger("ai_video.tasks")
         self._active_tasks: ThreadSafeDict[str, Any] = ThreadSafeDict()
@@ -199,7 +212,7 @@ class OnyxTaskManager:
     
     def _wrap_async_task(self, task: Callable) -> Callable:
         """Wrap async task for sync execution."""
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             try:
                 loop = asyncio.get_event_loop()
                 if loop.is_running():
@@ -221,7 +234,6 @@ class OnyxTaskManager:
     async def run_with_timeout(self, task: Callable, timeout: float, *args, **kwargs) -> Any:
         """Run task with timeout using Onyx's timeout utilities."""
         try:
-            from onyx.utils.threadpool_concurrency import run_with_timeout as onyx_timeout
             
             result = onyx_timeout(timeout, task, *args, **kwargs)
             return result
@@ -232,7 +244,6 @@ class OnyxTaskManager:
     async def run_in_background(self, task: Callable, *args, **kwargs) -> str:
         """Run task in background using Onyx's background utilities."""
         try:
-            from onyx.utils.threadpool_concurrency import run_in_background as onyx_background
             
             task_id = f"ai_video_{int(time.time())}"
             background_task = onyx_background(task, *args, **kwargs)
@@ -252,7 +263,7 @@ class OnyxSecurityManager:
     Onyx's security utilities.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = OnyxIntegrationConfig()
         self.logger = OnyxLogger("ai_video.security")
     
@@ -312,7 +323,7 @@ class OnyxPerformanceManager:
     using Onyx's performance utilities.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = OnyxIntegrationConfig()
         self.logger = OnyxLogger("ai_video.performance")
         self._cache: ThreadSafeDict[str, Any] = ThreadSafeDict()
@@ -355,7 +366,7 @@ class OnyxPerformanceManager:
             "ttl": ttl
         }
     
-    def cache_cleanup(self):
+    def cache_cleanup(self) -> Any:
         """Clean up expired cache entries."""
         current_time = time.time()
         expired_keys = []
@@ -375,7 +386,7 @@ class OnyxRetryManager:
     Provides retry logic using Onyx's retry utilities.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = OnyxIntegrationConfig()
         self.logger = OnyxLogger("ai_video.retry")
     
@@ -386,7 +397,7 @@ class OnyxRetryManager:
         
         attempts = max_attempts or self.config.retry_attempts
         
-        def decorator(func):
+        def decorator(func) -> Any:
             return retry_wrapper(
                 func,
                 max_attempts=attempts,
@@ -404,7 +415,7 @@ class OnyxFileManager:
     Provides file operations using Onyx's file utilities.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = OnyxLogger("ai_video.files")
     
     def get_file_info(self, file_path: str) -> Dict[str, Any]:
@@ -446,7 +457,9 @@ class OnyxIntegrationManager:
     """
     
     def __init__(self, config: Optional[OnyxIntegrationConfig] = None):
-        self.config = config or OnyxIntegrationConfig()
+        
+    """__init__ function."""
+self.config = config or OnyxIntegrationConfig()
         self.logger = OnyxLogger("ai_video.integration")
         
         # Initialize managers
@@ -478,7 +491,7 @@ class OnyxIntegrationManager:
             self.logger.error(f"Onyx integration initialization failed: {e}")
             raise AIVideoError(f"Integration initialization failed: {e}")
     
-    async def process_video_request(self, request: VideoRequest) -> VideoResponse:
+    async async def process_video_request(self, request: VideoRequest) -> VideoResponse:
         """Process video request using Onyx integration."""
         try:
             # Validate access
@@ -542,9 +555,9 @@ onyx_integration = OnyxIntegrationManager()
 
 
 # Integration decorators
-def use_onyx_llm(func):
+def use_onyx_llm(func) -> Any:
     """Decorator to use Onyx LLM for function."""
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         llm = await onyx_integration.llm_manager.get_default_llm()
         return await func(*args, llm=llm, **kwargs)
     return wrapper
@@ -557,8 +570,8 @@ def use_onyx_retry(max_attempts: Optional[int] = None):
 
 def use_onyx_timing(operation_name: str):
     """Decorator to use Onyx timing for function."""
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func) -> Any:
+        def wrapper(*args, **kwargs) -> Any:
             with onyx_integration.performance_manager.time_operation(operation_name):
                 return func(*args, **kwargs)
         return wrapper

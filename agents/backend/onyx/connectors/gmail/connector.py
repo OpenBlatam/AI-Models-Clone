@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from base64 import urlsafe_b64decode
 from typing import Any
 from typing import cast
@@ -16,8 +18,6 @@ from onyx.connectors.google_utils.google_utils import execute_single_retrieval
 from onyx.connectors.google_utils.resources import get_admin_service
 from onyx.connectors.google_utils.resources import get_gmail_service
 from onyx.connectors.google_utils.shared_constants import (
-    DB_CREDENTIALS_PRIMARY_ADMIN_KEY,
-)
 from onyx.connectors.google_utils.shared_constants import MISSING_SCOPES_ERROR_STR
 from onyx.connectors.google_utils.shared_constants import ONYX_SCOPE_INSTRUCTIONS
 from onyx.connectors.google_utils.shared_constants import SLIM_BATCH_SIZE
@@ -36,6 +36,11 @@ from onyx.connectors.models import TextSection
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.logger import setup_logger
 from onyx.utils.retry_wrapper import retry_builder
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    DB_CREDENTIALS_PRIMARY_ADMIN_KEY,
+)
 
 
 logger = setup_logger()
@@ -285,7 +290,7 @@ class GmailConnector(LoadConnector, PollConnector, SlimConnector):
         except Exception:
             raise
 
-    def _fetch_threads(
+    async def _fetch_threads(
         self,
         time_range_start: SecondsSinceUnixEpoch | None = None,
         time_range_end: SecondsSinceUnixEpoch | None = None,
@@ -323,7 +328,7 @@ class GmailConnector(LoadConnector, PollConnector, SlimConnector):
         if doc_batch:
             yield doc_batch
 
-    def _fetch_slim_threads(
+    async def _fetch_slim_threads(
         self,
         time_range_start: SecondsSinceUnixEpoch | None = None,
         time_range_end: SecondsSinceUnixEpoch | None = None,
@@ -395,5 +400,6 @@ class GmailConnector(LoadConnector, PollConnector, SlimConnector):
             raise e
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pass

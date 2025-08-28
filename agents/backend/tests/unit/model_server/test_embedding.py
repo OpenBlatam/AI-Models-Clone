@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import time
 from collections.abc import AsyncGenerator
@@ -20,8 +22,10 @@ from shared_configs.enums import EmbedTextType
 from shared_configs.model_server_models import EmbedRequest
 
 
+from typing import Any, List, Dict, Optional
+import logging
 @pytest.fixture
-async def mock_http_client() -> AsyncGenerator[AsyncMock, None]:
+async async def mock_http_client() -> AsyncGenerator[AsyncMock, None]:
     with patch("httpx.AsyncClient") as mock:
         client = AsyncMock(spec=AsyncClient)
         mock.return_value = client

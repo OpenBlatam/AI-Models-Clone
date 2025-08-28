@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from sqlalchemy import text
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add composite index for index attempt time updated
 
 Revision ID: 369644546676
@@ -6,12 +13,10 @@ Create Date: 2025-01-08 15:38:17.224380
 
 """
 
-from alembic import op
-from sqlalchemy import text
 
 # revision identifiers, used by Alembic.
-revision = "369644546676"
-down_revision = "2955778aa44c"
+revision: str = "369644546676"
+down_revision: str = "2955778aa44c"
 branch_labels: None = None
 depends_on: None = None
 
@@ -32,5 +37,5 @@ def upgrade() -> None:
 def downgrade() -> None:
     op.drop_index(
         "ix_index_attempt_ccpair_search_settings_time_updated",
-        table_name="index_attempt",
+        table_name: str = "index_attempt",
     )

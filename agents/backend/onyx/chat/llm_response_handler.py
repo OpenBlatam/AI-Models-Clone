@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from collections.abc import Generator
 from collections.abc import Iterator
@@ -10,9 +12,12 @@ from onyx.chat.models import StreamStopReason
 from onyx.chat.prompt_builder.answer_prompt_builder import LLMCall
 from onyx.chat.stream_processing.answer_response_handler import AnswerResponseHandler
 from onyx.chat.stream_processing.answer_response_handler import (
+from onyx.chat.tool_handling.tool_response_handler import ToolResponseHandler
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     DummyAnswerResponseHandler,
 )
-from onyx.chat.tool_handling.tool_response_handler import ToolResponseHandler
 
 
 # This is Legacy code that is not used anymore.
@@ -33,7 +38,9 @@ class LLMResponseHandlerManager:
         answer_handler: AnswerResponseHandler | None,
         is_cancelled: Callable[[], bool],
     ):
-        self.tool_handler = tool_handler or ToolResponseHandler([])
+        
+    """__init__ function."""
+self.tool_handler = tool_handler or ToolResponseHandler([])
         self.answer_handler = answer_handler or DummyAnswerResponseHandler()
         self.is_cancelled = is_cancelled
 

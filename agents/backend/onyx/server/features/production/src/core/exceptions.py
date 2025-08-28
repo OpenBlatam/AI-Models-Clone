@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, Dict, Optional, List
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚨 Custom Exception Classes
 ==========================
@@ -6,8 +13,6 @@ Production-grade exception handling with proper error codes,
 messages, and context information.
 """
 
-from typing import Any, Dict, Optional, List
-from enum import Enum
 
 
 class ErrorCode(Enum):
@@ -51,7 +56,9 @@ class BaseException(Exception):
         details: Optional[Dict[str, Any]] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        super().__init__(message)
+        
+    """__init__ function."""
+super().__init__(message)
         self.message = message
         self.code = code
         self.details = details or {}
@@ -80,7 +87,9 @@ class BusinessException(BaseException):
         details: Optional[Dict[str, Any]] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        super().__init__(message, code, details, context)
+        
+    """__init__ function."""
+super().__init__(message, code, details, context)
 
 
 class ValidationException(BaseException):
@@ -93,7 +102,9 @@ class ValidationException(BaseException):
         details: Optional[Dict[str, Any]] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message,
             ErrorCode.VALIDATION_ERROR,
             details or {"field_errors": field_errors or []},
@@ -112,7 +123,9 @@ class NotFoundException(BaseException):
         message: Optional[str] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        if message is None:
+        
+    """__init__ function."""
+if message is None:
             message = f"{resource} not found"
             if resource_id:
                 message += f" with id: {resource_id}"
@@ -134,7 +147,9 @@ class UnauthorizedException(BaseException):
         required_permissions: Optional[List[str]] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message,
             ErrorCode.UNAUTHORIZED,
             {"required_permissions": required_permissions or []},
@@ -151,7 +166,9 @@ class ForbiddenException(BaseException):
         required_permissions: Optional[List[str]] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message,
             ErrorCode.FORBIDDEN,
             {"required_permissions": required_permissions or []},
@@ -169,7 +186,9 @@ class RateLimitException(BaseException):
         limit: Optional[int] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             message,
             ErrorCode.RATE_LIMITED,
             {
@@ -189,7 +208,9 @@ class InsufficientCreditsException(BusinessException):
         available_credits: int,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Insufficient credits. Required: {required_credits}, Available: {available_credits}"
+        
+    """__init__ function."""
+message = f"Insufficient credits. Required: {required_credits}, Available: {available_credits}"
         super().__init__(
             message,
             ErrorCode.INSUFFICIENT_CREDITS,
@@ -210,7 +231,9 @@ class ContentTooLongException(BusinessException):
         max_length: int,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Content too long. Length: {content_length}, Max: {max_length}"
+        
+    """__init__ function."""
+message = f"Content too long. Length: {content_length}, Max: {max_length}"
         super().__init__(
             message,
             ErrorCode.CONTENT_TOO_LONG,
@@ -231,7 +254,9 @@ class InvalidPromptException(BusinessException):
         reason: str,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Invalid prompt: {reason}"
+        
+    """__init__ function."""
+message = f"Invalid prompt: {reason}"
         super().__init__(
             message,
             ErrorCode.INVALID_PROMPT,
@@ -253,7 +278,9 @@ class AIServiceUnavailableException(BusinessException):
         retry_after: Optional[int] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"AI service '{service_name}' is unavailable"
+        
+    """__init__ function."""
+message = f"AI service '{service_name}' is unavailable"
         if reason:
             message += f": {reason}"
         
@@ -279,7 +306,9 @@ class ProcessingFailedException(BusinessException):
         retryable: bool = False,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Processing failed for '{operation}': {reason}"
+        
+    """__init__ function."""
+message = f"Processing failed for '{operation}': {reason}"
         super().__init__(
             message,
             ErrorCode.PROCESSING_FAILED,
@@ -302,7 +331,9 @@ class DatabaseException(BaseException):
         reason: Optional[str] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Database error during {operation}"
+        
+    """__init__ function."""
+message = f"Database error during {operation}"
         if table:
             message += f" on table '{table}'"
         if reason:
@@ -330,7 +361,9 @@ class CacheException(BaseException):
         reason: Optional[str] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Cache error during {operation}"
+        
+    """__init__ function."""
+message = f"Cache error during {operation}"
         if key:
             message += f" for key '{key}'"
         if reason:
@@ -359,7 +392,9 @@ class ExternalAPIException(BaseException):
         response: Optional[str] = None,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"External API error for {service} at {endpoint}"
+        
+    """__init__ function."""
+message = f"External API error for {service} at {endpoint}"
         if status_code:
             message += f" (Status: {status_code})"
         
@@ -385,7 +420,9 @@ class ConfigurationException(BaseException):
         reason: str,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Configuration error for '{config_key}': {reason}"
+        
+    """__init__ function."""
+message = f"Configuration error for '{config_key}': {reason}"
         super().__init__(
             message,
             ErrorCode.CONFIGURATION_ERROR,
@@ -406,7 +443,9 @@ class ModelLoadingException(BaseException):
         reason: str,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Failed to load model '{model_name}': {reason}"
+        
+    """__init__ function."""
+message = f"Failed to load model '{model_name}': {reason}"
         super().__init__(
             message,
             ErrorCode.MODEL_LOADING_FAILED,
@@ -428,7 +467,9 @@ class InferenceException(BaseException):
         reason: str = "Inference failed",
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Inference failed for model '{model_name}': {reason}"
+        
+    """__init__ function."""
+message = f"Inference failed for model '{model_name}': {reason}"
         super().__init__(
             message,
             ErrorCode.INFERENCE_FAILED,
@@ -451,7 +492,9 @@ class TokenLimitException(BaseException):
         max_tokens: int,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Token limit exceeded for model '{model_name}'. Input: {input_tokens}, Max: {max_tokens}"
+        
+    """__init__ function."""
+message = f"Token limit exceeded for model '{model_name}'. Input: {input_tokens}, Max: {max_tokens}"
         super().__init__(
             message,
             ErrorCode.TOKEN_LIMIT_EXCEEDED,
@@ -473,7 +516,9 @@ class ContentFilteredException(BaseException):
         filter_reason: str,
         context: Optional[Dict[str, Any]] = None
     ):
-        message = f"Content was filtered: {filter_reason}"
+        
+    """__init__ function."""
+message = f"Content was filtered: {filter_reason}"
         super().__init__(
             message,
             ErrorCode.CONTENT_FILTERED,

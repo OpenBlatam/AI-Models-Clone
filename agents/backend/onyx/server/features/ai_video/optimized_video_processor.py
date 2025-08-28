@@ -1,9 +1,7 @@
-#!/usr/bin/env python3
-"""
-Optimized Video Processing System
-
-Advanced video processing with multiple optimization libraries.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import torch
 import torch.nn as nn
@@ -18,10 +16,18 @@ import time
 import json
 from concurrent.futures import ThreadPoolExecutor
 import threading
+    from advanced_optimization_libs import AdvancedOptimizer, OptimizationConfig
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Optimized Video Processing System
+
+Advanced video processing with multiple optimization libraries.
+"""
+
 
 # Import optimization libraries
 try:
-    from advanced_optimization_libs import AdvancedOptimizer, OptimizationConfig
     OPTIMIZATION_AVAILABLE = True
 except ImportError:
     OPTIMIZATION_AVAILABLE = False
@@ -48,8 +54,14 @@ class OptimizedVideoProcessor:
     """Advanced video processor with optimization features."""
     
     def __init__(self, config: VideoConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.device = torch.device('cuda' if torch.cuda.is_available() and config.use_gpu else 'cpu')
+        # Performance setup
+        from .utils.perf_utils import setup_torch_cuda_hints, enable_opencv_optimizations
+        setup_torch_cuda_hints(self.config.num_workers)
+        enable_opencv_optimizations(self.config.num_workers)
         
         # Initialize optimization system
         if OPTIMIZATION_AVAILABLE and config.enable_optimization:
@@ -78,6 +90,10 @@ class OptimizedVideoProcessor:
                 logger.error(f"Failed to open video: {self.config.input_path}")
                 return False
             
+            # Attempt low-latency buffering and HW acceleration where supported
+            from .utils.perf_utils import try_enable_low_latency_capture
+            try_enable_low_latency_capture(self.cap)
+
             self.total_frames = int(self.cap.get(cv2.CAP_PROP_FRAME_COUNT))
             fps = self.cap.get(cv2.CAP_PROP_FPS)
             width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
@@ -104,6 +120,10 @@ class OptimizedVideoProcessor:
         """Preprocess frame with optimization."""
         start_time = time.time()
         
+        # Ensure contiguous memory for downstream ops
+        from .utils.perf_utils import ensure_c_contiguous
+        frame = ensure_c_contiguous(frame)
+
         # Resize frame
         frame = cv2.resize(frame, self.config.target_resolution)
         
@@ -125,7 +145,10 @@ class OptimizedVideoProcessor:
             return []
         
         # Convert to tensor for batch processing
-        frames_tensor = torch.stack([torch.from_numpy(f) for f in frames]).to(self.device)
+        with torch.inference_mode():
+            from .utils.perf_utils import to_device_batch
+            frames_tensor = torch.stack([torch.from_numpy(f) for f in frames])
+            frames_tensor = to_device_batch(frames_tensor, self.device)
         
         # Apply batch processing optimizations
         if self.optimizer:
@@ -134,8 +157,10 @@ class OptimizedVideoProcessor:
             optimized_frames = self.optimizer.optimize_pipeline(frames_float.cpu().numpy())
             frames_tensor = torch.from_numpy(optimized_frames * 255).to(self.device)
         
-        # Convert back to numpy
-        processed_frames = [f.cpu().numpy().astype(np.uint8) for f in frames_tensor]
+        # Convert back to numpy and clamp to valid range
+        processed_frames = [
+            np.clip(f.cpu().numpy(), 0, 255).astype(np.uint8) for f in frames_tensor
+        ]
         
         return processed_frames
     
@@ -163,6 +188,10 @@ class OptimizedVideoProcessor:
         try:
             while True:
                 ret, frame = self.cap.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 if not ret:
                     break
                 
@@ -182,6 +211,10 @@ class OptimizedVideoProcessor:
                     # Write processed frames
                     for processed_frame in batch_processed:
                         self.writer.write(processed_frame)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         frame_count += 1
                     
                     batch_frames = []
@@ -196,6 +229,10 @@ class OptimizedVideoProcessor:
                 batch_processed = self.process_frame_batch(batch_frames)
                 for processed_frame in batch_processed:
                     self.writer.write(processed_frame)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     frame_count += 1
             
             logger.info(f"Video processing completed. Processed {frame_count} frames.")
@@ -231,6 +268,10 @@ class OptimizedVideoProcessor:
             
             while True:
                 ret, frame = self.cap.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 if not ret:
                     break
                 
@@ -246,6 +287,10 @@ class OptimizedVideoProcessor:
                     for processed_frame in processed_frames:
                         enhanced_frame = self.apply_ai_enhancement(processed_frame)
                         self.writer.write(enhanced_frame)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         frame_count += 1
                     
                     tasks = []
@@ -261,6 +306,10 @@ class OptimizedVideoProcessor:
                 for processed_frame in processed_frames:
                     enhanced_frame = self.apply_ai_enhancement(processed_frame)
                     self.writer.write(enhanced_frame)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     frame_count += 1
             
             logger.info(f"Async video processing completed. Processed {frame_count} frames.")
@@ -288,7 +337,7 @@ class OptimizedVideoProcessor:
             'fps_achieved': len(self.processing_times) / np.sum(self.processing_times)
         }
     
-    def cleanup(self):
+    def cleanup(self) -> Any:
         """Cleanup resources."""
         if self.cap:
             self.cap.release()
@@ -303,7 +352,9 @@ class OptimizedVideoWorkflow:
     """Complete optimized video workflow."""
     
     def __init__(self, config: VideoConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.processor = OptimizedVideoProcessor(config)
         self.results = {}
     
@@ -344,6 +395,10 @@ class OptimizedVideoWorkflow:
         """Save workflow results to file."""
         try:
             with open(output_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(self.results, f, indent=2, default=str)
             logger.info(f"Results saved to {output_path}")
         except Exception as e:
@@ -367,6 +422,10 @@ def create_sample_video(output_path: str, duration: int = 10, fps: int = 30):
         cv2.putText(frame, f"Frame {i}", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
         
         out.write(frame)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     
     out.release()
     logger.info(f"Sample video created: {output_path}")
@@ -410,5 +469,6 @@ def main():
     
     logger.info("Optimized Video Processing Demo completed")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

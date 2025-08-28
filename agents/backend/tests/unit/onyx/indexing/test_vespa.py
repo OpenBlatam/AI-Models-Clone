@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from http import HTTPStatus
 from typing import Any
 
@@ -10,6 +12,9 @@ from onyx.document_index.document_index_utils import get_both_index_properties
 from onyx.document_index.vespa_constants import DOCUMENT_ID_ENDPOINT
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.mark.skip()
 def test_vespa_update() -> None:
     """This Test exercises some ambiguous Vespa behavior and
@@ -21,7 +26,7 @@ def test_vespa_update() -> None:
     with Session(get_sqlalchemy_engine()) as db_session:
         primary_index_name, _, _, _ = get_both_index_properties(db_session)
         endpoint = (
-            f"{DOCUMENT_ID_ENDPOINT.format(index_name=primary_index_name)}/{doc_id}"
+            f"f"{DOCUMENT_ID_ENDPOINT"}/{doc_id}"
         )
         with httpx.Client(http2=True) as http_client:
             payload: dict[str, Any] = {}

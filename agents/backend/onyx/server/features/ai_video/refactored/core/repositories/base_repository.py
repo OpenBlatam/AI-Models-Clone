@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
+from uuid import UUID
+from pydantic import BaseModel
+from ..entities.base import Entity
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Base Repository Interface
 ========================
@@ -5,13 +18,8 @@ Base Repository Interface
 Base repository interface defining common operations for all repositories.
 """
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Generic, List, Optional, TypeVar, Union
-from uuid import UUID
 
-from pydantic import BaseModel
 
-from ..entities.base import Entity
 
 T = TypeVar("T", bound=Entity)
 
@@ -341,7 +349,7 @@ class BaseRepository(ABC, Generic[T]):
             # to know how to create the specific entity type
             raise NotImplementedError("update_or_create not implemented")
     
-    async def transaction(self):
+    async def transaction(self) -> Any:
         """
         Get transaction context manager.
         
@@ -361,11 +369,11 @@ class BaseRepository(ABC, Generic[T]):
         """
         pass
     
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Async context manager entry."""
         return self
     
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
         """Async context manager exit."""
         await self.close()
 

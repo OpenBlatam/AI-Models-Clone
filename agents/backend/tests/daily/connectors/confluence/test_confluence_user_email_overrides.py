@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import types
 from unittest.mock import patch
 
@@ -6,6 +8,9 @@ from onyx.connectors.confluence.onyx_confluence import OnyxConfluence
 from onyx.connectors.interfaces import CredentialsProviderInterface
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class MockCredentialsProvider(CredentialsProviderInterface):
     def get_tenant_id(self) -> str:
         return "test_tenant"

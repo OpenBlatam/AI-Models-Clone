@@ -1,10 +1,5 @@
-"""
-Base Router with Common Dependencies
-
-This module provides the base router with shared dependencies,
-middleware, and common functionality used across all route modules.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Optional, Dict, Any
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -12,9 +7,20 @@ from contextvars import ContextVar
 import logging
 import time
 from datetime import datetime
+from ..dependencies import (
+from ..schemas.base import BaseResponse, ErrorResponse
+from ..utils.logging import get_logger
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Base Router with Common Dependencies
+
+This module provides the base router with shared dependencies,
+middleware, and common functionality used across all route modules.
+"""
+
 
 # Import shared dependencies and utilities
-from ..dependencies import (
     get_current_user,
     get_db_session,
     get_cache_manager,
@@ -22,8 +28,6 @@ from ..dependencies import (
     get_error_monitor,
     get_async_io_manager
 )
-from ..schemas.base import BaseResponse, ErrorResponse
-from ..utils.logging import get_logger
 
 # Initialize router
 router = APIRouter(prefix="/api/v1", tags=["base"])
@@ -179,7 +183,7 @@ async def status_check(context: Dict[str, Any] = Depends(get_request_context)):
 
 # Error handlers
 @router.exception_handler(HTTPException)
-async def http_exception_handler(request, exc):
+async async def http_exception_handler(request, exc) -> Any:
     """Global HTTP exception handler."""
     logger.error(f"HTTP Exception: {exc.status_code} - {exc.detail}")
     return ErrorResponse(
@@ -189,7 +193,7 @@ async def http_exception_handler(request, exc):
     )
 
 @router.exception_handler(Exception)
-async def general_exception_handler(request, exc):
+async def general_exception_handler(request, exc) -> Any:
     """Global exception handler for unexpected errors."""
     logger.error(f"Unexpected error: {exc}", exc_info=True)
     return ErrorResponse(

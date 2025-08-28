@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 import time
 from datetime import datetime
 from datetime import timedelta
@@ -27,8 +35,6 @@ from ee.onyx.db.document import upsert_document_external_perms
 from ee.onyx.external_permissions.sync_params import DOC_PERMISSION_SYNC_PERIODS
 from ee.onyx.external_permissions.sync_params import DOC_PERMISSIONS_FUNC_MAP
 from ee.onyx.external_permissions.sync_params import (
-    DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION,
-)
 from onyx.access.models import DocExternalAccess
 from onyx.background.celery.apps.app_base import task_logger
 from onyx.background.celery.celery_redis import celery_find_task
@@ -78,6 +84,11 @@ from onyx.utils.logger import LoggerContextVars
 from onyx.utils.logger import setup_logger
 from onyx.utils.telemetry import optional_telemetry
 from onyx.utils.telemetry import RecordType
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION,
+)
 
 logger = setup_logger()
 
@@ -118,6 +129,11 @@ def _is_external_doc_permissions_sync_due(cc_pair: ConnectorCredentialPair) -> b
     source_sync_period *= int(OnyxRuntime.get_doc_permission_sync_multiplier())
 
     # If the last sync is greater than the full fetch period, we run the sync
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     next_sync = last_perm_sync + timedelta(seconds=source_sync_period)
     if datetime.now(timezone.utc) >= next_sync:
         return True
@@ -176,6 +192,11 @@ def check_for_doc_permissions_sync(self: Task, *, tenant_id: str) -> bool | None
         if not r.exists(OnyxRedisSignals.BLOCK_VALIDATE_PERMISSION_SYNC_FENCES):
             # clear any permission fences that don't have associated celery tasks in progress
             # tasks can be in the queue in redis, in reserved tasks (prefetched by the worker),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             # or be currently executing
             try:
                 validate_permission_sync_fences(
@@ -286,6 +307,11 @@ def try_creating_permissions_sync_task(
         redis_connector.permissions.set_fence(payload)
 
         result = app.send_task(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             OnyxCeleryTask.CONNECTOR_PERMISSION_SYNC_GENERATOR_TASK,
             kwargs=dict(
                 cc_pair_id=cc_pair_id,
@@ -325,7 +351,7 @@ def try_creating_permissions_sync_task(
     trail=False,
     bind=True,
 )
-def connector_permission_sync_generator_task(
+async def connector_permission_sync_generator_task(
     self: Task,
     cc_pair_id: int,
     tenant_id: str,
@@ -342,6 +368,11 @@ def connector_permission_sync_generator_task(
     doc_permission_sync_ctx_dict = doc_permission_sync_ctx.get()
     doc_permission_sync_ctx_dict["cc_pair_id"] = cc_pair_id
     doc_permission_sync_ctx_dict["request_id"] = self.request.id
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     doc_permission_sync_ctx.set(doc_permission_sync_ctx_dict)
 
     redis_connector = RedisConnector(tenant_id, cc_pair_id)
@@ -350,6 +381,11 @@ def connector_permission_sync_generator_task(
 
     # this wait is needed to avoid a race condition where
     # the primary worker sends the task and it is immediately executed
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     # before the primary worker can finalize the fence
     start = time.monotonic()
     while True:
@@ -458,10 +494,20 @@ def connector_permission_sync_generator_task(
             callback = PermissionSyncCallback(redis_connector, lock, r)
 
             # pass in the capability to fetch all existing docs for the cc_pair
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             # this is can be used to determine documents that are "missing" and thus
             # should no longer be accessible. The decision as to whether we should find
             # every document during the doc sync process is connector-specific.
-            def fetch_all_existing_docs_fn() -> list[str]:
+            async async def fetch_all_existing_docs_fn() -> list[str]:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
                 return get_document_ids_for_connector_credential_pair(
                     db_session=db_session,
                     connector_id=cc_pair.connector.id,
@@ -470,6 +516,11 @@ def connector_permission_sync_generator_task(
 
             document_external_accesses = doc_sync_func(
                 cc_pair, fetch_all_existing_docs_fn, callback
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             )
 
             task_logger.info(
@@ -585,6 +636,11 @@ def document_update_permissions(
 
 
 # NOTE(rkuo): Deprecating this due to degenerate behavior in Redis from sending
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 # large permissions through celery (over 1MB in size)
 # @shared_task(
 #     name=OnyxCeleryTask.UPDATE_EXTERNAL_DOCUMENT_PERMISSIONS_TASK,
@@ -733,6 +789,11 @@ def validate_permission_sync_fence(
     1. This function renews the active signal with a 5 minute TTL under the following conditions
     1.2. When the task is seen in the redis queue
     1.3. When the task is seen in the reserved / prefetched list
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     2. Externally, the active signal is renewed when:
     2.1. The fence is created
@@ -745,10 +806,20 @@ def validate_permission_sync_fence(
     whether a task is in the queue or currently executing.
     1. An unknown task id is always returned as state PENDING.
     2. Redis can be inspected for the task id, but the task id is gone between the time a worker receives the task
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     and the time it actually starts on the worker.
 
     queued_tasks: the celery queue of lightweight permission sync tasks
     reserved_tasks: prefetched tasks for sync task generator
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     """
     # if the fence doesn't exist, there's nothing to do
     fence_key = key_bytes.decode("utf-8")
@@ -804,6 +875,11 @@ def validate_permission_sync_fence(
 
     if payload.celery_task_id in reserved_tasks:
         # the celery task was prefetched and is reserved within a worker
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         redis_connector.permissions.set_active()
         return
 
@@ -877,8 +953,10 @@ class PermissionSyncCallback(IndexingHeartbeatInterface):
         redis_connector: RedisConnector,
         redis_lock: RedisLock,
         redis_client: Redis,
-    ):
-        super().__init__()
+    ) -> Any:
+        
+    """__init__ function."""
+super().__init__()
         self.redis_connector: RedisConnector = redis_connector
         self.redis_lock: RedisLock = redis_lock
         self.redis_client = redis_client

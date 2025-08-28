@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any, Literal
 from onyx.db.engine import get_iam_auth_token
 from onyx.configs.app_configs import USE_IAM_AUTH
@@ -26,6 +28,7 @@ from onyx.db.models import Base
 from celery.backends.database.session import ResultModelBase  # type: ignore
 from onyx.db.engine import SqlEngine
 
+from typing import Any, List, Dict, Optional
 # Make sure in alembic.ini [logger_root] level=INFO is set or most logging will be
 # hidden! (defaults to level=WARN)
 
@@ -37,9 +40,9 @@ if config.config_file_name is not None and config.attributes.get(
 ):
     fileConfig(config.config_file_name)
 
-target_metadata = [Base.metadata, ResultModelBase.metadata]
+target_metadata: List[Any] = [Base.metadata, ResultModelBase.metadata]
 
-EXCLUDE_TABLES = {"kombu_queue", "kombu_message"}
+EXCLUDE_TABLES: Dict[str, Any] = {"kombu_queue", "kombu_message"}
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +74,7 @@ def include_object(
 
 def get_schema_options() -> tuple[str, bool, bool, bool]:
     x_args_raw = context.get_x_argument()
-    x_args = {}
+    x_args: Dict[str, Any] = {}
     for arg in x_args_raw:
         for pair in arg.split(","):
             if "=" in pair:
@@ -167,12 +170,12 @@ async def run_async_migrations() -> None:
     if upgrade_all_tenants:
         tenant_schemas = get_all_tenant_ids()
 
-        i_tenant = 0
+        i_tenant: int = 0
         num_tenants = len(tenant_schemas)
         for schema in tenant_schemas:
             i_tenant += 1
             logger.info(
-                f"Migrating schema: index={i_tenant} num_tenants={num_tenants} schema={schema}"
+                f"Migrating schema: index: Dict[str, Any] = {i_tenant} num_tenants={num_tenants} schema={schema}"
             )
             try:
                 async with engine.connect() as connection:
@@ -248,7 +251,7 @@ def run_migrations_offline() -> None:
                 version_table_schema=schema,
                 include_schemas=True,
                 script_location=config.get_main_option("script_location"),
-                dialect_opts={"paramstyle": "named"},
+                dialect_opts: Dict[str, Any] = {"paramstyle": "named"},
             )
 
             with context.begin_transaction():
@@ -263,7 +266,7 @@ def run_migrations_offline() -> None:
             version_table_schema=schema_name,
             include_schemas=True,
             script_location=config.get_main_option("script_location"),
-            dialect_opts={"paramstyle": "named"},
+            dialect_opts: Dict[str, Any] = {"paramstyle": "named"},
         )
 
         with context.begin_transaction():

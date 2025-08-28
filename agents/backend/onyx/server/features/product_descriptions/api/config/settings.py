@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+from typing import Optional, List, Dict, Any
+from functools import lru_cache
+from pydantic import BaseSettings, Field, validator
+from pydantic.networks import RedisDsn, PostgresDsn
+import os
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Application Settings - Centralized Configuration
 ===============================================
@@ -6,12 +28,6 @@ Environment-based configuration using Pydantic Settings v2
 with validation, type safety, and environment variable support.
 """
 
-from typing import Optional, List, Dict, Any
-from functools import lru_cache
-from pydantic import BaseSettings, Field, validator
-from pydantic.networks import RedisDsn, PostgresDsn
-import os
-from enum import Enum
 
 
 class Environment(str, Enum):
@@ -208,13 +224,14 @@ class Settings(BaseSettings):
     api: APISettings = APISettings()
     ai: AISettings = AISettings()
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
         
     @validator('environment', pre=True)
-    def validate_environment(cls, v):
+    def validate_environment(cls, v) -> bool:
         if isinstance(v, str):
             return v.lower()
         return v

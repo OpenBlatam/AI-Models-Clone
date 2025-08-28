@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from typing import cast
 
@@ -7,45 +9,48 @@ from langchain_core.runnables.config import RunnableConfig
 from langgraph.types import StreamWriter
 
 from onyx.agents.agent_search.deep_search.shared.expanded_retrieval.operations import (
-    dispatch_subquery,
-)
 from onyx.agents.agent_search.deep_search.shared.expanded_retrieval.states import (
-    ExpandedRetrievalInput,
-)
 from onyx.agents.agent_search.deep_search.shared.expanded_retrieval.states import (
-    QueryExpansionUpdate,
-)
 from onyx.agents.agent_search.models import GraphConfig
 from onyx.agents.agent_search.shared_graph_utils.constants import (
-    AGENT_LLM_RATELIMIT_MESSAGE,
-)
 from onyx.agents.agent_search.shared_graph_utils.constants import (
-    AGENT_LLM_TIMEOUT_MESSAGE,
-)
 from onyx.agents.agent_search.shared_graph_utils.constants import (
-    AgentLLMErrorType,
-)
 from onyx.agents.agent_search.shared_graph_utils.models import AgentErrorLog
 from onyx.agents.agent_search.shared_graph_utils.models import BaseMessage_Content
 from onyx.agents.agent_search.shared_graph_utils.models import LLMNodeErrorStrings
 from onyx.agents.agent_search.shared_graph_utils.utils import dispatch_separated
 from onyx.agents.agent_search.shared_graph_utils.utils import (
-    get_langgraph_node_log_string,
-)
 from onyx.agents.agent_search.shared_graph_utils.utils import parse_question_id
 from onyx.configs.agent_configs import AGENT_MAX_TOKENS_SUBQUERY_GENERATION
 from onyx.configs.agent_configs import (
-    AGENT_TIMEOUT_CONNECT_LLM_QUERY_REWRITING_GENERATION,
-)
 from onyx.configs.agent_configs import AGENT_TIMEOUT_LLM_QUERY_REWRITING_GENERATION
 from onyx.llm.chat_llm import LLMRateLimitError
 from onyx.llm.chat_llm import LLMTimeoutError
 from onyx.prompts.agent_search import (
-    QUERY_REWRITING_PROMPT,
-)
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
 from onyx.utils.timing import log_function_time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    dispatch_subquery,
+)
+    ExpandedRetrievalInput,
+)
+    QueryExpansionUpdate,
+)
+    AGENT_LLM_RATELIMIT_MESSAGE,
+)
+    AGENT_LLM_TIMEOUT_MESSAGE,
+)
+    AgentLLMErrorType,
+)
+    get_langgraph_node_log_string,
+)
+    AGENT_TIMEOUT_CONNECT_LLM_QUERY_REWRITING_GENERATION,
+)
+    QUERY_REWRITING_PROMPT,
+)
 
 logger = setup_logger()
 
@@ -68,7 +73,7 @@ def expand_queries(
     # Sometimes we want to expand the original question, sometimes we want to expand a sub-question.
     # When we are running this node on the original question, no question is explictly passed in.
     # Instead, we use the original question from the search request.
-    graph_config = cast(GraphConfig, config["metadata"]["config"])
+    graph_config = cast(GraphConfig, config["metadata"]["config"f"])
     node_start_time = datetime.now()
     question = state.question
 
@@ -81,7 +86,7 @@ def expand_queries(
 
     msg = [
         HumanMessage(
-            content=QUERY_REWRITING_PROMPT.format(question=question),
+            content=QUERY_REWRITING_PROMPT",
         )
     ]
 

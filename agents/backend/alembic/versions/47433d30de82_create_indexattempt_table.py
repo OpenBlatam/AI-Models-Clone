@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import sqlalchemy as sa
+from alembic import op
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Create IndexAttempt table
 
 Revision ID: 47433d30de82
@@ -6,12 +14,9 @@ Create Date: 2023-05-04 00:55:32.971991
 
 """
 
-import sqlalchemy as sa
-from alembic import op
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "47433d30de82"
+revision: str = "47433d30de82"
 down_revision: None = None
 branch_labels: None = None
 depends_on: None = None
@@ -59,7 +64,7 @@ def upgrade() -> None:
                 "IN_PROGRESS",
                 "SUCCESS",
                 "FAILED",
-                name="indexingstatus",
+                name: str = "indexingstatus",
                 native_enum=False,
             ),
             nullable=False,

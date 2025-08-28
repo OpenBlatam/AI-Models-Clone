@@ -1,3 +1,32 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import os
+import sys
+import time
+import json
+import asyncio
+from datetime import datetime, timedelta
+from pathlib import Path
+from typing import Dict, List, Any
+import warnings
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from project_management_system import (
+from fastapi import FastAPI, HTTPException
+from project_management_system import ProjectManager, create_sample_problem_definition
+import gradio as gr
+from project_management_system import ProjectManager
+            import traceback
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Project Management System Demo
 
@@ -13,24 +42,10 @@ This demo showcases the complete project management system with:
 8. Integration Examples
 """
 
-import os
-import sys
-import time
-import json
-import asyncio
-from datetime import datetime, timedelta
-from pathlib import Path
-from typing import Dict, List, Any
-import warnings
 
 # Add the current directory to Python path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from project_management_system import (
     ProjectManager, ProblemDefinition, Task, TaskStatus, 
     ProjectStatus, ProblemType, DatasetType, create_sample_problem_definition
 )
@@ -44,12 +59,12 @@ sns.set_palette("husl")
 class ProjectManagementDemo:
     """Comprehensive demo for the project management system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.manager = ProjectManager("./demo_projects")
         self.demo_data = None
         self.setup_demo_data()
     
-    def setup_demo_data(self):
+    def setup_demo_data(self) -> Any:
         """Create sample dataset for demonstration."""
         np.random.seed(42)
         n_samples = 1000
@@ -91,7 +106,7 @@ class ProjectManagementDemo:
         
         self.demo_data = pd.DataFrame(data)
     
-    def demo_problem_definition(self):
+    def demo_problem_definition(self) -> Any:
         """Demonstrate problem definition creation."""
         print("=" * 80)
         print("PROBLEM DEFINITION DEMONSTRATION")
@@ -461,7 +476,7 @@ class ProjectManagementDemo:
             }.get(milestone['status'], "?")
             print(f"  {status_icon} {milestone['title']} ({milestone['status']})")
     
-    def demo_integration_examples(self):
+    def demo_integration_examples(self) -> Any:
         """Demonstrate integration with other systems."""
         print("\n" + "=" * 80)
         print("INTEGRATION EXAMPLES")
@@ -470,15 +485,15 @@ class ProjectManagementDemo:
         # Example 1: FastAPI Integration
         print("1. FastAPI Integration Example:")
         print("""
-from fastapi import FastAPI, HTTPException
-from project_management_system import ProjectManager, create_sample_problem_definition
 
 app = FastAPI()
 manager = ProjectManager()
 
 @app.post("/projects/")
 async def create_project(project_data: dict):
-    try:
+    
+    """create_project function."""
+try:
         problem_def = create_sample_problem_definition()
         project = manager.create_project(
             project_id=project_data["id"],
@@ -491,7 +506,9 @@ async def create_project(project_data: dict):
 
 @app.get("/projects/{project_id}/summary")
 async def get_project_summary(project_id: str):
-    try:
+    
+    """get_project_summary function."""
+try:
         summary = manager.get_project_summary(project_id)
         return summary
     except Exception as e:
@@ -501,10 +518,8 @@ async def get_project_summary(project_id: str):
         # Example 2: Gradio Integration
         print("\n2. Gradio Integration Example:")
         print("""
-import gradio as gr
-from project_management_system import ProjectManager
 
-def create_project_interface(project_name, problem_type, description):
+def create_project_interface(project_name, problem_type, description) -> Any:
     manager = ProjectManager()
     problem_def = create_sample_problem_definition()
     problem_def.title = project_name
@@ -533,7 +548,9 @@ interface = gr.Interface(
         print("\n3. Automated Workflow Example:")
         print("""
 async def automated_project_workflow():
-    manager = ProjectManager()
+    
+    """automated_project_workflow function."""
+manager = ProjectManager()
     
     # Create project
     problem_def = create_sample_problem_definition()
@@ -554,7 +571,7 @@ async def automated_project_workflow():
     return project.id
         """)
     
-    def run_complete_demo(self):
+    def run_complete_demo(self) -> Any:
         """Run the complete demonstration."""
         print("🚀 COMPREHENSIVE PROJECT MANAGEMENT SYSTEM DEMO")
         print("=" * 80)
@@ -605,7 +622,6 @@ async def automated_project_workflow():
             
         except Exception as e:
             print(f"\n❌ Demo failed with error: {e}")
-            import traceback
             traceback.print_exc()
 
 
@@ -615,5 +631,6 @@ def main():
     demo.run_complete_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

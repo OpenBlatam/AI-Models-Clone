@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add SlackBotConfig table
 
 Revision ID: 7da543f5672f
@@ -6,9 +14,6 @@ Create Date: 2023-09-24 16:34:17.526128
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "7da543f5672f"

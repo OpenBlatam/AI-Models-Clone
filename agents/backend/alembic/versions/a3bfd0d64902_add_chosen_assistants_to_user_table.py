@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add chosen_assistants to User table
 
 Revision ID: a3bfd0d64902
@@ -6,9 +14,6 @@ Create Date: 2024-05-26 17:22:24.834741
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "a3bfd0d64902"

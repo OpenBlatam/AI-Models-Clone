@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import pytest
+import torch
+import numpy as np
+from PIL import Image, ImageDraw
+from pathlib import Path
+import tempfile
+import shutil
+import time
+from unittest.mock import Mock, patch, AsyncMock
+from diffusion_models import (
+from transformers_manager import TransformersManager, ModelConfig, ModelType
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Tests for Diffusion Models
 =======================================
@@ -22,32 +41,20 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import pytest
-import torch
-import numpy as np
-from PIL import Image, ImageDraw
-from pathlib import Path
-import tempfile
-import shutil
-import time
-from unittest.mock import Mock, patch, AsyncMock
 
 # Import our modules
-from diffusion_models import (
     DiffusionModelsManager, DiffusionConfig, GenerationConfig,
     ImageToImageConfig, InpaintingConfig, ControlNetConfig,
     DiffusionTask, SchedulerType, SecurityPromptEngine,
     DiffusionResult
 )
-from transformers_manager import TransformersManager, ModelConfig, ModelType
 
 
 class TestDiffusionModelsManager:
     """Test suite for DiffusionModelsManager."""
     
     @pytest.fixture
-    async def diffusion_manager(self):
+    async def diffusion_manager(self) -> Any:
         """Create a diffusion manager instance for testing."""
         with tempfile.TemporaryDirectory() as temp_dir:
             manager = DiffusionModelsManager(cache_dir=temp_dir)
@@ -56,7 +63,7 @@ class TestDiffusionModelsManager:
             manager.clear_cache()
     
     @pytest.fixture
-    def sample_image(self):
+    def sample_image(self) -> Any:
         """Create a sample image for testing."""
         image = Image.new('RGB', (512, 512), color='white')
         draw = ImageDraw.Draw(image)
@@ -65,14 +72,14 @@ class TestDiffusionModelsManager:
         return image
     
     @pytest.fixture
-    def sample_mask(self):
+    def sample_mask(self) -> Any:
         """Create a sample mask for testing."""
         mask = Image.new('L', (512, 512), color=0)
         draw = ImageDraw.Draw(mask)
         draw.rectangle([200, 200, 312, 312], fill=255)
         return mask
     
-    def test_initialization(self, diffusion_manager):
+    def test_initialization(self, diffusion_manager) -> Any:
         """Test diffusion manager initialization."""
         assert diffusion_manager is not None
         assert hasattr(diffusion_manager, '_pipelines')
@@ -80,12 +87,12 @@ class TestDiffusionModelsManager:
         assert hasattr(diffusion_manager, '_metrics')
         assert hasattr(diffusion_manager, '_device')
     
-    def test_device_detection(self, diffusion_manager):
+    def test_device_detection(self, diffusion_manager) -> Any:
         """Test device detection logic."""
         device = diffusion_manager._detect_device()
         assert device in [torch.device('cpu'), torch.device('cuda'), torch.device('mps')]
     
-    def test_scheduler_creation(self, diffusion_manager):
+    def test_scheduler_creation(self, diffusion_manager) -> Any:
         """Test scheduler creation for different types."""
         schedulers = [
             SchedulerType.DDIM,
@@ -98,7 +105,7 @@ class TestDiffusionModelsManager:
             assert scheduler is not None
             assert hasattr(scheduler, 'step')
     
-    def test_device_selection(self, diffusion_manager):
+    def test_device_selection(self, diffusion_manager) -> Any:
         """Test device selection logic."""
         # Test auto device selection
         device = diffusion_manager._get_device("auto")
@@ -113,7 +120,7 @@ class TestDiffusionModelsManager:
             device = diffusion_manager._get_device("cuda")
             assert device == torch.device('cuda')
     
-    def test_memory_usage_tracking(self, diffusion_manager):
+    def test_memory_usage_tracking(self, diffusion_manager) -> Any:
         """Test memory usage tracking."""
         memory_usage = diffusion_manager._get_memory_usage()
         
@@ -127,7 +134,7 @@ class TestDiffusionModelsManager:
         assert 0 <= memory_usage['percent'] <= 100
     
     @pytest.mark.asyncio
-    async def test_pipeline_loading_text_to_image(self, diffusion_manager):
+    async def test_pipeline_loading_text_to_image(self, diffusion_manager) -> Any:
         """Test loading text-to-image pipeline."""
         config = DiffusionConfig(
             model_name="runwayml/stable-diffusion-v1-5",
@@ -144,7 +151,7 @@ class TestDiffusionModelsManager:
         assert pipeline_key in diffusion_manager._metrics
     
     @pytest.mark.asyncio
-    async def test_pipeline_loading_image_to_image(self, diffusion_manager):
+    async def test_pipeline_loading_image_to_image(self, diffusion_manager) -> Any:
         """Test loading image-to-image pipeline."""
         config = DiffusionConfig(
             model_name="runwayml/stable-diffusion-v1-5",
@@ -159,7 +166,7 @@ class TestDiffusionModelsManager:
         assert pipeline_key in diffusion_manager._pipelines
     
     @pytest.mark.asyncio
-    async def test_pipeline_loading_inpainting(self, diffusion_manager):
+    async def test_pipeline_loading_inpainting(self, diffusion_manager) -> Any:
         """Test loading inpainting pipeline."""
         config = DiffusionConfig(
             model_name="runwayml/stable-diffusion-v1-5",
@@ -174,7 +181,7 @@ class TestDiffusionModelsManager:
         assert pipeline_key in diffusion_manager._pipelines
     
     @pytest.mark.asyncio
-    async def test_pipeline_force_reload(self, diffusion_manager):
+    async def test_pipeline_force_reload(self, diffusion_manager) -> Any:
         """Test pipeline force reload functionality."""
         config = DiffusionConfig(
             model_name="runwayml/stable-diffusion-v1-5",
@@ -193,7 +200,7 @@ class TestDiffusionModelsManager:
         assert pipeline3 is not None
     
     @pytest.mark.asyncio
-    async def test_generation_config_validation(self, diffusion_manager):
+    async def test_generation_config_validation(self, diffusion_manager) -> Any:
         """Test generation configuration validation."""
         # Valid config
         valid_config = GenerationConfig(
@@ -216,7 +223,7 @@ class TestDiffusionModelsManager:
         assert config_with_seed.num_inference_steps == 10
     
     @pytest.mark.asyncio
-    async def test_image_to_image_config(self, diffusion_manager, sample_image):
+    async def test_image_to_image_config(self, diffusion_manager, sample_image) -> Any:
         """Test image-to-image configuration."""
         config = ImageToImageConfig(
             prompt="transform this image",
@@ -231,7 +238,7 @@ class TestDiffusionModelsManager:
         assert config.num_inference_steps == 20
     
     @pytest.mark.asyncio
-    async def test_inpainting_config(self, diffusion_manager, sample_image, sample_mask):
+    async def test_inpainting_config(self, diffusion_manager, sample_image, sample_mask) -> Any:
         """Test inpainting configuration."""
         config = InpaintingConfig(
             prompt="fill the masked area",
@@ -247,7 +254,7 @@ class TestDiffusionModelsManager:
         assert config.mask_strength == 0.8
     
     @pytest.mark.asyncio
-    async def test_controlnet_config(self, diffusion_manager, sample_image):
+    async def test_controlnet_config(self, diffusion_manager, sample_image) -> Any:
         """Test ControlNet configuration."""
         config = ControlNetConfig(
             prompt="generate with control",
@@ -260,7 +267,7 @@ class TestDiffusionModelsManager:
         assert config.control_image is sample_image
         assert config.controlnet_conditioning_scale == 1.0
     
-    def test_security_prompt_engineering(self):
+    def test_security_prompt_engineering(self) -> Any:
         """Test security prompt engineering."""
         # Test different threat types
         threat_types = ["malware_analysis", "network_security", "threat_hunting", "incident_response"]
@@ -279,7 +286,7 @@ class TestDiffusionModelsManager:
             assert "technical" in positive_prompt.lower()
             assert "cartoon" in negative_prompt.lower()
     
-    def test_security_prompt_severity_levels(self):
+    def test_security_prompt_severity_levels(self) -> Any:
         """Test security prompt generation with different severity levels."""
         severities = ["low", "medium", "high", "critical"]
         
@@ -297,7 +304,7 @@ class TestDiffusionModelsManager:
             elif severity == "high":
                 assert "high" in positive_prompt.lower()
     
-    def test_security_prompt_styles(self):
+    def test_security_prompt_styles(self) -> Any:
         """Test security prompt generation with different styles."""
         styles = ["technical", "detailed", "simple"]
         
@@ -318,7 +325,7 @@ class TestDiffusionModelsManager:
                 assert "simple" in positive_prompt.lower()
     
     @pytest.mark.asyncio
-    async def test_metrics_tracking(self, diffusion_manager):
+    async def test_metrics_tracking(self, diffusion_manager) -> Any:
         """Test metrics tracking functionality."""
         config = DiffusionConfig(
             model_name="runwayml/stable-diffusion-v1-5",
@@ -346,7 +353,7 @@ class TestDiffusionModelsManager:
         assert metrics['safety_violations'] >= 0
     
     @pytest.mark.asyncio
-    async def test_cache_management(self, diffusion_manager):
+    async def test_cache_management(self, diffusion_manager) -> Any:
         """Test cache management functionality."""
         config = DiffusionConfig(
             model_name="runwayml/stable-diffusion-v1-5",
@@ -375,7 +382,7 @@ class TestDiffusionModelsManager:
         assert len(diffusion_manager._metrics) == 0
     
     @pytest.mark.asyncio
-    async def test_pipeline_context_manager(self, diffusion_manager):
+    async def test_pipeline_context_manager(self, diffusion_manager) -> Any:
         """Test pipeline context manager."""
         config = DiffusionConfig(
             model_name="runwayml/stable-diffusion-v1-5",
@@ -386,7 +393,7 @@ class TestDiffusionModelsManager:
             assert pipeline is not None
             assert hasattr(pipeline, 'scheduler')
     
-    def test_list_loaded_pipelines(self, diffusion_manager):
+    def test_list_loaded_pipelines(self, diffusion_manager) -> List[Any]:
         """Test listing loaded pipelines."""
         pipelines = diffusion_manager.list_loaded_pipelines()
         assert isinstance(pipelines, list)
@@ -395,7 +402,7 @@ class TestDiffusionModelsManager:
         assert len(pipelines) == 0
     
     @pytest.mark.asyncio
-    async def test_error_handling_invalid_model(self, diffusion_manager):
+    async def test_error_handling_invalid_model(self, diffusion_manager) -> Any:
         """Test error handling for invalid model."""
         config = DiffusionConfig(
             model_name="invalid/model/name",
@@ -406,7 +413,7 @@ class TestDiffusionModelsManager:
             await diffusion_manager.load_pipeline(config)
     
     @pytest.mark.asyncio
-    async def test_error_handling_invalid_task(self, diffusion_manager):
+    async def test_error_handling_invalid_task(self, diffusion_manager) -> Any:
         """Test error handling for invalid task."""
         config = DiffusionConfig(
             model_name="runwayml/stable-diffusion-v1-5",
@@ -417,7 +424,7 @@ class TestDiffusionModelsManager:
             await diffusion_manager.load_pipeline(config)
     
     @pytest.mark.asyncio
-    async def test_optimization_application(self, diffusion_manager):
+    async def test_optimization_application(self, diffusion_manager) -> Any:
         """Test optimization application to pipelines."""
         config = DiffusionConfig(
             model_name="runwayml/stable-diffusion-v1-5",
@@ -439,7 +446,7 @@ class TestDiffusionModelsManager:
 class TestSecurityPromptEngine:
     """Test suite for SecurityPromptEngine."""
     
-    def test_prompt_generation_all_threat_types(self):
+    def test_prompt_generation_all_threat_types(self) -> Any:
         """Test prompt generation for all threat types."""
         threat_types = ["malware_analysis", "network_security", "threat_hunting", "incident_response"]
         severities = ["low", "medium", "high", "critical"]
@@ -457,7 +464,7 @@ class TestSecurityPromptEngine:
                     assert len(positive_prompt) > 0
                     assert len(negative_prompt) > 0
     
-    def test_prompt_content_validation(self):
+    def test_prompt_content_validation(self) -> Any:
         """Test that generated prompts contain expected content."""
         positive_prompt, negative_prompt = SecurityPromptEngine.generate_security_prompt(
             "malware_analysis", "high", "technical"
@@ -472,7 +479,7 @@ class TestSecurityPromptEngine:
         assert "cartoon" in negative_prompt.lower()
         assert "artistic" in negative_prompt.lower()
     
-    def test_prompt_consistency(self):
+    def test_prompt_consistency(self) -> Any:
         """Test that prompts are consistent for same inputs."""
         prompt1_pos, prompt1_neg = SecurityPromptEngine.generate_security_prompt(
             "network_security", "medium", "technical"
@@ -485,7 +492,7 @@ class TestSecurityPromptEngine:
         assert prompt1_pos == prompt2_pos
         assert prompt1_neg == prompt2_neg
     
-    def test_prompt_variation(self):
+    def test_prompt_variation(self) -> Any:
         """Test that prompts vary with different inputs."""
         prompt1_pos, _ = SecurityPromptEngine.generate_security_prompt(
             "malware_analysis", "high", "technical"
@@ -501,7 +508,7 @@ class TestSecurityPromptEngine:
 class TestDiffusionResult:
     """Test suite for DiffusionResult."""
     
-    def test_diffusion_result_creation(self):
+    def test_diffusion_result_creation(self) -> Any:
         """Test DiffusionResult creation and attributes."""
         # Create sample images
         images = [Image.new('RGB', (512, 512), color='red') for _ in range(3)]
@@ -520,7 +527,7 @@ class TestDiffusionResult:
         assert result.memory_usage["rss_mb"] == 100.0
         assert result.metadata["test"] == "data"
     
-    def test_diffusion_result_defaults(self):
+    def test_diffusion_result_defaults(self) -> Any:
         """Test DiffusionResult with default values."""
         images = [Image.new('RGB', (512, 512), color='blue')]
         
@@ -537,7 +544,7 @@ class TestIntegration:
     """Integration tests for diffusion models with transformers."""
     
     @pytest.fixture
-    async def managers(self):
+    async def managers(self) -> Any:
         """Create both diffusion and transformers managers."""
         with tempfile.TemporaryDirectory() as temp_dir:
             diffusion_manager = DiffusionModelsManager(cache_dir=temp_dir)
@@ -547,7 +554,7 @@ class TestIntegration:
             diffusion_manager.clear_cache()
     
     @pytest.mark.asyncio
-    async def test_managers_initialization(self, managers):
+    async def test_managers_initialization(self, managers) -> Any:
         """Test that both managers can be initialized together."""
         diffusion_manager, transformers_manager = managers
         
@@ -559,7 +566,7 @@ class TestIntegration:
         assert len(transformers_manager.list_loaded_models()) == 0
     
     @pytest.mark.asyncio
-    async def test_concurrent_loading(self, managers):
+    async def test_concurrent_loading(self, managers) -> Any:
         """Test concurrent loading of diffusion and transformer models."""
         diffusion_manager, transformers_manager = managers
         
@@ -589,5 +596,6 @@ class TestIntegration:
         assert len(transformers_manager.list_loaded_models()) == 1
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

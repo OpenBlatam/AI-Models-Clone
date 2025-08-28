@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+from uuid import uuid4
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, Request
+from pydantic import BaseModel, Field, validator
+from .http_exception_system import (
+from .http_exception_handlers import (
+from .http_response_models import (
+from .error_system import (
+from typing import Any, List, Dict, Optional
 """
 📚 HTTPException Usage Examples
 ==============================
@@ -6,16 +26,8 @@ Comprehensive examples showing how to use the HTTPException system
 in FastAPI applications with proper error handling and response modeling.
 """
 
-import asyncio
-import logging
-from typing import List, Optional, Dict, Any
-from datetime import datetime
-from uuid import uuid4
 
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, Request
-from pydantic import BaseModel, Field, validator
 
-from .http_exception_system import (
     OnyxHTTPException, HTTPExceptionFactory, HTTPExceptionMapper,
     HTTPExceptionHandler, http_exception_handler,
     raise_bad_request, raise_unauthorized, raise_forbidden,
@@ -23,15 +35,12 @@ from .http_exception_system import (
     raise_too_many_requests, raise_internal_server_error,
     raise_service_unavailable
 )
-from .http_exception_handlers import (
     setup_exception_handlers, handle_http_exceptions
 )
-from .http_response_models import (
     SuccessResponse, ErrorResponse, ListResponse, BatchResponse,
     ResponseFactory, create_success_response, create_error_response,
     create_list_response, create_batch_response
 )
-from .error_system import (
     ValidationError, AuthenticationError, AuthorizationError,
     ResourceNotFoundError, BusinessLogicError, DatabaseError,
     ErrorContext, ErrorFactory
@@ -48,7 +57,7 @@ class UserCreate(BaseModel):
     age: int = Field(..., ge=0, le=150, description="User age")
     
     @validator('email')
-    def validate_email(cls, v):
+    def validate_email(cls, v) -> bool:
         if '@' not in v:
             raise ValueError('Invalid email format')
         return v
@@ -101,7 +110,7 @@ class BlogPost(BaseModel):
 class UserService:
     """Example user service with proper error handling"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Simulate database
         self.users: Dict[str, User] = {}
         self.request_count = 0
@@ -209,7 +218,9 @@ class BlogPostService:
     """Example blog post service with error handling"""
     
     def __init__(self, user_service: UserService):
-        self.user_service = user_service
+        
+    """__init__ function."""
+self.user_service = user_service
         self.posts: Dict[str, BlogPost] = {}
     
     def _generate_id(self) -> str:
@@ -280,7 +291,7 @@ def create_example_app() -> FastAPI:
     admin_router = APIRouter(prefix="/admin", tags=["admin"])
     
     # Dependency to get request ID
-    def get_request_id(request: Request) -> str:
+    async def get_request_id(request: Request) -> str:
         return request.headers.get("X-Request-ID", str(uuid4()))
     
     # Dependency to check authentication (simplified)
@@ -645,5 +656,6 @@ async def example_usage():
     print("\nRun the app and test these endpoints to see error handling in action!")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(example_usage()) 

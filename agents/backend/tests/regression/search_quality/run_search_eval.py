@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import csv
 from collections import defaultdict
 from pathlib import Path
@@ -21,6 +23,9 @@ from tests.regression.search_quality.util_eval import metric_names
 from tests.regression.search_quality.util_retrieve import rerank_one_query
 from tests.regression.search_quality.util_retrieve import search_one_query
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger(__name__)
 
 
@@ -59,7 +64,15 @@ def run_search_eval() -> None:
         )
         with (
             search_result_path.open("w") as search_file,
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             eval_path.open("w") as eval_file,
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         ):
             search_csv_writer = csv.writer(search_file)
             eval_csv_writer = csv.writer(eval_file)
@@ -128,6 +141,10 @@ def run_search_eval() -> None:
 
         # aggregate and write results
         with aggregate_eval_path.open("w") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             aggregate_csv_writer = csv.writer(file)
             aggregate_csv_writer.writerow(["category", *metric_names])
 

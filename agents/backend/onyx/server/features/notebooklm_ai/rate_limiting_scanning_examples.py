@@ -1,3 +1,35 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import math
+import random
+import time
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union, Callable, Set, Tuple
+from enum import Enum
+import hashlib
+import json
+import threading
+from contextlib import contextmanager
+from collections import deque, defaultdict
+import statistics
+    import redis
+    import psutil
+from typing import Any, List, Dict, Optional
 """
 Rate-Limiting and Back-Off for Network Scanning Examples
 =======================================================
@@ -21,30 +53,13 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import logging
-import math
-import random
-import time
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, Callable, Set, Tuple
-from enum import Enum
-import hashlib
-import json
-import threading
-from contextlib import contextmanager
-from collections import deque, defaultdict
-import statistics
 
 try:
-    import redis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
 
 try:
-    import psutil
     PSUTIL_AVAILABLE = True
 except ImportError:
     PSUTIL_AVAILABLE = False
@@ -194,7 +209,7 @@ class AdaptiveRateLimiter:
         self.window_requests = deque()
         self.window_start = time.time()
     
-    def _refill_tokens(self):
+    def _refill_tokens(self) -> Any:
         """Refill tokens based on time elapsed."""
         now = time.time()
         time_passed = now - self.last_token_refill
@@ -203,7 +218,7 @@ class AdaptiveRateLimiter:
         self.tokens = min(self.config.burst_size, self.tokens + tokens_to_add)
         self.last_token_refill = now
     
-    def _update_sliding_window(self):
+    def _update_sliding_window(self) -> Any:
         """Update sliding window for rate calculation."""
         now = time.time()
         window_start = now - self.config.window_size
@@ -959,5 +974,6 @@ def main():
     logger.info("Rate limiting and back-off examples completed")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

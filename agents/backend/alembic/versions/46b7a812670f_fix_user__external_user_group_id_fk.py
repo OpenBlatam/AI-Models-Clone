@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """fix_user__external_user_group_id_fk
 
 Revision ID: 46b7a812670f
@@ -6,11 +12,10 @@ Create Date: 2024-09-23 12:58:03.894038
 
 """
 
-from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "46b7a812670f"
-down_revision = "f32615f71aeb"
+revision: str = "46b7a812670f"
+down_revision: str = "f32615f71aeb"
 branch_labels = None
 depends_on = None
 
@@ -20,7 +25,7 @@ def upgrade() -> None:
     op.drop_constraint(
         "user__external_user_group_id_pkey",
         "user__external_user_group_id",
-        type_="primary",
+        type_: str = "primary",
     )
 
     # Add the new composite primary key
@@ -36,7 +41,7 @@ def downgrade() -> None:
     op.drop_constraint(
         "user__external_user_group_id_pkey",
         "user__external_user_group_id",
-        type_="primary",
+        type_: str = "primary",
     )
     # Delete all entries from the table
     op.execute("DELETE FROM user__external_user_group_id")

@@ -1,10 +1,24 @@
-"""
-Attack request API schemas for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Attack request API schemas for cybersecurity tools.
+"""
 
 class AttackType(str, Enum):
     """Types of security attacks."""
@@ -62,19 +76,19 @@ class CreateAttackRequest(BaseModel):
     scheduled_at: Optional[datetime] = Field(None, description="Scheduled attack time")
     
     @field_validator('target')
-    def validate_target(cls, v):
+    def validate_target(cls, v) -> Optional[Dict[str, Any]]:
         if not v.strip():
             raise ValueError("Target cannot be empty")
         return v.strip()
     
     @field_validator('max_attempts')
-    def validate_max_attempts(cls, v):
+    def validate_max_attempts(cls, v) -> bool:
         if v is not None and v <= 0:
             raise ValueError("Max attempts must be positive")
         return v
     
     @field_validator('threads')
-    def validate_threads(cls, v):
+    def validate_threads(cls, v) -> bool:
         if v is not None and v <= 0:
             raise ValueError("Threads must be positive")
         return v

@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+from typing import Optional, List, Dict, Any
+from pydantic import BaseSettings, Field, validator
+from pydantic.types import SecretStr
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🔧 Configuration Management Module
 =================================
@@ -6,10 +20,6 @@ Production-grade configuration with environment variables,
 validation, and type safety using Pydantic.
 """
 
-import os
-from typing import Optional, List, Dict, Any
-from pydantic import BaseSettings, Field, validator
-from pydantic.types import SecretStr
 
 
 class DatabaseSettings(BaseSettings):
@@ -22,7 +32,8 @@ class DatabaseSettings(BaseSettings):
     POOL_RECYCLE: int = Field(default=3600, env="DB_POOL_RECYCLE")
     ECHO: bool = Field(default=False, env="DB_ECHO")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "DB_"
 
 
@@ -36,7 +47,8 @@ class RedisSettings(BaseSettings):
     SOCKET_TIMEOUT: int = Field(default=5, env="REDIS_SOCKET_TIMEOUT")
     SOCKET_CONNECT_TIMEOUT: int = Field(default=5, env="REDIS_SOCKET_CONNECT_TIMEOUT")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "REDIS_"
 
 
@@ -52,7 +64,8 @@ class OpenAISettings(BaseSettings):
     MAX_TOKENS: int = Field(default=4000, env="OPENAI_MAX_TOKENS")
     TEMPERATURE: float = Field(default=0.7, env="OPENAI_TEMPERATURE")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "OPENAI_"
 
 
@@ -68,7 +81,8 @@ class MonitoringSettings(BaseSettings):
     LOG_LEVEL: str = Field(default="INFO", env="LOG_LEVEL")
     STRUCTURED_LOGGING: bool = Field(default=True, env="STRUCTURED_LOGGING")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "MONITORING_"
 
 
@@ -84,12 +98,13 @@ class SecuritySettings(BaseSettings):
     ALLOW_CREDENTIALS: bool = Field(default=True, env="ALLOW_CREDENTIALS")
     
     @validator("CORS_ORIGINS", pre=True)
-    def parse_cors_origins(cls, v):
+    def parse_cors_origins(cls, v) -> Any:
         if isinstance(v, str):
             return [origin.strip() for origin in v.split(",")]
         return v
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "SECURITY_"
 
 
@@ -102,7 +117,8 @@ class CacheSettings(BaseSettings):
     COMPRESSION: bool = Field(default=True, env="CACHE_COMPRESSION")
     PERSISTENCE: bool = Field(default=False, env="CACHE_PERSISTENCE")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "CACHE_"
 
 
@@ -117,7 +133,8 @@ class AISettings(BaseSettings):
     RETRY_ATTEMPTS: int = Field(default=3, env="AI_RETRY_ATTEMPTS")
     FALLBACK_ENABLED: bool = Field(default=True, env="AI_FALLBACK_ENABLED")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "AI_"
 
 
@@ -130,7 +147,8 @@ class EventSettings(BaseSettings):
     MAX_RETRIES: int = Field(default=3, env="EVENT_MAX_RETRIES")
     BATCH_SIZE: int = Field(default=100, env="EVENT_BATCH_SIZE")
     
-    class Config:
+    @dataclass
+class Config:
         env_prefix = "EVENT_"
 
 
@@ -185,7 +203,8 @@ class Settings(BaseSettings):
     def cors_origins(self) -> List[str]:
         return self.security.CORS_ORIGINS
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = True

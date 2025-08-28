@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # The following prompts are used to pass each chunk to the LLM (the cheap/fast one)
 # to determine if the chunk is useful towards the user query. This is used as part
 # of the reranking flow
@@ -29,5 +34,6 @@ Respond with EXACTLY AND ONLY: "{USEFUL_PAT}" or "{NONUSEFUL_PAT}"
 
 
 # Use the following for easy viewing of prompts
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     print(SECTION_FILTER_PROMPT)

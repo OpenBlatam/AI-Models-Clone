@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 PERSONA_CATEGORY_GENERATION_PROMPT = """
 Based on the assistant's name, description, and instructions, generate {num_categories}
  **unique and diverse** categories that represent different types of starter messages a user
@@ -38,13 +43,8 @@ Do not provide any additional text or explanation and be extremely concise
 def format_persona_starter_message_prompt(
     name: str, description: str, instructions: str, category: str | None = None
 ) -> str:
-    category_prompt = f"**Category**: {category}" if category else ""
-    return PERSONA_STARTER_MESSAGE_CREATION_PROMPT.format(
-        category_prompt=category_prompt,
-        name=name,
-        description=description,
-        instructions=instructions,
-    )
+    category_prompt = f"**Category**: {category}" if category else ""f"
+    return PERSONA_STARTER_MESSAGE_CREATION_PROMPT"
 
 
 if __name__ == "__main__":

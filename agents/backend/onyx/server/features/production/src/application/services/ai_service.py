@@ -1,10 +1,7 @@
-"""
-🤖 Ultra-Optimized AI Service
-============================
-
-Production-grade AI service with GPU acceleration, intelligent caching,
-batch processing, and advanced optimization features.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -13,7 +10,6 @@ import hashlib
 from typing import List, Dict, Any, Optional, Tuple
 from concurrent.futures import ThreadPoolExecutor
 import json
-
 import openai
 import torch
 import numpy as np
@@ -21,9 +17,20 @@ from transformers import pipeline, AutoTokenizer, AutoModel
 from sentence_transformers import SentenceTransformer
 import redis.asyncio as redis
 from pydantic import BaseModel
-
 from src.core.config import OpenAISettings, AISettings
 from src.core.exceptions import AIServiceUnavailableException, InferenceException
+            import random
+from typing import Any, List, Dict, Optional
+"""
+🤖 Ultra-Optimized AI Service
+============================
+
+Production-grade AI service with GPU acceleration, intelligent caching,
+batch processing, and advanced optimization features.
+"""
+
+
+
 
 
 class AIServiceConfig(BaseModel):
@@ -70,7 +77,9 @@ class AIService:
         ai_config: AISettings,
         cache_service: Any
     ):
-        self.config = AIServiceConfig(
+        
+    """__init__ function."""
+self.config = AIServiceConfig(
             api_key=openai_config.API_KEY.get_secret_value(),
             organization=openai_config.ORGANIZATION,
             base_url=openai_config.BASE_URL,
@@ -118,7 +127,7 @@ class AIService:
         
         self.logger.info("AI Service initialized with ultra-optimization")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize AI service and load models"""
         
         self.logger.info("Initializing AI Service...")
@@ -139,7 +148,7 @@ class AIService:
             self.logger.error(f"Failed to initialize AI Service: {e}")
             raise AIServiceUnavailableException("AI Service", str(e))
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup AI service resources"""
         
         self.logger.info("Cleaning up AI Service...")
@@ -328,7 +337,6 @@ class AIService:
             
             # For now, return a random score (0-1, where 0 is original, 1 is plagiarized)
             # In real implementation, compare with database of known content
-            import random
             return random.uniform(0.0, 0.1)  # Low plagiarism score for demo
             
         except Exception as e:
@@ -382,7 +390,7 @@ class AIService:
             self.logger.error(f"Batch generation failed: {e}")
             raise InferenceException("batch generation", str(e))
     
-    async def _load_models(self):
+    async def _load_models(self) -> Any:
         """Load AI models for local processing"""
         
         try:
@@ -403,7 +411,7 @@ class AIService:
         except Exception as e:
             self.logger.warning(f"Some models failed to load: {e}")
     
-    async def _load_embedding_model(self):
+    async def _load_embedding_model(self) -> Any:
         """Load sentence transformer model"""
         
         try:
@@ -422,7 +430,7 @@ class AIService:
         except Exception as e:
             self.logger.error(f"Failed to load embedding model: {e}")
     
-    async def _load_sentiment_model(self):
+    async def _load_sentiment_model(self) -> Any:
         """Load sentiment analysis model"""
         
         try:
@@ -442,7 +450,7 @@ class AIService:
         except Exception as e:
             self.logger.error(f"Failed to load sentiment model: {e}")
     
-    async def _load_summarization_model(self):
+    async def _load_summarization_model(self) -> Any:
         """Load summarization model"""
         
         try:
@@ -462,7 +470,7 @@ class AIService:
         except Exception as e:
             self.logger.error(f"Failed to load summarization model: {e}")
     
-    async def _test_openai_connection(self):
+    async def _test_openai_connection(self) -> Any:
         """Test OpenAI API connection"""
         
         try:
@@ -494,7 +502,7 @@ class AIService:
                 self.logger.warning(f"OpenAI call failed, retrying in {wait_time}s: {e}")
                 await asyncio.sleep(wait_time)
     
-    async def _batch_processor(self):
+    async def _batch_processor(self) -> Any:
         """Background task for processing batch requests"""
         
         while True:

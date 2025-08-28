@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Optional
 from uuid import UUID
 
@@ -18,11 +20,18 @@ from onyx.db.models import User
 from onyx.server.query_and_chat.models import ChatSessionDetails
 from onyx.server.query_and_chat.models import ChatSessionsResponse
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 router = APIRouter(prefix="/threads")
 
 
 # Models
 class Thread(BaseModel):
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     id: UUID
     object: str = "thread"
     created_at: int
@@ -41,6 +50,10 @@ class ModifyThreadRequest(BaseModel):
 # API Endpoints
 @router.post("")
 def create_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     request: CreateThreadRequest,
     user: User | None = Depends(current_user),
     db_session: Session = Depends(get_session),
@@ -54,6 +67,10 @@ def create_thread(
     )
 
     return Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         id=new_chat_session.id,
         created_at=int(new_chat_session.time_created.timestamp()),
         metadata=request.metadata,
@@ -62,6 +79,10 @@ def create_thread(
 
 @router.get("/{thread_id}")
 def retrieve_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     thread_id: UUID,
     user: User | None = Depends(current_user),
     db_session: Session = Depends(get_session),
@@ -77,6 +98,10 @@ def retrieve_thread(
         raise HTTPException(status_code=404, detail="Thread not found")
 
     return Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         id=chat_session.id,
         created_at=int(chat_session.time_created.timestamp()),
         metadata=None,  # Assuming we don't store metadata in our current implementation
@@ -85,6 +110,10 @@ def retrieve_thread(
 
 @router.post("/{thread_id}")
 def modify_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     thread_id: UUID,
     request: ModifyThreadRequest,
     user: User | None = Depends(current_user),
@@ -103,6 +132,10 @@ def modify_thread(
         raise HTTPException(status_code=404, detail="Thread not found")
 
     return Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         id=chat_session.id,
         created_at=int(chat_session.time_created.timestamp()),
         metadata=request.metadata,
@@ -111,6 +144,10 @@ def modify_thread(
 
 @router.delete("/{thread_id}")
 def delete_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     thread_id: UUID,
     user: User | None = Depends(current_user),
     db_session: Session = Depends(get_session),

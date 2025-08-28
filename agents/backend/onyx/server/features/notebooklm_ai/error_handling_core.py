@@ -1,8 +1,5 @@
-"""
-Error Handling and Validation Core - Comprehensive error management
-Uses guard clauses, early returns, and structured logging
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import logging
 import re
 import asyncio
@@ -11,6 +8,12 @@ from dataclasses import dataclass, field
 from datetime import datetime
 import traceback
 import json
+from typing import Any, List, Dict, Optional
+"""
+Error Handling and Validation Core - Comprehensive error management
+Uses guard clauses, early returns, and structured logging
+"""
+
 
 # ============================================================================
 # CORE DATA STRUCTURES
@@ -448,7 +451,7 @@ def with_async_error_handling[T](func: Callable[..., T]) -> Callable[..., T]:
 def with_validation(validation_func: Callable[[Any], ValidationResult]):
     """Decorator to add validation to functions"""
     def decorator(func: Callable) -> Callable:
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # Validate first argument (assuming it's the main input)
             if args:
                 validation_result = validation_func(args[0])

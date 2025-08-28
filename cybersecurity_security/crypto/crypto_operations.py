@@ -1,9 +1,5 @@
-"""
-Cryptographic Operations
-
-Provides secure cryptographic operations including key generation, encryption, and hashing.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import hashlib
 import secrets
 import base64
@@ -13,6 +9,16 @@ from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from typing import Dict, Any, Literal, Union, Optional
 from pydantic import BaseModel, Field, validator
 from datetime import datetime
+        import bcrypt
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Cryptographic Operations
+
+Provides secure cryptographic operations including key generation, encryption, and hashing.
+"""
+
 
 class KeyGenerationRequest(BaseModel):
     """Pydantic model for key generation request."""
@@ -20,7 +26,7 @@ class KeyGenerationRequest(BaseModel):
     key_type: Literal["bytes", "hex", "urlsafe"] = Field(default="bytes", description="Key encoding type")
     
     @validator('key_length')
-    def validate_key_length(cls, v):
+    def validate_key_length(cls, v) -> bool:
         if v % 8 != 0:
             raise ValueError("Key length must be divisible by 8")
         return v
@@ -40,7 +46,7 @@ class EncryptionRequest(BaseModel):
     encryption_type: Literal["fernet"] = Field(default="fernet", description="Encryption algorithm")
     
     @validator('plaintext')
-    def validate_plaintext(cls, v):
+    def validate_plaintext(cls, v) -> bool:
         if not v:
             raise ValueError("Plaintext cannot be empty")
         return v
@@ -73,7 +79,7 @@ class PasswordHashRequest(BaseModel):
     hash_algorithm: Literal["sha256", "bcrypt"] = Field(default="sha256", description="Hashing algorithm")
     
     @validator('password')
-    def validate_password(cls, v):
+    def validate_password(cls, v) -> bool:
         if not v:
             raise ValueError("Password cannot be empty")
         return v
@@ -173,7 +179,6 @@ def hash_password(data: PasswordHashRequest) -> PasswordHashResult:
         hash_obj.update((password + salt).encode())
         password_hash = hash_obj.hexdigest()
     elif hash_algorithm == "bcrypt":
-        import bcrypt
         password_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
         salt = ""  # bcrypt includes salt in hash
     

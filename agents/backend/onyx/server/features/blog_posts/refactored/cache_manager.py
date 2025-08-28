@@ -1,6 +1,10 @@
-"""
-Gestor de cache ultra-optimizado con múltiples backends.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -9,18 +13,23 @@ from abc import ABC, abstractmethod
 from typing import Any, Optional, Dict, Union
 from dataclasses import dataclass, field
 from cachetools import TTLCache, LRUCache
-
 from .config import CacheConfig, CacheBackend
+    import orjson
+    import json as orjson
+    import redis.asyncio as aioredis
+from typing import Any, List, Dict, Optional
+"""
+Gestor de cache ultra-optimizado con múltiples backends.
+"""
+
+
 
 try:
-    import orjson
     ORJSON_AVAILABLE = True
 except ImportError:
-    import json as orjson
     ORJSON_AVAILABLE = False
 
 try:
-    import redis.asyncio as aioredis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
@@ -56,7 +65,7 @@ class CacheStats:
         self.total_requests += 1
         self._update_avg_get_time(get_time_ms)
     
-    def record_error(self):
+    def record_error(self) -> Any:
         """Registrar error."""
         self.errors += 1
     
@@ -113,7 +122,9 @@ class MemoryCacheBackend(CacheBackendInterface):
     """Backend de cache en memoria usando TTLCache."""
     
     def __init__(self, config: CacheConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.cache = TTLCache(
             maxsize=config.memory_size,
             ttl=config.ttl_seconds
@@ -165,11 +176,13 @@ class RedisCacheBackend(CacheBackendInterface):
     """Backend de cache usando Redis."""
     
     def __init__(self, config: CacheConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.client: Optional[aioredis.Redis] = None
         self._initialized = False
     
-    async def _ensure_connected(self):
+    async def _ensure_connected(self) -> Any:
         """Asegurar conexión con Redis."""
         if not self._initialized:
             try:
@@ -281,7 +294,9 @@ class HybridCacheBackend(CacheBackendInterface):
     """Backend híbrido: memoria + Redis."""
     
     def __init__(self, config: CacheConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.memory_backend = MemoryCacheBackend(config)
         self.redis_backend = RedisCacheBackend(config) if REDIS_AVAILABLE else None
     
@@ -346,7 +361,9 @@ class CacheManager:
     """Gestor principal de cache."""
     
     def __init__(self, config: CacheConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.stats = CacheStats()
         self.backend = self._create_backend()
     

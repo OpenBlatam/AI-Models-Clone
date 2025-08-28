@@ -1,21 +1,32 @@
-#####
-# Periodic Tasks
-#####
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import json
 from typing import Any
-
 from celery import shared_task
 from celery.contrib.abortable import AbortableTask  # type: ignore
 from celery.exceptions import TaskRevokedError
 from sqlalchemy import inspect
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-
 from onyx.background.celery.apps.app_base import task_logger
 from onyx.configs.app_configs import JOB_TIMEOUT
 from onyx.configs.constants import OnyxCeleryTask
 from onyx.configs.constants import PostgresAdvisoryLocks
 from onyx.db.engine import get_session_with_current_tenant
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#####
+# Periodic Tasks
+#####
+
+
 
 
 @shared_task(

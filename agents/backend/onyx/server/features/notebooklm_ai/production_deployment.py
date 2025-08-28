@@ -1,15 +1,5 @@
-"""
-Production Deployment Script
-============================
-
-Main deployment script that orchestrates all production components:
-- Main API server
-- Worker system
-- Monitoring system
-- Health checks
-- Graceful shutdown
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import logging
 import time
@@ -23,23 +13,37 @@ import threading
 from pathlib import Path
 import subprocess
 import psutil
-
-# Production imports
 import structlog
 import uvicorn
 from fastapi import FastAPI
 import redis.asyncio as redis
-
-# Local imports
 from production_config import get_config, ProductionConfig
 from main_production_advanced import ProductionApp
 from production_worker import WorkerPool
 from production_monitoring import ProductionMonitoring
+            import httpx
+from typing import Any, List, Dict, Optional
+"""
+Production Deployment Script
+============================
+
+Main deployment script that orchestrates all production components:
+- Main API server
+- Worker system
+- Monitoring system
+- Health checks
+- Graceful shutdown
+"""
+
+
+# Production imports
+
+# Local imports
 
 class ProductionDeployment:
     """Production deployment orchestrator"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = get_config()
         self.logger = structlog.get_logger()
         
@@ -60,12 +64,12 @@ class ProductionDeployment:
         
         self.logger.info("Production deployment initialized")
     
-    def _signal_handler(self, signum, frame):
+    def _signal_handler(self, signum, frame) -> Any:
         """Handle shutdown signals gracefully"""
         self.logger.info(f"Received signal {signum}, initiating graceful shutdown...")
         asyncio.create_task(self.shutdown())
     
-    async def startup(self):
+    async def startup(self) -> Any:
         """Startup all production components"""
         self.logger.info("🚀 Starting Production Deployment")
         self.startup_time = time.time()
@@ -101,7 +105,7 @@ class ProductionDeployment:
             await self.shutdown()
             raise
     
-    async def _validate_configuration(self):
+    async def _validate_configuration(self) -> bool:
         """Validate production configuration"""
         self.logger.info("Validating configuration...")
         
@@ -115,7 +119,7 @@ class ProductionDeployment:
         
         self.logger.info("✅ Configuration validated")
     
-    async def _initialize_redis(self):
+    async def _initialize_redis(self) -> Any:
         """Initialize Redis connection"""
         self.logger.info("Initializing Redis connection...")
         
@@ -128,7 +132,7 @@ class ProductionDeployment:
             self.logger.error(f"Failed to connect to Redis: {e}")
             raise
     
-    async def _start_monitoring(self):
+    async def _start_monitoring(self) -> Any:
         """Start monitoring system"""
         self.logger.info("Starting monitoring system...")
         
@@ -148,7 +152,7 @@ class ProductionDeployment:
             self.logger.error(f"Failed to start monitoring: {e}")
             raise
     
-    async def _start_workers(self):
+    async def _start_workers(self) -> Any:
         """Start worker pool"""
         self.logger.info("Starting worker pool...")
         
@@ -168,7 +172,7 @@ class ProductionDeployment:
             self.logger.error(f"Failed to start workers: {e}")
             raise
     
-    async def _start_api_server(self):
+    async async def _start_api_server(self) -> Any:
         """Start API server"""
         self.logger.info("Starting API server...")
         
@@ -207,7 +211,7 @@ class ProductionDeployment:
             self.logger.error(f"Failed to start API server: {e}")
             raise
     
-    async def _run_health_checks(self):
+    async def _run_health_checks(self) -> Any:
         """Run initial health checks"""
         self.logger.info("Running health checks...")
         
@@ -241,7 +245,6 @@ class ProductionDeployment:
         
         # Check API server
         try:
-            import httpx
             async with httpx.AsyncClient() as client:
                 response = await client.get(f"http://{self.config.api.host}:{self.config.api.port}/health", timeout=5)
                 results['api_server'] = 'healthy' if response.status_code == 200 else 'unhealthy'
@@ -272,7 +275,7 @@ class ProductionDeployment:
         
         return results
     
-    def _print_startup_summary(self):
+    def _print_startup_summary(self) -> Any:
         """Print startup summary"""
         uptime = time.time() - self.startup_time
         
@@ -317,7 +320,7 @@ class ProductionDeployment:
         print(summary)
         self.logger.info("Production deployment startup summary printed")
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Gracefully shutdown all components"""
         if not self.is_running:
             return
@@ -373,7 +376,7 @@ class ProductionDeployment:
 class DeploymentManager:
     """Deployment manager for different environments"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = structlog.get_logger()
         self.deployment = None
     
@@ -399,7 +402,7 @@ class DeploymentManager:
             self.logger.error(f"Deployment failed: {e}")
             raise
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop deployment"""
         if self.deployment:
             await self.deployment.shutdown()

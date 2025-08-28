@@ -1,38 +1,13 @@
-#!/usr/bin/env python3
-"""
-Advanced Diffusion Pipelines Implementation
-==========================================
-
-Comprehensive implementation of different diffusion pipelines:
-- StableDiffusionPipeline
-- StableDiffusionXLPipeline  
-- StableDiffusionImg2ImgPipeline
-- StableDiffusionInpaintPipeline
-- StableDiffusionControlNetPipeline
-- Custom pipelines with advanced features
-
-Features: Async processing, GPU optimization, memory management,
-batch processing, custom schedulers, and production monitoring.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 from diffusers import (
-    StableDiffusionPipeline, StableDiffusionXLPipeline,
-    StableDiffusionImg2ImgPipeline, StableDiffusionInpaintPipeline,
-    StableDiffusionControlNetPipeline, StableDiffusionUpscalePipeline,
-    DDIMPipeline, DDPMPipeline, TextToVideoZeroPipeline,
-    UNet2DConditionModel, AutoencoderKL, DDIMScheduler,
-    DDPMScheduler, PNDMScheduler, EulerDiscreteScheduler,
-    DPMSolverMultistepScheduler, DPMSolverSinglestepScheduler,
-    HeunDiscreteScheduler, KDPM2DiscreteScheduler,
-    KDPM2AncestralDiscreteScheduler, LMSDiscreteScheduler,
-    UniPCMultistepScheduler, VQDiffusionScheduler,
-    ScoreSdeVeScheduler, ScoreSdeVpScheduler,
-    ControlNetModel, MultiControlNetModel
-)
 from diffusers.utils import randn_tensor, is_accelerate_available
 from transformers import CLIPTextModel, CLIPTokenizer, CLIPTextModelWithProjection
 import asyncio
@@ -50,10 +25,43 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 from contextlib import contextmanager
 import warnings
+    from prometheus_client import Counter, Histogram, Gauge
+        from diffusers import TextToVideoZeroPipeline
+        import psutil
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Advanced Diffusion Pipelines Implementation
+==========================================
+
+Comprehensive implementation of different diffusion pipelines:
+- StableDiffusionPipeline
+- StableDiffusionXLPipeline  
+- StableDiffusionImg2ImgPipeline
+- StableDiffusionInpaintPipeline
+- StableDiffusionControlNetPipeline
+- Custom pipelines with advanced features
+
+Features: Async processing, GPU optimization, memory management,
+batch processing, custom schedulers, and production monitoring.
+"""
+
+    StableDiffusionPipeline, StableDiffusionXLPipeline,
+    StableDiffusionImg2ImgPipeline, StableDiffusionInpaintPipeline,
+    StableDiffusionControlNetPipeline, StableDiffusionUpscalePipeline,
+    DDIMPipeline, DDPMPipeline, TextToVideoZeroPipeline,
+    UNet2DConditionModel, AutoencoderKL, DDIMScheduler,
+    DDPMScheduler, PNDMScheduler, EulerDiscreteScheduler,
+    DPMSolverMultistepScheduler, DPMSolverSinglestepScheduler,
+    HeunDiscreteScheduler, KDPM2DiscreteScheduler,
+    KDPM2AncestralDiscreteScheduler, LMSDiscreteScheduler,
+    UniPCMultistepScheduler, VQDiffusionScheduler,
+    ScoreSdeVeScheduler, ScoreSdeVpScheduler,
+    ControlNetModel, MultiControlNetModel
+)
 
 # Performance monitoring
 try:
-    from prometheus_client import Counter, Histogram, Gauge
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
@@ -173,7 +181,9 @@ class DiffusionPipelineManager:
     """Manages multiple diffusion pipeline types with optimization."""
     
     def __init__(self, config: PipelineConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.device = torch.device(config.device)
         self.pipelines = {}
         self.schedulers = {}
@@ -193,7 +203,9 @@ class DiffusionPipelineManager:
             return pipeline_key
         
         def _load_pipeline():
-            pipeline = StableDiffusionPipeline.from_pretrained(
+            
+    """_load_pipeline function."""
+pipeline = StableDiffusionPipeline.from_pretrained(
                 model_name,
                 torch_dtype=self.config.torch_dtype,
                 cache_dir=self.config.cache_dir,
@@ -223,7 +235,9 @@ class DiffusionPipelineManager:
             return pipeline_key
         
         def _load_pipeline():
-            pipeline = StableDiffusionXLPipeline.from_pretrained(
+            
+    """_load_pipeline function."""
+pipeline = StableDiffusionXLPipeline.from_pretrained(
                 model_name,
                 torch_dtype=self.config.torch_dtype,
                 cache_dir=self.config.cache_dir,
@@ -255,7 +269,9 @@ class DiffusionPipelineManager:
             return pipeline_key
         
         def _load_pipeline():
-            pipeline = StableDiffusionImg2ImgPipeline.from_pretrained(
+            
+    """_load_pipeline function."""
+pipeline = StableDiffusionImg2ImgPipeline.from_pretrained(
                 model_name,
                 torch_dtype=self.config.torch_dtype,
                 cache_dir=self.config.cache_dir,
@@ -286,7 +302,9 @@ class DiffusionPipelineManager:
             return pipeline_key
         
         def _load_pipeline():
-            pipeline = StableDiffusionInpaintPipeline.from_pretrained(
+            
+    """_load_pipeline function."""
+pipeline = StableDiffusionInpaintPipeline.from_pretrained(
                 model_name,
                 torch_dtype=self.config.torch_dtype,
                 cache_dir=self.config.cache_dir,
@@ -316,7 +334,9 @@ class DiffusionPipelineManager:
             return pipeline_key
         
         def _load_pipeline():
-            # Load ControlNet model
+            
+    """_load_pipeline function."""
+# Load ControlNet model
             controlnet = ControlNetModel.from_pretrained(
                 controlnet_model_name,
                 torch_dtype=self.config.torch_dtype,
@@ -354,7 +374,7 @@ class DiffusionPipelineManager:
         self.pipelines[pipeline_key] = pipeline
         return pipeline_key
     
-    def _apply_pipeline_optimizations(self, pipeline):
+    def _apply_pipeline_optimizations(self, pipeline) -> Any:
         """Apply memory and performance optimizations to pipeline."""
         try:
             if self.config.enable_attention_slicing:
@@ -372,7 +392,7 @@ class DiffusionPipelineManager:
         except Exception as e:
             logger.warning(f"Failed to apply some optimizations: {e}")
     
-    def get_scheduler(self, scheduler_type: str, **kwargs) -> Any:
+    def get_scheduler(self, scheduler_type: str, **kwargs) -> Optional[Dict[str, Any]]:
         """Get scheduler by type."""
         scheduler_map = {
             "ddim": DDIMScheduler,
@@ -412,7 +432,9 @@ class DiffusionPipelineManager:
         
         try:
             def _generate():
-                # Prepare generation kwargs
+                
+    """_generate function."""
+# Prepare generation kwargs
                 generation_kwargs = {
                     "prompt": request.prompt,
                     "negative_prompt": request.negative_prompt,
@@ -507,7 +529,7 @@ class DiffusionPipelineManager:
             if self.config.enable_vae_slicing:
                 pipeline.enable_vae_slicing()
     
-    def cleanup(self):
+    def cleanup(self) -> Any:
         """Clean up resources."""
         for pipeline in self.pipelines.values():
             del pipeline
@@ -524,10 +546,11 @@ class CustomPipelineFactory:
     @staticmethod
     async def create_text_to_video_pipeline(model_name: str = "runwayml/stable-video-diffusion-img2vid-xt") -> Any:
         """Create text-to-video pipeline."""
-        from diffusers import TextToVideoZeroPipeline
         
         def _load_pipeline():
-            pipeline = TextToVideoZeroPipeline.from_pretrained(
+            
+    """_load_pipeline function."""
+pipeline = TextToVideoZeroPipeline.from_pretrained(
                 model_name,
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
             )
@@ -539,7 +562,9 @@ class CustomPipelineFactory:
     async def create_upscale_pipeline(model_name: str = "stabilityai/stable-diffusion-x4-upscaler") -> Any:
         """Create upscale pipeline."""
         def _load_pipeline():
-            pipeline = StableDiffusionUpscalePipeline.from_pretrained(
+            
+    """_load_pipeline function."""
+pipeline = StableDiffusionUpscalePipeline.from_pretrained(
                 model_name,
                 torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32
             )
@@ -551,7 +576,7 @@ class CustomPipelineFactory:
 class PipelinePerformanceMonitor:
     """Monitor pipeline performance and resource usage."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = {}
     
     def start_monitoring(self, pipeline_key: str):
@@ -585,7 +610,6 @@ class PipelinePerformanceMonitor:
     
     def _get_memory_usage(self) -> int:
         """Get current memory usage in bytes."""
-        import psutil
         return psutil.Process().memory_info().rss
     
     def _get_gpu_usage(self) -> float:
@@ -645,5 +669,6 @@ async def main():
         manager.cleanup()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

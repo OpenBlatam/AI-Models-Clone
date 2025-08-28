@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import fastapi_users_db_sqlalchemy
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+import sqlalchemy as sa
+from alembic import op
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Permission Framework
 
 Revision ID: 27c6ecc08586
@@ -6,14 +25,10 @@ Create Date: 2023-05-24 18:45:17.244495
 
 """
 
-import fastapi_users_db_sqlalchemy
-import sqlalchemy as sa
-from alembic import op
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "27c6ecc08586"
-down_revision = "2666d766cb9b"
+revision: str = "27c6ecc08586"
+down_revision: str = "2666d766cb9b"
 branch_labels: None = None
 depends_on: None = None
 
@@ -32,7 +47,7 @@ def upgrade() -> None:
                 "GOOGLE_DRIVE",
                 "GITHUB",
                 "CONFLUENCE",
-                name="documentsource",
+                name: str = "documentsource",
                 native_enum=False,
             ),
             nullable=False,
@@ -43,7 +58,7 @@ def upgrade() -> None:
                 "LOAD_STATE",
                 "POLL",
                 "EVENT",
-                name="inputtype",
+                name: str = "inputtype",
                 native_enum=False,
             ),
             nullable=True,
@@ -80,6 +95,16 @@ def upgrade() -> None:
         sa.Column(
             "user_id",
             fastapi_users_db_sqlalchemy.generics.GUID(),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             nullable=True,
         ),
         sa.Column("public_doc", sa.Boolean(), nullable=False),
@@ -172,7 +197,7 @@ def downgrade() -> None:
         for constraint in constraints
     ):
         op.drop_constraint(
-            "fk_index_attempt_credential_id", "index_attempt", type_="foreignkey"
+            "fk_index_attempt_credential_id", "index_attempt", type_: str = "foreignkey"
         )
 
     if any(
@@ -180,7 +205,7 @@ def downgrade() -> None:
         for constraint in constraints
     ):
         op.drop_constraint(
-            "fk_index_attempt_connector_id", "index_attempt", type_="foreignkey"
+            "fk_index_attempt_connector_id", "index_attempt", type_: str = "foreignkey"
         )
 
     op.drop_column("index_attempt", "credential_id")

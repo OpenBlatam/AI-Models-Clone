@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any
 from uuid import uuid4
 
@@ -9,6 +11,9 @@ from onyx.connectors.google_utils.resources import GoogleDocsService
 from onyx.connectors.google_utils.resources import GoogleDriveService
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 GOOGLE_SCOPES = {
     "google_drive": [
         "https://www.googleapis.com/auth/drive",

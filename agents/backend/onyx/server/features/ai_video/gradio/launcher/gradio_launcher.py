@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
-"""
-Gradio Launcher for AI Video System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
-Launches the Gradio web interface with proper configuration,
-error handling, and system checks.
-"""
+# Constants
+BUFFER_SIZE = 1024
 
 import os
 import sys
@@ -13,12 +13,23 @@ import argparse
 import asyncio
 from pathlib import Path
 from typing import Optional
+from gradio_interface import GradioAIVideoApp
+import gradio as gr
+            import torch
+            import shutil
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Gradio Launcher for AI Video System
+
+Launches the Gradio web interface with proper configuration,
+error handling, and system checks.
+"""
+
 
 # Add the parent directory to the path
 sys.path.append(str(Path(__file__).parent))
 
-from gradio_interface import GradioAIVideoApp
-import gradio as gr
 
 # Configure logging
 logging.basicConfig(
@@ -35,7 +46,7 @@ logger = logging.getLogger(__name__)
 class GradioLauncher:
     """Launcher for the Gradio AI Video application"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = None
         self.server_name = "0.0.0.0"
         self.server_port = 7860
@@ -76,7 +87,6 @@ class GradioLauncher:
         """Check if GPU is available for video processing"""
         
         try:
-            import torch
             if torch.cuda.is_available():
                 gpu_count = torch.cuda.device_count()
                 gpu_name = torch.cuda.get_device_name(0)
@@ -93,7 +103,6 @@ class GradioLauncher:
         """Check available disk space"""
         
         try:
-            import shutil
             total, used, free = shutil.disk_usage("/")
             free_gb = free // (1024**3)
             
@@ -107,7 +116,7 @@ class GradioLauncher:
             logger.warning(f"Could not check disk space: {e}")
             return True
     
-    def create_directories(self):
+    def create_directories(self) -> Any:
         """Create necessary directories for the application"""
         
         directories = [
@@ -121,7 +130,7 @@ class GradioLauncher:
             Path(directory).mkdir(exist_ok=True)
             logger.info(f"Created directory: {directory}")
     
-    def setup_environment(self):
+    def setup_environment(self) -> Any:
         """Setup the environment for the application"""
         
         # Set environment variables
@@ -134,7 +143,7 @@ class GradioLauncher:
         
         logger.info("Environment setup completed")
     
-    def parse_arguments(self):
+    def parse_arguments(self) -> Any:
         """Parse command line arguments"""
         
         parser = argparse.ArgumentParser(
@@ -283,5 +292,6 @@ def main():
     launcher.run()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

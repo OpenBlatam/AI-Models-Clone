@@ -1,7 +1,5 @@
-"""
-Configuration Manager for Key Messages ML Pipeline
-Handles loading, merging, and validating YAML configuration files
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import yaml
 import os
 from pathlib import Path
@@ -10,6 +8,13 @@ from dataclasses import dataclass, field
 import structlog
 from copy import deepcopy
 import torch
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Configuration Manager for Key Messages ML Pipeline
+Handles loading, merging, and validating YAML configuration files
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -24,7 +29,9 @@ class ConfigManager:
     """Manages configuration loading, merging, and validation."""
     
     def __init__(self, config_dir: str = "config", environment: str = None):
-        self.config_dir = Path(config_dir)
+        
+    """__init__ function."""
+self.config_dir = Path(config_dir)
         self.environment = environment or os.getenv("ML_ENVIRONMENT", "development")
         self.config_cache = {}
         
@@ -54,6 +61,10 @@ class ConfigManager:
             raise FileNotFoundError(f"Main configuration file not found: {main_config_path}")
         
         with open(main_config_path, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             config = yaml.safe_load(f)
         
         logger.info("Main configuration loaded", config_file=str(main_config_path))
@@ -78,6 +89,10 @@ class ConfigManager:
         
         if env_config_path.exists():
             with open(env_config_path, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 env_config = yaml.safe_load(f)
             
             # Merge environment config with main config
@@ -369,13 +384,15 @@ class ConfigManager:
     
     def resolve_device(self, device_config: str) -> str:
         """Resolve device configuration to actual device."""
-        if device_config == "auto":
+        match device_config:
+    case "auto":
             return "cuda" if torch.cuda.is_available() else "cpu"
         return device_config
     
     def resolve_torch_dtype(self, dtype_config: str) -> torch.dtype:
         """Resolve torch dtype configuration to actual dtype."""
-        if dtype_config == "auto":
+        match dtype_config:
+    case "auto":
             return torch.float16 if torch.cuda.is_available() else torch.float32
         elif dtype_config == "float16":
             return torch.float16
@@ -455,6 +472,10 @@ class ConfigManager:
         output_path = self.config_dir / filename
         
         with open(output_path, 'w', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config, f, default_flow_style=False, indent=2, allow_unicode=True)
         
         logger.info("Configuration saved", output_file=str(output_path))

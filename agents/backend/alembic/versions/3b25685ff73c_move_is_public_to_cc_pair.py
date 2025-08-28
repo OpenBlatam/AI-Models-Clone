@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Move is_public to cc_pair
 
 Revision ID: 3b25685ff73c
@@ -6,12 +13,10 @@ Create Date: 2023-10-05 18:47:09.582849
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "3b25685ff73c"
-down_revision = "e0a68a81d434"
+revision: str = "3b25685ff73c"
+down_revision: str = "e0a68a81d434"
 branch_labels: None = None
 depends_on: None = None
 

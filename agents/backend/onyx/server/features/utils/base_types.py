@@ -1,12 +1,23 @@
-"""
-Base Types - Onyx Integration
-Type definitions and enums for model operations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Set, Type, TypeVar, Union
 from datetime import datetime
 from enum import Enum
 import uuid
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Base Types - Onyx Integration
+Type definitions and enums for model operations.
+"""
 
 # Type variables
 T = TypeVar('T', bound='OnyxBaseModel')

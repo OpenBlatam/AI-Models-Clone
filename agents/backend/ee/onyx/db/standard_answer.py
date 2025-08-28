@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 import string
 from collections.abc import Sequence
@@ -9,6 +11,9 @@ from onyx.db.models import StandardAnswer
 from onyx.db.models import StandardAnswerCategory
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -47,6 +52,11 @@ def insert_standard_answer(
     db_session: Session,
 ) -> StandardAnswer:
     existing_categories = fetch_standard_answer_categories_by_ids(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         standard_answer_category_ids=category_ids,
         db_session=db_session,
     )
@@ -82,6 +92,11 @@ def update_standard_answer(
         raise ValueError(f"No standard answer with id {standard_answer_id}")
 
     existing_categories = fetch_standard_answer_categories_by_ids(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         standard_answer_category_ids=category_ids,
         db_session=db_session,
     )
@@ -138,7 +153,12 @@ def update_standard_answer_category(
     return standard_answer_category
 
 
-def fetch_standard_answer_category(
+async async def fetch_standard_answer_category(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     standard_answer_category_id: int,
     db_session: Session,
 ) -> StandardAnswerCategory | None:
@@ -149,7 +169,12 @@ def fetch_standard_answer_category(
     )
 
 
-def fetch_standard_answer_categories_by_ids(
+async async def fetch_standard_answer_categories_by_ids(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     standard_answer_category_ids: list[int],
     db_session: Session,
 ) -> Sequence[StandardAnswerCategory]:
@@ -160,13 +185,23 @@ def fetch_standard_answer_categories_by_ids(
     ).all()
 
 
-def fetch_standard_answer_categories(
+async async def fetch_standard_answer_categories(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
 ) -> Sequence[StandardAnswerCategory]:
     return db_session.scalars(select(StandardAnswerCategory)).all()
 
 
-def fetch_standard_answer(
+async async def fetch_standard_answer(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     standard_answer_id: int,
     db_session: Session,
 ) -> StandardAnswer | None:
@@ -175,7 +210,12 @@ def fetch_standard_answer(
     )
 
 
-def fetch_standard_answers(db_session: Session) -> Sequence[StandardAnswer]:
+async async def fetch_standard_answers(db_session: Session) -> Sequence[StandardAnswer]:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     return db_session.scalars(
         select(StandardAnswer).where(StandardAnswer.active.is_(True))
     ).all()
@@ -185,6 +225,11 @@ def create_initial_default_standard_answer_category(db_session: Session) -> None
     default_category_id = 0
     default_category_name = "General"
     default_category = fetch_standard_answer_category(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         standard_answer_category_id=default_category_id,
         db_session=db_session,
     )
@@ -204,7 +249,12 @@ def create_initial_default_standard_answer_category(db_session: Session) -> None
     db_session.commit()
 
 
-def fetch_standard_answer_categories_by_names(
+async async def fetch_standard_answer_categories_by_names(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     standard_answer_category_names: list[str],
     db_session: Session,
 ) -> Sequence[StandardAnswerCategory]:

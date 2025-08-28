@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+import time
+import unittest
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Any
+import torch
+import torch.nn as nn
+import numpy as np
+import pytest
+from unittest.mock import Mock, patch, MagicMock
+from PIL import Image
+from diffusion_pipelines import (
+from typing import Any, List, Dict, Optional
 """
 Comprehensive Tests for Diffusion Pipelines
 ==========================================
@@ -17,22 +33,9 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import logging
-import time
-import unittest
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
 
-import torch
-import torch.nn as nn
-import numpy as np
-import pytest
-from unittest.mock import Mock, patch, MagicMock
-from PIL import Image
 
 # Import our diffusion pipelines
-from diffusion_pipelines import (
     PipelineType, SchedulerType, PipelineConfig, GenerationConfig,
     DiffusionPipelineFactory, AdvancedPipelineManager,
     BaseDiffusionPipeline, StableDiffusionPipelineWrapper,
@@ -50,18 +53,18 @@ logger = logging.getLogger(__name__)
 class MockPipeline:
     """Mock pipeline for testing."""
     
-    def __init__(self, config):
+    def __init__(self, config) -> Any:
         self.config = config
         self.scheduler = Mock()
         self.scheduler.config = {"beta_start": 0.0001, "beta_end": 0.02}
     
-    def to(self, device):
+    def to(self, device) -> Any:
         return self
     
-    def __call__(self, **kwargs):
+    def __call__(self, **kwargs) -> Any:
         # Mock generation result
         class MockResult:
-            def __init__(self):
+            def __init__(self) -> Any:
                 self.images = [Image.new('RGB', (512, 512), color='red')]
                 self.nsfw_content_detected = [False]
         
@@ -71,7 +74,7 @@ class MockPipeline:
 class TestPipelineConfig(unittest.TestCase):
     """Test cases for pipeline configuration."""
     
-    def test_pipeline_config_defaults(self):
+    def test_pipeline_config_defaults(self) -> Any:
         """Test pipeline configuration defaults."""
         config = PipelineConfig()
         
@@ -85,7 +88,7 @@ class TestPipelineConfig(unittest.TestCase):
         self.assertEqual(config.height, 512)
         self.assertEqual(config.width, 512)
     
-    def test_pipeline_config_custom(self):
+    def test_pipeline_config_custom(self) -> Any:
         """Test pipeline configuration with custom values."""
         config = PipelineConfig(
             pipeline_type=PipelineType.STABLE_DIFFUSION_XL,
@@ -113,7 +116,7 @@ class TestPipelineConfig(unittest.TestCase):
 class TestGenerationConfig(unittest.TestCase):
     """Test cases for generation configuration."""
     
-    def test_generation_config_defaults(self):
+    def test_generation_config_defaults(self) -> Any:
         """Test generation configuration defaults."""
         config = GenerationConfig(prompt="test prompt")
         
@@ -127,7 +130,7 @@ class TestGenerationConfig(unittest.TestCase):
         self.assertEqual(config.output_type, "pil")
         self.assertEqual(config.return_dict, True)
     
-    def test_generation_config_custom(self):
+    def test_generation_config_custom(self) -> Any:
         """Test generation configuration with custom values."""
         config = GenerationConfig(
             prompt="test prompt",
@@ -155,7 +158,7 @@ class TestGenerationConfig(unittest.TestCase):
 class TestBaseDiffusionPipeline(unittest.TestCase):
     """Test cases for base diffusion pipeline."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.config = PipelineConfig(
             pipeline_type=PipelineType.STABLE_DIFFUSION,
@@ -163,7 +166,7 @@ class TestBaseDiffusionPipeline(unittest.TestCase):
             scheduler_type=SchedulerType.DDIM
         )
     
-    def test_device_detection_auto(self):
+    def test_device_detection_auto(self) -> Any:
         """Test automatic device detection."""
         config = PipelineConfig(device="auto")
         
@@ -182,13 +185,13 @@ class TestBaseDiffusionPipeline(unittest.TestCase):
                 pipeline = StableDiffusionPipelineWrapper(config)
                 self.assertEqual(pipeline.device, torch.device("cpu"))
     
-    def test_device_detection_manual(self):
+    def test_device_detection_manual(self) -> Any:
         """Test manual device specification."""
         config = PipelineConfig(device="cpu")
         pipeline = StableDiffusionPipelineWrapper(config)
         self.assertEqual(pipeline.device, torch.device("cpu"))
     
-    def test_memory_usage_tracking(self):
+    def test_memory_usage_tracking(self) -> Any:
         """Test memory usage tracking."""
         config = PipelineConfig(device="cpu")
         pipeline = StableDiffusionPipelineWrapper(config)
@@ -197,7 +200,7 @@ class TestBaseDiffusionPipeline(unittest.TestCase):
         self.assertIsInstance(memory_usage, float)
         self.assertGreaterEqual(memory_usage, 0.0)
     
-    def test_cleanup(self):
+    def test_cleanup(self) -> Any:
         """Test pipeline cleanup."""
         config = PipelineConfig(device="cpu")
         pipeline = StableDiffusionPipelineWrapper(config)
@@ -213,7 +216,7 @@ class TestBaseDiffusionPipeline(unittest.TestCase):
 class TestStableDiffusionPipelineWrapper(unittest.TestCase):
     """Test cases for StableDiffusionPipeline wrapper."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.config = PipelineConfig(
             pipeline_type=PipelineType.STABLE_DIFFUSION,
@@ -223,7 +226,7 @@ class TestStableDiffusionPipelineWrapper(unittest.TestCase):
         )
     
     @patch('diffusion_pipelines.StableDiffusionPipeline.from_pretrained')
-    def test_create_pipeline(self, mock_from_pretrained):
+    def test_create_pipeline(self, mock_from_pretrained) -> Any:
         """Test pipeline creation."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -241,7 +244,7 @@ class TestStableDiffusionPipelineWrapper(unittest.TestCase):
         self.assertEqual(pipeline, mock_pipeline)
     
     @patch('diffusion_pipelines.StableDiffusionPipeline.from_pretrained')
-    def test_configure_pipeline(self, mock_from_pretrained):
+    def test_configure_pipeline(self, mock_from_pretrained) -> Any:
         """Test pipeline configuration."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -256,7 +259,7 @@ class TestStableDiffusionPipelineWrapper(unittest.TestCase):
         mock_pipeline.enable_vae_slicing.assert_called_once()
     
     @patch('diffusion_pipelines.StableDiffusionPipeline.from_pretrained')
-    def test_generate(self, mock_from_pretrained):
+    def test_generate(self, mock_from_pretrained) -> Any:
         """Test image generation."""
         mock_pipeline = Mock()
         mock_result = Mock()
@@ -288,7 +291,7 @@ class TestStableDiffusionPipelineWrapper(unittest.TestCase):
 class TestStableDiffusionXLPipelineWrapper(unittest.TestCase):
     """Test cases for StableDiffusionXLPipeline wrapper."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.config = PipelineConfig(
             pipeline_type=PipelineType.STABLE_DIFFUSION_XL,
@@ -298,7 +301,7 @@ class TestStableDiffusionXLPipelineWrapper(unittest.TestCase):
         )
     
     @patch('diffusion_pipelines.StableDiffusionXLPipeline.from_pretrained')
-    def test_create_pipeline(self, mock_from_pretrained):
+    def test_create_pipeline(self, mock_from_pretrained) -> Any:
         """Test pipeline creation."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -316,7 +319,7 @@ class TestStableDiffusionXLPipelineWrapper(unittest.TestCase):
         self.assertEqual(pipeline, mock_pipeline)
     
     @patch('diffusion_pipelines.StableDiffusionXLPipeline.from_pretrained')
-    def test_configure_pipeline(self, mock_from_pretrained):
+    def test_configure_pipeline(self, mock_from_pretrained) -> Any:
         """Test pipeline configuration."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -334,7 +337,7 @@ class TestStableDiffusionXLPipelineWrapper(unittest.TestCase):
 class TestStableDiffusionImg2ImgPipelineWrapper(unittest.TestCase):
     """Test cases for StableDiffusionImg2ImgPipeline wrapper."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.config = PipelineConfig(
             pipeline_type=PipelineType.IMG2IMG,
@@ -344,7 +347,7 @@ class TestStableDiffusionImg2ImgPipelineWrapper(unittest.TestCase):
         )
     
     @patch('diffusion_pipelines.StableDiffusionImg2ImgPipeline.from_pretrained')
-    def test_create_pipeline(self, mock_from_pretrained):
+    def test_create_pipeline(self, mock_from_pretrained) -> Any:
         """Test pipeline creation."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -362,7 +365,7 @@ class TestStableDiffusionImg2ImgPipelineWrapper(unittest.TestCase):
         self.assertEqual(pipeline, mock_pipeline)
     
     @patch('diffusion_pipelines.StableDiffusionImg2ImgPipeline.from_pretrained')
-    def test_generate_without_image(self, mock_from_pretrained):
+    def test_generate_without_image(self, mock_from_pretrained) -> Any:
         """Test generation without image (should fail)."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -385,7 +388,7 @@ class TestStableDiffusionImg2ImgPipelineWrapper(unittest.TestCase):
 class TestStableDiffusionInpaintPipelineWrapper(unittest.TestCase):
     """Test cases for StableDiffusionInpaintPipeline wrapper."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.config = PipelineConfig(
             pipeline_type=PipelineType.INPAINT,
@@ -395,7 +398,7 @@ class TestStableDiffusionInpaintPipelineWrapper(unittest.TestCase):
         )
     
     @patch('diffusion_pipelines.StableDiffusionInpaintPipeline.from_pretrained')
-    def test_create_pipeline(self, mock_from_pretrained):
+    def test_create_pipeline(self, mock_from_pretrained) -> Any:
         """Test pipeline creation."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -413,7 +416,7 @@ class TestStableDiffusionInpaintPipelineWrapper(unittest.TestCase):
         self.assertEqual(pipeline, mock_pipeline)
     
     @patch('diffusion_pipelines.StableDiffusionInpaintPipeline.from_pretrained')
-    def test_generate_without_image_and_mask(self, mock_from_pretrained):
+    def test_generate_without_image_and_mask(self, mock_from_pretrained) -> Any:
         """Test generation without image and mask (should fail)."""
         mock_pipeline = Mock()
         mock_from_pretrained.return_value = mock_pipeline
@@ -436,7 +439,7 @@ class TestStableDiffusionInpaintPipelineWrapper(unittest.TestCase):
 class TestStableDiffusionControlNetPipelineWrapper(unittest.TestCase):
     """Test cases for StableDiffusionControlNetPipeline wrapper."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.config = PipelineConfig(
             pipeline_type=PipelineType.CONTROLNET,
@@ -447,7 +450,7 @@ class TestStableDiffusionControlNetPipelineWrapper(unittest.TestCase):
     
     @patch('diffusion_pipelines.ControlNetModel.from_pretrained')
     @patch('diffusion_pipelines.StableDiffusionControlNetPipeline.from_pretrained')
-    def test_create_pipeline(self, mock_pipeline_from_pretrained, mock_controlnet_from_pretrained):
+    def test_create_pipeline(self, mock_pipeline_from_pretrained, mock_controlnet_from_pretrained) -> Any:
         """Test pipeline creation."""
         mock_controlnet = Mock()
         mock_pipeline = Mock()
@@ -465,7 +468,7 @@ class TestStableDiffusionControlNetPipelineWrapper(unittest.TestCase):
 class TestDiffusionPipelineFactory(unittest.TestCase):
     """Test cases for diffusion pipeline factory."""
     
-    def test_create_stable_diffusion_pipeline(self):
+    def test_create_stable_diffusion_pipeline(self) -> Any:
         """Test creating StableDiffusionPipeline."""
         config = PipelineConfig(
             pipeline_type=PipelineType.STABLE_DIFFUSION,
@@ -475,7 +478,7 @@ class TestDiffusionPipelineFactory(unittest.TestCase):
         pipeline = DiffusionPipelineFactory.create(config)
         self.assertIsInstance(pipeline, StableDiffusionPipelineWrapper)
     
-    def test_create_stable_diffusion_xl_pipeline(self):
+    def test_create_stable_diffusion_xl_pipeline(self) -> Any:
         """Test creating StableDiffusionXLPipeline."""
         config = PipelineConfig(
             pipeline_type=PipelineType.STABLE_DIFFUSION_XL,
@@ -485,7 +488,7 @@ class TestDiffusionPipelineFactory(unittest.TestCase):
         pipeline = DiffusionPipelineFactory.create(config)
         self.assertIsInstance(pipeline, StableDiffusionXLPipelineWrapper)
     
-    def test_create_img2img_pipeline(self):
+    def test_create_img2img_pipeline(self) -> Any:
         """Test creating StableDiffusionImg2ImgPipeline."""
         config = PipelineConfig(
             pipeline_type=PipelineType.IMG2IMG,
@@ -495,7 +498,7 @@ class TestDiffusionPipelineFactory(unittest.TestCase):
         pipeline = DiffusionPipelineFactory.create(config)
         self.assertIsInstance(pipeline, StableDiffusionImg2ImgPipelineWrapper)
     
-    def test_create_inpaint_pipeline(self):
+    def test_create_inpaint_pipeline(self) -> Any:
         """Test creating StableDiffusionInpaintPipeline."""
         config = PipelineConfig(
             pipeline_type=PipelineType.INPAINT,
@@ -505,7 +508,7 @@ class TestDiffusionPipelineFactory(unittest.TestCase):
         pipeline = DiffusionPipelineFactory.create(config)
         self.assertIsInstance(pipeline, StableDiffusionInpaintPipelineWrapper)
     
-    def test_create_controlnet_pipeline(self):
+    def test_create_controlnet_pipeline(self) -> Any:
         """Test creating StableDiffusionControlNetPipeline."""
         config = PipelineConfig(
             pipeline_type=PipelineType.CONTROLNET,
@@ -515,7 +518,7 @@ class TestDiffusionPipelineFactory(unittest.TestCase):
         pipeline = DiffusionPipelineFactory.create(config, controlnet_model_id="test/controlnet")
         self.assertIsInstance(pipeline, StableDiffusionControlNetPipelineWrapper)
     
-    def test_create_invalid_pipeline_type(self):
+    def test_create_invalid_pipeline_type(self) -> Any:
         """Test creating pipeline with invalid type."""
         config = PipelineConfig(
             pipeline_type="invalid",
@@ -529,16 +532,16 @@ class TestDiffusionPipelineFactory(unittest.TestCase):
 class TestAdvancedPipelineManager(unittest.TestCase):
     """Test cases for advanced pipeline manager."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.manager = AdvancedPipelineManager()
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test manager initialization."""
         self.assertEqual(len(self.manager.pipelines), 0)
         self.assertIsNone(self.manager.active_pipeline)
     
-    def test_add_pipeline(self):
+    def test_add_pipeline(self) -> Any:
         """Test adding a pipeline."""
         config = PipelineConfig(
             pipeline_type=PipelineType.STABLE_DIFFUSION,
@@ -558,7 +561,7 @@ class TestAdvancedPipelineManager(unittest.TestCase):
             self.assertIn("test_pipeline", self.manager.pipelines)
             self.assertEqual(self.manager.active_pipeline, "test_pipeline")
     
-    def test_remove_pipeline(self):
+    def test_remove_pipeline(self) -> Any:
         """Test removing a pipeline."""
         # Add a pipeline first
         config = PipelineConfig(
@@ -580,7 +583,7 @@ class TestAdvancedPipelineManager(unittest.TestCase):
             self.assertNotIn("test_pipeline", self.manager.pipelines)
             self.assertIsNone(self.manager.active_pipeline)
     
-    def test_set_active_pipeline(self):
+    def test_set_active_pipeline(self) -> Any:
         """Test setting active pipeline."""
         # Add a pipeline first
         config = PipelineConfig(
@@ -600,12 +603,12 @@ class TestAdvancedPipelineManager(unittest.TestCase):
             self.manager.set_active_pipeline("test_pipeline")
             self.assertEqual(self.manager.active_pipeline, "test_pipeline")
     
-    def test_set_active_pipeline_not_found(self):
+    def test_set_active_pipeline_not_found(self) -> Any:
         """Test setting active pipeline that doesn't exist."""
         with self.assertRaises(ValueError):
             self.manager.set_active_pipeline("nonexistent_pipeline")
     
-    def test_get_pipeline_info(self):
+    def test_get_pipeline_info(self) -> Optional[Dict[str, Any]]:
         """Test getting pipeline information."""
         # Add a pipeline first
         config = PipelineConfig(
@@ -630,7 +633,7 @@ class TestAdvancedPipelineManager(unittest.TestCase):
             self.assertEqual(info["test_pipeline"]["model_id"], "runwayml/stable-diffusion-v1-5")
             self.assertTrue(info["test_pipeline"]["is_active"])
     
-    def test_cleanup_all(self):
+    def test_cleanup_all(self) -> Any:
         """Test cleaning up all pipelines."""
         # Add a pipeline first
         config = PipelineConfig(
@@ -658,7 +661,7 @@ class TestAdvancedPipelineManager(unittest.TestCase):
 class TestUtilityFunctions(unittest.TestCase):
     """Test cases for utility functions."""
     
-    def test_create_pipeline(self):
+    def test_create_pipeline(self) -> Any:
         """Test create_pipeline utility function."""
         with patch('diffusion_pipelines.DiffusionPipelineFactory.create') as mock_create:
             mock_pipeline = Mock()
@@ -669,12 +672,12 @@ class TestUtilityFunctions(unittest.TestCase):
             mock_create.assert_called_once()
             self.assertEqual(pipeline, mock_pipeline)
     
-    def test_create_pipeline_manager(self):
+    def test_create_pipeline_manager(self) -> Any:
         """Test create_pipeline_manager utility function."""
         manager = create_pipeline_manager()
         self.assertIsInstance(manager, AdvancedPipelineManager)
     
-    def test_get_available_pipeline_types(self):
+    def test_get_available_pipeline_types(self) -> Optional[Dict[str, Any]]:
         """Test get_available_pipeline_types utility function."""
         pipeline_types = get_available_pipeline_types()
         self.assertIsInstance(pipeline_types, list)
@@ -684,7 +687,7 @@ class TestUtilityFunctions(unittest.TestCase):
         self.assertIn(PipelineType.INPAINT, pipeline_types)
         self.assertIn(PipelineType.CONTROLNET, pipeline_types)
     
-    def test_get_available_scheduler_types(self):
+    def test_get_available_scheduler_types(self) -> Optional[Dict[str, Any]]:
         """Test get_available_scheduler_types utility function."""
         scheduler_types = get_available_scheduler_types()
         self.assertIsInstance(scheduler_types, list)
@@ -697,7 +700,7 @@ class TestUtilityFunctions(unittest.TestCase):
 class TestPerformanceAndMemory(unittest.TestCase):
     """Test cases for performance and memory usage."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.config = PipelineConfig(
             pipeline_type=PipelineType.STABLE_DIFFUSION,
@@ -706,7 +709,7 @@ class TestPerformanceAndMemory(unittest.TestCase):
             device="cpu"
         )
     
-    def test_memory_usage_tracking(self):
+    def test_memory_usage_tracking(self) -> Any:
         """Test memory usage tracking."""
         with patch('diffusion_pipelines.StableDiffusionPipeline.from_pretrained') as mock_from_pretrained:
             mock_pipeline = Mock()
@@ -718,7 +721,7 @@ class TestPerformanceAndMemory(unittest.TestCase):
             self.assertIsInstance(memory_usage, float)
             self.assertGreaterEqual(memory_usage, 0.0)
     
-    def test_processing_time_tracking(self):
+    def test_processing_time_tracking(self) -> Any:
         """Test processing time tracking."""
         with patch('diffusion_pipelines.StableDiffusionPipeline.from_pretrained') as mock_from_pretrained:
             mock_pipeline = Mock()
@@ -748,7 +751,7 @@ class TestPerformanceAndMemory(unittest.TestCase):
 class TestEdgeCases(unittest.TestCase):
     """Test cases for edge cases and error conditions."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.config = PipelineConfig(
             pipeline_type=PipelineType.STABLE_DIFFUSION,
@@ -757,7 +760,7 @@ class TestEdgeCases(unittest.TestCase):
             device="cpu"
         )
     
-    def test_pipeline_not_loaded_error(self):
+    def test_pipeline_not_loaded_error(self) -> Any:
         """Test error when pipeline is not loaded."""
         wrapper = StableDiffusionPipelineWrapper(self.config)
         
@@ -772,14 +775,14 @@ class TestEdgeCases(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             wrapper.generate(generation_config)
     
-    def test_invalid_device(self):
+    def test_invalid_device(self) -> Any:
         """Test invalid device specification."""
         config = PipelineConfig(device="invalid_device")
         
         with self.assertRaises(Exception):
             wrapper = StableDiffusionPipelineWrapper(config)
     
-    def test_empty_prompt(self):
+    def test_empty_prompt(self) -> Any:
         """Test generation with empty prompt."""
         with patch('diffusion_pipelines.StableDiffusionPipeline.from_pretrained') as mock_from_pretrained:
             mock_pipeline = Mock()
@@ -804,7 +807,7 @@ class TestEdgeCases(unittest.TestCase):
             result = wrapper.generate(generation_config)
             self.assertIsInstance(result.images, list)
     
-    def test_zero_inference_steps(self):
+    def test_zero_inference_steps(self) -> Any:
         """Test generation with zero inference steps."""
         with patch('diffusion_pipelines.StableDiffusionPipeline.from_pretrained') as mock_from_pretrained:
             mock_pipeline = Mock()

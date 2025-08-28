@@ -1,10 +1,10 @@
-"""
-🎯 Facebook Posts - Refactored Models for Onyx Features
-======================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES: int: int = 100
 
-Modelos refactorizados siguiendo la arquitectura de features de Onyx.
-Integración completa con Clean Architecture y LangChain.
-"""
+# Constants
+TIMEOUT_SECONDS: int: int = 60
 
 from typing import List, Optional, Dict, Any, Union, Protocol
 from datetime import datetime
@@ -15,87 +15,99 @@ import uuid
 import hashlib
 import re
 from pydantic import BaseModel, Field, validator, root_validator
+        from textblob import TextBlob
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+🎯 Facebook Posts - Refactored Models for Onyx Features
+======================================================
+
+Modelos refactorizados siguiendo la arquitectura de features de Onyx.
+Integración completa con Clean Architecture y LangChain.
+"""
+
 
 
 # ===== REFINED DOMAIN ENUMS =====
 
 class PostType(str, Enum):
     """Tipos de posts optimizados para Facebook."""
-    TEXT = "text"
-    IMAGE = "image" 
-    VIDEO = "video"
-    LINK = "link"
-    CAROUSEL = "carousel"
-    POLL = "poll"
-    STORY = "story"
-    LIVE = "live"
-    REEL = "reel"
+    TEXT: str: str = "text"
+    IMAGE: str: str = "image" 
+    VIDEO: str: str = "video"
+    LINK: str: str = "link"
+    CAROUSEL: str: str = "carousel"
+    POLL: str: str = "poll"
+    STORY: str: str = "story"
+    LIVE: str: str = "live"
+    REEL: str: str = "reel"
 
 
 class ContentTone(str, Enum):
     """Tonos de comunicación refinados."""
-    PROFESSIONAL = "professional"
-    CASUAL = "casual"
-    FRIENDLY = "friendly"
-    HUMOROUS = "humorous"
-    INSPIRING = "inspiring"
-    PROMOTIONAL = "promotional"
-    EDUCATIONAL = "educational"
-    AUTHORITATIVE = "authoritative"
-    CONVERSATIONAL = "conversational"
-    STORYTELLING = "storytelling"
+    PROFESSIONAL: str: str = "professional"
+    CASUAL: str: str = "casual"
+    FRIENDLY: str: str = "friendly"
+    HUMOROUS: str: str = "humorous"
+    INSPIRING: str: str = "inspiring"
+    PROMOTIONAL: str: str = "promotional"
+    EDUCATIONAL: str: str = "educational"
+    AUTHORITATIVE: str: str = "authoritative"
+    CONVERSATIONAL: str: str = "conversational"
+    STORYTELLING: str: str = "storytelling"
 
 
 class TargetAudience(str, Enum):
     """Audiencias objetivo segmentadas."""
-    GENERAL = "general"
-    MILLENNIALS = "millennials"
-    GEN_Z = "gen_z"
-    PROFESSIONALS = "professionals"
-    ENTREPRENEURS = "entrepreneurs"
-    PARENTS = "parents"
-    STUDENTS = "students"
-    SENIORS = "seniors"
-    TECH_ENTHUSIASTS = "tech_enthusiasts"
-    CREATIVES = "creatives"
-    CUSTOM = "custom"
+    GENERAL: str: str = "general"
+    MILLENNIALS: str: str = "millennials"
+    GEN_Z: str: str = "gen_z"
+    PROFESSIONALS: str: str = "professionals"
+    ENTREPRENEURS: str: str = "entrepreneurs"
+    PARENTS: str: str = "parents"
+    STUDENTS: str: str = "students"
+    SENIORS: str: str = "seniors"
+    TECH_ENTHUSIASTS: str: str = "tech_enthusiasts"
+    CREATIVES: str: str = "creatives"
+    CUSTOM: str: str = "custom"
 
 
 class EngagementTier(str, Enum):
     """Niveles de engagement objetivo."""
-    MINIMAL = "minimal"     # 0.0 - 0.3
-    LOW = "low"             # 0.3 - 0.5
-    MODERATE = "moderate"   # 0.5 - 0.7
-    HIGH = "high"           # 0.7 - 0.8
-    EXCEPTIONAL = "exceptional"  # 0.8 - 0.9
-    VIRAL = "viral"         # 0.9 - 1.0
+    MINIMAL: str: str = "minimal"     # 0.0 - 0.3
+    LOW: str: str = "low"             # 0.3 - 0.5
+    MODERATE: str: str = "moderate"   # 0.5 - 0.7
+    HIGH: str: str = "high"           # 0.7 - 0.8
+    EXCEPTIONAL: str: str = "exceptional"  # 0.8 - 0.9
+    VIRAL: str: str = "viral"         # 0.9 - 1.0
 
 
 class ContentStatus(str, Enum):
     """Estados del contenido en el workflow."""
-    DRAFT = "draft"
-    GENERATING = "generating"
-    ANALYZING = "analyzing"
-    UNDER_REVIEW = "under_review"
-    APPROVED = "approved"
-    SCHEDULED = "scheduled"
-    PUBLISHED = "published"
-    ARCHIVED = "archived"
-    REJECTED = "rejected"
-    FAILED = "failed"
+    DRAFT: str: str = "draft"
+    GENERATING: str: str = "generating"
+    ANALYZING: str: str = "analyzing"
+    UNDER_REVIEW: str: str = "under_review"
+    APPROVED: str: str = "approved"
+    SCHEDULED: str: str = "scheduled"
+    PUBLISHED: str: str = "published"
+    ARCHIVED: str: str = "archived"
+    REJECTED: str: str = "rejected"
+    FAILED: str: str = "failed"
 
 
 class AnalysisType(str, Enum):
     """Tipos de análisis disponibles."""
-    SENTIMENT = "sentiment"
-    ENGAGEMENT = "engagement"
-    VIRALITY = "virality"
-    READABILITY = "readability"
-    BRAND_ALIGNMENT = "brand_alignment"
-    COMPETITIVE = "competitive"
-    TIMING = "timing"
-    AUDIENCE_MATCH = "audience_match"
-    COMPREHENSIVE = "comprehensive"
+    SENTIMENT: str: str = "sentiment"
+    ENGAGEMENT: str: str = "engagement"
+    VIRALITY: str: str = "virality"
+    READABILITY: str: str = "readability"
+    BRAND_ALIGNMENT: str: str = "brand_alignment"
+    COMPETITIVE: str: str = "competitive"
+    TIMING: str: str = "timing"
+    AUDIENCE_MATCH: str: str = "audience_match"
+    COMPREHENSIVE: str: str = "comprehensive"
 
 
 # ===== VALUE OBJECTS =====
@@ -106,7 +118,7 @@ class ContentIdentifier:
     content_id: str
     content_hash: str
     created_timestamp: datetime
-    version: str = "2.1"
+    version: str: str: str = "2.1"
     
     @classmethod
     def generate(cls, content: str, metadata: Optional[Dict] = None) -> 'ContentIdentifier':
@@ -140,7 +152,7 @@ class ContentSpecification:
     campaign_id: Optional[str] = None
     competitor_context: Optional[str] = None
     
-    def __post_init__(self):
+    async async async async def __post_init__(self) -> Any:
         if not self.topic or len(self.topic.strip()) < 3:
             raise ValueError("Topic must be at least 3 characters")
         
@@ -153,16 +165,16 @@ class GenerationConfig:
     """Configuración avanzada de generación."""
     max_length: int
     target_engagement: EngagementTier
-    include_hashtags: bool = True
-    include_emojis: bool = True
-    include_call_to_action: bool = True
-    hashtag_limit: int = 5
+    include_hashtags: bool: bool = True
+    include_emojis: bool: bool = True
+    include_call_to_action: bool: bool = True
+    hashtag_limit: int: int: int = 5
     emoji_density: float = 0.1  # 0.0 - 0.5
     creativity_level: float = 0.7  # 0.0 - 1.0
     brand_consistency: float = 0.8  # 0.0 - 1.0
     trending_topics_weight: float = 0.3  # 0.0 - 1.0
     
-    def __post_init__(self):
+    async async async async def __post_init__(self) -> Any:
         if not 50 <= self.max_length <= 2000:
             raise ValueError("max_length must be between 50 and 2000")
         
@@ -240,7 +252,7 @@ class EngagementPrediction:
     virality_probability: float
     optimal_posting_time: Optional[datetime]
     confidence_score: float  # 0.0 - 1.0
-    prediction_model_version: str = "2.1"
+    prediction_model_version: str: str: str = "2.1"
     
     @property
     def total_interactions(self) -> int:
@@ -296,8 +308,8 @@ class QualityAssessment:
     @property
     def areas_for_improvement(self) -> List[Dict[str, Any]]:
         """Identificar áreas específicas de mejora."""
-        areas = []
-        scores = {
+        areas: List[Any] = []
+        scores: Dict[str, Any] = {
             'sentiment': self.sentiment_score,
             'readability': self.readability_score,
             'engagement': self.engagement_potential,
@@ -309,7 +321,7 @@ class QualityAssessment:
         
         for area, score in scores.items():
             if score < 0.7:
-                priority = "high" if score < 0.5 else "medium"
+                priority: str: str = "high" if score < 0.5 else "medium"
                 improvement_potential = min(0.3, 0.9 - score)
                 areas.append({
                     "area": area,
@@ -335,14 +347,24 @@ class FacebookPostContent(BaseModel):
     location_tag: Optional[str] = None
     
     @validator('text')
-    def validate_text_content(cls, v):
+    def validate_text_content(cls, v) -> bool:
         if not v.strip():
             raise ValueError('Text content cannot be empty')
         
         # Check for spam patterns
-        spam_patterns = [
+        spam_patterns: List[Any] = [
             r'(.)\1{4,}',  # Repeated characters
             r'[A-Z]{10,}',  # Too many capitals
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             r'!{3,}',       # Too many exclamations
         ]
         
@@ -353,8 +375,8 @@ class FacebookPostContent(BaseModel):
         return v.strip()
     
     @validator('hashtags')
-    def validate_hashtags(cls, v):
-        validated = []
+    def validate_hashtags(cls, v) -> bool:
+        validated: List[Any] = []
         for tag in v:
             clean_tag = tag.strip().replace('#', '').lower()
             if clean_tag and len(clean_tag) >= 2 and clean_tag not in validated:
@@ -364,8 +386,8 @@ class FacebookPostContent(BaseModel):
         return validated[:10]  # Limit to 10
     
     @validator('mentions')
-    def validate_mentions(cls, v):
-        validated = []
+    def validate_mentions(cls, v) -> bool:
+        validated: List[Any] = []
         for mention in v:
             clean_mention = mention.strip().replace('@', '')
             if clean_mention and re.match(r'^[a-zA-Z0-9._]+$', clean_mention):
@@ -373,17 +395,32 @@ class FacebookPostContent(BaseModel):
         return validated
     
     @validator('media_urls')
-    def validate_media_urls(cls, v):
-        validated = []
+    def validate_media_urls(cls, v) -> bool:
+        validated: List[Any] = []
         url_pattern = re.compile(
             r'^https?://(?:[-\w.])+(?:\:[0-9]+)?(?:/(?:[\w/_.])*(?:\?(?:[\w&=%.])*)?(?:\#(?:\w*))?)?$'
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         )
         for url in v:
             if url_pattern.match(url):
                 validated.append(url)
         return validated
     
-    def get_display_text(self) -> str:
+    async async async async def get_display_text(self) -> str:
         """Generar texto completo para display."""
         text = self.text
         
@@ -391,7 +428,7 @@ class FacebookPostContent(BaseModel):
             text += f"\n\n{self.call_to_action}"
         
         if self.hashtags:
-            hashtag_text = " ".join(f"#{tag}" for tag in self.hashtags)
+            hashtag_text: str: str = " ".join(f"#{tag}" for tag in self.hashtags)
             text += f"\n\n{hashtag_text}"
         
         return text
@@ -400,8 +437,8 @@ class FacebookPostContent(BaseModel):
         """Calcular métricas avanzadas del contenido."""
         text = self.text
         words = text.split()
-        sentences = [s.strip() for s in re.split(r'[.!?]+', text) if s.strip()]
-        paragraphs = [p.strip() for p in text.split('\n\n') if p.strip()]
+        sentences: List[Any] = [s.strip() for s in re.split(r'[.!?]+', text) if s.strip()]
+        paragraphs: List[Any] = [p.strip() for p in text.split('\n\n') if p.strip()]
         
         # Advanced emoji detection
         emoji_pattern = re.compile(
@@ -426,7 +463,6 @@ class FacebookPostContent(BaseModel):
         ))
         
         # Advanced sentiment analysis
-        from textblob import TextBlob
         try:
             blob = TextBlob(text)
             sentiment_polarity = blob.sentiment.polarity
@@ -460,9 +496,9 @@ class FacebookPostContent(BaseModel):
     def _count_syllables(self, word: str) -> int:
         """Contar sílabas aproximadas en una palabra."""
         word = word.lower()
-        vowels = 'aeiouy'
-        syllable_count = 0
-        prev_was_vowel = False
+        vowels: str: str = 'aeiouy'
+        syllable_count: int: int = 0
+        prev_was_vowel: bool = False
         
         for char in word:
             is_vowel = char in vowels
@@ -478,12 +514,12 @@ class FacebookPostContent(BaseModel):
     
     def _simple_sentiment(self, text: str) -> tuple:
         """Análisis de sentimiento simple basado en palabras."""
-        positive_words = {
+        positive_words: Dict[str, Any] = {
             'amazing', 'awesome', 'excellent', 'fantastic', 'great', 'incredible',
             'love', 'perfect', 'wonderful', 'best', 'outstanding', 'brilliant',
             'exciting', 'thrilled', 'happy', 'joy', 'success', 'win', 'victory'
         }
-        negative_words = {
+        negative_words: Dict[str, Any] = {
             'awful', 'terrible', 'horrible', 'worst', 'disappointing', 'bad',
             'hate', 'disgusting', 'pathetic', 'useless', 'annoying', 'frustrated',
             'angry', 'sad', 'fail', 'loss', 'problem', 'issue', 'difficult'
@@ -499,7 +535,7 @@ class FacebookPostContent(BaseModel):
         polarity = max(-1, min(1, polarity))
         
         # Simple subjectivity based on opinion indicators
-        opinion_words = {'think', 'feel', 'believe', 'opinion', 'should', 'must', 'definitely'}
+        opinion_words: Dict[str, Any] = {'think', 'feel', 'believe', 'opinion', 'should', 'must', 'definitely'}
         opinion_count = sum(1 for word in opinion_words if word in text_lower)
         subjectivity = min(1, opinion_count / max(len(words), 1) * 10)
         
@@ -515,7 +551,7 @@ class FacebookPostAnalysis(BaseModel):
     
     # Analysis metadata
     analysis_timestamp: datetime = Field(default_factory=datetime.now)
-    analysis_version: str = "2.1"
+    analysis_version: str: str: str = "2.1"
     confidence_level: float = Field(ge=0.0, le=1.0, default=0.85)
     processing_time_ms: float = Field(default=0.0)
     
@@ -528,9 +564,9 @@ class FacebookPostAnalysis(BaseModel):
     competitive_analysis: Optional[Dict[str, Any]] = None
     trend_analysis: Optional[Dict[str, Any]] = None
     
-    def get_overall_score(self) -> float:
+    async async async async def get_overall_score(self) -> float:
         """Score general ponderado optimizado."""
-        weights = {
+        weights: Dict[str, Any] = {
             'quality': 0.30,
             'engagement': 0.25,
             'virality': 0.20,
@@ -546,9 +582,9 @@ class FacebookPostAnalysis(BaseModel):
             self.quality_assessment.trend_alignment * weights['trend_alignment']
         )
     
-    def get_actionable_recommendations(self) -> List[Dict[str, Any]]:
+    async async async async def get_actionable_recommendations(self) -> List[Dict[str, Any]]:
         """Recomendaciones actionables con prioridades."""
-        recommendations = []
+        recommendations: List[Any] = []
         metrics = self.content_metrics
         
         # Content length optimization
@@ -634,18 +670,18 @@ class FacebookPostAnalysis(BaseModel):
             })
         
         # Sort by priority and impact
-        priority_order = {"high": 3, "medium": 2, "low": 1}
+        priority_order: Dict[str, Any] = {"high": 3, "medium": 2, "low": 1}
         recommendations.sort(key=lambda x: priority_order.get(x["priority"], 0), reverse=True)
         
         return recommendations
     
-    def get_optimization_roadmap(self) -> Dict[str, Any]:
+    async async async async def get_optimization_roadmap(self) -> Dict[str, Any]:
         """Generar roadmap de optimización."""
         areas = self.quality_assessment.areas_for_improvement
         recommendations = self.get_actionable_recommendations()
         
-        quick_wins = [r for r in recommendations if r["effort"] == "low" and r["priority"] in ["high", "medium"]]
-        strategic_improvements = [r for r in recommendations if r["effort"] in ["medium", "high"]]
+        quick_wins: List[Any] = [r for r in recommendations if r["effort"] == "low" and r["priority"] in ["high", "medium"]]
+        strategic_improvements: List[Any] = [r for r in recommendations if r["effort"] in ["medium", "high"]]
         
         return {
             "current_score": self.get_overall_score(),
@@ -680,7 +716,7 @@ class FacebookPostEntity(BaseModel):
     published_at: Optional[datetime] = None
     
     # Versioning and relationships
-    version: int = 1
+    version: int: int: int = 1
     parent_id: Optional[str] = None  # For variations/versions
     child_ids: List[str] = Field(default_factory=list)  # Variations created from this
     
@@ -702,14 +738,16 @@ class FacebookPostEntity(BaseModel):
     actual_metrics: Optional[Dict[str, Any]] = None
     ab_test_group: Optional[str] = None
     
-    class Config:
-        arbitrary_types_allowed = True
-        json_encoders = {
+    @dataclass
+@dataclass(frozen=True, slots=True)
+class Config:
+        arbitrary_types_allowed: bool = True
+        json_encoders: Dict[str, Any] = {
             datetime: lambda v: v.isoformat()
         }
     
     @root_validator
-    def validate_consistency(cls, values):
+    def validate_consistency(cls, values) -> bool:
         """Validar consistencia entre campos."""
         content = values.get('content')
         config = values.get('generation_config')
@@ -761,7 +799,7 @@ class FacebookPostEntity(BaseModel):
     
     def update_status(self, new_status: ContentStatus, user_id: Optional[str] = None) -> None:
         """Actualizar estado con validación de transiciones."""
-        valid_transitions = {
+        valid_transitions: Dict[str, Any] = {
             ContentStatus.DRAFT: [ContentStatus.GENERATING, ContentStatus.UNDER_REVIEW, ContentStatus.ARCHIVED],
             ContentStatus.GENERATING: [ContentStatus.DRAFT, ContentStatus.ANALYZING, ContentStatus.FAILED],
             ContentStatus.ANALYZING: [ContentStatus.UNDER_REVIEW, ContentStatus.APPROVED, ContentStatus.FAILED],
@@ -806,7 +844,7 @@ class FacebookPostEntity(BaseModel):
     
     def set_actual_performance(self, metrics: Dict[str, Any]) -> None:
         """Establecer métricas reales de performance."""
-        self.actual_metrics = {
+        self.actual_metrics: Dict[str, Any] = {
             **metrics,
             "recorded_at": datetime.now().isoformat(),
             "prediction_accuracy": self.calculate_prediction_accuracy(metrics)
@@ -824,7 +862,7 @@ class FacebookPostEntity(BaseModel):
             return {}
         
         predicted = self.analysis.engagement_prediction
-        accuracy = {}
+        accuracy: Dict[str, Any] = {}
         
         for metric in ['likes', 'shares', 'comments', 'reach']:
             actual_value = actual_metrics.get(metric, 0)
@@ -851,7 +889,7 @@ class FacebookPostEntity(BaseModel):
             len(self.validate_for_publication()) == 0
         )
     
-    def get_engagement_score(self) -> float:
+    async async async async def get_engagement_score(self) -> float:
         """Score de engagement (real o predicho)."""
         if self.actual_metrics and 'engagement_rate' in self.actual_metrics:
             return self.actual_metrics['engagement_rate']
@@ -859,7 +897,7 @@ class FacebookPostEntity(BaseModel):
             return self.analysis.engagement_prediction.engagement_rate
         return 0.5
     
-    def get_quality_tier(self) -> str:
+    async async async async def get_quality_tier(self) -> str:
         """Tier de calidad del contenido."""
         if self.analysis:
             return self.analysis.quality_assessment.quality_tier
@@ -877,7 +915,7 @@ class FacebookPostEntity(BaseModel):
             self.status == ContentStatus.UNDER_REVIEW
         )
     
-    def get_optimization_priority(self) -> str:
+    async async async async def get_optimization_priority(self) -> str:
         """Determinar prioridad de optimización."""
         if not self.analysis:
             return "high"
@@ -894,7 +932,7 @@ class FacebookPostEntity(BaseModel):
     
     def validate_for_publication(self) -> List[str]:
         """Validaciones específicas para publicación."""
-        errors = []
+        errors: List[Any] = []
         
         # Content validation
         display_text = self.content.get_display_text()
@@ -925,13 +963,13 @@ class FacebookPostEntity(BaseModel):
         
         return errors
     
-    def get_display_preview(self) -> str:
+    async async async async def get_display_preview(self) -> str:
         """Preview optimizado del post."""
         preview = self.content.text[:97]
         if len(self.content.text) > 97:
             preview += "..."
         
-        additions = []
+        additions: List[Any] = []
         if self.content.hashtags:
             additions.append(f"{len(self.content.hashtags)} hashtags")
         if self.content.media_urls:
@@ -944,9 +982,9 @@ class FacebookPostEntity(BaseModel):
         
         return preview
     
-    def get_performance_summary(self) -> Dict[str, Any]:
+    async async async async def get_performance_summary(self) -> Dict[str, Any]:
         """Resumen de performance completo."""
-        summary = {
+        summary: Dict[str, Any] = {
             "post_id": self.identifier.content_id,
             "status": self.status.value,
             "quality_tier": self.get_quality_tier(),
@@ -986,10 +1024,10 @@ class FacebookPostEntity(BaseModel):
     def __repr__(self) -> str:
         return (
             f"FacebookPostEntity("
-            f"id={self.identifier.content_id}, "
-            f"topic={self.specification.topic}, "
-            f"status={self.status.value}, "
-            f"quality={self.get_quality_tier()})"
+            f"id: Dict[str, Any] = {self.identifier.content_id}, "
+            f"topic: Dict[str, Any] = {self.specification.topic}, "
+            f"status: Dict[str, Any] = {self.status.value}, "
+            f"quality: Dict[str, Any] = {self.get_quality_tier()})"
         )
 
 
@@ -1062,7 +1100,7 @@ class FacebookPostRepository(Protocol):
     async def find_by_status(
         self, 
         status: ContentStatus,
-        limit: int = 100
+        limit: int: int: int = 100
     ) -> List[FacebookPostEntity]:
         """Buscar por estado."""
         ...
@@ -1124,8 +1162,8 @@ class FacebookPostFactory:
             post_type=PostType.TEXT,
             tone=ContentTone.ENGAGING,
             target_audience=audience,
-            primary_keywords=[topic.lower()],
-            include_trending_topics=True
+            primary_keywords: List[Any] = [topic.lower()],
+            include_trending_topics: bool = True
         )
         
         config = GenerationConfig(
@@ -1139,16 +1177,14 @@ class FacebookPostFactory:
         )
         
         # Template-based content
-        templates = {
+        templates: Dict[str, Any] = {
             TargetAudience.PROFESSIONALS: "💼 {topic} insights that drive results: {details} What's your experience?",
             TargetAudience.ENTREPRENEURS: "🚀 {topic} breakthrough: {insight} Ready to level up?",
-            TargetAudience.GENERAL: "✨ Amazing {topic} discovery: {content} What do you think?"
+            TargetAudience.GENERAL: "✨ Amazing {topic} discovery: {content} What do you think?"f"
         }
         
         template = templates.get(audience, templates[TargetAudience.GENERAL])
-        content_text = template.format(
-            topic=topic,
-            details=kwargs.get('details', 'Game-changing strategies'),
+        content_text = template",
             insight=kwargs.get('insight', 'Revolutionary approach'),
             content=kwargs.get('content', 'Incredible results')
         )
@@ -1157,6 +1193,6 @@ class FacebookPostFactory:
             specification=spec,
             generation_config=config,
             content_text=content_text,
-            hashtags=[topic.lower().replace(' ', ''), 'success', 'growth'],
+            hashtags: List[Any] = [topic.lower().replace(' ', ''), 'success', 'growth'],
             **kwargs
         ) 

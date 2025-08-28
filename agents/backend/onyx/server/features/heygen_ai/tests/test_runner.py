@@ -58,16 +58,8 @@ sys.path.insert(0, str(project_root))
 class TestRunner:
     """Comprehensive test runner for HeyGen AI service."""
     
-    def __init__(self) -> Any:
-        self.start_time = None
-        self.results = {}
-        self.coverage_data = {}
-        self.performance_metrics = {}
-        self.project_root = project_root
-        self.tests_dir = current_dir
-        
+    @staticmethod
     def run_tests(
-        self,
         categories: List[str] = None,
         parallel: bool = False,
         coverage: bool = False,
@@ -89,7 +81,7 @@ class TestRunner:
         Returns:
             Dictionary containing test results and metrics
         """
-        self.start_time = time.time()
+        start_time = time.time()
         
         if categories is None:
             categories = ['unit', 'integration', 'performance']
@@ -98,7 +90,7 @@ class TestRunner:
             output_path = Path(output_dir)
             output_path.mkdir(parents=True, exist_ok=True)
         else:
-            output_path = self.tests_dir / "reports"
+            output_path = current_dir / "reports"
             output_path.mkdir(exist_ok=True)
         
         print("🚀 HeyGen AI Testing Framework")
@@ -110,10 +102,14 @@ class TestRunner:
         print(f"Output: {output_path}")
         print("=" * 50)
         
+        results = {}
+        coverage_data = {}
+        performance_metrics = {}
+        
         # Run each test category
         for category in categories:
             print(f"\n🧪 Running {category} tests...")
-            category_results = self._run_category(
+            category_results = TestRunner._run_category(
                 category=category,
                 parallel=parallel,
                 coverage=coverage,
@@ -121,24 +117,24 @@ class TestRunner:
                 benchmark=benchmark,
                 output_dir=output_path
             )
-            self.results[category] = category_results
+            results[category] = category_results
         
         # Generate comprehensive report
-        report = self._generate_report(output_path)
+        report = TestRunner._generate_report(output_path, results, coverage_data, performance_metrics)
         
         # Print summary
-        self._print_summary()
+        TestRunner._print_summary(results, coverage_data, performance_metrics)
         
         return {
-            'results': self.results,
-            'coverage': self.coverage_data,
-            'performance': self.performance_metrics,
+            'results': results,
+            'coverage': coverage_data,
+            'performance': performance_metrics,
             'report_path': str(output_path / "test_report.json"),
-            'duration': time.time() - self.start_time
+            'duration': time.time() - start_time
         }
     
+    @staticmethod
     def _run_category(
-        self,
         category: str,
         parallel: bool,
         coverage: bool,
@@ -153,7 +149,7 @@ class TestRunner:
         cmd = ["python", "-m", "pytest"]
         
         # Add test directory for category
-        test_path = self._get_test_path(category)
+        test_path = TestRunner._get_test_path(category)
         if test_path.exists():
             cmd.append(str(test_path))
         else:
@@ -202,7 +198,7 @@ class TestRunner:
             print(f"   Command: {' '.join(cmd)}")
             result = subprocess.run(
                 cmd,
-                cwd=self.project_root,
+                cwd=project_root,
                 capture_output=True,
                 text=True,
                 timeout=1800  # 30 minutes max
@@ -233,42 +229,44 @@ class TestRunner:
                 'error': str(e)
             }
     
-    def _get_test_path(self, category: str) -> Path:
+    @staticmethod
+    def _get_test_path(category: str) -> Path:
         """Get the test path for a category."""
         if category == 'unit':
-            return self.tests_dir / "unit"
+            return current_dir / "unit"
         elif category == 'integration':
-            return self.tests_dir / "integration"
+            return current_dir / "integration"
         elif category == 'performance':
-            return self.tests_dir / "performance"
+            return current_dir / "performance"
         elif category == 'e2e':
-            return self.tests_dir / "e2e"
+            return current_dir / "e2e"
         else:
-            return self.tests_dir
+            return current_dir
     
-    def _generate_report(self, output_dir: Path) -> Dict[str, Any]:
+    @staticmethod
+    def _generate_report(output_dir: Path, results: Dict[str, Any], coverage_data: Dict[str, Any], performance_data: Dict[str, Any]) -> Dict[str, Any]:
         """Generate comprehensive test report."""
         report = {
             'timestamp': datetime.now(timezone.utc).isoformat(),
-            'duration': time.time() - self.start_time,
-            'results': self.results,
-            'summary': self._calculate_summary(),
-            'environment': self._get_environment_info(),
-            'coverage': self._collect_coverage_data(output_dir),
-            'performance': self._collect_performance_data(output_dir)
+            'results': results,
+            'summary': TestRunner._calculate_summary(results),
+            'environment': TestRunner._get_environment_info(),
+            'coverage': TestRunner._collect_coverage_data(output_dir, results),
+            'performance': TestRunner._collect_performance_data(output_dir, results)
         }
         
-        # Save report
+        # Save JSON report
         report_file = output_dir / "test_report.json"
         with open(report_file, 'w') as f:
-            json.dump(report, f, indent=2)
+            json.dump(report, f, indent=2, default=str)
         
         # Generate HTML report
-        self._generate_html_report(report, output_dir)
+        TestRunner._generate_html_report(report, output_dir)
         
         return report
     
-    def _calculate_summary(self) -> Dict[str, Any]:
+    @staticmethod
+    def _calculate_summary(results: Dict[str, Any]) -> Dict[str, Any]:
         """Calculate test summary statistics."""
         total_tests = 0
         passed_tests = 0
@@ -276,7 +274,7 @@ class TestRunner:
         skipped_tests = 0
         total_duration = 0
         
-        for category, result in self.results.items():
+        for category, result in results.items():
             if result.get('status') == 'passed':
                 passed_tests += 1
             elif result.get('status') == 'failed':
@@ -284,19 +282,20 @@ class TestRunner:
             elif result.get('status') == 'skipped':
                 skipped_tests += 1
             
+            total_tests += result.get('total', 0)
             total_duration += result.get('duration', 0)
-            total_tests += 1
         
         return {
-            'total_categories': total_tests,
-            'passed_categories': passed_tests,
-            'failed_categories': failed_tests,
-            'skipped_categories': skipped_tests,
-            'total_duration': total_duration,
-            'success_rate': (passed_tests / total_tests * 100) if total_tests > 0 else 0
+            'total_tests': total_tests,
+            'passed': passed_tests,
+            'failed': failed_tests,
+            'skipped': skipped_tests,
+            'success_rate': (passed_tests / total_tests * 100) if total_tests > 0 else 0,
+            'total_duration': total_duration
         }
     
-    def _get_environment_info(self) -> Dict[str, Any]:
+    @staticmethod
+    def _get_environment_info() -> Dict[str, Any]:
         """Collect environment information."""
         
         return {
@@ -305,137 +304,115 @@ class TestRunner:
             'architecture': platform.architecture(),
             'processor': platform.processor(),
             'working_directory': str(Path.cwd()),
-            'project_root': str(self.project_root)
+            'project_root': str(project_root)
         }
     
-    def _collect_coverage_data(self, output_dir: Path) -> Dict[str, Any]:
+    @staticmethod
+    def _collect_coverage_data(output_dir: Path, results: Dict[str, Any]) -> Dict[str, Any]:
         """Collect coverage data from reports."""
-        coverage_data = {}
+        final_coverage_data = {}
         
-        for category in self.results.keys():
+        for category in results.keys():
             coverage_file = output_dir / f"coverage_{category}.xml"
             if coverage_file.exists():
                 # Parse coverage XML (simplified)
-                coverage_data[category] = {
+                final_coverage_data[category] = {
                     'file': str(coverage_file),
                     'exists': True
                 }
         
-        return coverage_data
+        return final_coverage_data
     
-    def _collect_performance_data(self, output_dir: Path) -> Dict[str, Any]:
+    @staticmethod
+    def _collect_performance_data(output_dir: Path, results: Dict[str, Any]) -> Dict[str, Any]:
         """Collect performance benchmark data."""
-        performance_data = {}
+        final_performance_data = {}
         
-        for category in self.results.keys():
+        for category in results.keys():
             benchmark_file = output_dir / f"benchmark_{category}.json"
             if benchmark_file.exists():
                 try:
                     with open(benchmark_file, 'r') as f:
                         data = json.load(f)
-                        performance_data[category] = data
+                        final_performance_data[category] = data
                 except Exception as e:
-                    performance_data[category] = {'error': str(e)}
+                    final_performance_data[category] = {'error': str(e)}
         
-        return performance_data
+        return final_performance_data
     
-    def _generate_html_report(self, report: Dict[str, Any], output_dir: Path):
+    @staticmethod
+    def _generate_html_report(report: Dict[str, Any], output_dir: Path):
         """Generate HTML report."""
         html_content = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <title>HeyGen AI Test Report</title>
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 20px; }}
-        .header {{ background-color: #f8f9fa; padding: 20px; border-radius: 5px; }}
-        .summary {{ margin: 20px 0; }}
-        .category {{ margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 5px; }}
-        .passed {{ background-color: #d4edda; }}
-        .failed {{ background-color: #f8d7da; }}
-        .skipped {{ background-color: #fff3cd; }}
-        .metrics {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }}
-        .metric {{ padding: 10px; background-color: #e9ecef; border-radius: 5px; }}
-    </style>
-</head>
-<body>
-    <div class="header">
-        <h1>🚀 HeyGen AI Test Report</h1>
-        <p>Generated: {report['timestamp']}</p>
-        <p>Duration: {report['duration']:.2f} seconds</p>
-    </div>
-    
-    <div class="summary">
-        <h2>📊 Summary</h2>
-        <div class="metrics">
-            <div class="metric">
-                <strong>Total Categories:</strong> {report['summary']['total_categories']}
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>HeyGen AI Test Report</title>
+            <style>
+                body {{ font-family: Arial, sans-serif; margin: 20px; }}
+                .header {{ background: #f0f0f0; padding: 20px; border-radius: 5px; }}
+                .summary {{ margin: 20px 0; }}
+                .category {{ margin: 10px 0; padding: 10px; border: 1px solid #ddd; }}
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1>🚀 HeyGen AI Test Report</h1>
+                <p>Generated: {report['timestamp']}</p>
             </div>
-            <div class="metric">
-                <strong>Success Rate:</strong> {report['summary']['success_rate']:.1f}%
+            
+            <div class="summary">
+                <h2>Summary</h2>
+                <p>Total Tests: {report['summary']['total_tests']}</p>
+                <p>Passed: {report['summary']['passed']}</p>
+                <p>Failed: {report['summary']['failed']}</p>
+                <p>Success Rate: {report['summary']['success_rate']:.1f}%</p>
             </div>
-            <div class="metric">
-                <strong>Passed:</strong> {report['summary']['passed_categories']}
+            
+            <div class="categories">
+                <h2>Test Categories</h2>
+                {''.join([f'<div class="category"><h3>{cat}</h3><p>Status: {result.get("status", "unknown")}</p></div>' for cat, result in report['results'].items()])}
             </div>
-            <div class="metric">
-                <strong>Failed:</strong> {report['summary']['failed_categories']}
-            </div>
-        </div>
-    </div>
-    
-    <div class="results">
-        <h2>🧪 Test Results</h2>
-"""
-        
-        for category, result in report['results'].items():
-            status_class = result.get('status', 'unknown')
-            html_content += f"""
-        <div class="category {status_class}">
-            <h3>{category.title()} Tests</h3>
-            <p><strong>Status:</strong> {result.get('status', 'unknown')}</p>
-            <p><strong>Duration:</strong> {result.get('duration', 0):.2f}s</p>
-            {f'<p><strong>Error:</strong> {result.get("error", "")}</p>' if result.get('error') else ''}
-        </div>
-"""
-        
-        html_content += """
-    </div>
-</body>
-</html>
-"""
+        </body>
+        </html>
+        """
         
         html_file = output_dir / "test_report.html"
         with open(html_file, 'w') as f:
             f.write(html_content)
     
-    def _print_summary(self) -> Any:
+    @staticmethod
+    def _print_summary(results: Dict[str, Any], coverage_data: Dict[str, Any], performance_data: Dict[str, Any]):
         """Print test execution summary."""
-        summary = self._calculate_summary()
-        total_duration = time.time() - self.start_time
+        summary = TestRunner._calculate_summary(results)
         
         print("\n" + "=" * 50)
         print("📊 TEST EXECUTION SUMMARY")
         print("=" * 50)
-        print(f"Total Duration: {total_duration:.2f}s")
-        print(f"Categories Run: {summary['total_categories']}")
-        print(f"Success Rate: {summary['success_rate']:.1f}%")
-        print(f"✅ Passed: {summary['passed_categories']}")
-        print(f"❌ Failed: {summary['failed_categories']}")
-        print(f"⏭️  Skipped: {summary['skipped_categories']}")
+        print(f"Total Tests: {summary['total_tests']}")
+        print(f"✅ Passed: {summary['passed']}")
+        print(f"❌ Failed: {summary['failed']}")
+        print(f"⏭️ Skipped: {summary['skipped']}")
+        print(f"📈 Success Rate: {summary['success_rate']:.1f}%")
+        print(f"⏱️ Total Duration: {summary['total_duration']:.2f}s")
         print("=" * 50)
         
         # Print detailed results
-        for category, result in self.results.items():
+        for category, result in results.items():
             status_icon = {
                 'passed': '✅',
                 'failed': '❌',
                 'skipped': '⏭️',
-                'timeout': '⏰',
-                'error': '💥'
-            }.get(result.get('status'), '❓')
+                'error': '⚠️'
+            }.get(result.get('status', 'unknown'), '❓')
             
-            print(f"{status_icon} {category}: {result.get('status', 'unknown')} "
-                  f"({result.get('duration', 0):.2f}s)")
+            print(f"{status_icon} {category.upper()}: {result.get('status', 'unknown')}")
+            if result.get('total'):
+                print(f"   Tests: {result.get('total')}")
+            if result.get('duration'):
+                print(f"   Duration: {result.get('duration'):.2f}s")
+        
+        print("=" * 50)
 
 
 def main():

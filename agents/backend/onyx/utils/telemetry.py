@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import contextvars
 import threading
 import uuid
@@ -18,11 +20,14 @@ from onyx.db.models import User
 from onyx.key_value_store.factory import get_kv_store
 from onyx.key_value_store.interface import KvKeyNotFoundError
 from onyx.utils.variable_functionality import (
-    fetch_versioned_implementation_with_fallback,
-)
 from onyx.utils.variable_functionality import noop_fallback
 from shared_configs.configs import MULTI_TENANT
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    fetch_versioned_implementation_with_fallback,
+)
 
 _DANSWER_TELEMETRY_ENDPOINT = "https://telemetry.onyx.app/anonymous_telemetry"
 _CACHED_UUID: str | None = None
@@ -136,6 +141,10 @@ def optional_telemetry(
         # This is to ensure that the thread gets the current tenant ID
         current_context = contextvars.copy_context()
         thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             target=lambda: current_context.run(telemetry_logic), daemon=True
         )
         thread.start()

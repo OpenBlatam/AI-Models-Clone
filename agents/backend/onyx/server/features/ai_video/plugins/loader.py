@@ -1,14 +1,5 @@
-"""
-Plugin Loader - Production-Ready Plugin Loading System
-
-This module provides robust plugin loading capabilities with:
-- Dynamic discovery and loading
-- Comprehensive validation
-- Error handling and recovery
-- Performance monitoring
-- User-friendly error messages
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import importlib
 import importlib.util
@@ -20,10 +11,22 @@ from pathlib import Path
 from typing import Dict, List, Optional, Any, Type, Tuple
 from dataclasses import dataclass
 from contextlib import asynccontextmanager
-
 from ..core.exceptions import PluginError, ValidationError, DependencyError
 from ..core.types import PluginInfo
 from .base import BasePlugin
+from typing import Any, List, Dict, Optional
+"""
+Plugin Loader - Production-Ready Plugin Loading System
+
+This module provides robust plugin loading capabilities with:
+- Dynamic discovery and loading
+- Comprehensive validation
+- Error handling and recovery
+- Performance monitoring
+- User-friendly error messages
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +40,7 @@ class LoadResult:
     load_time: float = 0.0
     warnings: List[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.warnings is None:
             self.warnings = []
 
@@ -55,7 +58,9 @@ class PluginLoader:
     """
     
     def __init__(self, max_retries: int = 3, timeout: float = 30.0):
-        self.max_retries = max_retries
+        
+    """__init__ function."""
+self.max_retries = max_retries
         self.timeout = timeout
         self.loaded_modules: Dict[str, Any] = {}
         self.load_stats = {
@@ -254,7 +259,15 @@ class PluginLoader:
                 # Check if file contains plugin class
                 try:
                     with open(file_path, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         if f"class {plugin_name}" in content or f"name = '{plugin_name}'" in content:
                             return file_path
                 except Exception:

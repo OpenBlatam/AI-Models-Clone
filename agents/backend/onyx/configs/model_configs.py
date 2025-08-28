@@ -1,6 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 import json
 import os
 
+        from onyx.utils.logger import setup_logger
+        from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #####
 # Embedding/Reranking Model Configs
 #####
@@ -100,7 +110,6 @@ if _LITELLM_EXTRA_HEADERS_RAW:
         LITELLM_EXTRA_HEADERS = json.loads(_LITELLM_EXTRA_HEADERS_RAW)
     except Exception:
         # need to import here to avoid circular imports
-        from onyx.utils.logger import setup_logger
 
         logger = setup_logger()
         logger.error(
@@ -115,7 +124,6 @@ if _LITELLM_PASS_THROUGH_HEADERS_RAW:
         LITELLM_PASS_THROUGH_HEADERS = json.loads(_LITELLM_PASS_THROUGH_HEADERS_RAW)
     except Exception:
         # need to import here to avoid circular imports
-        from onyx.utils.logger import setup_logger
 
         logger = setup_logger()
         logger.error(

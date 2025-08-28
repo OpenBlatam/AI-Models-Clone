@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from .models import (
+from dataclasses import dataclass
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 ENTITIES - Domain Models
 ===========================
@@ -5,7 +21,6 @@
 Entidades del dominio NLP.
 """
 
-from .models import (
     TextInput,
     AnalysisResult,
     BatchResult,
@@ -23,10 +38,6 @@ __all__ = [
     'PerformanceMetrics'
 ]
 
-from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
-from datetime import datetime
-from enum import Enum
 
 
 class AnalysisType(Enum):
@@ -52,7 +63,7 @@ class TextInput:
     id: Optional[str] = None
     metadata: Optional[Dict[str, Any]] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.id is None:
             self.id = f"text_{hash(self.content) % 1000000}"
 

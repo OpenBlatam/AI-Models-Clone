@@ -1,10 +1,10 @@
-"""
-🧪 Efficient Data Loading Test Suite
-====================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive test suite for efficient data loading system with
-performance benchmarks and integration tests.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -17,7 +17,6 @@ from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch, MagicMock
 import warnings
-
 import torch
 import torch.nn as nn
 import numpy as np
@@ -26,10 +25,22 @@ from sklearn.datasets import make_classification
 import h5py
 import lmdb
 import msgpack
-
-# Import our systems
 from .production_transformers import DeviceManager
 from .efficient_data_loader import (
+        from transformers import AutoTokenizer
+    import asyncio
+from typing import Any, List, Dict, Optional
+"""
+🧪 Efficient Data Loading Test Suite
+====================================
+
+Comprehensive test suite for efficient data loading system with
+performance benchmarks and integration tests.
+"""
+
+
+
+# Import our systems
     DataLoaderManager, DataLoaderFactory, DataLoaderConfig,
     DataFormat, CacheStrategy, CachedDataset, OptimizedTextDataset,
     StreamingDataset, DataLoaderProfiler
@@ -40,7 +51,7 @@ logger = logging.getLogger(__name__)
 class TestDataLoaderConfig(unittest.TestCase):
     """Test DataLoader configuration."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration."""
         config = DataLoaderConfig()
         
@@ -52,7 +63,7 @@ class TestDataLoaderConfig(unittest.TestCase):
         self.assertTrue(config.shuffle)
         self.assertEqual(config.cache_strategy, CacheStrategy.MEMORY)
     
-    def test_auto_optimization(self):
+    def test_auto_optimization(self) -> Any:
         """Test auto-optimization of configuration."""
         config = DataLoaderConfig(num_workers=-1)
         
@@ -60,7 +71,7 @@ class TestDataLoaderConfig(unittest.TestCase):
         self.assertGreater(config.num_workers, 0)
         self.assertLessEqual(config.num_workers, 8)
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration."""
         config = DataLoaderConfig(
             batch_size=64,
@@ -79,7 +90,7 @@ class TestDataLoaderConfig(unittest.TestCase):
 class TestOptimizedTextDataset(unittest.TestCase):
     """Test optimized text dataset."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.test_data_path = Path(self.temp_dir) / "test_data.csv"
@@ -87,11 +98,11 @@ class TestOptimizedTextDataset(unittest.TestCase):
         # Create test dataset
         self.create_test_dataset()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def create_test_dataset(self):
+    def create_test_dataset(self) -> Any:
         """Create synthetic test dataset."""
         # Generate synthetic data
         X, y = make_classification(
@@ -113,7 +124,7 @@ class TestOptimizedTextDataset(unittest.TestCase):
         })
         df.to_csv(self.test_data_path, index=False)
     
-    def test_dataset_initialization(self):
+    def test_dataset_initialization(self) -> Any:
         """Test dataset initialization."""
         # Load test data
         df = pd.read_csv(self.test_data_path)
@@ -126,7 +137,7 @@ class TestOptimizedTextDataset(unittest.TestCase):
         self.assertEqual(len(dataset.texts), 100)
         self.assertEqual(len(dataset.labels), 100)
     
-    def test_dataset_item_access(self):
+    def test_dataset_item_access(self) -> Any:
         """Test dataset item access."""
         df = pd.read_csv(self.test_data_path)
         texts = df['text'].tolist()
@@ -141,9 +152,8 @@ class TestOptimizedTextDataset(unittest.TestCase):
         self.assertIsInstance(item['labels'], torch.Tensor)
         self.assertEqual(item['text'], texts[0])
     
-    def test_dataset_with_tokenizer(self):
+    def test_dataset_with_tokenizer(self) -> Any:
         """Test dataset with tokenizer."""
-        from transformers import AutoTokenizer
         
         # Mock tokenizer
         tokenizer = Mock()
@@ -167,7 +177,7 @@ class TestOptimizedTextDataset(unittest.TestCase):
         self.assertIn('attention_mask', item)
         self.assertIn('labels', item)
     
-    def test_validation(self):
+    def test_validation(self) -> Any:
         """Test input validation."""
         # Test mismatched lengths
         texts = ["text1", "text2"]
@@ -183,17 +193,17 @@ class TestOptimizedTextDataset(unittest.TestCase):
 class TestCachedDataset(unittest.TestCase):
     """Test cached dataset."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.cache_dir = Path(self.temp_dir) / "cache"
         self.cache_dir.mkdir(exist_ok=True)
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_memory_caching(self):
+    def test_memory_caching(self) -> Any:
         """Test memory caching strategy."""
         # Create mock dataset
         mock_dataset = Mock()
@@ -214,7 +224,7 @@ class TestCachedDataset(unittest.TestCase):
         self.assertEqual(item1, item2)
         self.assertIn(0, cached_dataset.cache)
     
-    def test_disk_caching(self):
+    def test_disk_caching(self) -> Any:
         """Test disk caching strategy."""
         # Create mock dataset
         mock_dataset = Mock()
@@ -240,7 +250,7 @@ class TestCachedDataset(unittest.TestCase):
         self.assertTrue(cached_dataset.cache_file.exists())
         self.assertTrue(cached_dataset.metadata_file.exists())
     
-    def test_cache_size_limit(self):
+    def test_cache_size_limit(self) -> Any:
         """Test cache size limiting."""
         # Create mock dataset
         mock_dataset = Mock()
@@ -265,17 +275,17 @@ class TestCachedDataset(unittest.TestCase):
 class TestDataLoaderFactory(unittest.TestCase):
     """Test DataLoader factory."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.factory = DataLoaderFactory(self.device_manager)
     
-    def test_factory_initialization(self):
+    def test_factory_initialization(self) -> Any:
         """Test factory initialization."""
         self.assertIsNotNone(self.factory.device_manager)
         self.assertIsNotNone(self.factory.logger)
     
-    def test_create_dataloader(self):
+    def test_create_dataloader(self) -> Any:
         """Test DataLoader creation."""
         # Create mock dataset
         mock_dataset = Mock()
@@ -294,7 +304,7 @@ class TestDataLoaderFactory(unittest.TestCase):
         self.assertEqual(dataloader.num_workers, 2)
         self.assertTrue(dataloader.pin_memory)
     
-    def test_config_optimization(self):
+    def test_config_optimization(self) -> Any:
         """Test configuration optimization."""
         config = DataLoaderConfig(num_workers=-1)
         
@@ -304,7 +314,7 @@ class TestDataLoaderFactory(unittest.TestCase):
         self.assertGreater(optimized_config.num_workers, 0)
         self.assertLessEqual(optimized_config.num_workers, 8)
     
-    def test_sampler_creation(self):
+    def test_sampler_creation(self) -> Any:
         """Test sampler creation."""
         # Create mock dataset
         mock_dataset = Mock()
@@ -320,7 +330,7 @@ class TestDataLoaderFactory(unittest.TestCase):
         sampler = self.factory._create_sampler(mock_dataset, config)
         self.assertIsInstance(sampler, torch.utils.data.SequentialSampler)
     
-    def test_weighted_sampler(self):
+    def test_weighted_sampler(self) -> Any:
         """Test weighted sampler creation."""
         # Create mock dataset with weights
         mock_dataset = Mock()
@@ -338,7 +348,7 @@ class TestDataLoaderFactory(unittest.TestCase):
 class TestDataLoaderManager(unittest.TestCase):
     """Test DataLoader manager."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
@@ -347,11 +357,11 @@ class TestDataLoaderManager(unittest.TestCase):
         # Create test dataset
         self.create_test_dataset()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def create_test_dataset(self):
+    def create_test_dataset(self) -> Any:
         """Create synthetic test dataset."""
         # Generate synthetic data
         X, y = make_classification(
@@ -373,7 +383,7 @@ class TestDataLoaderManager(unittest.TestCase):
         })
         df.to_csv(self.test_data_path, index=False)
     
-    async def test_manager_initialization(self):
+    async def test_manager_initialization(self) -> Any:
         """Test manager initialization."""
         manager = DataLoaderManager(self.device_manager)
         
@@ -381,7 +391,7 @@ class TestDataLoaderManager(unittest.TestCase):
         self.assertIsNotNone(manager.factory)
         self.assertIsNotNone(manager.logger)
     
-    async def test_load_csv_dataset(self):
+    async def test_load_csv_dataset(self) -> Any:
         """Test CSV dataset loading."""
         manager = DataLoaderManager(self.device_manager)
         
@@ -401,7 +411,7 @@ class TestDataLoaderManager(unittest.TestCase):
         self.assertIsInstance(dataloader, torch.utils.data.DataLoader)
         self.assertEqual(len(dataset), 200)
     
-    async def test_load_json_dataset(self):
+    async def test_load_json_dataset(self) -> Any:
         """Test JSON dataset loading."""
         manager = DataLoaderManager(self.device_manager)
         
@@ -413,6 +423,10 @@ class TestDataLoaderManager(unittest.TestCase):
         json_path = self.temp_dir / "test_data.json"
         
         with open(json_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(json_data, f)
         
         config = DataLoaderConfig(batch_size=8)
@@ -426,7 +440,7 @@ class TestDataLoaderManager(unittest.TestCase):
         self.assertIsInstance(dataset, OptimizedTextDataset)
         self.assertEqual(len(dataset), 50)
     
-    async def test_dataset_splitting(self):
+    async def test_dataset_splitting(self) -> Any:
         """Test dataset splitting."""
         manager = DataLoaderManager(self.device_manager)
         
@@ -445,7 +459,7 @@ class TestDataLoaderManager(unittest.TestCase):
         self.assertEqual(len(val_dataset), 200)
         self.assertEqual(len(test_dataset), 100)
     
-    async def test_dataloader_creation(self):
+    async def test_dataloader_creation(self) -> Any:
         """Test DataLoader creation."""
         manager = DataLoaderManager(self.device_manager)
         
@@ -471,7 +485,7 @@ class TestDataLoaderManager(unittest.TestCase):
         self.assertIsInstance(val_loader, torch.utils.data.DataLoader)
         self.assertIsInstance(test_loader, torch.utils.data.DataLoader)
     
-    def test_format_detection(self):
+    def test_format_detection(self) -> Any:
         """Test data format detection."""
         manager = DataLoaderManager(self.device_manager)
         
@@ -495,16 +509,16 @@ class TestDataLoaderManager(unittest.TestCase):
 class TestDataLoaderProfiler(unittest.TestCase):
     """Test DataLoader profiler."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.profiler = DataLoaderProfiler()
     
-    def test_profiler_initialization(self):
+    def test_profiler_initialization(self) -> Any:
         """Test profiler initialization."""
         self.assertIsNotNone(self.profiler.logger)
         self.assertEqual(self.profiler.metrics, {})
     
-    def test_profiling(self):
+    def test_profiling(self) -> Any:
         """Test DataLoader profiling."""
         # Create mock dataset and DataLoader
         mock_dataset = Mock()
@@ -537,7 +551,7 @@ class TestDataLoaderProfiler(unittest.TestCase):
         self.assertGreater(metrics['avg_batch_time'], 0)
         self.assertGreater(metrics['throughput_batches_per_sec'], 0)
     
-    def test_config_optimization(self):
+    def test_config_optimization(self) -> Any:
         """Test configuration optimization."""
         # Create current config
         current_config = DataLoaderConfig(
@@ -564,7 +578,7 @@ class TestDataLoaderProfiler(unittest.TestCase):
 class TestIntegration(unittest.TestCase):
     """Integration tests."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
@@ -573,11 +587,11 @@ class TestIntegration(unittest.TestCase):
         # Create test dataset
         self.create_test_dataset()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def create_test_dataset(self):
+    def create_test_dataset(self) -> Any:
         """Create synthetic test dataset."""
         # Generate synthetic data
         X, y = make_classification(
@@ -599,7 +613,7 @@ class TestIntegration(unittest.TestCase):
         })
         df.to_csv(self.test_data_path, index=False)
     
-    async def test_end_to_end_workflow(self):
+    async def test_end_to_end_workflow(self) -> Any:
         """Test end-to-end workflow."""
         # Create manager
         manager = DataLoaderManager(self.device_manager)
@@ -648,7 +662,7 @@ class TestIntegration(unittest.TestCase):
         self.assertIn('total_samples', stats)
         self.assertIn('batch_size', stats)
     
-    async def test_performance_profiling(self):
+    async def test_performance_profiling(self) -> Any:
         """Test performance profiling integration."""
         # Create manager and load dataset
         manager = DataLoaderManager(self.device_manager)
@@ -683,16 +697,16 @@ class TestIntegration(unittest.TestCase):
 class TestPerformanceBenchmarks(unittest.TestCase):
     """Performance benchmarks."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up benchmark environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up benchmark environment."""
         shutil.rmtree(self.temp_dir)
     
-    def benchmark_dataloader_creation(self):
+    def benchmark_dataloader_creation(self) -> Any:
         """Benchmark DataLoader creation."""
         factory = DataLoaderFactory(self.device_manager)
         
@@ -715,7 +729,7 @@ class TestPerformanceBenchmarks(unittest.TestCase):
         self.assertLess(creation_time, 1.0)  # Should complete within 1 second
         logger.info(f"DataLoader creation time: {creation_time:.4f} seconds")
     
-    def benchmark_batch_loading(self):
+    def benchmark_batch_loading(self) -> Any:
         """Benchmark batch loading performance."""
         # Create dataset and DataLoader
         dataset = torch.utils.data.TensorDataset(
@@ -749,16 +763,16 @@ class TestPerformanceBenchmarks(unittest.TestCase):
 class TestErrorHandling(unittest.TestCase):
     """Test error handling."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    async def test_invalid_data_path(self):
+    async def test_invalid_data_path(self) -> Any:
         """Test handling of invalid data path."""
         manager = DataLoaderManager(self.device_manager)
         
@@ -771,7 +785,7 @@ class TestErrorHandling(unittest.TestCase):
                 config
             )
     
-    async def test_invalid_data_format(self):
+    async def test_invalid_data_format(self) -> Any:
         """Test handling of invalid data format."""
         manager = DataLoaderManager(self.device_manager)
         
@@ -933,10 +947,11 @@ async def quick_performance_test():
 
 # Example usage
 if __name__ == "__main__":
-    import asyncio
     
     async def main():
-        print("🚀 Efficient Data Loading Test Suite")
+        
+    """main function."""
+print("🚀 Efficient Data Loading Test Suite")
         print("=" * 50)
         
         # Run quick tests

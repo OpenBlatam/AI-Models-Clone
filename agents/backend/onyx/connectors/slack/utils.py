@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import re
 from collections.abc import Callable
 from collections.abc import Generator
@@ -14,6 +19,9 @@ from onyx.connectors.models import BasicExpertInfo
 from onyx.utils.logger import setup_logger
 from onyx.utils.retry_wrapper import retry_builder
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 # retry after 0.1, 1.2, 3.4, 7.8, 16.6, 34.2 seconds
@@ -49,19 +57,19 @@ def get_message_link(
     return link
 
 
-def make_slack_api_call(
+async def make_slack_api_call(
     call: Callable[..., SlackResponse], **kwargs: Any
 ) -> SlackResponse:
     return call(**kwargs)
 
 
-def make_paginated_slack_api_call(
+async def make_paginated_slack_api_call(
     call: Callable[..., SlackResponse], **kwargs: Any
 ) -> Generator[dict[str, Any], None, None]:
     return _make_slack_api_call_paginated(call)(**kwargs)
 
 
-def _make_slack_api_call_paginated(
+async def _make_slack_api_call_paginated(
     call: Callable[..., SlackResponse],
 ) -> Callable[..., Generator[dict[str, Any], None, None]]:
     """Wraps calls to slack API so that they automatically handle pagination"""
@@ -84,7 +92,7 @@ def _make_slack_api_call_paginated(
 # NOTE(rkuo): we may not need this any more if the integrated retry handlers work as
 # expected.  Do we want to keep this around?
 
-# def make_slack_api_rate_limited(
+# async def make_slack_api_rate_limited(
 #     call: Callable[..., SlackResponse], max_retries: int = 7
 # ) -> Callable[..., SlackResponse]:
 #     """Wraps calls to slack API so that they automatically handle rate limiting"""
@@ -138,13 +146,13 @@ def _make_slack_api_call_paginated(
 
 # temporarily disabling due to using a different retry approach
 # might be permanent if everything works out
-# def make_slack_api_call_w_retries(
+# async def make_slack_api_call_w_retries(
 #     call: Callable[..., SlackResponse], **kwargs: Any
 # ) -> SlackResponse:
 #     return basic_retry_wrapper(call)(**kwargs)
 
 
-# def make_paginated_slack_api_call_w_retries(
+# async def make_paginated_slack_api_call_w_retries(
 #     call: Callable[..., SlackResponse], **kwargs: Any
 # ) -> Generator[dict[str, Any], None, None]:
 #     return _make_slack_api_call_paginated(basic_retry_wrapper(call))(**kwargs)

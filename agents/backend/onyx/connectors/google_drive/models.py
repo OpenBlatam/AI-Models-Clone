@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from enum import Enum
 from typing import Any
 
@@ -11,6 +16,9 @@ from onyx.connectors.interfaces import SecondsSinceUnixEpoch
 from onyx.utils.threadpool_concurrency import ThreadSafeDict
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class GDriveMimeType(str, Enum):
     DOC = "application/vnd.google-apps.document"
     SPREADSHEET = "application/vnd.google-apps.spreadsheet"

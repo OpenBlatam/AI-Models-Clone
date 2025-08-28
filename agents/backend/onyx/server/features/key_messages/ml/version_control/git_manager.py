@@ -1,9 +1,5 @@
-"""
-Git Manager for Key Messages ML Pipeline
-Provides programmatic Git operations and integration
-Updated with modern Python best practices and PyTorch ecosystem standards
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import subprocess
 import time
@@ -15,6 +11,14 @@ import json
 from contextlib import contextmanager
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Git Manager for Key Messages ML Pipeline
+Provides programmatic Git operations and integration
+Updated with modern Python best practices and PyTorch ecosystem standards
+"""
+
 
 logger = structlog.get_logger(__name__)
 
@@ -33,7 +37,7 @@ class GitConfig:
     max_retries: int = 3
     use_git_lfs: bool = True  # Git LFS for large files
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate Git configuration."""
         if not self.user_name or not self.user_email:
             raise ValueError("user_name and user_email must be provided")
@@ -53,7 +57,7 @@ class GitCommit:
     merge: bool = False
     parents: List[str] = field(default_factory=list)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not self.hash:
             raise ValueError("Commit hash is required")
 
@@ -67,7 +71,7 @@ class GitBranch:
     ahead: int = 0
     behind: int = 0
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not self.name:
             raise ValueError("Branch name is required")
 
@@ -81,7 +85,7 @@ class GitTag:
     tag_type: str = "lightweight"  # lightweight, annotated
     author: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not self.name or not self.commit_hash:
             raise ValueError("Tag name and commit hash are required")
 
@@ -89,7 +93,9 @@ class GitManager:
     """Modern Git manager with enhanced features and error handling."""
     
     def __init__(self, config: GitConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.repo_path = Path(config.repo_path).resolve()
         self._executor = ThreadPoolExecutor(max_workers=4)
         
@@ -101,11 +107,11 @@ class GitManager:
                    user_name=config.user_name,
                    user_email=config.user_email)
     
-    def __enter__(self):
+    def __enter__(self) -> Any:
         """Context manager entry."""
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> Any:
         """Context manager exit."""
         self._executor.shutdown(wait=True)
     
@@ -172,7 +178,7 @@ class GitManager:
                 time.sleep(1)
     
     @contextmanager
-    def _git_config_context(self, **kwargs):
+    def _git_config_context(self, **kwargs) -> Any:
         """Context manager for temporary Git configuration."""
         original_config = {}
         
@@ -417,14 +423,11 @@ class GitManager:
     
     def auto_commit(self, change_type: str, description: str, 
                    author: Optional[str] = None) -> Optional[str]:
-        """Create an automatic commit using the configured template."""
+        """Create an automatic commit using the configured template."""f"
         if not self.config.auto_commit:
             return None
         
-        message = self.config.commit_message_template.format(
-            change_type=change_type,
-            description=description
-        )
+        message = self.config.commit_message_template"
         
         return self.commit(message, author=author)
     

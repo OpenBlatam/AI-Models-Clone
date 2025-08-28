@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from typing import List
+from modular_engine import (
+from core.entities.models import OptimizationTier
+        import traceback
+from typing import Any, List, Dict, Optional
+import logging
 """
 🧪 DEMO MODULAR - Sistema NLP Ultra-Modular con Velocidades Extremas
 ==================================================================
@@ -5,17 +24,12 @@
 Demo del sistema modular con optimizaciones ultra-rápidas.
 """
 
-import asyncio
-import time
-from typing import List
 
-from modular_engine import (
     create_modular_engine, 
     quick_sentiment_analysis, 
     quick_quality_analysis,
     ultra_fast_mixed_analysis
 )
-from core.entities.models import OptimizationTier
 
 
 async def demo_ultra_speed_performance():
@@ -277,9 +291,9 @@ async def main():
         
     except Exception as e:
         print(f"❌ Error en demo: {e}")
-        import traceback
         traceback.print_exc()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 from typing import cast
 
@@ -11,8 +13,6 @@ from ee.onyx.server.query_and_chat.models import AgentSubQuery
 from ee.onyx.server.query_and_chat.models import AgentSubQuestion
 from ee.onyx.server.query_and_chat.models import BasicCreateChatMessageRequest
 from ee.onyx.server.query_and_chat.models import (
-    BasicCreateChatMessageWithHistoryRequest,
-)
 from ee.onyx.server.query_and_chat.models import ChatBasicResponse
 from onyx.auth.users import current_user
 from onyx.chat.chat_utils import combine_message_thread
@@ -48,6 +48,11 @@ from onyx.secondary_llm_flows.query_expansion import thread_based_query_rephrase
 from onyx.server.query_and_chat.models import ChatMessageDetail
 from onyx.server.query_and_chat.models import CreateChatMessageRequest
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    BasicCreateChatMessageWithHistoryRequest,
+)
 
 logger = setup_logger()
 
@@ -360,6 +365,10 @@ def handle_send_message_simple_with_history(
     db_session.commit()
 
     history_str = combine_message_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         messages=msg_history,
         max_tokens=max_history_tokens,
         llm_tokenizer=llm_tokenizer,

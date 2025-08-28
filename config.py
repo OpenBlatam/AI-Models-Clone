@@ -1,38 +1,72 @@
 """
-🔧 CONFIGURACIÓN DE PRODUCCIÓN - BLOG POSTS
+Production Configuration
+Environment-based configuration with security settings
 """
 
 import os
-from dataclasses import dataclass
-from typing import Optional
+from typing import List
+from pydantic_settings import BaseSettings
 
-@dataclass
-class Config:
-    # Environment
-    environment: str = os.getenv("ENVIRONMENT", "development")
-    debug: bool = os.getenv("DEBUG", "false").lower() == "true"
+class Settings(BaseSettings):
+    """Production settings"""
     
-    # Server
-    host: str = os.getenv("HOST", "0.0.0.0")
-    port: int = int(os.getenv("PORT", 8000))
-    workers: int = int(os.getenv("WORKERS", 1))
+    # Application settings
+    APP_NAME: str = "Production API"
+    DEBUG: bool = False  # Disable debug in production
+    ENV: str = "production"
     
-    # Cache
-    redis_url: str = os.getenv("REDIS_URL", "redis://localhost:6379")
-    cache_ttl: int = int(os.getenv("CACHE_TTL", 3600))
+    # API settings
+    API_V1_STR: str = "/api/v1"
+    ALLOWED_ORIGINS: List[str] = ["https://yourdomain.com"]
+    ALLOWED_HOSTS: List[str] = ["yourdomain.com", "api.yourdomain.com"]
     
-    # AI
-    openai_api_key: Optional[str] = os.getenv("OPENAI_API_KEY")
-    ai_timeout: int = int(os.getenv("AI_TIMEOUT", 30))
+    # Database settings
+    DATABASE_URL: str = "postgresql://user:password@localhost/production_db"
+    
+    # Security settings
+    SECRET_KEY: str = "your-super-secret-key-change-in-production"
+    ALGORITHM: str = "HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    
+    # Redis settings
+    REDIS_URL: str = "redis://localhost:6379"
+    
+    # Logging settings
+    LOG_LEVEL: str = "INFO"
+    LOG_FILE: str = "logs/production.log"
+    
+    # Rate limiting
+    RATE_LIMIT_PER_MINUTE: int = 100
+    
+    # CORS settings
+    CORS_ORIGINS: List[str] = ["https://yourdomain.com"]
+    
+    # Database connection pool
+    DB_POOL_SIZE: int = 20
+    DB_MAX_OVERFLOW: int = 30
+    DB_POOL_TIMEOUT: int = 30
+    
+    # Cache settings
+    CACHE_TTL: int = 3600  # 1 hour
     
     # Monitoring
-    prometheus_enabled: bool = os.getenv("PROMETHEUS_ENABLED", "true").lower() == "true"
-    metrics_port: int = int(os.getenv("METRICS_PORT", 9090))
+    ENABLE_METRICS: bool = True
+    METRICS_PORT: int = 9090
+    
+    class Config:
+        env_file = ".env"
+        case_sensitive = True
 
-# Global config instance
-settings = Config()
+# Create settings instance
+settings = Settings()
 
-# Production optimizations
-if settings.environment == "production":
-    settings.workers = max(2, os.cpu_count())
-    settings.debug = False 
+# Validate critical settings
+if settings.ENV == "production":
+    if settings.SECRET_KEY == "your-super-secret-key-change-in-production":
+        raise ValueError("SECRET_KEY must be changed in production")
+    
+    if settings.DEBUG:
+        raise ValueError("DEBUG must be False in production")
+    
+    if "localhost" in settings.DATABASE_URL:
+        raise ValueError("DATABASE_URL must point to production database") 

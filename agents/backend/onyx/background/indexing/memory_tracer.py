@@ -1,7 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import tracemalloc
 
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 DANSWER_TRACEMALLOC_FRAMES = 10
@@ -9,7 +14,9 @@ DANSWER_TRACEMALLOC_FRAMES = 10
 
 class MemoryTracer:
     def __init__(self, interval: int = 0, num_print_entries: int = 5):
-        self.interval = interval
+        
+    """__init__ function."""
+self.interval = interval
         self.num_print_entries = num_print_entries
         self.snapshot_first: tracemalloc.Snapshot | None = None
         self.snapshot_prev: tracemalloc.Snapshot | None = None

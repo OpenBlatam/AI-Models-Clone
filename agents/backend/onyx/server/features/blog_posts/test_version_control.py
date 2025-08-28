@@ -1,10 +1,13 @@
-"""
-Test Suite for Version Control System
-====================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module provides comprehensive tests for the version control system,
-including unit tests, integration tests, and performance tests.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import pytest
 import tempfile
@@ -16,9 +19,22 @@ from datetime import datetime
 from unittest.mock import Mock, patch, MagicMock
 import subprocess
 import os
+from version_control import (
+            import time
+            import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Test Suite for Version Control System
+====================================
+
+This module provides comprehensive tests for the version control system,
+including unit tests, integration tests, and performance tests.
+"""
+
 
 # Import the modules to test
-from version_control import (
     VersionMetadata,
     GitManager,
     ConfigurationVersioner,
@@ -109,7 +125,7 @@ def sample_results():
 class TestVersionMetadata:
     """Test VersionMetadata class."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test metadata initialization."""
         metadata = VersionMetadata(
             version_id="test_version",
@@ -126,7 +142,7 @@ class TestVersionMetadata:
         assert metadata.tags == []
         assert metadata.changes == []
     
-    def test_generate_id(self):
+    def test_generate_id(self) -> Any:
         """Test version ID generation."""
         metadata = VersionMetadata(
             version_id="",
@@ -141,7 +157,7 @@ class TestVersionMetadata:
         assert "model_" in generated_id
         assert "transformer_model" in generated_id
     
-    def test_to_dict(self):
+    def test_to_dict(self) -> Any:
         """Test conversion to dictionary."""
         metadata = VersionMetadata(
             version_id="test_version",
@@ -164,7 +180,7 @@ class TestVersionMetadata:
 class TestGitManager:
     """Test GitManager class."""
     
-    def test_initialization(self, temp_dir):
+    def test_initialization(self, temp_dir) -> Any:
         """Test Git manager initialization."""
         git_manager = GitManager(temp_dir)
         
@@ -172,7 +188,7 @@ class TestGitManager:
         assert git_manager.repo is not None
         assert (Path(temp_dir) / ".git").exists()
     
-    def test_get_status(self, temp_dir):
+    def test_get_status(self, temp_dir) -> Optional[Dict[str, Any]]:
         """Test getting Git status."""
         git_manager = GitManager(temp_dir)
         
@@ -185,7 +201,7 @@ class TestGitManager:
         assert "branch" in status
         assert "is_dirty" in status
     
-    def test_commit_changes(self, temp_dir):
+    def test_commit_changes(self, temp_dir) -> Any:
         """Test committing changes."""
         git_manager = GitManager(temp_dir)
         
@@ -198,7 +214,7 @@ class TestGitManager:
         assert isinstance(commit_hash, str)
         assert len(commit_hash) > 0
     
-    def test_create_tag(self, temp_dir):
+    def test_create_tag(self, temp_dir) -> Any:
         """Test creating Git tag."""
         git_manager = GitManager(temp_dir)
         
@@ -211,7 +227,7 @@ class TestGitManager:
         tag_name = git_manager.create_tag("v1.0.0", "First version")
         assert tag_name == "v1.0.0"
     
-    def test_get_commit_history(self, temp_dir):
+    def test_get_commit_history(self, temp_dir) -> Optional[Dict[str, Any]]:
         """Test getting commit history."""
         git_manager = GitManager(temp_dir)
         
@@ -234,7 +250,7 @@ class TestGitManager:
 class TestConfigurationVersioner:
     """Test ConfigurationVersioner class."""
     
-    def test_initialization(self, temp_dir):
+    def test_initialization(self, temp_dir) -> Any:
         """Test configuration versioner initialization."""
         config_dir = Path(temp_dir) / "configs"
         versioner = ConfigurationVersioner(str(config_dir))
@@ -243,7 +259,7 @@ class TestConfigurationVersioner:
         assert config_dir.exists()
         assert versioner.history_file.exists()
     
-    def test_version_config(self, temp_dir, sample_config):
+    def test_version_config(self, temp_dir, sample_config) -> Any:
         """Test versioning a configuration."""
         config_dir = Path(temp_dir) / "configs"
         versioner = ConfigurationVersioner(str(config_dir))
@@ -266,7 +282,7 @@ class TestConfigurationVersioner:
         config_file = version_dir / "test_config.yaml"
         assert config_file.exists()
     
-    def test_get_config_version(self, temp_dir, sample_config):
+    def test_get_config_version(self, temp_dir, sample_config) -> Optional[Dict[str, Any]]:
         """Test retrieving a specific config version."""
         config_dir = Path(temp_dir) / "configs"
         versioner = ConfigurationVersioner(str(config_dir))
@@ -283,7 +299,7 @@ class TestConfigurationVersioner:
         assert retrieved_config is not None
         assert retrieved_config["model"]["type"] == "transformer"
     
-    def test_get_latest_config(self, temp_dir, sample_config):
+    def test_get_latest_config(self, temp_dir, sample_config) -> Optional[Dict[str, Any]]:
         """Test getting latest configuration."""
         config_dir = Path(temp_dir) / "configs"
         versioner = ConfigurationVersioner(str(config_dir))
@@ -300,7 +316,7 @@ class TestConfigurationVersioner:
         assert latest_config is not None
         assert latest_config["model"]["type"] == "transformer"
     
-    def test_list_config_versions(self, temp_dir, sample_config):
+    def test_list_config_versions(self, temp_dir, sample_config) -> List[Any]:
         """Test listing configuration versions."""
         config_dir = Path(temp_dir) / "configs"
         versioner = ConfigurationVersioner(str(config_dir))
@@ -321,7 +337,7 @@ class TestConfigurationVersioner:
         assert len(versions) == 3
         assert all(v["item_name"] == "test_config" for v in versions)
     
-    def test_config_diff(self, temp_dir, sample_config):
+    def test_config_diff(self, temp_dir, sample_config) -> Any:
         """Test configuration diff generation."""
         config_dir = Path(temp_dir) / "configs"
         versioner = ConfigurationVersioner(str(config_dir))
@@ -356,7 +372,7 @@ class TestConfigurationVersioner:
 class TestModelVersioner:
     """Test ModelVersioner class."""
     
-    def test_initialization(self, temp_dir):
+    def test_initialization(self, temp_dir) -> Any:
         """Test model versioner initialization."""
         model_dir = Path(temp_dir) / "models"
         versioner = ModelVersioner(str(model_dir))
@@ -365,7 +381,7 @@ class TestModelVersioner:
         assert model_dir.exists()
         assert versioner.history_file.exists()
     
-    def test_version_model(self, temp_dir, sample_model_metadata):
+    def test_version_model(self, temp_dir, sample_model_metadata) -> Any:
         """Test versioning a model."""
         model_dir = Path(temp_dir) / "models"
         versioner = ModelVersioner(str(model_dir))
@@ -397,7 +413,7 @@ class TestModelVersioner:
         metadata_file = version_dir / "metadata.json"
         assert metadata_file.exists()
     
-    def test_get_model_version(self, temp_dir, sample_model_metadata):
+    def test_get_model_version(self, temp_dir, sample_model_metadata) -> Optional[Dict[str, Any]]:
         """Test retrieving a specific model version."""
         model_dir = Path(temp_dir) / "models"
         versioner = ModelVersioner(str(model_dir))
@@ -421,7 +437,7 @@ class TestModelVersioner:
         assert "metadata" in retrieved_model
         assert retrieved_model["metadata"]["architecture"] == "transformer"
     
-    def test_get_latest_model(self, temp_dir, sample_model_metadata):
+    def test_get_latest_model(self, temp_dir, sample_model_metadata) -> Optional[Dict[str, Any]]:
         """Test getting latest model."""
         model_dir = Path(temp_dir) / "models"
         versioner = ModelVersioner(str(model_dir))
@@ -443,7 +459,7 @@ class TestModelVersioner:
         assert latest_model is not None
         assert latest_model["metadata"]["architecture"] == "transformer"
     
-    def test_list_model_versions(self, temp_dir, sample_model_metadata):
+    def test_list_model_versions(self, temp_dir, sample_model_metadata) -> List[Any]:
         """Test listing model versions."""
         model_dir = Path(temp_dir) / "models"
         versioner = ModelVersioner(str(model_dir))
@@ -477,7 +493,7 @@ class TestModelVersioner:
 class TestExperimentVersioner:
     """Test ExperimentVersioner class."""
     
-    def test_initialization(self, temp_dir):
+    def test_initialization(self, temp_dir) -> Any:
         """Test experiment versioner initialization."""
         experiment_dir = Path(temp_dir) / "experiments"
         versioner = ExperimentVersioner(str(experiment_dir))
@@ -486,7 +502,7 @@ class TestExperimentVersioner:
         assert experiment_dir.exists()
         assert versioner.history_file.exists()
     
-    def test_version_experiment(self, temp_dir, sample_experiment_data, sample_results):
+    def test_version_experiment(self, temp_dir, sample_experiment_data, sample_results) -> Any:
         """Test versioning an experiment."""
         experiment_dir = Path(temp_dir) / "experiments"
         versioner = ExperimentVersioner(str(experiment_dir))
@@ -514,7 +530,7 @@ class TestExperimentVersioner:
         results_file = version_dir / "results.json"
         assert results_file.exists()
     
-    def test_get_experiment_version(self, temp_dir, sample_experiment_data, sample_results):
+    def test_get_experiment_version(self, temp_dir, sample_experiment_data, sample_results) -> Optional[Dict[str, Any]]:
         """Test retrieving a specific experiment version."""
         experiment_dir = Path(temp_dir) / "experiments"
         versioner = ExperimentVersioner(str(experiment_dir))
@@ -534,7 +550,7 @@ class TestExperimentVersioner:
         assert "results" in retrieved_experiment
         assert retrieved_experiment["experiment"]["experiment_name"] == "test_experiment"
     
-    def test_get_latest_experiment(self, temp_dir, sample_experiment_data, sample_results):
+    def test_get_latest_experiment(self, temp_dir, sample_experiment_data, sample_results) -> Optional[Dict[str, Any]]:
         """Test getting latest experiment."""
         experiment_dir = Path(temp_dir) / "experiments"
         versioner = ExperimentVersioner(str(experiment_dir))
@@ -552,7 +568,7 @@ class TestExperimentVersioner:
         assert latest_experiment is not None
         assert latest_experiment["experiment"]["experiment_name"] == "test_experiment"
     
-    def test_list_experiment_versions(self, temp_dir, sample_experiment_data, sample_results):
+    def test_list_experiment_versions(self, temp_dir, sample_experiment_data, sample_results) -> List[Any]:
         """Test listing experiment versions."""
         experiment_dir = Path(temp_dir) / "experiments"
         versioner = ExperimentVersioner(str(experiment_dir))
@@ -582,7 +598,7 @@ class TestExperimentVersioner:
 class TestVersionControlSystem:
     """Test VersionControlSystem class."""
     
-    def test_initialization(self, temp_dir):
+    def test_initialization(self, temp_dir) -> Any:
         """Test version control system initialization."""
         vc_system = VersionControlSystem(temp_dir, auto_commit=False)
         
@@ -593,7 +609,7 @@ class TestVersionControlSystem:
         assert vc_system.model_versioner is not None
         assert vc_system.experiment_versioner is not None
     
-    def test_version_configuration(self, temp_dir, sample_config):
+    def test_version_configuration(self, temp_dir, sample_config) -> Any:
         """Test versioning configuration through main system."""
         vc_system = VersionControlSystem(temp_dir, auto_commit=False)
         
@@ -612,7 +628,7 @@ class TestVersionControlSystem:
         assert config_data is not None
         assert config_data["model"]["type"] == "transformer"
     
-    def test_version_model(self, temp_dir, sample_model_metadata):
+    def test_version_model(self, temp_dir, sample_model_metadata) -> Any:
         """Test versioning model through main system."""
         vc_system = VersionControlSystem(temp_dir, auto_commit=False)
         
@@ -636,7 +652,7 @@ class TestVersionControlSystem:
         assert model_data is not None
         assert model_data["metadata"]["architecture"] == "transformer"
     
-    def test_version_experiment(self, temp_dir, sample_experiment_data, sample_results):
+    def test_version_experiment(self, temp_dir, sample_experiment_data, sample_results) -> Any:
         """Test versioning experiment through main system."""
         vc_system = VersionControlSystem(temp_dir, auto_commit=False)
         
@@ -656,7 +672,7 @@ class TestVersionControlSystem:
         assert experiment_data is not None
         assert experiment_data["experiment"]["experiment_name"] == "test_experiment"
     
-    def test_get_version_info(self, temp_dir, sample_config):
+    def test_get_version_info(self, temp_dir, sample_config) -> Optional[Dict[str, Any]]:
         """Test getting version information."""
         vc_system = VersionControlSystem(temp_dir, auto_commit=False)
         
@@ -673,7 +689,7 @@ class TestVersionControlSystem:
         assert version_info["type"] == "config"
         assert "data" in version_info
     
-    def test_list_versions(self, temp_dir, sample_config, sample_model_metadata):
+    def test_list_versions(self, temp_dir, sample_config, sample_model_metadata) -> List[Any]:
         """Test listing all versions."""
         vc_system = VersionControlSystem(temp_dir, auto_commit=False)
         
@@ -708,7 +724,7 @@ class TestVersionControlSystem:
         assert len(model_versions) == 1
         assert all(v["item_type"] == "model" for v in model_versions)
     
-    def test_create_snapshot(self, temp_dir, sample_config):
+    def test_create_snapshot(self, temp_dir, sample_config) -> Any:
         """Test creating project snapshot."""
         vc_system = VersionControlSystem(temp_dir, auto_commit=False)
         
@@ -734,7 +750,7 @@ class TestVersionControlSystem:
         snapshot_file = snapshot_dir / "snapshot.json"
         assert snapshot_file.exists()
     
-    def test_get_project_status(self, temp_dir, sample_config):
+    def test_get_project_status(self, temp_dir, sample_config) -> Optional[Dict[str, Any]]:
         """Test getting project status."""
         vc_system = VersionControlSystem(temp_dir, auto_commit=False)
         
@@ -763,7 +779,7 @@ class TestVersionControlSystem:
 class TestVersionControlContextManager:
     """Test version_control context manager."""
     
-    def test_context_manager(self, temp_dir, sample_config):
+    def test_context_manager(self, temp_dir, sample_config) -> Any:
         """Test version control context manager."""
         with version_control(temp_dir, auto_commit=False) as vc:
             # Version a configuration
@@ -789,7 +805,7 @@ class TestIntegration:
     """Integration tests for the version control system."""
     
     def test_full_workflow(self, temp_dir, sample_config, sample_model_metadata, 
-                          sample_experiment_data, sample_results):
+                          sample_experiment_data, sample_results) -> Any:
         """Test complete version control workflow."""
         with version_control(temp_dir, auto_commit=False) as vc:
             # 1. Version configuration
@@ -842,7 +858,7 @@ class TestIntegration:
             assert status["version_counts"]["models"] == 1
             assert status["version_counts"]["experiments"] == 1
     
-    def test_version_evolution(self, temp_dir, sample_config):
+    def test_version_evolution(self, temp_dir, sample_config) -> Any:
         """Test version evolution over time."""
         with version_control(temp_dir, auto_commit=False) as vc:
             # Initial version
@@ -891,7 +907,7 @@ class TestIntegration:
 class TestPerformance:
     """Performance tests for the version control system."""
     
-    def test_large_config_versioning(self, temp_dir):
+    def test_large_config_versioning(self, temp_dir) -> Any:
         """Test versioning large configuration files."""
         # Create large configuration
         large_config = {
@@ -937,7 +953,6 @@ class TestPerformance:
             }
         
         with version_control(temp_dir, auto_commit=False) as vc:
-            import time
             
             start_time = time.time()
             
@@ -957,10 +972,9 @@ class TestPerformance:
             config_data = vc.get_version_info("config", "large_config", version_id)
             assert config_data is not None
     
-    def test_multiple_versions_performance(self, temp_dir, sample_config):
+    def test_multiple_versions_performance(self, temp_dir, sample_config) -> Any:
         """Test performance with many versions."""
         with version_control(temp_dir, auto_commit=False) as vc:
-            import time
             
             start_time = time.time()
             
@@ -992,7 +1006,7 @@ class TestPerformance:
 class TestErrorHandling:
     """Test error handling in the version control system."""
     
-    def test_invalid_git_operations(self, temp_dir):
+    def test_invalid_git_operations(self, temp_dir) -> Any:
         """Test handling of invalid Git operations."""
         # Create a directory that's not a Git repository
         non_git_dir = Path(temp_dir) / "non_git"
@@ -1002,7 +1016,7 @@ class TestErrorHandling:
         git_manager = GitManager(str(non_git_dir))
         assert git_manager.repo is not None
     
-    def test_file_not_found(self, temp_dir):
+    def test_file_not_found(self, temp_dir) -> Any:
         """Test handling of missing files."""
         vc_system = VersionControlSystem(temp_dir, auto_commit=False)
         
@@ -1015,7 +1029,7 @@ class TestErrorHandling:
                 description="Test"
             )
     
-    def test_corrupted_history_file(self, temp_dir):
+    def test_corrupted_history_file(self, temp_dir) -> Any:
         """Test handling of corrupted history files."""
         # Create corrupted history file
         config_dir = Path(temp_dir) / "configs"
@@ -1023,7 +1037,15 @@ class TestErrorHandling:
         
         history_file = config_dir / "version_history.json"
         with open(history_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("invalid json content")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         # Should handle corrupted file gracefully
         versioner = ConfigurationVersioner(str(config_dir))

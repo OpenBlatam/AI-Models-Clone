@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -34,6 +36,9 @@ from onyx.server.models import IdReturn
 from onyx.utils.logger import setup_logger
 from shared_configs.configs import ALT_INDEX_SUFFIX
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 router = APIRouter(prefix="/search-settings")
 logger = setup_logger()
 

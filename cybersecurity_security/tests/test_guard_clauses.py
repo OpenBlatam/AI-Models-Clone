@@ -1,15 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import pytest
+import asyncio
+import time
+from unittest.mock import patch, MagicMock
+from ..core import (
+        from ..core import RetryStrategy
+        from ..core import SecurityLogger, LogContext
+        from ..core import PerformanceMonitor, MetricType
+        import time
+        import sys
+from typing import Any, List, Dict, Optional
+import logging
 """
 Tests for Guard Clauses
 
 Tests error and edge-case checking with guard clauses.
 """
 
-import pytest
-import asyncio
-import time
-from unittest.mock import patch, MagicMock
 
-from ..core import (
     # Guard Clause Types
     GuardType, GuardSeverity,
     
@@ -35,11 +50,13 @@ from ..core import (
 class TestGuardClauseDecorators:
     """Test suite for guard clause decorators."""
     
-    def test_guard_against_none(self):
+    def test_guard_against_none(self) -> Any:
         """Test guard against None values."""
         @guard_against_none("target")
         def test_function(target: str, port: int):
-            return f"Target: {target}, Port: {port}"
+            
+    """test_function function."""
+return f"Target: {target}, Port: {port}"
         
         # Valid call
         result = test_function("192.168.1.1", 80)
@@ -51,11 +68,13 @@ class TestGuardClauseDecorators:
         assert "cannot be None" in str(exc_info.value)
         assert exc_info.value.field == "target"
     
-    def test_guard_against_empty(self):
+    def test_guard_against_empty(self) -> Any:
         """Test guard against empty values."""
         @guard_against_empty("payload")
         def test_function(payload: str):
-            return f"Payload: {payload}"
+            
+    """test_function function."""
+return f"Payload: {payload}"
         
         # Valid call
         result = test_function("test payload")
@@ -74,11 +93,13 @@ class TestGuardClauseDecorators:
         with pytest.raises(ValidationError):
             test_function({})
     
-    def test_guard_against_invalid_type(self):
+    def test_guard_against_invalid_type(self) -> Any:
         """Test guard against invalid types."""
         @guard_against_invalid_type("port", int)
         def test_function(port: int):
-            return f"Port: {port}"
+            
+    """test_function function."""
+return f"Port: {port}"
         
         # Valid call
         result = test_function(80)
@@ -91,11 +112,13 @@ class TestGuardClauseDecorators:
         assert exc_info.value.field == "port"
         assert exc_info.value.value == "80"
     
-    def test_guard_against_invalid_range(self):
+    def test_guard_against_invalid_range(self) -> Any:
         """Test guard against invalid ranges."""
         @guard_against_invalid_range("timeout", min_value=1.0, max_value=300.0)
         def test_function(timeout: float):
-            return f"Timeout: {timeout}"
+            
+    """test_function function."""
+return f"Timeout: {timeout}"
         
         # Valid calls
         result = test_function(30.0)
@@ -117,11 +140,13 @@ class TestGuardClauseDecorators:
         with pytest.raises(ValidationError):
             test_function("invalid")
     
-    def test_guard_against_invalid_format(self):
+    def test_guard_against_invalid_format(self) -> Any:
         """Test guard against invalid format."""
         @guard_against_invalid_format("email", r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
         def test_function(email: str):
-            return f"Email: {email}"
+            
+    """test_function function."""
+return f"Email: {email}"
         
         # Valid call
         result = test_function("test@example.com")
@@ -134,11 +159,13 @@ class TestGuardClauseDecorators:
         assert exc_info.value.field == "email"
     
     @pytest.mark.asyncio
-    async def test_guard_against_timeout(self):
+    async def test_guard_against_timeout(self) -> Any:
         """Test guard against timeout."""
         @guard_against_timeout("timeout", default_timeout=30.0)
         async def test_function(timeout: float = 30.0):
-            await asyncio.sleep(0.1)
+            
+    """test_function function."""
+await asyncio.sleep(0.1)
             return "Success"
         
         # Valid call
@@ -153,11 +180,13 @@ class TestGuardClauseDecorators:
         with pytest.raises(TimeoutError):
             await test_function(0.01)
     
-    def test_guard_against_rate_limit(self):
+    def test_guard_against_rate_limit(self) -> Any:
         """Test guard against rate limiting."""
         @guard_against_rate_limit(max_calls=2, time_window=1.0)
         def test_function():
-            return "Success"
+            
+    """test_function function."""
+return "Success"
         
         # Valid calls
         result1 = test_function()
@@ -174,7 +203,7 @@ class TestGuardClauseDecorators:
 class TestGuardUtilities:
     """Test suite for guard utility functions."""
     
-    def test_guard_target(self):
+    def test_guard_target(self) -> Optional[Dict[str, Any]]:
         """Test target validation."""
         # Valid targets
         guard_target("192.168.1.1")
@@ -195,7 +224,7 @@ class TestGuardUtilities:
         with pytest.raises(ValidationError):
             guard_target(123)
     
-    def test_guard_port(self):
+    def test_guard_port(self) -> Any:
         """Test port validation."""
         # Valid ports
         guard_port(80)
@@ -219,7 +248,7 @@ class TestGuardUtilities:
         with pytest.raises(ValidationError):
             guard_port("80")
     
-    def test_guard_credentials(self):
+    def test_guard_credentials(self) -> Any:
         """Test credential validation."""
         # Valid credentials dict
         guard_credentials({"username": "admin", "password": "password123"})
@@ -246,7 +275,7 @@ class TestGuardUtilities:
         with pytest.raises(ValidationError):
             guard_credentials("username:")  # Empty password
     
-    def test_guard_payload(self):
+    def test_guard_payload(self) -> Any:
         """Test payload validation."""
         # Valid payload dict
         guard_payload({"content": "test payload", "type": "test"})
@@ -270,7 +299,7 @@ class TestGuardUtilities:
         with pytest.raises(ValidationError):
             guard_payload("x" * 2000000)  # Too large
     
-    def test_guard_config(self):
+    def test_guard_config(self) -> Any:
         """Test configuration validation."""
         # Valid config
         guard_config({"timeout": 30, "retries": 3})
@@ -291,7 +320,7 @@ class TestGuardUtilities:
         with pytest.raises(ValidationError):
             guard_config({"timeout": 30, "retries": "invalid"})  # Invalid retries
     
-    def test_guard_network_params(self):
+    def test_guard_network_params(self) -> Any:
         """Test network parameters validation."""
         # Valid parameters
         guard_network_params("192.168.1.1")
@@ -308,7 +337,7 @@ class TestGuardUtilities:
         with pytest.raises(ValidationError):
             guard_network_params("192.168.1.1", 80, -1.0)
     
-    def test_guard_crypto_params(self):
+    def test_guard_crypto_params(self) -> Any:
         """Test cryptographic parameters validation."""
         # Valid parameters
         guard_crypto_params("hash")
@@ -331,7 +360,7 @@ class TestGuardUtilities:
 class TestCompositeGuardClauses:
     """Test suite for composite guard clauses."""
     
-    def test_guard_scan_parameters(self):
+    def test_guard_scan_parameters(self) -> Any:
         """Test scan parameters validation."""
         # Valid parameters
         guard_scan_parameters("192.168.1.1", [80, 443], "port_scan", {"timeout": 30, "retries": 3})
@@ -349,7 +378,7 @@ class TestCompositeGuardClauses:
         with pytest.raises(ValidationError):
             guard_scan_parameters("192.168.1.1", [80, 443], "port_scan", {"timeout": -1, "retries": 3})
     
-    def test_guard_attack_parameters(self):
+    def test_guard_attack_parameters(self) -> Any:
         """Test attack parameters validation."""
         # Valid parameters
         guard_attack_parameters("192.168.1.1", "brute_force", {"content": "test"}, {"username": "admin", "password": "pass"})
@@ -367,7 +396,7 @@ class TestCompositeGuardClauses:
         with pytest.raises(ValidationError):
             guard_attack_parameters("192.168.1.1", "brute_force", {"content": "test"}, "invalid_credentials")
     
-    def test_guard_report_parameters(self):
+    def test_guard_report_parameters(self) -> Any:
         """Test report parameters validation."""
         # Valid parameters
         guard_report_parameters("html", "detailed", ["executive_summary", "findings"])
@@ -385,7 +414,7 @@ class TestCompositeGuardClauses:
 class TestGuardContext:
     """Test suite for guard context manager."""
     
-    def test_guard_context_basic(self):
+    def test_guard_context_basic(self) -> Any:
         """Test basic guard context usage."""
         with GuardContext("test_operation", "test_module", "test_function") as guard:
             # Apply guards
@@ -395,13 +424,13 @@ class TestGuardContext:
             # Should not raise any exceptions
             assert len(guard.guards_applied) == 2
     
-    def test_guard_context_with_error(self):
+    def test_guard_context_with_error(self) -> Any:
         """Test guard context with error handling."""
         with pytest.raises(ValidationError):
             with GuardContext("test_operation", "test_module", "test_function") as guard:
                 guard.apply_guard(guard_target, "invalid@target")
     
-    def test_guard_context_error_context(self):
+    def test_guard_context_error_context(self) -> Any:
         """Test guard context adds error context."""
         try:
             with GuardContext("test_operation", "test_module", "test_function") as guard:
@@ -416,11 +445,13 @@ class TestGuardContext:
 class TestApplyGuards:
     """Test suite for apply_guards decorator."""
     
-    def test_apply_guards_sync(self):
+    def test_apply_guards_sync(self) -> Any:
         """Test apply_guards with sync function."""
         @apply_guards(guard_target, guard_port)
         def test_function(target: str, port: int):
-            return f"Target: {target}, Port: {port}"
+            
+    """test_function function."""
+return f"Target: {target}, Port: {port}"
         
         # Valid call
         result = test_function("192.168.1.1", 80)
@@ -431,11 +462,13 @@ class TestApplyGuards:
             test_function("invalid@target", 80)
     
     @pytest.mark.asyncio
-    async def test_apply_guards_async(self):
+    async def test_apply_guards_async(self) -> Any:
         """Test apply_guards with async function."""
         @apply_guards(guard_target, guard_port)
         async def test_function(target: str, port: int):
-            await asyncio.sleep(0.1)
+            
+    """test_function function."""
+await asyncio.sleep(0.1)
             return f"Target: {target}, Port: {port}"
         
         # Valid call
@@ -449,11 +482,13 @@ class TestApplyGuards:
 class TestFunctionSignatureGuards:
     """Test suite for function signature guards."""
     
-    def test_guard_function_signature_sync(self):
+    def test_guard_function_signature_sync(self) -> Any:
         """Test function signature guards with sync function."""
         @guard_function_signature
         def test_function(data: str, count: int, enabled: bool = True):
-            return f"Data: {data}, Count: {count}, Enabled: {enabled}"
+            
+    """test_function function."""
+return f"Data: {data}, Count: {count}, Enabled: {enabled}"
         
         # Valid call
         result = test_function("test", 5, True)
@@ -470,11 +505,13 @@ class TestFunctionSignatureGuards:
             test_function("test", 5, "not_bool")  # Wrong type for enabled
     
     @pytest.mark.asyncio
-    async def test_guard_function_signature_async(self):
+    async def test_guard_function_signature_async(self) -> Any:
         """Test function signature guards with async function."""
         @guard_function_signature
         async def test_function(data: str, timeout: float):
-            await asyncio.sleep(0.1)
+            
+    """test_function function."""
+await asyncio.sleep(0.1)
             return f"Data: {data}, Timeout: {timeout}"
         
         # Valid call
@@ -488,13 +525,15 @@ class TestFunctionSignatureGuards:
 class TestGuardClauseIntegration:
     """Integration tests for guard clauses."""
     
-    def test_multiple_guards_integration(self):
+    def test_multiple_guards_integration(self) -> Any:
         """Test integration of multiple guard types."""
         @guard_against_none("target")
         @guard_against_invalid_type("port", int)
         @guard_against_invalid_range("timeout", 1.0, 300.0)
         def scan_target(target: str, port: int, timeout: float):
-            guard_target(target)
+            
+    """scan_target function."""
+guard_target(target)
             guard_port(port)
             return f"Scanning {target}:{port} with timeout {timeout}"
         
@@ -506,14 +545,15 @@ class TestGuardClauseIntegration:
         with pytest.raises(ValidationError):
             scan_target(None, "80", -1.0)
     
-    def test_guard_clauses_with_error_recovery(self):
+    def test_guard_clauses_with_error_recovery(self) -> Any:
         """Test guard clauses with error recovery."""
-        from ..core import RetryStrategy
         
         @guard_against_none("target")
         @guard_against_invalid_type("port", int)
         def scan_with_retry(target: str, port: int):
-            guard_target(target)
+            
+    """scan_with_retry function."""
+guard_target(target)
             guard_port(port)
             return f"Scanned {target}:{port}"
         
@@ -527,15 +567,16 @@ class TestGuardClauseIntegration:
         with pytest.raises(ValidationError):
             retry_strategy.execute(scan_with_retry, None, 80)
     
-    def test_guard_clauses_with_logging(self):
+    def test_guard_clauses_with_logging(self) -> Any:
         """Test guard clauses with logging integration."""
-        from ..core import SecurityLogger, LogContext
         
         logger = SecurityLogger("test_logger")
         
         @guard_against_none("target")
         def scan_with_logging(target: str):
-            guard_target(target)
+            
+    """scan_with_logging function."""
+guard_target(target)
             context = LogContext("scan", "test", "scan_with_logging")
             logger.info(f"Scanning target: {target}", context)
             return f"Scanned {target}"
@@ -548,15 +589,16 @@ class TestGuardClauseIntegration:
         with pytest.raises(ValidationError):
             scan_with_logging(None)
     
-    def test_guard_clauses_with_monitoring(self):
+    def test_guard_clauses_with_monitoring(self) -> Any:
         """Test guard clauses with monitoring integration."""
-        from ..core import PerformanceMonitor, MetricType
         
         monitor = PerformanceMonitor()
         
         @guard_against_none("target")
         def scan_with_monitoring(target: str):
-            guard_target(target)
+            
+    """scan_with_monitoring function."""
+guard_target(target)
             monitor.record_metric("scan_attempts", 1, MetricType.COUNTER)
             return f"Scanned {target}"
         
@@ -574,11 +616,13 @@ class TestGuardClauseIntegration:
 class TestGuardClauseEdgeCases:
     """Test edge cases for guard clauses."""
     
-    def test_guard_with_complex_types(self):
+    def test_guard_with_complex_types(self) -> Any:
         """Test guards with complex data types."""
         @guard_against_empty("data")
         def process_complex_data(data: dict):
-            return f"Processed {len(data)} items"
+            
+    """process_complex_data function."""
+return f"Processed {len(data)} items"
         
         # Valid complex data
         result = process_complex_data({"key1": "value1", "key2": "value2"})
@@ -591,10 +635,12 @@ class TestGuardClauseEdgeCases:
         with pytest.raises(ValidationError):
             process_complex_data([])
     
-    def test_guard_with_nested_validation(self):
+    def test_guard_with_nested_validation(self) -> Any:
         """Test guards with nested validation."""
         def validate_nested_config(config: dict):
-            if "network" not in config:
+            
+    """validate_nested_config function."""
+if "network" not in config:
                 raise ValidationError("Missing network config")
             
             network = config["network"]
@@ -603,7 +649,9 @@ class TestGuardClauseEdgeCases:
         
         @apply_guards(validate_nested_config)
         def scan_with_nested_config(config: dict):
-            return f"Scanning {config['network']['target']}:{config['network']['port']}"
+            
+    """scan_with_nested_config function."""
+return f"Scanning {config['network']['target']}:{config['network']['port']}"
         
         # Valid nested config
         valid_config = {"network": {"target": "192.168.1.1", "port": 80}}
@@ -615,15 +663,16 @@ class TestGuardClauseEdgeCases:
         with pytest.raises(ValidationError):
             scan_with_nested_config(invalid_config)
     
-    def test_guard_performance(self):
+    def test_guard_performance(self) -> Any:
         """Test guard clause performance."""
-        import time
         
         @guard_against_none("target")
         @guard_against_invalid_type("port", int)
         @guard_against_invalid_range("timeout", 1.0, 300.0)
         def performance_test(target: str, port: int, timeout: float):
-            return f"Test: {target}:{port} ({timeout}s)"
+            
+    """performance_test function."""
+return f"Test: {target}:{port} ({timeout}s)"
         
         # Measure performance
         start_time = time.time()
@@ -634,13 +683,14 @@ class TestGuardClauseEdgeCases:
         # Should complete quickly (less than 1 second for 1000 calls)
         assert end_time - start_time < 1.0
     
-    def test_guard_memory_usage(self):
+    def test_guard_memory_usage(self) -> Any:
         """Test guard clause memory usage."""
-        import sys
         
         @guard_against_none("data")
         def memory_test(data: str):
-            return f"Data: {data}"
+            
+    """memory_test function."""
+return f"Data: {data}"
         
         # Measure memory usage
         initial_memory = sys.getsizeof(memory_test)
@@ -655,45 +705,53 @@ class TestGuardClauseEdgeCases:
 class TestGuardClauseBestPractices:
     """Test best practices for guard clauses."""
     
-    def test_guard_order_matters(self):
+    def test_guard_order_matters(self) -> Any:
         """Test that guard order affects error messages."""
         @guard_against_none("target")
         @guard_against_invalid_type("target", str)
         def test_order(target: str):
-            return f"Target: {target}"
+            
+    """test_order function."""
+return f"Target: {target}"
         
         # Should fail on None check first
         with pytest.raises(ValidationError) as exc_info:
             test_order(None)
         assert "cannot be None" in str(exc_info.value)
     
-    def test_guard_specificity(self):
+    def test_guard_specificity(self) -> Any:
         """Test guard clause specificity."""
         @guard_against_invalid_range("port", 1, 65535)
         @guard_against_invalid_type("port", int)
         def test_specificity(port: int):
-            return f"Port: {port}"
+            
+    """test_specificity function."""
+return f"Port: {port}"
         
         # Should fail on type check first (more specific)
         with pytest.raises(ValidationError) as exc_info:
             test_specificity("invalid")
         assert "must be of type int" in str(exc_info.value)
     
-    def test_guard_error_messages(self):
+    def test_guard_error_messages(self) -> Any:
         """Test guard clause error messages."""
         @guard_against_none("target", "Target parameter is required")
         def test_error_message(target: str):
-            return f"Target: {target}"
+            
+    """test_error_message function."""
+return f"Target: {target}"
         
         with pytest.raises(ValidationError) as exc_info:
             test_error_message(None)
         assert "Target parameter is required" in str(exc_info.value)
     
-    def test_guard_context_preservation(self):
+    def test_guard_context_preservation(self) -> Any:
         """Test that guard context is preserved."""
         @guard_against_none("target")
         def test_context(target: str):
-            guard_target(target)
+            
+    """test_context function."""
+guard_target(target)
             return f"Target: {target}"
         
         with pytest.raises(ValidationError) as exc_info:

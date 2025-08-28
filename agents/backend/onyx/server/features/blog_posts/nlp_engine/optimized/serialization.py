@@ -1,3 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import time
+import sys
+from typing import Any, Dict, List, Optional, Tuple
+from dataclasses import dataclass
+from enum import Enum
+    import orjson
+    import json
+    import msgpack
+    import lz4.frame as lz4
+            import json
+            import json
+            import gzip
+            import gzip
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 ⚡ ULTRA-FAST SERIALIZATION - Enterprise Performance
 ===================================================
@@ -8,28 +35,19 @@ Sistema de serialización ultra-optimizado usando:
 - lz4: Compresión ultra-rápida
 """
 
-import time
-import sys
-from typing import Any, Dict, List, Optional, Tuple
-from dataclasses import dataclass
-from enum import Enum
 
 # Ultra-fast serialization libraries
 try:
-    import orjson
     ORJSON_AVAILABLE = True
 except ImportError:
-    import json
     ORJSON_AVAILABLE = False
 
 try:
-    import msgpack
     MSGPACK_AVAILABLE = True
 except ImportError:
     MSGPACK_AVAILABLE = False
 
 try:
-    import lz4.frame as lz4
     LZ4_AVAILABLE = True
 except ImportError:
     LZ4_AVAILABLE = False
@@ -78,7 +96,9 @@ class UltraFastSerializer:
         auto_compression_threshold: int = 1024,
         enable_metrics: bool = True
     ):
-        self.default_format = default_format
+        
+    """__init__ function."""
+self.default_format = default_format
         self.default_compression = default_compression
         self.auto_compression_threshold = auto_compression_threshold
         self.enable_metrics = enable_metrics
@@ -92,7 +112,7 @@ class UltraFastSerializer:
         
         self._validate_libraries()
     
-    def _validate_libraries(self):
+    def _validate_libraries(self) -> bool:
         """Validar disponibilidad de librerías optimizadas."""
         if not ORJSON_AVAILABLE:
             print("⚠️  orjson no disponible, usando json estándar (2-5x más lento)")
@@ -126,7 +146,6 @@ class UltraFastSerializer:
             serialized = msgpack.packb(data, use_bin_type=True)
         else:
             # Fallback a JSON estándar
-            import json
             serialized = json.dumps(data, ensure_ascii=False, separators=(',', ':')).encode('utf-8')
         
         serialization_time = time.perf_counter() - start_time
@@ -177,7 +196,6 @@ class UltraFastSerializer:
         elif format == SerializationFormat.MSGPACK and MSGPACK_AVAILABLE:
             result = msgpack.unpackb(decompressed_data, raw=False)
         else:
-            import json
             result = json.loads(decompressed_data.decode('utf-8'))
         
         deserialization_time = time.perf_counter() - start_time
@@ -201,7 +219,6 @@ class UltraFastSerializer:
         if algorithm == CompressionAlgorithm.LZ4 and LZ4_AVAILABLE:
             return lz4.compress(data, compression_level=1, content_checksum=True)
         else:
-            import gzip
             return gzip.compress(data, compresslevel=1)
     
     def _decompress(self, data: bytes, algorithm: CompressionAlgorithm) -> bytes:
@@ -209,7 +226,6 @@ class UltraFastSerializer:
         if algorithm == CompressionAlgorithm.LZ4 and LZ4_AVAILABLE:
             return lz4.decompress(data)
         else:
-            import gzip
             return gzip.decompress(data)
     
     def _update_serialization_metrics(self, metrics: SerializationMetrics):

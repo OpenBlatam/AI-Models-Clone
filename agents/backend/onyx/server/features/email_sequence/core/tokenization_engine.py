@@ -1,9 +1,10 @@
-"""
-Tokenization Engine for Email Sequence System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Advanced tokenization and sequence handling for text data with support for
-multiple tokenizers, sequence optimization, and efficient text processing.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import logging
@@ -12,24 +13,33 @@ from dataclasses import dataclass
 from collections import defaultdict
 import re
 import json
-
 import torch
 from transformers import (
-    AutoTokenizer,
-    PreTrainedTokenizer,
-    PreTrainedTokenizerFast,
-    BatchEncoding
-)
 from tokenizers import Tokenizer as HFTokenizer
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 import spacy
 from nltk.tokenize import word_tokenize, sent_tokenize
 import nltk
-
 from ..models.sequence import EmailSequence, SequenceStep
 from ..models.subscriber import Subscriber
 from ..models.template import EmailTemplate
+            import subprocess
+from typing import Any, List, Dict, Optional
+"""
+Tokenization Engine for Email Sequence System
+
+Advanced tokenization and sequence handling for text data with support for
+multiple tokenizers, sequence optimization, and efficient text processing.
+"""
+
+
+    AutoTokenizer,
+    PreTrainedTokenizer,
+    PreTrainedTokenizerFast,
+    BatchEncoding
+)
+
 
 logger = logging.getLogger(__name__)
 
@@ -71,7 +81,9 @@ class AdvancedTokenizer:
     """Advanced tokenizer with multiple tokenization strategies"""
     
     def __init__(self, config: TokenizationConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.tokenizer = self._load_tokenizer()
         self.spacy_nlp = self._load_spacy()
         self.tfidf_vectorizer = TfidfVectorizer(
@@ -111,13 +123,12 @@ class AdvancedTokenizer:
             logger.error(f"Failed to load tokenizer: {e}")
             raise
     
-    def _load_spacy(self):
+    def _load_spacy(self) -> Any:
         """Load spaCy model for advanced NLP"""
         try:
             return spacy.load("en_core_web_sm")
         except OSError:
             logger.warning("spaCy model not found. Installing...")
-            import subprocess
             subprocess.run(["python", "-m", "spacy", "download", "en_core_web_sm"])
             return spacy.load("en_core_web_sm")
     

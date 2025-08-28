@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import time
+import asyncio
+from typing import List, Dict, Any, Optional
+from datetime import datetime
+import logging
+    from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request
+    from fastapi.responses import JSONResponse
+    from fastapi.middleware.cors import CORSMiddleware
+    from fastapi.middleware.gzip import GZipMiddleware
+    from pydantic import BaseModel, Field, validator
+    from pydantic.types import conlist
+    from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.util import get_remote_address
+    from slowapi.errors import RateLimitExceeded
+from . import get_production_engine, OptimizationTier
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 🚀 PRODUCTION API - Ultra-Optimized NLP REST API
 ===============================================
@@ -14,41 +39,26 @@ Usage:
     uvicorn production_api:app --host 0.0.0.0 --port 8000 --workers 4
 """
 
-import time
-import asyncio
-from typing import List, Dict, Any, Optional
-from datetime import datetime
-import logging
 
 # FastAPI ultra-optimizado
 try:
-    from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request
-    from fastapi.responses import JSONResponse
-    from fastapi.middleware.cors import CORSMiddleware
-    from fastapi.middleware.gzip import GZipMiddleware
     FASTAPI_AVAILABLE = True
 except ImportError:
     FASTAPI_AVAILABLE = False
 
 # Modelos de datos optimizados
 try:
-    from pydantic import BaseModel, Field, validator
-    from pydantic.types import conlist
     PYDANTIC_AVAILABLE = True
 except ImportError:
     PYDANTIC_AVAILABLE = False
 
 # Rate limiting optimizado
 try:
-    from slowapi import Limiter, _rate_limit_exceeded_handler
-    from slowapi.util import get_remote_address
-    from slowapi.errors import RateLimitExceeded
     RATE_LIMITING_AVAILABLE = True
 except ImportError:
     RATE_LIMITING_AVAILABLE = False
 
 # Import our optimized engine
-from . import get_production_engine, OptimizationTier
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -216,7 +226,7 @@ async def shutdown_event():
 # UTILITY FUNCTIONS
 # =================================================================
 
-def generate_request_id() -> str:
+async def generate_request_id() -> str:
     """Generar ID único para la request."""
     return f"req_{int(time.time() * 1000000)}"
 
@@ -560,7 +570,6 @@ async def internal_error_handler(request: Request, exc: Exception):
 app.state.start_time = time.time()
 
 if __name__ == "__main__":
-    import uvicorn
     
     # Production configuration
     uvicorn.run(

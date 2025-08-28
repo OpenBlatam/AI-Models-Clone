@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import uuid
+from typing import Dict, List, Any, Optional
+from concurrent.futures import ThreadPoolExecutor
+import random
+from fastapi import FastAPI, Request, Response, BackgroundTasks, HTTPException
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+from non_blocking_routes import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Non-Blocking Routes Demo
 
@@ -11,18 +34,8 @@ This demo showcases:
 - Error handling and recovery strategies
 """
 
-import asyncio
-import time
-import uuid
-from typing import Dict, List, Any, Optional
-from concurrent.futures import ThreadPoolExecutor
-import random
 
-from fastapi import FastAPI, Request, Response, BackgroundTasks, HTTPException
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
 
-from non_blocking_routes import (
     NonBlockingRouteManager, DatabaseConnectionPool, RedisConnectionPool,
     HTTPConnectionPool, BackgroundTaskManager, CircuitBreaker,
     non_blocking_route, async_database_operation, async_external_api,
@@ -91,7 +104,7 @@ async def shutdown_event():
 class DemoProductService:
     """Demo product service with blocking and non-blocking examples."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.mock_products = {
             f"prod_{i}": {
                 "id": f"prod_{i}",
@@ -147,7 +160,7 @@ class DemoProductService:
 class DemoUserService:
     """Demo user service with blocking and non-blocking examples."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.mock_users = {
             f"user_{i}": {
                 "id": f"user_{i}",
@@ -185,7 +198,7 @@ class DemoUserService:
 class DemoCacheService:
     """Demo cache service with non-blocking operations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.mock_cache = {}
     
     async def get_cached_data(self, key: str) -> Optional[str]:
@@ -693,7 +706,9 @@ async def demonstrate_connection_pooling():
     
     # Simulate multiple concurrent database operations
     async def db_operation(operation_id: int):
-        await asyncio.sleep(0.1)  # Simulate database operation
+        
+    """db_operation function."""
+await asyncio.sleep(0.1)  # Simulate database operation
         return f"Operation {operation_id} completed"
     
     # Run 20 concurrent operations

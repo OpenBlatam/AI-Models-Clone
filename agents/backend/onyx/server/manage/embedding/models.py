@@ -1,11 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
 from shared_configs.enums import EmbeddingProvider
 
-if TYPE_CHECKING:
     from onyx.db.models import CloudEmbeddingProvider as CloudEmbeddingProviderModel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+if TYPE_CHECKING:
 
 
 class SearchSettingsDeleteRequest(BaseModel):
@@ -32,7 +37,7 @@ class CloudEmbeddingProvider(BaseModel):
     deployment_name: str | None = None
 
     @classmethod
-    def from_request(
+    async def from_request(
         cls, cloud_provider_model: "CloudEmbeddingProviderModel"
     ) -> "CloudEmbeddingProvider":
         return cls(

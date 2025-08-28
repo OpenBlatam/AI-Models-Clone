@@ -1,6 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import msgspec
 from typing import List, Optional
 
+        from datetime import datetime
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class ComplianceInfo(msgspec.Struct, frozen=True, slots=True):
     """
     Información de compliance, retención y auditoría.
@@ -21,7 +27,6 @@ class ComplianceInfo(msgspec.Struct, frozen=True, slots=True):
         return self.update(is_archived=True)
 
     def soft_delete(self, user_id: str, timestamp: Optional[str] = None) -> 'ComplianceInfo':
-        from datetime import datetime
         ts = timestamp or datetime.utcnow().isoformat()
         return self.update(deleted_at=ts, deleted_by=user_id)
 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 from collections.abc import Callable
 from http import HTTPStatus
@@ -49,8 +51,6 @@ from onyx.document_index.interfaces import VespaDocumentFields
 from onyx.httpx.httpx_pool import HttpxPool
 from onyx.redis.redis_connector_credential_pair import RedisConnectorCredentialPair
 from onyx.redis.redis_connector_credential_pair import (
-    RedisGlobalConnectorCredentialPair,
-)
 from onyx.redis.redis_document_set import RedisDocumentSet
 from onyx.redis.redis_pool import get_redis_client
 from onyx.redis.redis_pool import get_redis_replica_client
@@ -59,10 +59,15 @@ from onyx.redis.redis_usergroup import RedisUserGroup
 from onyx.utils.logger import setup_logger
 from onyx.utils.variable_functionality import fetch_versioned_implementation
 from onyx.utils.variable_functionality import (
-    fetch_versioned_implementation_with_fallback,
-)
 from onyx.utils.variable_functionality import global_version
 from onyx.utils.variable_functionality import noop_fallback
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    RedisGlobalConnectorCredentialPair,
+)
+    fetch_versioned_implementation_with_fallback,
+)
 
 logger = setup_logger()
 

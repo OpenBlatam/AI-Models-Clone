@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Remove Last Attempt Status from CC Pair
 
 Revision ID: ec85f2b3c544
@@ -6,8 +16,6 @@ Create Date: 2024-05-23 21:39:46.126010
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "ec85f2b3c544"

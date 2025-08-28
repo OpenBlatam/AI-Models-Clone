@@ -1,8 +1,10 @@
-"""
-SSH Enumerator
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
-Provides comprehensive SSH enumeration capabilities including version detection, key exchange analysis, and algorithm enumeration.
-"""
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import socket
@@ -12,6 +14,15 @@ from typing import Dict, Any, List, Optional, Union
 from pydantic import BaseModel, Field, validator
 from enum import Enum
 import time
+    import random
+from typing import Any, List, Dict, Optional
+import logging
+"""
+SSH Enumerator
+
+Provides comprehensive SSH enumeration capabilities including version detection, key exchange analysis, and algorithm enumeration.
+"""
+
 
 class SSHProtocolVersion(str, Enum):
     """Enumeration of SSH protocol versions."""
@@ -64,7 +75,7 @@ class SSHEnumerationRequest(BaseModel):
     password_list: List[str] = Field(default_factory=list, description="List of passwords for brute force")
     
     @validator('target_host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         if not v:
             raise ValueError("Target host cannot be empty")
         return v
@@ -190,7 +201,6 @@ def create_ssh2_kex_init() -> bytes:
     packet.append(20)
     
     # Cookie (16 random bytes)
-    import random
     for _ in range(16):
         packet.append(random.randint(0, 255))
     

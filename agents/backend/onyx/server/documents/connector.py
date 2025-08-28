@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import json
 import mimetypes
 import os
@@ -34,38 +39,18 @@ from onyx.configs.constants import OnyxCeleryTask
 from onyx.connectors.exceptions import ConnectorValidationError
 from onyx.connectors.factory import validate_ccpair_for_user
 from onyx.connectors.google_utils.google_auth import (
-    get_google_oauth_creds,
-)
 from onyx.connectors.google_utils.google_kv import (
-    build_service_account_creds,
-)
 from onyx.connectors.google_utils.google_kv import (
-    delete_google_app_cred,
-)
 from onyx.connectors.google_utils.google_kv import (
-    delete_service_account_key,
-)
 from onyx.connectors.google_utils.google_kv import get_auth_url
 from onyx.connectors.google_utils.google_kv import (
-    get_google_app_cred,
-)
 from onyx.connectors.google_utils.google_kv import (
-    get_service_account_key,
-)
 from onyx.connectors.google_utils.google_kv import (
-    update_credential_access_tokens,
-)
 from onyx.connectors.google_utils.google_kv import (
-    upsert_google_app_cred,
-)
 from onyx.connectors.google_utils.google_kv import (
-    upsert_service_account_key,
-)
 from onyx.connectors.google_utils.google_kv import verify_csrf
 from onyx.connectors.google_utils.shared_constants import DB_CREDENTIALS_DICT_TOKEN_KEY
 from onyx.connectors.google_utils.shared_constants import (
-    GoogleOAuthAuthenticationMethod,
-)
 from onyx.db.connector import create_connector
 from onyx.db.connector import delete_connector
 from onyx.db.connector import fetch_connector_by_id
@@ -79,8 +64,6 @@ from onyx.db.connector_credential_pair import get_cc_pair_groups_for_ids_paralle
 from onyx.db.connector_credential_pair import get_connector_credential_pair
 from onyx.db.connector_credential_pair import get_connector_credential_pairs_for_user
 from onyx.db.connector_credential_pair import (
-    get_connector_credential_pairs_for_user_parallel,
-)
 from onyx.db.credentials import cleanup_gmail_credentials
 from onyx.db.credentials import cleanup_google_drive_credentials
 from onyx.db.credentials import create_credential
@@ -130,6 +113,32 @@ from onyx.utils.logger import setup_logger
 from onyx.utils.telemetry import create_milestone_and_report
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
 from onyx.utils.variable_functionality import fetch_ee_implementation_or_noop
+        import json
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_google_oauth_creds,
+)
+    build_service_account_creds,
+)
+    delete_google_app_cred,
+)
+    delete_service_account_key,
+)
+    get_google_app_cred,
+)
+    get_service_account_key,
+)
+    update_credential_access_tokens,
+)
+    upsert_google_app_cred,
+)
+    upsert_service_account_key,
+)
+    GoogleOAuthAuthenticationMethod,
+)
+    get_connector_credential_pairs_for_user_parallel,
+)
 
 logger = setup_logger()
 
@@ -399,6 +408,10 @@ def extract_zip_metadata(zf: zipfile.ZipFile) -> dict[str, Any]:
     try:
         metadata_file_info = zf.getinfo(ONYX_METADATA_FILENAME)
         with zf.open(metadata_file_info, "r") as metadata_file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             try:
                 zip_metadata = json.load(metadata_file)
                 if isinstance(zip_metadata, list):
@@ -419,7 +432,7 @@ def extract_zip_metadata(zf: zipfile.ZipFile) -> dict[str, Any]:
     return zip_metadata
 
 
-def upload_files(files: list[UploadFile], db_session: Session) -> FileUploadResponse:
+async def upload_files(files: list[UploadFile], db_session: Session) -> FileUploadResponse:
     for file in files:
         if not file.filename:
             raise HTTPException(status_code=400, detail="File name cannot be empty")
@@ -449,6 +462,10 @@ def upload_files(files: list[UploadFile], db_session: Session) -> FileUploadResp
                             continue
 
                         sub_file_bytes = zf.read(file_info)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         sub_file_name = os.path.join(str(uuid.uuid4()), file_info)
                         deduped_file_paths.append(sub_file_name)
 
@@ -668,9 +685,12 @@ def get_connector_indexing_status(
     indexing_statuses: list[ConnectorIndexingStatus] = []
 
     if MOCK_CONNECTOR_FILE_PATH:
-        import json
 
         with open(MOCK_CONNECTOR_FILE_PATH, "r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             raw_data = json.load(f)
             connector_indexing_statuses = [
                 ConnectorIndexingStatus(**status) for status in raw_data

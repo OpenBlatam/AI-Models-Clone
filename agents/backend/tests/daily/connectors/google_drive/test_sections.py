@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -8,6 +10,9 @@ from tests.daily.connectors.google_drive.consts_and_utils import load_all_docs
 from tests.daily.connectors.google_drive.consts_and_utils import SECTIONS_FOLDER_URL
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @patch(
     "onyx.file_processing.extract_file_text.get_unstructured_api_key",
     return_value=None,

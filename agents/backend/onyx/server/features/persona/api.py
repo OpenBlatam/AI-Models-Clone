@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import uuid
 from uuid import UUID
 
@@ -41,8 +43,6 @@ from onyx.db.prompts import upsert_prompt
 from onyx.file_store.file_store import get_default_file_store
 from onyx.file_store.models import ChatFileType
 from onyx.secondary_llm_flows.starter_message_creation import (
-    generate_starter_messages,
-)
 from onyx.server.features.persona.models import FullPersonaSnapshot
 from onyx.server.features.persona.models import GenerateStarterMessageRequest
 from onyx.server.features.persona.models import ImageGenerationToolStatus
@@ -57,6 +57,11 @@ from onyx.tools.utils import is_image_generation_available
 from onyx.utils.logger import setup_logger
 from onyx.utils.telemetry import create_milestone_and_report
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    generate_starter_messages,
+)
 
 logger = setup_logger()
 

@@ -1,10 +1,22 @@
-"""
-Key message API schemas for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from enum import Enum
+            import ipaddress
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Key message API schemas for cybersecurity tools.
+"""
 
 class MessagePriority(str, Enum):
     """Message priority levels."""
@@ -55,21 +67,20 @@ class CreateKeyMessageRequest(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
     @field_validator('title')
-    def validate_title(cls, v):
+    def validate_title(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Title cannot be empty or whitespace only")
         return v.strip()
     
     @field_validator('content')
-    def validate_content(cls, v):
+    def validate_content(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Content cannot be empty or whitespace only")
         return v.strip()
     
     @field_validator('source_ip', 'target_ip')
-    def validate_ip_address(cls, v):
+    def validate_ip_address(cls, v) -> bool:
         if v is not None:
-            import ipaddress
             try:
                 ipaddress.ip_address(v)
             except ValueError:
@@ -77,7 +88,7 @@ class CreateKeyMessageRequest(BaseModel):
         return v
     
     @field_validator('cve_ids')
-    def validate_cve_ids(cls, v):
+    def validate_cve_ids(cls, v) -> bool:
         for cve_id in v:
             if not cve_id.startswith('CVE-'):
                 raise ValueError(f"Invalid CVE ID format: {cve_id}")

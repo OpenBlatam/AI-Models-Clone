@@ -1,10 +1,13 @@
-"""
-🚀 Multi-GPU Training Example
-=============================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This example demonstrates comprehensive multi-GPU training using
-DataParallel and DistributedDataParallel in the Gradio app.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import torch
 import torch.nn as nn
@@ -15,9 +18,21 @@ import time
 import json
 from typing import Dict, List, Any, Tuple
 import traceback
+from gradio_app import (
+        from gradio_app import performance_optimizer
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+🚀 Multi-GPU Training Example
+=============================
+
+This example demonstrates comprehensive multi-GPU training using
+DataParallel and DistributedDataParallel in the Gradio app.
+"""
+
 
 # Import the multi-GPU trainer from gradio_app
-from gradio_app import (
     multi_gpu_trainer, train_with_multi_gpu, evaluate_with_multi_gpu,
     get_multi_gpu_status, log_training_start, log_training_end
 )
@@ -25,7 +40,7 @@ from gradio_app import (
 class SimpleNeuralNetwork(nn.Module):
     """Simple neural network for multi-GPU training demonstration."""
     
-    def __init__(self, input_size=784, hidden_size=512, output_size=10):
+    def __init__(self, input_size=784, hidden_size=512, output_size=10) -> Any:
         super(SimpleNeuralNetwork, self).__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size)
@@ -33,7 +48,7 @@ class SimpleNeuralNetwork(nn.Module):
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.2)
         
-    def forward(self, x):
+    def forward(self, x) -> Any:
         x = self.relu(self.fc1(x))
         x = self.dropout(x)
         x = self.relu(self.fc2(x))
@@ -44,7 +59,7 @@ class SimpleNeuralNetwork(nn.Module):
 class DummyDataset(data.Dataset):
     """Dummy dataset for demonstration purposes."""
     
-    def __init__(self, num_samples=1000, input_size=784, num_classes=10):
+    def __init__(self, num_samples=1000, input_size=784, num_classes=10) -> Any:
         self.num_samples = num_samples
         self.input_size = input_size
         self.num_classes = num_classes
@@ -53,10 +68,10 @@ class DummyDataset(data.Dataset):
         self.data = torch.randn(num_samples, input_size)
         self.targets = torch.randint(0, num_classes, (num_samples,))
         
-    def __len__(self):
+    def __len__(self) -> Any:
         return self.num_samples
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         return self.data[idx], self.targets[idx]
 
 def demonstrate_gpu_info():
@@ -391,6 +406,10 @@ def demonstrate_multi_gpu_status():
         
         # Export status to JSON
         with open('logs/multi_gpu_status.json', 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(status, f, indent=2)
         print("\n✅ Multi-GPU status exported to logs/multi_gpu_status.json")
         
@@ -545,7 +564,6 @@ def demonstrate_integration_with_performance_optimizer():
     print("=" * 60)
     
     try:
-        from gradio_app import performance_optimizer
         
         # Create model
         model = SimpleNeuralNetwork()
@@ -614,5 +632,6 @@ def main():
     print("\n🎉 Multi-GPU training demonstration completed!")
     print("Check the 'logs' directory for exported metrics and status files.")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

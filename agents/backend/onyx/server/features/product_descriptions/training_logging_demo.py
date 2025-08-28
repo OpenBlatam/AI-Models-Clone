@@ -1,3 +1,39 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+import tempfile
+import os
+import sys
+from pathlib import Path
+from typing import Dict, Any, List, Optional, Tuple
+import json
+import random
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import torch.optim as optim
+from torch.utils.data import DataLoader, TensorDataset
+import numpy as np
+import pandas as pd
+import structlog
+from training_logging_system import (
+from robust_operations import RobustOperations
+                import shutil
+from typing import Any, List, Dict, Optional
+import logging
 """
 Training Logging System Demo
 
@@ -10,29 +46,11 @@ This demo showcases comprehensive logging for ML training with:
 - Log analysis and visualization
 """
 
-import asyncio
-import time
-import tempfile
-import os
-import sys
-from pathlib import Path
-from typing import Dict, Any, List, Optional, Tuple
-import json
-import random
 
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import torch.optim as optim
-from torch.utils.data import DataLoader, TensorDataset
-import numpy as np
-import pandas as pd
-import structlog
 
 # Add the current directory to the path to import our modules
 sys.path.append(str(Path(__file__).parent))
 
-from training_logging_system import (
     TrainingLogger,
     TrainingMetrics,
     SecurityEvent,
@@ -42,7 +60,6 @@ from training_logging_system import (
     create_training_logger,
     log_training_progress
 )
-from robust_operations import RobustOperations
 
 # Configure logging
 structlog.configure(
@@ -70,7 +87,9 @@ class CybersecurityModel(nn.Module):
     """Neural network for cybersecurity threat detection."""
     
     def __init__(self, input_size: int = 10, hidden_size: int = 64, num_classes: int = 2):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)
         self.fc2 = nn.Linear(hidden_size, hidden_size // 2)
         self.fc3 = nn.Linear(hidden_size // 2, num_classes)
@@ -78,7 +97,7 @@ class CybersecurityModel(nn.Module):
         self.batch_norm1 = nn.BatchNorm1d(hidden_size)
         self.batch_norm2 = nn.BatchNorm1d(hidden_size // 2)
         
-    def forward(self, x):
+    def forward(self, x) -> Any:
         x = F.relu(self.batch_norm1(self.fc1(x)))
         x = self.dropout(x)
         x = F.relu(self.batch_norm2(self.fc2(x)))
@@ -91,7 +110,9 @@ class AnomalyDetectionModel(nn.Module):
     """Autoencoder for anomaly detection."""
     
     def __init__(self, input_size: int = 10, hidden_size: int = 32):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.encoder = nn.Sequential(
             nn.Linear(input_size, hidden_size),
             nn.ReLU(),
@@ -105,7 +126,7 @@ class AnomalyDetectionModel(nn.Module):
             nn.Sigmoid()
         )
         
-    def forward(self, x):
+    def forward(self, x) -> Any:
         encoded = self.encoder(x)
         decoded = self.decoder(encoded)
         return decoded, encoded
@@ -114,7 +135,7 @@ class AnomalyDetectionModel(nn.Module):
 class TrainingLoggingDemo:
     """Demo class showcasing comprehensive training logging."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = {
             "log_dir": "demo_training_logs",
             "log_level": LogLevel.INFO,
@@ -193,7 +214,7 @@ class TrainingLoggingDemo:
         
         return train_loader, val_loader
     
-    def demo_basic_training_logging(self):
+    def demo_basic_training_logging(self) -> Any:
         """Demonstrate basic training logging."""
         logger.info("=== Basic Training Logging Demo ===")
         
@@ -329,7 +350,7 @@ class TrainingLoggingDemo:
             
             self.training_logger.end_training(final_metrics)
     
-    def demo_error_handling_logging(self):
+    def demo_error_handling_logging(self) -> Any:
         """Demonstrate error handling and logging."""
         logger.info("=== Error Handling Logging Demo ===")
         
@@ -413,7 +434,7 @@ class TrainingLoggingDemo:
         finally:
             self.training_logger.end_training()
     
-    def demo_security_event_logging(self):
+    def demo_security_event_logging(self) -> Any:
         """Demonstrate security event logging."""
         logger.info("=== Security Event Logging Demo ===")
         
@@ -479,7 +500,7 @@ class TrainingLoggingDemo:
             
             time.sleep(0.2)
     
-    def demo_performance_monitoring(self):
+    def demo_performance_monitoring(self) -> Any:
         """Demonstrate performance monitoring and alerting."""
         logger.info("=== Performance Monitoring Demo ===")
         
@@ -543,7 +564,7 @@ class TrainingLoggingDemo:
         
         self.training_logger.end_training()
     
-    def demo_model_save_load_logging(self):
+    def demo_model_save_load_logging(self) -> Any:
         """Demonstrate model save/load logging."""
         logger.info("=== Model Save/Load Logging Demo ===")
         
@@ -597,7 +618,7 @@ class TrainingLoggingDemo:
         except Exception as e:
             self.training_logger.log_model_load(str(model_path), False, str(e))
     
-    def demo_log_analysis(self):
+    def demo_log_analysis(self) -> Any:
         """Demonstrate log analysis and reporting."""
         logger.info("=== Log Analysis Demo ===")
         
@@ -631,7 +652,7 @@ class TrainingLoggingDemo:
                        avg_memory_usage=np.mean(memory_usage) if memory_usage else 0,
                        max_memory_usage=max(memory_usage) if memory_usage else 0)
     
-    def run_comprehensive_demo(self):
+    def run_comprehensive_demo(self) -> Any:
         """Run the complete training logging demo."""
         logger.info("Starting Comprehensive Training Logging Demo")
         
@@ -666,7 +687,6 @@ class TrainingLoggingDemo:
             
             # Clean up demo files
             try:
-                import shutil
                 shutil.rmtree(self.demo_dir)
                 logger.info("Demo cleanup completed")
             except Exception as e:

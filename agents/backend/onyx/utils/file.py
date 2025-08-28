@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import cast
 
 import puremagic
@@ -5,6 +7,9 @@ from pydantic import BaseModel
 
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -22,7 +27,15 @@ class OnyxStaticFileManager:
         try:
             mime_type: str = "application/octet-stream"
             with open(filename, "rb") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 file_content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 matches = puremagic.magic_string(file_content)
                 if matches:
                     mime_type = cast(str, matches[0].mime_type)

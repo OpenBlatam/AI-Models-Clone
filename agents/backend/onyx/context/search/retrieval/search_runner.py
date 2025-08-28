@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import string
 from collections.abc import Callable
 
@@ -23,8 +25,6 @@ from onyx.db.search_settings import get_multilingual_expansion
 from onyx.document_index.interfaces import DocumentIndex
 from onyx.document_index.interfaces import VespaChunkRequest
 from onyx.document_index.vespa.shared_utils.utils import (
-    replace_invalid_doc_id_characters,
-)
 from onyx.natural_language_processing.search_nlp_models import EmbeddingModel
 from onyx.secondary_llm_flows.query_expansion import multilingual_query_expansion
 from onyx.utils.logger import setup_logger
@@ -37,6 +37,12 @@ from shared_configs.configs import MODEL_SERVER_HOST
 from shared_configs.configs import MODEL_SERVER_PORT
 from shared_configs.enums import EmbedTextType
 from shared_configs.model_server_models import Embedding
+    from the large chunks to the referenced chunks,
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    replace_invalid_doc_id_characters,
+)
 
 logger = setup_logger()
 
@@ -58,7 +64,7 @@ def _dedupe_chunks(
     return list(used_chunks.values())
 
 
-def download_nltk_data() -> None:
+async def download_nltk_data() -> None:
     resources = {
         "stopwords": "corpora/stopwords",
         # "wordnet": "corpora/wordnet",  # Not in use
@@ -152,7 +158,6 @@ def doc_index_retrieval(
     """
     This function performs the search to retrieve the chunks,
     extracts chunks from the large chunks, persists the scores
-    from the large chunks to the referenced chunks,
     dedupes the chunks, and cleans the chunks.
     """
     query_embedding = query.precomputed_query_embedding or get_query_embedding(

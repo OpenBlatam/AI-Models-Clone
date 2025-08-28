@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from collections.abc import Generator
 from datetime import datetime
 from datetime import timezone
@@ -47,6 +52,9 @@ from onyx.server.query_and_chat.models import ChatSessionDetails
 from onyx.server.query_and_chat.models import ChatSessionsResponse
 from onyx.utils.threadpool_concurrency import parallel_yield
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 router = APIRouter()
 
 ONYX_ANONYMIZED_EMAIL = "anonymous@anonymous.invalid"
@@ -69,7 +77,7 @@ def yield_snapshot_from_chat_session(
     yield snapshot_from_chat_session(chat_session=chat_session, db_session=db_session)
 
 
-def fetch_and_process_chat_session_history(
+async def fetch_and_process_chat_session_history(
     db_session: Session,
     start: datetime,
     end: datetime,

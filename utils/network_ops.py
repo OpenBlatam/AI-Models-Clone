@@ -1,9 +1,10 @@
-"""
-Network Operations Module for Key Messages Feature.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Provides packet crafting, sniffing, and port scanning capabilities using Scapy and python-nmap.
-Implements functional programming patterns with RORO interfaces.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import json
@@ -13,12 +14,21 @@ import struct
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple, Union
 from enum import Enum
-
 import structlog
 from pydantic import BaseModel, Field, validator
+    from scapy.all import (
+    import nmap
+from typing import Any, List, Dict, Optional
+"""
+Network Operations Module for Key Messages Feature.
+
+Provides packet crafting, sniffing, and port scanning capabilities using Scapy and python-nmap.
+Implements functional programming patterns with RORO interfaces.
+"""
+
+
 
 try:
-    from scapy.all import (
         ARP, DNS, DNSQR, DNSRR, Ether, ICMP, IP, TCP, UDP, 
         Raw, sr, sr1, srp, sniff, send, srp1, conf
     )
@@ -28,7 +38,6 @@ except ImportError:
     logging.warning("Scapy not available. Network operations limited.")
 
 try:
-    import nmap
     NMAP_AVAILABLE = True
 except ImportError:
     NMAP_AVAILABLE = False

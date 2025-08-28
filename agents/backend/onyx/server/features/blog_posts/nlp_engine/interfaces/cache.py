@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Optional, Dict, Any, List
+from ..core.entities import AnalysisResult
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🔌 CACHE INTERFACES - Contratos para Cache y Repositorios
 ========================================================
@@ -5,9 +13,6 @@
 Interfaces para sistemas de cache y repositorios de datos.
 """
 
-from abc import ABC, abstractmethod
-from typing import Optional, Dict, Any, List
-from ..core.entities import AnalysisResult
 
 
 class ICacheRepository(ABC):

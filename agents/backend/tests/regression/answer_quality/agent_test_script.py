@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import csv
 import json
 import os
@@ -9,11 +11,7 @@ from typing import Any
 import yaml
 
 from onyx.agents.agent_search.deep_search.main.graph_builder import (
-    agent_search_graph_builder,
-)
 from onyx.agents.agent_search.deep_search.main.states import (
-    MainInput as MainInput_a,
-)
 from onyx.agents.agent_search.run_graph import run_agent_search_graph
 from onyx.agents.agent_search.run_graph import run_basic_graph
 from onyx.agents.agent_search.shared_graph_utils.utils import get_test_config
@@ -29,6 +27,13 @@ from onyx.llm.factory import get_default_llms
 from onyx.tools.force import ForceUseTool
 from onyx.tools.tool_implementations.search.search_tool import SearchTool
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    agent_search_graph_builder,
+)
+    MainInput as MainInput_a,
+)
 
 logger = setup_logger()
 
@@ -36,6 +41,10 @@ logger = setup_logger()
 cwd = os.getcwd()
 CONFIG = yaml.safe_load(
     open(f"{cwd}/backend/tests/regression/answer_quality/search_test_config.yaml")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 )
 INPUT_DIR = CONFIG["agent_test_input_folder"]
 OUTPUT_DIR = CONFIG["agent_test_output_folder"]
@@ -48,7 +57,11 @@ primary_llm, fast_llm = get_default_llms()
 # create a local json test data file and use it here
 
 
-input_file_object = open(
+with open(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}") as input_file_object:
     f"{INPUT_DIR}/agent_test_data.json",
 )
 output_file = f"{OUTPUT_DIR}/agent_test_output.csv"
@@ -214,6 +227,10 @@ with get_session_context_manager() as db_session:
 
 
 with open(output_file, "w", newline="") as csvfile:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     writer = csv.writer(csvfile, delimiter="\t")
     writer.writerow(
         [

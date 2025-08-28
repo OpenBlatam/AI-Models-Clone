@@ -1,9 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 
 from onyx.connectors.models import Document
 from onyx.connectors.web.connector import WEB_CONNECTOR_VALID_SETTINGS
 from onyx.connectors.web.connector import WebConnector
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 EXPECTED_QUOTE = (
     "If you can't explain it to a six year old, you don't understand it yourself."
 )

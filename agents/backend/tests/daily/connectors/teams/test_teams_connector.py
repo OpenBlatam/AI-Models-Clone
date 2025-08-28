@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import time
 
@@ -9,6 +11,9 @@ from tests.daily.connectors.utils import to_sections
 from tests.daily.connectors.utils import to_text_sections
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def teams_credentials() -> dict[str, str]:
     app_id = os.environ["TEAMS_APPLICATION_ID"]

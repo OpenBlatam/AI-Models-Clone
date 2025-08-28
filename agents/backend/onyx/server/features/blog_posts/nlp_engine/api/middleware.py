@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import time
+import logging
+from typing import Dict, Optional, Callable
+from collections import defaultdict, deque
+from fastapi import Request, Response
+from fastapi.middleware.base import BaseHTTPMiddleware
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🔧 PRODUCTION MIDDLEWARE - Rate Limiting, Logging & Metrics
 ==========================================================
@@ -5,19 +15,13 @@
 Middleware enterprise para API de producción.
 """
 
-import time
-import logging
-from typing import Dict, Optional, Callable
-from collections import defaultdict, deque
 
-from fastapi import Request, Response
-from fastapi.middleware.base import BaseHTTPMiddleware
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
     """Rate limiting middleware."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
         self.requests = defaultdict(deque)
         
@@ -30,7 +34,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
 class MetricsMiddleware(BaseHTTPMiddleware):
     """Metrics collection middleware."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
         self.metrics = {}
         
@@ -46,7 +50,7 @@ class MetricsMiddleware(BaseHTTPMiddleware):
 class LoggingMiddleware(BaseHTTPMiddleware):
     """Logging middleware."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
         self.logger = logging.getLogger("api")
         
@@ -56,7 +60,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         return response
 
 
-def setup_middleware(app):
+def setup_middleware(app) -> Any:
     """Setup all production middleware."""
     app.add_middleware(RateLimitMiddleware)
     app.add_middleware(MetricsMiddleware)

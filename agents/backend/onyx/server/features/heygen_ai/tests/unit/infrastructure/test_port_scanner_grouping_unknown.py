@@ -1,4 +1,4 @@
-from agents.backend.onyx.server.features.heygen_ai.port_scanner import AsyncPortScanner, PortScanResult
+from port_scanner import AsyncPortScanner, PortScanResult
 from datetime import datetime
 
 
@@ -11,6 +11,7 @@ def test_group_by_service_includes_unknown():
     grouped = scanner.group_by_service(results)
     assert "unknown" in grouped and "http" in grouped
     assert len(grouped["unknown"]) == 1
+
 
 
 

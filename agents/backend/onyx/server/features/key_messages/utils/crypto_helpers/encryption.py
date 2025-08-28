@@ -1,6 +1,5 @@
-"""
-Encryption utilities for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, Optional, Union
 from pydantic import BaseModel, field_validator
 import structlog
@@ -11,6 +10,12 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from cryptography.hazmat.backends import default_backend
 import os
 import base64
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Encryption utilities for cybersecurity tools.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -22,13 +27,13 @@ class EncryptionInput(BaseModel):
     encoding: str = "utf-8"
     
     @field_validator('data')
-    def validate_data(cls, v):
+    def validate_data(cls, v) -> bool:
         if not v:
             raise ValueError("Data cannot be empty")
         return v
     
     @field_validator('algorithm')
-    def validate_algorithm(cls, v):
+    def validate_algorithm(cls, v) -> bool:
         valid_algorithms = ["AES-256-GCM", "AES-256-CBC", "Fernet"]
         if v not in valid_algorithms:
             raise ValueError(f"Algorithm must be one of: {valid_algorithms}")
@@ -42,13 +47,13 @@ class DecryptionInput(BaseModel):
     encoding: str = "utf-8"
     
     @field_validator('encrypted_data')
-    def validate_encrypted_data(cls, v):
+    def validate_encrypted_data(cls, v) -> bool:
         if not v:
             raise ValueError("Encrypted data cannot be empty")
         return v
     
     @field_validator('key')
-    def validate_key(cls, v):
+    def validate_key(cls, v) -> bool:
         if not v:
             raise ValueError("Key cannot be empty")
         return v

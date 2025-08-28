@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import ssl
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
@@ -33,7 +33,7 @@ async def test_check_http_status_success(monkeypatch):
             return FakeResponse()
 
     # Patch aiohttp.ClientSession used inside module
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod, "aiohttp", SimpleNamespace(ClientSession=FakeSession, ClientTimeout=lambda total: total))
 
     utils = NetworkUtils(default_timeout=1.0)
@@ -56,7 +56,7 @@ async def test_check_http_status_error(monkeypatch):
         def get(self, url):
             raise RuntimeError("network error")
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod, "aiohttp", SimpleNamespace(ClientSession=lambda timeout: FakeSession(), ClientTimeout=lambda total: total))
 
     utils = NetworkUtils(default_timeout=1.0)
@@ -89,7 +89,7 @@ async def test_check_host_connectivity_success(monkeypatch):
     async def fake_open_connection(host, port):
         return object(), FakeWriter()
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(asyncio, "open_connection", fake_open_connection)
     # Avoid real DNS
     monkeypatch.setattr(mod, "socket", SimpleNamespace(gethostbyname=lambda h: "93.184.216.34"))
@@ -108,7 +108,7 @@ async def test_check_ssl_certificate_handles_errors(monkeypatch):
     def fake_create_connection(addr):
         raise OSError("fail")
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod, "socket", SimpleNamespace(create_connection=fake_create_connection))
     monkeypatch.setattr(mod, "ssl", ssl)
 

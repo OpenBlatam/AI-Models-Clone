@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from pathlib import Path
 from typing import cast
@@ -21,6 +23,9 @@ from onyx.tools.tool_implementations.search.search_tool import SearchTool
 from onyx.tools.utils import explicit_tool_calling_supported
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -48,6 +53,10 @@ def load_test_queries() -> list[TestQuery]:
     if not test_queries_path.exists():
         raise FileNotFoundError(f"Test queries file not found at {test_queries_path}")
     with test_queries_path.open("r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         test_queries_raw: list[dict] = json.load(f)
 
     # setup llm for question_search generation
@@ -87,6 +96,10 @@ def export_test_queries(test_queries: list[TestQuery], export_path: Path) -> Non
     """Exports the test queries to a JSON file."""
     logger.info(f"Exporting test queries to {export_path}")
     with export_path.open("w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         json.dump(
             [query.model_dump() for query in test_queries],
             f,

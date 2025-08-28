@@ -1,8 +1,10 @@
-"""
-Network Helpers
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Provides network utility functions for security operations.
-"""
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import socket
@@ -11,6 +13,14 @@ import time
 import json
 from functools import lru_cache
 from typing import Any, Dict, List, Optional
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Network Helpers
+
+Provides network utility functions for security operations.
+"""
+
 
 # DNS cache with LRU
 @lru_cache(maxsize=1024)
@@ -24,22 +34,30 @@ async def async_resolve_hostname(hostname: str) -> str:
 # Async HTTP client with connection pooling (dependency injection ready)
 class HTTPClientPool:
     def __init__(self, max_connections: int = 100, max_keepalive: int = 20):
-        self.client = httpx.AsyncClient(limits=httpx.Limits(max_connections=max_connections, max_keepalive_connections=max_keepalive))
+        
+    """__init__ function."""
+self.client = httpx.AsyncClient(limits=httpx.Limits(max_connections=max_connections, max_keepalive_connections=max_keepalive))
     async def get(self, url: str, **kwargs):
-        return await self.client.get(url, **kwargs)
+        
+    """get function."""
+return await self.client.get(url, **kwargs)
     async def post(self, url: str, **kwargs):
-        return await self.client.post(url, **kwargs)
-    async def close(self):
+        
+    """post function."""
+return await self.client.post(url, **kwargs)
+    async def close(self) -> Any:
         await self.client.aclose()
 
 # Rate limiter (token bucket)
 class RateLimiter:
     def __init__(self, rate_per_sec: float, burst: int = 1):
-        self.rate = rate_per_sec
+        
+    """__init__ function."""
+self.rate = rate_per_sec
         self.burst = burst
         self.tokens = burst
         self.last = time.monotonic()
-    async def acquire(self):
+    async def acquire(self) -> Any:
         now = time.monotonic()
         elapsed = now - self.last
         self.tokens = min(self.burst, self.tokens + elapsed * self.rate)
@@ -53,9 +71,13 @@ class RateLimiter:
 # Structured JSON logger
 class JsonLogger:
     def __init__(self, name: str):
-        self.name = name
+        
+    """__init__ function."""
+self.name = name
     def log(self, level: str, message: str, **kwargs):
-        log_record = {
+        
+    """log function."""
+log_record = {
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%S", time.gmtime()),
             "level": level,
             "logger": self.name,
@@ -68,11 +90,15 @@ logger = JsonLogger("network_helpers")
 
 # Async batch HTTP fetch with rate limiting and logging
 def chunked(lst: List[Any], size: int):
-    for i in range(0, len(lst), size):
+    
+    """chunked function."""
+for i in range(0, len(lst), size):
         yield lst[i:i+size]
 
 async def batch_fetch(urls: List[str], client: HTTPClientPool, rate_limiter: Optional[RateLimiter] = None, batch_size: int = 50):
-    results = []
+    
+    """batch_fetch function."""
+results = []
     for batch in chunked(urls, batch_size):
         tasks = []
         for url in batch:
@@ -92,7 +118,9 @@ async def batch_fetch(urls: List[str], client: HTTPClientPool, rate_limiter: Opt
 
 # Async DNS scan example with caching and logging
 async def async_dns_scan(hosts: List[str]):
-    results = []
+    
+    """async_dns_scan function."""
+results = []
     for host in hosts:
         try:
             ip = await async_resolve_hostname(host)

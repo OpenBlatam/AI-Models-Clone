@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import cast
 
 from fastapi import FastAPI
@@ -15,6 +17,9 @@ from onyx.server.onyx_api.ingestion import api_key_dep
 from onyx.utils.variable_functionality import fetch_ee_implementation_or_noop
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 PUBLIC_ENDPOINT_SPECS = [
     # built-in documentation functions
     ("/openapi.json", {"GET", "HEAD"}),

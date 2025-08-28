@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import random
+import time
+import hashlib
+from typing import Dict, List, Any, Optional
+import logging
+from nlp_engine.core.entities import AnalysisResult, AnalysisScore
+from nlp_engine.core.enums import AnalysisType, ProcessingTier, CacheStrategy, Environment, LogLevel
+from nlp_engine.interfaces.analyzers import IAnalyzer, IAnalyzerFactory
+from nlp_engine.interfaces.cache import ICacheRepository, ICacheKeyGenerator
+from nlp_engine.interfaces.metrics import IMetricsCollector, IPerformanceMonitor, IHealthChecker, IStructuredLogger
+from nlp_engine.interfaces.config import IConfigurationService
+from typing import Any, List, Dict, Optional
 """
 🔧 DEMO INFRASTRUCTURE - Mock Implementations
 ============================================
@@ -6,26 +30,16 @@ Implementaciones mock de las interfaces para demostrar
 la arquitectura modular sin dependencias externas.
 """
 
-import asyncio
-import random
-import time
-import hashlib
-from typing import Dict, List, Any, Optional
-import logging
 
-from nlp_engine.core.entities import AnalysisResult, AnalysisScore
-from nlp_engine.core.enums import AnalysisType, ProcessingTier, CacheStrategy, Environment, LogLevel
-from nlp_engine.interfaces.analyzers import IAnalyzer, IAnalyzerFactory
-from nlp_engine.interfaces.cache import ICacheRepository, ICacheKeyGenerator
-from nlp_engine.interfaces.metrics import IMetricsCollector, IPerformanceMonitor, IHealthChecker, IStructuredLogger
-from nlp_engine.interfaces.config import IConfigurationService
 
 
 class MockSentimentAnalyzer(IAnalyzer):
     """Mock analyzer para análisis de sentimientos."""
     
     def __init__(self, tier: ProcessingTier):
-        self._tier = tier
+        
+    """__init__ function."""
+self._tier = tier
         self._name = f"MockSentiment_{tier.value}"
     
     async def analyze(self, text: str, context: Optional[Dict[str, Any]] = None) -> AnalysisScore:
@@ -88,7 +102,9 @@ class MockQualityAnalyzer(IAnalyzer):
     """Mock analyzer para análisis de calidad."""
     
     def __init__(self, tier: ProcessingTier):
-        self._tier = tier
+        
+    """__init__ function."""
+self._tier = tier
         self._name = f"MockQuality_{tier.value}"
     
     async def analyze(self, text: str, context: Optional[Dict[str, Any]] = None) -> AnalysisScore:
@@ -182,7 +198,7 @@ class MockAnalyzerFactory(IAnalyzerFactory):
 class MockCacheRepository(ICacheRepository):
     """Repositorio de cache mock en memoria."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._cache: Dict[str, Any] = {}
         self._access_times: Dict[str, float] = {}
         self._ttls: Dict[str, float] = {}
@@ -280,7 +296,7 @@ class MockCacheKeyGenerator(ICacheKeyGenerator):
 class MockMetricsCollector(IMetricsCollector):
     """Collector de métricas mock."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._counters: Dict[str, int] = {}
         self._histograms: Dict[str, List[float]] = {}
         self._gauges: Dict[str, float] = {}
@@ -344,7 +360,7 @@ class MockMetricsCollector(IMetricsCollector):
 class MockPerformanceMonitor(IPerformanceMonitor):
     """Monitor de performance mock."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._monitoring = False
     
     async def start_monitoring(self) -> None:
@@ -389,7 +405,7 @@ class MockPerformanceMonitor(IPerformanceMonitor):
 class MockHealthChecker(IHealthChecker):
     """Health checker mock."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._checks: Dict[str, callable] = {}
     
     async def check_system_health(self) -> Dict[str, Any]:
@@ -436,7 +452,7 @@ class MockHealthChecker(IHealthChecker):
 class MockStructuredLogger(IStructuredLogger):
     """Logger estructurado mock."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._logger = logging.getLogger(self.__class__.__name__)
         self._context = {}
     
@@ -450,7 +466,7 @@ class MockStructuredLogger(IStructuredLogger):
         
         getattr(self._logger, level.lower(), self._logger.info)(str(log_data))
     
-    def log_analysis_request(self, request_id: str, text_length: int, analysis_types: List[str], tier: str) -> None:
+    async def log_analysis_request(self, request_id: str, text_length: int, analysis_types: List[str], tier: str) -> None:
         """Log de request de análisis."""
         self.log_structured('INFO', 'Analysis request received', {
             'request_id': request_id,
@@ -485,7 +501,7 @@ class MockStructuredLogger(IStructuredLogger):
 class MockConfigurationService(IConfigurationService):
     """Servicio de configuración mock."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._config = {
             'processing_tier': ProcessingTier.BALANCED,
             'cache_strategy': CacheStrategy.LRU,
@@ -517,7 +533,7 @@ class MockConfigurationService(IConfigurationService):
         """Obtener nivel de logging."""
         return self._config['log_level']
     
-    def get_config_value(self, key: str, default: Any = None) -> Any:
+    def get_config_value(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Obtener valor de configuración."""
         return self._config.get(key, default)
     

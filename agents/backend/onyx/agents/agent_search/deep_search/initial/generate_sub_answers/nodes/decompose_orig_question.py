@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from typing import cast
 
@@ -7,28 +9,16 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.types import StreamWriter
 
 from onyx.agents.agent_search.deep_search.initial.generate_initial_answer.states import (
-    SubQuestionRetrievalState,
-)
 from onyx.agents.agent_search.deep_search.main.models import (
-    AgentRefinedMetrics,
-)
 from onyx.agents.agent_search.deep_search.main.operations import dispatch_subquestion
 from onyx.agents.agent_search.deep_search.main.operations import (
-    dispatch_subquestion_sep,
-)
 from onyx.agents.agent_search.deep_search.main.states import (
-    InitialQuestionDecompositionUpdate,
-)
 from onyx.agents.agent_search.models import GraphConfig
 from onyx.agents.agent_search.shared_graph_utils.agent_prompt_ops import (
-    build_history_prompt,
-)
 from onyx.agents.agent_search.shared_graph_utils.models import BaseMessage_Content
 from onyx.agents.agent_search.shared_graph_utils.models import LLMNodeErrorStrings
 from onyx.agents.agent_search.shared_graph_utils.utils import dispatch_separated
 from onyx.agents.agent_search.shared_graph_utils.utils import (
-    get_langgraph_node_log_string,
-)
 from onyx.agents.agent_search.shared_graph_utils.utils import write_custom_event
 from onyx.chat.models import StreamStopInfo
 from onyx.chat.models import StreamStopReason
@@ -37,22 +27,37 @@ from onyx.chat.models import SubQuestionPiece
 from onyx.configs.agent_configs import AGENT_MAX_TOKENS_SUBQUESTION_GENERATION
 from onyx.configs.agent_configs import AGENT_NUM_DOCS_FOR_DECOMPOSITION
 from onyx.configs.agent_configs import (
-    AGENT_TIMEOUT_CONNECT_LLM_SUBQUESTION_GENERATION,
-)
 from onyx.configs.agent_configs import (
-    AGENT_TIMEOUT_LLM_SUBQUESTION_GENERATION,
-)
 from onyx.llm.chat_llm import LLMRateLimitError
 from onyx.llm.chat_llm import LLMTimeoutError
 from onyx.prompts.agent_search import (
-    INITIAL_DECOMPOSITION_PROMPT_QUESTIONS_AFTER_SEARCH_ASSUMING_REFINEMENT,
-)
 from onyx.prompts.agent_search import (
-    INITIAL_QUESTION_DECOMPOSITION_PROMPT_ASSUMING_REFINEMENT,
-)
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
 from onyx.utils.timing import log_function_time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    SubQuestionRetrievalState,
+)
+    AgentRefinedMetrics,
+)
+    dispatch_subquestion_sep,
+)
+    InitialQuestionDecompositionUpdate,
+)
+    build_history_prompt,
+)
+    get_langgraph_node_log_string,
+)
+    AGENT_TIMEOUT_CONNECT_LLM_SUBQUESTION_GENERATION,
+)
+    AGENT_TIMEOUT_LLM_SUBQUESTION_GENERATION,
+)
+    INITIAL_DECOMPOSITION_PROMPT_QUESTIONS_AFTER_SEARCH_ASSUMING_REFINEMENT,
+)
+    INITIAL_QUESTION_DECOMPOSITION_PROMPT_ASSUMING_REFINEMENT,
+)
 
 logger = setup_logger()
 
@@ -96,7 +101,7 @@ def decompose_orig_question(
         if not state.exploratory_search_results:
             logger.error("Initial search for decomposition failed")
 
-        sample_doc_str = "\n\n".join(
+        sample_doc_str = "\n\n"f".join(
             [
                 doc.combined_content
                 for doc in state.exploratory_search_results[
@@ -111,9 +116,7 @@ def decompose_orig_question(
 
     else:
         decomposition_prompt = (
-            INITIAL_QUESTION_DECOMPOSITION_PROMPT_ASSUMING_REFINEMENT.format(
-                question=question, history=history
-            )
+            INITIAL_QUESTION_DECOMPOSITION_PROMPT_ASSUMING_REFINEMENT"
         )
 
     # Start decomposition

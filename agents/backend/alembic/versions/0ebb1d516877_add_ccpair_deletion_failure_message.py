@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add ccpair deletion failure message
 
 Revision ID: 0ebb1d516877
@@ -6,13 +13,11 @@ Create Date: 2024-09-10 15:03:48.233926
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "0ebb1d516877"
-down_revision = "52a219fb5233"
+revision: str = "0ebb1d516877"
+down_revision: str = "52a219fb5233"
 branch_labels = None
 depends_on = None
 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections import defaultdict
 from collections.abc import Callable
 from uuid import UUID
@@ -36,6 +38,9 @@ from onyx.tools.utils import explicit_tool_calling_supported
 from onyx.utils.gpu_utils import fast_gpu_status_request
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 BASIC_SQ_KEY = SubQuestionKey(level=BASIC_KEY[0], question_num=BASIC_KEY[1])

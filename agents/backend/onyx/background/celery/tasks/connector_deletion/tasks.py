@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 import traceback
 from datetime import datetime
 from datetime import timezone
@@ -26,16 +31,10 @@ from onyx.configs.constants import OnyxRedisSignals
 from onyx.db.connector import fetch_connector_by_id
 from onyx.db.connector_credential_pair import add_deletion_failure_message
 from onyx.db.connector_credential_pair import (
-    delete_connector_credential_pair__no_commit,
-)
 from onyx.db.connector_credential_pair import (
-    delete_userfiles_for_cc_pair__no_commit,
-)
 from onyx.db.connector_credential_pair import get_connector_credential_pair_from_id
 from onyx.db.connector_credential_pair import get_connector_credential_pairs
 from onyx.db.document import (
-    delete_all_documents_by_connector_credential_pair__no_commit,
-)
 from onyx.db.document import get_document_ids_for_connector_credential_pair
 from onyx.db.document_set import delete_document_set_cc_pair_relationship__no_commit
 from onyx.db.engine import get_session_with_current_tenant
@@ -54,9 +53,18 @@ from onyx.redis.redis_connector_delete import RedisConnectorDeletePayload
 from onyx.redis.redis_pool import get_redis_client
 from onyx.redis.redis_pool import get_redis_replica_client
 from onyx.utils.variable_functionality import (
+from onyx.utils.variable_functionality import noop_fallback
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    delete_connector_credential_pair__no_commit,
+)
+    delete_userfiles_for_cc_pair__no_commit,
+)
+    delete_all_documents_by_connector_credential_pair__no_commit,
+)
     fetch_versioned_implementation_with_fallback,
 )
-from onyx.utils.variable_functionality import noop_fallback
 
 
 class TaskDependencyError(RuntimeError):

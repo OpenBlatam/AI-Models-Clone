@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import logging
+import time
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple, Any
+import torch
+import torch.nn as nn
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from PIL import Image, ImageDraw, ImageFont
+import cv2
+import psutil
+import gc
+from diffusion_pipelines import (
+from typing import Any, List, Dict, Optional
 """
 Advanced Diffusion Pipelines Demo
 ================================
@@ -24,24 +45,9 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import logging
-import time
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple, Any
 
-import torch
-import torch.nn as nn
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from PIL import Image, ImageDraw, ImageFont
-import cv2
-import psutil
-import gc
 
 # Import our diffusion pipelines
-from diffusion_pipelines import (
     PipelineType, SchedulerType, PipelineConfig, GenerationConfig,
     DiffusionPipelineFactory, AdvancedPipelineManager,
     create_pipeline, create_pipeline_manager,
@@ -66,7 +72,9 @@ class DiffusionPipelinesDemo:
     """
     
     def __init__(self, output_dir: str = "diffusion_pipelines_demo_output"):
-        self.output_dir = Path(output_dir)
+        
+    """__init__ function."""
+self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
         
         # Set up device
@@ -492,7 +500,7 @@ class DiffusionPipelinesDemo:
         
         return results
     
-    def demo_pipeline_manager(self):
+    def demo_pipeline_manager(self) -> Any:
         """Demonstrate the advanced pipeline manager."""
         logger.info("Demonstrating AdvancedPipelineManager...")
         
@@ -614,7 +622,7 @@ class DiffusionPipelinesDemo:
         
         logger.info(f"Performance comparison saved to {self.output_dir / 'performance_comparison.png'}")
     
-    def run_comprehensive_demo(self):
+    def run_comprehensive_demo(self) -> Any:
         """Run the comprehensive demo."""
         logger.info("Starting comprehensive diffusion pipelines demo...")
         
@@ -693,59 +701,183 @@ class DiffusionPipelinesDemo:
         report_path = self.output_dir / "demo_summary_report.txt"
         
         with open(report_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("DIFFUSION PIPELINES DEMO SUMMARY\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("=" * 40 + "\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Individual pipeline results
             f.write("1. INDIVIDUAL PIPELINE RESULTS\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("-" * 30 + "\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             for pipeline_name, result in results.items():
                 if pipeline_name in ["performance_comparison", "pipeline_manager"]:
                     continue
                     
                 f.write(f"{pipeline_name.upper()}:\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 if "error" in result:
                     f.write(f"  - Status: FAILED\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     f.write(f"  - Error: {result['error']}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 else:
                     f.write(f"  - Status: SUCCESS\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     f.write(f"  - Processing time: {result['processing_time']:.3f}s\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     f.write(f"  - Memory usage: {result['memory_usage']:.1f}MB\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     f.write(f"  - Images generated: {result['num_images']}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write("\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Performance comparison
             f.write("2. PERFORMANCE COMPARISON\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("-" * 25 + "\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             perf_results = results.get("performance_comparison", {})
             for pipeline_name, perf_data in perf_results.items():
                 f.write(f"{pipeline_name.upper()}:\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 if perf_data.get("success", False):
                     f.write(f"  - Processing time: {perf_data['processing_time']:.3f}s\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     f.write(f"  - Memory usage: {perf_data['memory_usage']:.1f}MB\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     f.write(f"  - Images generated: {perf_data['num_images']}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 else:
                     f.write(f"  - Status: FAILED\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     f.write(f"  - Error: {perf_data.get('error', 'Unknown error')}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write("\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Pipeline manager results
             f.write("3. PIPELINE MANAGER RESULTS\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("-" * 28 + "\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             manager_results = results.get("pipeline_manager", {})
             for pipeline_name, manager_data in manager_results.items():
                 f.write(f"{pipeline_name.upper()}:\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 if "error" in manager_data:
                     f.write(f"  - Status: FAILED\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     f.write(f"  - Error: {manager_data['error']}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 else:
                     f.write(f"  - Processing time: {manager_data['processing_time']:.3f}s\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     f.write(f"  - Memory usage: {manager_data['memory_usage']:.1f}MB\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     f.write(f"  - Images generated: {manager_data['num_images']}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write("\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         logger.info(f"Summary report saved to: {report_path}")
 

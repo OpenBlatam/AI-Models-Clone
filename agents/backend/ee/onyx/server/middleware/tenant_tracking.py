@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import logging
 from collections.abc import Awaitable
 from collections.abc import Callable
@@ -18,7 +20,9 @@ from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
 
 
-def add_api_server_tenant_id_middleware(
+from typing import Any, List, Dict, Optional
+import asyncio
+async def add_api_server_tenant_id_middleware(
     app: FastAPI, logger: logging.LoggerAdapter
 ) -> None:
     @app.middleware("http")
@@ -44,7 +48,7 @@ def add_api_server_tenant_id_middleware(
             raise
 
 
-async def _get_tenant_id_from_request(
+async async def _get_tenant_id_from_request(
     request: Request, logger: logging.LoggerAdapter
 ) -> str:
     """

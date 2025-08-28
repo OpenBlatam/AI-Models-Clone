@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 from typing import List
 
@@ -18,8 +20,6 @@ from onyx.configs.constants import CELERY_USER_FILE_FOLDER_SYNC_BEAT_LOCK_TIMEOU
 from onyx.configs.constants import OnyxCeleryTask
 from onyx.configs.constants import OnyxRedisLocks
 from onyx.db.connector_credential_pair import (
-    get_connector_credential_pairs_with_user_files,
-)
 from onyx.db.document import get_document
 from onyx.db.engine import get_session_with_current_tenant
 from onyx.db.models import ConnectorCredentialPair
@@ -33,6 +33,11 @@ from onyx.document_index.interfaces import VespaDocumentUserFields
 from onyx.httpx.httpx_pool import HttpxPool
 from onyx.redis.redis_pool import get_redis_client
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_connector_credential_pairs_with_user_files,
+)
 
 logger = setup_logger()
 

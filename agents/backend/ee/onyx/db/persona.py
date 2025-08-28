@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -9,6 +11,9 @@ from onyx.db.notification import create_notification
 from onyx.server.features.persona.models import PersonaSharedNotificationData
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def make_persona_private(
     persona_id: int,
     creator_user_id: UUID | None,
@@ -22,9 +27,19 @@ def make_persona_private(
     db_session.query(Persona__User).filter(
         Persona__User.persona_id == persona_id
     ).delete(synchronize_session="fetch")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session.query(Persona__UserGroup).filter(
         Persona__UserGroup.persona_id == persona_id
     ).delete(synchronize_session="fetch")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     if user_ids:
         user_ids_set = set(user_ids)

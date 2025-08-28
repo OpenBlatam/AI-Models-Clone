@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .config.settings import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 ULTRA LANDING PAGE SYSTEM
 ===========================
@@ -18,7 +24,6 @@ __author__ = "Blatam Academy"
 __description__ = "Ultra Landing Page System with AI-Powered SEO & Conversion"
 
 # Exports principales
-from .config.settings import (
     UltraLandingPageSettings,
     get_settings,
     get_seo_config,

@@ -1,7 +1,5 @@
-"""
-Model Tests - Onyx Integration
-Test suite for model operations and validations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any, Dict, List, Optional, Set, Type, TypeVar, Union, ClassVar
 from datetime import datetime
 import logging
@@ -9,6 +7,17 @@ import os
 import pytest
 from pydantic import BaseModel, ValidationError
 from ..model_types import (
+from ..model_config import ModelConfig
+from ..model_helpers import (
+from ..model_mixins import (
+from ..model_decorators import (
+from ..model_exceptions import (
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Model Tests - Onyx Integration
+Test suite for model operations and validations.
+"""
     JsonDict, JsonList, JsonValue, FieldType, FieldValue,
     ModelId, ModelKey, ModelValue, ModelData, ModelList, ModelDict,
     IndexField, IndexValue, IndexKey, IndexData, IndexList, IndexDict,
@@ -19,8 +28,6 @@ from ..model_types import (
     OnyxBaseModel, ModelField, ModelSchema, ModelRegistry,
     ModelCache, ModelIndex, ModelEvent, ModelValidation, ModelFactory
 )
-from ..model_config import ModelConfig
-from ..model_helpers import (
     validate_email, validate_url, validate_phone, validate_date, validate_datetime,
     validate_field_type, validate_field_value, validate_model_fields,
     create_model_index, create_model_cache, create_model_event,
@@ -28,15 +35,12 @@ from ..model_helpers import (
     get_model_indexes, get_model_cache, get_model_events,
     update_model_timestamps, update_model_status, update_model_version, update_model_metadata
 )
-from ..model_mixins import (
     TimestampMixin, SoftDeleteMixin, VersionMixin, AuditMixin,
     ValidationMixin, CacheMixin, SerializationMixin, IndexingMixin, LoggingMixin
 )
-from ..model_decorators import (
     register_model, cache_model, validate_model, track_changes,
     require_active, log_operations, enforce_version, validate_schema
 )
-from ..model_exceptions import (
     OnyxModelError, ValidationError, IndexingError, CacheError,
     SerializationError, VersionError, AuditError, SoftDeleteError,
     TimestampError, RegistryError, FactoryError, DeserializationError,
@@ -276,7 +280,7 @@ def test_deserialization_error():
         OnyxBaseModel.from_dict({"created_at": "invalid-date"})
 
 # Test model operations
-def test_model_operations(test_model):
+def test_model_operations(test_model) -> Any:
     """Test model operations."""
     # Test update
     new_name = "Updated Name"
@@ -295,7 +299,7 @@ def test_model_operations(test_model):
     assert test_model.deleted_at is None
 
 # Test model serialization
-def test_serialize_model(test_model):
+def test_serialize_model(test_model) -> Any:
     """Test model serialization."""
     data = test_model.to_dict()
     assert data["name"] == test_model.name
@@ -308,7 +312,7 @@ def test_serialize_model(test_model):
     assert data["deleted_at"] == test_model.deleted_at
 
 # Test model deserialization
-def test_deserialize_model(test_model_data):
+def test_deserialize_model(test_model_data) -> Any:
     """Test model deserialization."""
     model = TestModel.from_dict(test_model_data)
     assert model.name == test_model_data["name"]
@@ -316,7 +320,7 @@ def test_deserialize_model(test_model_data):
     assert model.age == test_model_data["age"]
 
 # Test model caching
-def test_model_cache(test_model):
+def test_model_cache(test_model) -> Any:
     """Test model caching."""
     # Test cache set
     test_model.cache("email")
@@ -324,7 +328,7 @@ def test_model_cache(test_model):
     # This is just a placeholder for the cache functionality
 
 # Test model indexing
-def test_model_index(test_model):
+def test_model_index(test_model) -> Any:
     """Test model indexing."""
     # Test index set
     test_model.index(None)  # Pass None as indexer since we're not implementing actual indexing
@@ -332,7 +336,7 @@ def test_model_index(test_model):
     # This is just a placeholder for the indexing functionality
 
 # Test model mixins
-def test_model_mixins(test_model):
+def test_model_mixins(test_model) -> Any:
     """Test model mixins."""
     # Test TimestampMixin
     assert test_model.created_at is not None
@@ -463,7 +467,7 @@ def test_validate_field_value():
     errors = validate_field_value("test", {"type": "string", "enum": ["value1", "value2"]})
     assert len(errors) > 0
 
-def test_validate_model_fields(test_model):
+def test_validate_model_fields(test_model) -> bool:
     """Test model fields validation."""
     validation = validate_model_fields(test_model, test_model.schema)
     assert validation.is_valid is True
@@ -479,77 +483,77 @@ def test_validate_model_fields(test_model):
     assert validation.is_valid is False
 
 # Test model operations
-def test_create_model_index(test_model):
+def test_create_model_index(test_model) -> Any:
     """Test model index creation."""
     index = create_model_index(test_model, "email", test_model.email)
     assert index.field == "email"
     assert index.value == test_model.email
     assert index.model_id == test_model.id
 
-def test_create_model_cache(test_model):
+def test_create_model_cache(test_model) -> Any:
     """Test model cache creation."""
     cache = create_model_cache(test_model, "email", test_model.email)
     assert cache.key == "email"
     assert cache.value == test_model.email
 
-def test_create_model_event(test_model):
+def test_create_model_event(test_model) -> Any:
     """Test model event creation."""
     event = create_model_event(test_model, "created", {"action": "create"})
     assert event.name == "created"
     assert event.data["action"] == "create"
     assert event.model_id == test_model.id
 
-def test_serialize_model(test_model):
+def test_serialize_model(test_model) -> Any:
     """Test model serialization."""
     data = serialize_model(test_model)
     assert data["name"] == test_model.name
     assert data["email"] == test_model.email
     assert data["age"] == test_model.age
 
-def test_deserialize_model(test_model_data):
+def test_deserialize_model(test_model_data) -> Any:
     """Test model deserialization."""
     model = deserialize_model(TestModel, test_model_data)
     assert model.name == test_model_data["name"]
     assert model.email == test_model_data["email"]
     assert model.age == test_model_data["age"]
 
-def test_get_model_indexes(test_model):
+def test_get_model_indexes(test_model) -> Optional[Dict[str, Any]]:
     """Test model indexes retrieval."""
     indexes = get_model_indexes(test_model, test_model.schema)
     assert len(indexes) == 1
     assert indexes[0].field == "email"
     assert indexes[0].value == test_model.email
 
-def test_get_model_cache(test_model):
+def test_get_model_cache(test_model) -> Optional[Dict[str, Any]]:
     """Test model cache retrieval."""
     cache = get_model_cache(test_model, test_model.schema)
     assert len(cache) == 2
     assert any(c.key == str(test_model.id) for c in cache)
     assert any(c.key == test_model.email for c in cache)
 
-def test_get_model_events(test_model):
+def test_get_model_events(test_model) -> Optional[Dict[str, Any]]:
     """Test model events retrieval."""
     events = get_model_events(test_model, test_model.schema, "created")
     assert len(events) == 0  # No event handlers defined
 
 # Test model updates
-def test_update_model_timestamps(test_model):
+def test_update_model_timestamps(test_model) -> Any:
     """Test model timestamps update."""
     update_model_timestamps(test_model)
     assert test_model.created_at is not None
     assert test_model.updated_at is not None
 
-def test_update_model_status(test_model):
+def test_update_model_status(test_model) -> Any:
     """Test model status update."""
     update_model_status(test_model, ModelStatus.INACTIVE)
     assert test_model.status == ModelStatus.INACTIVE
 
-def test_update_model_version(test_model):
+def test_update_model_version(test_model) -> Any:
     """Test model version update."""
     update_model_version(test_model, "1.1.0")
     assert test_model.version == "1.1.0"
 
-def test_update_model_metadata(test_model):
+def test_update_model_metadata(test_model) -> Any:
     """Test model metadata update."""
     metadata = {"source": "test", "tags": ["test"]}
     update_model_metadata(test_model, metadata)
@@ -560,18 +564,18 @@ def test_register_model():
     """Test model registration."""
     assert TestModel in ModelRegistry.models.values()
 
-def test_cache_model(test_model):
+def test_cache_model(test_model) -> Any:
     """Test model caching."""
     @cache_model("email")
-    def test_method(self):
+    def test_method(self) -> Any:
         return self.email
     
     test_method(test_model)
 
-def test_validate_model(test_model):
+def test_validate_model(test_model) -> bool:
     """Test model validation."""
     @validate_model(validate_types=True, validate_custom=True)
-    def test_method(self):
+    def test_method(self) -> Any:
         return self.email
     
     test_method(test_model)
@@ -580,19 +584,19 @@ def test_validate_model(test_model):
     with pytest.raises(ValidationError):
         test_method(test_model)
 
-def test_track_changes(test_model):
+def test_track_changes(test_model) -> Any:
     """Test change tracking."""
     @track_changes
-    def test_method(self):
+    def test_method(self) -> Any:
         self.name = "Updated Name"
     
     test_method(test_model)
     assert test_model.name == "Updated Name"
 
-def test_require_active(test_model):
+def test_require_active(test_model) -> Any:
     """Test active requirement."""
     @require_active
-    def test_method(self):
+    def test_method(self) -> Any:
         return self.email
     
     test_method(test_model)
@@ -601,18 +605,18 @@ def test_require_active(test_model):
     with pytest.raises(ValueError):
         test_method(test_model)
 
-def test_log_operations(test_model):
+def test_log_operations(test_model) -> Any:
     """Test operation logging."""
     @log_operations(logging.getLogger(__name__))
-    def test_method(self):
+    def test_method(self) -> Any:
         return self.email
     
     test_method(test_model)
 
-def test_enforce_version(test_model):
+def test_enforce_version(test_model) -> Any:
     """Test version enforcement."""
     @enforce_version("1.0.0")
-    def test_method(self):
+    def test_method(self) -> Any:
         return self.email
     
     test_method(test_model)
@@ -621,10 +625,10 @@ def test_enforce_version(test_model):
     with pytest.raises(ValueError):
         test_method(test_model)
 
-def test_validate_schema(test_model):
+def test_validate_schema(test_model) -> bool:
     """Test schema validation."""
     @validate_schema(test_model.schema.validation)
-    def test_method(self):
+    def test_method(self) -> Any:
         return self.email
     
     test_method(test_model)

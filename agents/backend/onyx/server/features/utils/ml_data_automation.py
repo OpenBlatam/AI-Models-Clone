@@ -1,18 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import argparse
+import os
+import logging
+from ml_data_pipeline import consume_and_store
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 ML Data Automation Script
 - Automatiza el ciclo Kafka → MinIO/Ceph/HDFS → Dataset ML/LLM
 - Configurable por CLI o variables de entorno
 - Listo para usarse como servicio o cronjob
 """
-import argparse
-import os
-import logging
-from ml_data_pipeline import consume_and_store
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 def main():
-    parser = argparse.ArgumentParser(description="Automatiza el pipeline de datos ML/LLM (Kafka → MinIO/Ceph/HDFS)")
+    
+    """main function."""
+parser = argparse.ArgumentParser(description="Automatiza el pipeline de datos ML/LLM (Kafka → MinIO/Ceph/HDFS)")
     parser.add_argument('--backend', choices=['s3', 'hdfs'], required=True, help='Backend de almacenamiento (s3, hdfs)')
     parser.add_argument('--topic', type=str, required=True, help='Kafka topic a monitorear')
     parser.add_argument('--batch_size', type=int, default=100, help='Tamaño de lote para guardar')

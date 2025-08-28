@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+import hashlib
+import uuid
+from dataclasses import dataclass, field
+from ..interfaces.facebook_interfaces import (
+        import re
+        from ..interfaces.facebook_interfaces import PostSpecification, GenerationConfig
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 Facebook Posts - Domain Entities
 ===================================
@@ -5,13 +21,7 @@
 Entidades del dominio core para Facebook posts siguiendo Clean Architecture.
 """
 
-from typing import List, Optional, Dict, Any
-from datetime import datetime
-import hashlib
-import uuid
-from dataclasses import dataclass, field
 
-from ..interfaces.facebook_interfaces import (
     PostIdentifier, PostSpecification, PostContent, AnalysisResult,
     ContentMetrics, EngagementMetrics, QualityScores, PostType,
     ContentTone, TargetAudience, AnalysisStatus, ContentQuality,
@@ -29,7 +39,9 @@ class FacebookPostEntity:
         content: PostContent,
         analysis: Optional[AnalysisResult] = None
     ):
-        self._validate_inputs(identifier, specification, content)
+        
+    """__init__ function."""
+self._validate_inputs(identifier, specification, content)
         
         self._identifier = identifier
         self._specification = specification
@@ -250,7 +262,6 @@ class FacebookPostEntity:
     
     def _count_emojis(self, text: str) -> int:
         """Contar emojis en el texto."""
-        import re
         emoji_pattern = re.compile(
             "["
             "\U0001F600-\U0001F64F"  # emoticons
@@ -344,7 +355,6 @@ class FacebookPostFactory:
         )
         
         # Crear especificación
-        from ..interfaces.facebook_interfaces import PostSpecification, GenerationConfig
         
         config = GenerationConfig(
             max_length=kwargs.get('max_length', 280),
@@ -409,10 +419,7 @@ class FacebookPostFactory:
             raise ValueError(f"Unknown template type: {template_type}")
         
         template = templates[template_type]
-        content_text = template["content_template"].format(
-            topic=topic,
-            **template_params
-        )
+        content_text = template["content_template"f"]"
         
         return FacebookPostFactory.create_new_post(
             topic=topic,

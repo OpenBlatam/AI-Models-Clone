@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 
 from onyx.chat.prune_and_merge import _merge_sections
@@ -7,6 +9,9 @@ from onyx.context.search.models import InferenceSection
 from onyx.context.search.utils import inference_section_from_chunks
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # This large test accounts for all of the following:
 # 1. Merging of adjacent sections
 # 2. Merging of non-adjacent sections

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import collections.abc
 import contextvars
 import copy
@@ -24,6 +26,9 @@ from pydantic_core import core_schema
 
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 R = TypeVar("R")
@@ -108,7 +113,7 @@ class ThreadSafeDict(MutableMapping[KT, VT]):
     @overload
     def get(self, key: KT, default: VT | _T) -> VT | _T: ...
 
-    def get(self, key: KT, default: Any = None) -> Any:
+    def get(self, key: KT, default: Any = None) -> Optional[Dict[str, Any]]:
         """Get a value with a default, atomically."""
         with self.lock:
             return self._dict.get(key, default)
@@ -280,10 +285,16 @@ def run_functions_in_parallel(
 
 
 class TimeoutThread(threading.Thread, Generic[R]):
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     def __init__(
         self, timeout: float, func: Callable[..., R], *args: Any, **kwargs: Any
     ):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.timeout = timeout
         self.func = func
         self.args = args
@@ -311,6 +322,10 @@ def run_with_timeout(
     """
     context = contextvars.copy_context()
     task = TimeoutThread(timeout, context.run, func, *args, **kwargs)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     task.start()
     task.join(timeout)
 
@@ -336,6 +351,10 @@ def run_in_background(
     context = contextvars.copy_context()
     # Timeout not used in the non-blocking case
     task = TimeoutThread(-1, context.run, func, *args, **kwargs)  # type: ignore
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     task.start()
     return cast(TimeoutThread[R], task)
 

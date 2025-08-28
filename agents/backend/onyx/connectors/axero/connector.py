@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import time
 from datetime import datetime
 from datetime import timezone
@@ -9,12 +14,8 @@ from pydantic import BaseModel
 from onyx.configs.app_configs import INDEX_BATCH_SIZE
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import (
-    process_in_batches,
-)
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import time_str_to_utc
 from onyx.connectors.cross_connector_utils.rate_limit_wrapper import (
-    rate_limit_builder,
-)
 from onyx.connectors.interfaces import GenerateDocumentsOutput
 from onyx.connectors.interfaces import PollConnector
 from onyx.connectors.interfaces import SecondsSinceUnixEpoch
@@ -24,6 +25,14 @@ from onyx.connectors.models import TextSection
 from onyx.file_processing.html_utils import parse_html_page_basic
 from onyx.utils.logger import setup_logger
 from onyx.utils.retry_wrapper import retry_builder
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    process_in_batches,
+)
+    rate_limit_builder,
+)
 
 
 logger = setup_logger()
@@ -38,7 +47,7 @@ def _get_auth_header(api_key: str) -> dict[str, str]:
 
 @retry_builder()
 @rate_limit_builder(max_calls=5, period=1)
-def _rate_limited_request(
+async def _rate_limited_request(
     endpoint: str, headers: dict, params: dict | None = None
 ) -> Any:
     # https://my.axerosolutions.com/spaces/5/communifire-documentation/wiki/view/370/rest-api
@@ -346,7 +355,6 @@ class AxeroConnector(PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     connector = AxeroConnector()
     connector.load_credentials(

@@ -1,8 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any
 from typing import Dict
 
 import requests
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 API_SERVER_URL = "http://localhost:3000"  # Adjust this to your Onyx server URL
 HEADERS = {"Content-Type": "application/json"}
 API_KEY = "onyx-api-key"  # API key here, if auth is enabled
@@ -144,5 +149,6 @@ def main() -> None:
     print(f"Created GitHub CC Pair: {github_cc_pair}")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main()

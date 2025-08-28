@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import time
+import logging
+from typing import Dict, Any, Optional, List
+import numpy as np
+from ..core.patterns import happy_path_last
+from ..core.validators import (
+from ..core.error_handlers import handle_data_processing_errors
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🎯 DATA PROCESSING EXAMPLES - HAPPY PATH LAST
 =============================================
@@ -5,16 +19,9 @@
 Ejemplos de procesamiento de datos usando el patrón happy path last.
 """
 
-import time
-import logging
-from typing import Dict, Any, Optional, List
-import numpy as np
 
-from ..core.patterns import happy_path_last
-from ..core.validators import (
     validate_data_array, validate_operation, validate_data_processing_params
 )
-from ..core.error_handlers import handle_data_processing_errors
 
 # =============================================================================
 # BASIC DATA PROCESSING EXAMPLES
@@ -166,7 +173,7 @@ def process_data_with_operation_decorated(data: np.ndarray, operation: str) -> n
 class DataProcessingPipeline:
     """Pipeline de procesamiento de datos usando happy path last."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.processing = False
         self.current_operations = 0
         self.processed_count = 0

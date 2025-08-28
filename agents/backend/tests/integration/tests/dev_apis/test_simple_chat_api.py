@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import os
 
@@ -18,6 +20,9 @@ from tests.integration.common_utils.test_models import DATestCCPair
 from tests.integration.common_utils.test_models import DATestUser
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.mark.skipif(
     os.environ.get("ENABLE_PAID_ENTERPRISE_EDITION_FEATURES", "").lower() != "true",
     reason="/chat/send-message-simple-with-history tests are enterprise only",
@@ -72,7 +77,7 @@ def test_send_message_simple_with_history(reset: None, admin_user: DATestUser) -
     os.environ.get("ENABLE_PAID_ENTERPRISE_EDITION_FEATURES", "").lower() != "true",
     reason="/chat/send-message-simple-with-history tests are enterprise only",
 )
-def test_using_reference_docs_with_simple_with_history_api_flow(reset: None) -> None:
+async def test_using_reference_docs_with_simple_with_history_api_flow(reset: None) -> None:
     # Creating an admin user (first user created is automatically an admin)
     admin_user: DATestUser = UserManager.create(name="admin_user")
 

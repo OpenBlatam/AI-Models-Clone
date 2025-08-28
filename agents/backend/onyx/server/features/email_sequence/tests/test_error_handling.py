@@ -1,9 +1,7 @@
-"""
-Error Handling and Validation Test Suite
-
-Comprehensive tests for error handling, input validation, and debugging
-capabilities in the email sequence system.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import unittest
 import asyncio
@@ -13,11 +11,21 @@ import pandas as pd
 from pathlib import Path
 import sys
 import os
+from core.error_handling import (
+        import shutil
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Error Handling and Validation Test Suite
+
+Comprehensive tests for error handling, input validation, and debugging
+capabilities in the email sequence system.
+"""
+
 
 # Add the parent directory to the path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from core.error_handling import (
     ErrorHandler, InputValidator, DataLoaderErrorHandler,
     ModelInferenceErrorHandler, GradioErrorHandler,
     ValidationError, ModelError, DataError, ConfigurationError,
@@ -28,11 +36,11 @@ from core.error_handling import (
 class TestErrorHandler(unittest.TestCase):
     """Test cases for the ErrorHandler class"""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures"""
         self.error_handler = ErrorHandler(debug_mode=True)
     
-    def test_error_logging(self):
+    def test_error_logging(self) -> Any:
         """Test error logging functionality"""
         
         # Test logging a simple error
@@ -50,10 +58,10 @@ class TestErrorHandler(unittest.TestCase):
         self.assertIsNotNone(error_info["timestamp"])
         self.assertIsNotNone(error_info["traceback"])
     
-    def test_safe_execute_success(self):
+    def test_safe_execute_success(self) -> Any:
         """Test safe execution with successful operation"""
         
-        def test_function(x, y):
+        def test_function(x, y) -> Any:
             return x + y
         
         result, error = self.error_handler.safe_execute(test_function, 5, 3, context="Addition test")
@@ -62,10 +70,10 @@ class TestErrorHandler(unittest.TestCase):
         self.assertIsNone(error)
         self.assertEqual(len(self.error_handler.error_log), 0)
     
-    def test_safe_execute_failure(self):
+    def test_safe_execute_failure(self) -> Any:
         """Test safe execution with failed operation"""
         
-        def test_function(x, y):
+        def test_function(x, y) -> Any:
             return x / y
         
         result, error = self.error_handler.safe_execute(test_function, 5, 0, context="Division test")
@@ -74,10 +82,10 @@ class TestErrorHandler(unittest.TestCase):
         self.assertIsNotNone(error)
         self.assertEqual(len(self.error_handler.error_log), 1)
     
-    def test_safe_async_execute_success(self):
+    def test_safe_async_execute_success(self) -> Any:
         """Test safe async execution with successful operation"""
         
-        async def test_async_function(x, y):
+        async def test_async_function(x, y) -> Any:
             await asyncio.sleep(0.1)
             return x * y
         
@@ -89,10 +97,10 @@ class TestErrorHandler(unittest.TestCase):
         self.assertIsNone(error)
         self.assertEqual(len(self.error_handler.error_log), 0)
     
-    def test_safe_async_execute_failure(self):
+    def test_safe_async_execute_failure(self) -> Any:
         """Test safe async execution with failed operation"""
         
-        async def test_async_function(x, y):
+        async def test_async_function(x, y) -> Any:
             await asyncio.sleep(0.1)
             raise ValueError("Async test error")
         
@@ -104,7 +112,7 @@ class TestErrorHandler(unittest.TestCase):
         self.assertIsNotNone(error)
         self.assertEqual(len(self.error_handler.error_log), 1)
     
-    def test_error_summary(self):
+    def test_error_summary(self) -> Any:
         """Test error summary generation"""
         
         # Log some test errors
@@ -124,11 +132,11 @@ class TestErrorHandler(unittest.TestCase):
 class TestInputValidator(unittest.TestCase):
     """Test cases for the InputValidator class"""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures"""
         self.validator = InputValidator()
     
-    def test_validate_model_type_valid(self):
+    def test_validate_model_type_valid(self) -> bool:
         """Test model type validation with valid inputs"""
         
         valid_models = ["GPT-3.5", "GPT-4", "Claude", "Custom", "Custom Model"]
@@ -138,7 +146,7 @@ class TestInputValidator(unittest.TestCase):
             self.assertTrue(is_valid, f"Model {model} should be valid")
             self.assertEqual(error_msg, "")
     
-    def test_validate_model_type_invalid(self):
+    def test_validate_model_type_invalid(self) -> bool:
         """Test model type validation with invalid inputs"""
         
         invalid_models = ["", None, "Invalid Model", "GPT-5", "Claude-2"]
@@ -148,7 +156,7 @@ class TestInputValidator(unittest.TestCase):
             self.assertFalse(is_valid, f"Model {model} should be invalid")
             self.assertNotEqual(error_msg, "")
     
-    def test_validate_sequence_length_valid(self):
+    def test_validate_sequence_length_valid(self) -> bool:
         """Test sequence length validation with valid inputs"""
         
         valid_lengths = [1, 3, 5, 7, 10]
@@ -158,7 +166,7 @@ class TestInputValidator(unittest.TestCase):
             self.assertTrue(is_valid, f"Length {length} should be valid")
             self.assertEqual(error_msg, "")
     
-    def test_validate_sequence_length_invalid(self):
+    def test_validate_sequence_length_invalid(self) -> bool:
         """Test sequence length validation with invalid inputs"""
         
         invalid_lengths = [0, -1, 11, 15, "5", 3.5]
@@ -168,7 +176,7 @@ class TestInputValidator(unittest.TestCase):
             self.assertFalse(is_valid, f"Length {length} should be invalid")
             self.assertNotEqual(error_msg, "")
     
-    def test_validate_creativity_level_valid(self):
+    def test_validate_creativity_level_valid(self) -> bool:
         """Test creativity level validation with valid inputs"""
         
         valid_levels = [0.1, 0.3, 0.5, 0.7, 0.9, 1.0]
@@ -178,7 +186,7 @@ class TestInputValidator(unittest.TestCase):
             self.assertTrue(is_valid, f"Level {level} should be valid")
             self.assertEqual(error_msg, "")
     
-    def test_validate_creativity_level_invalid(self):
+    def test_validate_creativity_level_invalid(self) -> bool:
         """Test creativity level validation with invalid inputs"""
         
         invalid_levels = [0.0, -0.1, 1.1, 2.0, "0.5", None]
@@ -188,7 +196,7 @@ class TestInputValidator(unittest.TestCase):
             self.assertFalse(is_valid, f"Level {level} should be invalid")
             self.assertNotEqual(error_msg, "")
     
-    def test_validate_subscriber_data_valid(self):
+    def test_validate_subscriber_data_valid(self) -> bool:
         """Test subscriber data validation with valid inputs"""
         
         valid_subscriber = {
@@ -202,7 +210,7 @@ class TestInputValidator(unittest.TestCase):
         self.assertTrue(is_valid)
         self.assertEqual(error_msg, "")
     
-    def test_validate_subscriber_data_invalid(self):
+    def test_validate_subscriber_data_invalid(self) -> bool:
         """Test subscriber data validation with invalid inputs"""
         
         # Test missing fields
@@ -228,7 +236,7 @@ class TestInputValidator(unittest.TestCase):
         self.assertFalse(is_valid)
         self.assertNotEqual(error_msg, "")
     
-    def test_validate_training_config_valid(self):
+    def test_validate_training_config_valid(self) -> bool:
         """Test training config validation with valid inputs"""
         
         valid_config = {
@@ -241,7 +249,7 @@ class TestInputValidator(unittest.TestCase):
         self.assertTrue(is_valid)
         self.assertEqual(error_msg, "")
     
-    def test_validate_training_config_invalid(self):
+    def test_validate_training_config_invalid(self) -> bool:
         """Test training config validation with invalid inputs"""
         
         # Test missing fields
@@ -269,7 +277,7 @@ class TestInputValidator(unittest.TestCase):
 class TestDataLoaderErrorHandler(unittest.TestCase):
     """Test cases for the DataLoaderErrorHandler class"""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures"""
         self.error_handler = ErrorHandler(debug_mode=True)
         self.data_handler = DataLoaderErrorHandler(self.error_handler)
@@ -277,12 +285,11 @@ class TestDataLoaderErrorHandler(unittest.TestCase):
         # Create temporary directory for test files
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test fixtures"""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_safe_load_csv_success(self):
+    def test_safe_load_csv_success(self) -> Any:
         """Test successful CSV loading"""
         
         # Create a test CSV file
@@ -303,7 +310,7 @@ class TestDataLoaderErrorHandler(unittest.TestCase):
         self.assertEqual(len(result), 3)
         self.assertEqual(list(result.columns), ['name', 'email', 'company'])
     
-    def test_safe_load_csv_file_not_found(self):
+    def test_safe_load_csv_file_not_found(self) -> Any:
         """Test CSV loading with non-existent file"""
         
         non_existent_path = os.path.join(self.temp_dir, 'non_existent.csv')
@@ -313,13 +320,21 @@ class TestDataLoaderErrorHandler(unittest.TestCase):
         self.assertIsNotNone(error)
         self.assertIn("File not found", error)
     
-    def test_safe_load_csv_empty_file(self):
+    def test_safe_load_csv_empty_file(self) -> Any:
         """Test CSV loading with empty file"""
         
         # Create an empty CSV file
         empty_csv_path = os.path.join(self.temp_dir, 'empty.csv')
         with open(empty_csv_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write('')
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         result, error = self.data_handler.safe_load_csv(empty_csv_path)
         
@@ -327,7 +342,7 @@ class TestDataLoaderErrorHandler(unittest.TestCase):
         self.assertIsNotNone(error)
         self.assertIn("empty", error.lower())
     
-    def test_safe_load_json_success(self):
+    def test_safe_load_json_success(self) -> Any:
         """Test successful JSON loading"""
         
         # Create a test JSON file
@@ -342,6 +357,10 @@ class TestDataLoaderErrorHandler(unittest.TestCase):
         
         json_path = os.path.join(self.temp_dir, 'test.json')
         with open(json_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(test_data, f)
         
         # Test loading
@@ -352,13 +371,21 @@ class TestDataLoaderErrorHandler(unittest.TestCase):
         self.assertEqual(result["name"], "Test User")
         self.assertEqual(result["settings"]["model_type"], "GPT-3.5")
     
-    def test_safe_load_json_invalid_format(self):
+    def test_safe_load_json_invalid_format(self) -> Any:
         """Test JSON loading with invalid format"""
         
         # Create an invalid JSON file
         invalid_json_path = os.path.join(self.temp_dir, 'invalid.json')
         with open(invalid_json_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write('{"name": "Test", "invalid": json}')
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         result, error = self.data_handler.safe_load_json(invalid_json_path)
         
@@ -366,7 +393,7 @@ class TestDataLoaderErrorHandler(unittest.TestCase):
         self.assertIsNotNone(error)
         self.assertIn("Invalid JSON format", error)
     
-    def test_safe_save_data_json_success(self):
+    def test_safe_save_data_json_success(self) -> Any:
         """Test successful JSON saving"""
         
         test_data = {"name": "Test", "value": 123}
@@ -382,10 +409,14 @@ class TestDataLoaderErrorHandler(unittest.TestCase):
         
         # Verify content
         with open(json_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             loaded_data = json.load(f)
         self.assertEqual(loaded_data, test_data)
     
-    def test_safe_save_data_csv_success(self):
+    def test_safe_save_data_csv_success(self) -> Any:
         """Test successful CSV saving"""
         
         test_data = pd.DataFrame({
@@ -403,7 +434,7 @@ class TestDataLoaderErrorHandler(unittest.TestCase):
         # Verify file was created
         self.assertTrue(os.path.exists(csv_path))
     
-    def test_safe_save_data_unsupported_type(self):
+    def test_safe_save_data_unsupported_type(self) -> Any:
         """Test saving with unsupported file type"""
         
         test_data = {"name": "Test"}
@@ -419,12 +450,12 @@ class TestDataLoaderErrorHandler(unittest.TestCase):
 class TestModelInferenceErrorHandler(unittest.TestCase):
     """Test cases for the ModelInferenceErrorHandler class"""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures"""
         self.error_handler = ErrorHandler(debug_mode=True)
         self.model_handler = ModelInferenceErrorHandler(self.error_handler)
     
-    def test_safe_model_load_file_not_found(self):
+    def test_safe_model_load_file_not_found(self) -> Any:
         """Test model loading with non-existent file"""
         
         non_existent_path = "non_existent_model.pth"
@@ -434,7 +465,7 @@ class TestModelInferenceErrorHandler(unittest.TestCase):
         self.assertIsNotNone(error)
         self.assertIn("Model file not found", error)
     
-    def test_safe_model_load_unsupported_type(self):
+    def test_safe_model_load_unsupported_type(self) -> Any:
         """Test model loading with unsupported model type"""
         
         # Create a dummy file
@@ -454,12 +485,12 @@ class TestModelInferenceErrorHandler(unittest.TestCase):
 class TestGradioErrorHandler(unittest.TestCase):
     """Test cases for the GradioErrorHandler class"""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures"""
         self.error_handler = ErrorHandler(debug_mode=True)
         self.gradio_handler = GradioErrorHandler(self.error_handler, debug_mode=True)
     
-    def test_format_gradio_error(self):
+    def test_format_gradio_error(self) -> Any:
         """Test Gradio error formatting"""
         
         error_type = "Test Error"
@@ -472,7 +503,7 @@ class TestGradioErrorHandler(unittest.TestCase):
         self.assertEqual(formatted_error["message"], message)
         self.assertIn("timestamp", formatted_error)
     
-    def test_validate_gradio_inputs_valid(self):
+    def test_validate_gradio_inputs_valid(self) -> bool:
         """Test Gradio input validation with valid inputs"""
         
         valid_inputs = {
@@ -486,7 +517,7 @@ class TestGradioErrorHandler(unittest.TestCase):
         self.assertTrue(is_valid)
         self.assertEqual(len(errors), 0)
     
-    def test_validate_gradio_inputs_invalid(self):
+    def test_validate_gradio_inputs_invalid(self) -> bool:
         """Test Gradio input validation with invalid inputs"""
         
         invalid_inputs = {
@@ -504,43 +535,43 @@ class TestGradioErrorHandler(unittest.TestCase):
 class TestDecorators(unittest.TestCase):
     """Test cases for error handling decorators"""
     
-    def test_handle_async_operation_success(self):
+    def test_handle_async_operation_success(self) -> Any:
         """Test async operation decorator with success"""
         
         @handle_async_operation
-        async def test_async_function(x, y):
+        async def test_async_function(x, y) -> Any:
             await asyncio.sleep(0.1)
             return x + y
         
         result = asyncio.run(test_async_function(3, 4))
         self.assertEqual(result, 7)
     
-    def test_handle_async_operation_failure(self):
+    def test_handle_async_operation_failure(self) -> Any:
         """Test async operation decorator with failure"""
         
         @handle_async_operation
-        async def test_async_function(x, y):
+        async def test_async_function(x, y) -> Any:
             await asyncio.sleep(0.1)
             raise ValueError("Test error")
         
         with self.assertRaises(ValueError):
             asyncio.run(test_async_function(3, 4))
     
-    def test_handle_data_operation_success(self):
+    def test_handle_data_operation_success(self) -> Any:
         """Test data operation decorator with success"""
         
         @handle_data_operation
-        def test_data_function(data):
+        def test_data_function(data) -> Any:
             return data.upper()
         
         result = test_data_function("test")
         self.assertEqual(result, "TEST")
     
-    def test_handle_data_operation_failure(self):
+    def test_handle_data_operation_failure(self) -> Any:
         """Test data operation decorator with failure"""
         
         @handle_data_operation
-        def test_data_function(data):
+        def test_data_function(data) -> Any:
             raise FileNotFoundError("Test file not found")
         
         with self.assertRaises(DataError):

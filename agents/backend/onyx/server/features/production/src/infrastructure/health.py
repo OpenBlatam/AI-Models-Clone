@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+import time
+import psutil
+from typing import Dict, Any, List, Optional
+from datetime import datetime, timedelta
+from contextlib import asynccontextmanager
+import structlog
+from prometheus_client import Gauge, Counter
+from src.core.config import Settings
+from src.core.exceptions import BusinessException
+from typing import Any, List, Dict, Optional
 """
 🏥 Ultra-Optimized Health Checker
 =================================
@@ -10,19 +33,8 @@ Production-grade health checking with:
 - Comprehensive reporting
 """
 
-import asyncio
-import logging
-import time
-import psutil
-from typing import Dict, Any, List, Optional
-from datetime import datetime, timedelta
-from contextlib import asynccontextmanager
 
-import structlog
-from prometheus_client import Gauge, Counter
 
-from src.core.config import Settings
-from src.core.exceptions import BusinessException
 
 
 class HealthChecker:
@@ -32,7 +44,9 @@ class HealthChecker:
     """
     
     def __init__(self, settings: Settings):
-        self.settings = settings
+        
+    """__init__ function."""
+self.settings = settings
         self.logger = structlog.get_logger(__name__)
         
         # Health status tracking
@@ -90,7 +104,7 @@ class HealthChecker:
         
         self.logger.info("Health Checker initialized")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize health checker"""
         
         self.logger.info("Initializing Health Checker...")
@@ -106,7 +120,7 @@ class HealthChecker:
             self.logger.error(f"Failed to initialize Health Checker: {e}")
             raise BusinessException(f"Health Checker initialization failed: {e}")
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup health checker"""
         
         self.logger.info("Cleaning up Health Checker...")
@@ -330,7 +344,7 @@ class HealthChecker:
                 "error": str(e)
             }
     
-    async def _check_external_apis_health(self) -> Dict[str, Any]:
+    async async def _check_external_apis_health(self) -> Dict[str, Any]:
         """Check external APIs health"""
         
         start_time = time.time()
@@ -435,7 +449,7 @@ class HealthChecker:
             self.logger.error(f"Failed to get circuit breaker status: {e}")
             return {}
     
-    async def _health_check_loop(self):
+    async def _health_check_loop(self) -> Any:
         """Background task for periodic health checking"""
         
         while self.is_running:

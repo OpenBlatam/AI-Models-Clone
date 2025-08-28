@@ -1,8 +1,13 @@
-"""
-SMB Enumerator
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Provides comprehensive SMB enumeration capabilities including share enumeration, user enumeration, and policy checking.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import socket
@@ -11,6 +16,14 @@ from typing import Dict, Any, List, Optional, Union
 from pydantic import BaseModel, Field, validator
 from enum import Enum
 import time
+from typing import Any, List, Dict, Optional
+import logging
+"""
+SMB Enumerator
+
+Provides comprehensive SMB enumeration capabilities including share enumeration, user enumeration, and policy checking.
+"""
+
 
 class SMBShareType(str, Enum):
     """Enumeration of SMB share types."""
@@ -31,7 +44,7 @@ class SMBEnumerationRequest(BaseModel):
     max_concurrent_connections: int = Field(default=5, ge=1, le=20, description="Maximum concurrent connections")
     
     @validator('target_host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         if not v:
             raise ValueError("Target host cannot be empty")
         return v
@@ -131,7 +144,7 @@ async def enumerate_smb_shares_async(data: SMBEnumerationRequest) -> List[SMBSha
     
     return shares
 
-def create_smb_negotiate_request() -> bytes:
+async def create_smb_negotiate_request() -> bytes:
     """Create SMB negotiate protocol request."""
     # Simplified SMB negotiate request
     request = bytearray()
@@ -277,7 +290,7 @@ async def check_smb_null_sessions_async(data: SMBEnumerationRequest) -> bool:
         print(f"SMB null session check failed: {e}")
         return False
 
-def create_smb_null_session_request() -> bytes:
+async def create_smb_null_session_request() -> bytes:
     """Create SMB null session request."""
     # Simplified null session request
     request = bytearray()

@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+from contextlib import asynccontextmanager
+from typing import Any, Dict, List, Optional, TypeVar, Union
+from functools import lru_cache
+from fastapi import Depends, FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+from lazy_loading_manager import (
+        import time
+        import uuid
+from typing import Any, List, Dict, Optional
 """
 FastAPI Dependency Injection System for Lazy Loading
 
@@ -6,17 +29,8 @@ lazy loading state and shared resources with proper lifecycle management,
 configuration, and testing support.
 """
 
-import asyncio
-import logging
-from contextlib import asynccontextmanager
-from typing import Any, Dict, List, Optional, TypeVar, Union
-from functools import lru_cache
 
-from fastapi import Depends, FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
 
-from lazy_loading_manager import (
     LazyLoadingConfig, LoadingStrategy, LoadingStats,
     OnDemandLoader, PaginatedLoader, StreamingLoader, BackgroundLoader,
     CursorBasedLoader, WindowedLoader, LazyLoadingManager,
@@ -278,13 +292,13 @@ class DependencyManager:
             raise RuntimeError("Lazy manager not initialized")
         return self.state.lazy_manager
     
-    def get_loader(self, name: str) -> Any:
+    def get_loader(self, name: str) -> Optional[Dict[str, Any]]:
         """Get lazy loader by name."""
         if name not in self.state.loaders:
             raise ValueError(f"Loader '{name}' not found")
         return self.state.loaders[name]
     
-    def get_data_source(self, name: str) -> Any:
+    def get_data_source(self, name: str) -> Optional[Dict[str, Any]]:
         """Get data source by name."""
         if name not in self.state.data_sources:
             raise ValueError(f"Data source '{name}' not found")
@@ -396,7 +410,7 @@ def get_custom_config(
 
 
 # Request-scoped dependencies
-def get_request_id(request: Request) -> str:
+async def get_request_id(request: Request) -> str:
     """Get unique request ID."""
     return getattr(request.state, "request_id", "unknown")
 
@@ -438,7 +452,7 @@ def get_error_handler():
 def get_performance_monitor():
     """Get performance monitor dependency."""
     class PerformanceMonitor:
-        def __init__(self):
+        def __init__(self) -> Any:
             self.request_times: List[float] = []
             self.error_count = 0
             self.success_count = 0
@@ -483,7 +497,9 @@ def create_app(config: Optional[DependencyConfig] = None) -> FastAPI:
     # Create FastAPI app with lifespan management
     @asynccontextmanager
     async def lifespan(app: FastAPI):
-        # Startup
+        
+    """lifespan function."""
+# Startup
         await dependency_manager.initialize()
         yield
         # Shutdown
@@ -500,8 +516,6 @@ def create_app(config: Optional[DependencyConfig] = None) -> FastAPI:
     @app.middleware("http")
     async def add_request_context(request: Request, call_next):
         """Add request context and performance monitoring."""
-        import time
-        import uuid
         
         # Generate request ID
         request.state.request_id = str(uuid.uuid4())
@@ -519,14 +533,18 @@ def create_app(config: Optional[DependencyConfig] = None) -> FastAPI:
     # Add exception handlers
     @app.exception_handler(ValueError)
     async def value_error_handler(request: Request, exc: ValueError):
-        return JSONResponse(
+        
+    """value_error_handler function."""
+return JSONResponse(
             status_code=400,
             content={"error": "Bad Request", "detail": str(exc)}
         )
     
     @app.exception_handler(RuntimeError)
     async def runtime_error_handler(request: Request, exc: RuntimeError):
-        return JSONResponse(
+        
+    """runtime_error_handler function."""
+return JSONResponse(
             status_code=500,
             content={"error": "Internal Server Error", "detail": str(exc)}
         )
@@ -677,15 +695,17 @@ class TestDependencyManager:
     """Test dependency manager for unit testing."""
     
     def __init__(self, config: Optional[DependencyConfig] = None):
-        self.config = config or DependencyConfig()
+        
+    """__init__ function."""
+self.config = config or DependencyConfig()
         self.manager = DependencyManager(self.config)
     
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Async context manager entry."""
         await self.manager.initialize()
         return self.manager
     
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
         """Async context manager exit."""
         await self.manager.shutdown()
 
@@ -710,7 +730,9 @@ if __name__ == "__main__":
     # Add routes (these would be in a separate router file)
     @app.get("/")
     async def root():
-        return {"message": "Lazy Loading API with Dependency Injection"}
+        
+    """root function."""
+return {"message": "Lazy Loading API with Dependency Injection"}
     
     @app.get("/health")
     async def health_check(

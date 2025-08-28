@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import tempfile
 import urllib.parse
@@ -28,6 +30,9 @@ from onyx.connectors.zulip.utils import call_api
 from onyx.connectors.zulip.utils import encode_zulip_narrow_operand
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Potential improvements
 # 1. Group documents messages into topics, make 1 document per topic per week
 # 2. Add end date support once https://github.com/zulip/zulip/issues/25436 is solved
@@ -86,7 +91,15 @@ class ZulipConnector(LoadConnector, PollConnector):
             raise Exception("Could not determine tempfile directory")
         config_file = os.path.join(tempdir, f"zuliprc-{self.realm_name}")
         with open(config_file, "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(contents_spaces_to_newlines)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         self.client = Client(config_file=config_file)
         return None
 

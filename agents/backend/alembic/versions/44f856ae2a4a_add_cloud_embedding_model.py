@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add cloud embedding model and update embedding_model
 
 Revision ID: 44f856ae2a4a
@@ -6,12 +13,10 @@ Create Date: 2024-06-28 20:01:05.927647
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "44f856ae2a4a"
-down_revision = "d716b0791ddd"
+revision: str = "44f856ae2a4a"
+down_revision: str = "d716b0791ddd"
 branch_labels: None = None
 depends_on: None = None
 
@@ -23,6 +28,16 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("api_key", sa.LargeBinary(), nullable=True),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         sa.Column("default_model_id", sa.Integer(), nullable=True),
         sa.PrimaryKeyConstraint("id"),
         sa.UniqueConstraint("name"),
@@ -53,10 +68,10 @@ def upgrade() -> None:
 def downgrade() -> None:
     # Remove foreign key constraints
     op.drop_constraint(
-        "fk_embedding_model_cloud_provider", "embedding_model", type_="foreignkey"
+        "fk_embedding_model_cloud_provider", "embedding_model", type_: str = "foreignkey"
     )
     op.drop_constraint(
-        "fk_embedding_provider_default_model", "embedding_provider", type_="foreignkey"
+        "fk_embedding_provider_default_model", "embedding_provider", type_: str = "foreignkey"
     )
 
     # Remove cloud_provider_id column

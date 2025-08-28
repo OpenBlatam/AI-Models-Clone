@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from datetime import datetime, timedelta
+from decimal import Decimal
+from enum import Enum
+from typing import Any, Dict, List, Optional, Union
+from pydantic import BaseModel, Field, validator, root_validator
+from pydantic.config import ConfigDict
+        import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 ULTRA LANDING PAGE MODELS - SEO & COPY OPTIMIZED
 ===================================================
@@ -6,12 +24,6 @@ Modelos avanzados para landing pages con el mejor SEO y copy,
 integrados con LangChain y compatibles con Onyx BaseModel.
 """
 
-from datetime import datetime, timedelta
-from decimal import Decimal
-from enum import Enum
-from typing import Any, Dict, List, Optional, Union
-from pydantic import BaseModel, Field, validator, root_validator
-from pydantic.config import ConfigDict
 
 
 # =============================================================================
@@ -141,7 +153,7 @@ class PricingModel(BaseModel):
     psychological_price: bool = Field(default=False, description="Precio psicológico (99, 97, etc.)")
     
     @validator('discount_percentage', always=True)
-    def calculate_discount(cls, v, values):
+    def calculate_discount(cls, v, values) -> Any:
         """Calcula el descuento automáticamente."""
         price = values.get('price')
         original_price = values.get('original_price')
@@ -190,7 +202,6 @@ class UltraLandingPageModel(BaseModel):
     
     @validator('slug')
     def validate_slug(cls, v: str) -> str:
-        import re
         slug = re.sub(r'[^a-z0-9\-]', '-', v.lower())
         slug = re.sub(r'-+', '-', slug).strip('-')
         if len(slug) < 3:

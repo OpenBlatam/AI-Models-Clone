@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add last_pruned to the connector_credential_pair table
 
 Revision ID: ac5eaac849f9
@@ -6,8 +13,6 @@ Create Date: 2024-09-10 15:04:26.437118
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "ac5eaac849f9"

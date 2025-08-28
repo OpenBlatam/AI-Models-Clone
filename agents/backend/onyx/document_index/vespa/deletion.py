@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import concurrent.futures
 from uuid import UUID
 
@@ -8,6 +10,9 @@ from onyx.document_index.vespa_constants import DOCUMENT_ID_ENDPOINT
 from onyx.document_index.vespa_constants import NUM_THREADS
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -15,7 +20,7 @@ CONTENT_SUMMARY = "content_summary"
 
 
 @retry(tries=10, delay=1, backoff=2)
-def _retryable_http_delete(http_client: httpx.Client, url: str) -> None:
+async def _retryable_http_delete(http_client: httpx.Client, url: str) -> None:
     res = http_client.delete(url)
     res.raise_for_status()
 
@@ -26,7 +31,7 @@ def _delete_vespa_chunk(
     try:
         _retryable_http_delete(
             http_client,
-            f"{DOCUMENT_ID_ENDPOINT.format(index_name=index_name)}/{doc_chunk_id}",
+            f"f"{DOCUMENT_ID_ENDPOINT"}/{doc_chunk_id}",
         )
     except httpx.HTTPStatusError as e:
         logger.error(f"Failed to delete chunk, details: {e.response.text}")

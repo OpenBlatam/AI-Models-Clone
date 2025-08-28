@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import sys
+import os
+import json
+import logging
+from pathlib import Path
+        from transformers_integration_system import (
+        import gradio_app
+        from transformers_integration_system import create_transformers_config, TransformersConfig
+        from transformers_integration_system import get_available_models
+        from transformers_integration_system import validate_transformers_inputs
+        import gradio_app
+        from transformers_integration_system import initialize_transformers_system
+        from transformers_integration_system import AdvancedTransformersTrainer, TransformersConfig
+        from transformers_integration_system import TransformersPipeline, TransformersConfig
+        import gradio_app
+        from transformers_integration_system import get_available_models
+        from transformers_integration_system import validate_transformers_inputs
+        import gradio_app
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🧪 Test Transformers Integration
 ================================
@@ -6,11 +31,6 @@ Test script to verify the transformers integration system works correctly
 with the Gradio application.
 """
 
-import sys
-import os
-import json
-import logging
-from pathlib import Path
 
 # Add the current directory to the path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -26,7 +46,6 @@ def test_imports():
     
     try:
         # Test transformers integration system import
-        from transformers_integration_system import (
             AdvancedTransformersTrainer, TransformersConfig, TransformersPipeline,
             create_transformers_config, get_available_models, validate_transformers_inputs,
             initialize_transformers_system
@@ -34,7 +53,6 @@ def test_imports():
         print("✅ transformers_integration_system imported successfully")
         
         # Test gradio app import
-        import gradio_app
         print("✅ gradio_app imported successfully")
         
         return True
@@ -49,7 +67,6 @@ def test_configuration_creation():
     print("\n🔧 Testing configuration creation...")
     
     try:
-        from transformers_integration_system import create_transformers_config, TransformersConfig
         
         # Test basic configuration
         config = create_transformers_config()
@@ -83,7 +100,6 @@ def test_available_models():
     print("\n📋 Testing available models...")
     
     try:
-        from transformers_integration_system import get_available_models
         
         models = get_available_models()
         assert isinstance(models, dict)
@@ -111,7 +127,6 @@ def test_input_validation():
     print("\n✅ Testing input validation...")
     
     try:
-        from transformers_integration_system import validate_transformers_inputs
         
         # Test valid inputs
         is_valid, error_msg = validate_transformers_inputs(
@@ -158,7 +173,6 @@ def test_gradio_interface_functions():
     print("\n🎛️ Testing Gradio interface functions...")
     
     try:
-        import gradio_app
         
         # Test that interface functions exist
         required_functions = [
@@ -189,7 +203,6 @@ def test_system_initialization():
     print("\n🚀 Testing system initialization...")
     
     try:
-        from transformers_integration_system import initialize_transformers_system
         
         # Test initialization
         success = initialize_transformers_system()
@@ -208,7 +221,6 @@ def test_trainer_creation():
     print("\n🏋️ Testing trainer creation...")
     
     try:
-        from transformers_integration_system import AdvancedTransformersTrainer, TransformersConfig
         
         # Create a minimal configuration for testing
         config = TransformersConfig(
@@ -239,7 +251,6 @@ def test_pipeline_creation():
     print("\n🔧 Testing pipeline creation...")
     
     try:
-        from transformers_integration_system import TransformersPipeline, TransformersConfig
         
         # Create configuration
         config = TransformersConfig()
@@ -266,14 +277,12 @@ def test_gradio_interface_integration():
     print("\n🎛️ Testing Gradio interface integration...")
     
     try:
-        import gradio_app
         
         # Check if transformers tab exists in the interface
         # This is a basic check - we can't easily test the full Gradio interface
         # without running the actual app
         
         # Test that the interface functions return JSON strings
-        from transformers_integration_system import get_available_models
         
         # Test get_available_models_interface
         result = gradio_app.get_available_models_interface()
@@ -308,7 +317,6 @@ def test_error_handling():
     print("\n⚠️ Testing error handling...")
     
     try:
-        from transformers_integration_system import validate_transformers_inputs
         
         # Test with invalid inputs
         is_valid, error_msg = validate_transformers_inputs("", "", 0)
@@ -317,7 +325,6 @@ def test_error_handling():
         print("✅ Error handling works for invalid inputs")
         
         # Test interface functions with invalid inputs
-        import gradio_app
         
         # Test with empty model name
         result = gradio_app.train_transformers_model_interface(
@@ -397,5 +404,6 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

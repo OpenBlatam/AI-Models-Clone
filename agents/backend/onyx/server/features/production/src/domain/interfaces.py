@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from abc import ABC, abstractmethod
+from typing import List, Optional, Dict, Any, Protocol
+from uuid import UUID
+from .entities import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🔌 Domain Interfaces
 ===================
@@ -6,11 +21,7 @@ Abstract interfaces defining contracts for the domain layer
 in the clean architecture pattern.
 """
 
-from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Any, Protocol
-from uuid import UUID
 
-from .entities import (
     User, ContentRequest, GeneratedContent, ContentTemplate, UsageMetrics,
     Status, ContentType, Language, Tone
 )
@@ -64,22 +75,22 @@ class ContentRepository(ABC):
     """Abstract interface for content data access"""
     
     @abstractmethod
-    async def create_request(self, request: ContentRequest) -> ContentRequest:
+    async async def create_request(self, request: ContentRequest) -> ContentRequest:
         """Create a new content request"""
         pass
     
     @abstractmethod
-    async def get_request_by_id(self, request_id: UUID) -> Optional[ContentRequest]:
+    async async def get_request_by_id(self, request_id: UUID) -> Optional[ContentRequest]:
         """Get content request by ID"""
         pass
     
     @abstractmethod
-    async def update_request(self, request: ContentRequest) -> ContentRequest:
+    async async def update_request(self, request: ContentRequest) -> ContentRequest:
         """Update content request"""
         pass
     
     @abstractmethod
-    async def list_user_requests(self, user_id: UUID, skip: int = 0, limit: int = 100) -> List[ContentRequest]:
+    async async def list_user_requests(self, user_id: UUID, skip: int = 0, limit: int = 100) -> List[ContentRequest]:
         """List user's content requests"""
         pass
     
@@ -94,7 +105,7 @@ class ContentRepository(ABC):
         pass
     
     @abstractmethod
-    async def get_content_by_request(self, request_id: UUID) -> Optional[GeneratedContent]:
+    async async def get_content_by_request(self, request_id: UUID) -> Optional[GeneratedContent]:
         """Get content by request ID"""
         pass
     
@@ -321,12 +332,12 @@ class FileStorageService(ABC):
     """Abstract interface for file storage"""
     
     @abstractmethod
-    async def upload_file(self, file_data: bytes, filename: str, content_type: str) -> str:
+    async async def upload_file(self, file_data: bytes, filename: str, content_type: str) -> str:
         """Upload file and return URL"""
         pass
     
     @abstractmethod
-    async def download_file(self, file_url: str) -> bytes:
+    async async def download_file(self, file_url: str) -> bytes:
         """Download file content"""
         pass
     
@@ -462,7 +473,7 @@ class ContentGenerator(Protocol):
         """Generate content from request"""
         ...
     
-    async def validate_request(self, request: ContentRequest) -> bool:
+    async async def validate_request(self, request: ContentRequest) -> bool:
         """Validate content request"""
         ...
     

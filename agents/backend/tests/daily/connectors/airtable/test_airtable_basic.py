@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from typing import cast
 from unittest.mock import MagicMock
@@ -11,6 +13,9 @@ from onyx.connectors.models import Document
 from onyx.connectors.models import ImageSection
 from onyx.connectors.models import TextSection
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 BASE_VIEW_ID = "viwVUEJjWPd8XYjh8"
 
 

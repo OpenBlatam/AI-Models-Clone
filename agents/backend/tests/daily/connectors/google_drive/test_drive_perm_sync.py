@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import copy
 import json
 import os
@@ -16,6 +18,9 @@ from tests.daily.connectors.google_drive.consts_and_utils import ADMIN_EMAIL
 from tests.daily.connectors.google_drive.consts_and_utils import PUBLIC_RANGE
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _build_connector(
     google_drive_service_acct_connector_factory: Callable[..., GoogleDriveConnector],
 ) -> GoogleDriveConnector:
@@ -57,6 +62,10 @@ def test_gdrive_perm_sync_with_real_data(
 
     # Load drive_id_mapping.json
     with open(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         os.path.join(os.path.dirname(__file__), "drive_id_mapping.json"), "r"
     ) as f:
         drive_id_mapping = json.load(f)

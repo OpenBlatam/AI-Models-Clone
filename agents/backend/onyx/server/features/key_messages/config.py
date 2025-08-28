@@ -1,12 +1,26 @@
-"""
-Optimized configuration for Key Messages feature.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import os
 from typing import Optional, List, Dict, Any
 from functools import lru_cache
-
 from pydantic import Field, validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Optimized configuration for Key Messages feature.
+"""
+
 
 class RedisConfig(BaseSettings):
     """Redis configuration."""
@@ -88,7 +102,7 @@ class LLMConfig(BaseSettings):
     model_config = SettingsConfigDict(env_prefix="LLM_")
     
     @validator('api_key', pre=True, always=True)
-    def validate_api_key(cls, v):
+    async def validate_api_key(cls, v) -> bool:
         """Validate API key is provided."""
         if not v:
             # Try to get from environment
@@ -146,7 +160,7 @@ class KeyMessagesConfig(BaseSettings):
     )
     
     @validator('environment')
-    def validate_environment(cls, v):
+    def validate_environment(cls, v) -> bool:
         """Validate environment value."""
         valid_environments = ['development', 'staging', 'production', 'test']
         if v not in valid_environments:
@@ -154,7 +168,7 @@ class KeyMessagesConfig(BaseSettings):
         return v
     
     @validator('debug')
-    def validate_debug(cls, v, values):
+    def validate_debug(cls, v, values) -> bool:
         """Validate debug mode based on environment."""
         if values.get('environment') == 'production' and v:
             raise ValueError("Debug mode cannot be enabled in production")
@@ -212,7 +226,7 @@ def get_redis_config() -> RedisConfig:
     """Get Redis configuration."""
     return get_settings().redis
 
-def get_http_config() -> HTTPConfig:
+async def get_http_config() -> HTTPConfig:
     """Get HTTP configuration."""
     return get_settings().http
 
@@ -336,6 +350,10 @@ def apply_environment_overrides(config: Dict[str, Any], environment: str) -> Dic
     if os.path.exists(env_config_path):
         try:
             with open(env_config_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 env_config = yaml.safe_load(f)
             
             # Merge configurations

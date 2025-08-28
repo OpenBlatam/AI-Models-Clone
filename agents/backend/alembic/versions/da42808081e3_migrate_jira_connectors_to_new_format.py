@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from alembic import op
+import sqlalchemy as sa
+import json
+from onyx.configs.constants import DocumentSource
+from onyx.connectors.onyx_jira.utils import extract_jira_project
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """migrate jira connectors to new format
 
 Revision ID: da42808081e3
@@ -6,12 +19,7 @@ Create Date: 2025-02-24 11:24:54.396040
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-import json
 
-from onyx.configs.constants import DocumentSource
-from onyx.connectors.onyx_jira.utils import extract_jira_project
 
 
 # revision identifiers, used by Alembic.
@@ -39,6 +47,11 @@ def upgrade() -> None:
         ),
         {"source": DocumentSource.JIRA.value.upper()},
     ).fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     # Update each connector's config
     for connector_id, old_config in jira_connectors:
@@ -97,6 +110,11 @@ def downgrade() -> None:
         ),
         {"source": DocumentSource.JIRA.value.upper()},
     ).fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     # Update each connector's config back to the old format
     for connector_id, new_config in jira_connectors:

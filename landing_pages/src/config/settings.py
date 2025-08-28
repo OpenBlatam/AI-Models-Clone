@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from pydantic import BaseSettings, Field
+from typing import Dict, List, Any, Optional
+import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 SYSTEM SETTINGS - REFACTORED CONFIGURATION
 ============================================
@@ -6,9 +20,6 @@ Configuraciones principales del sistema ultra-avanzado de landing pages.
 Optimizado para performance empresarial y escalabilidad.
 """
 
-from pydantic import BaseSettings, Field
-from typing import Dict, List, Any, Optional
-import os
 
 
 class SystemSettings(BaseSettings):
@@ -245,7 +256,7 @@ class SystemSettings(BaseSettings):
         """Verifica si una feature está habilitada."""
         return self.FEATURES_ENABLED.get(feature_name, False)
     
-    def get_external_api_config(self, api_name: str) -> Dict[str, str]:
+    async def get_external_api_config(self, api_name: str) -> Dict[str, str]:
         """Obtiene configuración de una API externa."""
         return self.EXTERNAL_APIS.get(api_name, {})
 

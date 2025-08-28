@@ -1,22 +1,36 @@
-"""
-Middleware Examples - FastAPI Middleware Usage Examples
-Demonstrates how to use the comprehensive middleware system for logging,
-error monitoring, and performance optimization.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
 import random
 from typing import Dict, List, Optional, Any
 from contextlib import asynccontextmanager
-
 from fastapi import FastAPI, Request, Response, HTTPException, Depends
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field
 import structlog
 import redis.asyncio as redis
-
 from ..utils.middleware_system import (
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Middleware Examples - FastAPI Middleware Usage Examples
+Demonstrates how to use the comprehensive middleware system for logging,
+error monitoring, and performance optimization.
+"""
+
+
+
     MiddlewareManager,
     MiddlewareConfig,
     create_middleware_config,
@@ -60,7 +74,9 @@ def create_basic_app() -> FastAPI:
     # Add routes
     @app.get("/")
     async def root():
-        return {"message": "Hello World", "timestamp": time.time()}
+        
+    """root function."""
+return {"message": "Hello World", "timestamp": time.time()}
     
     @app.get("/slow")
     async def slow_endpoint():
@@ -111,7 +127,9 @@ async def create_production_app() -> FastAPI:
     # Add production routes
     @app.get("/api/v1/health")
     async def health_check():
-        return {
+        
+    """health_check function."""
+return {
             "status": "healthy",
             "timestamp": time.time(),
             "version": "1.0.0"
@@ -341,7 +359,9 @@ def create_lifespan_middleware_app() -> FastAPI:
     # Add routes
     @app.get("/")
     async def root():
-        return {"message": "Hello with lifespan middleware"}
+        
+    """root function."""
+return {"message": "Hello with lifespan middleware"}
     
     @app.get("/redis-test")
     async def redis_test():
@@ -360,7 +380,7 @@ def create_lifespan_middleware_app() -> FastAPI:
 class UserService:
     """Example service for dependency injection."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.users = {}
     
     async def get_user(self, user_id: int) -> Optional[Dict[str, Any]]:
@@ -589,7 +609,6 @@ async def demo_middleware_functionality():
 
 # Example usage
 if __name__ == "__main__":
-    import uvicorn
     
     # Run the demo
     asyncio.run(demo_middleware_functionality())

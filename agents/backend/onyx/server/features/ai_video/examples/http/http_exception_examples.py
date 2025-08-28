@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+import logging
+from typing import Dict, Any, Optional, List
+from dataclasses import dataclass
+from fastapi import FastAPI, Request, Depends, HTTPException
+from fastapi.responses import JSONResponse
+from sqlalchemy.ext.asyncio import AsyncSession
+from .http_exceptions import (
+from typing import Any, List, Dict, Optional
 """
 🚀 HTTP EXCEPTION EXAMPLES - REAL-WORLD AI VIDEO SCENARIOS
 ==========================================================
@@ -10,17 +34,8 @@ Practical examples of HTTP exception usage in AI Video applications:
 - Validation and resource management
 """
 
-import asyncio
-import time
-import logging
-from typing import Dict, Any, Optional, List
-from dataclasses import dataclass
 
-from fastapi import FastAPI, Request, Depends, HTTPException
-from fastapi.responses import JSONResponse
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from .http_exceptions import (
     # Base exceptions
     AIVideoHTTPException,
     ErrorContext,
@@ -105,12 +120,12 @@ class VideoRequest:
 class VideoProcessingAPI:
     """Video processing API with comprehensive error handling."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_handler = HTTPExceptionHandler()
         self.error_monitor = ErrorMonitor()
         self.rate_limit_store = {}  # Simple in-memory rate limiting
     
-    async def validate_video_request(self, request: VideoRequest) -> None:
+    async async def validate_video_request(self, request: VideoRequest) -> None:
         """Validate video request with specific error types."""
         
         # Validate required fields
@@ -274,7 +289,7 @@ class VideoProcessingAPI:
                 detail="Database connection lost"
             )
     
-    async def process_video_request(self, request: VideoRequest) -> Dict[str, Any]:
+    async async def process_video_request(self, request: VideoRequest) -> Dict[str, Any]:
         """Process video request with comprehensive error handling."""
         
         # Create error context
@@ -351,7 +366,7 @@ class VideoProcessingAPI:
 class ModelManagementAPI:
     """Model management API with error handling."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.loaded_models = {}
         self.model_registry = {
             "stable-diffusion": {"size_mb": 2048, "status": "available"},
@@ -477,7 +492,7 @@ class ModelManagementAPI:
 class DatabaseService:
     """Database service with error handling."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.connection_status = "connected"
         self.simulated_errors = set()
     
@@ -528,7 +543,7 @@ class DatabaseService:
 class CacheService:
     """Cache service with error handling."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.cache_data = {}
         self.connection_status = "connected"
         self.simulated_errors = set()
@@ -570,7 +585,7 @@ class CacheService:
 # EXAMPLE 4: FASTAPI INTEGRATION
 # ============================================================================
 
-def create_video_api() -> FastAPI:
+async def create_video_api() -> FastAPI:
     """Create FastAPI app with comprehensive error handling."""
     
     app = FastAPI(title="AI Video API", version="1.0.0")
@@ -669,7 +684,7 @@ async def some_risky_operation(video_id: str):
 class ExternalVideoService:
     """External video service integration with error handling."""
     
-    async def upload_video(self, video_path: str, user_id: str) -> Dict[str, Any]:
+    async async def upload_video(self, video_path: str, user_id: str) -> Dict[str, Any]:
         """Upload video to external service with error handling."""
         
         # Simulate external service call
@@ -783,7 +798,9 @@ async def example_rate_limiting():
 if __name__ == "__main__":
     # Run examples
     async def main():
-        print("=== Video Generation Example ===")
+        
+    """main function."""
+print("=== Video Generation Example ===")
         await example_video_generation()
         
         print("\n=== Model Management Example ===")

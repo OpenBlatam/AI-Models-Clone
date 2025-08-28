@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from __future__ import annotations
+from typing import Any, Dict, List, Optional, Type
+from datetime import datetime
+import uuid
+import asyncio
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+from fastapi.responses import JSONResponse
+import structlog
+from .functional_components import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Functional Endpoints with Pydantic Models
 ========================================
@@ -15,17 +37,8 @@ This module shows how to:
 - Use async components
 """
 
-from __future__ import annotations
-from typing import Any, Dict, List, Optional, Type
-from datetime import datetime
-import uuid
-import asyncio
 
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-from fastapi.responses import JSONResponse
-import structlog
 
-from .functional_components import (
     BaseInputModel, BaseOutputModel, ErrorOutputModel,
     component, async_component, compose_components, compose_async_components,
     execute_parallel, conditional_component, retry_component,

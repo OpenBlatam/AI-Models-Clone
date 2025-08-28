@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import logging
+import asyncio
+from typing import Any, Dict, List, Optional, Callable, Union
+from datetime import datetime
+from functools import wraps
+from fastapi import FastAPI, Request, Response, Depends, HTTPException
+from fastapi.middleware.base import BaseHTTPMiddleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import RequestResponseEndpoint
+from .http_exception_system import (
+from .http_exception_handlers import (
+from .http_response_models import (
+from .error_system import (
+        import asyncio
+    from fastapi import APIRouter
+import re
+from pathlib import Path
+from .http_exception_system import (
+from typing import Any, List, Dict, Optional
 """
 🔗 HTTPException Integration Guide
 ==================================
@@ -6,28 +30,15 @@ Integration module showing how to integrate the HTTPException system
 with existing FastAPI applications, middleware, and external services.
 """
 
-import logging
-import asyncio
-from typing import Any, Dict, List, Optional, Callable, Union
-from datetime import datetime
-from functools import wraps
 
-from fastapi import FastAPI, Request, Response, Depends, HTTPException
-from fastapi.middleware.base import BaseHTTPMiddleware
-from fastapi.responses import JSONResponse
-from starlette.middleware.base import RequestResponseEndpoint
 
-from .http_exception_system import (
     OnyxHTTPException, HTTPExceptionFactory, HTTPExceptionMapper,
     HTTPExceptionHandler, http_exception_handler
 )
-from .http_exception_handlers import (
     setup_exception_handlers, handle_http_exceptions
 )
-from .http_response_models import (
     SuccessResponse, ErrorResponse, ResponseFactory
 )
-from .error_system import (
     OnyxBaseError, ValidationError, AuthenticationError, AuthorizationError,
     ResourceNotFoundError, BusinessLogicError, DatabaseError,
     ErrorContext, ErrorFactory
@@ -42,7 +53,9 @@ class HTTPExceptionMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app, enable_logging: bool = True, enable_metrics: bool = True):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.enable_logging = enable_logging
         self.enable_metrics = enable_metrics
         self.error_counts = {}
@@ -75,7 +88,7 @@ class HTTPExceptionMiddleware(BaseHTTPMiddleware):
             # Handle unexpected exceptions
             return await self._handle_unexpected_exception(request, e, start_time, request_id)
     
-    async def _handle_onyx_http_exception(
+    async async def _handle_onyx_http_exception(
         self, 
         request: Request, 
         exc: OnyxHTTPException, 
@@ -160,7 +173,9 @@ class HTTPExceptionIntegration:
     """
     
     def __init__(self, app: FastAPI):
-        self.app = app
+        
+    """__init__ function."""
+self.app = app
         self.middleware_added = False
         self.handlers_setup = False
     
@@ -199,7 +214,7 @@ class HTTPExceptionIntegration:
         self.app.add_exception_handler(exception_type, handler)
         logger.info(f"Added custom handler for {exception_type.__name__}")
     
-    def create_error_monitoring_endpoint(self):
+    def create_error_monitoring_endpoint(self) -> Any:
         """Create endpoint for monitoring error metrics"""
         
         @self.app.get("/health/errors")
@@ -228,11 +243,13 @@ class ErrorHandlingDecorator:
     """
     
     def __init__(self, default_status_code: int = 500):
-        self.default_status_code = default_status_code
+        
+    """__init__ function."""
+self.default_status_code = default_status_code
     
     def __call__(self, func: Callable) -> Callable:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             try:
                 return await func(*args, **kwargs)
             except OnyxBaseError as e:
@@ -246,7 +263,7 @@ class ErrorHandlingDecorator:
                 raise http_exception
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             try:
                 return func(*args, **kwargs)
             except OnyxBaseError as e:
@@ -260,7 +277,6 @@ class ErrorHandlingDecorator:
                 raise http_exception
         
         # Return appropriate wrapper
-        import asyncio
         if asyncio.iscoroutinefunction(func):
             return async_wrapper
         else:
@@ -297,7 +313,6 @@ def create_integration_example():
     """
     Create an example showing integration with existing applications.
     """
-    from fastapi import APIRouter
     
     # Create existing app
     app = FastAPI(title="Integration Example")
@@ -449,14 +464,22 @@ def create_migration_script():
 # Migration Script for HTTPException System
 # =========================================
 
-import re
-from pathlib import Path
 
 def migrate_file(file_path: str):
-    '''Migrate a single file to use the new HTTPException system'''
+    
+    """migrate_file function."""
+'''Migrate a single file to use the new HTTPException system'''
     
     with open(file_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     
     # Migration patterns
     patterns = [
@@ -522,7 +545,6 @@ def migrate_file(file_path: str):
     # Add imports if needed
     if 'raise_not_found' in content and 'from .http_exception_system import' not in content:
         import_statement = '''
-from .http_exception_system import (
     raise_bad_request, raise_unauthorized, raise_forbidden,
     raise_not_found, raise_conflict, raise_unprocessable_entity,
     raise_too_many_requests, raise_internal_server_error,
@@ -543,12 +565,22 @@ from .http_exception_system import (
     
     # Write back to file
     with open(file_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         f.write(content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     
     print(f"Migrated {file_path}")
 
 def migrate_directory(directory: str):
-    '''Migrate all Python files in a directory'''
+    
+    """migrate_directory function."""
+'''Migrate all Python files in a directory'''
     
     for file_path in Path(directory).rglob("*.py"):
         if "migration" not in str(file_path):
@@ -588,5 +620,6 @@ def example_integration():
     print("- Add @ErrorHandlingDecorator() to service functions")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     example_integration() 

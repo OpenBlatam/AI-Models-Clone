@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 import asyncio
 import datetime
 import io
@@ -27,8 +32,6 @@ from onyx.chat.chat_utils import create_chat_chain
 from onyx.chat.chat_utils import extract_headers
 from onyx.chat.process_message import stream_chat_message
 from onyx.chat.prompt_builder.citations_prompt import (
-    compute_max_document_tokens_for_persona,
-)
 from onyx.configs.app_configs import WEB_DOMAIN
 from onyx.configs.constants import DocumentSource
 from onyx.configs.constants import FileOrigin
@@ -72,8 +75,6 @@ from onyx.llm.factory import get_default_llms
 from onyx.llm.factory import get_llms_for_persona
 from onyx.natural_language_processing.utils import get_tokenizer
 from onyx.secondary_llm_flows.chat_session_naming import (
-    get_renamed_conversation_name,
-)
 from onyx.server.documents.models import ConnectorBase
 from onyx.server.documents.models import CredentialBase
 from onyx.server.query_and_chat.chat_utils import mime_type_to_chat_file_type
@@ -102,6 +103,12 @@ from onyx.utils.headers import get_custom_tool_additional_request_headers
 from onyx.utils.logger import setup_logger
 from onyx.utils.telemetry import create_milestone_and_report
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+    compute_max_document_tokens_for_persona,
+)
+    get_renamed_conversation_name,
+)
 
 RECENT_DOCS_FOLDER_ID = -1
 
@@ -644,6 +651,10 @@ def seed_chat_from_slack(
     )
 
     add_chats_to_session_from_slack_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         db_session=db_session,
         slack_chat_session_id=slack_chat_session_id,
         new_chat_session_id=new_chat_session.id,
@@ -717,6 +728,10 @@ def upload_files_for_chat(
         file_type = mime_type_to_chat_file_type(file.content_type)
 
         file_content = file.file.read()  # Read the file content
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
         # NOTE: Image conversion to JPEG used to be enforced here.
         # This was removed to:

@@ -1,0 +1,27 @@
+Collecting autodoc
+  Downloading autodoc-0.5.0.tar.gz (14 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting webtest (from autodoc)
+  Downloading webtest-3.0.6-py3-none-any.whl.metadata (2.0 kB)
+Requirement already satisfied: decorator in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from autodoc) (5.2.1)
+Collecting WebOb>=1.2 (from webtest->autodoc)
+  Downloading WebOb-1.8.9-py2.py3-none-any.whl.metadata (11 kB)
+Collecting waitress>=3.0.2 (from webtest->autodoc)
+  Using cached waitress-3.0.2-py3-none-any.whl.metadata (5.8 kB)
+Requirement already satisfied: beautifulsoup4 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from webtest->autodoc) (4.13.4)
+Requirement already satisfied: soupsieve>1.2 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from beautifulsoup4->webtest->autodoc) (2.7)
+Requirement already satisfied: typing-extensions>=4.0.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from beautifulsoup4->webtest->autodoc) (4.14.0)
+Downloading webtest-3.0.6-py3-none-any.whl (32 kB)
+Downloading waitress-3.0.2-py3-none-any.whl (56 kB)
+   ---------------------------------------- 56.2/56.2 kB 1.5 MB/s eta 0:00:00
+Downloading WebOb-1.8.9-py2.py3-none-any.whl (115 kB)
+   ---------------------------------------- 115.4/115.4 kB 3.4 MB/s eta 0:00:00
+Building wheels for collected packages: autodoc
+  Building wheel for autodoc (setup.py): started
+  Building wheel for autodoc (setup.py): finished with status 'done'
+  Created wheel for autodoc: filename=autodoc-0.5.0-py3-none-any.whl size=6384 sha256=58bd0305c4698d21f2ba4ef899d1fd9416ad740149d31d7278c08ce7da54ec9a
+  Stored in directory: c:\users\user\appdata\local\pip\cache\wheels\0b\85\a7\fef1b2938be6fe2627598141131b310408c741b3f5b9d4cfc5
+Successfully built autodoc
+Installing collected packages: WebOb, waitress, webtest, autodoc
+Successfully installed WebOb-1.8.9 autodoc-0.5.0 waitress-3.0.2 webtest-3.0.6

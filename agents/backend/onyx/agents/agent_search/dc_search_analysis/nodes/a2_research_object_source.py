@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -11,15 +13,18 @@ from onyx.agents.agent_search.dc_search_analysis.ops import extract_section
 from onyx.agents.agent_search.dc_search_analysis.ops import research
 from onyx.agents.agent_search.dc_search_analysis.states import ObjectSourceInput
 from onyx.agents.agent_search.dc_search_analysis.states import (
-    ObjectSourceResearchUpdate,
-)
 from onyx.agents.agent_search.models import GraphConfig
 from onyx.agents.agent_search.shared_graph_utils.agent_prompt_ops import (
-    trim_prompt_piece,
-)
 from onyx.prompts.agents.dc_prompts import DC_OBJECT_SOURCE_RESEARCH_PROMPT
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    ObjectSourceResearchUpdate,
+)
+    trim_prompt_piece,
+)
 
 logger = setup_logger()
 
@@ -125,16 +130,10 @@ def research_object_source(
 
     # Built prompt
 
-    today = datetime.now().strftime("%A, %Y-%m-%d")
+    today = datetime.now().strftime("%A, %Y-%m-%d"f")
 
     dc_object_source_research_prompt = (
-        DC_OBJECT_SOURCE_RESEARCH_PROMPT.format(
-            today=today,
-            question=question,
-            task=agent_2_task,
-            document_text=document_texts,
-            format=agent_2_output_objective,
-        )
+        DC_OBJECT_SOURCE_RESEARCH_PROMPT"
         .replace("---object---", object)
         .replace("---source---", document_source.value)
     )

@@ -1,9 +1,13 @@
-"""
-Onyx AI Video System - Main Entry Point
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Main entry point for the Onyx-adapted AI Video system that integrates
-all Onyx components and provides a unified interface for video generation.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import signal
@@ -15,8 +19,6 @@ import argparse
 import json
 import time
 from datetime import datetime
-
-# Onyx imports
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import ThreadSafeDict
 from onyx.utils.timing import time_function
@@ -24,13 +26,24 @@ from onyx.utils.telemetry import TelemetryLogger
 from onyx.utils.gpu_utils import get_gpu_info, is_gpu_available
 from onyx.core.functions import format_response, handle_error
 from onyx.db.engine import get_session_with_current_tenant
-
-# Local imports
 from .models import VideoRequest, VideoResponse, PluginConfig
 from .core.exceptions import AIVideoError, PluginError, ValidationError
 from .core.onyx_integration import OnyxIntegrationManager, onyx_integration
 from .onyx_video_workflow import OnyxVideoWorkflow, onyx_video_generator
 from .onyx_plugin_manager import OnyxPluginManager, onyx_plugin_manager, OnyxPluginContext
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Onyx AI Video System - Main Entry Point
+
+Main entry point for the Onyx-adapted AI Video system that integrates
+all Onyx components and provides a unified interface for video generation.
+"""
+
+
+# Onyx imports
+
+# Local imports
 
 logger = setup_logger(__name__)
 
@@ -43,7 +56,7 @@ class OnyxAIVideoSystem:
     for AI-powered video generation with enterprise-grade features.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = setup_logger("onyx_ai_video_system")
         self.telemetry = TelemetryLogger()
         self.cache: ThreadSafeDict[str, Any] = ThreadSafeDict()
@@ -99,7 +112,7 @@ class OnyxAIVideoSystem:
     
     def _setup_signal_handlers(self) -> None:
         """Setup signal handlers for graceful shutdown."""
-        def signal_handler(signum, frame):
+        def signal_handler(signum, frame) -> Any:
             self.logger.info(f"Received signal {signum}, initiating shutdown...")
             asyncio.create_task(self.shutdown())
         
@@ -199,7 +212,7 @@ class OnyxAIVideoSystem:
             self.logger.error(f"Vision video generation failed: {request.request_id} - {e}")
             raise AIVideoError(f"Vision video generation failed: {e}")
     
-    async def _validate_request(self, request: VideoRequest) -> None:
+    async async def _validate_request(self, request: VideoRequest) -> None:
         """Validate video request."""
         try:
             # Basic validation
@@ -403,7 +416,7 @@ async def shutdown_system() -> None:
 
 def setup_signal_handlers(system: OnyxAIVideoSystem) -> None:
     """Setup signal handlers for graceful shutdown."""
-    def signal_handler(signum, frame):
+    def signal_handler(signum, frame) -> Any:
         logger.info(f"Received signal {signum}, initiating shutdown...")
         asyncio.create_task(system.shutdown())
     
@@ -516,7 +529,7 @@ async def run_system_tests(system: OnyxAIVideoSystem) -> None:
 
 
 # API endpoints for integration
-async def api_generate_video(request_data: Dict[str, Any]) -> Dict[str, Any]:
+async async def api_generate_video(request_data: Dict[str, Any]) -> Dict[str, Any]:
     """API endpoint for video generation."""
     try:
         # Create video request
@@ -560,7 +573,7 @@ async def api_generate_video(request_data: Dict[str, Any]) -> Dict[str, Any]:
         return await handle_error(e, {"endpoint": "generate_video"})
 
 
-async def api_get_status() -> Dict[str, Any]:
+async async def api_get_status() -> Dict[str, Any]:
     """API endpoint for system status."""
     try:
         system = await get_system()
@@ -572,7 +585,7 @@ async def api_get_status() -> Dict[str, Any]:
         return await handle_error(e, {"endpoint": "get_status"})
 
 
-async def api_get_metrics() -> Dict[str, Any]:
+async async def api_get_metrics() -> Dict[str, Any]:
     """API endpoint for system metrics."""
     try:
         system = await get_system()
@@ -584,5 +597,6 @@ async def api_get_metrics() -> Dict[str, Any]:
         return await handle_error(e, {"endpoint": "get_metrics"})
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

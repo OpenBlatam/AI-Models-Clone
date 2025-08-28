@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import json
+from datetime import datetime
+from typing import Dict, List, Any
+import structlog
+from optimized_scan_engine import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Optimized Scan Engine Demo
 
@@ -10,14 +24,7 @@ Comprehensive demonstration of the production-ready cybersecurity scanning engin
 - Security best practices implementation
 """
 
-import asyncio
-import time
-import json
-from datetime import datetime
-from typing import Dict, List, Any
-import structlog
 
-from optimized_scan_engine import (
     OptimizedScanEngine,
     ScanConfig,
     ScanRequest,
@@ -411,9 +418,9 @@ async def demo_fastapi_integration():
 def create_mock_http_session():
     """Create mock HTTP session for demo."""
     class MockHTTPSession:
-        async def get(self, url, timeout=None):
+        async def get(self, url, timeout=None) -> Optional[Dict[str, Any]]:
             class MockResponse:
-                def __init__(self, url):
+                def __init__(self, url) -> Any:
                     self.url = url
                     self.status = 200
                     self.headers = {
@@ -422,13 +429,13 @@ def create_mock_http_session():
                         "Content-Type": "text/html"
                     }
                 
-                async def text(self):
+                async def text(self) -> Any:
                     return f"<html><body>Welcome to {self.url}</body></html>"
                 
-                async def __aenter__(self):
+                async def __aenter__(self) -> Any:
                     return self
                 
-                async def __aexit__(self, exc_type, exc_val, exc_tb):
+                async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
                     pass
             
             return MockResponse(url)
@@ -438,9 +445,9 @@ def create_mock_http_session():
 def create_mock_http_session_with_vulnerabilities():
     """Create mock HTTP session that simulates vulnerabilities."""
     class MockHTTPSession:
-        async def get(self, url, timeout=None):
+        async def get(self, url, timeout=None) -> Optional[Dict[str, Any]]:
             class MockResponse:
-                def __init__(self, url):
+                def __init__(self, url) -> Any:
                     self.url = url
                     self.status = 200
                     self.headers = {
@@ -448,14 +455,14 @@ def create_mock_http_session_with_vulnerabilities():
                         # Missing security headers to trigger findings
                     }
                 
-                async def text(self):
+                async def text(self) -> Any:
                     # Include admin interface to trigger finding
                     return f"<html><body>Admin Panel: {self.url}/admin</body></html>"
                 
-                async def __aenter__(self):
+                async def __aenter__(self) -> Any:
                     return self
                 
-                async def __aexit__(self, exc_type, exc_val, exc_tb):
+                async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
                     pass
             
             return MockResponse(url)
@@ -465,10 +472,10 @@ def create_mock_http_session_with_vulnerabilities():
 def create_mock_http_session_with_errors():
     """Create mock HTTP session that simulates various errors."""
     class MockHTTPSession:
-        def __init__(self):
+        def __init__(self) -> Any:
             self.request_count = 0
         
-        async def get(self, url, timeout=None):
+        async def get(self, url, timeout=None) -> Optional[Dict[str, Any]]:
             self.request_count += 1
             
             if "invalid-site" in url:
@@ -480,18 +487,18 @@ def create_mock_http_session_with_errors():
                 raise Exception("Connection refused")
             else:
                 class MockResponse:
-                    def __init__(self, url):
+                    def __init__(self, url) -> Any:
                         self.url = url
                         self.status = 500 if "500" in url else 200
                         self.headers = {}
                     
-                    async def text(self):
+                    async def text(self) -> Any:
                         return "Error response" if self.status == 500 else "OK"
                     
-                    async def __aenter__(self):
+                    async def __aenter__(self) -> Any:
                         return self
                     
-                    async def __aexit__(self, exc_type, exc_val, exc_tb):
+                    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
                         pass
                 
                 return MockResponse(url)
@@ -501,10 +508,10 @@ def create_mock_http_session_with_errors():
 def create_mock_crypto_backend():
     """Create mock crypto backend for demo."""
     class MockCryptoBackend:
-        async def encrypt(self, data):
+        async def encrypt(self, data) -> Any:
             return b"encrypted_" + data
         
-        async def decrypt(self, data):
+        async def decrypt(self, data) -> Any:
             return data.replace(b"encrypted_", b"")
     
     return MockCryptoBackend()
@@ -666,5 +673,6 @@ async def main():
         print(f"\n❌ Demo failed: {e}")
         logger.error("Demo execution failed", error=str(e))
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

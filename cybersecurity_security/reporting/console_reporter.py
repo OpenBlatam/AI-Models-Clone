@@ -1,8 +1,10 @@
-"""
-Console Reporter
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Provides console-based reporting with colored output and structured formatting.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 from typing import Dict, Any, List, Optional, Union
@@ -11,6 +13,14 @@ from enum import Enum
 import time
 from datetime import datetime
 import json
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Console Reporter
+
+Provides console-based reporting with colored output and structured formatting.
+"""
+
 
 # Color codes for console output
 class Colors:
@@ -46,7 +56,7 @@ class ConsoleReportRequest(BaseModel):
     timestamp: bool = Field(default=True, description="Include timestamps")
     
     @validator('scan_results', 'vulnerability_data', 'enumeration_data', 'attack_data')
-    def validate_data(cls, v):
+    def validate_data(cls, v) -> bool:
         if v is not None and not v:
             raise ValueError("Data cannot be empty if provided")
         return v

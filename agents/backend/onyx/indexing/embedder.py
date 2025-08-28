@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 from abc import ABC
 from abc import abstractmethod
@@ -20,6 +22,9 @@ from shared_configs.enums import EmbedTextType
 from shared_configs.model_server_models import Embedding
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -41,7 +46,9 @@ class IndexingEmbedder(ABC):
         reduced_dimension: int | None,
         callback: IndexingHeartbeatInterface | None,
     ):
-        self.model_name = model_name
+        
+    """__init__ function."""
+self.model_name = model_name
         self.normalize = normalize
         self.query_prefix = query_prefix
         self.passage_prefix = passage_prefix
@@ -94,7 +101,9 @@ class DefaultIndexingEmbedder(IndexingEmbedder):
         reduced_dimension: int | None = None,
         callback: IndexingHeartbeatInterface | None = None,
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             model_name,
             normalize,
             query_prefix,

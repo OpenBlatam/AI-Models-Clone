@@ -1,13 +1,13 @@
-"""
-Multi-GPU Training Demo
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This demo showcases the comprehensive multi-GPU training system with:
-- DataParallel vs DistributedDataParallel comparison
-- Performance benchmarking
-- Memory usage monitoring
-- Fault tolerance demonstration
-- Real-world training scenarios
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import json
@@ -16,7 +16,6 @@ import os
 import time
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
-
 import numpy as np
 import pandas as pd
 import structlog
@@ -28,8 +27,21 @@ from torch.utils.tensorboard import SummaryWriter
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
-
 from multi_gpu_training import (
+from typing import Any, List, Dict, Optional
+"""
+Multi-GPU Training Demo
+
+This demo showcases the comprehensive multi-GPU training system with:
+- DataParallel vs DistributedDataParallel comparison
+- Performance benchmarking
+- Memory usage monitoring
+- Fault tolerance demonstration
+- Real-world training scenarios
+"""
+
+
+
     MultiGPUConfig, MultiGPUTrainingManager, TrainingMode,
     setup_distributed_training, launch_distributed_training
 )
@@ -60,7 +72,9 @@ class DemoModel(nn.Module):
     """Demo model for multi-GPU training demonstration."""
     
     def __init__(self, input_dim: int = 768, hidden_dim: int = 512, num_classes: int = 10):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.encoder = nn.Sequential(
             nn.Linear(input_dim, hidden_dim),
             nn.ReLU(),
@@ -76,13 +90,13 @@ class DemoModel(nn.Module):
         # Initialize weights
         self.apply(self._init_weights)
     
-    def _init_weights(self, module):
+    def _init_weights(self, module) -> Any:
         if isinstance(module, nn.Linear):
             nn.init.xavier_uniform_(module.weight)
             if module.bias is not None:
                 nn.init.zeros_(module.bias)
     
-    def forward(self, x, task="classification"):
+    def forward(self, x, task="classification") -> Any:
         features = self.encoder(x)
         
         if task == "classification":
@@ -114,7 +128,9 @@ class MultiTaskLoss(nn.Module):
     """Multi-task loss function."""
     
     def __init__(self, classification_weight: float = 1.0, regression_weight: float = 0.5):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.classification_weight = classification_weight
         self.regression_weight = regression_weight
         self.ce_loss = nn.CrossEntropyLoss()
@@ -141,7 +157,9 @@ class DemoDataset(Dataset):
     """Demo dataset with multi-task capabilities."""
     
     def __init__(self, num_samples: int = 10000, input_dim: int = 768, num_classes: int = 10):
-        self.num_samples = num_samples
+        
+    """__init__ function."""
+self.num_samples = num_samples
         self.input_dim = input_dim
         self.num_classes = num_classes
         
@@ -156,10 +174,10 @@ class DemoDataset(Dataset):
         
         logger.info(f"Created demo dataset with {num_samples} samples")
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return self.num_samples
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         return {
             'input_ids': self.data[idx],
             'labels': self.labels[idx],
@@ -170,7 +188,7 @@ class DemoDataset(Dataset):
 class PerformanceMonitor:
     """Monitor training performance and resource usage."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = {
             'training_time': [],
             'memory_usage': [],
@@ -180,7 +198,7 @@ class PerformanceMonitor:
         }
         self.start_time = None
     
-    def start_monitoring(self):
+    def start_monitoring(self) -> Any:
         """Start performance monitoring."""
         self.start_time = time.time()
         logger.info("Performance monitoring started")
@@ -266,7 +284,7 @@ class PerformanceMonitor:
 class MultiGPUTrainingDemo:
     """Comprehensive demo for multi-GPU training."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.results = {}
         self.monitor = PerformanceMonitor()
     
@@ -592,7 +610,7 @@ class MultiGPUTrainingDemo:
         output_path = Path("multi_gpu_training_results.json")
         
         # Convert numpy types to native Python types for JSON serialization
-        def convert_numpy(obj):
+        def convert_numpy(obj) -> Any:
             if isinstance(obj, np.integer):
                 return int(obj)
             elif isinstance(obj, np.floating):
@@ -602,7 +620,7 @@ class MultiGPUTrainingDemo:
             return obj
         
         # Recursively convert numpy types
-        def recursive_convert(obj):
+        def recursive_convert(obj) -> Any:
             if isinstance(obj, dict):
                 return {k: recursive_convert(v) for k, v in obj.items()}
             elif isinstance(obj, list):
@@ -613,6 +631,10 @@ class MultiGPUTrainingDemo:
         serializable_results = recursive_convert(results)
         
         with open(output_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(serializable_results, f, indent=2)
         
         logger.info(f"Demo results saved to {output_path}")

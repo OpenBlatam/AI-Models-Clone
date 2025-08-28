@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from sqlalchemy import String
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Remove Native Enum
 
 Revision ID: 46625e4745d4
@@ -6,12 +13,10 @@ Create Date: 2023-10-27 11:38:33.803145
 
 """
 
-from alembic import op
-from sqlalchemy import String
 
 # revision identifiers, used by Alembic.
-revision = "46625e4745d4"
-down_revision = "9d97fecfab7f"
+revision: str = "46625e4745d4"
+down_revision: str = "9d97fecfab7f"
 branch_labels: None = None
 depends_on: None = None
 
@@ -19,6 +24,21 @@ depends_on: None = None
 def upgrade() -> None:
     # At this point, we directly changed some previous migrations,
     # https://github.com/onyx-dot-app/onyx/pull/637
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     # Due to using Postgres native Enums, it caused some complications for first time users.
     # To remove those complications, all Enums are only handled application side moving forward.
     # This migration exists to ensure that existing users don't run into upgrade issues.

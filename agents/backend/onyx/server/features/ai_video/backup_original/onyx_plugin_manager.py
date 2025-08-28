@@ -1,10 +1,7 @@
-"""
-Onyx Plugin Manager
-
-Adapted plugin manager that leverages Onyx's threading utilities,
-file processing capabilities, and performance optimizations for
-efficient plugin management and execution.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -15,8 +12,6 @@ from typing import Any, Dict, List, Optional, Union, Type
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-
-# Onyx imports
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import ThreadSafeDict, run_functions_in_parallel, FunctionCall
 from onyx.utils.timing import time_function
@@ -28,11 +23,23 @@ from onyx.utils.gpu_utils import get_gpu_info, is_gpu_available
 from onyx.core.functions import process_document, validate_user_access
 from onyx.llm.factory import get_default_llms
 from onyx.llm.interfaces import LLM
-
-# Local imports
 from .models import PluginConfig, VideoRequest, VideoResponse
 from .core.exceptions import PluginError, ValidationError, AIVideoError
 from .core.onyx_integration import OnyxIntegrationManager, onyx_integration
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Onyx Plugin Manager
+
+Adapted plugin manager that leverages Onyx's threading utilities,
+file processing capabilities, and performance optimizations for
+efficient plugin management and execution.
+"""
+
+
+# Onyx imports
+
+# Local imports
 
 logger = setup_logger(__name__)
 
@@ -74,7 +81,9 @@ class OnyxPluginBase:
     """
     
     def __init__(self, config: Dict[str, Any]):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.logger = setup_logger(f"onyx_plugin.{self.__class__.__name__}")
         self.telemetry = TelemetryLogger()
         self.cache: ThreadSafeDict[str, Any] = ThreadSafeDict()
@@ -140,7 +149,7 @@ class OnyxPluginManager:
     infrastructure for optimal performance and reliability.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = setup_logger("onyx_plugin_manager")
         self.telemetry = TelemetryLogger()
         self.plugins: ThreadSafeDict[str, OnyxPluginBase] = ThreadSafeDict()

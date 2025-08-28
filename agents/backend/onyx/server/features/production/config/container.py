@@ -1,21 +1,9 @@
-"""
-Dependency Injection Container
-==============================
-
-Production dependency injection container with all services properly configured.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 from typing import Dict, Any, Optional
 from dataclasses import dataclass
-
 from domain.interfaces import (
-    CopywritingRepository,
-    CacheService,
-    AIService,
-    EventPublisher,
-    MonitoringService
-)
 from infrastructure.repositories import PostgresCopywritingRepository
 from infrastructure.cache import RedisCacheService
 from infrastructure.ai import DevinAIService
@@ -23,10 +11,26 @@ from infrastructure.events import AsyncEventPublisher
 from infrastructure.monitoring import PrometheusMonitoringService
 from application.services import CopywritingApplicationService
 from application.use_cases import (
+from presentation.controllers import CopywritingController
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Dependency Injection Container
+==============================
+
+Production dependency injection container with all services properly configured.
+"""
+
+
+    CopywritingRepository,
+    CacheService,
+    AIService,
+    EventPublisher,
+    MonitoringService
+)
     GenerateCopywritingUseCase,
     GetCopywritingHistoryUseCase
 )
-from presentation.controllers import CopywritingController
 
 
 @dataclass
@@ -56,7 +60,7 @@ class Container:
     # State
     is_initialized: bool = False
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize all services in dependency order."""
         if self.is_initialized:
             return
@@ -76,7 +80,7 @@ class Container:
         except Exception as e:
             raise Exception(f"Failed to initialize container: {e}")
     
-    async def _initialize_infrastructure(self):
+    async def _initialize_infrastructure(self) -> Any:
         """Initialize infrastructure services."""
         # Repository
         self.repository = PostgresCopywritingRepository(
@@ -113,7 +117,7 @@ class Container:
         self.monitoring_service = PrometheusMonitoringService()
         await self.monitoring_service.initialize()
     
-    async def _initialize_application(self):
+    async def _initialize_application(self) -> Any:
         """Initialize application services."""
         # Application service
         self.application_service = CopywritingApplicationService(
@@ -136,14 +140,14 @@ class Container:
             repository=self.repository
         )
     
-    async def _initialize_controllers(self):
+    async def _initialize_controllers(self) -> Any:
         """Initialize controllers."""
         self.copywriting_controller = CopywritingController(
             generate_use_case=self.generate_use_case,
             history_use_case=self.history_use_case
         )
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup all services."""
         if not self.is_initialized:
             return
@@ -170,7 +174,7 @@ class Container:
         except Exception as e:
             raise Exception(f"Failed to cleanup container: {e}")
     
-    def get_service(self, service_name: str) -> Any:
+    def get_service(self, service_name: str) -> Optional[Dict[str, Any]]:
         """Get service by name."""
         services = {
             "repository": self.repository,

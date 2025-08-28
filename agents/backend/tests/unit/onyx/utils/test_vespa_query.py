@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -7,8 +12,6 @@ from onyx.configs.constants import INDEX_SEPARATOR
 from onyx.context.search.models import IndexFilters
 from onyx.context.search.models import Tag
 from onyx.document_index.vespa.shared_utils.vespa_request_builders import (
-    build_vespa_filters,
-)
 from onyx.document_index.vespa_constants import DOC_UPDATED_AT
 from onyx.document_index.vespa_constants import DOCUMENT_SETS
 from onyx.document_index.vespa_constants import HIDDEN
@@ -18,6 +21,11 @@ from onyx.document_index.vespa_constants import TENANT_ID
 from onyx.document_index.vespa_constants import USER_FILE
 from onyx.document_index.vespa_constants import USER_FOLDER
 from shared_configs.configs import MULTI_TENANT
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    build_vespa_filters,
+)
 
 # Import the function under test
 

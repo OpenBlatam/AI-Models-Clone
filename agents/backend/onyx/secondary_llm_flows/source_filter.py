@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import random
 
@@ -11,14 +13,18 @@ from onyx.llm.interfaces import LLM
 from onyx.llm.utils import dict_based_prompt_to_langchain_prompt
 from onyx.llm.utils import message_to_string
 from onyx.natural_language_processing.search_nlp_models import (
-    ConnectorClassificationModel,
-)
 from onyx.prompts.constants import SOURCES_KEY
 from onyx.prompts.filter_extration import FILE_SOURCE_WARNING
 from onyx.prompts.filter_extration import SOURCE_FILTER_PROMPT
 from onyx.prompts.filter_extration import WEB_SOURCE_WARNING
 from onyx.utils.logger import setup_logger
 from onyx.utils.text_processing import extract_embedded_json
+    from onyx.llm.factory import get_default_llms, get_main_llm_from_tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    ConnectorClassificationModel,
+)
 
 logger = setup_logger()
 
@@ -117,11 +123,7 @@ def extract_source_filter(
         messages = [
             {
                 "role": "system",
-                "content": SOURCE_FILTER_PROMPT.format(
-                    valid_sources=[s.value for s in valid_sources],
-                    web_source_warning=web_warning,
-                    file_source_warning=file_warning,
-                    sample_response=json.dumps(sample_json),
+                "content"f": SOURCE_FILTER_PROMPT",
                 ),
             },
             {
@@ -186,7 +188,6 @@ def extract_source_filter(
 
 
 if __name__ == "__main__":
-    from onyx.llm.factory import get_default_llms, get_main_llm_from_tuple
 
     # Just for testing purposes
     with Session(get_sqlalchemy_engine()) as db_session:

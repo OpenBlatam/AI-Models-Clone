@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional
+from uuid import UUID
+from pydantic import BaseModel
+from ...core.entities import Video, Template, Avatar, Script
+from ...core.entities.video import VideoStatus, ProcessingStage
+from ...core.repositories import VideoRepository, TemplateRepository, AvatarRepository, ScriptRepository
+from ...shared.logging import get_logger
+from ...shared.metrics import record_metric
+from typing import Any, List, Dict, Optional
+import logging
 """
 Video Use Cases
 ==============
@@ -5,18 +22,8 @@ Video Use Cases
 Use cases for video generation and management operations.
 """
 
-import asyncio
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional
-from uuid import UUID
 
-from pydantic import BaseModel
 
-from ...core.entities import Video, Template, Avatar, Script
-from ...core.entities.video import VideoStatus, ProcessingStage
-from ...core.repositories import VideoRepository, TemplateRepository, AvatarRepository, ScriptRepository
-from ...shared.logging import get_logger
-from ...shared.metrics import record_metric
 
 logger = get_logger(__name__)
 
@@ -58,7 +65,9 @@ class CreateVideoUseCase:
         avatar_repository: AvatarRepository,
         script_repository: ScriptRepository,
     ):
-        self.video_repository = video_repository
+        
+    """__init__ function."""
+self.video_repository = video_repository
         self.template_repository = template_repository
         self.avatar_repository = avatar_repository
         self.script_repository = script_repository
@@ -213,7 +222,9 @@ class GetVideoUseCase:
     """Use case for getting video details."""
     
     def __init__(self, video_repository: VideoRepository):
-        self.video_repository = video_repository
+        
+    """__init__ function."""
+self.video_repository = video_repository
     
     async def execute(self, request: GetVideoRequest) -> GetVideoResponse:
         """Execute the get video use case."""
@@ -254,7 +265,9 @@ class ListVideosUseCase:
     """Use case for listing user videos."""
     
     def __init__(self, video_repository: VideoRepository):
-        self.video_repository = video_repository
+        
+    """__init__ function."""
+self.video_repository = video_repository
     
     async def execute(self, request: ListVideosRequest) -> ListVideosResponse:
         """Execute the list videos use case."""
@@ -304,7 +317,9 @@ class UpdateVideoUseCase:
     """Use case for updating video details."""
     
     def __init__(self, video_repository: VideoRepository):
-        self.video_repository = video_repository
+        
+    """__init__ function."""
+self.video_repository = video_repository
     
     async def execute(self, request: UpdateVideoRequest) -> UpdateVideoResponse:
         """Execute the update video use case."""
@@ -348,7 +363,9 @@ class DeleteVideoUseCase:
     """Use case for deleting a video."""
     
     def __init__(self, video_repository: VideoRepository):
-        self.video_repository = video_repository
+        
+    """__init__ function."""
+self.video_repository = video_repository
     
     async def execute(self, request: DeleteVideoRequest) -> DeleteVideoResponse:
         """Execute the delete video use case."""
@@ -384,7 +401,9 @@ class ProcessVideoUseCase:
     """Use case for processing a video."""
     
     def __init__(self, video_repository: VideoRepository):
-        self.video_repository = video_repository
+        
+    """__init__ function."""
+self.video_repository = video_repository
     
     async def execute(self, request: ProcessVideoRequest) -> ProcessVideoResponse:
         """Execute the process video use case."""

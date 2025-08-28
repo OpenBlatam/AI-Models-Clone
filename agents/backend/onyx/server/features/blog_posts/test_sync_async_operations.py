@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import pytest
+import asyncio
+import time
+from datetime import datetime, timedelta
+from unittest.mock import Mock, AsyncMock, patch
+from typing import Dict, Any, List
+from .sync_async_operations import (
+from .functional_fastapi_components import (
+        import time
+        import time
+from typing import Any, List, Dict, Optional
+import logging
 """
 🧪 Test Suite for Synchronous vs Asynchronous Operations
 =======================================================
@@ -12,14 +35,7 @@ Comprehensive tests for:
 - Edge cases
 """
 
-import pytest
-import asyncio
-import time
-from datetime import datetime, timedelta
-from unittest.mock import Mock, AsyncMock, patch
-from typing import Dict, Any, List
 
-from .sync_async_operations import (
     # Synchronous functions
     validate_text_content,
     calculate_text_statistics,
@@ -53,7 +69,6 @@ from .sync_async_operations import (
     list_analyses_handler
 )
 
-from .functional_fastapi_components import (
     TextAnalysisRequest,
     BatchAnalysisRequest,
     AnalysisResponse,
@@ -106,7 +121,7 @@ MOCK_ANALYSIS_DATA = {
 class TestSynchronousOperations:
     """Test suite for synchronous operations."""
     
-    def test_validate_text_content_valid(self):
+    def test_validate_text_content_valid(self) -> bool:
         """Test text validation with valid content."""
         is_valid, errors, warnings = validate_text_content(SAMPLE_TEXT)
         
@@ -114,7 +129,7 @@ class TestSynchronousOperations:
         assert len(errors) == 0
         assert len(warnings) == 0
     
-    def test_validate_text_content_empty(self):
+    def test_validate_text_content_empty(self) -> bool:
         """Test text validation with empty content."""
         is_valid, errors, warnings = validate_text_content(SAMPLE_TEXT_EMPTY)
         
@@ -123,7 +138,7 @@ class TestSynchronousOperations:
         assert "empty" in errors[0].lower()
         assert len(warnings) == 0
     
-    def test_validate_text_content_whitespace(self):
+    def test_validate_text_content_whitespace(self) -> bool:
         """Test text validation with whitespace-only content."""
         is_valid, errors, warnings = validate_text_content(SAMPLE_TEXT_WHITESPACE)
         
@@ -132,7 +147,7 @@ class TestSynchronousOperations:
         assert "whitespace" in errors[0].lower()
         assert len(warnings) == 0
     
-    def test_validate_text_content_too_long(self):
+    def test_validate_text_content_too_long(self) -> bool:
         """Test text validation with content that's too long."""
         is_valid, errors, warnings = validate_text_content(SAMPLE_TEXT_LONG)
         
@@ -141,7 +156,7 @@ class TestSynchronousOperations:
         assert "too long" in errors[0].lower()
         assert len(warnings) == 0
     
-    def test_validate_text_content_too_short(self):
+    def test_validate_text_content_too_short(self) -> bool:
         """Test text validation with content that's too short."""
         is_valid, errors, warnings = validate_text_content(SAMPLE_TEXT_SHORT)
         
@@ -150,7 +165,7 @@ class TestSynchronousOperations:
         assert len(warnings) == 1
         assert "short" in warnings[0].lower()
     
-    def test_calculate_text_statistics(self):
+    def test_calculate_text_statistics(self) -> Any:
         """Test text statistics calculation."""
         stats = calculate_text_statistics(SAMPLE_TEXT)
         
@@ -170,27 +185,27 @@ class TestSynchronousOperations:
         assert stats["average_word_length"] > 0
         assert 0 <= stats["complexity_score"] <= 1
     
-    def test_calculate_text_statistics_empty(self):
+    def test_calculate_text_statistics_empty(self) -> Any:
         """Test text statistics calculation with empty text."""
         stats = calculate_text_statistics("")
         
         assert isinstance(stats, dict)
         assert len(stats) == 0
     
-    def test_calculate_complexity_score(self):
+    def test_calculate_complexity_score(self) -> Any:
         """Test complexity score calculation."""
         score = calculate_complexity_score(SAMPLE_TEXT)
         
         assert isinstance(score, float)
         assert 0 <= score <= 1
     
-    def test_calculate_complexity_score_empty(self):
+    def test_calculate_complexity_score_empty(self) -> Any:
         """Test complexity score calculation with empty text."""
         score = calculate_complexity_score("")
         
         assert score == 0.0
     
-    def test_generate_cache_key(self):
+    def test_generate_cache_key(self) -> Any:
         """Test cache key generation."""
         key = generate_cache_key("test text", "sentiment", "standard")
         
@@ -198,21 +213,21 @@ class TestSynchronousOperations:
         assert key.startswith("analysis:")
         assert len(key) > 20  # Should be a hash
     
-    def test_generate_cache_key_consistent(self):
+    def test_generate_cache_key_consistent(self) -> Any:
         """Test that cache key generation is consistent."""
         key1 = generate_cache_key("test text", "sentiment", "standard")
         key2 = generate_cache_key("test text", "sentiment", "standard")
         
         assert key1 == key2
     
-    def test_calculate_processing_priority(self):
+    def test_calculate_processing_priority(self) -> Any:
         """Test processing priority calculation."""
         priority = calculate_processing_priority("standard", 1000, "sentiment")
         
         assert isinstance(priority, int)
         assert 1 <= priority <= 10
     
-    def test_calculate_processing_priority_different_tiers(self):
+    def test_calculate_processing_priority_different_tiers(self) -> Any:
         """Test processing priority with different optimization tiers."""
         basic_priority = calculate_processing_priority("basic", 1000, "sentiment")
         standard_priority = calculate_processing_priority("standard", 1000, "sentiment")
@@ -222,14 +237,14 @@ class TestSynchronousOperations:
         # Ultra should have higher priority than basic
         assert ultra_priority >= basic_priority
     
-    def test_estimate_processing_time(self):
+    def test_estimate_processing_time(self) -> Any:
         """Test processing time estimation."""
         time_ms = estimate_processing_time(1000, "sentiment", "standard")
         
         assert isinstance(time_ms, float)
         assert time_ms > 0
     
-    def test_get_analysis_config(self):
+    def test_get_analysis_config(self) -> Optional[Dict[str, Any]]:
         """Test analysis configuration retrieval."""
         config = get_analysis_config("sentiment", "standard")
         
@@ -239,7 +254,7 @@ class TestSynchronousOperations:
         assert "max_length" in config
         assert "confidence_threshold" in config
     
-    def test_get_analysis_config_caching(self):
+    def test_get_analysis_config_caching(self) -> Optional[Dict[str, Any]]:
         """Test that analysis config is cached."""
         # First call
         config1 = get_analysis_config("sentiment", "standard")
@@ -248,7 +263,7 @@ class TestSynchronousOperations:
         
         assert config1 == config2
     
-    def test_transform_analysis_to_response(self):
+    def test_transform_analysis_to_response(self) -> Any:
         """Test analysis data transformation."""
         response_data = transform_analysis_to_response(MOCK_ANALYSIS_DATA)
         
@@ -258,14 +273,14 @@ class TestSynchronousOperations:
         assert "analysis_type" in response_data
         assert "text_statistics" in response_data
     
-    def test_transform_analysis_to_response_empty(self):
+    def test_transform_analysis_to_response_empty(self) -> Any:
         """Test analysis data transformation with empty data."""
         response_data = transform_analysis_to_response({})
         
         assert isinstance(response_data, dict)
         assert len(response_data) == 0
     
-    def test_calculate_batch_progress(self):
+    def test_calculate_batch_progress(self) -> Any:
         """Test batch progress calculation."""
         progress = calculate_batch_progress(5, 1, 10)
         
@@ -280,7 +295,7 @@ class TestSynchronousOperations:
         assert progress["error_rate"] == 10.0
         assert progress["remaining_count"] == 4
     
-    def test_calculate_batch_progress_empty(self):
+    def test_calculate_batch_progress_empty(self) -> Any:
         """Test batch progress calculation with empty batch."""
         progress = calculate_batch_progress(0, 0, 0)
         
@@ -297,7 +312,7 @@ class TestAsynchronousOperations:
     """Test suite for asynchronous operations."""
     
     @pytest.mark.asyncio
-    async def test_create_analysis_async(self):
+    async def test_create_analysis_async(self) -> Any:
         """Test asynchronous analysis creation."""
         # Mock database manager
         mock_db = AsyncMock()
@@ -320,7 +335,7 @@ class TestAsynchronousOperations:
         mock_db.create_text_analysis.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_create_analysis_async_invalid_text(self):
+    async def test_create_analysis_async_invalid_text(self) -> Any:
         """Test asynchronous analysis creation with invalid text."""
         mock_db = AsyncMock()
         
@@ -334,7 +349,7 @@ class TestAsynchronousOperations:
             await create_analysis_async(request, mock_db)
     
     @pytest.mark.asyncio
-    async def test_get_analysis_async_found(self):
+    async def test_get_analysis_async_found(self) -> Optional[Dict[str, Any]]:
         """Test asynchronous analysis retrieval when found."""
         mock_db = AsyncMock()
         mock_db.get_text_analysis.return_value = MOCK_ANALYSIS_DATA
@@ -347,7 +362,7 @@ class TestAsynchronousOperations:
         mock_db.get_text_analysis.assert_called_once_with(1)
     
     @pytest.mark.asyncio
-    async def test_get_analysis_async_not_found(self):
+    async def test_get_analysis_async_not_found(self) -> Optional[Dict[str, Any]]:
         """Test asynchronous analysis retrieval when not found."""
         mock_db = AsyncMock()
         mock_db.get_text_analysis.return_value = None
@@ -357,7 +372,7 @@ class TestAsynchronousOperations:
         assert result is None
     
     @pytest.mark.asyncio
-    async def test_update_analysis_async_success(self):
+    async def test_update_analysis_async_success(self) -> Any:
         """Test asynchronous analysis update."""
         mock_db = AsyncMock()
         updated_data = MOCK_ANALYSIS_DATA.copy()
@@ -373,7 +388,7 @@ class TestAsynchronousOperations:
         mock_db.update_text_analysis.assert_called_once_with(1, update_data)
     
     @pytest.mark.asyncio
-    async def test_update_analysis_async_not_found(self):
+    async def test_update_analysis_async_not_found(self) -> Any:
         """Test asynchronous analysis update when not found."""
         mock_db = AsyncMock()
         mock_db.update_text_analysis.return_value = None
@@ -383,7 +398,7 @@ class TestAsynchronousOperations:
         assert result is None
     
     @pytest.mark.asyncio
-    async def test_list_analyses_async(self):
+    async def test_list_analyses_async(self) -> List[Any]:
         """Test asynchronous analysis listing."""
         mock_db = AsyncMock()
         mock_analyses = [MOCK_ANALYSIS_DATA]
@@ -402,7 +417,7 @@ class TestAsynchronousOperations:
         mock_db.list_text_analyses.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_process_analysis_background_async(self):
+    async def test_process_analysis_background_async(self) -> Any:
         """Test asynchronous background processing."""
         mock_db = AsyncMock()
         
@@ -415,7 +430,7 @@ class TestAsynchronousOperations:
         assert call_args[0][1]["status"] == "completed"
     
     @pytest.mark.asyncio
-    async def test_create_batch_analysis_async(self):
+    async def test_create_batch_analysis_async(self) -> Any:
         """Test asynchronous batch analysis creation."""
         mock_db = AsyncMock()
         mock_batch = {
@@ -446,7 +461,7 @@ class TestAsynchronousOperations:
         assert result.error_count == 0
     
     @pytest.mark.asyncio
-    async def test_process_batch_texts_async(self):
+    async def test_process_batch_texts_async(self) -> Any:
         """Test asynchronous batch text processing."""
         mock_db = AsyncMock()
         texts = ["Text 1", "Text 2", "Text 3"]
@@ -467,7 +482,7 @@ class TestAsynchronousOperations:
 class TestAnalysisCache:
     """Test suite for cache management."""
     
-    def test_cache_initialization(self):
+    def test_cache_initialization(self) -> Any:
         """Test cache initialization."""
         cache = AnalysisCache()
         
@@ -475,7 +490,7 @@ class TestAnalysisCache:
         assert hasattr(cache, '_lock')
         assert isinstance(cache._cache, dict)
     
-    def test_cache_set_sync(self):
+    def test_cache_set_sync(self) -> Any:
         """Test synchronous cache storage."""
         cache = AnalysisCache()
         cache.set_sync("test_key", "test_data", ttl_seconds=60)
@@ -485,7 +500,7 @@ class TestAnalysisCache:
         assert cache._cache["test_key"].data == "test_data"
         assert cache._cache["test_key"].ttl_seconds == 60
     
-    def test_cache_get_sync_found(self):
+    def test_cache_get_sync_found(self) -> Optional[Dict[str, Any]]:
         """Test synchronous cache retrieval when found."""
         cache = AnalysisCache()
         cache.set_sync("test_key", "test_data", ttl_seconds=60)
@@ -495,7 +510,7 @@ class TestAnalysisCache:
         assert result == "test_data"
         assert cache._cache["test_key"].access_count == 1
     
-    def test_cache_get_sync_not_found(self):
+    def test_cache_get_sync_not_found(self) -> Optional[Dict[str, Any]]:
         """Test synchronous cache retrieval when not found."""
         cache = AnalysisCache()
         
@@ -503,7 +518,7 @@ class TestAnalysisCache:
         
         assert result is None
     
-    def test_cache_get_sync_expired(self):
+    def test_cache_get_sync_expired(self) -> Optional[Dict[str, Any]]:
         """Test synchronous cache retrieval when expired."""
         cache = AnalysisCache()
         cache.set_sync("test_key", "test_data", ttl_seconds=1)
@@ -517,7 +532,7 @@ class TestAnalysisCache:
         assert "test_key" not in cache._cache  # Should be cleaned up
     
     @pytest.mark.asyncio
-    async def test_cache_set_async(self):
+    async def test_cache_set_async(self) -> Any:
         """Test asynchronous cache storage."""
         cache = AnalysisCache()
         await cache.set_async("test_key", "test_data", ttl_seconds=60)
@@ -526,7 +541,7 @@ class TestAnalysisCache:
         assert cache._cache["test_key"].data == "test_data"
     
     @pytest.mark.asyncio
-    async def test_cache_get_async(self):
+    async def test_cache_get_async(self) -> Optional[Dict[str, Any]]:
         """Test asynchronous cache retrieval."""
         cache = AnalysisCache()
         await cache.set_async("test_key", "test_data", ttl_seconds=60)
@@ -535,7 +550,7 @@ class TestAnalysisCache:
         
         assert result == "test_data"
     
-    def test_cache_cleanup_sync(self):
+    def test_cache_cleanup_sync(self) -> Any:
         """Test synchronous cache cleanup."""
         cache = AnalysisCache()
         cache.set_sync("key1", "data1", ttl_seconds=1)
@@ -551,7 +566,7 @@ class TestAnalysisCache:
         assert "key2" in cache._cache
     
     @pytest.mark.asyncio
-    async def test_cache_cleanup_async(self):
+    async def test_cache_cleanup_async(self) -> Any:
         """Test asynchronous cache cleanup."""
         cache = AnalysisCache()
         await cache.set_async("key1", "data1", ttl_seconds=1)
@@ -564,7 +579,7 @@ class TestAnalysisCache:
         
         assert removed_count == 1
     
-    def test_cache_get_stats_sync(self):
+    def test_cache_get_stats_sync(self) -> Optional[Dict[str, Any]]:
         """Test synchronous cache statistics."""
         cache = AnalysisCache()
         cache.set_sync("key1", "data1", ttl_seconds=60)
@@ -588,7 +603,7 @@ class TestAnalysisCache:
 class TestPerformanceMonitor:
     """Test suite for performance monitoring."""
     
-    def test_monitor_initialization(self):
+    def test_monitor_initialization(self) -> Any:
         """Test performance monitor initialization."""
         monitor = PerformanceMonitor()
         
@@ -596,7 +611,7 @@ class TestPerformanceMonitor:
         assert hasattr(monitor, '_lock')
         assert isinstance(monitor._metrics, list)
     
-    def test_start_operation_sync(self):
+    def test_start_operation_sync(self) -> Any:
         """Test synchronous operation start."""
         monitor = PerformanceMonitor()
         metrics = monitor.start_operation_sync("test_operation")
@@ -608,7 +623,7 @@ class TestPerformanceMonitor:
         assert metrics.success is True
     
     @pytest.mark.asyncio
-    async def test_start_operation_async(self):
+    async def test_start_operation_async(self) -> Any:
         """Test asynchronous operation start."""
         monitor = PerformanceMonitor()
         metrics = await monitor.start_operation_async("test_operation")
@@ -616,7 +631,7 @@ class TestPerformanceMonitor:
         assert isinstance(metrics, ProcessingMetrics)
         assert metrics.operation_type == "test_operation"
     
-    def test_complete_operation_sync(self):
+    def test_complete_operation_sync(self) -> Any:
         """Test synchronous operation completion."""
         monitor = PerformanceMonitor()
         metrics = monitor.start_operation_sync("test_operation")
@@ -629,7 +644,7 @@ class TestPerformanceMonitor:
         assert metrics.success is True
         assert len(monitor._metrics) == 1
     
-    def test_complete_operation_sync_with_error(self):
+    def test_complete_operation_sync_with_error(self) -> Any:
         """Test synchronous operation completion with error."""
         monitor = PerformanceMonitor()
         metrics = monitor.start_operation_sync("test_operation")
@@ -640,7 +655,7 @@ class TestPerformanceMonitor:
         assert metrics.error_message == "Test error"
     
     @pytest.mark.asyncio
-    async def test_complete_operation_async(self):
+    async def test_complete_operation_async(self) -> Any:
         """Test asynchronous operation completion."""
         monitor = PerformanceMonitor()
         metrics = await monitor.start_operation_async("test_operation")
@@ -651,7 +666,7 @@ class TestPerformanceMonitor:
         assert metrics.success is True
         assert len(monitor._metrics) == 1
     
-    def test_get_stats_sync(self):
+    def test_get_stats_sync(self) -> Optional[Dict[str, Any]]:
         """Test synchronous statistics retrieval."""
         monitor = PerformanceMonitor()
         
@@ -670,7 +685,7 @@ class TestPerformanceMonitor:
         assert stats["success_rate"] == 50.0
         assert stats["average_duration_ms"] > 0
     
-    def test_get_stats_sync_empty(self):
+    def test_get_stats_sync_empty(self) -> Optional[Dict[str, Any]]:
         """Test synchronous statistics retrieval with no operations."""
         monitor = PerformanceMonitor()
         stats = monitor.get_stats_sync()
@@ -679,7 +694,7 @@ class TestPerformanceMonitor:
         assert len(stats) == 0
     
     @pytest.mark.asyncio
-    async def test_get_stats_async(self):
+    async def test_get_stats_async(self) -> Optional[Dict[str, Any]]:
         """Test asynchronous statistics retrieval."""
         monitor = PerformanceMonitor()
         metrics = await monitor.start_operation_async("test_operation")
@@ -699,7 +714,7 @@ class TestRouteHandlers:
     """Test suite for route handlers."""
     
     @pytest.mark.asyncio
-    async def test_create_analysis_handler(self):
+    async def test_create_analysis_handler(self) -> Any:
         """Test analysis creation handler."""
         # Mock dependencies
         mock_background_tasks = Mock()
@@ -724,7 +739,7 @@ class TestRouteHandlers:
         mock_background_tasks.add_task.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_get_analysis_handler_found(self):
+    async def test_get_analysis_handler_found(self) -> Optional[Dict[str, Any]]:
         """Test analysis retrieval handler when found."""
         mock_db = AsyncMock()
         mock_db.get_text_analysis.return_value = MOCK_ANALYSIS_DATA
@@ -736,7 +751,7 @@ class TestRouteHandlers:
         assert result.id == 1
     
     @pytest.mark.asyncio
-    async def test_get_analysis_handler_not_found(self):
+    async def test_get_analysis_handler_not_found(self) -> Optional[Dict[str, Any]]:
         """Test analysis retrieval handler when not found."""
         mock_db = AsyncMock()
         mock_db.get_text_analysis.return_value = None
@@ -746,7 +761,7 @@ class TestRouteHandlers:
             await get_analysis_handler(999, mock_db, cache)
     
     @pytest.mark.asyncio
-    async def test_list_analyses_handler(self):
+    async def test_list_analyses_handler(self) -> List[Any]:
         """Test analysis listing handler."""
         mock_db = AsyncMock()
         mock_analyses = [MOCK_ANALYSIS_DATA]
@@ -764,7 +779,7 @@ class TestRouteHandlers:
         assert result.size == 20
     
     @pytest.mark.asyncio
-    async def test_list_analyses_handler_invalid_pagination(self):
+    async def test_list_analyses_handler_invalid_pagination(self) -> List[Any]:
         """Test analysis listing handler with invalid pagination."""
         mock_db = AsyncMock()
         
@@ -782,7 +797,7 @@ class TestIntegration:
     """Integration tests for sync/async operations."""
     
     @pytest.mark.asyncio
-    async def test_full_analysis_workflow(self):
+    async def test_full_analysis_workflow(self) -> Any:
         """Test complete analysis workflow."""
         # Initialize components
         cache = AnalysisCache()
@@ -840,7 +855,7 @@ class TestIntegration:
         assert stats["successful_operations"] == 1
     
     @pytest.mark.asyncio
-    async def test_batch_processing_workflow(self):
+    async def test_batch_processing_workflow(self) -> Any:
         """Test batch processing workflow."""
         mock_db = AsyncMock()
         mock_batch = {
@@ -881,9 +896,8 @@ class TestIntegration:
 class TestPerformance:
     """Performance tests for sync/async operations."""
     
-    def test_sync_operations_performance(self):
+    def test_sync_operations_performance(self) -> Any:
         """Test performance of synchronous operations."""
-        import time
         
         start_time = time.time()
         
@@ -900,9 +914,8 @@ class TestPerformance:
         assert duration < 1.0
     
     @pytest.mark.asyncio
-    async def test_async_operations_performance(self):
+    async def test_async_operations_performance(self) -> Any:
         """Test performance of asynchronous operations."""
-        import time
         
         mock_db = AsyncMock()
         mock_db.create_text_analysis.return_value = MOCK_ANALYSIS_DATA
@@ -938,7 +951,7 @@ class TestPerformance:
 class TestErrorHandling:
     """Test error handling in sync/async operations."""
     
-    def test_sync_operations_with_invalid_input(self):
+    def test_sync_operations_with_invalid_input(self) -> Any:
         """Test synchronous operations with invalid input."""
         # Test with None input
         stats = calculate_text_statistics(None)
@@ -953,7 +966,7 @@ class TestErrorHandling:
         assert score == 0.0
     
     @pytest.mark.asyncio
-    async def test_async_operations_with_db_errors(self):
+    async def test_async_operations_with_db_errors(self) -> Any:
         """Test asynchronous operations with database errors."""
         mock_db = AsyncMock()
         mock_db.create_text_analysis.side_effect = Exception("Database error")
@@ -968,7 +981,7 @@ class TestErrorHandling:
             await create_analysis_async(request, mock_db)
     
     @pytest.mark.asyncio
-    async def test_background_processing_error_handling(self):
+    async def test_background_processing_error_handling(self) -> Any:
         """Test error handling in background processing."""
         mock_db = AsyncMock()
         mock_db.update_text_analysis.side_effect = Exception("Update error")

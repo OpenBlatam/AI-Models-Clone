@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Generator
 from datetime import datetime
 from datetime import timezone
@@ -11,10 +13,13 @@ from onyx.db.models import ConnectorCredentialPair
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
-def _get_slim_doc_generator(
+async def _get_slim_doc_generator(
     cc_pair: ConnectorCredentialPair,
     gmail_connector: GmailConnector,
     callback: IndexingHeartbeatInterface | None = None,
@@ -36,6 +41,11 @@ def _get_slim_doc_generator(
 def gmail_doc_sync(
     cc_pair: ConnectorCredentialPair,
     fetch_all_existing_docs_fn: FetchAllDocumentsFunction,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     callback: IndexingHeartbeatInterface | None,
 ) -> Generator[DocExternalAccess, None, None]:
     """

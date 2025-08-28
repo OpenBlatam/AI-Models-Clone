@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any
+from uuid import uuid4
+from slack_sdk import WebClient
+from slack_sdk.errors import SlackApiError
+from onyx.connectors.slack.connector import default_msg_filter
+from onyx.connectors.slack.connector import get_channel_messages
+from onyx.connectors.slack.utils import make_paginated_slack_api_call
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Assumptions:
 - The test users have already been created
@@ -9,15 +21,8 @@ Assumptions:
     - chat:write.public
 """
 
-from typing import Any
-from uuid import uuid4
 
-from slack_sdk import WebClient
-from slack_sdk.errors import SlackApiError
 
-from onyx.connectors.slack.connector import default_msg_filter
-from onyx.connectors.slack.connector import get_channel_messages
-from onyx.connectors.slack.utils import make_paginated_slack_api_call
 
 
 def _get_slack_channel_id(channel: dict[str, Any]) -> str:

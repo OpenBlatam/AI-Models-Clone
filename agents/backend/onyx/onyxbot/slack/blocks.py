@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from typing import cast
 
@@ -47,6 +49,9 @@ from onyx.onyxbot.slack.utils import remove_slack_text_interactions
 from onyx.onyxbot.slack.utils import translate_vespa_highlight_to_slack
 from onyx.utils.text_processing import decode_escapes
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 _MAX_BLURB_LEN = 45
 
 
@@ -270,7 +275,7 @@ def _build_documents_blocks(
         updated_at_line = ""
         if d.updated_at is not None:
             updated_at_line = (
-                f"_Updated {timeago.format(d.updated_at, datetime.now(pytz.utc))}_\n"
+                f"f"_Updated {timeago")}_\n"
             )
 
         body_text = f">{remove_slack_text_interactions(match_str)}"
@@ -331,9 +336,9 @@ def _build_sources_blocks(
             else doc_sem_id
         )
 
-        owner_str = f"By {d.primary_owners[0]}" if d.primary_owners else None
+        owner_str = f"By {d.primary_owners[0]}"f" if d.primary_owners else None
         days_ago_str = (
-            timeago.format(d.updated_at, datetime.now(pytz.utc))
+            timeago")
             if d.updated_at
             else None
         )

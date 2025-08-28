@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from abc import ABC, abstractmethod
+from typing import List, Optional, Dict, Any, Tuple
+from datetime import datetime
+import asyncio
+import logging
+from ..domain.entities import (
+            from ..domain.entities import PostIdentifier, FacebookPostFactory
+                from ..domain.entities import PostIdentifier
+from typing import Any, List, Dict, Optional
 """
 🎯 Facebook Posts - Application Use Cases (Onyx Compatible)
 ==========================================================
@@ -5,13 +22,7 @@
 Casos de uso de aplicación siguiendo Clean Architecture y patterns Onyx.
 """
 
-from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Any, Tuple
-from datetime import datetime
-import asyncio
-import logging
 
-from ..domain.entities import (
     FacebookPostEntity, PostSpecification, PostContent, 
     PostAnalysis, ContentStatus, EngagementTier
 )
@@ -100,7 +111,9 @@ class GeneratePostUseCaseImpl(GeneratePostUseCase):
         langchain_service,
         logger: Optional[logging.Logger] = None
     ):
-        self.content_generator = content_generator
+        
+    """__init__ function."""
+self.content_generator = content_generator
         self.content_analyzer = content_analyzer
         self.post_repository = post_repository
         self.langchain_service = langchain_service
@@ -123,7 +136,6 @@ class GeneratePostUseCaseImpl(GeneratePostUseCase):
             content = await self.content_generator.generate_content(specification)
             
             # Step 2: Create post entity
-            from ..domain.entities import PostIdentifier, FacebookPostFactory
             identifier = PostIdentifier.generate(content.text)
             
             post = FacebookPostEntity(
@@ -181,7 +193,9 @@ class AnalyzePostUseCaseImpl(AnalyzePostUseCase):
         post_repository,
         logger: Optional[logging.Logger] = None
     ):
-        self.content_analyzer = content_analyzer
+        
+    """__init__ function."""
+self.content_analyzer = content_analyzer
         self.post_repository = post_repository
         self.logger = logger or logging.getLogger(__name__)
     
@@ -232,7 +246,9 @@ class OptimizePostUseCaseImpl(OptimizePostUseCase):
         post_repository,
         logger: Optional[logging.Logger] = None
     ):
-        self.content_optimizer = content_optimizer
+        
+    """__init__ function."""
+self.content_optimizer = content_optimizer
         self.content_analyzer = content_analyzer
         self.post_repository = post_repository
         self.logger = logger or logging.getLogger(__name__)
@@ -304,7 +320,9 @@ class BatchGenerateUseCaseImpl(BatchGenerateUseCase):
         generate_use_case: GeneratePostUseCase,
         logger: Optional[logging.Logger] = None
     ):
-        self.generate_use_case = generate_use_case
+        
+    """__init__ function."""
+self.generate_use_case = generate_use_case
         self.logger = logger or logging.getLogger(__name__)
     
     async def execute(
@@ -370,7 +388,9 @@ class PublishPostUseCaseImpl(PublishPostUseCase):
         facebook_api_client,
         logger: Optional[logging.Logger] = None
     ):
-        self.post_repository = post_repository
+        
+    """__init__ function."""
+self.post_repository = post_repository
         self.facebook_api_client = facebook_api_client
         self.logger = logger or logging.getLogger(__name__)
     
@@ -446,7 +466,9 @@ class GenerateVariationsUseCase:
         post_repository,
         logger: Optional[logging.Logger] = None
     ):
-        self.content_generator = content_generator
+        
+    """__init__ function."""
+self.content_generator = content_generator
         self.content_analyzer = content_analyzer
         self.post_repository = post_repository
         self.logger = logger or logging.getLogger(__name__)
@@ -475,7 +497,6 @@ class GenerateVariationsUseCase:
             
             for i, variation_content in enumerate(variations):
                 # Create variation identifier
-                from ..domain.entities import PostIdentifier
                 identifier = PostIdentifier.generate(variation_content.text)
                 
                 # Create variation post
@@ -528,7 +549,9 @@ class PerformanceTrackingUseCase:
         facebook_api_client,
         logger: Optional[logging.Logger] = None
     ):
-        self.post_repository = post_repository
+        
+    """__init__ function."""
+self.post_repository = post_repository
         self.facebook_api_client = facebook_api_client
         self.logger = logger or logging.getLogger(__name__)
     

@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.sql import func
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add last synced and last modified to document table
 
 Revision ID: 52a219fb5233
@@ -6,9 +14,6 @@ Create Date: 2024-08-28 17:40:46.077470
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.sql import func
 
 # revision identifiers, used by Alembic.
 revision = "52a219fb5233"

@@ -1,7 +1,5 @@
-"""
-Model Factory - Onyx Integration
-Factory for creating models with schemas.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from dataclasses import dataclass, field
@@ -9,6 +7,15 @@ from datetime import datetime
 from .base_types import CACHE_TTL, VALIDATION_TIMEOUT
 from .model_field import ModelField, FieldConfig
 from .model_schema import ModelSchema, SchemaConfig
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Model Factory - Onyx Integration
+Factory for creating models with schemas.
+"""
 # from .base_model import OnyxBaseModel  # REMOVED to break circular import
 
 T = TypeVar('T')
@@ -16,7 +23,7 @@ T = TypeVar('T')
 class ModelFactory:
     """Factory for creating models with schemas."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize factory."""
         self._schemas: Dict[str, ModelSchema] = {}
         self._models: Dict[str, Type["OnyxBaseModel"]] = {}
@@ -29,7 +36,6 @@ class ModelFactory:
         self._schemas[name] = schema
     
     def register_model(self, name: str, model_class: Type["OnyxBaseModel"]) -> None:
-        from .base_model import OnyxBaseModel
         """Register a model class."""
         if name in self._models:
             raise ValueError(f"Model {name} already exists")
@@ -44,7 +50,6 @@ class ModelFactory:
         return self._models.get(name)
     
     def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional["OnyxBaseModel"]:
-        from .base_model import OnyxBaseModel
         """Create a model."""
         schema = self.get_schema(name)
         model_class = self.get_model_class(name)

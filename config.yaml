@@ -1,0 +1,172 @@
+# Enhanced Blaze AI Configuration
+# Version: 2.1.0
+
+# Server Configuration
+server:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+  workers: 4
+  timeout: 30
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "json"  # json, console, file
+  file_path: "logs/app.log"
+  max_size: "10MB"
+  backup_count: 5
+  console_colors: true
+
+# Security Configuration
+security:
+  jwt_secret_key: "your-super-secret-jwt-key-change-in-production"
+  jwt_algorithm: "HS256"
+  jwt_expiration_minutes: 30
+  api_key_header: "X-API-Key"
+  trusted_hosts: ["localhost", "127.0.0.1", "0.0.0.0"]
+  rate_limit_enabled: true
+  threat_detection_enabled: true
+  input_validation_enabled: true
+  cors:
+    allowed_origins: ["*"]
+    allowed_methods: ["*"]
+    allowed_headers: ["*"]
+
+# Rate Limiting Configuration
+rate_limiting:
+  default_limit: 100
+  default_window: 60  # seconds
+  storage_type: "memory"  # memory, redis
+  redis_url: "redis://localhost:6379/0"
+  adaptive_throttling: true
+  rules:
+    - path: "/api/v1/process"
+      limit: 50
+      window: 60
+      user_based: true
+    - path: "/api/v1/status"
+      limit: 1000
+      window: 60
+      user_based: false
+
+# Error Handling Configuration
+error_handling:
+  circuit_breaker_enabled: true
+  retry_enabled: true
+  error_recovery_enabled: true
+  max_retries: 3
+  retry_delay: 1.0
+  circuit_breaker:
+    failure_threshold: 5
+    recovery_timeout: 60
+    expected_exception: "ServiceUnavailableError"
+
+# Monitoring Configuration
+monitoring:
+  metrics_enabled: true
+  system_metrics_enabled: true
+  profiling_enabled: true
+  alerting_enabled: true
+  prometheus_enabled: true
+  prometheus_port: 9090
+  alert_rules:
+    - name: "high_cpu_usage"
+      condition: "cpu_percent > 80"
+      severity: "warning"
+    - name: "high_memory_usage"
+      condition: "memory_percent > 85"
+      severity: "critical"
+    - name: "high_error_rate"
+      condition: "error_rate > 5"
+      severity: "critical"
+
+# Health Check Configuration
+health:
+  check_interval: 30  # seconds
+  timeout: 5
+  services:
+    - name: "database"
+      type: "http"
+      url: "http://localhost:5432/health"
+    - name: "cache"
+      type: "redis"
+      url: "redis://localhost:6379"
+    - name: "api"
+      type: "http"
+      url: "http://localhost:8000/health"
+
+# Database Configuration
+database:
+  url: "postgresql://user:password@localhost:5432/blaze_ai"
+  pool_size: 10
+  max_overflow: 20
+  echo: false
+
+# Cache Configuration
+cache:
+  type: "redis"
+  url: "redis://localhost:6379/0"
+  ttl: 3600  # seconds
+  max_size: 1000
+
+# AI Model Configuration
+ai_models:
+  default_model: "gpt-3.5-turbo"
+  models:
+    - name: "gpt-3.5-turbo"
+      provider: "openai"
+      max_tokens: 4096
+      temperature: 0.7
+    - name: "gpt-4"
+      provider: "openai"
+      max_tokens: 8192
+      temperature: 0.7
+    - name: "claude-3"
+      provider: "anthropic"
+      max_tokens: 4096
+      temperature: 0.7
+
+# Feature Flags
+features:
+  enhanced_error_handling: true
+  rate_limiting: true
+  performance_monitoring: true
+  security_middleware: true
+  health_checks: true
+  prometheus_metrics: true
+  distributed_tracing: false
+  a_b_testing: false
+
+# Environment-specific overrides
+environments:
+  development:
+    server:
+      reload: true
+    logging:
+      level: "DEBUG"
+    security:
+      cors:
+        allowed_origins: ["http://localhost:3000", "http://127.0.0.1:3000"]
+  
+  production:
+    server:
+      reload: false
+      workers: 8
+    logging:
+      level: "WARNING"
+      format: "json"
+    security:
+      cors:
+        allowed_origins: ["https://yourdomain.com"]
+    features:
+      distributed_tracing: true
+      a_b_testing: true
+  
+  testing:
+    server:
+      port: 8001
+    logging:
+      level: "ERROR"
+    database:
+      url: "postgresql://test:test@localhost:5432/blaze_ai_test"

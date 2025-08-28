@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import abc
 from collections.abc import Generator
 from collections.abc import Iterator
@@ -16,6 +18,9 @@ from onyx.connectors.models import Document
 from onyx.connectors.models import SlimDocument
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 SecondsSinceUnixEpoch = float
 
 GenerateDocumentsOutput = Iterator[list[Document]]

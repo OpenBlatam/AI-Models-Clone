@@ -1,13 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import sys
+import time
+from pathlib import Path
+        from optimized_main import OptimizedNotebookLMAI
+        from ultra_optimized_runner import UltraOptimizedRunner
+        from performance_monitor import OptimizedPerformanceMonitor
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Simple Runner for Optimized NotebookLM AI System
 Quick execution with performance monitoring
 """
 
-import asyncio
-import sys
-import time
-from pathlib import Path
 
 # Add current directory to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -17,7 +30,6 @@ async def run_basic_optimization():
     print("🚀 Starting NotebookLM AI Optimization...")
     
     try:
-        from optimized_main import OptimizedNotebookLMAI
         
         ai_system = OptimizedNotebookLMAI()
         
@@ -53,7 +65,6 @@ async def run_ultra_optimization():
     print("🚀 Starting Ultra Optimization...")
     
     try:
-        from ultra_optimized_runner import UltraOptimizedRunner
         
         with UltraOptimizedRunner() as runner:
             # Optimize resources
@@ -91,7 +102,6 @@ async def run_performance_monitoring():
     print("📊 Starting Performance Monitoring...")
     
     try:
-        from performance_monitor import OptimizedPerformanceMonitor
         
         monitor = OptimizedPerformanceMonitor(monitor_interval=1.0)
         
@@ -162,5 +172,6 @@ async def main():
     
     print("=" * 50)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

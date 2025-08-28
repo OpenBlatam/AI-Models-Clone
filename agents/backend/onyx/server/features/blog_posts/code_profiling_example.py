@@ -1,10 +1,16 @@
-"""
-🚀 Code Profiling Example
-=========================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This example demonstrates comprehensive code profiling for identifying and optimizing
-bottlenecks in data loading, preprocessing, and other operations.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import torch
 import torch.nn as nn
@@ -15,13 +21,23 @@ import json
 from typing import Dict, List, Any
 import logging
 import psutil # Added for system info
+from code_profiling_system import (
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+🚀 Code Profiling Example
+=========================
+
+This example demonstrates comprehensive code profiling for identifying and optimizing
+bottlenecks in data loading, preprocessing, and other operations.
+"""
+
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Import the profiling system
-from code_profiling_system import (
     CodeProfiler, ProfilingConfig, DataLoadingProfiler, PreprocessingProfiler,
     profile_function, profile_data_loading, profile_preprocessing
 )
@@ -31,14 +47,16 @@ class SampleNeuralNetwork(nn.Module):
     """Sample neural network for profiling demonstration."""
     
     def __init__(self, input_size: int = 10, hidden_size: int = 64, num_classes: int = 2):
-        super(SampleNeuralNetwork, self).__init__()
+        
+    """__init__ function."""
+super(SampleNeuralNetwork, self).__init__()
         self.fc1 = nn.Linear(input_size, hidden_size)
         self.relu = nn.ReLU()
         self.dropout = nn.Dropout(0.2)
         self.fc2 = nn.Linear(hidden_size, hidden_size // 2)
         self.fc3 = nn.Linear(hidden_size // 2, num_classes)
         
-    def forward(self, x):
+    def forward(self, x) -> Any:
         x = self.fc1(x)
         x = self.relu(x)
         x = self.dropout(x)
@@ -53,12 +71,14 @@ class SlowDataLoader:
     """Intentionally slow data loader for profiling demonstration."""
     
     def __init__(self, num_samples: int = 1000, batch_size: int = 32):
-        self.num_samples = num_samples
+        
+    """__init__ function."""
+self.num_samples = num_samples
         self.batch_size = batch_size
         self.data = torch.randn(num_samples, 10)
         self.labels = torch.randint(0, 2, (num_samples,))
         
-    def __iter__(self):
+    def __iter__(self) -> Any:
         for i in range(0, self.num_samples, self.batch_size):
             # Simulate slow data loading
             time.sleep(0.01)  # 10ms delay
@@ -208,12 +228,12 @@ def demonstrate_preprocessing_profiling():
     
     # Define preprocessing functions
     @profiler.profile_preprocessing
-    def normalize_data(data):
+    def normalize_data(data) -> Any:
         """Normalize data - should be fast."""
         return (data - data.mean()) / data.std()
     
     @profiler.profile_preprocessing
-    def augment_data(data):
+    def augment_data(data) -> Any:
         """Data augmentation - should be slower."""
         # Simulate data augmentation
         time.sleep(0.05)
@@ -221,7 +241,7 @@ def demonstrate_preprocessing_profiling():
         return augmented
     
     @profiler.profile_preprocessing
-    def complex_preprocessing(data):
+    def complex_preprocessing(data) -> Any:
         """Complex preprocessing - should be memory intensive."""
         # Multiple operations
         result = data
@@ -432,7 +452,9 @@ def demonstrate_profiling_export():
     # Run some profiling
     @profiler.profile_function
     def export_test_function():
-        time.sleep(0.1)
+        
+    """export_test_function function."""
+time.sleep(0.1)
         return "export_test"
     
     export_test_function()
@@ -447,6 +469,10 @@ def demonstrate_profiling_export():
     # Load and display exported results
     try:
         with open(export_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             exported_data = json.load(f)
         
         print(f"📊 Exported data summary:")
@@ -478,7 +504,7 @@ def demonstrate_performance_comparison():
     
     # Unoptimized function
     @profiler.profile_function
-    def unoptimized_function(data):
+    def unoptimized_function(data) -> Any:
         """Unoptimized function with loops."""
         result = torch.zeros_like(data)
         for i in range(data.shape[0]):
@@ -488,7 +514,7 @@ def demonstrate_performance_comparison():
     
     # Optimized function
     @profiler.profile_function
-    def optimized_function(data):
+    def optimized_function(data) -> Any:
         """Optimized function with vectorized operations."""
         return data * 2 + 1
     
@@ -599,5 +625,6 @@ def main():
     return results
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

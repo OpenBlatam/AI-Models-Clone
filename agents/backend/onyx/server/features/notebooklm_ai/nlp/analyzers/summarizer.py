@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Resumidor de Texto Avanzado - NotebookLM AI
-📝 Generación de resúmenes con múltiples algoritmos y configuraciones
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -14,13 +16,23 @@ from collections import defaultdict, OrderedDict, Counter
 import structlog
 import threading
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Resumidor de Texto Avanzado - NotebookLM AI
+📝 Generación de resúmenes con múltiples algoritmos y configuraciones
+"""
+
 
 logger = structlog.get_logger()
 
 # Cache LRU thread-safe
 class LRUCache:
     def __init__(self, maxsize: int = 1000):
-        self.maxsize = maxsize
+        
+    """__init__ function."""
+self.maxsize = maxsize
         self.cache = OrderedDict()
         self.lock = threading.Lock()
     
@@ -33,14 +45,16 @@ class LRUCache:
             return None
     
     def put(self, key: str, value: Any):
-        with self.lock:
+        
+    """put function."""
+with self.lock:
             if key in self.cache:
                 self.cache.pop(key)
             elif len(self.cache) >= self.maxsize:
                 self.cache.popitem(last=False)
             self.cache[key] = value
     
-    def clear(self):
+    def clear(self) -> Any:
         with self.lock:
             self.cache.clear()
 
@@ -76,7 +90,9 @@ class TextSummarizer:
     """Resumidor de texto avanzado."""
     
     def __init__(self, config: SummaryConfig = None):
-        self.config = config or SummaryConfig()
+        
+    """__init__ function."""
+self.config = config or SummaryConfig()
         self.stats = defaultdict(int)
         self.cache = LRUCache(self.config.cache_maxsize) if self.config.enable_caching else None
         self.executor = ThreadPoolExecutor(max_workers=self.config.max_workers)
@@ -302,7 +318,7 @@ class TextSummarizer:
             "cache_hit_rate": self.stats.get("cache_hits", 0) / max(self.stats["total_requests"], 1)
         }
     
-    def clear_cache(self):
+    def clear_cache(self) -> Any:
         """Limpia el cache."""
         if self.cache:
             self.cache.clear()

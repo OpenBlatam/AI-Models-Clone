@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import time
 from collections.abc import Callable
@@ -47,13 +49,16 @@ from onyx.tools.models import ToolResponse
 from onyx.tools.tool import Tool
 from onyx.tools.tool_implementations.search.search_utils import llm_doc_to_dict
 from onyx.tools.tool_implementations.search_like_tool_utils import (
-    build_next_prompt_for_search_like_tool,
-)
 from onyx.tools.tool_implementations.search_like_tool_utils import (
-    FINAL_CONTEXT_DOCUMENTS_ID,
-)
 from onyx.utils.logger import setup_logger
 from onyx.utils.special_types import JSON_ro
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    build_next_prompt_for_search_like_tool,
+)
+    FINAL_CONTEXT_DOCUMENTS_ID,
+)
 
 logger = setup_logger()
 

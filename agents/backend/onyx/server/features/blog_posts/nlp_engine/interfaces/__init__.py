@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .analyzers import (
+from .cache import (
+from .metrics import (
+from .config import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🔌 INTERFACES MODULE - Ports & Contracts
 ========================================
@@ -7,7 +16,6 @@ las capas de infraestructura.
 """
 
 # Analyzer interfaces
-from .analyzers import (
     IAnalyzer, 
     IAnalyzerFactory, 
     IAdvancedAnalyzer, 
@@ -15,7 +23,6 @@ from .analyzers import (
 )
 
 # Cache interfaces
-from .cache import (
     ICacheRepository, 
     IDistributedCache, 
     ICacheKeyGenerator,
@@ -24,7 +31,6 @@ from .cache import (
 )
 
 # Metrics interfaces
-from .metrics import (
     IMetricsCollector, 
     IPerformanceMonitor, 
     IHealthChecker,
@@ -34,7 +40,6 @@ from .metrics import (
 )
 
 # Config interfaces
-from .config import (
     IConfigurationService, 
     IEnvironmentConfigLoader, 
     IFileConfigLoader,

@@ -1,3 +1,33 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import os
+import time
+from contextlib import asynccontextmanager
+from dataclasses import dataclass, field
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing_extensions import TypedDict
+import torch
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+import requests
+from io import BytesIO
+from diffusers import (
+from diffusers.utils import logging as diffusers_logging
+from diffusers.utils.torch_utils import randn_tensor
+from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
+from transformers import (
+import cv2
+from torchvision import transforms
+import psutil
+import gc
+from typing import Any, List, Dict, Optional
 """
 Advanced Diffusers Library Implementation
 ========================================
@@ -15,25 +45,9 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import logging
-import os
-import time
-from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
-from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
-from typing_extensions import TypedDict
 
-import torch
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
-import requests
-from io import BytesIO
 
 # Advanced Diffusers imports
-from diffusers import (
     # Core pipelines
     StableDiffusionPipeline, StableDiffusionImg2ImgPipeline,
     StableDiffusionInpaintPipeline, StableDiffusionControlNetPipeline,
@@ -62,21 +76,13 @@ from diffusers import (
     # Model manipulation
     ModelMixin, ConfigMixin, SchedulerMixin
 )
-from diffusers.utils import logging as diffusers_logging
-from diffusers.utils.torch_utils import randn_tensor
-from diffusers.pipelines.stable_diffusion import StableDiffusionPipelineOutput
 
 # Transformers for advanced text processing
-from transformers import (
     CLIPTextModel, CLIPTokenizer, CLIPTextModelWithProjection,
     T5EncoderModel, T5Tokenizer
 )
 
 # Image processing
-import cv2
-from torchvision import transforms
-import psutil
-import gc
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -252,7 +258,7 @@ class AdvancedDiffusionManager:
         else:
             return torch.device("cpu")
     
-    def _get_advanced_scheduler(self, scheduler_type: AdvancedSchedulerType, **kwargs) -> Any:
+    def _get_advanced_scheduler(self, scheduler_type: AdvancedSchedulerType, **kwargs) -> Optional[Dict[str, Any]]:
         """Get advanced scheduler with custom parameters."""
         scheduler_map = {
             AdvancedSchedulerType.DDIM: DDIMScheduler,
@@ -294,7 +300,7 @@ class AdvancedDiffusionManager:
         
         return scheduler_class(**default_params)
     
-    def _get_attention_processor(self, processor_type: AttentionProcessorType) -> Any:
+    def _get_attention_processor(self, processor_type: AttentionProcessorType) -> Optional[Dict[str, Any]]:
         """Get attention processor for optimization."""
         processor_map = {
             AttentionProcessorType.DEFAULT: None,

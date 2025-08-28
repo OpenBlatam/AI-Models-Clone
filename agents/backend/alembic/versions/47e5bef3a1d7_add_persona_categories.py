@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add persona categories
 
 Revision ID: 47e5bef3a1d7
@@ -6,13 +13,11 @@ Create Date: 2024-11-05 18:55:02.221064
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "47e5bef3a1d7"
-down_revision = "dfbe9e93d3c7"
+revision: str = "47e5bef3a1d7"
+down_revision: str = "dfbe9e93d3c7"
 branch_labels = None
 depends_on = None
 
@@ -36,11 +41,11 @@ def upgrade() -> None:
         "persona_category",
         ["category_id"],
         ["id"],
-        ondelete="SET NULL",
+        ondelete: str = "SET NULL",
     )
 
 
 def downgrade() -> None:
-    op.drop_constraint("persona_category_id_fkey", "persona", type_="foreignkey")
+    op.drop_constraint("persona_category_id_fkey", "persona", type_: str = "foreignkey")
     op.drop_column("persona", "category_id")
     op.drop_table("persona_category")

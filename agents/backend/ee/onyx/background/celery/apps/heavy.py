@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import csv
 import io
 from datetime import datetime
@@ -8,7 +10,17 @@ from celery import Task
 
 from ee.onyx.background.task_name_builders import query_history_task_name
 from ee.onyx.server.query_history.api import fetch_and_process_chat_session_history
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.query_history.api import ONYX_ANONYMIZED_EMAIL
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.query_history.models import QuestionAnswerPairSnapshot
 from onyx.background.celery.apps.heavy import celery_app
 from onyx.background.task_utils import construct_query_history_report_name
@@ -27,6 +39,9 @@ from onyx.file_store.file_store import get_default_file_store
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -39,9 +54,19 @@ logger = setup_logger()
 )
 def export_query_history_task(self: Task, *, start: datetime, end: datetime) -> None:
     if not self.request.id:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         raise RuntimeError("No task id defined for this task; cannot identify it")
 
     task_id = self.request.id
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     start_time = datetime.now(tz=timezone.utc)
 
     stream = io.StringIO()
@@ -62,6 +87,11 @@ def export_query_history_task(self: Task, *, start: datetime, end: datetime) -> 
             )
 
             snapshot_generator = fetch_and_process_chat_session_history(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
                 db_session=db_session,
                 start=start,
                 end=end,

@@ -1,32 +1,36 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import logging
+from typing import Dict, Any, Optional, Tuple
+from concurrent.futures import ThreadPoolExecutor
+from .base import BaseAnalyzer, CachedAnalyzerMixin
+from ..models import NLPAnalysisResult, SentimentMetrics
+from ..config import NLPConfig
+    from textblob import TextBlob
+    from transformers import pipeline
+    import torch
+    import nltk
+    from nltk.sentiment import SentimentIntensityAnalyzer
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Analizador de sentimientos ultra-optimizado.
 """
 
-import logging
-from typing import Dict, Any, Optional, Tuple
-from concurrent.futures import ThreadPoolExecutor
 
-from .base import BaseAnalyzer, CachedAnalyzerMixin
-from ..models import NLPAnalysisResult, SentimentMetrics
-from ..config import NLPConfig
 
 # Importaciones condicionales
 try:
-    from textblob import TextBlob
     TEXTBLOB_AVAILABLE = True
 except ImportError:
     TEXTBLOB_AVAILABLE = False
 
 try:
-    from transformers import pipeline
-    import torch
     TRANSFORMERS_AVAILABLE = True
 except ImportError:
     TRANSFORMERS_AVAILABLE = False
 
 try:
-    import nltk
-    from nltk.sentiment import SentimentIntensityAnalyzer
     NLTK_AVAILABLE = True
 except ImportError:
     NLTK_AVAILABLE = False
@@ -37,12 +41,14 @@ class SentimentAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
     """Analizador de sentimientos con múltiples técnicas."""
     
     def __init__(self, config: NLPConfig, executor: Optional[ThreadPoolExecutor] = None):
-        super().__init__(config, executor)
+        
+    """__init__ function."""
+super().__init__(config, executor)
         self.transformer_model = None
         self.vader_analyzer = None
         self._initialize_models()
     
-    def _initialize_models(self):
+    def _initialize_models(self) -> Any:
         """Inicializar modelos de sentimientos."""
         # Inicializar VADER si está disponible
         if NLTK_AVAILABLE and self.config.analysis.enable_sentiment:
@@ -121,7 +127,9 @@ class SentimentAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
         """Análisis con TextBlob."""
         try:
             def analyze():
-                blob = TextBlob(text)
+                
+    """analyze function."""
+blob = TextBlob(text)
                 return SentimentMetrics(
                     polarity=blob.sentiment.polarity,
                     subjectivity=blob.sentiment.subjectivity,
@@ -139,7 +147,9 @@ class SentimentAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
         """Análisis con VADER."""
         try:
             def analyze():
-                scores = self.vader_analyzer.polarity_scores(text)
+                
+    """analyze function."""
+scores = self.vader_analyzer.polarity_scores(text)
                 compound = scores['compound']
                 
                 return SentimentMetrics(
@@ -159,7 +169,9 @@ class SentimentAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
         """Análisis con modelo Transformer."""
         try:
             def analyze():
-                # Límite de texto para transformers
+                
+    """analyze function."""
+# Límite de texto para transformers
                 text_truncated = text[:500]
                 results = self.transformer_model(text_truncated)
                 

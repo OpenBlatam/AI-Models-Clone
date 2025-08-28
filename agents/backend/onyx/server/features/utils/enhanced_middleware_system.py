@@ -1,10 +1,13 @@
-"""
-🔧 Enhanced Middleware System
-============================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive middleware system for handling unexpected errors, logging, and error monitoring.
-Integrates with the HTTPException system and provides advanced observability features.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -22,7 +25,6 @@ from collections import defaultdict, deque
 import statistics
 from datetime import datetime, timedelta
 import weakref
-
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -36,16 +38,27 @@ from pydantic import BaseModel, Field, validator
 import structlog
 from prometheus_client import Counter, Histogram, Gauge, generate_latest, REGISTRY
 import redis.asyncio as redis
+from .http_exception_system import (
+from .http_response_models import (
+from .error_system import (
+    from fastapi import FastAPI
+from typing import Any, List, Dict, Optional
+"""
+🔧 Enhanced Middleware System
+============================
+
+Comprehensive middleware system for handling unexpected errors, logging, and error monitoring.
+Integrates with the HTTPException system and provides advanced observability features.
+"""
+
+
 
 # Import our HTTPException system
-from .http_exception_system import (
     OnyxHTTPException, HTTPExceptionFactory, HTTPExceptionMapper,
     HTTPExceptionHandler, http_exception_handler
 )
-from .http_response_models import (
     ErrorResponse, ErrorDetail, ResponseFactory
 )
-from .error_system import (
     OnyxBaseError, ValidationError, AuthenticationError, AuthorizationError,
     ResourceNotFoundError, BusinessLogicError, DatabaseError,
     ErrorContext, ErrorFactory, ErrorSeverity, ErrorCategory
@@ -81,7 +94,7 @@ class ErrorHandlingConfig(BaseModel):
     critical_request_threshold: float = Field(default=5.0, description="Critical request threshold in seconds")
     
     @validator('error_sampling_rate')
-    def validate_sampling_rate(cls, v):
+    def validate_sampling_rate(cls, v) -> bool:
         if not 0.0 <= v <= 1.0:
             raise ValueError('Error sampling rate must be between 0.0 and 1.0')
         return v
@@ -186,7 +199,9 @@ class EnhancedMetrics:
     """Enhanced metrics collection with error tracking."""
     
     def __init__(self, config: MonitoringConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.prefix = config.metrics_prefix
         
         # Request metrics
@@ -295,7 +310,9 @@ class EnhancedErrorHandlingMiddleware(BaseHTTPMiddleware):
         config: EnhancedMiddlewareConfig,
         metrics: Optional[EnhancedMetrics] = None
     ):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.metrics = metrics
         self.logger = structlog.get_logger(__name__)
@@ -356,7 +373,7 @@ class EnhancedErrorHandlingMiddleware(BaseHTTPMiddleware):
             # Handle unexpected errors
             return await self._handle_unexpected_error(request, e, context)
     
-    async def _handle_onyx_http_exception(
+    async async def _handle_onyx_http_exception(
         self, 
         request: Request, 
         exc: OnyxHTTPException, 
@@ -679,7 +696,9 @@ class EnhancedLoggingMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app: ASGIApp, config: EnhancedMiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.logger = structlog.get_logger(__name__)
         self.request_logger = structlog.get_logger("request")
@@ -847,7 +866,9 @@ class EnhancedMiddlewareManager:
     """
     
     def __init__(self, config: EnhancedMiddlewareConfig, redis_client: Optional[redis.Redis] = None):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.redis_client = redis_client
         self.metrics = EnhancedMetrics(config.monitoring) if config.monitoring.collect_metrics else None
         self.logger = structlog.get_logger(__name__)
@@ -1087,7 +1108,6 @@ def setup_enhanced_middleware(
 def example_usage():
     """Example of how to use the enhanced middleware system."""
     
-    from fastapi import FastAPI
     
     # Create app
     app = FastAPI(title="Enhanced Middleware Example")
@@ -1101,25 +1121,36 @@ def example_usage():
     # Add endpoints
     @app.get("/")
     async def root():
-        return {"message": "Enhanced middleware example"}
+        
+    """root function."""
+return {"message": "Enhanced middleware example"}
     
     @app.get("/health")
     async def health():
-        return manager.get_health_status()
+        
+    """health function."""
+return manager.get_health_status()
     
     @app.get("/metrics")
     async def metrics():
-        return manager.get_metrics()
+        
+    """metrics function."""
+return manager.get_metrics()
     
     @app.get("/performance")
     async def performance():
-        return manager.get_performance_summary()
+        
+    """performance function."""
+return manager.get_performance_summary()
     
     @app.get("/errors")
     async def errors():
-        return manager.get_error_summary()
+        
+    """errors function."""
+return manager.get_error_summary()
     
     return app
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     example_usage() 

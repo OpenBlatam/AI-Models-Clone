@@ -1,8 +1,7 @@
-"""
-Web Application Security
-
-Provides web application security features including FastAPI integration and JWT authentication.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 from fastapi import FastAPI, Request, Response, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,6 +10,15 @@ import jwt
 from typing import Dict, Any, Optional, List, Literal
 from pydantic import BaseModel, Field, validator
 from datetime import datetime, timedelta
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Web Application Security
+
+Provides web application security features including FastAPI integration and JWT authentication.
+"""
+
 
 class AppConfig(BaseModel):
     """Pydantic model for app configuration."""
@@ -19,7 +27,7 @@ class AppConfig(BaseModel):
     allowed_origins: List[str] = Field(default=["*"], description="Allowed CORS origins")
     
     @validator('secret_key')
-    def validate_secret_key(cls, v):
+    def validate_secret_key(cls, v) -> bool:
         if len(v) < 32:
             raise ValueError("Secret key must be at least 32 characters long")
         return v
@@ -31,7 +39,7 @@ class JWTConfig(BaseModel):
     token_expire_minutes: int = Field(default=30, ge=1, le=1440)
     
     @validator('secret_key')
-    def validate_secret_key(cls, v):
+    def validate_secret_key(cls, v) -> bool:
         if len(v) < 32:
             raise ValueError("Secret key must be at least 32 characters long")
         return v
@@ -51,7 +59,7 @@ class TokenData(BaseModel):
     username: str
     roles: List[str]
 
-def create_secure_fastapi_app(data: AppConfig) -> Dict[str, Any]:
+async def create_secure_fastapi_app(data: AppConfig) -> Dict[str, Any]:
     """Create secure FastAPI application (CPU-bound setup)."""
     app_name = data.app_name
     secret_key = data.secret_key
@@ -71,7 +79,9 @@ def create_secure_fastapi_app(data: AppConfig) -> Dict[str, Any]:
     # Security headers middleware
     @app.middleware("http")
     async def add_security_headers(request: Request, call_next):
-        response = await call_next(request)
+        
+    """add_security_headers function."""
+response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"

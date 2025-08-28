@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import os
 import resource
@@ -7,21 +9,24 @@ import pytest
 
 from onyx.connectors.google_drive.connector import GoogleDriveConnector
 from onyx.connectors.google_utils.shared_constants import (
+from onyx.connectors.google_utils.shared_constants import (
+from onyx.connectors.google_utils.shared_constants import (
+from onyx.connectors.google_utils.shared_constants import (
+from onyx.connectors.google_utils.shared_constants import (
+from tests.load_env_vars import load_env_vars
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     DB_CREDENTIALS_AUTHENTICATION_METHOD,
 )
-from onyx.connectors.google_utils.shared_constants import (
     DB_CREDENTIALS_DICT_SERVICE_ACCOUNT_KEY,
 )
-from onyx.connectors.google_utils.shared_constants import (
     DB_CREDENTIALS_DICT_TOKEN_KEY,
 )
-from onyx.connectors.google_utils.shared_constants import (
     DB_CREDENTIALS_PRIMARY_ADMIN_KEY,
 )
-from onyx.connectors.google_utils.shared_constants import (
     GoogleOAuthAuthenticationMethod,
 )
-from tests.load_env_vars import load_env_vars
 
 
 # Load environment variables at the module level
@@ -85,7 +90,7 @@ def get_credentials_from_env(email: str, oauth: bool) -> dict:
 
 
 @pytest.fixture
-def google_drive_oauth_uploaded_connector_factory() -> (
+async def google_drive_oauth_uploaded_connector_factory() -> (
     Callable[..., GoogleDriveConnector]
 ):
     def _connector_factory(

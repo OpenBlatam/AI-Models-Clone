@@ -1,7 +1,5 @@
-"""
-Model Manager - Onyx Integration
-Manager for handling model operations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from dataclasses import dataclass, field
@@ -11,13 +9,25 @@ from .model_field import ModelField, FieldConfig
 from .model_schema import ModelSchema, SchemaConfig
 from .model_factory import ModelFactory
 from .model_registry import ModelRegistry
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Model Manager - Onyx Integration
+Manager for handling model operations.
+"""
 
 T = TypeVar('T')
 
 class ModelManager:
     """Manager for handling model operations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize manager."""
         self._registry = ModelRegistry()
         self._cache: Dict[str, Dict[str, Any]] = {}
@@ -30,7 +40,6 @@ class ModelManager:
     def register_model(self, name: str, model_class: Type['OnyxBaseModel']) -> None:
         """Register a model class."""
         # Import here to avoid circular import
-        from .base_model import OnyxBaseModel
         self._registry.register_model(name, model_class)
         self._cache[name] = {}
         self._cache_timestamps[name] = {}
@@ -38,7 +47,6 @@ class ModelManager:
     def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional['OnyxBaseModel']:
         """Create a model."""
         # Import here to avoid circular import
-        from .base_model import OnyxBaseModel
         model = self._registry.create_model(name, data, id)
         
         if model and model.id:
@@ -50,7 +58,6 @@ class ModelManager:
     def get_model(self, name: str, id: str) -> Optional['OnyxBaseModel']:
         """Get a model by ID."""
         # Import here to avoid circular import
-        from .base_model import OnyxBaseModel
         # Check cache
         if name in self._cache and id in self._cache[name]:
             timestamp = self._cache_timestamps[name][id]
@@ -69,7 +76,6 @@ class ModelManager:
     def get_models(self, name: str) -> Dict[str, 'OnyxBaseModel']:
         """Get all models of a type."""
         # Import here to avoid circular import
-        from .base_model import OnyxBaseModel
         models = self._registry.get_models(name)
         
         # Update cache
@@ -82,7 +88,6 @@ class ModelManager:
     def update_model(self, name: str, id: str, data: Dict[str, Any]) -> Optional['OnyxBaseModel']:
         """Update a model."""
         # Import here to avoid circular import
-        from .base_model import OnyxBaseModel
         model = self._registry.update_model(name, id, data)
         
         if model:

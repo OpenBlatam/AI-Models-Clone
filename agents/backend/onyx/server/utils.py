@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import base64
 import json
 import os
@@ -8,13 +10,18 @@ from fastapi import HTTPException
 from fastapi import status
 
 from onyx.connectors.google_utils.shared_constants import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     DB_CREDENTIALS_AUTHENTICATION_METHOD,
 )
 
 
 class BasicAuthenticationError(HTTPException):
     def __init__(self, detail: str):
-        super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
+        
+    """__init__ function."""
+super().__init__(status_code=status.HTTP_403_FORBIDDEN, detail=detail)
 
 
 class DateTimeEncoder(json.JSONEncoder):

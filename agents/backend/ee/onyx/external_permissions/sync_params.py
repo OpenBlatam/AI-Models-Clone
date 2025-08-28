@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from ee.onyx.configs.app_configs import CONFLUENCE_PERMISSION_DOC_SYNC_FREQUENCY
 from ee.onyx.configs.app_configs import CONFLUENCE_PERMISSION_GROUP_SYNC_FREQUENCY
 from ee.onyx.configs.app_configs import GOOGLE_DRIVE_PERMISSION_GROUP_SYNC_FREQUENCY
@@ -10,11 +12,14 @@ from ee.onyx.external_permissions.google_drive.group_sync import gdrive_group_sy
 from ee.onyx.external_permissions.perm_sync_types import DocSyncFuncType
 from ee.onyx.external_permissions.perm_sync_types import GroupSyncFuncType
 from ee.onyx.external_permissions.post_query_censoring import (
-    DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION,
-)
 from ee.onyx.external_permissions.slack.doc_sync import slack_doc_sync
 from ee.onyx.external_permissions.slack.group_sync import slack_group_sync
 from onyx.configs.constants import DocumentSource
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION,
+)
 
 
 # These functions update:
@@ -64,6 +69,11 @@ def source_group_sync_is_cc_pair_agnostic(source: DocumentSource) -> bool:
 # If nothing is specified here, we run the doc_sync every time the celery beat runs
 DOC_PERMISSION_SYNC_PERIODS: dict[DocumentSource, int] = {
     # Polling is not supported so we fetch all doc permissions every 5 minutes
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     DocumentSource.CONFLUENCE: CONFLUENCE_PERMISSION_DOC_SYNC_FREQUENCY,
     DocumentSource.SLACK: SLACK_PERMISSION_DOC_SYNC_FREQUENCY,
 }
@@ -71,6 +81,11 @@ DOC_PERMISSION_SYNC_PERIODS: dict[DocumentSource, int] = {
 # If nothing is specified here, we run the doc_sync every time the celery beat runs
 EXTERNAL_GROUP_SYNC_PERIODS: dict[DocumentSource, int] = {
     # Polling is not supported so we fetch all group permissions every 30 minutes
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     DocumentSource.GOOGLE_DRIVE: GOOGLE_DRIVE_PERMISSION_GROUP_SYNC_FREQUENCY,
     DocumentSource.CONFLUENCE: CONFLUENCE_PERMISSION_GROUP_SYNC_FREQUENCY,
 }

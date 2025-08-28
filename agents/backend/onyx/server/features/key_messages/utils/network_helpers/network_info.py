@@ -1,6 +1,5 @@
-"""
-Network information utilities for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, field_validator
 import structlog
@@ -10,6 +9,13 @@ import subprocess
 import platform
 from dataclasses import dataclass
 from enum import Enum
+        import urllib.request
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Network information utilities for cybersecurity tools.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -46,7 +52,7 @@ class NetworkInfoInput(BaseModel):
     timeout: float = 5.0
     
     @field_validator('timeout')
-    def validate_timeout(cls, v):
+    def validate_timeout(cls, v) -> bool:
         if v <= 0:
             raise ValueError("Timeout must be positive")
         return v
@@ -58,7 +64,7 @@ class IPValidationInput(BaseModel):
     allow_loopback: bool = False
     
     @field_validator('ip_address')
-    def validate_ip_address(cls, v):
+    def validate_ip_address(cls, v) -> bool:
         if not v:
             raise ValueError("IP address cannot be empty")
         return v
@@ -212,13 +218,20 @@ def get_local_ip_address() -> str:
 def get_public_ip_address(timeout: float) -> Optional[str]:
     """Get the public IP address."""
     try:
-        import urllib.request
         
         # Use a public IP service
         url = "https://api.ipify.org"
         
         with urllib.request.urlopen(url, timeout=timeout) as response:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             public_ip = response.read().decode('utf-8').strip()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             return public_ip
             
     except Exception as e:
@@ -401,6 +414,10 @@ def get_dns_servers() -> List[str]:
             # Read /etc/resolv.conf on Unix
             try:
                 with open("/etc/resolv.conf", "r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     for line in f:
                         if line.startswith("nameserver"):
                             server = line.split()[1].strip()

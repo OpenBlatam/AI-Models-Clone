@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from typing import Any
 
@@ -9,24 +11,27 @@ from onyx.configs.app_configs import OAUTH_GOOGLE_DRIVE_CLIENT_ID
 from onyx.configs.app_configs import OAUTH_GOOGLE_DRIVE_CLIENT_SECRET
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.google_utils.shared_constants import (
+from onyx.connectors.google_utils.shared_constants import (
+from onyx.connectors.google_utils.shared_constants import (
+from onyx.connectors.google_utils.shared_constants import (
+from onyx.connectors.google_utils.shared_constants import (
+from onyx.connectors.google_utils.shared_constants import (
+from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     DB_CREDENTIALS_AUTHENTICATION_METHOD,
 )
-from onyx.connectors.google_utils.shared_constants import (
     DB_CREDENTIALS_DICT_SERVICE_ACCOUNT_KEY,
 )
-from onyx.connectors.google_utils.shared_constants import (
     DB_CREDENTIALS_DICT_TOKEN_KEY,
 )
-from onyx.connectors.google_utils.shared_constants import (
     DB_CREDENTIALS_PRIMARY_ADMIN_KEY,
 )
-from onyx.connectors.google_utils.shared_constants import (
     GOOGLE_SCOPES,
 )
-from onyx.connectors.google_utils.shared_constants import (
     GoogleOAuthAuthenticationMethod,
 )
-from onyx.utils.logger import setup_logger
 
 logger = setup_logger()
 

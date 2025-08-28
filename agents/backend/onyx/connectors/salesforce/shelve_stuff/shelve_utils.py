@@ -1,9 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 
 from onyx.connectors.salesforce.utils import BASE_DATA_PATH
 from onyx.connectors.salesforce.utils import get_object_type_path
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def get_object_shelf_path(object_type: str) -> str:
     """Get the path to the shelf file for a specific object type."""
     base_path = get_object_type_path(object_type)

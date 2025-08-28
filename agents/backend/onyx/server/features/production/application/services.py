@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import logging
+from typing import List, Optional, Dict, Any, Tuple
+from datetime import datetime, timedelta
+from domain.entities import (
+from domain.interfaces import (
+from .use_cases import (
+from typing import Any, List, Dict, Optional
 """
 Application Services
 ===================
@@ -5,12 +18,7 @@ Application Services
 High-level business operations that orchestrate use cases and domain logic.
 """
 
-import asyncio
-import logging
-from typing import List, Optional, Dict, Any, Tuple
-from datetime import datetime, timedelta
 
-from domain.entities import (
     CopywritingRequest,
     CopywritingResponse,
     PerformanceMetrics,
@@ -18,14 +26,12 @@ from domain.entities import (
     CopywritingStyle,
     CopywritingTone
 )
-from domain.interfaces import (
     CopywritingRepository,
     CacheService,
     AIService,
     EventPublisher,
     MonitoringService
 )
-from .use_cases import (
     GenerateCopywritingUseCase,
     GetCopywritingHistoryUseCase,
     AnalyzeCopywritingUseCase,
@@ -49,7 +55,9 @@ class CopywritingApplicationService:
         event_publisher: EventPublisher,
         monitoring_service: Optional[MonitoringService] = None
     ):
-        self.repository = repository
+        
+    """__init__ function."""
+self.repository = repository
         self.ai_service = ai_service
         self.cache_service = cache_service
         self.event_publisher = event_publisher

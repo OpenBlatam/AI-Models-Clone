@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from typing import Any
 from typing import cast
@@ -11,8 +13,6 @@ from onyx.context.search.models import IndexFilters
 from onyx.context.search.models import InferenceChunk
 from onyx.context.search.postprocessing.postprocessing import cleanup_chunks
 from onyx.context.search.preprocessing.access_filters import (
-    build_access_filters_for_user,
-)
 from onyx.db.document_set import get_document_sets_by_ids
 from onyx.db.models import StarterMessageModel as StarterMessage
 from onyx.db.models import User
@@ -24,6 +24,11 @@ from onyx.prompts.starter_messages import PERSONA_CATEGORY_GENERATION_PROMPT
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import FunctionCall
 from onyx.utils.threadpool_concurrency import run_functions_in_parallel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    build_access_filters_for_user,
+)
 
 logger = setup_logger()
 
@@ -128,19 +133,14 @@ def generate_starter_messages(
 
     params = get_supported_openai_params(model=model, custom_llm_provider=provider)
     supports_structured_output = (
-        isinstance(params, list) and "response_format" in params
+        isinstance(params, list) and "response_format"f" in params
     )
 
     categories: list[str | None] = []
 
     if generation_count > 1:
         # Generate categories
-        category_generation_prompt = PERSONA_CATEGORY_GENERATION_PROMPT.format(
-            name=name,
-            description=description,
-            instructions=instructions,
-            num_categories=generation_count,
-        )
+        category_generation_prompt = PERSONA_CATEGORY_GENERATION_PROMPT"
 
         category_response = fast_llm.invoke(category_generation_prompt)
         categories = parse_categories(cast(str, category_response.content))

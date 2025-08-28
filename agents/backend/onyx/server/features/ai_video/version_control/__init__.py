@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from version_control import GitManager, ConfigVersioning, ChangeTracker
+from .git_manager import (
+from .config_versioning import (
+from .change_tracker import (
+import logging
+from datetime import datetime
+from typing import List, Dict, Any, Tuple, Optional 
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Version Control Module
 =====================
@@ -16,7 +30,6 @@ Features:
 Quick Start:
 -----------
 ```python
-from version_control import GitManager, ConfigVersioning, ChangeTracker
 
 # Initialize git manager
 git_mgr = GitManager()
@@ -42,7 +55,6 @@ Components:
 - ChangeTracker: File change monitoring and tracking
 """
 
-from .git_manager import (
     GitManager,
     GitConfig,
     ChangeInfo,
@@ -50,7 +62,6 @@ from .git_manager import (
     create_git_manager
 )
 
-from .config_versioning import (
     ConfigVersioning,
     ConfigVersion,
     ConfigDiff,
@@ -58,7 +69,6 @@ from .config_versioning import (
     version_config
 )
 
-from .change_tracker import (
     ChangeTracker,
     FileChange,
     ChangeSet,
@@ -78,7 +88,9 @@ class VersionControlSystem:
         change_dir: str = "change_history",
         auto_commit: bool = True
     ):
-        self.git_manager = create_git_manager(repo_path, auto_commit)
+        
+    """__init__ function."""
+self.git_manager = create_git_manager(repo_path, auto_commit)
         self.config_versioning = create_config_versioning(config_dir)
         self.change_tracker = create_change_tracker(change_dir)
         
@@ -334,9 +346,6 @@ __all__ = [
 ]
 
 # Import logging for convenience
-import logging
 logger = logging.getLogger(__name__)
 
 # Import datetime for convenience functions
-from datetime import datetime
-from typing import List, Dict, Any, Tuple, Optional 

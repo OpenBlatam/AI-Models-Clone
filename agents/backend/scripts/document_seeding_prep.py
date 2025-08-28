@@ -1,9 +1,14 @@
-# This script preps the documents used for initially seeding the index. It handles the embedding so that the
-# documents can be added to the index with minimal processing.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
-
 from pydantic import BaseModel
 from sentence_transformers import SentenceTransformer  # type: ignore
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# This script preps the documents used for initially seeding the index. It handles the embedding so that the
+# documents can be added to the index with minimal processing.
+
 
 
 class SeedPresaveDocument(BaseModel):
@@ -243,4 +248,8 @@ documents = [
 documents_dict = [doc.model_dump() for doc in documents]
 
 with open("./backend/onyx/seeding/initial_docs.json", "w") as json_file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     json.dump(documents_dict, json_file, indent=4)

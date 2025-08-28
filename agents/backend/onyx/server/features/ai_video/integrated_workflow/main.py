@@ -1,19 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import argparse
+import logging
+import json
+from typing import Optional
+from ..integrated_workflow.core.workflow import IntegratedVideoWorkflow
+from ..integrated_workflow.core.models import WorkflowConfiguration
+from ..integrated_workflow.utils import (
+from ..plugins import ManagerConfig, ValidationLevel
+from typing import Any, List, Dict, Optional
 """
 Integrated Workflow - Main Entry Point
 
 Main entry point for the integrated AI video workflow system.
 """
 
-import asyncio
-import argparse
-import logging
-import json
-from typing import Optional
 
 # Import integrated workflow
-from ..integrated_workflow.core.workflow import IntegratedVideoWorkflow
-from ..integrated_workflow.core.models import WorkflowConfiguration
-from ..integrated_workflow.utils import (
     create_integrated_workflow,
     quick_video_generation,
     batch_video_generation,
@@ -23,7 +27,6 @@ from ..integrated_workflow.utils import (
 )
 
 # Import plugin system
-from ..plugins import ManagerConfig, ValidationLevel
 
 logger = logging.getLogger(__name__)
 
@@ -158,5 +161,6 @@ async def main():
         await workflow.shutdown()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

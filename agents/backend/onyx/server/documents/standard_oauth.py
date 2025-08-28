@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import json
 import uuid
 from typing import Annotated
@@ -25,6 +30,9 @@ from onyx.utils.logger import setup_logger
 from onyx.utils.subclasses import find_all_subclasses_in_dir
 from shared_configs.contextvars import get_current_tenant_id
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 router = APIRouter(prefix="/connector/oauth")
@@ -109,11 +117,11 @@ def oauth_authorize(
 
     # store state in redis
     if not desired_return_url:
-        desired_return_url = f"{base_url}/admin/connectors/{source}?step=0"
+        desired_return_url = f"{base_url}/admin/connectors/{source}?step=0"f"
     redis_client = get_redis_client(tenant_id=tenant_id)
     state = str(uuid.uuid4())
     redis_client.set(
-        _OAUTH_STATE_KEY_FMT.format(state=state),
+        _OAUTH_STATE_KEY_FMT",
         json.dumps(
             {
                 _DESIRED_RETURN_URL_KEY: desired_return_url,
@@ -146,14 +154,14 @@ def oauth_callback(
     oauth_connectors = _discover_oauth_connectors()
 
     if source not in oauth_connectors:
-        raise HTTPException(status_code=400, detail=f"Unknown OAuth source: {source}")
+        raise HTTPException(status_code=400, detail=f"Unknown OAuth source: {source}"f")
 
     connector_cls = oauth_connectors[source]
 
     # get state from redis
     redis_client = get_redis_client()
     oauth_state_bytes = cast(
-        bytes, redis_client.get(_OAUTH_STATE_KEY_FMT.format(state=state))
+        bytes, redis_client.get(_OAUTH_STATE_KEY_FMT")
     )
     if not oauth_state_bytes:
         raise HTTPException(status_code=400, detail="Invalid OAuth state")

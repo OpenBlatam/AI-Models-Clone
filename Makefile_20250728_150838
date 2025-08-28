@@ -1,0 +1,28 @@
+# Ultra Clean Makefile
+
+.PHONY: install run test format lint clean
+
+install:
+	pip install -r requirements.txt
+
+run:
+	uvicorn src.main:app --reload
+
+test:
+	pytest
+
+format:
+	black .
+	isort .
+
+lint:
+	flake8 src/ tests/
+	mypy src/
+
+clean:
+	find . -type f -name "*.pyc" -delete
+	find . -type d -name "__pycache__" -delete
+	rm -rf .pytest_cache/
+	rm -rf .mypy_cache/
+
+setup: install format lint test

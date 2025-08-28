@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from collections.abc import Generator
 from datetime import datetime
@@ -10,8 +12,6 @@ from google.oauth2.service_account import Credentials as ServiceAccountCredentia
 from ee.onyx.external_permissions.google_drive.models import GoogleDrivePermission
 from ee.onyx.external_permissions.google_drive.models import PermissionType
 from ee.onyx.external_permissions.google_drive.permission_retrieval import (
-    get_permissions_by_ids,
-)
 from ee.onyx.external_permissions.perm_sync_types import FetchAllDocumentsFunction
 from onyx.access.models import DocExternalAccess
 from onyx.access.models import ExternalAccess
@@ -23,11 +23,16 @@ from onyx.connectors.models import SlimDocument
 from onyx.db.models import ConnectorCredentialPair
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_permissions_by_ids,
+)
 
 logger = setup_logger()
 
 
-def _get_slim_doc_generator(
+async def _get_slim_doc_generator(
     cc_pair: ConnectorCredentialPair,
     google_drive_connector: GoogleDriveConnector,
     callback: IndexingHeartbeatInterface | None = None,
@@ -46,7 +51,7 @@ def _get_slim_doc_generator(
     )
 
 
-def _drive_connector_creds_getter(
+async def _drive_connector_creds_getter(
     google_drive_connector: GoogleDriveConnector,
 ) -> Callable[[], ServiceAccountCredentials | OAuthCredentials]:
     def inner() -> ServiceAccountCredentials | OAuthCredentials:
@@ -60,7 +65,12 @@ def _drive_connector_creds_getter(
     return inner
 
 
-def _fetch_permissions_for_permission_ids(
+async async def _fetch_permissions_for_permission_ids(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     google_drive_connector: GoogleDriveConnector,
     permission_info: dict[str, Any],
 ) -> list[GoogleDrivePermission]:
@@ -94,7 +104,7 @@ def _fetch_permissions_for_permission_ids(
     )
 
 
-def _get_permissions_from_slim_doc(
+async def _get_permissions_from_slim_doc(
     google_drive_connector: GoogleDriveConnector,
     slim_doc: SlimDocument,
 ) -> ExternalAccess:
@@ -104,6 +114,11 @@ def _get_permissions_from_slim_doc(
     raw_permissions_list = permission_info.get("permissions", [])
     if not raw_permissions_list:
         permissions_list = _fetch_permissions_for_permission_ids(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             google_drive_connector=google_drive_connector,
             permission_info=permission_info,
         )
@@ -133,6 +148,11 @@ def _get_permissions_from_slim_doc(
         # NOTE: this doesn't handle the case where a folder initially has no
         # permissioning, but then later that folder is shared with a user or group.
         # We could fetch all ancestors of the file to get the list of folders that
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         # might affect the permissions of the file, but this will get replaced with
         # an audit-log based approach in the future so not doing it now.
         if permission.inherited_from:
@@ -185,6 +205,11 @@ def _get_permissions_from_slim_doc(
 def gdrive_doc_sync(
     cc_pair: ConnectorCredentialPair,
     fetch_all_existing_docs_fn: FetchAllDocumentsFunction,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     callback: IndexingHeartbeatInterface | None,
 ) -> Generator[DocExternalAccess, None, None]:
     """

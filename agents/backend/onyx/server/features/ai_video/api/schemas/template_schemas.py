@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional, Union
+from uuid import uuid4
+from pydantic import BaseModel, Field, field_validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Template and Avatar AI Schemas
 =============================
@@ -5,12 +18,7 @@ Template and Avatar AI Schemas
 Pydantic schemas for template selection, AI avatars, and image synchronization.
 """
 
-from datetime import datetime
-from enum import Enum
-from typing import Any, Dict, List, Optional, Union
-from uuid import uuid4
 
-from pydantic import BaseModel, Field, field_validator
 
 
 class TemplateCategory(str, Enum):

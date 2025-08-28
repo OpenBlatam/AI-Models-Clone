@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 from datetime import datetime
 
@@ -24,6 +26,9 @@ from onyx.db.models import TaskQueueState
 from onyx.db.tasks import get_all_tasks_with_prefix
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _build_filter_conditions(
     start_time: datetime | None,
     end_time: datetime | None,
@@ -75,7 +80,7 @@ def _build_filter_conditions(
     return conditions
 
 
-def get_total_filtered_chat_sessions_count(
+async def get_total_filtered_chat_sessions_count(
     db_session: Session,
     start_time: datetime | None,
     end_time: datetime | None,
@@ -90,7 +95,7 @@ def get_total_filtered_chat_sessions_count(
     return db_session.scalar(stmt) or 0
 
 
-def get_page_of_chat_sessions(
+async def get_page_of_chat_sessions(
     start_time: datetime | None,
     end_time: datetime | None,
     db_session: Session,
@@ -130,7 +135,12 @@ def get_page_of_chat_sessions(
     return db_session.scalars(stmt).unique().all()
 
 
-def fetch_chat_sessions_eagerly_by_time(
+async async def fetch_chat_sessions_eagerly_by_time(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     start: datetime,
     end: datetime,
     db_session: Session,
@@ -176,7 +186,7 @@ def fetch_chat_sessions_eagerly_by_time(
     return chat_sessions
 
 
-def get_all_query_history_export_tasks(
+async def get_all_query_history_export_tasks(
     db_session: Session,
 ) -> list[TaskQueueState]:
     return get_all_tasks_with_prefix(db_session, QUERY_HISTORY_TASK_NAME_PREFIX)

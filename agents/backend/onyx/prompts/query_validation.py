@@ -1,11 +1,16 @@
-# The following prompts are used for verifying if the user's query can be answered by the current
-# system. Many new users do not understand the design/capabilities of the system and will ask
-# questions that are unanswerable such as aggregations or user specific questions that the system
-# cannot handle, this is used to identify those cases
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.prompts.constants import ANSWERABLE_PAT
 from onyx.prompts.constants import GENERAL_SEP_PAT
 from onyx.prompts.constants import QUESTION_PAT
 from onyx.prompts.constants import THOUGHT_PAT
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# The following prompts are used for verifying if the user's query can be answered by the current
+# system. Many new users do not understand the design/capabilities of the system and will ask
+# questions that are unanswerable such as aggregations or user specific questions that the system
+# cannot handle, this is used to identify those cases
 
 
 ANSWERABLE_PROMPT = f"""
@@ -54,5 +59,6 @@ won't find an answer.
 
 
 # Use the following for easy viewing of prompts
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     print(ANSWERABLE_PROMPT)

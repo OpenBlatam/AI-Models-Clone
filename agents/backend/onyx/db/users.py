@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 from typing import Any
 from uuid import UUID
@@ -24,6 +26,9 @@ from onyx.db.models import User__UserGroup
 from onyx.utils.variable_functionality import fetch_ee_implementation_or_noop
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def validate_user_role_update(
     requested_role: UserRole, current_role: UserRole, explicit_override: bool = False
 ) -> None:
@@ -221,7 +226,7 @@ def get_user_by_email(email: str, db_session: Session) -> User | None:
     return user
 
 
-def fetch_user_by_id(db_session: Session, user_id: UUID) -> User | None:
+async def fetch_user_by_id(db_session: Session, user_id: UUID) -> User | None:
     return db_session.query(User).filter(User.id == user_id).first()  # type: ignore
 
 

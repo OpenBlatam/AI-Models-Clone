@@ -1,17 +1,7 @@
-"""
-🚀 Functional Model Training & Evaluation System
-===============================================
-
-Pure functional, declarative approach to model training and evaluation.
-Uses data transformations, pure functions, and functional patterns instead of classes.
-
-Key Principles:
-- Pure functions with no side effects
-- Data transformations over mutable state
-- Composition over inheritance
-- Immutable data structures
-- Declarative configuration
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -27,7 +17,6 @@ import os
 from functools import partial, reduce
 from operator import itemgetter
 import itertools
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -37,10 +26,6 @@ from torch.utils.tensorboard import SummaryWriter
 import numpy as np
 import pandas as pd
 from sklearn.metrics import (
-    accuracy_score, precision_recall_fscore_support, 
-    confusion_matrix, classification_report, roc_auc_score,
-    mean_squared_error, mean_absolute_error, r2_score
-)
 from sklearn.model_selection import train_test_split, KFold
 import optuna
 from optuna.samplers import TPESampler
@@ -51,6 +36,30 @@ import torch.profiler
 import cProfile
 import pstats
 import io
+    from transformers import AutoModelForSequenceClassification, AutoTokenizer
+    from transformers import get_linear_schedule_with_warmup
+    import yaml
+from typing import Any, List, Dict, Optional
+"""
+🚀 Functional Model Training & Evaluation System
+===============================================
+
+Pure functional, declarative approach to model training and evaluation.
+Uses data transformations, pure functions, and functional patterns instead of classes.
+
+Key Principles:
+- Pure functions with no side effects
+- Data transformations over mutable state
+- Composition over inheritance
+- Immutable data structures
+- Declarative configuration
+"""
+
+
+    accuracy_score, precision_recall_fscore_support, 
+    confusion_matrix, classification_report, roc_auc_score,
+    mean_squared_error, mean_absolute_error, r2_score
+)
 
 # Set up logging
 logging.basicConfig(
@@ -320,7 +329,6 @@ def create_model(config: TrainingConfig, num_classes: int) -> nn.Module:
 
 def create_transformer_model(model_name: str, num_classes: int) -> nn.Module:
     """Create transformer model in a pure functional way."""
-    from transformers import AutoModelForSequenceClassification, AutoTokenizer
     
     model = AutoModelForSequenceClassification.from_pretrained(
         model_name,
@@ -334,7 +342,9 @@ def create_custom_model(num_classes: int) -> nn.Module:
     """Create custom model in a pure functional way."""
     class CustomTransformer(nn.Module):
         def __init__(self, num_classes: int, vocab_size: int = 30522, hidden_size: int = 768):
-            super().__init__()
+            
+    """__init__ function."""
+super().__init__()
             self.embedding = nn.Embedding(vocab_size, hidden_size)
             self.transformer = nn.TransformerEncoderLayer(
                 d_model=hidden_size,
@@ -344,7 +354,7 @@ def create_custom_model(num_classes: int) -> nn.Module:
             )
             self.classifier = nn.Linear(hidden_size, num_classes)
         
-        def forward(self, input_ids, attention_mask=None):
+        def forward(self, input_ids, attention_mask=None) -> Any:
             embeddings = self.embedding(input_ids)
             if attention_mask is not None:
                 embeddings = embeddings * attention_mask.unsqueeze(-1)
@@ -386,7 +396,6 @@ def create_scheduler(
     num_training_steps: int
 ) -> Any:
     """Create scheduler in a pure functional way."""
-    from transformers import get_linear_schedule_with_warmup
     
     return get_linear_schedule_with_warmup(
         optimizer,
@@ -407,16 +416,16 @@ def create_scaler(config: TrainingConfig) -> Optional[Any]:
 def create_dataset(texts: List[str], labels: List[int], tokenizer=None, max_length: int = 512) -> Dataset:
     """Create dataset in a pure functional way."""
     class FunctionalDataset(Dataset):
-        def __init__(self, texts, labels, tokenizer, max_length):
+        def __init__(self, texts, labels, tokenizer, max_length) -> Any:
             self.texts = texts
             self.labels = labels
             self.tokenizer = tokenizer
             self.max_length = max_length
         
-        def __len__(self):
+        def __len__(self) -> Any:
             return len(self.texts)
         
-        def __getitem__(self, idx):
+        def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
             text = self.texts[idx]
             label = self.labels[idx]
             
@@ -831,9 +840,12 @@ async def functional_train_with_config(
     config_path: str
 ) -> Dict[str, Any]:
     """Train using YAML config file with functional approach."""
-    import yaml
     
     with open(config_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         config_dict = yaml.safe_load(f)
     
     # Convert string enums
@@ -875,7 +887,9 @@ def get_training_summary(results: Dict[str, Any]) -> Dict[str, Any]:
 def demo():
     """Demo the functional training system."""
     async def run_demo():
-        print("🚀 Functional Training Demo")
+        
+    """run_demo function."""
+print("🚀 Functional Training Demo")
         print("=" * 50)
         
         # Quick training example
@@ -893,5 +907,6 @@ def demo():
     
     asyncio.run(run_demo())
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     demo() 

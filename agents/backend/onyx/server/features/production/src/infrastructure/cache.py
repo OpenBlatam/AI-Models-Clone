@@ -1,3 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import json
+import hashlib
+import time
+from typing import Any, Optional, Dict, List, Union
+from contextlib import asynccontextmanager
+import redis.asyncio as redis
+import orjson
+import lz4.frame
+import zstandard as zstd
+from pydantic import BaseModel
+from src.core.config import RedisSettings, CacheSettings
+from src.core.exceptions import CacheException
+from typing import Any, List, Dict, Optional
 """
 ⚡ Ultra-Optimized Cache Service
 ===============================
@@ -11,22 +37,8 @@ Production-grade caching with:
 - Distributed locking
 """
 
-import asyncio
-import logging
-import json
-import hashlib
-import time
-from typing import Any, Optional, Dict, List, Union
-from contextlib import asynccontextmanager
 
-import redis.asyncio as redis
-import orjson
-import lz4.frame
-import zstandard as zstd
-from pydantic import BaseModel
 
-from src.core.config import RedisSettings, CacheSettings
-from src.core.exceptions import CacheException
 
 
 class CacheServiceConfig(BaseModel):
@@ -63,7 +75,9 @@ class CacheService:
     """
     
     def __init__(self, redis_settings: RedisSettings, cache_settings: CacheSettings):
-        self.config = CacheServiceConfig(
+        
+    """__init__ function."""
+self.config = CacheServiceConfig(
             url=redis_settings.URL,
             password=redis_settings.PASSWORD.get_secret_value() if redis_settings.PASSWORD else None,
             db=redis_settings.DB,
@@ -116,7 +130,7 @@ class CacheService:
         
         self.logger.info("Cache Service initialized")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize cache service and Redis connection"""
         
         self.logger.info("Initializing Cache Service...")
@@ -153,7 +167,7 @@ class CacheService:
             self.logger.error(f"Failed to initialize Cache Service: {e}")
             raise CacheException("initialization", reason=str(e))
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup cache service resources"""
         
         self.logger.info("Cleaning up Cache Service...")
@@ -455,7 +469,7 @@ class CacheService:
                 "last_health_check": self.last_health_check
             }
     
-    async def _test_connection(self):
+    async def _test_connection(self) -> Any:
         """Test Redis connection"""
         
         try:
@@ -466,7 +480,7 @@ class CacheService:
             self.logger.error(f"Redis connection test failed: {e}")
             raise CacheException("connection test", reason=str(e))
     
-    async def _initialize_warmup(self):
+    async def _initialize_warmup(self) -> Any:
         """Initialize cache warming"""
         
         try:
@@ -476,7 +490,7 @@ class CacheService:
         except Exception as e:
             self.logger.error(f"Failed to initialize warmup: {e}")
     
-    async def _warmup_loop(self):
+    async def _warmup_loop(self) -> Any:
         """Background task for cache warming"""
         
         while True:
@@ -493,7 +507,7 @@ class CacheService:
                 self.logger.error(f"Warmup loop error: {e}")
                 await asyncio.sleep(60)  # Wait 1 minute on error
     
-    async def _warmup_frequent_data(self):
+    async def _warmup_frequent_data(self) -> Any:
         """Warm up frequently accessed data"""
         
         try:

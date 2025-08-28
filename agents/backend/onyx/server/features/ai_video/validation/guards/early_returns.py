@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import logging
+import time
+import asyncio
+from typing import (
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from pathlib import Path
+import numpy as np
+import functools
+import inspect
+from contextlib import contextmanager
+from .error_handling import (
+        import psutil
+        import psutil
+from typing import Any, List, Dict, Optional
 """
 🚀 EARLY RETURNS - GUARD CLAUSE PATTERN
 ======================================
@@ -6,22 +26,10 @@ Sistema de early returns para evitar if statements anidados profundos.
 Implementa el patrón "guard clause" para mejorar legibilidad y mantenibilidad.
 """
 
-import logging
-import time
-import asyncio
-from typing import (
     Any, Optional, Union, Dict, List, Tuple, Callable, 
     TypeVar, Generic, Protocol, runtime_checkable
 )
-from dataclasses import dataclass, field
-from enum import Enum, auto
-from pathlib import Path
-import numpy as np
-import functools
-import inspect
-from contextlib import contextmanager
 
-from .error_handling import (
     AIVideoError, ErrorCategory, ErrorSeverity, ErrorContext,
     ValidationError, SystemError, ConfigurationError
 )
@@ -59,7 +67,7 @@ def early_return_on_error(
     """Decorador para early returns en condiciones de error."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # Verificar condiciones de error al inicio
             for condition in error_conditions:
                 try:
@@ -75,7 +83,7 @@ def early_return_on_error(
             return func(*args, **kwargs)
         
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Verificar condiciones de error al inicio
             for condition in error_conditions:
                 try:
@@ -107,7 +115,7 @@ def early_return_on_condition(
     """Decorador para early return en condición específica."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # Verificar condición al inicio
             try:
                 if condition(*args, **kwargs):
@@ -120,7 +128,7 @@ def early_return_on_condition(
             return func(*args, **kwargs)
         
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Verificar condición al inicio
             try:
                 if asyncio.iscoroutinefunction(condition):
@@ -184,14 +192,12 @@ class EarlyReturnConditions:
     @staticmethod
     def insufficient_memory(required_mb: float) -> bool:
         """Verificar si hay memoria insuficiente."""
-        import psutil
         available_memory = psutil.virtual_memory().available / (1024 * 1024)
         return available_memory < required_mb
     
     @staticmethod
     def system_overloaded(max_cpu_percent: float = 90.0) -> bool:
         """Verificar si sistema está sobrecargado."""
-        import psutil
         cpu_percent = psutil.cpu_percent(interval=0.1)
         return cpu_percent > max_cpu_percent
     
@@ -629,7 +635,7 @@ async def async_load_model_decorated(model_path: str, batch_size: int) -> Dict[s
 class VideoProcessor:
     """Procesador de video usando early returns."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.loaded_models = set()
         self.processing = False
     
@@ -741,7 +747,7 @@ class VideoProcessor:
 def apply_early_returns(func: Callable) -> Callable:
     """Aplicar early returns a función existente."""
     @functools.wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         # Aplicar validaciones básicas
         result = EarlyReturnPatterns.validate_inputs(*args, **kwargs)
         if result is not None:
@@ -750,7 +756,7 @@ def apply_early_returns(func: Callable) -> Callable:
         return func(*args, **kwargs)
     
     @functools.wraps(func)
-    async def async_wrapper(*args, **kwargs):
+    async def async_wrapper(*args, **kwargs) -> Any:
         # Aplicar validaciones básicas
         result = EarlyReturnPatterns.validate_inputs(*args, **kwargs)
         if result is not None:

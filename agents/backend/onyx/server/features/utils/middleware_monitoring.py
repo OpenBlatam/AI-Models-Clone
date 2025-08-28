@@ -1,10 +1,13 @@
-"""
-📊 Middleware Monitoring System
-==============================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive monitoring system for middleware with real-time metrics,
-alerting, analytics, and performance tracking.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -16,12 +19,24 @@ from datetime import datetime, timedelta
 from enum import Enum
 from collections import defaultdict, deque
 import weakref
-
 from fastapi import FastAPI, Request, Response
 from pydantic import BaseModel, Field
 import structlog
 from prometheus_client import Counter, Histogram, Gauge, Summary, generate_latest, REGISTRY
 import redis.asyncio as redis
+            import psutil
+    from fastapi import FastAPI
+from typing import Any, List, Dict, Optional
+import logging
+"""
+📊 Middleware Monitoring System
+==============================
+
+Comprehensive monitoring system for middleware with real-time metrics,
+alerting, analytics, and performance tracking.
+"""
+
+
 
 logger = structlog.get_logger(__name__)
 
@@ -140,7 +155,9 @@ class MetricsCollector:
     """Collector for various metrics."""
     
     def __init__(self, config: MonitoringConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.prefix = config.metrics_prefix
         
         # Prometheus metrics
@@ -354,7 +371,9 @@ class AlertManager:
     """Manager for handling alerts and notifications."""
     
     def __init__(self, config: MonitoringConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.logger = structlog.get_logger(__name__)
         self.alerts = deque(maxlen=1000)
         self.alert_handlers: List[Callable[[Alert], None]] = []
@@ -504,7 +523,9 @@ class MonitoringMiddleware:
     """Middleware for comprehensive monitoring."""
     
     def __init__(self, config: MonitoringConfig, redis_client: Optional[redis.Redis] = None):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.redis_client = redis_client
         self.logger = structlog.get_logger(__name__)
         
@@ -520,11 +541,13 @@ class MonitoringMiddleware:
         # Setup alert handlers
         self._setup_alert_handlers()
     
-    def _setup_alert_handlers(self):
+    def _setup_alert_handlers(self) -> Any:
         """Setup default alert handlers."""
         # Log alert handler
         def log_alert_handler(alert: Alert):
-            log_level = {
+            
+    """log_alert_handler function."""
+log_level = {
                 AlertLevel.INFO: self.logger.info,
                 AlertLevel.WARNING: self.logger.warning,
                 AlertLevel.ERROR: self.logger.error,
@@ -547,7 +570,9 @@ class MonitoringMiddleware:
         # Redis alert handler (if Redis is available)
         if self.redis_client:
             async def redis_alert_handler(alert: Alert):
-                try:
+                
+    """redis_alert_handler function."""
+try:
                     alert_data = {
                         "id": alert.id,
                         "type": alert.type.value,
@@ -631,13 +656,12 @@ class MonitoringMiddleware:
         else:
             return "unknown"
     
-    async def collect_system_metrics(self):
+    async def collect_system_metrics(self) -> Any:
         """Collect system metrics."""
         if not self.config.enabled:
             return
         
         try:
-            import psutil
             
             # Memory usage
             memory = psutil.virtual_memory()
@@ -654,7 +678,7 @@ class MonitoringMiddleware:
         except Exception as e:
             self.logger.error("Failed to collect system metrics", error=str(e))
     
-    async def check_alerts(self):
+    async def check_alerts(self) -> Any:
         """Check for alerts based on current metrics."""
         if not self.config.enabled or not self.config.enable_alerts:
             return []
@@ -736,7 +760,9 @@ class MonitoringManager:
     """Manager for the complete monitoring system."""
     
     def __init__(self, config: MonitoringConfig, redis_client: Optional[redis.Redis] = None):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.redis_client = redis_client
         self.logger = structlog.get_logger(__name__)
         
@@ -750,7 +776,7 @@ class MonitoringManager:
         # Performance tracking
         self.start_time = time.time()
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start monitoring system."""
         if not self.config.enabled:
             self.logger.info("Monitoring disabled")
@@ -767,7 +793,7 @@ class MonitoringManager:
         
         self.logger.info("Monitoring system started")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop monitoring system."""
         if not self.config.enabled:
             return
@@ -791,7 +817,7 @@ class MonitoringManager:
         
         self.logger.info("Monitoring system stopped")
     
-    async def _metrics_collector(self):
+    async def _metrics_collector(self) -> Any:
         """Background task for collecting metrics."""
         while True:
             try:
@@ -803,7 +829,7 @@ class MonitoringManager:
                 self.logger.error("Metrics collection failed", error=str(e))
                 await asyncio.sleep(60)  # Wait before retrying
     
-    async def _alert_checker(self):
+    async def _alert_checker(self) -> Any:
         """Background task for checking alerts."""
         while True:
             try:
@@ -922,27 +948,39 @@ async def setup_monitoring(
     # Add monitoring endpoints
     @app.get("/health")
     async def health():
-        return manager.get_health_status()
+        
+    """health function."""
+return manager.get_health_status()
     
     @app.get("/metrics")
     async def metrics():
-        return manager.get_metrics()
+        
+    """metrics function."""
+return manager.get_metrics()
     
     @app.get("/monitoring/performance")
     async def performance():
-        return manager.get_performance_summary()
+        
+    """performance function."""
+return manager.get_performance_summary()
     
     @app.get("/monitoring/errors")
     async def errors():
-        return manager.get_error_summary()
+        
+    """errors function."""
+return manager.get_error_summary()
     
     @app.get("/monitoring/alerts")
     async def alerts(hours: int = 24):
-        return manager.get_alerts(hours)
+        
+    """alerts function."""
+return manager.get_alerts(hours)
     
     @app.post("/monitoring/alerts/{alert_id}/silence")
     async def silence_alert(alert_id: str, duration_minutes: int = 60):
-        manager.silence_alert(alert_id, duration_minutes)
+        
+    """silence_alert function."""
+manager.silence_alert(alert_id, duration_minutes)
         return {"message": f"Alert {alert_id} silenced for {duration_minutes} minutes"}
     
     return manager
@@ -951,7 +989,6 @@ async def setup_monitoring(
 async def example_usage():
     """Example of how to use the monitoring system."""
     
-    from fastapi import FastAPI
     
     # Create app
     app = FastAPI(title="Monitoring Example")
@@ -965,18 +1002,25 @@ async def example_usage():
     # Add test endpoints
     @app.get("/")
     async def root():
-        return {"message": "Monitoring example"}
+        
+    """root function."""
+return {"message": "Monitoring example"}
     
     @app.get("/test/error")
     async def test_error():
-        raise ValueError("Test error for monitoring")
+        
+    """test_error function."""
+raise ValueError("Test error for monitoring")
     
     @app.get("/test/slow")
     async def test_slow():
-        await asyncio.sleep(3)  # Simulate slow request
+        
+    """test_slow function."""
+await asyncio.sleep(3)  # Simulate slow request
         return {"message": "Slow request completed"}
     
     return app
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(example_usage()) 

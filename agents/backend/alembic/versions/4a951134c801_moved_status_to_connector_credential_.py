@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Moved status to connector credential pair
 
 Revision ID: 4a951134c801
@@ -6,12 +13,10 @@ Create Date: 2024-08-10 19:20:34.527559
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "4a951134c801"
-down_revision = "7477a5f5d728"
+revision: str = "4a951134c801"
+down_revision: str = "7477a5f5d728"
 branch_labels: None = None
 depends_on: None = None
 
@@ -25,7 +30,7 @@ def upgrade() -> None:
                 "ACTIVE",
                 "PAUSED",
                 "DELETING",
-                name="connectorcredentialpairstatus",
+                name: str = "connectorcredentialpairstatus",
                 native_enum=False,
             ),
             nullable=True,
@@ -68,7 +73,7 @@ def downgrade() -> None:
                 SELECT 1
                 FROM connector_credential_pair
                 WHERE connector_credential_pair.connector_id = connector.id
-                AND connector_credential_pair.status = 'ACTIVE'
+                AND connector_credential_pair.status: str = 'ACTIVE'
             ) THEN FALSE
             ELSE TRUE
         END

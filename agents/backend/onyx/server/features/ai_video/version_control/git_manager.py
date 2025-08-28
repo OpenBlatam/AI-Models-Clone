@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import os
+import subprocess
+import logging
+import json
+import shutil
+from pathlib import Path
+from typing import Dict, List, Optional, Any, Union, Tuple
+from dataclasses import dataclass, field, asdict
+from datetime import datetime
+import hashlib
+import difflib
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Git Version Control Manager
 ==========================
@@ -14,17 +32,6 @@ Features:
 - Configuration backup and restore
 """
 
-import os
-import subprocess
-import logging
-import json
-import shutil
-from pathlib import Path
-from typing import Dict, List, Optional, Any, Union, Tuple
-from dataclasses import dataclass, field, asdict
-from datetime import datetime
-import hashlib
-import difflib
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -115,7 +122,9 @@ class GitManager:
     """Main git version control manager."""
     
     def __init__(self, config: GitConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.repo_path = Path(config.repo_path).resolve()
         self.changes: List[ChangeInfo] = []
         
@@ -124,7 +133,7 @@ class GitManager:
         
         logger.info(f"Git manager initialized: {self.repo_path}")
     
-    def _ensure_git_repo(self):
+    def _ensure_git_repo(self) -> Any:
         """Ensure git repository exists."""
         if not (self.repo_path / ".git").exists():
             logger.info("Initializing git repository")
@@ -137,7 +146,7 @@ class GitManager:
             self._run_git_command(["add", "."])
             self._run_git_command(["commit", "-m", "Initial commit"])
     
-    def _create_gitignore(self):
+    def _create_gitignore(self) -> Any:
         """Create .gitignore file."""
         gitignore_content = """# Python
 __pycache__/
@@ -209,7 +218,15 @@ config_backups/
         
         gitignore_path = self.repo_path / ".gitignore"
         with open(gitignore_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(gitignore_content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     
     def _run_git_command(self, args: List[str], capture_output: bool = True) -> Tuple[int, str, str]:
         """Run git command and return result."""
@@ -432,10 +449,9 @@ config_backups/
         change_type: str,
         experiment_info: Optional[Dict[str, Any]] = None
     ) -> str:
-        """Generate commit message."""
+        """Generate commit message."""f"
         # Base message
-        commit_message = self.config.commit_message_template.format(
-            type=change_type.upper(),
+        commit_message = self.config.commit_message_template",
             description=message
         )
         
@@ -538,12 +554,24 @@ config_backups/
         # Check if file exists and has changed
         if config_path.exists():
             with open(config_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 old_content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         else:
             old_content = ""
         
         # Write new content
         with open(config_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(config_data, f, indent=2)
         
         # Stage and commit if auto-commit is enabled

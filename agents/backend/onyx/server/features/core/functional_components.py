@@ -1,3 +1,31 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from __future__ import annotations
+from typing import (
+from datetime import datetime, timedelta
+import uuid
+import time
+import asyncio
+from functools import lru_cache, wraps, partial
+from dataclasses import dataclass, field
+from enum import Enum
+import logging
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
+from fastapi import HTTPException, status
+import structlog
+from ..utils.optimized_base_model import OptimizedBaseModel
+from ..utils.error_system import error_factory, ErrorContext, ValidationError
+    import hashlib
+from typing import Any, List, Dict, Optional
 """
 Functional Components with Pydantic Models
 =========================================
@@ -16,26 +44,11 @@ Features:
 - Dependency injection ready
 """
 
-from __future__ import annotations
-from typing import (
     Any, Dict, List, Optional, Type, TypeVar, Union, Callable, 
     Generic, Awaitable, Protocol, runtime_checkable
 )
-from datetime import datetime, timedelta
-import uuid
-import time
-import asyncio
-from functools import lru_cache, wraps, partial
-from dataclasses import dataclass, field
-from enum import Enum
-import logging
 
-from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
-from fastapi import HTTPException, status
-import structlog
 
-from ..utils.optimized_base_model import OptimizedBaseModel
-from ..utils.error_system import error_factory, ErrorContext, ValidationError
 
 logger = structlog.get_logger(__name__)
 
@@ -360,7 +373,6 @@ def async_component(
 
 def _generate_cache_key(input_data: BaseInputModel, kwargs: Dict[str, Any]) -> str:
     """Generate cache key from input data and kwargs."""
-    import hashlib
     
     # Create a hashable representation
     data_dict = input_data.model_dump() if isinstance(input_data, BaseModel) else input_data

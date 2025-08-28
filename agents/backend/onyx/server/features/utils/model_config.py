@@ -1,8 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from __future__ import annotations
-"""
-Model Configuration - Onyx Integration
-Configuration settings for model operations.
-"""
 from typing import Any, Dict, List, Optional, Set, Type, TypeVar, Union
 from datetime import datetime
 import json
@@ -10,6 +17,16 @@ import logging
 import os
 from pathlib import Path
 from .model_types import (
+from datetime import datetime
+from typing import List, Optional
+import logging
+import os
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Model Configuration - Onyx Integration
+Configuration settings for model operations.
+"""
     JsonDict, JsonList, JsonValue, FieldType, FieldValue,
     ModelId, ModelKey, ModelValue, ModelData, ModelList, ModelDict,
     IndexField, IndexValue, IndexKey, IndexData, IndexList, IndexDict,
@@ -105,6 +122,10 @@ class ModelConfig:
         
         if os.path.exists(config_file):
             with open(config_file, "r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 config = json.load(f)
                 
                 for key, value in config.items():
@@ -126,6 +147,10 @@ class ModelConfig:
         os.makedirs(os.path.dirname(config_file), exist_ok=True)
         
         with open(config_file, "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(config, f, indent=4)
     
     @classmethod
@@ -213,7 +238,7 @@ class ModelConfig:
         }
     
     @classmethod
-    def get_api_config(cls) -> Dict[str, Any]:
+    async def get_api_config(cls) -> Dict[str, Any]:
         """Get API configuration."""
         return {
             "host": cls.API_HOST,
@@ -249,10 +274,6 @@ class ModelConfig:
 
 # Example usage:
 """
-from datetime import datetime
-from typing import List, Optional
-import logging
-import os
 
 # Set environment variables
 os.environ["REDIS_HOST"] = "localhost"

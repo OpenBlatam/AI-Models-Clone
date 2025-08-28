@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+import time
+    from refactored_optimization_system import (
+    from refactored_workflow_engine import (
+                import numpy as np
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Simple Integration Test for Refactored Optimization System
@@ -5,9 +17,6 @@ Simple Integration Test for Refactored Optimization System
 This test validates the core functionality without complex serialization.
 """
 
-import asyncio
-import logging
-import time
 
 # Configure logging
 logging.basicConfig(
@@ -17,11 +26,9 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 try:
-    from refactored_optimization_system import (
         OptimizationManager, create_optimization_manager,
         monitor_performance, retry_on_failure
     )
-    from refactored_workflow_engine import (
         RefactoredWorkflowEngine, create_workflow_engine
     )
     REFACTORED_AVAILABLE = True
@@ -57,9 +64,8 @@ async def test_core_functionality():
         numba_optimizer = optimization_manager.get_optimizer("numba")
         if numba_optimizer and numba_optimizer.is_available():
             try:
-                import numpy as np
                 
-                def test_function(x, y):
+                def test_function(x, y) -> Any:
                     return np.sqrt(x**2 + y**2)
                 
                 compiled_func = numba_optimizer.compile_function(test_function)
@@ -81,7 +87,7 @@ async def test_core_functionality():
         dask_optimizer = optimization_manager.get_optimizer("dask")
         if dask_optimizer and dask_optimizer.is_available():
             try:
-                def process_item(item):
+                def process_item(item) -> Any:
                     return item * 2
                 
                 test_data = [1, 2, 3, 4, 5]
@@ -174,7 +180,7 @@ async def test_performance_monitoring():
     
     try:
         @monitor_performance
-        def test_function(data):
+        def test_function(data) -> Any:
             time.sleep(0.1)
             return [x * 2 for x in data]
         
@@ -199,7 +205,7 @@ async def test_error_handling():
     
     try:
         @retry_on_failure(max_retries=2, delay=0.1)
-        def test_function(should_fail=False):
+        def test_function(should_fail=False) -> Any:
             if should_fail:
                 raise ValueError("Simulated failure")
             return "success"

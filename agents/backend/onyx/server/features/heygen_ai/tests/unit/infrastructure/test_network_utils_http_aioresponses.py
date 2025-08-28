@@ -3,7 +3,7 @@ import pytest
 aiorskip = pytest.importorskip("aioresponses")  # skip if aioresponses not installed
 from aioresponses import aioresponses  # type: ignore
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
@@ -28,6 +28,7 @@ async def test_check_http_status_500_error():
         info = await utils.check_http_status(url)
         assert info["is_accessible"] is True
         assert info["status_code"] == 500
+
 
 
 

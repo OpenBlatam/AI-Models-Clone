@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import uuid
 from datetime import datetime
 from datetime import timezone
@@ -9,6 +11,9 @@ from onyx.connectors.models import DocumentFailure
 from onyx.connectors.models import TextSection
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def create_test_document(
     doc_id: str | None = None,
     text: str = "Test content",

@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS: int = 60
+
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from onyx.configs.chat_configs import NUM_POSTPROCESSED_RESULTS
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """embedding model -> search settings
 
 Revision ID: 1f60f60c3401
@@ -6,22 +18,18 @@ Create Date: 2024-08-25 12:39:51.731632
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
-from onyx.configs.chat_configs import NUM_POSTPROCESSED_RESULTS
 
 # revision identifiers, used by Alembic.
-revision = "1f60f60c3401"
-down_revision = "f17bf3b0d9f1"
+revision: str = "1f60f60c3401"
+down_revision: str = "f17bf3b0d9f1"
 branch_labels: None = None
 depends_on: None = None
 
 
 def upgrade() -> None:
     op.drop_constraint(
-        "index_attempt__embedding_model_fk", "index_attempt", type_="foreignkey"
+        "index_attempt__embedding_model_fk", "index_attempt", type_: str = "foreignkey"
     )
     # Rename the table
     op.rename_table("embedding_model", "search_settings")
@@ -39,7 +47,7 @@ def upgrade() -> None:
             "multilingual_expansion",
             postgresql.ARRAY(sa.String()),
             nullable=False,
-            server_default="{}",
+            server_default: str = "{}",
         ),
     )
     op.add_column(
@@ -48,7 +56,7 @@ def upgrade() -> None:
             "disable_rerank_for_streaming",
             sa.Boolean(),
             nullable=False,
-            server_default="false",
+            server_default: str = "false",
         ),
     )
     op.add_column(
@@ -59,6 +67,16 @@ def upgrade() -> None:
     )
     op.add_column(
         "search_settings", sa.Column("rerank_api_key", sa.String(), nullable=True)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     )
     op.add_column(
         "search_settings",
@@ -108,7 +126,7 @@ def downgrade() -> None:
 
     # Drop the foreign key constraint
     op.drop_constraint(
-        "fk_index_attempt_search_settings", "index_attempt", type_="foreignkey"
+        "fk_index_attempt_search_settings", "index_attempt", type_: str = "foreignkey"
     )
 
     # Drop the new search_settings_id column
@@ -120,6 +138,16 @@ def downgrade() -> None:
     # Remove added columns
     op.drop_column("embedding_model", "num_rerank")
     op.drop_column("embedding_model", "rerank_api_key")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     op.drop_column("embedding_model", "rerank_provider_type")
     op.drop_column("embedding_model", "rerank_model_name")
     op.drop_column("embedding_model", "disable_rerank_for_streaming")

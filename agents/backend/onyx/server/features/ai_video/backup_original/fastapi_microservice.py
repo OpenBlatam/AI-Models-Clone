@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from fastapi import FastAPI, APIRouter, BackgroundTasks, Depends, status, HTTPException, Request, Header, Query, Response, Body, Security
 from fastapi.security import OAuth2PasswordBearer, SecurityScopes
 from fastapi.middleware.cors import CORSMiddleware
@@ -28,10 +39,21 @@ from cachetools import LRUCache, TTLCache
 import orjson
 from fastapi.responses import ORJSONResponse
 
-# --- SQLAlchemy para persistencia ---
 from sqlalchemy import create_engine, Column, String, Integer, DateTime, Text, Boolean, JSON, ForeignKey
 from sqlalchemy.orm import sessionmaker, declarative_base, relationship
 from sqlalchemy.exc import OperationalError
+from prometheus_client import Counter, Histogram, generate_latest
+import requests
+    from agents.backend.onyx.server.features.ai_video.onyx_ai_video import generate_video as onyx_generate_video
+    from agents.backend.onyx.server.features.ai_video.onyx_ai_video.core.models import VideoRequest, VideoResponse
+    from agents.backend.onyx.server.features.ai_video.onyx_ai_video.api.main import get_system
+from fastapi import HTTPException, Request, Depends
+from functools import wraps
+from typing import Callable, List, Optional
+from .services import VideoService, BatchService
+from . import utils_batch
+from typing import Any, List, Dict, Optional
+# --- SQLAlchemy para persistencia ---
 
 DB_URL = os.getenv("DB_URL", "sqlite:///./ai_video.db")
 Base = declarative_base()
@@ -90,7 +112,9 @@ class WebhookFailureDB(Base):
 
 # --- CREAR TABLAS ---
 def try_create_db():
-    try:
+    
+    """try_create_db function."""
+try:
         Base.metadata.create_all(bind=engine)
         return True
     except OperationalError:
@@ -120,7 +144,6 @@ JWT_EXP_MINUTES = int(os.getenv("JWT_EXP_MINUTES", "60"))
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # --- PROMETHEUS ---
-from prometheus_client import Counter, Histogram, generate_latest
 JOBS_ENQUEUED = Counter('jobs_enqueued', 'Total jobs encolados', ['user_id'])
 JOBS_COMPLETED = Counter('jobs_completed', 'Total jobs completados', ['user_id'])
 JOBS_FAILED = Counter('jobs_failed', 'Total jobs fallidos', ['user_id'])
@@ -152,7 +175,9 @@ ERROR_UNAUTHORIZED = "Unauthorized"
 
 # --- HELPERS DRY ---
 def get_db_session():
-    if not db_available:
+    
+    """get_db_session function."""
+if not db_available:
         return None
     db = SessionLocal()
     try:
@@ -160,7 +185,7 @@ def get_db_session():
     finally:
         db.close()
 
-def audit_request(user, endpoint, method, ip, trace_id, scope, onyx):
+async def audit_request(user, endpoint, method, ip, trace_id, scope, onyx) -> Any:
     db = None
     if db_available:
         db = next(get_db_session())
@@ -168,7 +193,9 @@ def audit_request(user, endpoint, method, ip, trace_id, scope, onyx):
         audit_access(db, **audit_info)
 
 def envelope(success: bool, data=None, error=None, mode=None, start_time=None):
-    resp = {"success": success, "data": data, "error": error, "timestamp": datetime.utcnow()}
+    
+    """envelope function."""
+resp = {"success": success, "data": data, "error": error, "timestamp": datetime.utcnow()}
     if mode:
         resp["mode"] = mode
     if start_time:
@@ -176,15 +203,19 @@ def envelope(success: bool, data=None, error=None, mode=None, start_time=None):
     return resp
 
 def select_mode(use_onyx: bool, onyx_func: Callable, local_func: Callable, *args, **kwargs):
-    if use_onyx:
+    
+    """select_mode function."""
+if use_onyx:
         return onyx_func(*args, **kwargs)
     return local_func(*args, **kwargs)
 
 # --- DECORADOR DE RESPUESTA Y LOGS ---
 def api_endpoint(mode_param: str = "use_onyx"):
-    def decorator(func):
+    
+    """api_endpoint function."""
+def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             request: Request = kwargs.get("request")
             use_onyx = kwargs.get(mode_param, False)
             user = kwargs.get("user", {})
@@ -213,7 +244,9 @@ def api_endpoint(mode_param: str = "use_onyx"):
 
 # --- UTILS ---
 def get_db():
-    if not db_available:
+    
+    """get_db function."""
+if not db_available:
         raise HTTPException(503, "DB no disponible")
     db = SessionLocal()
     try:
@@ -221,22 +254,22 @@ def get_db():
     finally:
         db.close()
 
-def log_event_db(db, request_id, event, details, trace_id=None, span_id=None):
+def log_event_db(db, request_id, event, details, trace_id=None, span_id=None) -> Any:
     log = LogDB(request_id=request_id, event=event, details=details, trace_id=trace_id, span_id=span_id)
     db.add(log)
     db.commit()
 
-def audit_access(db, user_id, endpoint, method, ip, trace_id, scope):
+def audit_access(db, user_id, endpoint, method, ip, trace_id, scope) -> Any:
     audit = AuditDB(user_id=user_id, endpoint=endpoint, method=method, ip=ip, trace_id=trace_id, scope=scope)
     db.add(audit)
     db.commit()
 
-def revoke_token_db(db, token):
+def revoke_token_db(db, token) -> Any:
     db.add(RevokedTokenDB(token=token))
     db.commit()
     REVOKED_TOKENS.add(token)
 
-def is_token_revoked(db, token):
+def is_token_revoked(db, token) -> Any:
     if token in REVOKED_TOKENS:
         return True
     return db.query(RevokedTokenDB).filter_by(token=token).first() is not None
@@ -245,7 +278,7 @@ def is_token_revoked(db, token):
 # ...
 
 # --- CONTROL DE ACCESO GRANULAR ---
-def require_scope(required_scope):
+def require_scope(required_scope) -> Any:
     def dependency(user=Depends(get_current_user)):
         scopes = user.get("scopes", ["user"])
         if required_scope not in scopes:
@@ -402,7 +435,9 @@ async def retry_webhook_failure(
 # --- HEALTHCHECK EXTENDIDO Y SHUTDOWN ---
 @api_router.get("/health/extended", tags=["Health"], summary="Healthcheck extendido", response_model=dict, responses={200: {"content": {"application/json": {"example": {"success": True, "data": {"status": "ok", "db": True, "onyx": True, "redis": True, "workers": 1}, "error": None, "timestamp": "2024-05-01T12:00:00Z"}}}}})
 async def health_extended():
-    # Simular chequeos
+    
+    """health_extended function."""
+# Simular chequeos
     return envelope(True, data={"status": "ok", "db": db_available, "onyx": get_system is not None, "redis": True, "workers": 1})
 
 @api_router.post("/drain", tags=["Admin"], summary="Drain/shutdown graceful", response_model=dict, responses={200: {"content": {"application/json": {"example": {"success": True, "data": {"message": "Draining initiated"}, "error": None, "timestamp": "2024-05-01T12:00:00Z"}}}}})
@@ -416,7 +451,6 @@ Ejemplo curl:
 curl -X POST "http://localhost:8000/api/v1/video" -H "accept: application/json" -H "Authorization: Bearer supersecrettoken" -H "Content-Type: application/json" -d '{"input_text": "Crea un video demo", "user_id": "user1"}'
 
 Ejemplo Python:
-import requests
 resp = requests.post("http://localhost:8000/api/v1/video", json={"input_text": "Crea un video demo", "user_id": "user1"}, headers={"Authorization": "Bearer supersecrettoken"})
 print(resp.json())
 
@@ -444,14 +478,14 @@ async def metrics_endpoint(user=Depends(require_scope("admin")), x_trace_id: Opt
 # --- HEALTHCHECK EXTENDIDO ---
 @app.get("/health")
 async def health():
-    return envelope(True, data={"status": "ok", "version": API_VERSION, "build": BUILD, "db": db_available})
+    
+    """health function."""
+return envelope(True, data={"status": "ok", "version": API_VERSION, "build": BUILD, "db": db_available})
 
 # (El resto de endpoints y lógica se implementan siguiendo este patrón, usando la DB si está disponible y registrando auditoría, métricas y propagando trace_id/span_id) 
 
 # Importar función de Onyx (ajusta el import según tu estructura real)
 try:
-    from agents.backend.onyx.server.features.ai_video.onyx_ai_video import generate_video as onyx_generate_video
-    from agents.backend.onyx.server.features.ai_video.onyx_ai_video.core.models import VideoRequest, VideoResponse
 except ImportError:
     onyx_generate_video = None
     VideoRequest = None
@@ -459,14 +493,10 @@ except ImportError:
 
 # Helper para obtener Onyx system y métodos
 try:
-    from agents.backend.onyx.server.features.ai_video.onyx_ai_video.api.main import get_system
 except ImportError:
     get_system = None
 
 # --- utils_api.py ---
-from fastapi import HTTPException, Request, Depends
-from functools import wraps
-from typing import Callable, List, Optional
 
 # Validación batch
 def validate_batch_ids(ids: list) -> None:
@@ -484,10 +514,14 @@ def require_user(func: Callable) -> Callable:
 
 # Decorador de logging estructurado y manejo de errores
 def endpoint_protected(endpoint_name: str):
-    def decorator(func: Callable) -> Callable:
+    
+    """endpoint_protected function."""
+def decorator(func: Callable) -> Callable:
         @wraps(func)
         async def wrapper(*args, x_trace_id: Optional[str] = None, **kwargs):
-            try:
+            
+    """wrapper function."""
+try:
                 return await func(*args, x_trace_id=x_trace_id, **kwargs)
             except Exception as e:
                 logger.error({"endpoint": endpoint_name, "error": str(e), "trace_id": x_trace_id})
@@ -496,8 +530,6 @@ def endpoint_protected(endpoint_name: str):
     return decorator
 
 # --- Instanciar servicios como singleton (fuera de los endpoints, solo una vez por proceso) ---
-from .services import VideoService, BatchService
-from . import utils_batch
 
 video_service = VideoService(get_system, VIDEO_STATUS, VIDEO_LOGS, envelope, logger=logger)
 batch_service = BatchService(
@@ -537,7 +569,7 @@ class VideoRequestInput(BaseModel):
     duration: int = Field(60, ge=5, le=600, description="Duración en segundos (5-600)")
     # ... otros campos opcionales ...
     @validator("quality")
-    def check_quality(cls, v):
+    def check_quality(cls, v) -> Any:
         if v not in {"low", "medium", "high"}:
             raise ValueError("quality debe ser 'low', 'medium' o 'high'")
         return v
@@ -861,7 +893,9 @@ def get_trace_id(request: Request) -> str:
 
 @app.exception_handler(ServiceError)
 async def service_error_handler(request: Request, exc: ServiceError):
-    trace_id = get_trace_id(request)
+    
+    """service_error_handler function."""
+trace_id = get_trace_id(request)
     now = datetime.utcnow().isoformat()
     if 'logger' in globals() and logger:
         logger.error({"endpoint": str(request.url), "event": "service_error", "trace_id": trace_id, "error": str(exc)})
@@ -872,7 +906,9 @@ async def service_error_handler(request: Request, exc: ServiceError):
 
 @app.exception_handler(ValidationError)
 async def validation_error_handler(request: Request, exc: ValidationError):
-    trace_id = get_trace_id(request)
+    
+    """validation_error_handler function."""
+trace_id = get_trace_id(request)
     now = datetime.utcnow().isoformat()
     if 'logger' in globals() and logger:
         logger.error({"endpoint": str(request.url), "event": "validation_error", "trace_id": trace_id, "error": exc.errors()})
@@ -883,7 +919,9 @@ async def validation_error_handler(request: Request, exc: ValidationError):
 
 @app.exception_handler(Exception)
 async def generic_error_handler(request: Request, exc: Exception):
-    trace_id = get_trace_id(request)
+    
+    """generic_error_handler function."""
+trace_id = get_trace_id(request)
     now = datetime.utcnow().isoformat()
     if 'logger' in globals() and logger:
         logger.error({"endpoint": str(request.url), "event": "internal_error", "trace_id": trace_id, "error": str(exc)})

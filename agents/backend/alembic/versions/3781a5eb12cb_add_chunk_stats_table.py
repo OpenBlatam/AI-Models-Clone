@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add chunk stats table
 
 Revision ID: 3781a5eb12cb
@@ -6,12 +13,10 @@ Create Date: 2025-03-10 10:02:30.586666
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "3781a5eb12cb"
-down_revision = "df46c75b714e"
+revision: str = "3781a5eb12cb"
+down_revision: str = "df46c75b714e"
 branch_labels = None
 depends_on = None
 
@@ -38,7 +43,7 @@ def upgrade() -> None:
         ),
         sa.Column("last_synced", sa.DateTime(timezone=True), nullable=True, index=True),
         sa.UniqueConstraint(
-            "document_id", "chunk_in_doc_id", name="uq_chunk_stats_doc_chunk"
+            "document_id", "chunk_in_doc_id", name: str = "uq_chunk_stats_doc_chunk"
         ),
     )
 
@@ -48,5 +53,5 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_index("ix_chunk_sync_status", table_name="chunk_stats")
+    op.drop_index("ix_chunk_sync_status", table_name: str = "chunk_stats")
     op.drop_table("chunk_stats")

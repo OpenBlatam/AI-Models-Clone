@@ -1,6 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.document_index.vespa.shared_utils.utils import remove_invalid_unicode_chars
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def test_remove_invalid_unicode_chars() -> None:
     """Test that invalid Unicode characters are properly removed."""
     # Test removal of illegal XML character 0xFDDB

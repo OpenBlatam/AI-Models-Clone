@@ -1,19 +1,39 @@
-"""
-Brand Kit Typography Component - Onyx Integration
-Component for managing brand typography with advanced features.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, Literal, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
 from ..base_types import (
+from ..model_field import ModelField, FieldConfig
+from ..base import ValidationMixin, CacheMixin, EventMixin, IndexMixin, PermissionMixin, StatusMixin
+        from prometheus_client import Counter
+        import structlog
+        from prometheus_client import Counter
+        import structlog
+        import numpy as np
+        import pandas as pd
+        from prometheus_client import Counter
+        import structlog
+        import orjson
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Brand Kit Typography Component - Onyx Integration
+Component for managing brand typography with advanced features.
+"""
     CACHE_TTL, VALIDATION_TIMEOUT,
     ModelId, ModelKey, ModelValue,
     ValidationType, CacheType, EventType,
     StatusType, CategoryType, PermissionType
 )
-from ..model_field import ModelField, FieldConfig
-from ..base import ValidationMixin, CacheMixin, EventMixin, IndexMixin, PermissionMixin, StatusMixin
 
 T = TypeVar('T')
 
@@ -81,7 +101,7 @@ class BrandKitTypography:
     version: str = '1.0.0'
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize typography field with validation and caching"""
         self.typography_field = ModelField(
             name=self.name,
@@ -278,8 +298,6 @@ class BrandKitTypography:
     @classmethod
     def batch_to_dicts(cls, objs: List["BrandKitTypography"]) -> List[dict]:
         """Convierte una lista de BrandKitTypography a lista de dicts, con métricas y logging."""
-        from prometheus_client import Counter
-        import structlog
         logger = structlog.get_logger()
         metric = Counter('brandkittypography_batch_to_dicts_total', 'Total batch_to_dicts calls')
         metric.inc()
@@ -293,8 +311,6 @@ class BrandKitTypography:
     @classmethod
     def batch_from_dicts(cls, dicts: List[dict]) -> List["BrandKitTypography"]:
         """Convierte una lista de dicts a BrandKitTypography, con métricas y logging."""
-        from prometheus_client import Counter
-        import structlog
         logger = structlog.get_logger()
         metric = Counter('brandkittypography_batch_from_dicts_total', 'Total batch_from_dicts calls')
         metric.inc()
@@ -307,22 +323,18 @@ class BrandKitTypography:
     @classmethod
     def batch_to_numpy(cls, objs: List["BrandKitTypography"]):
         """Convierte una lista de BrandKitTypography a un array numpy."""
-        import numpy as np
         dicts = cls.batch_to_dicts(objs)
         return np.array(dicts)
 
     @classmethod
     def batch_to_pandas(cls, objs: List["BrandKitTypography"]):
         """Convierte una lista de BrandKitTypography a un DataFrame pandas."""
-        import pandas as pd
         dicts = cls.batch_to_dicts(objs)
         return pd.DataFrame(dicts)
 
     @classmethod
     def batch_deduplicate(cls, objs: List["BrandKitTypography"], key="name") -> List["BrandKitTypography"]:
         """Elimina duplicados por key, validando unicidad y tipos."""
-        from prometheus_client import Counter
-        import structlog
         logger = structlog.get_logger()
         metric = Counter('brandkittypography_batch_deduplicate_total', 'Total batch_deduplicate calls')
         metric.inc()
@@ -341,7 +353,6 @@ class BrandKitTypography:
     @classmethod
     def to_training_example(cls, obj: "BrandKitTypography") -> dict:
         """Convierte un BrandKitTypography a ejemplo de entrenamiento ML/LLM."""
-        import orjson
         return orjson.loads(orjson.dumps(obj.get_data()))
 
     @classmethod

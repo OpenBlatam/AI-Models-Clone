@@ -1,10 +1,13 @@
-"""
-ONYX BLOG POST - OpenRouter Client Module
-=========================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Cliente para OpenRouter API con soporte para múltiples modelos de IA.
-Incluye rate limiting, retry logic y cost tracking.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -14,8 +17,17 @@ from typing import Dict, List, Optional, Any, AsyncGenerator
 from dataclasses import dataclass, field
 import aiohttp
 from datetime import datetime, timedelta
-
 from ..models import OpenRouterRequest, OpenRouterResponse, OpenRouterModel
+from typing import Any, List, Dict, Optional
+"""
+ONYX BLOG POST - OpenRouter Client Module
+=========================================
+
+Cliente para OpenRouter API con soporte para múltiples modelos de IA.
+Incluye rate limiting, retry logic y cost tracking.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +66,9 @@ class RateLimiter:
     tokens_per_minute: int = 100000
     
     def __init__(self, requests_per_minute: int = 60, tokens_per_minute: int = 100000):
-        self.requests_per_minute = requests_per_minute
+        
+    """__init__ function."""
+self.requests_per_minute = requests_per_minute
         self.tokens_per_minute = tokens_per_minute
         self.request_times: List[float] = []
         self.token_usage: List[tuple] = []  # (timestamp, tokens)
@@ -99,7 +113,9 @@ class OpenRouterClient:
         default_model: str = "openai/gpt-4-turbo",
         rate_limiter: Optional[RateLimiter] = None
     ):
-        self.api_key = api_key
+        
+    """__init__ function."""
+self.api_key = api_key
         self.app_name = app_name
         self.base_url = base_url
         self.default_model = default_model
@@ -140,7 +156,7 @@ class OpenRouterClient:
             "X-Title": self.app_name
         }
     
-    async def _make_request(
+    async async def _make_request(
         self,
         endpoint: str,
         data: Dict[str, Any],
@@ -328,7 +344,7 @@ class OpenRouterClient:
             logger.error(f"Connection test failed: {e}")
             return False
     
-    async def close(self):
+    async def close(self) -> Any:
         """Cerrar cliente y limpiar recursos"""
         logger.info("OpenRouterClient closing...")
         # Aquí se pueden agregar cleanup tasks si es necesario
@@ -337,7 +353,9 @@ class OpenRouterModelManager:
     """Manager para diferentes modelos de OpenRouter"""
     
     def __init__(self, client: OpenRouterClient):
-        self.client = client
+        
+    """__init__ function."""
+self.client = client
         self.model_configs = {
             OpenRouterModel.GPT_4_TURBO: {
                 "max_tokens": 4096,
@@ -400,7 +418,7 @@ class OpenRouterModelManager:
         """Obtener configuración de un modelo"""
         return self.model_configs.get(model, self.model_configs[OpenRouterModel.GPT_4_TURBO])
     
-    async def create_optimized_request(
+    async async def create_optimized_request(
         self,
         model: OpenRouterModel,
         messages: List[Dict[str, str]],

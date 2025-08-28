@@ -7,7 +7,7 @@ try:
 except Exception:  # pragma: no cover
     pytest.skip("hypothesis.provisional not available", allow_module_level=True)
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @given(ip=ipv4_address())
@@ -21,6 +21,7 @@ def test_is_valid_ip_address_rejects_non_numeric(s: str):
     u = NetworkUtils()
     # Most letter-containing strings are invalid IPs
     assert u.is_valid_ip_address(s) is False
+
 
 
 

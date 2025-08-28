@@ -1,0 +1,13 @@
+Collecting zipkin
+  Downloading zipkin-0.1.0.tar.gz (15 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Requirement already satisfied: thrift>=0.9.1 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from zipkin) (0.22.0)
+Building wheels for collected packages: zipkin
+  Building wheel for zipkin (setup.py): started
+  Building wheel for zipkin (setup.py): finished with status 'done'
+  Created wheel for zipkin: filename=zipkin-0.1.0-py3-none-any.whl size=22700 sha256=4e80c4b2566593709a230fe053910724b9bd349d5b499d04951022ca02e6520d
+  Stored in directory: c:\users\user\appdata\local\pip\cache\wheels\a1\5c\dd\5e69812d02980e3dcae8098806c004760a91efaf8dc56de6ea
+Successfully built zipkin
+Installing collected packages: zipkin
+Successfully installed zipkin-0.1.0

@@ -1,14 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import pytest
+from datetime import datetime
+from typing import Dict, Any, List
+from ..types import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Tests for Types Module
 
 Tests Pydantic models and schemas functionality.
 """
 
-import pytest
-from datetime import datetime
-from typing import Dict, Any, List
 
-from ..types import (
     # Models
     BaseRequest, BaseResult, BaseConfig,
     ScanRequest, ScanResult, ScanConfig, ScanStatus, ScanType,
@@ -34,7 +45,7 @@ from ..types import (
 class TestBaseModels:
     """Test suite for base models."""
     
-    def test_base_request_creation(self):
+    async def test_base_request_creation(self) -> Any:
         """Test BaseRequest creation."""
         request = BaseRequest(
             request_id="test_001",
@@ -46,7 +57,7 @@ class TestBaseModels:
         assert request.timestamp is not None
         assert isinstance(request.metadata, dict)
     
-    def test_base_result_creation(self):
+    def test_base_result_creation(self) -> Any:
         """Test BaseResult creation."""
         result = BaseResult(
             request_id="test_001",
@@ -59,7 +70,7 @@ class TestBaseModels:
         assert result.duration == 1.5
         assert result.timestamp is not None
     
-    def test_base_config_creation(self):
+    def test_base_config_creation(self) -> Any:
         """Test BaseConfig creation."""
         config = BaseConfig(
             name="test_config",
@@ -77,7 +88,7 @@ class TestBaseModels:
 class TestScanModels:
     """Test suite for scan models."""
     
-    def test_scan_request_creation(self):
+    async def test_scan_request_creation(self) -> Any:
         """Test ScanRequest creation."""
         request = ScanRequest(
             request_id="scan_001",
@@ -90,7 +101,7 @@ class TestScanModels:
         assert request.targets == ["192.168.1.1", "example.com"]
         assert request.ports == [80, 443, 22]
     
-    def test_scan_request_validation(self):
+    async def test_scan_request_validation(self) -> Any:
         """Test ScanRequest validation."""
         # Valid request
         request = ScanRequest(
@@ -117,7 +128,7 @@ class TestScanModels:
                 ports=[70000]
             )
     
-    def test_scan_result_creation(self):
+    def test_scan_result_creation(self) -> Any:
         """Test ScanResult creation."""
         result = ScanResult(
             request_id="scan_001",
@@ -136,7 +147,7 @@ class TestScanModels:
         assert result.vulnerabilities_found == 2
         assert result.scan_status == ScanStatus.COMPLETED
     
-    def test_scan_config_creation(self):
+    def test_scan_config_creation(self) -> Any:
         """Test ScanConfig creation."""
         config = ScanConfig(
             name="port_scanner",
@@ -154,7 +165,7 @@ class TestScanModels:
 class TestVulnerabilityModels:
     """Test suite for vulnerability models."""
     
-    def test_vulnerability_creation(self):
+    def test_vulnerability_creation(self) -> Any:
         """Test Vulnerability creation."""
         vuln = Vulnerability(
             id="VULN-001",
@@ -177,7 +188,7 @@ class TestVulnerabilityModels:
         assert vuln.type == VulnerabilityType.SQL_INJECTION
         assert vuln.cvss_score == 8.5
     
-    def test_vulnerability_report_creation(self):
+    def test_vulnerability_report_creation(self) -> Any:
         """Test VulnerabilityReport creation."""
         vuln1 = Vulnerability(
             id="VULN-001",
@@ -212,7 +223,7 @@ class TestVulnerabilityModels:
 class TestNetworkModels:
     """Test suite for network models."""
     
-    def test_network_target_creation(self):
+    def test_network_target_creation(self) -> Optional[Dict[str, Any]]:
         """Test NetworkTarget creation."""
         target = NetworkTarget(
             host="192.168.1.1",
@@ -226,7 +237,7 @@ class TestNetworkModels:
         assert target.is_alive is True
         assert target.response_time == 5.2
     
-    def test_network_port_creation(self):
+    def test_network_port_creation(self) -> Any:
         """Test NetworkPort creation."""
         port = NetworkPort(
             port=80,
@@ -241,7 +252,7 @@ class TestNetworkModels:
         assert port.state == "open"
         assert port.service == "http"
     
-    def test_network_service_creation(self):
+    def test_network_service_creation(self) -> Any:
         """Test NetworkService creation."""
         service = NetworkService(
             name="http",
@@ -257,7 +268,7 @@ class TestNetworkModels:
         assert service.protocol == "tcp"
         assert service.product == "Apache"
     
-    def test_network_host_creation(self):
+    def test_network_host_creation(self) -> Any:
         """Test NetworkHost creation."""
         target = NetworkTarget(host="192.168.1.1", is_alive=True)
         port = NetworkPort(port=80, state="open", service="http")
@@ -278,7 +289,7 @@ class TestNetworkModels:
 class TestAttackModels:
     """Test suite for attack models."""
     
-    def test_attack_request_creation(self):
+    async def test_attack_request_creation(self) -> Any:
         """Test AttackRequest creation."""
         request = AttackRequest(
             request_id="attack_001",
@@ -293,7 +304,7 @@ class TestAttackModels:
         assert request.payload is not None
         assert request.credentials is not None
     
-    def test_attack_payload_creation(self):
+    def test_attack_payload_creation(self) -> Any:
         """Test AttackPayload creation."""
         payload = AttackPayload(
             payload_id="PAYLOAD-001",
@@ -308,7 +319,7 @@ class TestAttackModels:
         assert payload.content == "' OR 1=1 --"
         assert payload.size == 12
     
-    def test_attack_session_creation(self):
+    def test_attack_session_creation(self) -> Any:
         """Test AttackSession creation."""
         session = AttackSession(
             session_id="SESSION-001",
@@ -327,7 +338,7 @@ class TestAttackModels:
 class TestReportModels:
     """Test suite for report models."""
     
-    def test_report_request_creation(self):
+    async def test_report_request_creation(self) -> Any:
         """Test ReportRequest creation."""
         request = ReportRequest(
             request_id="report_001",
@@ -342,7 +353,7 @@ class TestReportModels:
         assert len(request.sections) == 2
         assert len(request.scan_results) == 2
     
-    def test_report_result_creation(self):
+    def test_report_result_creation(self) -> Any:
         """Test ReportResult creation."""
         result = ReportResult(
             request_id="report_001",
@@ -363,7 +374,7 @@ class TestReportModels:
 class TestEnumerationModels:
     """Test suite for enumeration models."""
     
-    def test_enumeration_request_creation(self):
+    async def test_enumeration_request_creation(self) -> Any:
         """Test EnumerationRequest creation."""
         request = EnumerationRequest(
             request_id="enum_001",
@@ -376,7 +387,7 @@ class TestEnumerationModels:
         assert request.target == "192.168.1.1"
         assert request.ports == [21, 22, 23, 25, 80, 443]
     
-    def test_service_info_creation(self):
+    def test_service_info_creation(self) -> Any:
         """Test ServiceInfo creation."""
         service = ServiceInfo(
             service_name="ssh",
@@ -391,7 +402,7 @@ class TestEnumerationModels:
         assert service.protocol == "tcp"
         assert service.version == "OpenSSH 8.2p1"
     
-    def test_port_info_creation(self):
+    def test_port_info_creation(self) -> Any:
         """Test PortInfo creation."""
         service = ServiceInfo(service_name="http", port=80)
         port_info = PortInfo(
@@ -409,7 +420,7 @@ class TestEnumerationModels:
 class TestCryptoModels:
     """Test suite for crypto models."""
     
-    def test_crypto_request_creation(self):
+    async def test_crypto_request_creation(self) -> Any:
         """Test CryptoRequest creation."""
         request = CryptoRequest(
             request_id="crypto_001",
@@ -422,7 +433,7 @@ class TestCryptoModels:
         assert request.data == "Hello, World!"
         assert request.algorithm == HashAlgorithm.SHA256
     
-    def test_crypto_result_creation(self):
+    def test_crypto_result_creation(self) -> Any:
         """Test CryptoResult creation."""
         result = CryptoResult(
             request_id="crypto_001",
@@ -443,7 +454,7 @@ class TestCryptoModels:
 class TestNetworkModels:
     """Test suite for network models."""
     
-    def test_network_request_creation(self):
+    async def test_network_request_creation(self) -> Any:
         """Test NetworkRequest creation."""
         request = NetworkRequest(
             request_id="network_001",
@@ -458,7 +469,7 @@ class TestNetworkModels:
         assert request.timeout == 10.0
         assert request.retries == 3
     
-    def test_network_result_creation(self):
+    def test_network_result_creation(self) -> Any:
         """Test NetworkResult creation."""
         result = NetworkResult(
             request_id="network_001",
@@ -478,7 +489,7 @@ class TestNetworkModels:
 class TestUtilityModels:
     """Test suite for utility models."""
     
-    def test_file_info_creation(self):
+    def test_file_info_creation(self) -> Any:
         """Test FileInfo creation."""
         file_info = FileInfo(
             filename="test.txt",
@@ -493,7 +504,7 @@ class TestUtilityModels:
         assert file_info.size == 1024
         assert file_info.checksum == "abc123"
     
-    def test_process_info_creation(self):
+    def test_process_info_creation(self) -> Any:
         """Test ProcessInfo creation."""
         process_info = ProcessInfo(
             pid=1234,
@@ -509,7 +520,7 @@ class TestUtilityModels:
         assert process_info.command == "python script.py"
         assert process_info.memory_usage == 1024000
     
-    def test_system_info_creation(self):
+    def test_system_info_creation(self) -> Any:
         """Test SystemInfo creation."""
         system_info = SystemInfo(
             hostname="test-host",
@@ -526,7 +537,7 @@ class TestUtilityModels:
         assert system_info.cpu_count == 4
         assert system_info.memory_total == 8589934592
     
-    def test_log_entry_creation(self):
+    def test_log_entry_creation(self) -> Any:
         """Test LogEntry creation."""
         log_entry = LogEntry(
             level="INFO",
@@ -542,7 +553,7 @@ class TestUtilityModels:
         assert log_entry.source == "test_module"
         assert log_entry.module == "test"
     
-    def test_error_info_creation(self):
+    def test_error_info_creation(self) -> Any:
         """Test ErrorInfo creation."""
         error_info = ErrorInfo(
             error_id="ERROR-001",
@@ -560,7 +571,7 @@ class TestUtilityModels:
 class TestSchemas:
     """Test suite for schemas."""
     
-    def test_scan_request_schema_validation(self):
+    async def test_scan_request_schema_validation(self) -> Any:
         """Test ScanRequestSchema validation."""
         # Valid schema
         schema = ScanRequestSchema(
@@ -578,7 +589,7 @@ class TestSchemas:
                 targets=["invalid@target"]
             )
     
-    def test_attack_request_schema_validation(self):
+    async def test_attack_request_schema_validation(self) -> Any:
         """Test AttackRequestSchema validation."""
         schema = AttackRequestSchema(
             attack_type=AttackType.BRUTE_FORCE,
@@ -588,7 +599,7 @@ class TestSchemas:
         assert schema.attack_type == AttackType.BRUTE_FORCE
         assert schema.target == "192.168.1.1:22"
     
-    def test_enumeration_request_schema_validation(self):
+    async def test_enumeration_request_schema_validation(self) -> Any:
         """Test EnumerationRequestSchema validation."""
         schema = EnumerationRequestSchema(
             enumeration_type=EnumerationType.PORT_ENUMERATION,
@@ -598,7 +609,7 @@ class TestSchemas:
         assert schema.enumeration_type == EnumerationType.PORT_ENUMERATION
         assert schema.target == "192.168.1.1"
     
-    def test_report_request_schema_validation(self):
+    async def test_report_request_schema_validation(self) -> Any:
         """Test ReportRequestSchema validation."""
         schema = ReportRequestSchema(
             report_format=ReportFormat.HTML,
@@ -608,7 +619,7 @@ class TestSchemas:
         assert schema.report_format == ReportFormat.HTML
         assert schema.report_level == ReportLevel.DETAILED
     
-    def test_crypto_request_schema_validation(self):
+    async def test_crypto_request_schema_validation(self) -> Any:
         """Test CryptoRequestSchema validation."""
         schema = CryptoRequestSchema(
             operation=CryptoOperation.HASH,
@@ -618,7 +629,7 @@ class TestSchemas:
         assert schema.operation == CryptoOperation.HASH
         assert schema.data == "Hello, World!"
     
-    def test_network_request_schema_validation(self):
+    async def test_network_request_schema_validation(self) -> Any:
         """Test NetworkRequestSchema validation."""
         schema = NetworkRequestSchema(
             operation=NetworkOperation.DNS_LOOKUP,
@@ -628,7 +639,7 @@ class TestSchemas:
         assert schema.operation == NetworkOperation.DNS_LOOKUP
         assert schema.target == "google.com"
     
-    def test_target_validation_schema(self):
+    def test_target_validation_schema(self) -> Optional[Dict[str, Any]]:
         """Test TargetValidationSchema validation."""
         # Valid IP
         schema = TargetValidationSchema(target="192.168.1.1", target_type="ip")
@@ -642,13 +653,13 @@ class TestSchemas:
         with pytest.raises(ValueError, match="Invalid IP address"):
             TargetValidationSchema(target="invalid-ip", target_type="ip")
     
-    def test_port_validation_schema(self):
+    def test_port_validation_schema(self) -> Any:
         """Test PortValidationSchema validation."""
         schema = PortValidationSchema(port=80, protocol="tcp")
         assert schema.port == 80
         assert schema.protocol == "tcp"
     
-    def test_credential_validation_schema(self):
+    def test_credential_validation_schema(self) -> Any:
         """Test CredentialValidationSchema validation."""
         schema = CredentialValidationSchema(
             username="admin",
@@ -659,7 +670,7 @@ class TestSchemas:
         assert schema.password == "password123"
         assert schema.domain == "example.com"
     
-    def test_payload_validation_schema(self):
+    def test_payload_validation_schema(self) -> Any:
         """Test PayloadValidationSchema validation."""
         schema = PayloadValidationSchema(
             payload_type="sql_injection",
@@ -670,7 +681,7 @@ class TestSchemas:
         assert schema.payload_type == "sql_injection"
         assert schema.content == "' OR 1=1 --"
     
-    def test_export_schemas(self):
+    def test_export_schemas(self) -> Any:
         """Test export schemas."""
         # JSON export
         json_schema = JSONExportSchema(
@@ -708,7 +719,7 @@ class TestSchemas:
 class TestModelSerialization:
     """Test suite for model serialization."""
     
-    def test_model_to_dict(self):
+    def test_model_to_dict(self) -> Any:
         """Test model serialization to dictionary."""
         request = ScanRequest(
             request_id="scan_001",
@@ -721,7 +732,7 @@ class TestModelSerialization:
         assert data["scan_type"] == "port_scan"
         assert data["targets"] == ["192.168.1.1"]
     
-    def test_model_to_json(self):
+    def test_model_to_json(self) -> Any:
         """Test model serialization to JSON."""
         request = ScanRequest(
             request_id="scan_001",
@@ -733,7 +744,7 @@ class TestModelSerialization:
         assert "scan_001" in json_data
         assert "port_scan" in json_data
     
-    def test_model_from_dict(self):
+    def test_model_from_dict(self) -> Any:
         """Test model creation from dictionary."""
         data = {
             "request_id": "scan_001",
@@ -748,7 +759,7 @@ class TestModelSerialization:
 class TestModelValidation:
     """Test suite for model validation."""
     
-    def test_required_fields_validation(self):
+    def test_required_fields_validation(self) -> Any:
         """Test required fields validation."""
         with pytest.raises(ValueError):
             ScanRequest(
@@ -756,7 +767,7 @@ class TestModelValidation:
                 # Missing required fields
             )
     
-    def test_field_type_validation(self):
+    def test_field_type_validation(self) -> Any:
         """Test field type validation."""
         with pytest.raises(ValueError):
             ScanRequest(
@@ -765,7 +776,7 @@ class TestModelValidation:
                 targets=["192.168.1.1"]
             )
     
-    def test_field_range_validation(self):
+    def test_field_range_validation(self) -> Any:
         """Test field range validation."""
         with pytest.raises(ValueError):
             ScanRequest(
@@ -775,7 +786,7 @@ class TestModelValidation:
                 ports=[70000]  # Invalid port number
             )
     
-    def test_custom_validator(self):
+    def test_custom_validator(self) -> Any:
         """Test custom validator functions."""
         # Test target validation
         with pytest.raises(ValueError, match="Invalid target format"):
@@ -788,7 +799,7 @@ class TestModelValidation:
 class TestEnumValues:
     """Test suite for enum values."""
     
-    def test_scan_type_enum_values(self):
+    def test_scan_type_enum_values(self) -> Any:
         """Test ScanType enum values."""
         assert ScanType.PORT_SCAN == "port_scan"
         assert ScanType.VULNERABILITY_SCAN == "vulnerability_scan"
@@ -798,7 +809,7 @@ class TestEnumValues:
         assert ScanType.DNS_SCAN == "dns_scan"
         assert ScanType.COMPREHENSIVE_SCAN == "comprehensive_scan"
     
-    def test_vulnerability_level_enum_values(self):
+    def test_vulnerability_level_enum_values(self) -> Any:
         """Test VulnerabilityLevel enum values."""
         assert VulnerabilityLevel.INFO == "info"
         assert VulnerabilityLevel.LOW == "low"
@@ -806,7 +817,7 @@ class TestEnumValues:
         assert VulnerabilityLevel.HIGH == "high"
         assert VulnerabilityLevel.CRITICAL == "critical"
     
-    def test_attack_type_enum_values(self):
+    def test_attack_type_enum_values(self) -> Any:
         """Test AttackType enum values."""
         assert AttackType.BRUTE_FORCE == "brute_force"
         assert AttackType.EXPLOIT == "exploit"
@@ -815,7 +826,7 @@ class TestEnumValues:
         assert AttackType.SQL_INJECTION == "sql_injection"
         assert AttackType.XSS == "xss"
     
-    def test_report_format_enum_values(self):
+    def test_report_format_enum_values(self) -> Any:
         """Test ReportFormat enum values."""
         assert ReportFormat.JSON == "json"
         assert ReportFormat.HTML == "html"
@@ -824,7 +835,7 @@ class TestEnumValues:
         assert ReportFormat.XML == "xml"
         assert ReportFormat.MARKDOWN == "markdown"
     
-    def test_crypto_operation_enum_values(self):
+    def test_crypto_operation_enum_values(self) -> Any:
         """Test CryptoOperation enum values."""
         assert CryptoOperation.HASH == "hash"
         assert CryptoOperation.ENCRYPT == "encrypt"
@@ -834,7 +845,7 @@ class TestEnumValues:
         assert CryptoOperation.KEY_GENERATION == "key_generation"
         assert CryptoOperation.KEY_DERIVATION == "key_derivation"
     
-    def test_network_operation_enum_values(self):
+    def test_network_operation_enum_values(self) -> Any:
         """Test NetworkOperation enum values."""
         assert NetworkOperation.DNS_LOOKUP == "dns_lookup"
         assert NetworkOperation.HTTP_REQUEST == "http_request"

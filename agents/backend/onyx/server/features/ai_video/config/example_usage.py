@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import os
+import sys
+import logging
+from pathlib import Path
+from config import (
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Example Usage of Configuration Management System
 ===============================================
@@ -15,15 +30,10 @@ Scenarios covered:
 7. Experiment tracking integration
 """
 
-import os
-import sys
-import logging
-from pathlib import Path
 
 # Add the parent directory to the path to import modules
 sys.path.append(str(Path(__file__).parent.parent))
 
-from config import (
     ConfigManager,
     quick_load_config,
     create_custom_config,
@@ -368,5 +378,6 @@ def main():
         logger.exception("Exception occurred")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

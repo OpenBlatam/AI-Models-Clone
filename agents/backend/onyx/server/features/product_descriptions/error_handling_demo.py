@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-"""
-Error Handling Middleware Demo
-Product Descriptions Feature - Comprehensive Error Handling, Logging, and Monitoring Demonstration
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -12,6 +11,13 @@ import requests
 import random
 from typing import Dict, Any, List
 from datetime import datetime, timedelta
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Error Handling Middleware Demo
+Product Descriptions Feature - Comprehensive Error Handling, Logging, and Monitoring Demonstration
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -21,7 +27,9 @@ class ErrorHandlingDemo:
     """Comprehensive error handling middleware demonstration"""
     
     def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.session = requests.Session()
         self.results: List[Dict[str, Any]] = []
         self.error_monitor_stats: Dict[str, Any] = {}
@@ -365,7 +373,7 @@ class ErrorHandlingDemo:
             self.log_result("Circuit Breaker Functionality", False, {"error": str(e)}, duration)
             return {"error": str(e)}
     
-    async def test_slow_request_detection(self) -> Dict[str, Any]:
+    async async def test_slow_request_detection(self) -> Dict[str, Any]:
         """Test slow request detection"""
         start_time = time.time()
         
@@ -582,6 +590,10 @@ class ErrorHandlingDemo:
         """Save test results to file"""
         try:
             with open(filename, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(self.results, f, indent=2)
             logger.info(f"Results saved to {filename}")
         except Exception as e:
@@ -635,5 +647,6 @@ async def main():
     print("Demo completed! Check error_handling_demo_results.json for detailed results.")
     print("=" * 70)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

@@ -1,3 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+import logging
+from typing import Dict, Any, Optional, List, Union, Tuple, Callable, TypeVar
+from dataclasses import dataclass, field
+from enum import Enum
+from functools import partial
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.utils.data import DataLoader, Dataset
+import numpy as np
+from functional_utils import (
+        from transformers import AutoModelForSequenceClassification
+        from transformers import get_linear_schedule_with_warmup
+        import pandas as pd
+        from sklearn.model_selection import train_test_split
+        from sklearn.metrics import accuracy_score, precision_recall_fscore_support
+        from pathlib import Path
+    import yaml
+from typing import Any, List, Dict, Optional
 """
 🔧 Modular Training Framework
 ============================
@@ -13,20 +39,7 @@ Key Principles:
 - Immutable data transformations
 """
 
-import asyncio
-import time
-import logging
-from typing import Dict, Any, Optional, List, Union, Tuple, Callable, TypeVar
-from dataclasses import dataclass, field
-from enum import Enum
-from functools import partial
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, Dataset
-import numpy as np
 
-from functional_utils import (
     Result, ValidationResult, safe_execute, timer_context,
     transform_list, filter_list, group_by, sort_by,
     pipe, compose, log_function_call, log_data_info,
@@ -235,7 +248,6 @@ class ModelFactory:
     @staticmethod
     def _create_transformer_model(model_name: str, num_classes: int) -> nn.Module:
         """Create transformer model."""
-        from transformers import AutoModelForSequenceClassification
         
         model = AutoModelForSequenceClassification.from_pretrained(
             model_name,
@@ -250,7 +262,9 @@ class ModelFactory:
         """Create custom model."""
         class CustomTransformer(nn.Module):
             def __init__(self, num_classes: int, vocab_size: int = 30522, hidden_size: int = 768):
-                super().__init__()
+                
+    """__init__ function."""
+super().__init__()
                 self.embedding = nn.Embedding(vocab_size, hidden_size)
                 self.transformer = nn.TransformerEncoderLayer(
                     d_model=hidden_size,
@@ -260,7 +274,7 @@ class ModelFactory:
                 )
                 self.classifier = nn.Linear(hidden_size, num_classes)
             
-            def forward(self, input_ids, attention_mask=None):
+            def forward(self, input_ids, attention_mask=None) -> Any:
                 embeddings = self.embedding(input_ids)
                 if attention_mask is not None:
                     embeddings = embeddings * attention_mask.unsqueeze(-1)
@@ -311,7 +325,6 @@ class SchedulerFactory:
         num_training_steps: int
     ) -> Any:
         """Create scheduler using modular approach."""
-        from transformers import get_linear_schedule_with_warmup
         
         return get_linear_schedule_with_warmup(
             optimizer,
@@ -345,16 +358,16 @@ class DataLoaderFactory:
     ) -> Dataset:
         """Create dataset using modular approach."""
         class FunctionalDataset(Dataset):
-            def __init__(self, texts, labels, tokenizer, max_length):
+            def __init__(self, texts, labels, tokenizer, max_length) -> Any:
                 self.texts = texts
                 self.labels = labels
                 self.tokenizer = tokenizer
                 self.max_length = max_length
             
-            def __len__(self):
+            def __len__(self) -> Any:
                 return len(self.texts)
             
-            def __getitem__(self, idx):
+            def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
                 text = self.texts[idx]
                 label = self.labels[idx]
                 
@@ -444,13 +457,11 @@ class TrainingPipeline:
     def _load_and_split_data(config: TrainingConfig) -> Tuple[Dataset, Dataset, Dataset]:
         """Load and split data using modular approach."""
         # Load data (simplified - replace with your data loading logic)
-        import pandas as pd
         data = pd.read_csv(config.dataset_path)
         texts = data['text'].tolist()
         labels = data['label'].tolist()
         
         # Split data
-        from sklearn.model_selection import train_test_split
         train_texts, temp_texts, train_labels, temp_labels = train_test_split(
             texts, labels, test_size=config.eval_split + config.test_split, random_state=42
         )
@@ -618,7 +629,6 @@ class TrainingPipeline:
     @staticmethod
     def _calculate_epoch_metrics(predictions: List, targets: List, total_loss: float, num_batches: int) -> Dict[str, float]:
         """Calculate epoch metrics."""
-        from sklearn.metrics import accuracy_score, precision_recall_fscore_support
         
         metrics = {
             'accuracy': accuracy_score(targets, predictions),
@@ -679,7 +689,6 @@ class TrainingPipeline:
     @staticmethod
     def _save_model(state: TrainingState, epoch: int, metrics: Dict) -> str:
         """Save model."""
-        from pathlib import Path
         output_dir = Path(state.config.output_dir)
         output_dir.mkdir(exist_ok=True)
         
@@ -751,9 +760,12 @@ async def quick_train_transformer(
 
 async def modular_train_with_config(config_path: str) -> Dict[str, Any]:
     """Train using YAML config file with modular approach."""
-    import yaml
     
     with open(config_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         config_dict = yaml.safe_load(f)
     
     # Convert string enums
@@ -870,5 +882,6 @@ def demo_modular_training():
     
     print("\n🎉 All modular training functions working correctly!")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     demo_modular_training() 

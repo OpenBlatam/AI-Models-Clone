@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import sys
+import os
+from pathlib import Path
+        from examples.pytorch_debugging_demo import main as run_demo
+        import traceback
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 PyTorch Debugging Tools Demo Launcher
@@ -6,9 +19,6 @@ Launcher script for demonstrating PyTorch's built-in debugging tools
 including autograd.detect_anomaly(), profiler, and other debugging utilities.
 """
 
-import sys
-import os
-from pathlib import Path
 
 # Add the project root to the Python path
 project_root = Path(__file__).parent.parent.parent.parent.parent
@@ -26,7 +36,6 @@ def main():
     
     try:
         # Import and run the demo
-        from examples.pytorch_debugging_demo import main as run_demo
         run_demo()
         
     except ImportError as e:
@@ -38,7 +47,6 @@ def main():
         
     except Exception as e:
         print(f"Error running demo: {e}")
-        import traceback
         traceback.print_exc()
         return 1
     

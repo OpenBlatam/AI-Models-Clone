@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 
 from onyx.chat.models import SectionRelevancePiece
@@ -9,6 +11,9 @@ from onyx.prompts.agentic_evaluation import AGENTIC_SEARCH_SYSTEM_PROMPT
 from onyx.prompts.agentic_evaluation import AGENTIC_SEARCH_USER_PROMPT
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -22,12 +27,7 @@ def _get_agent_eval_messages(
         },
         {
             "role": "user",
-            "content": AGENTIC_SEARCH_USER_PROMPT.format(
-                title=title,
-                content=content,
-                query=query,
-                optional_metadata=center_metadata,
-            ),
+            "content"f": AGENTIC_SEARCH_USER_PROMPT",
         },
     ]
     return messages

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import requests
 
 from ee.onyx.server.query_and_chat.models import DocumentSearchRequest
@@ -10,6 +12,9 @@ from tests.integration.common_utils.constants import GENERAL_HEADERS
 from tests.integration.common_utils.test_models import DATestUser
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class DocumentSearchManager:
     @staticmethod
     def search_documents(

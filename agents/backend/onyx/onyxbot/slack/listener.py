@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import os
 import signal
 import sys
@@ -36,8 +41,6 @@ from onyx.configs.onyxbot_configs import DANSWER_BOT_RESPOND_EVERY_CHANNEL
 from onyx.configs.onyxbot_configs import NOTIFY_SLACKBOT_NO_ANSWER
 from onyx.connectors.slack.utils import expert_info_from_slack_id
 from onyx.context.search.retrieval.search_runner import (
-    download_nltk_data,
-)
 from onyx.db.engine import get_all_tenant_ids
 from onyx.db.engine import get_session_with_current_tenant
 from onyx.db.engine import get_session_with_tenant
@@ -68,19 +71,11 @@ from onyx.onyxbot.slack.constants import VIEW_DOC_FEEDBACK_ID
 from onyx.onyxbot.slack.handlers.handle_buttons import handle_doc_feedback_button
 from onyx.onyxbot.slack.handlers.handle_buttons import handle_followup_button
 from onyx.onyxbot.slack.handlers.handle_buttons import (
-    handle_followup_resolved_button,
-)
 from onyx.onyxbot.slack.handlers.handle_buttons import (
-    handle_generate_answer_button,
-)
 from onyx.onyxbot.slack.handlers.handle_buttons import (
-    handle_publish_ephemeral_message_button,
-)
 from onyx.onyxbot.slack.handlers.handle_buttons import handle_slack_feedback
 from onyx.onyxbot.slack.handlers.handle_message import handle_message
 from onyx.onyxbot.slack.handlers.handle_message import (
-    remove_scheduled_feedback_reminder,
-)
 from onyx.onyxbot.slack.handlers.handle_message import schedule_feedback_reminder
 from onyx.onyxbot.slack.models import SlackMessageInfo
 from onyx.onyxbot.slack.utils import check_message_limit
@@ -104,6 +99,19 @@ from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 from shared_configs.configs import SLACK_CHANNEL_ID
 from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    download_nltk_data,
+)
+    handle_followup_resolved_button,
+)
+    handle_generate_answer_button,
+)
+    handle_publish_ephemeral_message_button,
+)
+    remove_scheduled_feedback_reminder,
+)
 
 logger = setup_logger()
 
@@ -163,9 +171,17 @@ class SlackbotHandler:
         # Start background threads
         logger.info("Starting background threads")
         self.acquire_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             target=self.acquire_tenants_loop, daemon=True
         )
         self.heartbeat_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             target=self.heartbeat_loop, daemon=True
         )
 
@@ -570,7 +586,7 @@ class SlackbotHandler:
         sys.exit(0)
 
 
-def prefilter_requests(req: SocketModeRequest, client: TenantSocketModeClient) -> bool:
+async def prefilter_requests(req: SocketModeRequest, client: TenantSocketModeClient) -> bool:
     """True to keep going, False to ignore this Slack request"""
 
     # skip cases where the bot is disabled in the web UI
@@ -798,7 +814,7 @@ def process_feedback(req: SocketModeRequest, client: TenantSocketModeClient) -> 
     logger.info(f"Successfully handled QA feedback for event: {query_event_id}")
 
 
-def build_request_details(
+async def build_request_details(
     req: SocketModeRequest, client: TenantSocketModeClient
 ) -> SlackMessageInfo:
     tagged: bool = False
@@ -845,6 +861,10 @@ def build_request_details(
 
         if thread_ts != message_ts and thread_ts is not None:
             thread_messages = read_slack_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 tenant_id=tenant_id,
                 channel=channel,
                 thread=thread_ts,

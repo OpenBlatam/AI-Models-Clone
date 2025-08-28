@@ -3,7 +3,7 @@ import types
 import ssl as _ssl
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
@@ -32,7 +32,7 @@ async def test_check_host_connectivity_with_ssl_info(monkeypatch):
     async def fake_open_connection(host, port):
         return object(), FakeWriter()
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod.asyncio, "open_connection", fake_open_connection)
     # Avoid real DNS
     monkeypatch.setattr(
@@ -53,7 +53,7 @@ async def test_check_host_connectivity_timeout(monkeypatch):
     async def fake_open_connection(host, port):
         raise asyncio.TimeoutError
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod.asyncio, "open_connection", fake_open_connection)
     monkeypatch.setattr(
         NetworkUtils, "resolve_hostname_to_ip", lambda self, h: asyncio.sleep(0, result="unresolved")
@@ -63,6 +63,7 @@ async def test_check_host_connectivity_timeout(monkeypatch):
     info = await u.check_host_connectivity("nohost", 80, timeout=0.01)
     assert info.is_connection_successful is False
     assert info.error_message == "Connection timeout"
+
 
 
 

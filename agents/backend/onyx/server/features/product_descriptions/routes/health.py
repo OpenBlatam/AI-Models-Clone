@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Dict, Any, List
+from fastapi import APIRouter, Depends, HTTPException, status
+import logging
+import asyncio
+from datetime import datetime
+from ..routes.base import get_request_context, log_route_access
+from ..schemas.base import BaseResponse, ErrorResponse
+from ..async_database_api_operations import AsyncDatabaseManager
+from ..caching_manager import CachingManager
+from ..performance_metrics import PerformanceMonitor
+from ..error_handling_middleware import ErrorMonitor
+        import psutil
+from typing import Any, List, Dict, Optional
 """
 Health Router
 
@@ -5,23 +20,12 @@ This module contains routes for health checks, status monitoring,
 and system diagnostics. Provides comprehensive system health information.
 """
 
-from typing import Dict, Any, List
-from fastapi import APIRouter, Depends, HTTPException, status
-import logging
-import asyncio
-from datetime import datetime
 
 # Import dependencies
-from ..routes.base import get_request_context, log_route_access
 
 # Import schemas
-from ..schemas.base import BaseResponse, ErrorResponse
 
 # Import services
-from ..async_database_api_operations import AsyncDatabaseManager
-from ..caching_manager import CachingManager
-from ..performance_metrics import PerformanceMonitor
-from ..error_handling_middleware import ErrorMonitor
 
 # Initialize router
 router = APIRouter(prefix="/health", tags=["health"])
@@ -333,7 +337,6 @@ async def system_diagnostics(
         }
         
         # Get system information
-        import psutil
         diagnostics["system_info"] = {
             "cpu_percent": psutil.cpu_percent(interval=1),
             "memory_percent": psutil.virtual_memory().percent,

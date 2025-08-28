@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import cast
 
 from redis import Redis
@@ -5,6 +7,11 @@ from sqlalchemy.orm import Session
 
 from ee.onyx.db.user_group import delete_user_group
 from ee.onyx.db.user_group import fetch_user_group
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.db.user_group import mark_user_group_as_synced
 from ee.onyx.db.user_group import prepare_user_group_for_deletion
 from onyx.background.celery.apps.app_base import task_logger
@@ -14,6 +21,9 @@ from onyx.db.sync_record import update_sync_record_status
 from onyx.redis.redis_usergroup import RedisUserGroup
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -56,6 +66,11 @@ def monitor_usergroup_taskset(
         return
 
     user_group = fetch_user_group(db_session=db_session, user_group_id=usergroup_id)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     if user_group:
         usergroup_name = user_group.name
         try:

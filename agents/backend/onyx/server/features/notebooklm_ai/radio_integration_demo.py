@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+import sys
+import logging
+from typing import List, Dict, Optional
+import torch
+import torch.nn as nn
+from torch.utils.data import DataLoader, Dataset
+import numpy as np
+from production_code import MultiGPUTrainer, TrainingConfiguration, RadioIntegration
+                import time
+                import time
+            import gradio as gr
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Radio Integration Demo
@@ -11,18 +33,9 @@ This demo showcases the comprehensive radio integration features including:
 - Gradio interface for radio control
 """
 
-import os
-import sys
-import logging
-from typing import List, Dict, Optional
-import torch
-import torch.nn as nn
-from torch.utils.data import DataLoader, Dataset
-import numpy as np
 
 # Add the current directory to the path to import production_code
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from production_code import MultiGPUTrainer, TrainingConfiguration, RadioIntegration
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -32,7 +45,7 @@ logger = logging.getLogger(__name__)
 class RadioIntegrationDemo:
     """Demo class for showcasing radio integration features"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Configure radio integration
         self.config = TrainingConfiguration(
             enable_radio_integration=True,
@@ -50,7 +63,7 @@ class RadioIntegrationDemo:
         
         logger.info("Radio Integration Demo initialized")
     
-    def demo_station_search(self):
+    def demo_station_search(self) -> Any:
         """Demo radio station search functionality"""
         print("\n" + "="*50)
         print("RADIO STATION SEARCH DEMO")
@@ -79,7 +92,7 @@ class RadioIntegrationDemo:
             else:
                 print("  No stations found")
     
-    def demo_popular_stations(self):
+    def demo_popular_stations(self) -> Any:
         """Demo popular stations functionality"""
         print("\n" + "="*50)
         print("POPULAR RADIO STATIONS DEMO")
@@ -99,7 +112,7 @@ class RadioIntegrationDemo:
             else:
                 print("  No popular stations found")
     
-    def demo_playback_control(self):
+    def demo_playback_control(self) -> Any:
         """Demo playback control functionality"""
         print("\n" + "="*50)
         print("PLAYBACK CONTROL DEMO")
@@ -133,7 +146,6 @@ class RadioIntegrationDemo:
                 print(f"Track info: {track_info}")
                 
                 # Stop playback after a few seconds
-                import time
                 print("Playing for 5 seconds...")
                 time.sleep(5)
                 
@@ -144,7 +156,7 @@ class RadioIntegrationDemo:
         else:
             print("No stations found for playback demo")
     
-    def demo_playlist_management(self):
+    def demo_playlist_management(self) -> List[Any]:
         """Demo playlist management functionality"""
         print("\n" + "="*50)
         print("PLAYLIST MANAGEMENT DEMO")
@@ -175,7 +187,7 @@ class RadioIntegrationDemo:
         else:
             print("✗ Failed to create playlist")
     
-    def demo_audio_analysis(self):
+    def demo_audio_analysis(self) -> Any:
         """Demo audio analysis functionality"""
         print("\n" + "="*50)
         print("AUDIO ANALYSIS DEMO")
@@ -206,7 +218,7 @@ class RadioIntegrationDemo:
         else:
             print("✗ Audio analysis failed")
     
-    def demo_background_music_training(self):
+    def demo_background_music_training(self) -> Any:
         """Demo background music during training simulation"""
         print("\n" + "="*50)
         print("BACKGROUND MUSIC TRAINING DEMO")
@@ -228,7 +240,6 @@ class RadioIntegrationDemo:
                 print(f"Radio status: {status['is_playing']}")
                 
                 # Simulate training time
-                import time
                 time.sleep(2)
             
             # Stop background music
@@ -237,14 +248,13 @@ class RadioIntegrationDemo:
         else:
             print("✗ Failed to start background music")
     
-    def demo_gradio_interface(self):
+    def demo_gradio_interface(self) -> Any:
         """Demo Gradio interface for radio control"""
         print("\n" + "="*50)
         print("GRADIO INTERFACE DEMO")
         print("="*50)
         
         try:
-            import gradio as gr
             
             # Create radio interface
             interface = self.radio.create_radio_interface()
@@ -274,7 +284,7 @@ class RadioIntegrationDemo:
         except Exception as e:
             print(f"✗ Error creating interface: {e}")
     
-    def demo_radio_api_integration(self):
+    async def demo_radio_api_integration(self) -> Any:
         """Demo radio API integrations"""
         print("\n" + "="*50)
         print("RADIO API INTEGRATION DEMO")
@@ -295,7 +305,7 @@ class RadioIntegrationDemo:
             else:
                 print("✗ Radio Browser API test failed")
     
-    def run_complete_demo(self):
+    def run_complete_demo(self) -> Any:
         """Run the complete radio integration demo"""
         print("🎵 RADIO INTEGRATION DEMO")
         print("="*60)
@@ -377,5 +387,6 @@ def main():
     demo.run_complete_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

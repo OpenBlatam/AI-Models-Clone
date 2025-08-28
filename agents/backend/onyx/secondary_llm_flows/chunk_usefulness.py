@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 
 from onyx.configs.chat_configs import DISABLE_LLM_DOC_RELEVANCE
@@ -9,6 +11,9 @@ from onyx.prompts.llm_chunk_filter import SECTION_FILTER_PROMPT
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -31,8 +36,7 @@ def llm_eval_section(
         messages = [
             {
                 "role": "user",
-                "content": SECTION_FILTER_PROMPT.format(
-                    title=title.replace("\n", " "),
+                "content"f": SECTION_FILTER_PROMPT",
                     chunk_text=section_content,
                     user_query=query,
                     optional_metadata=metadata_str,

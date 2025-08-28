@@ -2,7 +2,7 @@ import asyncio
 import types
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
@@ -17,7 +17,7 @@ async def test_get_dns_records_success(monkeypatch):
         def resolve(self, hostname, record_type):
             return FakeAnswers(["93.184.216.34"])
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod.dns, "resolver", types.SimpleNamespace(Resolver=FakeResolver))
 
     utils = NetworkUtils()
@@ -39,7 +39,7 @@ async def test_ping_host_success(monkeypatch):
     async def fake_create_subprocess_exec(*args, **kwargs):
         return FakeProc()
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(asyncio, "create_subprocess_exec", fake_create_subprocess_exec)
 
     utils = NetworkUtils()
@@ -48,6 +48,7 @@ async def test_ping_host_success(monkeypatch):
     assert stats["packets_sent"] == 2
     assert stats["packets_received"] == 2
     assert stats["packet_loss_percentage"] == 0.0
+
 
 
 

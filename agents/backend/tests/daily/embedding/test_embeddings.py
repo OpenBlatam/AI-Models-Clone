@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import os
 
 import pytest
@@ -6,6 +14,9 @@ from onyx.natural_language_processing.search_nlp_models import EmbeddingModel
 from shared_configs.enums import EmbedTextType
 from shared_configs.model_server_models import EmbeddingProvider
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 VALID_SAMPLE = ["hi", "hello my name is bob", "woah there!!!. 😃"]
 VALID_LONG_SAMPLE = ["hi " * 999]
 # openai limit is 2048, cohere is supposed to be 96 but in practice that doesn't
@@ -125,6 +136,8 @@ def test_azure_embedding(azure_embedding_model: EmbeddingModel) -> None:
 
 # NOTE (chris): this test doesn't work, and I do not know why
 # def test_azure_embedding_model_rate_limit(azure_embedding_model: EmbeddingModel):
+
+    """test_azure_embedding_model_rate_limit function."""
 #     """NOTE: this test relies on a very low rate limit for the Azure API +
 #     this test only being run once in a 1 minute window"""
 #     # VALID_LONG_SAMPLE is 999 tokens, so the second call should run into rate

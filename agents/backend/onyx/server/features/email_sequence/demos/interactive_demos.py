@@ -1,9 +1,10 @@
-"""
-Interactive Demos for Email Sequence AI System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-A collection of interactive Gradio demos showcasing model inference,
-visualization, and real-time analysis capabilities.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import gradio as gr
 import asyncio
@@ -19,16 +20,24 @@ from typing import Dict, List, Any, Optional, Tuple
 from datetime import datetime, timedelta
 import random
 import time
-
-# Add the parent directory to the path
 import sys
-sys.path.append(str(Path(__file__).parent.parent))
-
 from core.sequence_generator import EmailSequenceGenerator, GeneratorConfig
 from core.evaluation_metrics import EmailSequenceEvaluator, MetricsConfig
 from models.sequence import EmailSequence, SequenceStep
 from models.subscriber import Subscriber
 from models.template import EmailTemplate
+from typing import Any, List, Dict, Optional
+"""
+Interactive Demos for Email Sequence AI System
+
+A collection of interactive Gradio demos showcasing model inference,
+visualization, and real-time analysis capabilities.
+"""
+
+
+# Add the parent directory to the path
+sys.path.append(str(Path(__file__).parent.parent))
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -38,7 +47,7 @@ logger = logging.getLogger(__name__)
 class InteractiveDemos:
     """Interactive demos for email sequence system"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.sequence_generator = None
         self.evaluator = None
         self.demo_data = self._create_demo_data()
@@ -327,19 +336,13 @@ class InteractiveDemos:
         
         # Create sequence steps based on parameters
         steps = []
-        templates = self.demo_data["templates"]
+        templates = self.demo_data["templates"f"]
         
         for i in range(length):
             template = templates[i % len(templates)]
             
             # Customize content based on subscriber and industry
-            content = template.content_template.format(
-                name=subscriber.name,
-                interest=subscriber.interests[0] if subscriber.interests else "our platform",
-                industry=industry,
-                feature="advanced analytics" if i == 1 else "automation tools",
-                company_name="TechCorp" if industry == "Technology" else "IndustryLeader"
-            )
+            content = template.content_template"
             
             step = SequenceStep(
                 order=i + 1,
@@ -1043,5 +1046,6 @@ def main():
     )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

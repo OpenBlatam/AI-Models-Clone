@@ -1,9 +1,10 @@
-"""
-Structured Main Application
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module provides a well-structured FastAPI application with clear
-route organization, dependency injection, and comprehensive middleware.
-"""
+# Constants
+MAX_RETRIES = 100
 
 from contextlib import asynccontextmanager
 from typing import Dict, Any
@@ -13,16 +14,29 @@ from fastapi.middleware.gzip import GZipMiddleware
 import logging
 import time
 from datetime import datetime
+from .routes import (
+from .version_control_middleware import (
+from .dependencies.core import cleanup_resources
+from .api.config.settings import Settings
+from .utils.logging import setup_logging, get_logger
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Structured Main Application
+
+This module provides a well-structured FastAPI application with clear
+route organization, dependency injection, and comprehensive middleware.
+"""
+
 
 # Import routes
-from .routes import (
     register_routers,
     get_all_routers,
     ROUTER_REGISTRY
 )
 
 # Import middleware
-from .version_control_middleware import (
     RequestLoggingMiddleware,
     PerformanceMonitoringMiddleware,
     ErrorHandlingMiddleware,
@@ -31,13 +45,10 @@ from .version_control_middleware import (
 )
 
 # Import dependencies
-from .dependencies.core import cleanup_resources
 
 # Import configuration
-from .api.config.settings import Settings
 
 # Import utilities
-from .utils.logging import setup_logging, get_logger
 
 # Setup logging
 setup_logging()
@@ -327,7 +338,6 @@ if settings.ENVIRONMENT == "development":
 __all__ = ["app"]
 
 if __name__ == "__main__":
-    import uvicorn
     
     uvicorn.run(
         "structured_main:app",

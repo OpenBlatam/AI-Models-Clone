@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 
 from celery import shared_task
@@ -19,6 +21,9 @@ from onyx.redis.redis_pool import redis_lock_dump
 from shared_configs.configs import IGNORED_SYNCING_TENANT_LIST
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @shared_task(
     name=OnyxCeleryTask.CLOUD_BEAT_TASK_GENERATOR,
     ignore_result=True,
@@ -67,6 +72,11 @@ def cloud_beat_task_generator(
                 continue
 
             self.app.send_task(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
                 task_name,
                 kwargs=dict(
                     tenant_id=tenant_id,

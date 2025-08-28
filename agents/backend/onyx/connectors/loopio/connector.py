@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from collections.abc import Generator
 from datetime import datetime
@@ -22,6 +24,10 @@ from onyx.file_processing.html_utils import parse_html_page_basic
 from onyx.file_processing.html_utils import strip_excessive_newlines_and_spaces
 from onyx.utils.logger import setup_logger
 
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 LOOPIO_API_BASE = "https://api.loopio.com/"
 LOOPIO_AUTH_URL = LOOPIO_API_BASE + "oauth2/access_token"
 LOOPIO_DATA_URL = LOOPIO_API_BASE + "data/"
@@ -40,7 +46,7 @@ class LoopioConnector(LoadConnector, PollConnector):
         self.loopio_client_token: str | None = None
         self.loopio_stack_name = loopio_stack_name
 
-    def _fetch_data(
+    async def _fetch_data(
         self, resource: str, params: dict[str, str | int]
     ) -> Generator[dict[str, Any], None, None]:
         client = BackendApplicationClient(
@@ -199,7 +205,6 @@ class LoopioConnector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     connector = LoopioConnector(
         loopio_stack_name=os.environ.get("LOOPIO_STACK_NAME", None)

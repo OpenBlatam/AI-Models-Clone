@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import re
+from typing import List, Dict, Any, Optional
+from .entities import AnalysisScore, TextFingerprint
+from .enums import AnalysisType, ProcessingTier
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 DOMAIN SERVICES - Servicios del Dominio NLP
 =============================================
@@ -6,10 +24,6 @@ Servicios que encapsulan lógica de dominio que no pertenece
 a ninguna entidad específica.
 """
 
-import re
-from typing import List, Dict, Any, Optional
-from .entities import AnalysisScore, TextFingerprint
-from .enums import AnalysisType, ProcessingTier
 
 
 class ScoreValidator:

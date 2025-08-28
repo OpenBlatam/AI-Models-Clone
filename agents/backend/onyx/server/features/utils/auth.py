@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import os
 from fastapi import Header, HTTPException, status, Security, Depends, Form, Request
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
@@ -7,6 +14,9 @@ from typing import Optional, List, Dict, Any
 from .schemas import TokenResponse, RefreshTokenRequest
 from .logging_utils import logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 OAUTH2_SECRET: str = os.getenv('LLM_OAUTH2_SECRET', 'supersecret')
 OAUTH2_ALG: str = os.getenv('LLM_OAUTH2_ALG', 'HS256')
 ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv('LLM_ACCESS_TOKEN_MINUTES', '15'))
@@ -18,6 +28,7 @@ DEFAULT_SCOPE: str = "llm:predict"
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 http_bearer = HTTPBearer()
 
+@dataclass
 class AuthError:
     INVALID_API_KEY = "Invalid API Key"
     MISSING_BEARER = "Missing Bearer token"

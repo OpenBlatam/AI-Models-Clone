@@ -1,6 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.connectors.confluence.models import ConfluenceUser
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def process_confluence_user_profiles_override(
     confluence_user_email_override: list[dict[str, str]],
 ) -> list[ConfluenceUser]:

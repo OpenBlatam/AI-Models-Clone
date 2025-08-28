@@ -1,10 +1,16 @@
-"""
-Optimized AI Video Workflow with Advanced Libraries
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module provides a highly optimized version of the video workflow
-integrating Ray, Optuna, Numba, Dask, Redis, Prometheus, and FastAPI
-for maximum performance and scalability.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import logging
@@ -17,16 +23,29 @@ from dataclasses import dataclass, field
 from functools import wraps
 from pathlib import Path
 import multiprocessing
+from .optimization_libraries import (
+from .video_workflow import (
+                from .video_workflow import VideoWorkflow
+    from .optimization_libraries import (
+            import psutil
+    from .video_workflow import VideoWorkflow
+from typing import Any, List, Dict, Optional
+"""
+Optimized AI Video Workflow with Advanced Libraries
+
+This module provides a highly optimized version of the video workflow
+integrating Ray, Optuna, Numba, Dask, Redis, Prometheus, and FastAPI
+for maximum performance and scalability.
+"""
+
 
 # Import optimization libraries
-from .optimization_libraries import (
     AdvancedOptimizer, OptimizationConfig, create_optimization_config,
     initialize_optimization_system, monitor_performance, retry_on_failure,
     parallel_processing, memory_optimized_processing
 )
 
 # Import original workflow components
-from .video_workflow import (
     VideoWorkflow, WorkflowState, WorkflowStatus, WorkflowTimings,
     WorkflowHooks, run_full_workflow
 )
@@ -51,6 +70,9 @@ class OptimizedWorkflowConfig:
     chunk_size: int = 1000
     cache_ttl: int = 3600
     retry_attempts: int = 3
+    # Torch performance toggles (safe defaults)
+    enable_torch_compile: bool = True
+    torch_compile_mode: Optional[str] = None  # None|'default'|'reduce-overhead'|'max-autotune'
     
     # Monitoring settings
     enable_performance_monitoring: bool = True
@@ -66,7 +88,9 @@ class OptimizedVideoWorkflow:
         original_workflow: VideoWorkflow,
         config: OptimizedWorkflowConfig = None
     ):
-        self.original_workflow = original_workflow
+        
+    """__init__ function."""
+self.original_workflow = original_workflow
         self.config = config or OptimizedWorkflowConfig()
         
         # Initialize optimization system
@@ -75,6 +99,15 @@ class OptimizedVideoWorkflow:
             cache_ttl=self.config.cache_ttl
         )
         self.optimizer = initialize_optimization_system(optimization_config)
+
+        # Safe global torch perf hints
+        try:
+            import torch
+            if torch.cuda.is_available():
+                torch.backends.cuda.matmul.allow_tf32 = True
+                torch.set_float32_matmul_precision('high')
+        except Exception:
+            pass
         
         # Performance tracking
         self.performance_metrics = {}
@@ -193,7 +226,7 @@ class OptimizedVideoWorkflow:
             # Split URL processing into chunks
             url_chunks = [url]  # For single URL, could be extended for multiple
             
-            def extract_chunk(url_chunk):
+            def extract_chunk(url_chunk) -> Any:
                 # This would call the actual extraction logic
                 return {"url": url_chunk, "content": f"extracted_{url_chunk}"}
             
@@ -320,11 +353,13 @@ class OptimizedWorkflowManager:
     """Manager for multiple optimized workflows."""
     
     def __init__(self, config: OptimizedWorkflowConfig = None):
-        self.config = config or OptimizedWorkflowConfig()
+        
+    """__init__ function."""
+self.config = config or OptimizedWorkflowConfig()
         self.workflows = {}
         self.optimizer = None
         
-    def initialize(self):
+    def initialize(self) -> Any:
         """Initialize the workflow manager."""
         optimization_config = create_optimization_config(
             ray_num_cpus=self.config.max_workers,
@@ -353,7 +388,7 @@ class OptimizedWorkflowManager:
             self.initialize()
         
         # Use parallel processing for batch execution
-        async def execute_single_workflow(config):
+        async def execute_single_workflow(config) -> Any:
             workflow_id = config["workflow_id"]
             url = config["url"]
             avatar = config.get("avatar")
@@ -362,7 +397,6 @@ class OptimizedWorkflowManager:
             # Create or get existing workflow
             if workflow_id not in self.workflows:
                 # Create a dummy workflow for demonstration
-                from .video_workflow import VideoWorkflow
                 dummy_workflow = VideoWorkflow(None, None, None, None)
                 self.create_workflow(workflow_id, dummy_workflow)
             
@@ -426,7 +460,6 @@ async def execute_batch_optimized_workflows(
 
 def get_optimization_libraries_status() -> Dict[str, bool]:
     """Get status of all optimization libraries."""
-    from .optimization_libraries import (
         RAY_AVAILABLE, OPTUNA_AVAILABLE, NUMBA_AVAILABLE,
         DASK_AVAILABLE, REDIS_AVAILABLE, PROMETHEUS_AVAILABLE, FASTAPI_AVAILABLE
     )
@@ -446,12 +479,11 @@ def get_optimization_libraries_status() -> Dict[str, bool]:
 def monitor_workflow_performance(func: Callable) -> Callable:
     """Decorator to monitor workflow performance."""
     @wraps(func)
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         start_time = time.time()
         start_memory = None
         
         try:
-            import psutil
             start_memory = psutil.Process().memory_info().rss
         except ImportError:
             pass
@@ -491,7 +523,6 @@ async def test_optimized_workflow():
     )
     
     # Create a dummy original workflow
-    from .video_workflow import VideoWorkflow
     dummy_workflow = VideoWorkflow(None, None, None, None)
     
     # Create optimized workflow

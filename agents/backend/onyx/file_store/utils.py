@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import base64
 from collections.abc import Callable
 from io import BytesIO
@@ -21,6 +23,11 @@ from onyx.utils.b64 import get_image_type
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
 
+    from onyx.db.models import Persona
+    from sqlalchemy.orm import joinedload
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -77,6 +84,10 @@ def load_chat_file(
     return InMemoryChatFile(
         file_id=file_descriptor["id"],
         content=file_io.read(),
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         file_type=file_descriptor["type"],
         filename=file_descriptor.get("name"),
     )
@@ -141,6 +152,10 @@ def load_user_file(file_id: int, db_session: Session) -> InMemoryChatFile:
         chat_file = InMemoryChatFile(
             file_id=str(user_file.file_id),
             content=file_io.read(),
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             file_type=plaintext_chat_file_type,
             filename=user_file.name,
         )
@@ -154,6 +169,10 @@ def load_user_file(file_id: int, db_session: Session) -> InMemoryChatFile:
         chat_file = InMemoryChatFile(
             file_id=str(user_file.file_id),
             content=file_io.read(),
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             file_type=chat_file_type,
             filename=user_file.name,
         )
@@ -327,8 +346,6 @@ def save_files(urls: list[str], base64_files: list[str]) -> list[str]:
 def load_all_persona_files_for_chat(
     persona_id: int, db_session: Session
 ) -> tuple[list[InMemoryChatFile], list[int]]:
-    from onyx.db.models import Persona
-    from sqlalchemy.orm import joinedload
 
     persona = (
         db_session.query(Persona)

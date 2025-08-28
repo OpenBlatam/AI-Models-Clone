@@ -1,11 +1,10 @@
-"""
-Test Suite for Experiment Tracking and Model Checkpointing System
-================================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module provides comprehensive tests for the experiment tracking and
-model checkpointing functionality, including unit tests, integration tests,
-and performance tests.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import pytest
 import torch
@@ -19,9 +18,23 @@ from datetime import datetime
 from unittest.mock import Mock, patch, MagicMock
 import numpy as np
 import pandas as pd
+from experiment_tracking import (
+            import time
+        import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Test Suite for Experiment Tracking and Model Checkpointing System
+================================================================
+
+This module provides comprehensive tests for the experiment tracking and
+model checkpointing functionality, including unit tests, integration tests,
+and performance tests.
+"""
+
 
 # Import the modules to test
-from experiment_tracking import (
     ExperimentMetadata,
     CheckpointMetadata,
     BaseTracker,
@@ -81,13 +94,13 @@ def sample_model():
 
 
 @pytest.fixture
-def sample_optimizer(sample_model):
+def sample_optimizer(sample_model) -> Any:
     """Sample optimizer for testing."""
     return torch.optim.Adam(sample_model.parameters())
 
 
 @pytest.fixture
-def sample_scheduler(sample_optimizer):
+def sample_scheduler(sample_optimizer) -> Any:
     """Sample scheduler for testing."""
     return torch.optim.lr_scheduler.StepLR(sample_optimizer, step_size=1)
 
@@ -99,7 +112,7 @@ def sample_scheduler(sample_optimizer):
 class TestExperimentMetadata:
     """Test ExperimentMetadata class."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test metadata initialization."""
         metadata = ExperimentMetadata(
             experiment_name="test_experiment",
@@ -116,7 +129,7 @@ class TestExperimentMetadata:
         assert metadata.start_time is not None
         assert metadata.end_time is None
     
-    def test_generate_id(self):
+    def test_generate_id(self) -> Any:
         """Test experiment ID generation."""
         metadata = ExperimentMetadata(
             experiment_name="test_experiment",
@@ -128,7 +141,7 @@ class TestExperimentMetadata:
         assert len(generated_id) > 0
         assert "_" in generated_id
     
-    def test_to_dict(self):
+    def test_to_dict(self) -> Any:
         """Test conversion to dictionary."""
         metadata = ExperimentMetadata(
             experiment_name="test_experiment",
@@ -140,7 +153,7 @@ class TestExperimentMetadata:
         assert metadata_dict["experiment_name"] == "test_experiment"
         assert metadata_dict["experiment_id"] == "test_123"
     
-    def test_mark_completed(self):
+    def test_mark_completed(self) -> Any:
         """Test marking experiment as completed."""
         metadata = ExperimentMetadata(
             experiment_name="test_experiment",
@@ -151,7 +164,7 @@ class TestExperimentMetadata:
         assert metadata.status == "completed"
         assert metadata.end_time is not None
     
-    def test_mark_failed(self):
+    def test_mark_failed(self) -> Any:
         """Test marking experiment as failed."""
         metadata = ExperimentMetadata(
             experiment_name="test_experiment",
@@ -170,7 +183,7 @@ class TestExperimentMetadata:
 class TestCheckpointMetadata:
     """Test CheckpointMetadata class."""
     
-    def test_initialization(self, sample_model):
+    def test_initialization(self, sample_model) -> Any:
         """Test checkpoint metadata initialization."""
         metadata = CheckpointMetadata(
             checkpoint_id="test_checkpoint",
@@ -187,7 +200,7 @@ class TestCheckpointMetadata:
         assert metadata.step == 100
         assert metadata.model_state_dict is not None
     
-    def test_generate_id(self):
+    def test_generate_id(self) -> Any:
         """Test checkpoint ID generation."""
         metadata = CheckpointMetadata(
             checkpoint_id="",
@@ -205,7 +218,7 @@ class TestCheckpointMetadata:
         assert "epoch_1" in generated_id
         assert "step_100" in generated_id
     
-    def test_to_dict(self, sample_model):
+    def test_to_dict(self, sample_model) -> Any:
         """Test conversion to dictionary."""
         metadata = CheckpointMetadata(
             checkpoint_id="test_checkpoint",
@@ -229,7 +242,7 @@ class TestCheckpointMetadata:
 class TestBaseTracker:
     """Test BaseTracker class."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test base tracker initialization."""
         config = {"test": "config"}
         tracker = BaseTracker("test_experiment", config)
@@ -237,7 +250,7 @@ class TestBaseTracker:
         assert tracker.experiment_name == "test_experiment"
         assert tracker.config == config
     
-    def test_abstract_methods(self):
+    def test_abstract_methods(self) -> Any:
         """Test that abstract methods raise NotImplementedError."""
         tracker = BaseTracker("test_experiment", {})
         
@@ -270,7 +283,7 @@ class TestBaseTracker:
 class TestTensorBoardTracker:
     """Test TensorBoardTracker class."""
     
-    def test_initialization(self, temp_dir, sample_config):
+    def test_initialization(self, temp_dir, sample_config) -> Any:
         """Test TensorBoard tracker initialization."""
         sample_config["tensorboard_log_dir"] = temp_dir
         
@@ -280,7 +293,7 @@ class TestTensorBoardTracker:
         assert tracker.log_dir.exists()
         assert tracker.writer is not None
     
-    def test_log_metrics(self, temp_dir, sample_config):
+    def test_log_metrics(self, temp_dir, sample_config) -> Any:
         """Test logging metrics to TensorBoard."""
         sample_config["tensorboard_log_dir"] = temp_dir
         tracker = TensorBoardTracker("test_experiment", sample_config)
@@ -292,7 +305,7 @@ class TestTensorBoardTracker:
         log_files = list(tracker.log_dir.glob("*"))
         assert len(log_files) > 0
     
-    def test_log_hyperparameters(self, temp_dir, sample_config):
+    def test_log_hyperparameters(self, temp_dir, sample_config) -> Any:
         """Test logging hyperparameters to TensorBoard."""
         sample_config["tensorboard_log_dir"] = temp_dir
         tracker = TensorBoardTracker("test_experiment", sample_config)
@@ -304,7 +317,7 @@ class TestTensorBoardTracker:
         log_files = list(tracker.log_dir.glob("*"))
         assert len(log_files) > 0
     
-    def test_log_text(self, temp_dir, sample_config):
+    def test_log_text(self, temp_dir, sample_config) -> Any:
         """Test logging text to TensorBoard."""
         sample_config["tensorboard_log_dir"] = temp_dir
         tracker = TensorBoardTracker("test_experiment", sample_config)
@@ -315,7 +328,7 @@ class TestTensorBoardTracker:
         log_files = list(tracker.log_dir.glob("*"))
         assert len(log_files) > 0
     
-    def test_finish(self, temp_dir, sample_config):
+    def test_finish(self, temp_dir, sample_config) -> Any:
         """Test finishing TensorBoard experiment."""
         sample_config["tensorboard_log_dir"] = temp_dir
         tracker = TensorBoardTracker("test_experiment", sample_config)
@@ -331,7 +344,7 @@ class TestTensorBoardTracker:
 class TestModelCheckpointer:
     """Test ModelCheckpointer class."""
     
-    def test_initialization(self, temp_dir):
+    def test_initialization(self, temp_dir) -> Any:
         """Test checkpointer initialization."""
         checkpoint_dir = Path(temp_dir) / "checkpoints"
         checkpointer = ModelCheckpointer(str(checkpoint_dir), max_checkpoints=5)
@@ -341,7 +354,7 @@ class TestModelCheckpointer:
         assert checkpoint_dir.exists()
         assert checkpointer.registry_file.exists()
     
-    def test_save_checkpoint(self, temp_dir, sample_model, sample_optimizer):
+    def test_save_checkpoint(self, temp_dir, sample_model, sample_optimizer) -> Any:
         """Test saving model checkpoint."""
         checkpoint_dir = Path(temp_dir) / "checkpoints"
         checkpointer = ModelCheckpointer(str(checkpoint_dir))
@@ -364,12 +377,16 @@ class TestModelCheckpointer:
         
         # Check registry
         with open(checkpointer.registry_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             registry = json.load(f)
         
         assert "test_123" in registry["experiments"]
         assert len(registry["experiments"]["test_123"]) == 1
     
-    def test_load_checkpoint(self, temp_dir, sample_model, sample_optimizer):
+    def test_load_checkpoint(self, temp_dir, sample_model, sample_optimizer) -> Any:
         """Test loading model checkpoint."""
         checkpoint_dir = Path(temp_dir) / "checkpoints"
         checkpointer = ModelCheckpointer(str(checkpoint_dir))
@@ -402,7 +419,7 @@ class TestModelCheckpointer:
         assert step == 100
         assert metadata.experiment_id == "test_123"
     
-    def test_get_best_checkpoint(self, temp_dir, sample_model, sample_optimizer):
+    def test_get_best_checkpoint(self, temp_dir, sample_model, sample_optimizer) -> Optional[Dict[str, Any]]:
         """Test getting best checkpoint."""
         checkpoint_dir = Path(temp_dir) / "checkpoints"
         checkpointer = ModelCheckpointer(str(checkpoint_dir))
@@ -442,7 +459,7 @@ class TestModelCheckpointer:
         metadata, _, _ = checkpointer.load_checkpoint(best_checkpoint, sample_model)
         assert metadata.val_loss == 0.5
     
-    def test_cleanup_old_checkpoints(self, temp_dir, sample_model, sample_optimizer):
+    def test_cleanup_old_checkpoints(self, temp_dir, sample_model, sample_optimizer) -> Any:
         """Test cleanup of old checkpoints."""
         checkpoint_dir = Path(temp_dir) / "checkpoints"
         checkpointer = ModelCheckpointer(str(checkpoint_dir), max_checkpoints=2)
@@ -462,7 +479,7 @@ class TestModelCheckpointer:
         checkpoints = checkpointer.list_checkpoints("test_123")
         assert len(checkpoints) <= 2
     
-    def test_list_checkpoints(self, temp_dir, sample_model, sample_optimizer):
+    def test_list_checkpoints(self, temp_dir, sample_model, sample_optimizer) -> List[Any]:
         """Test listing checkpoints."""
         checkpoint_dir = Path(temp_dir) / "checkpoints"
         checkpointer = ModelCheckpointer(str(checkpoint_dir))
@@ -493,7 +510,7 @@ class TestModelCheckpointer:
 class TestExperimentTracker:
     """Test ExperimentTracker class."""
     
-    def test_initialization(self, sample_config):
+    def test_initialization(self, sample_config) -> Any:
         """Test experiment tracker initialization."""
         tracker = ExperimentTracker("test_experiment", sample_config)
         
@@ -503,7 +520,7 @@ class TestExperimentTracker:
         assert tracker.checkpointer is not None
         assert len(tracker.trackers) > 0
     
-    def test_log_metrics(self, sample_config):
+    def test_log_metrics(self, sample_config) -> Any:
         """Test logging metrics."""
         tracker = ExperimentTracker("test_experiment", sample_config)
         
@@ -514,7 +531,7 @@ class TestExperimentTracker:
         assert len(tracker.metrics_history["train_loss"]) == 0  # No train_loss in metrics
         assert len(tracker.metrics_history["val_loss"]) == 0    # No val_loss in metrics
     
-    def test_save_checkpoint(self, sample_config, sample_model, sample_optimizer):
+    def test_save_checkpoint(self, sample_config, sample_model, sample_optimizer) -> Any:
         """Test saving checkpoint through tracker."""
         tracker = ExperimentTracker("test_experiment", sample_config)
         
@@ -530,7 +547,7 @@ class TestExperimentTracker:
         
         assert Path(checkpoint_path).exists()
     
-    def test_load_checkpoint(self, sample_config, sample_model, sample_optimizer):
+    def test_load_checkpoint(self, sample_config, sample_model, sample_optimizer) -> Any:
         """Test loading checkpoint through tracker."""
         tracker = ExperimentTracker("test_experiment", sample_config)
         
@@ -558,7 +575,7 @@ class TestExperimentTracker:
         assert epoch == 1
         assert step == 100
     
-    def test_get_best_checkpoint(self, sample_config, sample_model, sample_optimizer):
+    def test_get_best_checkpoint(self, sample_config, sample_model, sample_optimizer) -> Optional[Dict[str, Any]]:
         """Test getting best checkpoint through tracker."""
         tracker = ExperimentTracker("test_experiment", sample_config)
         
@@ -582,7 +599,7 @@ class TestExperimentTracker:
         best_checkpoint = tracker.get_best_checkpoint()
         assert best_checkpoint is not None
     
-    def test_create_performance_plots(self, sample_config):
+    def test_create_performance_plots(self, sample_config) -> Any:
         """Test creating performance plots."""
         tracker = ExperimentTracker("test_experiment", sample_config)
         
@@ -600,7 +617,7 @@ class TestExperimentTracker:
             plot_files = list(Path(temp_dir).glob("*.png"))
             assert len(plot_files) > 0
     
-    def test_finish(self, sample_config):
+    def test_finish(self, sample_config) -> Any:
         """Test finishing experiment."""
         tracker = ExperimentTracker("test_experiment", sample_config)
         
@@ -621,7 +638,7 @@ class TestExperimentTracker:
 class TestExperimentTrackingContextManager:
     """Test experiment_tracking context manager."""
     
-    def test_context_manager_success(self, sample_config, sample_model, sample_optimizer):
+    def test_context_manager_success(self, sample_config, sample_model, sample_optimizer) -> Any:
         """Test successful experiment tracking with context manager."""
         with experiment_tracking("test_experiment", sample_config) as tracker:
             # Log some metrics
@@ -641,7 +658,7 @@ class TestExperimentTrackingContextManager:
         # (This would require accessing the tracker after context exit,
         # which is not possible with the current implementation)
     
-    def test_context_manager_exception(self, sample_config):
+    def test_context_manager_exception(self, sample_config) -> Any:
         """Test experiment tracking with exception."""
         with pytest.raises(ValueError):
             with experiment_tracking("test_experiment", sample_config) as tracker:
@@ -656,7 +673,7 @@ class TestExperimentTrackingContextManager:
 class TestIntegration:
     """Integration tests for the experiment tracking system."""
     
-    def test_full_training_workflow(self, temp_dir, sample_config, sample_model, sample_optimizer):
+    def test_full_training_workflow(self, temp_dir, sample_config, sample_model, sample_optimizer) -> Any:
         """Test complete training workflow with experiment tracking."""
         sample_config["checkpoint_dir"] = temp_dir
         
@@ -706,7 +723,7 @@ class TestIntegration:
                 assert epoch >= 0
                 assert step >= 0
     
-    def test_multiple_experiments(self, temp_dir, sample_config, sample_model, sample_optimizer):
+    def test_multiple_experiments(self, temp_dir, sample_config, sample_model, sample_optimizer) -> Any:
         """Test running multiple experiments."""
         sample_config["checkpoint_dir"] = temp_dir
         
@@ -736,6 +753,10 @@ class TestIntegration:
         assert registry_file.exists()
         
         with open(registry_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             registry = json.load(f)
         
         # Should have experiments for all three experiments
@@ -749,7 +770,7 @@ class TestIntegration:
 class TestPerformance:
     """Performance tests for the experiment tracking system."""
     
-    def test_large_model_checkpointing(self, temp_dir, sample_config):
+    def test_large_model_checkpointing(self, temp_dir, sample_config) -> Any:
         """Test checkpointing with large models."""
         # Create a larger model
         large_model = nn.Sequential(
@@ -767,7 +788,6 @@ class TestPerformance:
         sample_config["checkpoint_dir"] = temp_dir
         
         with experiment_tracking("large_model_test", sample_config) as tracker:
-            import time
             
             start_time = time.time()
             
@@ -787,11 +807,10 @@ class TestPerformance:
             # Checkpointing should be reasonably fast
             assert end_time - start_time < 10.0  # Should complete within 10 seconds
     
-    def test_high_frequency_logging(self, sample_config):
+    def test_high_frequency_logging(self, sample_config) -> Any:
         """Test high-frequency metric logging."""
         tracker = ExperimentTracker("high_freq_test", sample_config)
         
-        import time
         
         start_time = time.time()
         
@@ -815,26 +834,34 @@ class TestPerformance:
 class TestErrorHandling:
     """Test error handling in the experiment tracking system."""
     
-    def test_invalid_checkpoint_path(self, sample_config, sample_model, sample_optimizer):
+    def test_invalid_checkpoint_path(self, sample_config, sample_model, sample_optimizer) -> Any:
         """Test loading non-existent checkpoint."""
         tracker = ExperimentTracker("error_test", sample_config)
         
         with pytest.raises(FileNotFoundError):
             tracker.load_checkpoint("non_existent_path.pt", sample_model, sample_optimizer)
     
-    def test_corrupted_checkpoint(self, temp_dir, sample_config, sample_model, sample_optimizer):
+    def test_corrupted_checkpoint(self, temp_dir, sample_config, sample_model, sample_optimizer) -> Any:
         """Test loading corrupted checkpoint file."""
         tracker = ExperimentTracker("error_test", sample_config)
         
         # Create a corrupted checkpoint file
         corrupted_path = Path(temp_dir) / "corrupted.pt"
         with open(corrupted_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("This is not a valid checkpoint file")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         with pytest.raises(Exception):  # Should raise some exception
             tracker.load_checkpoint(str(corrupted_path), sample_model, sample_optimizer)
     
-    def test_tracker_initialization_failure(self):
+    def test_tracker_initialization_failure(self) -> Any:
         """Test handling of tracker initialization failures."""
         config = {
             "tracking": {

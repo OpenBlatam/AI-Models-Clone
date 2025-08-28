@@ -1,3 +1,20 @@
+"""
+Test package initialization for HeyGen AI features.
+Sets up proper import paths for testing.
+"""
+
+import os
+import sys
+from pathlib import Path
+
+# Add the project root to Python path for proper imports
+current_dir = Path(__file__).parent
+project_root = current_dir.parent
+sys.path.insert(0, str(project_root))
+
+# Also add the current directory for relative imports
+sys.path.insert(0, str(current_dir))
+
 from typing_extensions import Literal, TypedDict
 from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any, List, Dict, Optional

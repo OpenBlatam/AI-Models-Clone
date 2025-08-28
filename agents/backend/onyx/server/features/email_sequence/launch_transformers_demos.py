@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+import sys
+import subprocess
+from typing import List, Dict
+        import transformers
+        from transformers import pipelines
+        import torch
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Transformers Demos Launcher
@@ -6,10 +21,6 @@ This script provides easy access to all Transformers-related demos
 for the Email Sequence AI System.
 """
 
-import os
-import sys
-import subprocess
-from typing import List, Dict
 
 
 def print_banner():
@@ -68,15 +79,12 @@ def check_transformers_installation():
     print("🔍 Checking Transformers installation...")
     
     try:
-        import transformers
         print(f"✅ Transformers version: {transformers.__version__}")
         
         # Check available pipelines
-        from transformers import pipelines
         print(f"✅ Available pipeline tasks: {len(pipelines.SUPPORTED_TASKS)}")
         
         # Check PyTorch
-        import torch
         print(f"✅ PyTorch version: {torch.__version__}")
         print(f"✅ CUDA available: {torch.cuda.is_available()}")
         
@@ -153,5 +161,6 @@ def main():
         print("\n" + "="*60 + "\n")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

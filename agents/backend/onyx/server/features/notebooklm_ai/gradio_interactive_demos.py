@@ -1,16 +1,16 @@
-#!/usr/bin/env python3
-"""
-Interactive Gradio Demos for Model Inference and Visualization
-=============================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module provides comprehensive interactive demos for:
-- Text generation and analysis
-- Image generation with diffusion models
-- Audio processing and radio integration
-- Model training visualization
-- Performance monitoring
-- Real-time inference
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import os
 import sys
@@ -32,10 +32,25 @@ from PIL import Image, ImageDraw, ImageFont
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
+from production_code import (
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Interactive Gradio Demos for Model Inference and Visualization
+=============================================================
+
+This module provides comprehensive interactive demos for:
+- Text generation and analysis
+- Image generation with diffusion models
+- Audio processing and radio integration
+- Model training visualization
+- Performance monitoring
+- Real-time inference
+"""
+
 
 # Add the current directory to the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from production_code import (
     MultiGPUTrainer, TrainingConfiguration, RadioIntegration,
     PerformanceOptimizer, EarlyStopping, LearningRateMonitor
 )
@@ -48,7 +63,7 @@ logger = logging.getLogger(__name__)
 class InteractiveGradioDemos:
     """Comprehensive interactive Gradio demos for model inference and visualization"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = TrainingConfiguration(
             enable_radio_integration=True,
             enable_gradio_demo=True,
@@ -69,7 +84,7 @@ class InteractiveGradioDemos:
         
         logger.info("Interactive Gradio Demos initialized")
     
-    def _initialize_demo_data(self):
+    def _initialize_demo_data(self) -> Any:
         """Initialize demo data and sample content"""
         self.demo_data = {
             'sample_texts': [
@@ -975,5 +990,6 @@ def main():
     demos.launch_demos(port=7860, share=False)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

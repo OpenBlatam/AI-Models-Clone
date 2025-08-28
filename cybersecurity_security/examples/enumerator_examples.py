@@ -1,15 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from typing import Dict, Any
+from ..enumerators import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Enumerator Examples
 
 Demonstrates how to use the comprehensive enumerator modules.
 """
 
-import asyncio
-import time
-from typing import Dict, Any
 
 # Import enumerator modules
-from ..enumerators import (
     # DNS Enumerator
     DNSEnumerationRequest, DNSRecordType, enumerate_dns_records_async,
     SubdomainEnumerationRequest, enumerate_dns_subdomains_async,
@@ -350,5 +357,6 @@ async def main():
         print(f"❌ Error running enumerator examples: {e}")
         raise
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

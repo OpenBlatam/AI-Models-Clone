@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import pytest
+import asyncio
+import time
+from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock, patch
+from typing import Dict, Any
+from optimized_scan_engine import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Enhanced Tests for Optimized Scan Engine
 
@@ -11,14 +28,7 @@ Comprehensive tests for the enhanced scan engine covering:
 - Performance under load with enhanced features
 """
 
-import pytest
-import asyncio
-import time
-from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
-from typing import Dict, Any
 
-from optimized_scan_engine import (
     UltraOptimizedScanEngine,
     EnhancedAsyncIOHelpers,
     EnhancedSecurityMetrics,
@@ -90,7 +100,7 @@ def enhanced_scan_engine():
 class TestEnhancedSecurityMetrics:
     """Test EnhancedSecurityMetrics dataclass."""
     
-    def test_enhanced_metrics_initialization(self):
+    def test_enhanced_metrics_initialization(self) -> Any:
         """Test enhanced metrics initialization."""
         metrics = EnhancedSecurityMetrics(
             scan_id="test-123",
@@ -105,7 +115,7 @@ class TestEnhancedSecurityMetrics:
         assert metrics.correlation_id is not None
         assert metrics.ml_confidence_score == 0.0
     
-    def test_enhanced_false_positive_rate_calculation(self):
+    def test_enhanced_false_positive_rate_calculation(self) -> Any:
         """Test enhanced false positive rate calculation."""
         metrics = EnhancedSecurityMetrics(
             scan_id="test-123",
@@ -116,7 +126,7 @@ class TestEnhancedSecurityMetrics:
         
         assert metrics.false_positive_rate == 0.3
     
-    def test_enhanced_throughput_calculation(self):
+    def test_enhanced_throughput_calculation(self) -> Any:
         """Test throughput calculation."""
         metrics = EnhancedSecurityMetrics(
             scan_id="test-123",
@@ -128,7 +138,7 @@ class TestEnhancedSecurityMetrics:
         
         assert metrics.throughput == 2.0  # 20 targets / 10 seconds
     
-    def test_enhanced_efficiency_score_calculation(self):
+    def test_enhanced_efficiency_score_calculation(self) -> Any:
         """Test efficiency score calculation."""
         metrics = EnhancedSecurityMetrics(
             scan_id="test-123",
@@ -145,7 +155,7 @@ class TestEnhancedSecurityMetrics:
         assert 0.0 <= metrics.efficiency_score <= 1.0
         assert metrics.efficiency_score > 0.5  # Should be reasonably good
     
-    def test_enhanced_as_dict_serialization(self):
+    def test_enhanced_as_dict_serialization(self) -> Any:
         """Test enhanced metrics serialization to dictionary."""
         start_time = datetime.utcnow()
         metrics = EnhancedSecurityMetrics(
@@ -170,7 +180,7 @@ class TestEnhancedSecurityMetrics:
 class TestEnhancedScanConfig:
     """Test EnhancedScanConfig validation."""
     
-    def test_enhanced_valid_config(self):
+    def test_enhanced_valid_config(self) -> Any:
         """Test valid enhanced configuration."""
         config = EnhancedScanConfig(
             targets=["https://example.com"],
@@ -185,7 +195,7 @@ class TestEnhancedScanConfig:
         assert config.confidence_threshold == 0.8
         assert config.max_concurrent_scans == 20  # default
     
-    def test_enhanced_target_deduplication(self):
+    def test_enhanced_target_deduplication(self) -> Optional[Dict[str, Any]]:
         """Test target deduplication."""
         config = EnhancedScanConfig(
             targets=["https://example.com", "https://EXAMPLE.COM", "https://test.com"],
@@ -197,7 +207,7 @@ class TestEnhancedScanConfig:
         assert "https://example.com" in config.targets
         assert "https://test.com" in config.targets
     
-    def test_enhanced_scan_type_validation(self):
+    def test_enhanced_scan_type_validation(self) -> Any:
         """Test enhanced scan type validation."""
         # Valid types
         valid_types = ["vulnerability", "port", "web", "network", "api", "mobile"]
@@ -215,7 +225,7 @@ class TestEnhancedScanConfig:
                 scan_type="invalid_type"
             )
     
-    def test_enhanced_config_limits_validation(self):
+    def test_enhanced_config_limits_validation(self) -> Any:
         """Test configuration limits validation."""
         # Network scan with too many concurrent scans
         with pytest.raises(ValueError):
@@ -236,7 +246,7 @@ class TestEnhancedScanConfig:
 class TestEnhancedFinding:
     """Test EnhancedFinding model."""
     
-    def test_enhanced_finding_creation(self):
+    def test_enhanced_finding_creation(self) -> Any:
         """Test enhanced finding creation."""
         finding = EnhancedFinding(
             target="https://example.com",
@@ -256,7 +266,7 @@ class TestEnhancedFinding:
         assert finding.id is not None
         assert finding.tags == []
     
-    def test_enhanced_finding_with_tags_and_references(self):
+    def test_enhanced_finding_with_tags_and_references(self) -> Any:
         """Test enhanced finding with tags and references."""
         finding = EnhancedFinding(
             target="https://example.com",
@@ -289,7 +299,7 @@ class TestEnhancedAsyncIOHelpers:
     """Test EnhancedAsyncIOHelpers class."""
     
     @pytest.mark.asyncio
-    async def test_enhanced_fetch_target_data_success(self, mock_http_session, mock_crypto_backend):
+    async async def test_enhanced_fetch_target_data_success(self, mock_http_session, mock_crypto_backend) -> Optional[Dict[str, Any]]:
         """Test successful enhanced target data fetching."""
         helpers = EnhancedAsyncIOHelpers(mock_http_session, mock_crypto_backend)
         
@@ -305,7 +315,7 @@ class TestEnhancedAsyncIOHelpers:
         assert "cache_key" in result
     
     @pytest.mark.asyncio
-    async def test_enhanced_fetch_target_data_with_retries(self, mock_http_session, mock_crypto_backend):
+    async async def test_enhanced_fetch_target_data_with_retries(self, mock_http_session, mock_crypto_backend) -> Optional[Dict[str, Any]]:
         """Test enhanced target data fetching with retry logic."""
         # Mock HTTP session to fail first, then succeed
         mock_http_session.get.side_effect = [
@@ -321,7 +331,7 @@ class TestEnhancedAsyncIOHelpers:
         assert result["attempt"] == 2
     
     @pytest.mark.asyncio
-    async def test_enhanced_encrypt_finding_with_key_rotation(self, mock_http_session, mock_crypto_backend):
+    async def test_enhanced_encrypt_finding_with_key_rotation(self, mock_http_session, mock_crypto_backend) -> Any:
         """Test enhanced finding encryption with key rotation."""
         helpers = EnhancedAsyncIOHelpers(mock_http_session, mock_crypto_backend)
         
@@ -331,7 +341,7 @@ class TestEnhancedAsyncIOHelpers:
         mock_crypto_backend.encrypt.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_enhanced_validate_target_comprehensive(self, mock_http_session, mock_crypto_backend):
+    async def test_enhanced_validate_target_comprehensive(self, mock_http_session, mock_crypto_backend) -> Optional[Dict[str, Any]]:
         """Test comprehensive enhanced target validation."""
         helpers = EnhancedAsyncIOHelpers(mock_http_session, mock_crypto_backend)
         
@@ -353,7 +363,7 @@ class TestUltraOptimizedScanEngine:
     """Test UltraOptimizedScanEngine class."""
     
     @pytest.mark.asyncio
-    async def test_enhanced_start_scan(self, enhanced_scan_engine, sample_enhanced_scan_config, mock_http_session, mock_crypto_backend):
+    async def test_enhanced_start_scan(self, enhanced_scan_engine, sample_enhanced_scan_config, mock_http_session, mock_crypto_backend) -> Any:
         """Test starting an enhanced scan."""
         scan_id, metrics = await enhanced_scan_engine.start_scan_enhanced(
             sample_enhanced_scan_config,
@@ -369,7 +379,7 @@ class TestUltraOptimizedScanEngine:
         assert scan_id in enhanced_scan_engine.active_scans
     
     @pytest.mark.asyncio
-    async def test_enhanced_scan_execution_completion(self, enhanced_scan_engine, sample_enhanced_scan_config, mock_http_session, mock_crypto_backend):
+    async def test_enhanced_scan_execution_completion(self, enhanced_scan_engine, sample_enhanced_scan_config, mock_http_session, mock_crypto_backend) -> Any:
         """Test complete enhanced scan execution."""
         scan_id, metrics = await enhanced_scan_engine.start_scan_enhanced(
             sample_enhanced_scan_config,
@@ -393,7 +403,7 @@ class TestUltraOptimizedScanEngine:
         assert completed_metrics.ml_confidence_score >= 0.0
     
     @pytest.mark.asyncio
-    async def test_enhanced_scan_with_ml_detection(self, enhanced_scan_engine, mock_http_session, mock_crypto_backend):
+    async def test_enhanced_scan_with_ml_detection(self, enhanced_scan_engine, mock_http_session, mock_crypto_backend) -> Any:
         """Test enhanced scan with ML detection enabled."""
         config = EnhancedScanConfig(
             targets=["https://admin-site.com"],
@@ -416,12 +426,12 @@ class TestUltraOptimizedScanEngine:
         assert completed_metrics.ml_confidence_score >= 0.0
         assert completed_metrics.efficiency_score > 0.0
     
-    def test_enhanced_get_scan_metrics_not_found(self, enhanced_scan_engine):
+    def test_enhanced_get_scan_metrics_not_found(self, enhanced_scan_engine) -> Optional[Dict[str, Any]]:
         """Test getting metrics for non-existent enhanced scan."""
         result = enhanced_scan_engine.get_scan_metrics_enhanced("non-existent-id")
         assert result is None
     
-    def test_enhanced_get_all_metrics_empty(self, enhanced_scan_engine):
+    def test_enhanced_get_all_metrics_empty(self, enhanced_scan_engine) -> Optional[Dict[str, Any]]:
         """Test getting enhanced metrics when no scans exist."""
         metrics = enhanced_scan_engine.get_all_metrics_enhanced()
         
@@ -433,7 +443,7 @@ class TestUltraOptimizedScanEngine:
         assert metrics["average_ml_confidence"] == 0.0
         assert metrics["system_health"] == "healthy"
     
-    def test_enhanced_get_all_metrics_with_scans(self, enhanced_scan_engine):
+    def test_enhanced_get_all_metrics_with_scans(self, enhanced_scan_engine) -> Optional[Dict[str, Any]]:
         """Test getting enhanced metrics with existing scans."""
         # Add some mock metrics to history
         mock_metrics = EnhancedSecurityMetrics(
@@ -467,7 +477,7 @@ class TestEnhancedFastAPIIntegration:
     """Test Enhanced FastAPI integration functions."""
     
     @pytest.mark.asyncio
-    async def test_enhanced_start_security_scan_success(self, mock_http_session, mock_crypto_backend, sample_enhanced_scan_config):
+    async def test_enhanced_start_security_scan_success(self, mock_http_session, mock_crypto_backend, sample_enhanced_scan_config) -> Any:
         """Test successful enhanced scan start via FastAPI."""
         request = EnhancedScanRequest(
             config=sample_enhanced_scan_config,
@@ -493,7 +503,7 @@ class TestEnhancedFastAPIIntegration:
         assert response.estimated_duration is not None
     
     @pytest.mark.asyncio
-    async def test_enhanced_get_scan_metrics_success(self):
+    async def test_enhanced_get_scan_metrics_success(self) -> Optional[Dict[str, Any]]:
         """Test getting enhanced scan metrics via FastAPI."""
         # Mock scan engine to return metrics
         with patch('optimized_scan_engine.enhanced_scan_engine') as mock_engine:
@@ -512,7 +522,7 @@ class TestEnhancedFastAPIIntegration:
             assert "ml_confidence_score" in result
     
     @pytest.mark.asyncio
-    async def test_enhanced_get_overall_metrics(self):
+    async def test_enhanced_get_overall_metrics(self) -> Optional[Dict[str, Any]]:
         """Test getting enhanced overall metrics via FastAPI."""
         with patch('optimized_scan_engine.enhanced_scan_engine') as mock_engine:
             mock_engine.get_all_metrics_enhanced.return_value = {
@@ -534,7 +544,7 @@ class TestEnhancedFastAPIIntegration:
             assert result["system_health"] == "healthy"
     
     @pytest.mark.asyncio
-    async def test_enhanced_health_check_healthy(self):
+    async def test_enhanced_health_check_healthy(self) -> Any:
         """Test enhanced health check when system is healthy."""
         with patch('optimized_scan_engine.enhanced_scan_engine') as mock_engine:
             mock_engine.get_all_metrics_enhanced.return_value = {
@@ -552,7 +562,7 @@ class TestEnhancedFastAPIIntegration:
             assert "system_metrics" in result
     
     @pytest.mark.asyncio
-    async def test_enhanced_health_check_degraded(self):
+    async def test_enhanced_health_check_degraded(self) -> Any:
         """Test enhanced health check when system is degraded."""
         with patch('optimized_scan_engine.enhanced_scan_engine') as mock_engine:
             mock_engine.get_all_metrics_enhanced.return_value = {
@@ -573,7 +583,7 @@ class TestEnhancedEdgeCases:
     """Test enhanced edge cases and error conditions."""
     
     @pytest.mark.asyncio
-    async def test_enhanced_concurrent_scan_limiting(self, enhanced_scan_engine, mock_http_session, mock_crypto_backend):
+    async def test_enhanced_concurrent_scan_limiting(self, enhanced_scan_engine, mock_http_session, mock_crypto_backend) -> Any:
         """Test enhanced concurrent scan limiting."""
         config = EnhancedScanConfig(
             targets=[f"https://example{i}.com" for i in range(20)],
@@ -598,7 +608,7 @@ class TestEnhancedEdgeCases:
         assert completed_metrics.efficiency_score > 0.0
     
     @pytest.mark.asyncio
-    async def test_enhanced_scan_timeout_handling(self, enhanced_scan_engine, mock_crypto_backend):
+    async def test_enhanced_scan_timeout_handling(self, enhanced_scan_engine, mock_crypto_backend) -> Any:
         """Test enhanced scan timeout handling."""
         # Mock slow HTTP session
         slow_session = AsyncMock()
@@ -608,7 +618,7 @@ class TestEnhancedEdgeCases:
         slow_response.text = AsyncMock(return_value="")
         
         # Make the response slow
-        async def slow_get(*args, **kwargs):
+        async def slow_get(*args, **kwargs) -> Optional[Dict[str, Any]]:
             await asyncio.sleep(0.2)  # Simulate slow response
             return slow_response
         
@@ -635,7 +645,7 @@ class TestEnhancedEdgeCases:
         assert completed_metrics.error_count >= 0  # Should handle timeout gracefully
     
     @pytest.mark.asyncio
-    async def test_enhanced_priority_scanning(self, enhanced_scan_engine, mock_http_session, mock_crypto_backend):
+    async def test_enhanced_priority_scanning(self, enhanced_scan_engine, mock_http_session, mock_crypto_backend) -> Any:
         """Test enhanced priority-based scanning."""
         config = EnhancedScanConfig(
             targets=["https://critical-site.com", "https://normal-site.com"],
@@ -666,7 +676,7 @@ class TestEnhancedPerformance:
     """Test enhanced performance characteristics."""
     
     @pytest.mark.asyncio
-    async def test_enhanced_scan_performance_metrics(self, enhanced_scan_engine, mock_http_session, mock_crypto_backend):
+    async def test_enhanced_scan_performance_metrics(self, enhanced_scan_engine, mock_http_session, mock_crypto_backend) -> Any:
         """Test enhanced scan performance metrics collection."""
         config = EnhancedScanConfig(
             targets=["https://example1.com", "https://example2.com"],
@@ -698,7 +708,7 @@ class TestEnhancedPerformance:
         assert completed_metrics.ml_confidence_score >= 0.0
     
     @pytest.mark.asyncio
-    async def test_enhanced_concurrent_scan_requests(self, mock_http_session, mock_crypto_backend):
+    async async def test_enhanced_concurrent_scan_requests(self, mock_http_session, mock_crypto_backend) -> Any:
         """Test handling multiple concurrent enhanced scan requests."""
         config = EnhancedScanConfig(
             targets=["https://example.com"],
@@ -739,7 +749,7 @@ class TestEnhancedStructuredLogging:
     """Test enhanced structured logging functionality."""
     
     @pytest.mark.asyncio
-    async def test_enhanced_scan_logging_events(self, enhanced_scan_engine, sample_enhanced_scan_config, mock_http_session, mock_crypto_backend, caplog):
+    async def test_enhanced_scan_logging_events(self, enhanced_scan_engine, sample_enhanced_scan_config, mock_http_session, mock_crypto_backend, caplog) -> Any:
         """Test that enhanced scan events are properly logged."""
         with caplog.at_level("INFO"):
             scan_id, metrics = await enhanced_scan_engine.start_scan_enhanced(
@@ -764,7 +774,7 @@ class TestEnhancedStructuredLogging:
         assert len(correlation_logs) > 0
     
     @pytest.mark.asyncio
-    async def test_enhanced_error_logging(self, enhanced_scan_engine, mock_crypto_backend, caplog):
+    async def test_enhanced_error_logging(self, enhanced_scan_engine, mock_crypto_backend, caplog) -> Any:
         """Test enhanced error logging."""
         # Mock HTTP session to raise exception
         error_session = AsyncMock()
@@ -791,5 +801,6 @@ class TestEnhancedStructuredLogging:
         log_messages = [record.message for record in caplog.records]
         assert any("Failed to fetch target after all retries" in msg for msg in log_messages)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v", "--tb=short"]) 

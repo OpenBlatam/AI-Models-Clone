@@ -1,10 +1,13 @@
-"""
-Error Handling System Demonstration
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This example demonstrates the comprehensive error handling system
-for the email sequence AI system, showing how to handle various
-error scenarios gracefully.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -14,25 +17,35 @@ from pathlib import Path
 import sys
 import time
 import random
+from core.error_handling import (
+from models.sequence import EmailSequence, SequenceStep
+from models.subscriber import Subscriber
+from models.template import EmailTemplate
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Error Handling System Demonstration
+
+This example demonstrates the comprehensive error handling system
+for the email sequence AI system, showing how to handle various
+error scenarios gracefully.
+"""
+
 
 # Add the parent directory to the path
 sys.path.append(str(Path(__file__).parent.parent))
 
-from core.error_handling import (
     ErrorHandler, InputValidator, DataLoaderErrorHandler,
     ModelInferenceErrorHandler, GradioErrorHandler,
     ValidationError, ModelError, DataError, ConfigurationError,
     handle_async_operation, handle_model_operation, handle_data_operation
 )
-from models.sequence import EmailSequence, SequenceStep
-from models.subscriber import Subscriber
-from models.template import EmailTemplate
 
 
 class ErrorHandlingDemo:
     """Demonstration of the error handling system"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the demo with error handling components"""
         
         print("🚀 Initializing Error Handling Demo...")
@@ -50,7 +63,7 @@ class ErrorHandlingDemo:
         
         print("✅ Error handling system initialized successfully!")
     
-    def _create_sample_subscribers(self):
+    def _create_sample_subscribers(self) -> Any:
         """Create sample subscribers for testing"""
         return [
             Subscriber(
@@ -71,7 +84,7 @@ class ErrorHandlingDemo:
             )
         ]
     
-    def _create_sample_templates(self):
+    def _create_sample_templates(self) -> Any:
         """Create sample email templates"""
         return [
             EmailTemplate(
@@ -88,7 +101,7 @@ class ErrorHandlingDemo:
             )
         ]
     
-    def demo_input_validation(self):
+    def demo_input_validation(self) -> Any:
         """Demonstrate input validation with various scenarios"""
         
         print("\n" + "="*60)
@@ -153,7 +166,7 @@ class ErrorHandlingDemo:
             if not is_valid:
                 print(f"    Error: {error}")
     
-    def demo_data_loading_errors(self):
+    def demo_data_loading_errors(self) -> Any:
         """Demonstrate data loading error handling"""
         
         print("\n" + "="*60)
@@ -209,6 +222,10 @@ class ErrorHandlingDemo:
             
             json_path = Path(temp_dir) / 'test_data.json'
             with open(json_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(test_json_data, f)
             
             result, error = self.data_handler.safe_load_json(str(json_path))
@@ -226,7 +243,7 @@ class ErrorHandlingDemo:
             print(f"  Result: {result}")
             print(f"  Error: {error}")
     
-    def demo_safe_execution(self):
+    def demo_safe_execution(self) -> Any:
         """Demonstrate safe execution with error handling"""
         
         print("\n" + "="*60)
@@ -236,7 +253,7 @@ class ErrorHandlingDemo:
         # Test successful execution
         print("\n✅ Testing Successful Execution:")
         
-        def successful_function(x, y):
+        def successful_function(x, y) -> Any:
             return x + y
         
         result, error = self.error_handler.safe_execute(
@@ -249,7 +266,7 @@ class ErrorHandlingDemo:
         # Test failed execution
         print("\n❌ Testing Failed Execution:")
         
-        def failing_function(x, y):
+        def failing_function(x, y) -> Any:
             return x / y
         
         result, error = self.error_handler.safe_execute(
@@ -262,7 +279,7 @@ class ErrorHandlingDemo:
         # Test async execution
         print("\n🔄 Testing Async Execution:")
         
-        async def async_function(x, y):
+        async def async_function(x, y) -> Any:
             await asyncio.sleep(0.1)
             return x * y
         
@@ -274,7 +291,7 @@ class ErrorHandlingDemo:
         print(f"  Async function result: {result}")
         print(f"  Error: {error}")
     
-    def demo_decorators(self):
+    def demo_decorators(self) -> Any:
         """Demonstrate error handling decorators"""
         
         print("\n" + "="*60)
@@ -285,7 +302,7 @@ class ErrorHandlingDemo:
         print("\n📊 Testing Data Operation Decorator:")
         
         @handle_data_operation
-        def data_processing_function(data):
+        def data_processing_function(data) -> Any:
             if not data:
                 raise FileNotFoundError("Data file not found")
             return data.upper()
@@ -308,7 +325,7 @@ class ErrorHandlingDemo:
         print("\n🔄 Testing Async Operation Decorator:")
         
         @handle_async_operation
-        async def async_processing_function(data):
+        async def async_processing_function(data) -> Any:
             await asyncio.sleep(0.1)
             if data == "error":
                 raise ValueError("Async processing error")
@@ -328,7 +345,7 @@ class ErrorHandlingDemo:
         except Exception as e:
             print(f"  ❌ Error: {e}")
     
-    def demo_gradio_error_handling(self):
+    def demo_gradio_error_handling(self) -> Any:
         """Demonstrate Gradio-specific error handling"""
         
         print("\n" + "="*60)
@@ -368,7 +385,7 @@ class ErrorHandlingDemo:
         )
         print(f"  Formatted error: {formatted_error}")
     
-    def demo_error_summary(self):
+    def demo_error_summary(self) -> Any:
         """Demonstrate error summary and monitoring"""
         
         print("\n" + "="*60)
@@ -407,7 +424,7 @@ class ErrorHandlingDemo:
             print(f"  Last error context: {last_error['context']}")
             print(f"  Last error operation: {last_error['operation']}")
     
-    def demo_comprehensive_scenario(self):
+    def demo_comprehensive_scenario(self) -> Any:
         """Demonstrate a comprehensive error handling scenario"""
         
         print("\n" + "="*60)
@@ -464,6 +481,10 @@ class ErrorHandlingDemo:
         with tempfile.TemporaryDirectory() as temp_dir:
             config_path = Path(temp_dir) / 'config.json'
             with open(config_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(config_data, f)
             
             config, error = self.data_handler.safe_load_json(str(config_path))
@@ -477,7 +498,7 @@ class ErrorHandlingDemo:
         print("\n3️⃣ Model Inference Simulation:")
         
         @handle_model_operation
-        def simulate_model_inference(prompt, config):
+        def simulate_model_inference(prompt, config) -> Any:
             # Simulate potential model errors
             if "error" in prompt.lower():
                 raise RuntimeError("Model inference failed")
@@ -523,7 +544,7 @@ class ErrorHandlingDemo:
         
         print("\n🎉 Comprehensive scenario completed successfully!")
     
-    def run_full_demo(self):
+    def run_full_demo(self) -> Any:
         """Run the complete error handling demonstration"""
         
         print("🚀 EMAIL SEQUENCE ERROR HANDLING SYSTEM DEMONSTRATION")
@@ -567,5 +588,6 @@ def main():
     print("This demo shows how the system handles various error scenarios gracefully.")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

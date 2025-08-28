@@ -1,11 +1,16 @@
-"""
-Performance Middleware - Request timing and optimization
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 from typing import Callable
 from fastapi import Request, Response
 from ..utils.metrics import record_metric
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Performance Middleware - Request timing and optimization
+"""
+
 
 
 def create_performance_middleware() -> Callable:

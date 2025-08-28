@@ -1,11 +1,15 @@
-"""
-Optimized API for Key Messages feature with modern FastAPI practices and functional programming.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import asyncio
 import time
 from typing import Dict, List, Optional, Any, Callable, Union
 from contextlib import asynccontextmanager
-
 from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -18,8 +22,16 @@ import structlog
 from prometheus_client import Counter, Histogram, generate_latest, CONTENT_TYPE_LATEST
 from prometheus_client.registry import CollectorRegistry
 import psutil
-
 from onyx.server.features.key_messages.models import (
+from onyx.server.features.key_messages.service import (
+from onyx.server.features.key_messages.config import get_settings
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Optimized API for Key Messages feature with modern FastAPI practices and functional programming.
+"""
+
+
     KeyMessageRequest,
     KeyMessageResponse,
     BatchKeyMessageRequest,
@@ -27,12 +39,10 @@ from onyx.server.features.key_messages.models import (
     MessageType,
     MessageTone
 )
-from onyx.server.features.key_messages.service import (
     ServiceConfig, startup_service, shutdown_service, check_service_health,
     generate_response, analyze_message, generate_batch, clear_cache, get_cache_stats,
     validate_service_health, validate_message_request, validate_batch_request
 )
-from onyx.server.features.key_messages.config import get_settings
 
 # Configure structured logging
 logger = structlog.get_logger(__name__)
@@ -246,7 +256,7 @@ ENUM_DATA_HANDLERS = {
     "tones": MessageTone
 }
 
-def create_enum_data_handler(enum_class):
+def create_enum_data_handler(enum_class) -> Any:
     """Create handler for enum data."""
     # Guard clause: Check if enum_class is None
     if enum_class is None:
@@ -461,7 +471,7 @@ for enum_name, enum_class in ENUM_DATA_HANDLERS.items():
     if enum_class is None:
         continue
     
-    async def create_enum_endpoint(enum_class=enum_class, enum_name=enum_name):
+    async def create_enum_endpoint(enum_class=enum_class, enum_name=enum_name) -> Any:
         """Create endpoint for enum data."""
         try:
             enum_data = create_enum_data_handler(enum_class)

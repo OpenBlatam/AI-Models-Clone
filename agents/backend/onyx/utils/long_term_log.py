@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import json
 import os
 import threading
@@ -8,6 +16,9 @@ from typing import Any
 from onyx.utils.logger import setup_logger
 from onyx.utils.special_types import JSON_ro
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 _LOG_FILE_NAME_TIMESTAMP_FORMAT = "%Y-%m-%d_%H-%M-%S-%f"
@@ -23,7 +34,9 @@ class LongTermLogger:
         log_file_path: str = "/tmp/long_term_log",
         max_files_per_category: int = 1000,
     ):
-        self.metadata = metadata
+        
+    """__init__ function."""
+self.metadata = metadata
         self.log_file_path = Path(log_file_path)
         self.max_files_per_category = max_files_per_category
         try:
@@ -75,6 +88,10 @@ class LongTermLogger:
                 / f"{datetime.now().strftime(_LOG_FILE_NAME_TIMESTAMP_FORMAT)}.json"
             )
             with open(file_path, "w+") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 # default allows us to "ignore" unserializable objects
                 json.dump(final_record, f, default=lambda x: str(x))
         except Exception:
@@ -85,6 +102,10 @@ class LongTermLogger:
         try:
             # Run in separate thread to have minimal overhead in main flows
             thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 target=self._record, args=(message, category), daemon=True
             )
             thread.start()
@@ -92,7 +113,7 @@ class LongTermLogger:
             # Should never interfere with normal functions of Onyx
             pass
 
-    def fetch_category(
+    async def fetch_category(
         self,
         category: str,
         start_time: datetime | None = None,

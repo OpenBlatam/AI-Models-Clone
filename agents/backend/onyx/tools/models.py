@@ -1,3 +1,7 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
 from collections.abc import Callable
 from datetime import datetime
 from typing import Any
@@ -15,6 +19,9 @@ from onyx.context.search.models import QueryExpansions
 from shared_configs.model_server_models import Embedding
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class ToolResponse(BaseModel):
     id: str | None = None
     response: Any = None
@@ -81,7 +88,8 @@ class SearchToolOverrideKwargs(BaseModel):
     time_cutoff: datetime | None = None
     expanded_queries: QueryExpansions | None = None
 
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
 
 

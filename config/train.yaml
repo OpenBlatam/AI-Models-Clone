@@ -1,0 +1,42 @@
+project:
+  name: modular_mlp_demo
+  seed: 42
+
+model:
+  input_dim: 128
+  hidden_dims: [256, 256]
+  num_classes: 10
+  dropout: 0.0
+
+data:
+  train_samples: 60000
+  val_samples: 6000
+  batch_size: 256
+  num_workers: 2
+  pin_memory: true
+  persistent_workers: false
+  prefetch_factor: 2
+
+train:
+  epochs: 5
+  learning_rate: 0.0003
+  weight_decay: 0.01
+  grad_clip_norm: 1.0
+  amp: true
+  grad_accum_steps: 1
+
+tracking:
+  use_wandb: false
+  wandb:
+    project: modular_mlp_demo
+    entity: null
+  tensorboard: true
+  log_dir: experiments
+  run_name: null
+
+checkpointing:
+  dir: checkpoints/modular_mlp_demo
+  monitor: val/loss
+  mode: min
+  save_top_k: 1
+  save_every: 1

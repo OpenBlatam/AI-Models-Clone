@@ -1,10 +1,5 @@
-"""
-Functional Utilities for AI Video Processing
-===========================================
-
-Pure functions for common operations in AI video generation.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, List, Optional, Callable, Any, Tuple, Union
 from functools import partial, reduce, wraps
 import torch
@@ -14,6 +9,14 @@ from pathlib import Path
 import json
 import asyncio
 from datetime import datetime
+from typing import Any, List, Dict, Optional
+"""
+Functional Utilities for AI Video Processing
+===========================================
+
+Pure functions for common operations in AI video generation.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +77,7 @@ def memoize(func: Callable) -> Callable:
     cache = {}
     
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         key = str(args) + str(sorted(kwargs.items()))
         if key not in cache:
             cache[key] = func(*args, **kwargs)
@@ -86,7 +89,7 @@ def retry(max_attempts: int = 3, delay: float = 1.0):
     """Retry decorator for functions that may fail."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             for attempt in range(max_attempts):
                 try:
                     return func(*args, **kwargs)
@@ -102,7 +105,7 @@ def retry(max_attempts: int = 3, delay: float = 1.0):
 def with_logging(func: Callable) -> Callable:
     """Log function calls and results."""
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         logger.info(f"Calling {func.__name__}")
         result = func(*args, **kwargs)
         logger.info(f"Completed {func.__name__}")
@@ -112,7 +115,7 @@ def with_logging(func: Callable) -> Callable:
 def with_timing(func: Callable) -> Callable:
     """Time function execution."""
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()
@@ -132,12 +135,20 @@ def save_json(data: Dict, path: PathLike) -> Path:
     path = Path(path)
     ensure_dir(path.parent)
     with open(path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         json.dump(data, f, indent=2, default=str)
     return path
 
 def load_json(path: PathLike) -> Dict:
     """Load data from JSON file."""
     with open(path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         return json.load(f)
 
 def list_files(directory: PathLike, pattern: str = "*") -> List[Path]:
@@ -252,7 +263,7 @@ def safe_execute(func: Callable, default: Any = None) -> Any:
 
 def with_fallback(func: Callable, fallback: Callable) -> Callable:
     """Create function with fallback."""
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         try:
             return func(*args, **kwargs)
         except Exception:
@@ -264,7 +275,7 @@ def validate_and_transform(
     validator: Callable,
     transformer: Callable,
     error_msg: str = "Validation failed"
-) -> Any:
+) -> bool:
     """Validate data and apply transformation."""
     if not validator(data):
         raise ValueError(error_msg)

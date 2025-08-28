@@ -1,11 +1,19 @@
-"""
-HTML reporting module for cybersecurity assessment results.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, field_validator
 from datetime import datetime
 import structlog
 import json
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+HTML reporting module for cybersecurity assessment results.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -19,13 +27,13 @@ class HTMLReportInput(BaseModel):
     template_name: str = "default"
     
     @field_validator('scan_results')
-    def validate_scan_results(cls, v):
+    def validate_scan_results(cls, v) -> bool:
         if not v:
             raise ValueError("Scan results cannot be empty")
         return v
     
     @field_validator('target_info')
-    def validate_target_info(cls, v):
+    def validate_target_info(cls, v) -> Optional[Dict[str, Any]]:
         if not v:
             raise ValueError("Target info cannot be empty")
         return v

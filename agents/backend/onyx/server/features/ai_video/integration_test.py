@@ -1,9 +1,10 @@
-#!/usr/bin/env python3
-"""
-Integration Test for Refactored Optimization System and Workflow Engine
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-This test validates that all components work together correctly in a real-world scenario.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -11,6 +12,17 @@ import logging
 import time
 from typing import Dict, Any, List
 from pathlib import Path
+    from refactored_optimization_system import (
+    from refactored_workflow_engine import (
+                import numpy as np
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Integration Test for Refactored Optimization System and Workflow Engine
+
+This test validates that all components work together correctly in a real-world scenario.
+"""
+
 
 # Configure logging
 logging.basicConfig(
@@ -20,12 +32,10 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 try:
-    from refactored_optimization_system import (
         OptimizationManager, create_optimization_manager,
         monitor_performance, retry_on_failure,
         OptimizationError, LibraryNotAvailableError
     )
-    from refactored_workflow_engine import (
         RefactoredWorkflowEngine, create_workflow_engine,
         WorkflowState, WorkflowStatus
     )
@@ -38,12 +48,12 @@ except ImportError as e:
 class IntegrationTestSuite:
     """Comprehensive integration test suite for the refactored system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.test_results = {}
         self.optimization_manager = None
         self.workflow_engine = None
         
-    async def setup_systems(self):
+    async def setup_systems(self) -> Any:
         """Initialize all systems for testing."""
         logger.info("Setting up integration test systems...")
         
@@ -74,7 +84,7 @@ class IntegrationTestSuite:
         return init_results
     
     @monitor_performance
-    async def test_optimization_system_integration(self):
+    async def test_optimization_system_integration(self) -> Any:
         """Test that all optimization components work together."""
         logger.info("Testing optimization system integration...")
         
@@ -84,9 +94,8 @@ class IntegrationTestSuite:
         numba_optimizer = self.optimization_manager.get_optimizer("numba")
         if numba_optimizer and numba_optimizer.is_available():
             try:
-                import numpy as np
                 
-                def test_function(x, y):
+                def test_function(x, y) -> Any:
                     return np.sqrt(x**2 + y**2)
                 
                 compiled_func = numba_optimizer.compile_function(test_function)
@@ -107,7 +116,7 @@ class IntegrationTestSuite:
         dask_optimizer = self.optimization_manager.get_optimizer("dask")
         if dask_optimizer and dask_optimizer.is_available():
             try:
-                def process_item(item):
+                def process_item(item) -> Any:
                     return item * 2
                 
                 test_data = [1, 2, 3, 4, 5]
@@ -171,7 +180,7 @@ class IntegrationTestSuite:
         return results
     
     @monitor_performance
-    async def test_workflow_engine_integration(self):
+    async def test_workflow_engine_integration(self) -> Any:
         """Test that the workflow engine integrates with all optimizers."""
         logger.info("Testing workflow engine integration...")
         
@@ -229,7 +238,7 @@ class IntegrationTestSuite:
         return results
     
     @monitor_performance
-    async def test_error_handling_integration(self):
+    async def test_error_handling_integration(self) -> Any:
         """Test error handling across the entire system."""
         logger.info("Testing error handling integration...")
         
@@ -273,7 +282,7 @@ class IntegrationTestSuite:
         return results
     
     @monitor_performance
-    async def test_performance_monitoring_integration(self):
+    async def test_performance_monitoring_integration(self) -> Any:
         """Test performance monitoring across the system."""
         logger.info("Testing performance monitoring integration...")
         
@@ -281,7 +290,7 @@ class IntegrationTestSuite:
         
         # Test decorated function performance
         @monitor_performance
-        def test_performance_function(data):
+        def test_performance_function(data) -> Any:
             time.sleep(0.1)  # Simulate work
             return [x * 2 for x in data]
         
@@ -301,7 +310,7 @@ class IntegrationTestSuite:
         
         # Test retry mechanism
         @retry_on_failure(max_retries=2, delay=0.1)
-        def test_retry_function(should_fail=False):
+        def test_retry_function(should_fail=False) -> Any:
             if should_fail:
                 raise ValueError("Simulated failure")
             return "success"
@@ -329,7 +338,7 @@ class IntegrationTestSuite:
         
         return results
     
-    async def run_comprehensive_integration_test(self):
+    async def run_comprehensive_integration_test(self) -> Any:
         """Run all integration tests."""
         logger.info("Starting comprehensive integration test...")
         
@@ -359,7 +368,7 @@ class IntegrationTestSuite:
         
         return self.test_results
     
-    def _calculate_test_summary(self):
+    def _calculate_test_summary(self) -> Any:
         """Calculate overall test summary."""
         total_tests = 0
         passed_tests = 0
@@ -385,7 +394,7 @@ class IntegrationTestSuite:
             "overall_status": "PASS" if failed_tests == 0 else "FAIL"
         }
     
-    def cleanup(self):
+    def cleanup(self) -> Any:
         """Cleanup test resources."""
         if self.workflow_engine:
             self.workflow_engine.cleanup()
@@ -405,6 +414,10 @@ async def main():
         
         # Save results
         with open("integration_test_results.json", "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(results, f, indent=2, default=str)
         
         # Print summary
@@ -434,5 +447,6 @@ async def main():
         test_suite.cleanup()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

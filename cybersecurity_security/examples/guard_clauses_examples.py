@@ -1,14 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from typing import List, Dict, Any, Optional
+from ..core import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Guard Clauses Examples
 
 Demonstrates error and edge-case checking with guard clauses.
 """
 
-import asyncio
-import time
-from typing import List, Dict, Any, Optional
 
-from ..core import (
     # Guard Clause Types
     GuardType, GuardSeverity,
     
@@ -69,7 +82,7 @@ def demonstrate_basic_guard_clauses():
     
     # Example 7: Guard against rate limiting
     @guard_against_rate_limit(max_calls=5, time_window=60.0)
-    def api_call() -> str:
+    async def api_call() -> str:
         return "API call successful"
     
     # Test the guard clauses
@@ -331,7 +344,9 @@ def demonstrate_guard_context():
     
     # Example 1: Using guard context
     def scan_operation(target: str, ports: List[int], timeout: float):
-        with GuardContext("port_scan", "scanner", "scan_target") as guard:
+        
+    """scan_operation function."""
+with GuardContext("port_scan", "scanner", "scan_target") as guard:
             # Apply multiple guards
             guard.apply_guard(guard_target, target)
             guard.apply_guard(guard_port, 80)  # Example port check
@@ -342,7 +357,9 @@ def demonstrate_guard_context():
     
     # Example 2: Guard context with error handling
     def attack_operation(target: str, attack_type: str, payload: Dict[str, Any]):
-        with GuardContext("attack", "attacker", "execute_attack") as guard:
+        
+    """attack_operation function."""
+with GuardContext("attack", "attacker", "execute_attack") as guard:
             try:
                 # Apply attack-specific guards
                 guard.apply_guard(guard_target, target)
@@ -397,7 +414,9 @@ def demonstrate_apply_guards():
     
     # Example 2: Apply guards with custom validation
     def validate_scan_config(config: Dict[str, Any]):
-        if "timeout" not in config:
+        
+    """validate_scan_config function."""
+if "timeout" not in config:
             raise ValidationError("Missing timeout in config")
         if config["timeout"] <= 0:
             raise ValidationError("Timeout must be positive")
@@ -521,7 +540,7 @@ def demonstrate_real_world_examples():
     
     # Example 1: Security scanner with comprehensive guards
     class SecurityScanner:
-        def __init__(self):
+        def __init__(self) -> Any:
             self.scan_history = []
         
         @guard_against_none("target")
@@ -563,7 +582,7 @@ def demonstrate_real_world_examples():
     
     # Example 2: Attack module with rate limiting
     class AttackModule:
-        def __init__(self):
+        def __init__(self) -> Any:
             self.attack_count = 0
         
         @guard_against_rate_limit(max_calls=10, time_window=60.0)
@@ -744,5 +763,6 @@ def main():
         print(f"❌ Error running guard clause examples: {e}")
         raise
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

@@ -1,9 +1,10 @@
-"""
-Product Description Generator
-=============================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-High-level generator class that orchestrates the model for product description generation.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import torch
 import asyncio
@@ -12,9 +13,18 @@ import logging
 from concurrent.futures import ThreadPoolExecutor
 import time
 from dataclasses import asdict
-
 from .model import ProductDescriptionModel
 from .config import ProductDescriptionConfig, ECOMMERCE_CONFIG, LUXURY_CONFIG, TECHNICAL_CONFIG
+        import hashlib
+from typing import Any, List, Dict, Optional
+"""
+Product Description Generator
+=============================
+
+High-level generator class that orchestrates the model for product description generation.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +42,9 @@ class ProductDescriptionGenerator:
     """
     
     def __init__(self, config: Optional[ProductDescriptionConfig] = None):
-        self.config = config or ProductDescriptionConfig()
+        
+    """__init__ function."""
+self.config = config or ProductDescriptionConfig()
         self.model: Optional[ProductDescriptionModel] = None
         self.is_initialized = False
         
@@ -237,7 +249,7 @@ class ProductDescriptionGenerator:
         """Generate descriptions for multiple products asynchronously."""
         semaphore = asyncio.Semaphore(max_concurrent)
         
-        async def generate_single(product):
+        async def generate_single(product) -> Any:
             async with semaphore:
                 return await self.generate_async(
                     product_name=product["product_name"],
@@ -305,7 +317,6 @@ class ProductDescriptionGenerator:
     
     def _generate_cache_key(self, *args) -> str:
         """Generate cache key from parameters."""
-        import hashlib
         key_string = "|".join(str(arg) for arg in args)
         return hashlib.md5(key_string.encode()).hexdigest()
     
@@ -343,12 +354,12 @@ class ProductDescriptionGenerator:
             "model_device": self.config.model.device if self.model else None
         }
     
-    def clear_cache(self):
+    def clear_cache(self) -> Any:
         """Clear the generation cache."""
         self.cache.clear()
         logger.info("Cache cleared")
     
-    def __del__(self):
+    def __del__(self) -> Any:
         """Cleanup resources."""
         if hasattr(self, 'executor'):
             self.executor.shutdown(wait=False) 

@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from __future__ import annotations
+from typing import (
+from datetime import datetime
+import uuid
+import time
+from functools import wraps
+from dataclasses import dataclass, field
+from enum import Enum
+import logging
+from fastapi import (
+from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
+import structlog
+from ..utils.optimized_base_model import OptimizedBaseModel
+from ..utils.error_system import error_factory, ErrorContext, ValidationError
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Declarative Route Definitions with Clear Return Type Annotations
 ===============================================================
@@ -19,29 +44,14 @@ Features:
 - OpenAPI documentation
 """
 
-from __future__ import annotations
-from typing import (
     Any, Dict, List, Optional, Type, TypeVar, Union, Callable, 
     Generic, Awaitable, Protocol, runtime_checkable, Annotated
 )
-from datetime import datetime
-import uuid
-import time
-from functools import wraps
-from dataclasses import dataclass, field
-from enum import Enum
-import logging
 
-from fastapi import (
     APIRouter, Depends, HTTPException, status, Request, Response,
     BackgroundTasks, Query, Path, Body, Header, Form, File, UploadFile
 )
-from fastapi.responses import JSONResponse, StreamingResponse, FileResponse
-from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
-import structlog
 
-from ..utils.optimized_base_model import OptimizedBaseModel
-from ..utils.error_system import error_factory, ErrorContext, ValidationError
 
 logger = structlog.get_logger(__name__)
 
@@ -166,7 +176,7 @@ def declarative_route(
         )
         
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.perf_counter()
             request_id = str(uuid.uuid4())
             
@@ -430,7 +440,9 @@ class DeclarativeRouter:
     """Router class for declarative route definitions."""
     
     def __init__(self, prefix: str = "", tags: Optional[List[str]] = None):
-        self.prefix = prefix
+        
+    """__init__ function."""
+self.prefix = prefix
         self.tags = tags or []
         self.routes: List[RouteMetadata] = []
         self.router = APIRouter(prefix=prefix, tags=self.tags)

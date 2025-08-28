@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-"""
-Onyx AI Video System - Startup Script
-
-Command-line interface and startup script for the Onyx-adapted AI Video system.
-Provides initialization, configuration management, and system control.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import argparse
@@ -14,20 +11,32 @@ import signal
 import time
 from pathlib import Path
 from typing import Dict, Any, Optional
-
-# Onyx imports
 from onyx.utils.logger import setup_logger
 from onyx.utils.timing import time_function
 from onyx.utils.telemetry import TelemetryLogger
 from onyx.utils.gpu_utils import get_gpu_info, is_gpu_available
 from onyx.core.functions import format_response, handle_error
-
-# Local imports
 from .onyx_config import get_config, save_config, validate_config, get_config_summary, create_default_config
 from .onyx_main import OnyxAIVideoSystem, get_system, shutdown_system
 from .onyx_video_workflow import onyx_video_generator
 from .onyx_plugin_manager import onyx_plugin_manager
 from .core.onyx_integration import onyx_integration
+            from .models import VideoRequest
+                from .models import VideoRequest
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Onyx AI Video System - Startup Script
+
+Command-line interface and startup script for the Onyx-adapted AI Video system.
+Provides initialization, configuration management, and system control.
+"""
+
+
+# Onyx imports
+
+# Local imports
 
 logger = setup_logger(__name__)
 
@@ -40,7 +49,7 @@ class OnyxAIVideoCLI:
     and video generation operations.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = setup_logger("onyx_ai_video_cli")
         self.telemetry = TelemetryLogger()
         self.system: Optional[OnyxAIVideoSystem] = None
@@ -111,7 +120,7 @@ class OnyxAIVideoCLI:
             self.logger.info("System is running. Press Ctrl+C to stop.")
             
             # Setup signal handlers
-            def signal_handler(signum, frame):
+            def signal_handler(signum, frame) -> Any:
                 self.logger.info(f"Received signal {signum}, shutting down...")
                 asyncio.create_task(self.shutdown())
             
@@ -361,7 +370,6 @@ class OnyxAIVideoCLI:
     async def _generate_video(self, args: argparse.Namespace) -> int:
         """Generate video from command line."""
         try:
-            from .models import VideoRequest
             
             # Create video request
             request = VideoRequest(
@@ -499,7 +507,6 @@ class OnyxAIVideoCLI:
             
             # Test 4: Video generation (if requested)
             if args.test_generation:
-                from .models import VideoRequest
                 
                 test_request = VideoRequest(
                     input_text="Test video generation",
@@ -688,5 +695,6 @@ async def main() -> int:
         return 1
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     sys.exit(asyncio.run(main())) 

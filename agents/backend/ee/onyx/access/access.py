@@ -1,16 +1,34 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy.orm import Session
 
 from ee.onyx.db.external_perm import fetch_external_groups_for_user
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.db.external_perm import fetch_public_external_group_ids
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.db.user_group import fetch_user_groups_for_documents
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.db.user_group import fetch_user_groups_for_user
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.external_permissions.post_query_censoring import (
-    DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION,
-)
 from ee.onyx.external_permissions.sync_params import DOC_PERMISSIONS_FUNC_MAP
 from onyx.access.access import (
-    _get_access_for_documents as get_access_for_documents_without_groups,
-)
 from onyx.access.access import _get_acl_for_user as get_acl_for_user_without_groups
 from onyx.access.models import DocumentAccess
 from onyx.access.utils import prefix_external_group
@@ -18,9 +36,16 @@ from onyx.access.utils import prefix_user_group
 from onyx.db.document import get_document_sources
 from onyx.db.document import get_documents_by_ids
 from onyx.db.models import User
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    DOC_SOURCE_TO_CHUNK_CENSORING_FUNCTION,
+)
+    _get_access_for_documents as get_access_for_documents_without_groups,
+)
 
 
-def _get_access_for_document(
+async def _get_access_for_document(
     document_id: str,
     db_session: Session,
 ) -> DocumentAccess:
@@ -37,7 +62,7 @@ def _get_access_for_document(
     return next(iter(id_to_access.values()))
 
 
-def _get_access_for_documents(
+async def _get_access_for_documents(
     document_ids: list[str],
     db_session: Session,
 ) -> dict[str, DocumentAccess]:
@@ -48,6 +73,11 @@ def _get_access_for_documents(
     user_group_info: dict[str, list[str]] = {
         document_id: group_names
         for document_id, group_names in fetch_user_groups_for_documents(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             db_session=db_session,
             document_ids=document_ids,
         )
@@ -65,6 +95,11 @@ def _get_access_for_documents(
     )
 
     all_public_ext_u_group_ids = set(fetch_public_external_group_ids(db_session))
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     access_map = {}
     for document_id, non_ee_access in non_ee_access_dict.items():
@@ -109,21 +144,36 @@ def _get_access_for_documents(
     return access_map
 
 
-def _get_acl_for_user(user: User | None, db_session: Session) -> set[str]:
+async def _get_acl_for_user(user: User | None, db_session: Session) -> set[str]:
     """Returns a list of ACL entries that the user has access to. This is meant to be
     used downstream to filter out documents that the user does not have access to. The
     user should have access to a document if at least one entry in the document's ACL
     matches one entry in the returned set.
 
     NOTE: is imported in onyx.access.access by `fetch_versioned_implementation`
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     DO NOT REMOVE."""
     db_user_groups = fetch_user_groups_for_user(db_session, user.id) if user else []
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     prefixed_user_groups = [
         prefix_user_group(db_user_group.name) for db_user_group in db_user_groups
     ]
 
     db_external_groups = (
         fetch_external_groups_for_user(db_session, user.id) if user else []
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     )
     prefixed_external_groups = [
         prefix_external_group(db_external_group.external_user_group_id)

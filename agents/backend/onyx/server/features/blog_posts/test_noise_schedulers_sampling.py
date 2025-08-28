@@ -1,8 +1,10 @@
-"""
-Comprehensive tests for Noise Schedulers and Sampling Methods
-Tests all components including schedulers, sampling methods, analysis tools,
-and practical implementations
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import torch
 import torch.nn as nn
@@ -14,9 +16,23 @@ import tempfile
 import os
 import warnings
 import matplotlib.pyplot as plt
+from noise_schedulers_sampling import (
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Comprehensive tests for Noise Schedulers and Sampling Methods
+Tests all components including schedulers, sampling methods, analysis tools,
+and practical implementations
+"""
+
 
 # Import noise schedulers and sampling methods
-from noise_schedulers_sampling import (
     NoiseSchedulerConfig, NoiseSchedulerBase, AdvancedNoiseScheduler,
     AdvancedSamplingMethods, NoiseSchedulerAnalyzer, NoiseSchedulerVisualizer,
     CustomNoiseScheduler
@@ -29,7 +45,7 @@ warnings.filterwarnings("ignore")
 class TestNoiseSchedulerConfig:
     """Test NoiseSchedulerConfig dataclass"""
     
-    def test_noise_scheduler_config_defaults(self):
+    def test_noise_scheduler_config_defaults(self) -> Any:
         """Test default configuration values"""
         config = NoiseSchedulerConfig()
         
@@ -86,7 +102,7 @@ class TestNoiseSchedulerConfig:
         assert config.adaptive_threshold == 0.1
         assert config.adaptive_window_size == 10
     
-    def test_noise_scheduler_config_custom(self):
+    def test_noise_scheduler_config_custom(self) -> Any:
         """Test custom configuration values"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=500,
@@ -167,7 +183,7 @@ class TestNoiseSchedulerConfig:
 class TestNoiseSchedulerBase:
     """Test base noise scheduler functionality"""
     
-    def test_beta_schedule_linear(self):
+    def test_beta_schedule_linear(self) -> Any:
         """Test linear beta schedule"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -178,13 +194,13 @@ class TestNoiseSchedulerBase:
         
         # Create a concrete implementation for testing
         class TestScheduler(NoiseSchedulerBase):
-            def step(self, model_output, timestep, sample, **kwargs):
+            def step(self, model_output, timestep, sample, **kwargs) -> Any:
                 return {'prev_sample': sample}
             
-            def add_noise(self, original_samples, timesteps):
+            def add_noise(self, original_samples, timesteps) -> Any:
                 return original_samples
             
-            def set_timesteps(self, num_inference_steps, device):
+            def set_timesteps(self, num_inference_steps, device) -> Any:
                 pass
         
         scheduler = TestScheduler(config)
@@ -195,7 +211,7 @@ class TestNoiseSchedulerBase:
         assert torch.all(scheduler.betas >= 0)
         assert torch.all(scheduler.betas <= 1)
     
-    def test_beta_schedule_cosine(self):
+    def test_beta_schedule_cosine(self) -> Any:
         """Test cosine beta schedule"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -205,13 +221,13 @@ class TestNoiseSchedulerBase:
         )
         
         class TestScheduler(NoiseSchedulerBase):
-            def step(self, model_output, timestep, sample, **kwargs):
+            def step(self, model_output, timestep, sample, **kwargs) -> Any:
                 return {'prev_sample': sample}
             
-            def add_noise(self, original_samples, timesteps):
+            def add_noise(self, original_samples, timesteps) -> Any:
                 return original_samples
             
-            def set_timesteps(self, num_inference_steps, device):
+            def set_timesteps(self, num_inference_steps, device) -> Any:
                 pass
         
         scheduler = TestScheduler(config)
@@ -231,7 +247,7 @@ class TestNoiseSchedulerBase:
         
         assert not torch.allclose(scheduler.betas, linear_scheduler.betas)
     
-    def test_beta_schedule_quadratic(self):
+    def test_beta_schedule_quadratic(self) -> Any:
         """Test quadratic beta schedule"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -241,13 +257,13 @@ class TestNoiseSchedulerBase:
         )
         
         class TestScheduler(NoiseSchedulerBase):
-            def step(self, model_output, timestep, sample, **kwargs):
+            def step(self, model_output, timestep, sample, **kwargs) -> Any:
                 return {'prev_sample': sample}
             
-            def add_noise(self, original_samples, timesteps):
+            def add_noise(self, original_samples, timesteps) -> Any:
                 return original_samples
             
-            def set_timesteps(self, num_inference_steps, device):
+            def set_timesteps(self, num_inference_steps, device) -> Any:
                 pass
         
         scheduler = TestScheduler(config)
@@ -258,7 +274,7 @@ class TestNoiseSchedulerBase:
         assert torch.all(scheduler.betas >= 0)
         assert torch.all(scheduler.betas <= 1)
     
-    def test_beta_schedule_sigmoid(self):
+    def test_beta_schedule_sigmoid(self) -> Any:
         """Test sigmoid beta schedule"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -268,13 +284,13 @@ class TestNoiseSchedulerBase:
         )
         
         class TestScheduler(NoiseSchedulerBase):
-            def step(self, model_output, timestep, sample, **kwargs):
+            def step(self, model_output, timestep, sample, **kwargs) -> Any:
                 return {'prev_sample': sample}
             
-            def add_noise(self, original_samples, timesteps):
+            def add_noise(self, original_samples, timesteps) -> Any:
                 return original_samples
             
-            def set_timesteps(self, num_inference_steps, device):
+            def set_timesteps(self, num_inference_steps, device) -> Any:
                 pass
         
         scheduler = TestScheduler(config)
@@ -283,7 +299,7 @@ class TestNoiseSchedulerBase:
         assert torch.all(scheduler.betas >= 0)
         assert torch.all(scheduler.betas <= 1)
     
-    def test_beta_schedule_scaled_linear(self):
+    def test_beta_schedule_scaled_linear(self) -> Any:
         """Test scaled linear beta schedule"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -293,13 +309,13 @@ class TestNoiseSchedulerBase:
         )
         
         class TestScheduler(NoiseSchedulerBase):
-            def step(self, model_output, timestep, sample, **kwargs):
+            def step(self, model_output, timestep, sample, **kwargs) -> Any:
                 return {'prev_sample': sample}
             
-            def add_noise(self, original_samples, timesteps):
+            def add_noise(self, original_samples, timesteps) -> Any:
                 return original_samples
             
-            def set_timesteps(self, num_inference_steps, device):
+            def set_timesteps(self, num_inference_steps, device) -> Any:
                 pass
         
         scheduler = TestScheduler(config)
@@ -310,7 +326,7 @@ class TestNoiseSchedulerBase:
         assert torch.all(scheduler.betas >= 0)
         assert torch.all(scheduler.betas <= 1)
     
-    def test_derived_quantities(self):
+    def test_derived_quantities(self) -> Any:
         """Test derived quantities from beta schedule"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -320,13 +336,13 @@ class TestNoiseSchedulerBase:
         )
         
         class TestScheduler(NoiseSchedulerBase):
-            def step(self, model_output, timestep, sample, **kwargs):
+            def step(self, model_output, timestep, sample, **kwargs) -> Any:
                 return {'prev_sample': sample}
             
-            def add_noise(self, original_samples, timesteps):
+            def add_noise(self, original_samples, timesteps) -> Any:
                 return original_samples
             
-            def set_timesteps(self, num_inference_steps, device):
+            def set_timesteps(self, num_inference_steps, device) -> Any:
                 pass
         
         scheduler = TestScheduler(config)
@@ -353,7 +369,7 @@ class TestNoiseSchedulerBase:
 class TestAdvancedNoiseScheduler:
     """Test advanced noise scheduler"""
     
-    def test_scheduler_initialization(self):
+    def test_scheduler_initialization(self) -> Any:
         """Test scheduler initialization"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -369,7 +385,7 @@ class TestAdvancedNoiseScheduler:
         assert scheduler.scheduler is not None
         assert scheduler.timesteps is None
     
-    def test_scheduler_add_noise(self):
+    def test_scheduler_add_noise(self) -> Any:
         """Test scheduler add noise"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -390,7 +406,7 @@ class TestAdvancedNoiseScheduler:
         assert not torch.isnan(noisy_samples).any()
         assert not torch.allclose(noisy_samples, original_samples)
     
-    def test_scheduler_step(self):
+    def test_scheduler_step(self) -> Any:
         """Test scheduler step"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -412,7 +428,7 @@ class TestAdvancedNoiseScheduler:
         assert result['prev_sample'].shape == sample.shape
         assert not torch.isnan(result['prev_sample']).any()
     
-    def test_scheduler_set_timesteps(self):
+    def test_scheduler_set_timesteps(self) -> Any:
         """Test scheduler set timesteps"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -431,7 +447,7 @@ class TestAdvancedNoiseScheduler:
         assert len(scheduler.scheduler.timesteps) == 20
         assert scheduler.timesteps is not None
     
-    def test_scheduler_scale_model_input(self):
+    def test_scheduler_scale_model_input(self) -> Any:
         """Test scheduler scale model input"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -451,7 +467,7 @@ class TestAdvancedNoiseScheduler:
         assert scaled_sample.shape == sample.shape
         assert not torch.isnan(scaled_sample).any()
     
-    def test_different_scheduler_types(self):
+    def test_different_scheduler_types(self) -> Any:
         """Test different scheduler types"""
         scheduler_types = ["ddpm", "ddim", "pndm", "euler"]
         
@@ -473,7 +489,7 @@ class TestAdvancedNoiseScheduler:
 class TestAdvancedSamplingMethods:
     """Test advanced sampling methods"""
     
-    def test_sampling_methods_initialization(self):
+    def test_sampling_methods_initialization(self) -> Any:
         """Test sampling methods initialization"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -488,7 +504,7 @@ class TestAdvancedSamplingMethods:
         assert sampling_methods.config == config
         assert sampling_methods.device is not None
     
-    def test_standard_sampling(self):
+    def test_standard_sampling(self) -> Any:
         """Test standard sampling"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -503,12 +519,12 @@ class TestAdvancedSamplingMethods:
         
         # Simple model for testing
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -521,7 +537,7 @@ class TestAdvancedSamplingMethods:
         assert samples.shape == latents.shape
         assert not torch.isnan(samples).any()
     
-    def test_temperature_sampling(self):
+    def test_temperature_sampling(self) -> Any:
         """Test temperature sampling"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -535,12 +551,12 @@ class TestAdvancedSamplingMethods:
         scheduler = AdvancedNoiseScheduler(config)
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -553,7 +569,7 @@ class TestAdvancedSamplingMethods:
         assert samples.shape == latents.shape
         assert not torch.isnan(samples).any()
     
-    def test_noise_injection_sampling(self):
+    def test_noise_injection_sampling(self) -> Any:
         """Test noise injection sampling"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -567,12 +583,12 @@ class TestAdvancedSamplingMethods:
         scheduler = AdvancedNoiseScheduler(config)
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -585,7 +601,7 @@ class TestAdvancedSamplingMethods:
         assert samples.shape == latents.shape
         assert not torch.isnan(samples).any()
     
-    def test_classifier_free_guidance_sampling(self):
+    def test_classifier_free_guidance_sampling(self) -> Any:
         """Test classifier-free guidance sampling"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -599,12 +615,12 @@ class TestAdvancedSamplingMethods:
         scheduler = AdvancedNoiseScheduler(config)
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t, embeddings=None):
+            def forward(self, x, t, embeddings=None) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -625,7 +641,7 @@ class TestAdvancedSamplingMethods:
 class TestNoiseSchedulerAnalyzer:
     """Test noise scheduler analyzer"""
     
-    def test_analyzer_initialization(self):
+    def test_analyzer_initialization(self) -> Any:
         """Test analyzer initialization"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -638,7 +654,7 @@ class TestNoiseSchedulerAnalyzer:
         
         assert analyzer.config == config
     
-    def test_analyze_scheduler_properties(self):
+    def test_analyze_scheduler_properties(self) -> Any:
         """Test scheduler properties analysis"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -663,7 +679,7 @@ class TestNoiseSchedulerAnalyzer:
         assert properties['beta_schedule'] == "linear"
         assert properties['prediction_type'] == "epsilon"
     
-    def test_compare_schedulers(self):
+    def test_compare_schedulers(self) -> Any:
         """Test scheduler comparison"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -685,7 +701,7 @@ class TestNoiseSchedulerAnalyzer:
         for scheduler_type in scheduler_types:
             assert comparison[scheduler_type]['scheduler_type'] == scheduler_type
     
-    def test_analyze_sampling_efficiency(self):
+    def test_analyze_sampling_efficiency(self) -> Any:
         """Test sampling efficiency analysis"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -699,12 +715,12 @@ class TestNoiseSchedulerAnalyzer:
         scheduler = AdvancedNoiseScheduler(config)
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -729,7 +745,7 @@ class TestNoiseSchedulerAnalyzer:
 class TestNoiseSchedulerVisualizer:
     """Test noise scheduler visualizer"""
     
-    def test_visualizer_initialization(self):
+    def test_visualizer_initialization(self) -> Any:
         """Test visualizer initialization"""
         config = NoiseSchedulerConfig(
             save_path="test_visualizations"
@@ -742,10 +758,9 @@ class TestNoiseSchedulerVisualizer:
         assert os.path.exists("test_visualizations")
         
         # Cleanup
-        import shutil
         shutil.rmtree("test_visualizations")
     
-    def test_visualize_beta_schedules(self):
+    def test_visualize_beta_schedules(self) -> Any:
         """Test beta schedules visualization"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -763,10 +778,9 @@ class TestNoiseSchedulerVisualizer:
         assert os.path.exists(os.path.join("test_visualizations", "beta_schedules.png"))
         
         # Cleanup
-        import shutil
         shutil.rmtree("test_visualizations")
     
-    def test_visualize_alphas_cumprod(self):
+    def test_visualize_alphas_cumprod(self) -> Any:
         """Test alphas cumprod visualization"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -784,10 +798,9 @@ class TestNoiseSchedulerVisualizer:
         assert os.path.exists(os.path.join("test_visualizations", "alphas_cumprod.png"))
         
         # Cleanup
-        import shutil
         shutil.rmtree("test_visualizations")
     
-    def test_visualize_sampling_comparison(self):
+    def test_visualize_sampling_comparison(self) -> Any:
         """Test sampling comparison visualization"""
         config = NoiseSchedulerConfig(
             save_path="test_visualizations"
@@ -807,14 +820,13 @@ class TestNoiseSchedulerVisualizer:
         assert os.path.exists(os.path.join("test_visualizations", "sampling_comparison.png"))
         
         # Cleanup
-        import shutil
         shutil.rmtree("test_visualizations")
 
 
 class TestCustomNoiseScheduler:
     """Test custom noise scheduler"""
     
-    def test_custom_scheduler_initialization(self):
+    def test_custom_scheduler_initialization(self) -> Any:
         """Test custom scheduler initialization"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -832,7 +844,7 @@ class TestCustomNoiseScheduler:
         assert scheduler.noise_injection_strength == 0.1
         assert scheduler.betas.shape == (100,)
     
-    def test_custom_scheduler_step(self):
+    def test_custom_scheduler_step(self) -> Any:
         """Test custom scheduler step"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -855,7 +867,7 @@ class TestCustomNoiseScheduler:
         assert result['prev_sample'].shape == sample.shape
         assert not torch.isnan(result['prev_sample']).any()
     
-    def test_custom_scheduler_add_noise(self):
+    def test_custom_scheduler_add_noise(self) -> Any:
         """Test custom scheduler add noise"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -875,7 +887,7 @@ class TestCustomNoiseScheduler:
         assert not torch.isnan(noisy_samples).any()
         assert not torch.allclose(noisy_samples, original_samples)
     
-    def test_custom_scheduler_set_timesteps(self):
+    def test_custom_scheduler_set_timesteps(self) -> Any:
         """Test custom scheduler set timesteps"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -893,7 +905,7 @@ class TestCustomNoiseScheduler:
         assert len(scheduler.timesteps) == 20
         assert scheduler.timesteps.device == device
     
-    def test_custom_scheduler_scale_model_input(self):
+    def test_custom_scheduler_scale_model_input(self) -> Any:
         """Test custom scheduler scale model input"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -916,7 +928,7 @@ class TestCustomNoiseScheduler:
 class TestIntegration:
     """Integration tests"""
     
-    def test_end_to_end_sampling(self):
+    def test_end_to_end_sampling(self) -> Any:
         """Test end-to-end sampling pipeline"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -930,12 +942,12 @@ class TestIntegration:
         sampling_methods = AdvancedSamplingMethods(config)
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -956,7 +968,7 @@ class TestIntegration:
         assert not torch.isnan(samples_temp).any()
         assert not torch.isnan(samples_noise).any()
     
-    def test_scheduler_comparison_pipeline(self):
+    def test_scheduler_comparison_pipeline(self) -> Any:
         """Test scheduler comparison pipeline"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -984,14 +996,13 @@ class TestIntegration:
         assert os.path.exists(os.path.join(config.save_path, "alphas_cumprod.png"))
         
         # Cleanup
-        import shutil
         shutil.rmtree(config.save_path)
 
 
 class TestMathematicalCorrectness:
     """Test mathematical correctness of noise schedulers"""
     
-    def test_beta_schedule_properties(self):
+    def test_beta_schedule_properties(self) -> Any:
         """Test properties of beta schedule"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -1019,7 +1030,7 @@ class TestMathematicalCorrectness:
         # Alphas cumprod should be monotonically decreasing
         assert torch.all(scheduler.alphas_cumprod[1:] <= scheduler.alphas_cumprod[:-1])
     
-    def test_noise_addition_equation(self):
+    def test_noise_addition_equation(self) -> Any:
         """Test that noise addition follows the correct equation"""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,

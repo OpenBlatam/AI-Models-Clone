@@ -1,10 +1,10 @@
-"""
-🧪 Functional Approach Tests
-============================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive tests for the functional, declarative programming approach.
-Tests pure functions, immutable data structures, and functional patterns.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import pytest
 import numpy as np
@@ -13,9 +13,28 @@ from unittest.mock import patch, MagicMock
 import tempfile
 import json
 from pathlib import Path
+from functional_training import (
+from functional_config_loader import (
+from functional_evaluation_metrics import (
+from functional_fastapi_app import (
+        import yaml
+        from hypothesis import given, strategies as st
+        from hypothesis import given, strategies as st
+        import time
+        import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+🧪 Functional Approach Tests
+============================
+
+Comprehensive tests for the functional, declarative programming approach.
+Tests pure functions, immutable data structures, and functional patterns.
+"""
+
 
 # Import functional modules
-from functional_training import (
     TrainingConfig, TrainingMode, ModelType, TrainingState,
     create_default_config, update_config, validate_config,
     create_model, create_optimizer, create_scheduler,
@@ -23,21 +42,18 @@ from functional_training import (
     get_device_info, setup_device_optimization
 )
 
-from functional_config_loader import (
     ExperimentConfig, ExperimentMetadata, ConfigValidationResult,
     load_config_from_yaml, save_config_to_yaml,
     create_experiment_config, validate_config_parameters,
     merge_configs, create_config_from_template
 )
 
-from functional_evaluation_metrics import (
     TaskType, MetricType, MetricConfig, EvaluationResult,
     calculate_classification_metrics, calculate_regression_metrics,
     evaluate_model, compare_models, rank_models,
     quick_evaluate_classification, quick_evaluate_regression
 )
 
-from functional_fastapi_app import (
     TrainingRequest, InferenceRequest, ExperimentStatus, TrainingResponse,
     create_app_config, create_cors_config, setup_logging,
     create_experiment_id, create_experiment_state, update_experiment_state,
@@ -92,7 +108,7 @@ def sample_training_request():
 class TestFunctionalTraining:
     """Test functional training functions."""
     
-    def test_create_default_config(self):
+    def test_create_default_config(self) -> Any:
         """Test creating default configuration."""
         config = create_default_config("test-model", "data/test.csv")
         
@@ -103,7 +119,7 @@ class TestFunctionalTraining:
         assert config.batch_size == 16
         assert config.learning_rate == 2e-5
     
-    def test_update_config_immutable(self, sample_config):
+    def test_update_config_immutable(self, sample_config) -> Any:
         """Test that config updates are immutable."""
         original_batch_size = sample_config.batch_size
         updated_config = update_config(sample_config, batch_size=32)
@@ -115,13 +131,13 @@ class TestFunctionalTraining:
         # Should be different objects
         assert sample_config is not updated_config
     
-    def test_validate_config_valid(self, sample_config):
+    def test_validate_config_valid(self, sample_config) -> bool:
         """Test validation of valid configuration."""
         is_valid, errors = validate_config(sample_config)
         assert is_valid
         assert len(errors) == 0
     
-    def test_validate_config_invalid(self):
+    def test_validate_config_invalid(self) -> bool:
         """Test validation of invalid configuration."""
         invalid_config = TrainingConfig(
             model_type=ModelType.TRANSFORMER,
@@ -138,7 +154,7 @@ class TestFunctionalTraining:
         assert len(errors) > 0
         assert "batch_size must be positive" in errors
     
-    def test_calculate_metrics_pure(self, sample_data):
+    def test_calculate_metrics_pure(self, sample_data) -> Any:
         """Test that calculate_metrics is pure."""
         y_true = sample_data['y_true']
         y_pred = sample_data['y_pred']
@@ -151,7 +167,7 @@ class TestFunctionalTraining:
         # Should return same result
         assert metrics1 == metrics2
     
-    def test_get_device_info_pure(self):
+    def test_get_device_info_pure(self) -> Optional[Dict[str, Any]]:
         """Test that get_device_info is pure."""
         info1 = get_device_info()
         info2 = get_device_info()
@@ -168,7 +184,7 @@ class TestFunctionalTraining:
 class TestFunctionalConfigLoader:
     """Test functional configuration loader."""
     
-    def test_load_and_save_yaml(self, sample_config, tmp_path):
+    def test_load_and_save_yaml(self, sample_config, tmp_path) -> Any:
         """Test loading and saving YAML configuration."""
         config_path = tmp_path / "test_config.yaml"
         
@@ -184,7 +200,7 @@ class TestFunctionalConfigLoader:
         assert loaded_config.batch_size == sample_config.batch_size
         assert loaded_config.learning_rate == sample_config.learning_rate
     
-    def test_create_experiment_config(self, sample_config):
+    def test_create_experiment_config(self, sample_config) -> Any:
         """Test creating experiment configuration."""
         exp_config = create_experiment_config("test_exp", "Test experiment", sample_config)
         
@@ -194,14 +210,14 @@ class TestFunctionalConfigLoader:
         assert exp_config.metadata.experiment_id == "test_exp"
         assert exp_config.metadata.timestamp != ""
     
-    def test_validate_config_parameters(self, sample_config):
+    def test_validate_config_parameters(self, sample_config) -> bool:
         """Test configuration parameter validation."""
         result = validate_config_parameters(sample_config)
         
         assert result.is_valid
         assert len(result.errors) == 0
     
-    def test_merge_configs(self, sample_config):
+    def test_merge_configs(self, sample_config) -> Any:
         """Test merging configurations."""
         overrides = {"batch_size": 32, "learning_rate": 1e-5}
         merged_config = merge_configs(sample_config, overrides)
@@ -210,7 +226,7 @@ class TestFunctionalConfigLoader:
         assert merged_config.learning_rate == 1e-5
         assert merged_config.model_name == sample_config.model_name  # Unchanged
     
-    def test_create_config_from_template(self):
+    def test_create_config_from_template(self) -> Any:
         """Test creating config from template."""
         config = create_config_from_template(
             "quick", "test-model", "data/test.csv", num_epochs=10
@@ -228,7 +244,7 @@ class TestFunctionalConfigLoader:
 class TestFunctionalEvaluationMetrics:
     """Test functional evaluation metrics."""
     
-    def test_calculate_classification_metrics_pure(self, sample_data):
+    def test_calculate_classification_metrics_pure(self, sample_data) -> Any:
         """Test that classification metrics calculation is pure."""
         y_true = sample_data['y_true']
         y_pred = sample_data['y_pred']
@@ -242,7 +258,7 @@ class TestFunctionalEvaluationMetrics:
         # Should return same result
         assert metrics1 == metrics2
     
-    def test_calculate_regression_metrics_pure(self, sample_data):
+    def test_calculate_regression_metrics_pure(self, sample_data) -> Any:
         """Test that regression metrics calculation is pure."""
         y_true = sample_data['y_true_reg']
         y_pred = sample_data['y_pred_reg']
@@ -255,7 +271,7 @@ class TestFunctionalEvaluationMetrics:
         # Should return same result
         assert metrics1 == metrics2
     
-    def test_evaluate_model_classification(self, sample_data):
+    def test_evaluate_model_classification(self, sample_data) -> Any:
         """Test model evaluation for classification."""
         y_true = sample_data['y_true']
         y_pred = sample_data['y_pred']
@@ -271,7 +287,7 @@ class TestFunctionalEvaluationMetrics:
         assert result.confusion_matrix is not None
         assert result.inference_time_ms >= 0
     
-    def test_evaluate_model_regression(self, sample_data):
+    def test_evaluate_model_regression(self, sample_data) -> Any:
         """Test model evaluation for regression."""
         y_true = sample_data['y_true_reg']
         y_pred = sample_data['y_pred_reg']
@@ -284,7 +300,7 @@ class TestFunctionalEvaluationMetrics:
         assert 'r2' in result.metrics
         assert result.confusion_matrix is None
     
-    def test_compare_models(self, sample_data):
+    def test_compare_models(self, sample_data) -> Any:
         """Test model comparison."""
         y_true = sample_data['y_true']
         y_pred1 = sample_data['y_pred']
@@ -305,7 +321,7 @@ class TestFunctionalEvaluationMetrics:
         assert comparison.best_model in comparison.model_names
         assert len(comparison.improvement_scores) == 2
     
-    def test_rank_models(self, sample_data):
+    def test_rank_models(self, sample_data) -> Any:
         """Test model ranking."""
         y_true = sample_data['y_true']
         y_pred1 = sample_data['y_pred']
@@ -327,7 +343,7 @@ class TestFunctionalEvaluationMetrics:
         scores = [rank[1] for rank in rankings]
         assert scores == sorted(scores, reverse=True)
     
-    def test_quick_evaluate_classification(self, sample_data):
+    def test_quick_evaluate_classification(self, sample_data) -> Any:
         """Test quick classification evaluation."""
         y_true = sample_data['y_true']
         y_pred = sample_data['y_pred']
@@ -340,7 +356,7 @@ class TestFunctionalEvaluationMetrics:
         assert 'precision' in metrics
         assert 'recall' in metrics
     
-    def test_quick_evaluate_regression(self, sample_data):
+    def test_quick_evaluate_regression(self, sample_data) -> Any:
         """Test quick regression evaluation."""
         y_true = sample_data['y_true_reg']
         y_pred = sample_data['y_pred_reg']
@@ -358,7 +374,7 @@ class TestFunctionalEvaluationMetrics:
 class TestFunctionalFastAPIApp:
     """Test functional FastAPI app functions."""
     
-    def test_create_app_config(self):
+    def test_create_app_config(self) -> Any:
         """Test creating app configuration."""
         config = create_app_config()
         
@@ -366,7 +382,7 @@ class TestFunctionalFastAPIApp:
         assert config['description'] == "Production-ready functional NLP training and inference API"
         assert config['version'] == "1.0.0"
     
-    def test_create_cors_config(self):
+    def test_create_cors_config(self) -> Any:
         """Test creating CORS configuration."""
         cors_config = create_cors_config()
         
@@ -375,7 +391,7 @@ class TestFunctionalFastAPIApp:
         assert cors_config['allow_methods'] == ["*"]
         assert cors_config['allow_headers'] == ["*"]
     
-    def test_create_experiment_id(self, sample_training_request):
+    def test_create_experiment_id(self, sample_training_request) -> Any:
         """Test creating experiment ID."""
         # With custom ID
         request_with_id = TrainingRequest(
@@ -390,7 +406,7 @@ class TestFunctionalFastAPIApp:
         assert exp_id.startswith("exp_")
         assert "distilbert-base-uncased" in exp_id
     
-    def test_create_experiment_state(self, sample_training_request):
+    def test_create_experiment_state(self, sample_training_request) -> Any:
         """Test creating experiment state."""
         exp_id = "test_exp"
         state = create_experiment_state(exp_id, sample_training_request)
@@ -403,7 +419,7 @@ class TestFunctionalFastAPIApp:
         assert 'start_time' in state
         assert 'request' in state
     
-    def test_update_experiment_state_immutable(self, sample_training_request):
+    def test_update_experiment_state_immutable(self, sample_training_request) -> Any:
         """Test that experiment state updates are immutable."""
         exp_id = "test_exp"
         original_state = create_experiment_state(exp_id, sample_training_request)
@@ -421,7 +437,7 @@ class TestFunctionalFastAPIApp:
         # Should be different objects
         assert original_state is not updated_state
     
-    def test_create_training_response(self):
+    def test_create_training_response(self) -> Any:
         """Test creating training response."""
         response = create_training_response(
             experiment_id="test_exp",
@@ -435,7 +451,7 @@ class TestFunctionalFastAPIApp:
         assert response.message == "Success"
         assert response.estimated_duration == 300
     
-    def test_calculate_estimated_duration(self):
+    def test_calculate_estimated_duration(self) -> Any:
         """Test calculating estimated duration."""
         # Quick training
         duration = calculate_estimated_duration(5, "quick")
@@ -449,7 +465,7 @@ class TestFunctionalFastAPIApp:
         duration = calculate_estimated_duration(3, "config")
         assert duration == 3 * 350  # 3 epochs * 350 seconds
     
-    def test_handle_training_error(self):
+    def test_handle_training_error(self) -> Any:
         """Test handling training errors."""
         error = ValueError("Test error")
         experiment_id = "test_exp"
@@ -466,7 +482,7 @@ class TestFunctionalFastAPIApp:
 class TestFunctionalIntegration:
     """Test integration between functional modules."""
     
-    def test_end_to_end_training_flow(self, sample_config):
+    def test_end_to_end_training_flow(self, sample_config) -> Any:
         """Test end-to-end training flow using functional approach."""
         # Create config
         config = create_default_config("test-model", "data/test.csv")
@@ -490,7 +506,7 @@ class TestFunctionalIntegration:
         assert result.task_type == TaskType.CLASSIFICATION
         assert 'accuracy' in result.metrics
     
-    def test_config_loading_and_evaluation_pipeline(self, tmp_path):
+    def test_config_loading_and_evaluation_pipeline(self, tmp_path) -> Any:
         """Test config loading and evaluation pipeline."""
         # Create sample config file
         config_data = {
@@ -504,8 +520,11 @@ class TestFunctionalIntegration:
         }
         
         config_path = tmp_path / "test_config.yaml"
-        import yaml
         with open(config_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         
         # Load config
@@ -520,7 +539,7 @@ class TestFunctionalIntegration:
         exp_config = create_experiment_config("test_exp", "Test", config)
         assert exp_config.config == config
     
-    def test_functional_data_transformation_pipeline(self, sample_data):
+    def test_functional_data_transformation_pipeline(self, sample_data) -> Any:
         """Test functional data transformation pipeline."""
         y_true = sample_data['y_true']
         y_pred = sample_data['y_pred']
@@ -554,16 +573,15 @@ class TestFunctionalProperties:
     """Test functional properties using hypothesis."""
     
     @pytest.mark.skipif(True, reason="Requires hypothesis library")
-    def test_config_immutability_property(self):
+    def test_config_immutability_property(self) -> Any:
         """Test that config updates are always immutable."""
-        from hypothesis import given, strategies as st
         
         @given(
             model_name=st.text(min_size=1),
             dataset_path=st.text(min_size=1),
             batch_size=st.integers(min_value=1, max_value=128)
         )
-        def config_immutability_property(model_name, dataset_path, batch_size):
+        def config_immutability_property(model_name, dataset_path, batch_size) -> Any:
             config = create_default_config(model_name, dataset_path)
             original_batch_size = config.batch_size
             
@@ -579,15 +597,14 @@ class TestFunctionalProperties:
         config_immutability_property()
     
     @pytest.mark.skipif(True, reason="Requires hypothesis library")
-    def test_metrics_purity_property(self):
+    def test_metrics_purity_property(self) -> Any:
         """Test that metric calculations are always pure."""
-        from hypothesis import given, strategies as st
         
         @given(
             y_true=st.lists(st.integers(min_value=0, max_value=2), min_size=10),
             y_pred=st.lists(st.integers(min_value=0, max_value=2), min_size=10)
         )
-        def metrics_purity_property(y_true, y_pred):
+        def metrics_purity_property(y_true, y_pred) -> Any:
             if len(y_true) == len(y_pred):
                 y_true_arr = np.array(y_true)
                 y_pred_arr = np.array(y_pred)
@@ -606,9 +623,8 @@ class TestFunctionalProperties:
 class TestFunctionalPerformance:
     """Test performance characteristics of functional approach."""
     
-    def test_config_update_performance(self, sample_config):
+    def test_config_update_performance(self, sample_config) -> Any:
         """Test performance of config updates."""
-        import time
         
         start_time = time.time()
         for _ in range(1000):
@@ -618,9 +634,8 @@ class TestFunctionalPerformance:
         # Should complete in reasonable time
         assert end_time - start_time < 1.0  # Less than 1 second
     
-    def test_metrics_calculation_performance(self, sample_data):
+    def test_metrics_calculation_performance(self, sample_data) -> Any:
         """Test performance of metrics calculation."""
-        import time
         
         y_true = sample_data['y_true']
         y_pred = sample_data['y_pred']
@@ -668,5 +683,6 @@ def demo_functional_tests():
     
     print("\n🎉 All functional tests passed!")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     demo_functional_tests() 

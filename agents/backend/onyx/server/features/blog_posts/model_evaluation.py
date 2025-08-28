@@ -1,10 +1,13 @@
-"""
-🚀 Model Evaluation System - Production Ready
-=============================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Enterprise-grade model evaluation system with advanced metrics,
-cross-validation, model comparison, and production evaluation pipelines.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -16,18 +19,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from enum import Enum
 import warnings
-
 import torch
 import torch.nn as nn
 import numpy as np
 import pandas as pd
 from sklearn.metrics import (
-    accuracy_score, precision_recall_fscore_support, 
-    confusion_matrix, classification_report, roc_auc_score,
-    mean_squared_error, mean_absolute_error, r2_score,
-    log_loss, cohen_kappa_score, matthews_corrcoef,
-    hamming_loss, jaccard_score, f1_score
-)
 from sklearn.model_selection import cross_val_score, StratifiedKFold, KFold
 from sklearn.preprocessing import label_binarize
 import matplotlib.pyplot as plt
@@ -36,10 +32,27 @@ from scipy import stats
 import plotly.graph_objects as go
 import plotly.express as px
 from plotly.subplots import make_subplots
-
-# Import our production engines
 from .production_transformers import ProductionTransformersEngine, DeviceManager
 from .model_training import ModelTrainer, TrainingConfig, ModelType, TrainingMode
+        from .model_training import ModelTrainer
+from typing import Any, List, Dict, Optional
+"""
+🚀 Model Evaluation System - Production Ready
+=============================================
+
+Enterprise-grade model evaluation system with advanced metrics,
+cross-validation, model comparison, and production evaluation pipelines.
+"""
+
+
+    accuracy_score, precision_recall_fscore_support, 
+    confusion_matrix, classification_report, roc_auc_score,
+    mean_squared_error, mean_absolute_error, r2_score,
+    log_loss, cohen_kappa_score, matthews_corrcoef,
+    hamming_loss, jaccard_score, f1_score
+)
+
+# Import our production engines
 
 logger = logging.getLogger(__name__)
 
@@ -100,7 +113,9 @@ class ModelEvaluator:
     """Production-ready model evaluator."""
     
     def __init__(self, device_manager: DeviceManager):
-        self.device_manager = device_manager
+        
+    """__init__ function."""
+self.device_manager = device_manager
         self.device = device_manager.get_best_device()
         self.logger = logging.getLogger(f"{__name__}.ModelEvaluator")
         
@@ -397,7 +412,6 @@ class ModelEvaluator:
     
     def create_model(self, config: TrainingConfig, num_classes: int) -> Tuple[nn.Module, Any]:
         """Create model (reuse from ModelTrainer)."""
-        from .model_training import ModelTrainer
         trainer = ModelTrainer(self.device_manager)
         return trainer.create_model(config, num_classes)
     
@@ -461,6 +475,10 @@ class ModelEvaluator:
         # Save detailed metrics
         metrics_path = output_path.replace('.html', '_metrics.json')
         with open(metrics_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump({
                 'model_name': performance.model_name,
                 'accuracy': performance.accuracy,
@@ -485,7 +503,9 @@ class ProductionEvaluationPipeline:
     """Production evaluation pipeline."""
     
     def __init__(self, device_manager: DeviceManager):
-        self.device_manager = device_manager
+        
+    """__init__ function."""
+self.device_manager = device_manager
         self.evaluator = ModelEvaluator(device_manager)
         self.logger = logging.getLogger(f"{__name__}.ProductionEvaluationPipeline")
     
@@ -558,6 +578,10 @@ class ProductionEvaluationPipeline:
         # Save comprehensive results
         results_path = output_path / "evaluation_results.json"
         with open(results_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(results, f, indent=2, default=str)
         
         self.logger.info(f"Evaluation pipeline completed. Results saved to {output_path}")
@@ -700,7 +724,9 @@ async def quick_model_comparison(
 # Example usage
 if __name__ == "__main__":
     async def demo():
-        # Quick evaluation example
+        
+    """demo function."""
+# Quick evaluation example
         result = await quick_model_evaluation(
             model_path="models/distilbert_sentiment_best.pth",
             test_dataset_path="data/test_dataset.csv"

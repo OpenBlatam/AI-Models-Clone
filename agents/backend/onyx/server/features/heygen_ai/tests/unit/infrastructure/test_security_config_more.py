@@ -1,4 +1,4 @@
-from agents.backend.onyx.server.features.heygen_ai.security_config import SecurityConfigManager
+from security_config import SecurityConfigManager
 
 
 def test_is_security_feature_enabled_unknown():
@@ -15,6 +15,7 @@ def test_update_settings_and_validation_score(tmp_path):
     result = mgr.validate_security_configuration()
     assert isinstance(result['security_score'], (int, float))
     assert 'recommendations' in result and isinstance(result['recommendations'], list)
+
 
 
 

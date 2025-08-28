@@ -1,7 +1,0 @@
-openai-whisper
-elevenlabs
-soundfile
-numpy
-continua
-clean up
-refactory

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from unittest.mock import AsyncMock
 from unittest.mock import MagicMock
 
@@ -7,6 +9,9 @@ from onyx.db.models import OAuthAccount
 from onyx.db.models import User
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def mock_user() -> MagicMock:
     """Creates a mock User instance for testing."""

@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .console_reporter import (
+from .html_reporter import (
+from .json_reporter import (
+from .report_aggregator import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Security Reporting Module
 
@@ -5,7 +14,6 @@ Provides comprehensive reporting capabilities for security assessment results.
 Supports console, HTML, and JSON output formats.
 """
 
-from .console_reporter import (
     ConsoleReportRequest,
     ConsoleReportResult,
     ConsoleReportLevel,
@@ -17,7 +25,6 @@ from .console_reporter import (
     print_attack_results
 )
 
-from .html_reporter import (
     HTMLReportRequest,
     HTMLReportResult,
     HTMLReportTemplate,
@@ -29,7 +36,6 @@ from .html_reporter import (
     create_recommendations_section
 )
 
-from .json_reporter import (
     JSONReportRequest,
     JSONReportResult,
     JSONReportFormat,
@@ -41,7 +47,6 @@ from .json_reporter import (
     create_structured_report
 )
 
-from .report_aggregator import (
     ReportAggregatorRequest,
     ReportAggregatorResult,
     ReportType,

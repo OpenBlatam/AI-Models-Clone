@@ -1,19 +1,25 @@
-"""
-Email Delivery Service
-
-This module provides email delivery functionality for the email sequence system.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import logging
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 from uuid import UUID
-
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import aiosmtplib
+from typing import Any, List, Dict, Optional
+"""
+Email Delivery Service
+
+This module provides email delivery functionality for the email sequence system.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -230,7 +236,7 @@ class EmailDeliveryService:
             logger.error(f"Error queuing email for {to_email}: {e}")
             return False
     
-    async def process_delivery_queue(self):
+    async def process_delivery_queue(self) -> Any:
         """Process the delivery queue"""
         while True:
             try:
@@ -328,7 +334,7 @@ class EmailDeliveryService:
             'timestamp': datetime.utcnow()
         }
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close the delivery service"""
         try:
             # Wait for queue to be processed

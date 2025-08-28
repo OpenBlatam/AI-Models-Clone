@@ -1,24 +1,29 @@
-"""
-Brand Kit Schema Component - Onyx Integration
-Optimized component for managing brand kit schema with advanced features.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, Literal, Tuple, ClassVar
 from dataclasses import dataclass, field
 from datetime import datetime
 from ..base import ModelField, ValidationMixin, CacheMixin, EventMixin, IndexMixin, PermissionMixin, StatusMixin
 from ..base_types import (
-    CACHE_TTL, VALIDATION_TIMEOUT,
-    ModelId, ModelKey, ModelValue,
-    ValidationType, CacheType, EventType,
-    StatusType, CategoryType, PermissionType
-)
 from ..model_schema import ModelSchema, SchemaConfig
 from .color import BrandKitColor
 from .typography import BrandKitTypography
 from .voice import BrandKitVoice
 import math
 from functools import lru_cache
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Brand Kit Schema Component - Onyx Integration
+Optimized component for managing brand kit schema with advanced features.
+"""
+    CACHE_TTL, VALIDATION_TIMEOUT,
+    ModelId, ModelKey, ModelValue,
+    ValidationType, CacheType, EventType,
+    StatusType, CategoryType, PermissionType
+)
 
 T = TypeVar('T')
 
@@ -73,7 +78,7 @@ class BrandKitSchema:
     _validation_cache: ClassVar[Dict[str, bool]] = {}
     _field_cache: ClassVar[Dict[str, Dict[str, Any]]] = {}
 
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize schema field with optimized validation and caching"""
         self.schema_field = ModelField(
             name=self.name,
@@ -211,7 +216,7 @@ class BrandKitSchema:
         """Create schema from data with optimized initialization"""
         return cls(**data)
 
-    def __del__(self):
+    def __del__(self) -> Any:
         """Cleanup caches on deletion"""
         self.get_data.cache_clear()
         self.validate_colors.cache_clear()

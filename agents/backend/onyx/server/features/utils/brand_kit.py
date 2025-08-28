@@ -1,17 +1,10 @@
-"""
-Brand Kit Model - Onyx Integration
-Model for managing brand kit data with enhanced capabilities and Onyx integration.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, Literal
 from dataclasses import dataclass, field
 from datetime import datetime
 from .base_types import (
-    CACHE_TTL, VALIDATION_TIMEOUT,
-    ModelId, ModelKey, ModelValue,
-    ValidationType, CacheType, EventType,
-    StatusType, CategoryType, PermissionType
-)
 from .model_field import ModelField, FieldConfig
 from .model_schema import ModelSchema, SchemaConfig
 from .base_model import OnyxBaseModel
@@ -21,6 +14,18 @@ from .event_mixin import EventMixin
 from .index_mixin import IndexMixin
 from .permission_mixin import PermissionMixin
 from .status_mixin import StatusMixin
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Brand Kit Model - Onyx Integration
+Model for managing brand kit data with enhanced capabilities and Onyx integration.
+"""
+    CACHE_TTL, VALIDATION_TIMEOUT,
+    ModelId, ModelKey, ModelValue,
+    ValidationType, CacheType, EventType,
+    StatusType, CategoryType, PermissionType
+)
 
 T = TypeVar('T')
 

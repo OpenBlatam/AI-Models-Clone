@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any
 
 from pydantic import BaseModel
@@ -5,6 +7,9 @@ from pydantic import BaseModel
 from onyx.connectors.google_utils.resources import GoogleDocsService
 from onyx.connectors.models import TextSection
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 HEADING_DELIMITER = "\n"
 
 

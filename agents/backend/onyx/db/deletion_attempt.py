@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy.orm import Session
 
 from onyx.db.index_attempt import get_last_attempt
@@ -6,6 +8,9 @@ from onyx.db.models import IndexingStatus
 from onyx.db.search_settings import get_current_search_settings
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def check_deletion_attempt_is_allowed(
     connector_credential_pair: ConnectorCredentialPair,
     db_session: Session,

@@ -1,9 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 from datetime import datetime
 from typing import Dict, Any, List
 from pydantic import BaseModel, Field
 
 from ..base_model import (
+from ..redis_indexer import RedisIndexer
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     OnyxBaseModel,
     OnyxGenericModel,
     TimestampMixin,
@@ -13,7 +19,6 @@ from ..base_model import (
     ValidationMixin,
     SerializationMixin
 )
-from ..redis_indexer import RedisIndexer
 
 # Test model classes
 class TestModel(OnyxBaseModel):
@@ -41,7 +46,7 @@ def test_model_data():
     }
 
 @pytest.fixture
-def test_model(test_model_data):
+def test_model(test_model_data) -> Any:
     """Create a test model instance."""
     return TestModel(**test_model_data)
 
@@ -55,7 +60,7 @@ def redis_indexer():
     )
 
 # Test TimestampMixin
-def test_timestamp_mixin(test_model):
+def test_timestamp_mixin(test_model) -> Any:
     """Test timestamp mixin functionality."""
     assert isinstance(test_model.created_at, datetime)
     assert isinstance(test_model.updated_at, datetime)
@@ -66,7 +71,7 @@ def test_timestamp_mixin(test_model):
     assert test_model.updated_at > old_updated_at
 
 # Test IdentifierMixin
-def test_identifier_mixin(test_model):
+def test_identifier_mixin(test_model) -> Any:
     """Test identifier mixin functionality."""
     assert isinstance(test_model.id, str)
     assert test_model.version == 1
@@ -76,7 +81,7 @@ def test_identifier_mixin(test_model):
     assert test_model.version == 2
 
 # Test StatusMixin
-def test_status_mixin(test_model):
+def test_status_mixin(test_model) -> Any:
     """Test status mixin functionality."""
     assert test_model.is_active is True
     assert test_model.status == "active"
@@ -92,7 +97,7 @@ def test_status_mixin(test_model):
     assert test_model.status == "active"
 
 # Test IndexingMixin
-def test_indexing_mixin(test_model, redis_indexer):
+def test_indexing_mixin(test_model, redis_indexer) -> Any:
     """Test indexing mixin functionality."""
     # Test index data
     index_data = test_model.get_index_data()
@@ -115,7 +120,7 @@ def test_indexing_mixin(test_model, redis_indexer):
     test_model.remove_index(redis_indexer)
 
 # Test ValidationMixin
-def test_validation_mixin(test_model):
+def test_validation_mixin(test_model) -> Any:
     """Test validation mixin functionality."""
     # Test valid model
     assert test_model.is_valid() is True
@@ -128,7 +133,7 @@ def test_validation_mixin(test_model):
     assert any("name" in error for error in test_model.validate_fields())
 
 # Test SerializationMixin
-def test_serialization_mixin(test_model):
+def test_serialization_mixin(test_model) -> Any:
     """Test serialization mixin functionality."""
     # Test to_dict
     model_dict = test_model.to_dict()
@@ -157,7 +162,7 @@ def test_serialization_mixin(test_model):
     assert len(hash_value) == 64  # SHA-256 hash length
 
 # Test OnyxBaseModel
-def test_onyx_base_model(test_model_data):
+def test_onyx_base_model(test_model_data) -> Any:
     """Test OnyxBaseModel functionality."""
     # Test model creation
     model = TestModel(**test_model_data)

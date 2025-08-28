@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from collections.abc import Sequence
 from datetime import datetime
 from datetime import timedelta
@@ -21,8 +26,6 @@ from sqlalchemy.orm import Session
 
 from onyx.agents.agent_search.shared_graph_utils.models import CombinedAgentMetrics
 from onyx.agents.agent_search.shared_graph_utils.models import (
-    SubQuestionAnswerResults,
-)
 from onyx.auth.schemas import UserRole
 from onyx.chat.models import DocumentRelevance
 from onyx.configs.chat_configs import HARD_DELETE_CHATS
@@ -58,6 +61,11 @@ from onyx.server.query_and_chat.models import SubQuestionDetail
 from onyx.tools.tool_runner import ToolCallFinalResult
 from onyx.utils.logger import setup_logger
 from onyx.utils.special_types import JSON_ro
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    SubQuestionAnswerResults,
+)
 
 logger = setup_logger()
 
@@ -476,6 +484,10 @@ def get_chat_messages_by_sessions(
 
 
 def add_chats_to_session_from_slack_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     db_session: Session,
     slack_chat_session_id: UUID,
     new_chat_session_id: UUID,

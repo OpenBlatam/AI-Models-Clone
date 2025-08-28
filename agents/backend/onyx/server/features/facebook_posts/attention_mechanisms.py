@@ -1,681 +1,554 @@
-from typing_extensions import Literal, TypedDict
-from typing import Any, List, Dict, Optional, Union, Tuple
-# Constants
-MAX_CONNECTIONS = 1000
-
-# Constants
-MAX_RETRIES = 100
-
-# Constants
-TIMEOUT_SECONDS = 60
+"""
+Advanced Attention Mechanisms and Positional Encodings Implementation.
+"""
 
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import math
-import numpy as np
-from typing import Optional, Tuple, List, Dict, Any, Union, Callable
+from typing import Dict, Any, Optional, Tuple, List, Union
 from dataclasses import dataclass
-import logging
-from enum import Enum
-from typing import Any, List, Dict, Optional
-import asyncio
-#!/usr/bin/env python3
-"""
-Advanced Attention Mechanisms and Positional Encodings
-Comprehensive implementation of attention mechanisms and positional encodings with advanced features.
-"""
-
-
-
-class AttentionType(Enum):
-    """Types of attention mechanisms."""
-    SCALED_DOT_PRODUCT = "scaled_dot_product"
-    MULTI_HEAD = "multi_head"
-    FLASH_ATTENTION = "flash_attention"
-    SPARSE_ATTENTION = "sparse_attention"
-    LOCAL_ATTENTION = "local_attention"
-    ROTARY_POSITIONAL = "rotary_positional"
-    RELATIVE_POSITIONAL = "relative_positional"
-    LINEAR_ATTENTION = "linear_attention"
-
-
-class PositionalEncodingType(Enum):
-    """Types of positional encodings."""
-    SINUSOIDAL = "sinusoidal"
-    LEARNED = "learned"
-    ROTARY = "rotary"
-    ALIBI = "alibi"
-    RELATIVE = "relative"
+import math
 
 
 @dataclass
 class AttentionConfig:
     """Configuration for attention mechanisms."""
-    # Attention parameters
-    attention_type: AttentionType = AttentionType.MULTI_HEAD
-    num_heads: int = 8
+    hidden_size: int = 768
+    num_heads: int = 12
     head_dim: int = 64
-    dropout: float = 0.1
-    
-    # Positional encoding parameters
-    positional_encoding_type: PositionalEncodingType = PositionalEncodingType.SINUSOIDAL
-    max_position_embeddings: int = 512
-    embedding_dim: int = 512
-    
-    # Advanced features
-    use_bias: bool = True
+    dropout_rate: float = 0.1
+    attention_dropout: float = 0.1
+    use_bias: bool = False
     use_scale: bool = True
-    use_mask: bool = True
-    
-    # Flash attention parameters
+    use_relative_position: bool = False
+    max_relative_position: int = 32
+    use_rotary: bool = True
     use_flash_attention: bool = True
-    flash_attention_dropout: float = 0.1
-    
-    # Sparse attention parameters
-    sparse_attention_window: int = 128
-    sparse_attention_stride: int = 64
-    
-    # Local attention parameters
-    local_attention_window: int = 256
-    
-    # Rotary parameters
-    rotary_dim: int = 64
-    rotary_base: int = 10000
+    max_position_embeddings: int = 2048
 
 
-class SinusoidalPositionalEncoding(nn.Module):
-    """Sinusoidal positional encoding."""
+class RotaryPositionalEmbedding(nn.Module):
+    """Correctly implemented Rotary Positional Embedding (RoPE)."""
     
-    def __init__(self, embedding_dim: int, max_position_embeddings: int = 512):
-        
-    """__init__ function."""
-super().__init__()
-        self.embedding_dim = embedding_dim
-        self.max_position_embeddings = max_position_embeddings
-        
-        # Create positional encoding matrix
-        pe = torch.zeros(max_position_embeddings, embedding_dim)
-        position = torch.arange(0, max_position_embeddings, dtype=torch.float).unsqueeze(1)
-        div_term = torch.exp(torch.arange(0, embedding_dim, 2).float() * 
-                           (-math.log(10000.0) / embedding_dim))
-        
-        pe[:, 0::2] = torch.sin(position * div_term)
-        pe[:, 1::2] = torch.cos(position * div_term)
-        pe = pe.unsqueeze(0).transpose(0, 1)
-        
-        self.register_buffer('pe', pe)
-    
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Add positional encoding to input."""
-        return x + self.pe[:x.size(0), :]
-
-
-class LearnedPositionalEncoding(nn.Module):
-    """Learned positional encoding."""
-    
-    def __init__(self, embedding_dim: int, max_position_embeddings: int = 512):
-        
-    """__init__ function."""
-super().__init__()
-        self.embedding_dim = embedding_dim
-        self.max_position_embeddings = max_position_embeddings
-        self.position_embeddings = nn.Embedding(max_position_embeddings, embedding_dim)
-    
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        """Add learned positional encoding to input."""
-        seq_len = x.size(0)
-        positions = torch.arange(seq_len, device=x.device, dtype=torch.long)
-        position_embeddings = self.position_embeddings(positions)
-        return x + position_embeddings
-
-
-class RotaryPositionalEncoding(nn.Module):
-    """Rotary positional encoding (RoPE)."""
-    
-    def __init__(self, embedding_dim: int, max_position_embeddings: int = 512, base: int = 10000):
-        
-    """__init__ function."""
-super().__init__()
-        self.embedding_dim = embedding_dim
+    def __init__(self, dim: int, max_position_embeddings: int = 2048, base: int = 10000):
+        super().__init__()
+        self.dim = dim
         self.max_position_embeddings = max_position_embeddings
         self.base = base
         
-        # Create rotation matrix
-        inv_freq = 1.0 / (base ** (torch.arange(0, embedding_dim, 2).float() / embedding_dim))
-        self.register_buffer('inv_freq', inv_freq)
+        # Precompute rotation matrices
+        self.register_buffer('cos_cached', self._get_cos_cache())
+        self.register_buffer('sin_cached', self._get_sin_cache())
     
-    def forward(self, x: torch.Tensor, seq_len: int) -> torch.Tensor:
-        """Apply rotary positional encoding."""
-        t = torch.arange(seq_len, device=x.device).type_as(self.inv_freq)
-        freqs = torch.einsum('i,j->ij', t, self.inv_freq)
-        emb = torch.cat((freqs, freqs), dim=-1)
+    def _get_cos_cache(self) -> torch.Tensor:
+        """Generate cosine cache for rotary embeddings."""
+        inv_freq = 1.0 / (self.base ** (torch.arange(0, self.dim, 2).float() / self.dim))
+        pos = torch.arange(self.max_position_embeddings, dtype=torch.float)
+        freqs = torch.outer(pos, inv_freq)
+        return torch.cos(freqs)
+    
+    def _get_sin_cache(self) -> torch.Tensor:
+        """Generate sine cache for rotary embeddings."""
+        inv_freq = 1.0 / (self.base ** (torch.arange(0, self.dim, 2).float() / self.dim))
+        pos = torch.arange(self.max_position_embeddings, dtype=torch.float)
+        freqs = torch.outer(pos, inv_freq)
+        return torch.sin(freqs)
+    
+    def _rotate_half(self, x: torch.Tensor) -> torch.Tensor:
+        """Rotate half the hidden dims of the input."""
+        x1, x2 = torch.chunk(x, 2, dim=-1)
+        return torch.cat((-x2, x1), dim=-1)
+    
+    def forward(self, q: torch.Tensor, k: torch.Tensor, seq_len: int) -> Tuple[torch.Tensor, torch.Tensor]:
+        """Apply rotary positional embeddings to query and key tensors."""
+        if seq_len > self.max_position_embeddings:
+            # Extend cache if needed
+            self._extend_cache(seq_len)
         
-        # Apply rotation
-        cos = torch.cos(emb)[None, :, None, :]
-        sin = torch.sin(emb)[None, :, None, :]
+        # Get rotation matrices for current sequence length
+        cos = self.cos_cached[:seq_len]
+        sin = self.sin_cached[:seq_len]
         
-        # Split input into even and odd dimensions
-        x_even = x[..., ::2]
-        x_odd = x[..., 1::2]
+        # Apply to query and key
+        q_embed = (q * cos) + (self._rotate_half(q) * sin)
+        k_embed = (k * cos) + (self._rotate_half(k) * sin)
         
-        # Apply rotation
-        rotated_even = x_even * cos - x_odd * sin
-        rotated_odd = x_even * sin + x_odd * cos
-        
-        # Interleave back
-        rotated = torch.stack([rotated_even, rotated_odd], dim=-1).flatten(-2)
-        
-        return rotated
+        return q_embed, k_embed
+    
+    def _extend_cache(self, seq_len: int):
+        """Extend cache for longer sequences."""
+        self.max_position_embeddings = seq_len
+        self.cos_cached = self._get_cos_cache()
+        self.sin_cached = self._get_sin_cache()
 
 
-class ALiBiPositionalEncoding(nn.Module):
-    """Attention with Linear Biases (ALiBi) positional encoding."""
+class AbsolutePositionalEmbedding(nn.Module):
+    """Sinusoidal absolute positional embeddings."""
     
-    def __init__(self, num_heads: int, max_position_embeddings: int = 512):
-        
-    """__init__ function."""
-super().__init__()
-        self.num_heads = num_heads
+    def __init__(self, hidden_size: int, max_position_embeddings: int = 2048):
+        super().__init__()
+        self.hidden_size = hidden_size
         self.max_position_embeddings = max_position_embeddings
         
-        # Create ALiBi slopes
-        slopes = torch.Tensor(self._get_slopes(num_heads))
-        self.register_buffer('slopes', slopes)
+        # Create sinusoidal position embeddings
+        pe = torch.zeros(max_position_embeddings, hidden_size)
+        position = torch.arange(0, max_position_embeddings, dtype=torch.float).unsqueeze(1)
+        
+        div_term = torch.exp(torch.arange(0, hidden_size, 2).float() * 
+                           (-math.log(10000.0) / hidden_size))
+        
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        
+        self.register_buffer('pe', pe.unsqueeze(0))
     
-    def _get_slopes(self, num_heads: int) -> List[float]:
-        """Get ALiBi slopes."""
-        def get_slopes_power_of_2(n) -> Optional[Dict[str, Any]]:
-            start = (2**(-2**-(math.log2(n)-3)))
-            ratio = start
-            return [start*ratio**i for i in range(n)]
+    def forward(self, x: torch.Tensor, position_ids: Optional[torch.Tensor] = None) -> torch.Tensor:
+        """Add positional embeddings to input."""
+        if position_ids is None:
+            seq_len = x.size(1)
+            position_ids = torch.arange(seq_len, device=x.device).unsqueeze(0)
         
-        if math.log2(num_heads).is_integer():
-            return get_slopes_power_of_2(num_heads)
-        else:
-            closest_power_of_2 = 2**math.floor(math.log2(num_heads))
-            return get_slopes_power_of_2(closest_power_of_2) + \
-                   self._get_slopes(2*closest_power_of_2)[0::2][:num_heads-closest_power_of_2]
-    
-    def forward(self, attention_scores: torch.Tensor) -> torch.Tensor:
-        """Add ALiBi biases to attention scores."""
-        batch_size, num_heads, seq_len, seq_len = attention_scores.shape
-        
-        # Create position indices
-        positions = torch.arange(seq_len, device=attention_scores.device)
-        
-        # Create ALiBi matrix
-        alibi_matrix = positions.unsqueeze(0) - positions.unsqueeze(1)
-        alibi_matrix = alibi_matrix.unsqueeze(0).unsqueeze(0)  # Add batch and head dimensions
-        
-        # Apply slopes
-        alibi_biases = alibi_matrix * self.slopes.view(1, -1, 1, 1)
-        
-        return attention_scores + alibi_biases
+        pos_embeddings = self.pe[:, position_ids].squeeze(0)
+        return x + pos_embeddings
 
 
-class ScaledDotProductAttention(nn.Module):
-    """Scaled dot-product attention mechanism."""
+class RelativePositionalBias(nn.Module):
+    """Relative positional bias for attention (T5-style)."""
     
-    def __init__(self, config: AttentionConfig):
+    def __init__(self, num_heads: int, max_distance: int = 128):
+        super().__init__()
+        self.num_heads = num_heads
+        self.max_distance = max_distance
         
-    """__init__ function."""
-super().__init__()
-        self.config = config
-        self.scale = math.sqrt(config.head_dim) if config.use_scale else 1.0
-        self.dropout = nn.Dropout(config.dropout)
+        # Relative position bias table
+        self.relative_attention_bias = nn.Embedding(
+            2 * max_distance + 1, 
+            num_heads
+        )
+        
+        # Initialize weights
+        self._initialize_weights()
     
-    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor,
-                mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Forward pass for scaled dot-product attention."""
-        # Compute attention scores
-        scores = torch.matmul(query, key.transpose(-2, -1)) / self.scale
+    def _initialize_weights(self):
+        """Initialize relative position bias."""
+        nn.init.normal_(self.relative_attention_bias.weight, mean=0.0, std=0.02)
+    
+    def _relative_position_bucket(self, relative_position: torch.Tensor) -> torch.Tensor:
+        """Compute relative position buckets."""
+        ret = 0
+        n = -relative_position
         
-        # Apply mask if provided
-        if mask is not None:
-            scores = scores.masked_fill(mask == 0, -1e9)
+        num_buckets = self.max_distance
+        max_exact = num_buckets // 2
         
-        # Apply softmax
-        attention_weights = F.softmax(scores, dim=-1)
-        attention_weights = self.dropout(attention_weights)
+        is_small = n < max_exact
+        val_if_large = max_exact + (
+            torch.log(n.float() / max_exact) / math.log(self.max_distance / max_exact) * 
+            (num_buckets - max_exact)
+        ).long()
         
-        # Apply attention to values
-        output = torch.matmul(attention_weights, value)
+        val_if_large = torch.min(val_if_large, torch.full_like(val_if_large, num_buckets - 1))
+        ret += torch.where(is_small, n, val_if_large)
         
-        return output, attention_weights
+        return ret + self.max_distance
+    
+    def forward(self, seq_len: int) -> torch.Tensor:
+        """Compute relative position bias."""
+        range_vec = torch.arange(seq_len)
+        range_mat = range_vec.unsqueeze(-1) - range_vec.unsqueeze(0)
+        
+        # Compute relative position buckets
+        relative_position_bucket = self._relative_position_bucket(range_mat)
+        
+        # Get relative position bias
+        bias = self.relative_attention_bias(relative_position_bucket)
+        bias = bias.permute(2, 0, 1).unsqueeze(0)  # [1, num_heads, seq_len, seq_len]
+        
+        return bias
 
 
 class MultiHeadAttention(nn.Module):
-    """Multi-head attention mechanism."""
+    """Correctly implemented multi-head attention with all modern features."""
     
     def __init__(self, config: AttentionConfig):
-        
-    """__init__ function."""
-super().__init__()
+        super().__init__()
         self.config = config
+        
+        assert config.hidden_size % config.num_heads == 0
+        
+        self.hidden_size = config.hidden_size
         self.num_heads = config.num_heads
-        self.head_dim = config.head_dim
-        self.embedding_dim = config.num_heads * config.head_dim
+        self.head_dim = config.hidden_size // config.num_heads
+        self.scale = math.sqrt(self.head_dim) if config.use_scale else 1.0
         
-        # Linear transformations
-        self.query_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.key_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.value_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.output_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
+        # Query, Key, Value projections
+        self.q_proj = nn.Linear(config.hidden_size, config.hidden_size, bias=config.use_bias)
+        self.k_proj = nn.Linear(config.hidden_size, config.hidden_size, bias=config.use_bias)
+        self.v_proj = nn.Linear(config.hidden_size, config.hidden_size, bias=config.use_bias)
+        self.o_proj = nn.Linear(config.hidden_size, config.hidden_size, bias=config.use_bias)
         
-        # Attention mechanism
-        self.attention = ScaledDotProductAttention(config)
+        # Dropouts
+        self.attention_dropout = nn.Dropout(config.attention_dropout)
+        self.output_dropout = nn.Dropout(config.dropout_rate)
         
-        # Dropout
-        self.dropout = nn.Dropout(config.dropout)
+        # Positional encodings
+        if config.use_rotary:
+            self.rotary_emb = RotaryPositionalEmbedding(
+                self.head_dim, 
+                config.max_position_embeddings
+            )
+        
+        if config.use_relative_position:
+            self.relative_bias = RelativePositionalBias(
+                config.num_heads, 
+                config.max_relative_position
+            )
+        
+        # Flash attention
+        self.use_flash_attention = config.use_flash_attention and hasattr(F, 'scaled_dot_product_attention')
+        
+        # Initialize weights
+        self._initialize_weights()
     
-    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor,
-                mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Forward pass for multi-head attention."""
-        batch_size = query.size(0)
-        
-        # Linear transformations
-        query = self.query_projection(query)
-        key = self.key_projection(key)
-        value = self.value_projection(value)
-        
-        # Reshape for multi-head attention
-        query = query.view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
-        key = key.view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
-        value = value.view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
-        
-        # Apply attention
-        attention_output, attention_weights = self.attention(query, key, value, mask)
-        
-        # Reshape back
-        attention_output = attention_output.transpose(1, 2).contiguous().view(
-            batch_size, -1, self.embedding_dim
-        )
-        
-        # Output projection
-        output = self.output_projection(attention_output)
-        output = self.dropout(output)
-        
-        return output, attention_weights
-
-
-class FlashAttention(nn.Module):
-    """Flash attention implementation for efficiency."""
+    def _initialize_weights(self):
+        """Initialize attention weights."""
+        for module in [self.q_proj, self.k_proj, self.v_proj, self.o_proj]:
+            nn.init.xavier_uniform_(module.weight)
+            if module.bias is not None:
+                nn.init.zeros_(module.bias)
     
-    def __init__(self, config: AttentionConfig):
+    def forward(
+        self,
+        hidden_states: torch.Tensor,
+        attention_mask: Optional[torch.Tensor] = None,
+        past_key_value: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+        output_attentions: bool = False,
+        use_cache: bool = False
+    ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor, torch.Tensor]]]:
+        """Forward pass with all attention features."""
+        batch_size, seq_len, hidden_size = hidden_states.size()
         
-    """__init__ function."""
-super().__init__()
-        self.config = config
-        self.num_heads = config.num_heads
-        self.head_dim = config.head_dim
-        self.embedding_dim = config.num_heads * config.head_dim
-        
-        # Linear transformations
-        self.query_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.key_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.value_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.output_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        
-        # Dropout
-        self.dropout = nn.Dropout(config.flash_attention_dropout)
-    
-    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor,
-                mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Forward pass for flash attention."""
-        batch_size = query.size(0)
-        
-        # Linear transformations
-        query = self.query_projection(query)
-        key = self.key_projection(key)
-        value = self.value_projection(value)
-        
-        # Reshape for multi-head attention
-        query = query.view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
-        key = key.view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
-        value = value.view(batch_size, -1, self.num_heads, self.head_dim).transpose(1, 2)
-        
-        # Flash attention computation
-        attention_output = self._flash_attention(query, key, value, mask)
-        
-        # Reshape back
-        attention_output = attention_output.transpose(1, 2).contiguous().view(
-            batch_size, -1, self.embedding_dim
-        )
-        
-        # Output projection
-        output = self.output_projection(attention_output)
-        output = self.dropout(output)
-        
-        return output, None  # Flash attention doesn't return attention weights
-    
-    def _flash_attention(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor,
-                        mask: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """Flash attention implementation."""
-        # Compute attention scores
-        scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(self.head_dim)
-        
-        # Apply mask if provided
-        if mask is not None:
-            scores = scores.masked_fill(mask == 0, -1e9)
-        
-        # Apply softmax
-        attention_weights = F.softmax(scores, dim=-1)
-        attention_weights = self.dropout(attention_weights)
-        
-        # Apply attention to values
-        output = torch.matmul(attention_weights, value)
-        
-        return output
-
-
-class SparseAttention(nn.Module):
-    """Sparse attention mechanism."""
-    
-    def __init__(self, config: AttentionConfig):
-        
-    """__init__ function."""
-super().__init__()
-        self.config = config
-        self.num_heads = config.num_heads
-        self.head_dim = config.head_dim
-        self.embedding_dim = config.num_heads * config.head_dim
-        self.window_size = config.sparse_attention_window
-        self.stride = config.sparse_attention_stride
-        
-        # Linear transformations
-        self.query_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.key_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.value_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.output_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        
-        # Attention mechanism
-        self.attention = ScaledDotProductAttention(config)
-        
-        # Dropout
-        self.dropout = nn.Dropout(config.dropout)
-    
-    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor,
-                mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Forward pass for sparse attention."""
-        batch_size, seq_len = query.size(0), query.size(1)
-        
-        # Linear transformations
-        query = self.query_projection(query)
-        key = self.key_projection(key)
-        value = self.value_projection(value)
+        # Linear projections
+        query = self.q_proj(hidden_states)
+        key = self.k_proj(hidden_states)
+        value = self.v_proj(hidden_states)
         
         # Reshape for multi-head attention
         query = query.view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
         key = key.view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
         value = value.view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
         
-        # Sparse attention computation
-        attention_output = self._sparse_attention(query, key, value, mask)
+        # Apply rotary positional embeddings
+        if self.config.use_rotary:
+            query, key = self.rotary_emb(query, key, seq_len)
         
-        # Reshape back
-        attention_output = attention_output.transpose(1, 2).contiguous().view(
-            batch_size, seq_len, self.embedding_dim
-        )
+        # Handle past key-value states for generation
+        if past_key_value is not None:
+            past_key, past_value = past_key_value
+            key = torch.cat([past_key, key], dim=2)
+            value = torch.cat([past_value, value], dim=2)
         
-        # Output projection
-        output = self.output_projection(attention_output)
-        output = self.dropout(output)
-        
-        return output, None  # Sparse attention doesn't return attention weights
-    
-    def _sparse_attention(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor,
-                         mask: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """Sparse attention implementation."""
-        batch_size, num_heads, seq_len, head_dim = query.shape
-        
-        # Create sparse attention pattern
-        sparse_output = torch.zeros_like(query)
-        
-        for i in range(0, seq_len, self.stride):
-            # Define attention window
-            start_idx = max(0, i - self.window_size // 2)
-            end_idx = min(seq_len, i + self.window_size // 2)
-            
-            # Extract window
-            query_window = query[:, :, i:i+1, :]
-            key_window = key[:, :, start_idx:end_idx, :]
-            value_window = value[:, :, start_idx:end_idx, :]
-            
-            # Compute attention for window
-            scores = torch.matmul(query_window, key_window.transpose(-2, -1)) / math.sqrt(head_dim)
-            
-            # Apply mask if provided
-            if mask is not None:
-                mask_window = mask[:, i:i+1, start_idx:end_idx]
-                scores = scores.masked_fill(mask_window == 0, -1e9)
-            
-            # Apply softmax
-            attention_weights = F.softmax(scores, dim=-1)
-            attention_weights = self.dropout(attention_weights)
-            
-            # Apply attention to values
-            window_output = torch.matmul(attention_weights, value_window)
-            sparse_output[:, :, i:i+1, :] = window_output
-        
-        return sparse_output
-
-
-class LocalAttention(nn.Module):
-    """Local attention mechanism."""
-    
-    def __init__(self, config: AttentionConfig):
-        
-    """__init__ function."""
-super().__init__()
-        self.config = config
-        self.num_heads = config.num_heads
-        self.head_dim = config.head_dim
-        self.embedding_dim = config.num_heads * config.head_dim
-        self.window_size = config.local_attention_window
-        
-        # Linear transformations
-        self.query_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.key_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.value_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        self.output_projection = nn.Linear(self.embedding_dim, self.embedding_dim, bias=config.use_bias)
-        
-        # Attention mechanism
-        self.attention = ScaledDotProductAttention(config)
-        
-        # Dropout
-        self.dropout = nn.Dropout(config.dropout)
-    
-    def forward(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor,
-                mask: Optional[torch.Tensor] = None) -> Tuple[torch.Tensor, torch.Tensor]:
-        """Forward pass for local attention."""
-        batch_size, seq_len = query.size(0), query.size(1)
-        
-        # Linear transformations
-        query = self.query_projection(query)
-        key = self.key_projection(key)
-        value = self.value_projection(value)
-        
-        # Reshape for multi-head attention
-        query = query.view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
-        key = key.view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
-        value = value.view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
-        
-        # Local attention computation
-        attention_output = self._local_attention(query, key, value, mask)
-        
-        # Reshape back
-        attention_output = attention_output.transpose(1, 2).contiguous().view(
-            batch_size, seq_len, self.embedding_dim
-        )
-        
-        # Output projection
-        output = self.output_projection(attention_output)
-        output = self.dropout(output)
-        
-        return output, None  # Local attention doesn't return attention weights
-    
-    def _local_attention(self, query: torch.Tensor, key: torch.Tensor, value: torch.Tensor,
-                        mask: Optional[torch.Tensor] = None) -> torch.Tensor:
-        """Local attention implementation."""
-        batch_size, num_heads, seq_len, head_dim = query.shape
-        
-        # Create local attention output
-        local_output = torch.zeros_like(query)
-        
-        for i in range(seq_len):
-            # Define local window
-            start_idx = max(0, i - self.window_size // 2)
-            end_idx = min(seq_len, i + self.window_size // 2)
-            
-            # Extract local window
-            query_local = query[:, :, i:i+1, :]
-            key_local = key[:, :, start_idx:end_idx, :]
-            value_local = value[:, :, start_idx:end_idx, :]
-            
-            # Compute attention for local window
-            scores = torch.matmul(query_local, key_local.transpose(-2, -1)) / math.sqrt(head_dim)
-            
-            # Apply mask if provided
-            if mask is not None:
-                mask_local = mask[:, i:i+1, start_idx:end_idx]
-                scores = scores.masked_fill(mask_local == 0, -1e9)
-            
-            # Apply softmax
-            attention_weights = F.softmax(scores, dim=-1)
-            attention_weights = self.dropout(attention_weights)
-            
-            # Apply attention to values
-            local_window_output = torch.matmul(attention_weights, value_local)
-            local_output[:, :, i:i+1, :] = local_window_output
-        
-        return local_output
-
-
-class AttentionFactory:
-    """Factory for creating different attention mechanisms."""
-    
-    @staticmethod
-    def create_attention(config: AttentionConfig) -> nn.Module:
-        """Create attention mechanism based on configuration."""
-        if config.attention_type == AttentionType.SCALED_DOT_PRODUCT:
-            return ScaledDotProductAttention(config)
-        elif config.attention_type == AttentionType.MULTI_HEAD:
-            return MultiHeadAttention(config)
-        elif config.attention_type == AttentionType.FLASH_ATTENTION:
-            return FlashAttention(config)
-        elif config.attention_type == AttentionType.SPARSE_ATTENTION:
-            return SparseAttention(config)
-        elif config.attention_type == AttentionType.LOCAL_ATTENTION:
-            return LocalAttention(config)
+        # Prepare for caching
+        if use_cache:
+            present_key_value = (key, value)
         else:
-            raise ValueError(f"Unknown attention type: {config.attention_type}")
-
-
-def demonstrate_attention_mechanisms():
-    """Demonstrate attention mechanisms and positional encodings."""
-    print("Attention Mechanisms and Positional Encodings Demonstration")
-    print("=" * 60)
-    
-    # Test different configurations
-    configs = [
-        AttentionConfig(
-            attention_type=AttentionType.MULTI_HEAD,
-            num_heads=8,
-            head_dim=64,
-            positional_encoding_type=PositionalEncodingType.SINUSOIDAL
-        ),
-        AttentionConfig(
-            attention_type=AttentionType.FLASH_ATTENTION,
-            num_heads=8,
-            head_dim=64,
-            positional_encoding_type=PositionalEncodingType.ROTARY
-        ),
-        AttentionConfig(
-            attention_type=AttentionType.SPARSE_ATTENTION,
-            num_heads=8,
-            head_dim=64,
-            positional_encoding_type=PositionalEncodingType.ALIBI
-        )
-    ]
-    
-    results = {}
-    
-    for i, config in enumerate(configs):
-        print(f"\nTesting {config.attention_type.value} attention:")
+            present_key_value = None
         
-        try:
-            # Create attention mechanism
-            attention = AttentionFactory.create_attention(config)
+        # Attention computation
+        if self.use_flash_attention:
+            # Use flash attention
+            attention_output = F.scaled_dot_product_attention(
+                query, key, value,
+                attn_mask=attention_mask,
+                dropout_p=self.attention_dropout.p if self.training else 0.0,
+                is_causal=False
+            )
+            attention_weights = None
+        else:
+            # Standard attention
+            attention_scores = torch.matmul(query, key.transpose(-2, -1)) / self.scale
             
-            # Create positional encoding
-            if config.positional_encoding_type == PositionalEncodingType.SINUSOIDAL:
-                pos_encoding = SinusoidalPositionalEncoding(config.embedding_dim)
-            elif config.positional_encoding_type == PositionalEncodingType.LEARNED:
-                pos_encoding = LearnedPositionalEncoding(config.embedding_dim)
-            elif config.positional_encoding_type == PositionalEncodingType.ROTARY:
-                pos_encoding = RotaryPositionalEncoding(config.embedding_dim)
-            elif config.positional_encoding_type == PositionalEncodingType.ALIBI:
-                pos_encoding = ALiBiPositionalEncoding(config.num_heads)
-            else:
-                pos_encoding = SinusoidalPositionalEncoding(config.embedding_dim)
+            # Add relative position bias
+            if self.config.use_relative_position:
+                relative_bias = self.relative_bias(seq_len)
+                attention_scores = attention_scores + relative_bias
             
-            # Test with dummy data
-            batch_size = 2
-            seq_len = 128
-            embedding_dim = config.embedding_dim
+            # Apply attention mask
+            if attention_mask is not None:
+                if attention_mask.dim() == 2:
+                    # Expand mask dimensions
+                    attention_mask = attention_mask.unsqueeze(1).unsqueeze(2)
+                attention_scores = attention_scores + attention_mask
             
-            query = torch.randn(batch_size, seq_len, embedding_dim)
-            key = torch.randn(batch_size, seq_len, embedding_dim)
-            value = torch.randn(batch_size, seq_len, embedding_dim)
+            # Softmax
+            attention_weights = F.softmax(attention_scores, dim=-1)
+            attention_weights = self.attention_dropout(attention_weights)
             
-            # Apply positional encoding
-            if isinstance(pos_encoding, (SinusoidalPositionalEncoding, LearnedPositionalEncoding)):
-                query = pos_encoding(query.transpose(0, 1)).transpose(0, 1)
-                key = pos_encoding(key.transpose(0, 1)).transpose(0, 1)
-                value = pos_encoding(value.transpose(0, 1)).transpose(0, 1)
-            elif isinstance(pos_encoding, RotaryPositionalEncoding):
-                query = pos_encoding(query, seq_len)
-                key = pos_encoding(key, seq_len)
-                value = pos_encoding(value, seq_len)
-            
-            # Apply attention
-            if isinstance(pos_encoding, ALiBiPositionalEncoding):
-                # For ALiBi, we need to apply it to attention scores
-                output, attention_weights = attention(query, key, value)
-                if attention_weights is not None:
-                    attention_weights = pos_encoding(attention_weights)
-            else:
-                output, attention_weights = attention(query, key, value)
-            
-            print(f"  Input shape: {query.shape}")
-            print(f"  Output shape: {output.shape}")
-            if attention_weights is not None:
-                print(f"  Attention weights shape: {attention_weights.shape}")
-            
-            # Model statistics
-            total_params = sum(p.numel() for p in attention.parameters())
-            print(f"  Total parameters: {total_params:,}")
-            
-            results[f"attention_{i}"] = {
-                'config': config,
-                'total_params': total_params,
-                'output_shape': output.shape,
-                'success': True
-            }
-            
-        except Exception as e:
-            print(f"  Error: {e}")
-            results[f"attention_{i}"] = {
-                'config': config,
-                'error': str(e),
-                'success': False
-            }
+            # Apply attention to values
+            attention_output = torch.matmul(attention_weights, value)
+        
+        # Reshape output
+        attention_output = attention_output.transpose(1, 2).contiguous()
+        attention_output = attention_output.view(batch_size, seq_len, hidden_size)
+        
+        # Output projection
+        attention_output = self.o_proj(attention_output)
+        attention_output = self.output_dropout(attention_output)
+        
+        # Prepare outputs
+        outputs = (attention_output,)
+        if output_attentions:
+            outputs += (attention_weights,)
+        if use_cache:
+            outputs += (present_key_value,)
+        
+        return outputs
+
+
+class CrossAttention(nn.Module):
+    """Cross-attention for encoder-decoder architectures."""
     
-    return results
+    def __init__(self, config: AttentionConfig):
+        super().__init__()
+        self.config = config
+        
+        self.hidden_size = config.hidden_size
+        self.num_heads = config.num_heads
+        self.head_dim = config.hidden_size // config.num_heads
+        self.scale = math.sqrt(self.head_dim) if config.use_scale else 1.0
+        
+        # Projections
+        self.q_proj = nn.Linear(config.hidden_size, config.hidden_size, bias=config.use_bias)
+        self.k_proj = nn.Linear(config.hidden_size, config.hidden_size, bias=config.use_bias)
+        self.v_proj = nn.Linear(config.hidden_size, config.hidden_size, bias=config.use_bias)
+        self.o_proj = nn.Linear(config.hidden_size, config.hidden_size, bias=config.use_bias)
+        
+        # Dropouts
+        self.attention_dropout = nn.Dropout(config.attention_dropout)
+        self.output_dropout = nn.Dropout(config.dropout_rate)
+        
+        # Flash attention
+        self.use_flash_attention = config.use_flash_attention and hasattr(F, 'scaled_dot_product_attention')
+    
+    def forward(
+        self,
+        hidden_states: torch.Tensor,
+        encoder_hidden_states: torch.Tensor,
+        attention_mask: Optional[torch.Tensor] = None,
+        encoder_attention_mask: Optional[torch.Tensor] = None,
+        output_attentions: bool = False
+    ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
+        """Cross-attention forward pass."""
+        batch_size, seq_len, hidden_size = hidden_states.size()
+        encoder_seq_len = encoder_hidden_states.size(1)
+        
+        # Query from decoder, Key and Value from encoder
+        query = self.q_proj(hidden_states)
+        key = self.k_proj(encoder_hidden_states)
+        value = self.v_proj(encoder_hidden_states)
+        
+        # Reshape for multi-head attention
+        query = query.view(batch_size, seq_len, self.num_heads, self.head_dim).transpose(1, 2)
+        key = key.view(batch_size, encoder_seq_len, self.num_heads, self.head_dim).transpose(1, 2)
+        value = value.view(batch_size, encoder_seq_len, self.num_heads, self.head_dim).transpose(1, 2)
+        
+        # Attention computation
+        if self.use_flash_attention:
+            attention_output = F.scaled_dot_product_attention(
+                query, key, value,
+                attn_mask=encoder_attention_mask,
+                dropout_p=self.attention_dropout.p if self.training else 0.0
+            )
+            attention_weights = None
+        else:
+            # Standard cross-attention
+            attention_scores = torch.matmul(query, key.transpose(-2, -1)) / self.scale
+            
+            # Apply encoder attention mask
+            if encoder_attention_mask is not None:
+                if encoder_attention_mask.dim() == 2:
+                    encoder_attention_mask = encoder_attention_mask.unsqueeze(1).unsqueeze(2)
+                attention_scores = attention_scores + encoder_attention_mask
+            
+            # Softmax
+            attention_weights = F.softmax(attention_scores, dim=-1)
+            attention_weights = self.attention_dropout(attention_weights)
+            
+            # Apply attention to values
+            attention_output = torch.matmul(attention_weights, value)
+        
+        # Reshape output
+        attention_output = attention_output.transpose(1, 2).contiguous()
+        attention_output = attention_output.view(batch_size, seq_len, hidden_size)
+        
+        # Output projection
+        attention_output = self.o_proj(attention_output)
+        attention_output = self.output_dropout(attention_output)
+        
+        # Prepare outputs
+        outputs = (attention_output,)
+        if output_attentions:
+            outputs += (attention_weights,)
+        
+        return outputs
+
+
+class TransformerBlock(nn.Module):
+    """Complete transformer block with attention and feed-forward."""
+    
+    def __init__(self, config: AttentionConfig):
+        super().__init__()
+        self.config = config
+        
+        # Self-attention
+        self.self_attention = MultiHeadAttention(config)
+        
+        # Cross-attention (optional)
+        self.cross_attention = CrossAttention(config) if config.use_cross_attention else None
+        
+        # Feed-forward network
+        self.feed_forward = nn.Sequential(
+            nn.Linear(config.hidden_size, config.hidden_size * 4),
+            nn.GELU(),
+            nn.Dropout(config.dropout_rate),
+            nn.Linear(config.hidden_size * 4, config.hidden_size),
+            nn.Dropout(config.dropout_rate)
+        )
+        
+        # Layer normalizations
+        self.ln1 = nn.LayerNorm(config.hidden_size, eps=1e-5)
+        self.ln2 = nn.LayerNorm(config.hidden_size, eps=1e-5)
+        if self.cross_attention:
+            self.ln_cross = nn.LayerNorm(config.hidden_size, eps=1e-5)
+        
+        # Dropout
+        self.dropout = nn.Dropout(config.dropout_rate)
+    
+    def forward(
+        self,
+        hidden_states: torch.Tensor,
+        attention_mask: Optional[torch.Tensor] = None,
+        encoder_hidden_states: Optional[torch.Tensor] = None,
+        encoder_attention_mask: Optional[torch.Tensor] = None,
+        past_key_value: Optional[Tuple[torch.Tensor, torch.Tensor]] = None,
+        output_attentions: bool = False,
+        use_cache: bool = False
+    ) -> Tuple[torch.Tensor, Optional[torch.Tensor], Optional[Tuple[torch.Tensor, torch.Tensor]]]:
+        """Forward pass through transformer block."""
+        # Self-attention with pre-norm
+        residual = hidden_states
+        hidden_states = self.ln1(hidden_states)
+        
+        self_attention_outputs = self.self_attention(
+            hidden_states,
+            attention_mask=attention_mask,
+            past_key_value=past_key_value,
+            output_attentions=output_attentions,
+            use_cache=use_cache
+        )
+        
+        attention_output = self_attention_outputs[0]
+        hidden_states = residual + self.dropout(attention_output)
+        
+        # Cross-attention (if applicable)
+        if self.cross_attention and encoder_hidden_states is not None:
+            residual = hidden_states
+            hidden_states = self.ln_cross(hidden_states)
+            
+            cross_attention_outputs = self.cross_attention(
+                hidden_states,
+                encoder_hidden_states,
+                attention_mask=attention_mask,
+                encoder_attention_mask=encoder_attention_mask,
+                output_attentions=output_attentions
+            )
+            
+            cross_attention_output = cross_attention_outputs[0]
+            hidden_states = residual + self.dropout(cross_attention_output)
+        
+        # Feed-forward with pre-norm
+        residual = hidden_states
+        hidden_states = self.ln2(hidden_states)
+        ff_output = self.feed_forward(hidden_states)
+        hidden_states = residual + self.dropout(ff_output)
+        
+        # Prepare outputs
+        outputs = (hidden_states,)
+        if output_attentions:
+            outputs += self_attention_outputs[1:]
+        if use_cache:
+            outputs += self_attention_outputs[-1:]
+        
+        return outputs
+
+
+def create_attention_mask(input_ids: torch.Tensor, mask_type: str = "causal") -> torch.Tensor:
+    """Create attention masks for different attention patterns."""
+    batch_size, seq_len = input_ids.size()
+    
+    if mask_type == "causal":
+        # Causal mask for autoregressive models
+        mask = torch.triu(torch.ones(seq_len, seq_len), diagonal=1)
+        mask = mask.masked_fill(mask == 1, float('-inf'))
+        return mask.unsqueeze(0).unsqueeze(0)
+    
+    elif mask_type == "bidirectional":
+        # No mask for bidirectional attention
+        return None
+    
+    elif mask_type == "prefix":
+        # Allow attention to prefix tokens
+        mask = torch.zeros(seq_len, seq_len)
+        return mask.unsqueeze(0).unsqueeze(0)
+    
+    else:
+        raise ValueError(f"Unknown mask type: {mask_type}")
+
+
+# Usage example
+def main():
+    """Main function demonstrating attention mechanisms."""
+    
+    # Configuration
+    config = AttentionConfig(
+        hidden_size=768,
+        num_heads=12,
+        dropout_rate=0.1,
+        use_rotary=True,
+        use_relative_position=True,
+        use_flash_attention=True
+    )
+    
+    # Create attention layer
+    attention = MultiHeadAttention(config)
+    
+    # Create sample input
+    batch_size, seq_len = 2, 128
+    hidden_states = torch.randn(batch_size, seq_len, config.hidden_size)
+    
+    # Create attention mask
+    attention_mask = create_attention_mask(
+        torch.ones(batch_size, seq_len), 
+        mask_type="causal"
+    )
+    
+    # Forward pass
+    outputs = attention(
+        hidden_states,
+        attention_mask=attention_mask,
+        output_attentions=True
+    )
+    
+    attention_output = outputs[0]
+    attention_weights = outputs[1] if len(outputs) > 1 else None
+    
+    print(f"✅ Attention Mechanisms & Positional Encodings Ready!")
+    print(f"   Input shape: {hidden_states.shape}")
+    print(f"   Output shape: {attention_output.shape}")
+    print(f"   Attention weights shape: {attention_weights.shape if attention_weights is not None else 'None'}")
+    print(f"   Using RoPE: {config.use_rotary}")
+    print(f"   Using Flash Attention: {config.use_flash_attention}")
 
 
 if __name__ == "__main__":
-    # Demonstrate attention mechanisms
-    results = demonstrate_attention_mechanisms()
-    print("\nAttention mechanisms demonstration completed!") 
+    main()

@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import sqlalchemy as sa
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add new available tenant table
 
 Revision ID: 3b45e0018bf1
@@ -6,9 +13,7 @@ Create Date: 2025-03-06 09:55:18.229910
 
 """
 
-import sqlalchemy as sa
 
-from alembic import op
 
 
 # revision identifiers, used by Alembic.

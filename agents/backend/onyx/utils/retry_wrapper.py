@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from logging import Logger
 from typing import Any
@@ -10,6 +12,9 @@ from retry import retry
 from onyx.configs.app_configs import REQUEST_TIMEOUT_SECONDS
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -46,7 +51,7 @@ def retry_builder(
     return retry_with_default
 
 
-def request_with_retries(
+async def request_with_retries(
     method: str,
     url: str,
     *,
@@ -60,7 +65,7 @@ def request_with_retries(
     backoff: float = 2,
 ) -> requests.Response:
     @retry(tries=tries, delay=delay, backoff=backoff, logger=cast(Logger, logger))
-    def _make_request() -> requests.Response:
+    async def _make_request() -> requests.Response:
         response = requests.request(
             method=method,
             url=url,

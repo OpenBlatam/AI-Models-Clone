@@ -1,8 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import structlog
 from pydantic import Field, field_validator, ConfigDict, BaseModel
 from uuid6 import uuid7, UUID
 import orjson
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = structlog.get_logger()
 
 class ORJSONModel(BaseModel):
@@ -14,7 +19,7 @@ class PasswordCreate(ORJSONModel):
     description: str | None = None
 
     @field_validator('value')
-    def password_strong(cls, v):
+    def password_strong(cls, v) -> Any:
         if not v or not v.strip():
             logger.error("PasswordCreate value validation failed", value=v)
             raise ValueError("Password must not be empty")
@@ -23,7 +28,7 @@ class PasswordCreate(ORJSONModel):
             raise ValueError("Password must be at least 8 characters")
         return v
 
-    def __post_init_post_parse__(self):
+    def __post_init_post_parse__(self) -> Any:
         logger.info("PasswordCreate instantiated", description=self.description)
 
 class PasswordRead(ORJSONModel):
@@ -31,5 +36,5 @@ class PasswordRead(ORJSONModel):
     id: UUID
     description: str | None
 
-    def __post_init_post_parse__(self):
+    def __post_init_post_parse__(self) -> Any:
         logger.info("PasswordRead instantiated", id=str(self.id), description=self.description) 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 from typing import cast
 from uuid import uuid4
@@ -16,9 +18,12 @@ from onyx.configs.constants import OnyxCeleryTask
 from onyx.configs.constants import OnyxRedisConstants
 from onyx.db.connector_credential_pair import get_connector_credential_pair_from_id
 from onyx.db.document import (
+from onyx.redis.redis_object_helper import RedisObjectHelper
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     construct_document_id_select_for_connector_credential_pair_by_needs_sync,
 )
-from onyx.redis.redis_object_helper import RedisObjectHelper
 
 
 class RedisConnectorCredentialPair(RedisObjectHelper):

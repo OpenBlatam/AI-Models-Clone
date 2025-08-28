@@ -1,17 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 
 from ee.onyx.db.external_perm import fetch_external_groups_for_user_email_and_group_ids
 from ee.onyx.external_permissions.salesforce.utils import (
-    get_any_salesforce_client_for_doc_id,
-)
 from ee.onyx.external_permissions.salesforce.utils import get_objects_access_for_user_id
 from ee.onyx.external_permissions.salesforce.utils import (
-    get_salesforce_user_id_from_email,
-)
 from onyx.configs.app_configs import BLURB_SIZE
 from onyx.context.search.models import InferenceChunk
 from onyx.db.engine import get_session_context_manager
 from onyx.utils.logger import setup_logger
+    import random
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_any_salesforce_client_for_doc_id,
+)
+    get_salesforce_user_id_from_email,
+)
 
 logger = setup_logger()
 
@@ -27,7 +33,6 @@ def _get_dummy_object_access_map(
 ) -> dict[str, bool]:
     time.sleep(0.15)
     # return {object_id: True for object_id in object_ids}
-    import random
 
     return {object_id: random.choice([True, False]) for object_id in object_ids}
 

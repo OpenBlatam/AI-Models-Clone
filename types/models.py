@@ -1,6 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from pydantic import BaseModel, Field
 from typing import List, Dict, Any
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 __all__ = ["ScanResult", ExploitResult"]
 
 class ScanResult(BaseModel):

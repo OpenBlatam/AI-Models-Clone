@@ -1,9 +1,7 @@
-"""
-FastAPI Best Practices Demo
-
-This demo showcases FastAPI best practices for Data Models, Path Operations,
-and Middleware following the official documentation guidelines.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -11,19 +9,27 @@ import time
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 import logging
-
-# Import FastAPI components
 from fastapi import FastAPI, Depends, HTTPException, status, Query, Path, Body
 from fastapi.testclient import TestClient
 from fastapi.responses import JSONResponse
+from models.fastapi_models import (
+from operations.fastapi_operations import router as operations_router
+from middleware.fastapi_middleware import (
+from typing import Any, List, Dict, Optional
+"""
+FastAPI Best Practices Demo
+
+This demo showcases FastAPI best practices for Data Models, Path Operations,
+and Middleware following the official documentation guidelines.
+"""
+
+
+# Import FastAPI components
 
 # Import our models and middleware
-from models.fastapi_models import (
     User, UserCreate, ProductDescription, ProductDescriptionRequest,
     ProductDescriptionResponse, PaginationParams, ErrorResponse
 )
-from operations.fastapi_operations import router as operations_router
-from middleware.fastapi_middleware import (
     MiddlewareStack, RequestLoggingMiddleware, PerformanceMonitoringMiddleware,
     ErrorHandlingMiddleware, SecurityHeadersMiddleware, RateLimitingMiddleware
 )
@@ -35,13 +41,13 @@ logger = logging.getLogger(__name__)
 class FastAPIBestPracticesDemo:
     """Demo class for showcasing FastAPI best practices."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.demo_results = []
         self.start_time = None
         self.app = None
         self.client = None
     
-    async def run_demo(self):
+    async def run_demo(self) -> Any:
         """Run the complete FastAPI best practices demo."""
         logger.info("🚀 Starting FastAPI Best Practices Demo")
         self.start_time = time.time()
@@ -60,7 +66,7 @@ class FastAPIBestPracticesDemo:
             logger.error(f"Demo failed: {e}")
             raise
     
-    async def demo_data_models(self):
+    async def demo_data_models(self) -> Any:
         """Demo FastAPI data models best practices."""
         logger.info("\n📋 Demo 1: Data Models Best Practices")
         
@@ -123,7 +129,7 @@ class FastAPIBestPracticesDemo:
         logger.info("   - Computed fields and mixins")
         logger.info("   - Proper error handling and messages")
     
-    async def demo_path_operations(self):
+    async def demo_path_operations(self) -> Any:
         """Demo FastAPI path operations best practices."""
         logger.info("\n🔧 Demo 2: Path Operations Best Practices")
         
@@ -200,7 +206,7 @@ class FastAPIBestPracticesDemo:
         logger.info("   - Background tasks for async operations")
         logger.info("   - Dependency injection for shared resources")
     
-    async def demo_middleware(self):
+    async def demo_middleware(self) -> Any:
         """Demo FastAPI middleware best practices."""
         logger.info("\n🛡️ Demo 3: Middleware Best Practices")
         
@@ -224,7 +230,9 @@ class FastAPIBestPracticesDemo:
         # Add a test endpoint
         @app.get("/test")
         async def test_endpoint():
-            return {"message": "Test endpoint with middleware"}
+            
+    """test_endpoint function."""
+return {"message": "Test endpoint with middleware"}
         
         # Test middleware
         try:
@@ -270,7 +278,7 @@ class FastAPIBestPracticesDemo:
         logger.info("   - Performance monitoring and optimization")
         logger.info("   - Request context management")
     
-    async def demo_integration(self):
+    async def demo_integration(self) -> Any:
         """Demo integration of all FastAPI best practices."""
         logger.info("\n🔗 Demo 4: Integration Best Practices")
         
@@ -296,7 +304,9 @@ class FastAPIBestPracticesDemo:
         # Add custom endpoints
         @app.get("/", tags=["Root"])
         async def root():
-            return {
+            
+    """root function."""
+return {
                 "message": "FastAPI Best Practices Demo",
                 "version": "1.0.0",
                 "docs": "/docs",
@@ -305,7 +315,9 @@ class FastAPIBestPracticesDemo:
         
         @app.get("/api/v1/status", tags=["Status"])
         async def status_endpoint():
-            return {
+            
+    """status_endpoint function."""
+return {
                 "status": "healthy",
                 "timestamp": datetime.utcnow().isoformat(),
                 "middleware_count": len(middleware_stack.get_middleware_config())
@@ -376,7 +388,7 @@ class FastAPIBestPracticesDemo:
         logger.info("   - Documentation generation")
         logger.info("   - Testing support")
     
-    async def demo_testing(self):
+    async def demo_testing(self) -> Any:
         """Demo testing best practices for FastAPI."""
         logger.info("\n🧪 Demo 5: Testing Best Practices")
         
@@ -469,7 +481,7 @@ class FastAPIBestPracticesDemo:
         }
         return purposes.get(middleware_name, "Unknown purpose")
     
-    async def print_demo_summary(self):
+    async def print_demo_summary(self) -> Any:
         """Print a summary of the demo results."""
         logger.info("\n" + "="*60)
         logger.info("📋 FASTAPI BEST PRACTICES DEMO SUMMARY")
@@ -511,5 +523,6 @@ async def main():
     demo = FastAPIBestPracticesDemo()
     await demo.run_demo()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

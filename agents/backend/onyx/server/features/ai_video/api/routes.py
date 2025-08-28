@@ -1,3 +1,39 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+from typing import List, Optional
+from uuid import uuid4
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query, Path
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.responses import StreamingResponse, JSONResponse
+from ..dependencies import (
+from ..core.error_handler import error_handler, ErrorContext
+from ..core.exceptions import AIVideoError, ValidationError as AIVideoValidationError
+import logging
+        import uuid
+        import redis
+        import json
+        import os
+            import uuid
+        import redis
+        import json
+        import redis
+        import json
+        import redis
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 API Routes - AI Video System
@@ -6,17 +42,9 @@ Declarative route definitions with clear return type annotations,
 functional components, and Pydantic models for FastAPI.
 """
 
-import asyncio
-import time
-from typing import List, Optional
-from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks, Query, Path
-from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.responses import StreamingResponse, JSONResponse
 
 # Import dependencies and models
-from ..dependencies import (
     VideoRequest, VideoResponse, SystemStatus, ErrorResponse,
     get_db_session, get_performance_optimizer, get_error_context,
     validate_video_request, generate_video_id, format_processing_time,
@@ -26,11 +54,8 @@ from ..dependencies import (
 )
 
 # Import core components
-from ..core.error_handler import error_handler, ErrorContext
-from ..core.exceptions import AIVideoError, ValidationError as AIVideoValidationError
 
 # Setup logging
-import logging
 logger = logging.getLogger(__name__)
 
 
@@ -515,7 +540,6 @@ async def generate_video(
             )
         
         # Generate job ID
-        import uuid
         job_id = str(uuid.uuid4())
         
         # Estimate processing time based on parameters
@@ -550,8 +574,6 @@ async def get_job_status(
 ):
     """Get job status and progress."""
     try:
-        import redis
-        import json
         
         redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
         job_data = redis_client.get(f"job:{job_id}")
@@ -590,7 +612,6 @@ async def download_video(
 ):
     """Download generated video."""
     try:
-        import os
         video_path = f"generated_videos/{video_id}.mp4"
         
         if not os.path.exists(video_path):
@@ -601,6 +622,10 @@ async def download_video(
         
         return StreamingResponse(
             open(video_path, "rb"),
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             media_type="video/mp4",
             headers={"Content-Disposition": f"attachment; filename={video_id}.mp4"}
         )
@@ -627,7 +652,6 @@ async def batch_generate_videos(
         job_ids = []
         
         for request in batch_request.requests:
-            import uuid
             job_id = str(uuid.uuid4())
             job_ids.append(job_id)
             
@@ -662,8 +686,6 @@ async def list_user_jobs(
 ):
     """List user's video generation jobs."""
     try:
-        import redis
-        import json
         
         redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
         
@@ -713,8 +735,6 @@ async def cancel_job(
 ):
     """Cancel a video generation job."""
     try:
-        import redis
-        import json
         
         redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
         job_data = redis_client.get(f"job:{job_id}")
@@ -812,7 +832,6 @@ async def get_user_quota(
         )
     
     try:
-        import redis
         redis_client = redis.Redis(host='localhost', port=6379, db=0, decode_responses=True)
         
         # Get quota data

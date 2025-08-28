@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from datetime import datetime
 
 import pytest
@@ -10,6 +15,9 @@ from onyx.chat.stream_processing.utils import DocumentIdOrderMapping
 from onyx.configs.constants import DocumentSource
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 This module contains tests for the citation extraction functionality in Onyx.
 
@@ -323,7 +331,7 @@ def process_text(
                 "This function ",
                 "greets the user.",
             ],
-            "Here's a Python code block:\n```python\ndef greet(name):\n    "
+            "Here's a Python code block:\n```python\ndef greet(name) -> Any:\n    "
             "print(f'Hello, {name}!')\ngreet('World')\n```\nThis function greets the user.",
             [],
         ),

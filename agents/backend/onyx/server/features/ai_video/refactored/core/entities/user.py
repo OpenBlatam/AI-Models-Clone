@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from datetime import datetime
+from enum import Enum
+from typing import Dict, List, Optional
+from uuid import UUID
+from pydantic import Field, field_validator
+from .base import AggregateRoot
+        import re
+        import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 User Entity
 ==========
@@ -5,14 +21,8 @@ User Entity
 User entity representing system users with permissions and preferences.
 """
 
-from datetime import datetime
-from enum import Enum
-from typing import Dict, List, Optional
-from uuid import UUID
 
-from pydantic import Field, field_validator
 
-from .base import AggregateRoot
 
 
 class UserRole(str, Enum):
@@ -109,7 +119,6 @@ class User(AggregateRoot):
             raise ValueError("Username cannot be empty")
         
         # Check for valid characters
-        import re
         if not re.match(r"^[a-zA-Z0-9_-]+$", v):
             raise ValueError("Username can only contain letters, numbers, underscores, and hyphens")
         
@@ -119,7 +128,6 @@ class User(AggregateRoot):
     @classmethod
     def validate_email(cls, v: str) -> str:
         """Validate email address."""
-        import re
         email_pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         if not re.match(email_pattern, v):
             raise ValueError("Invalid email address format")

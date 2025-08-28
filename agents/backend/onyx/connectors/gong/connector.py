@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import base64
 import time
 from collections.abc import Generator
@@ -24,6 +26,10 @@ from onyx.connectors.models import Document
 from onyx.connectors.models import TextSection
 from onyx.utils.logger import setup_logger
 
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -173,7 +179,7 @@ class GongConnector(LoadConnector, PollConnector):
 
         return id_mapping
 
-    def _fetch_calls(
+    async def _fetch_calls(
         self, start_datetime: str | None = None, end_datetime: str | None = None
     ) -> GenerateDocumentsOutput:
         num_calls = 0
@@ -376,7 +382,6 @@ class GongConnector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     connector = GongConnector()
     connector.load_credentials(

@@ -1,13 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from ee.onyx.db.external_perm import ExternalUserGroup
 from ee.onyx.external_permissions.confluence.constants import ALL_CONF_EMAILS_GROUP_NAME
 from onyx.background.error_logging import emit_background_error
 from onyx.connectors.confluence.onyx_confluence import (
-    get_user_email_from_username__server,
-)
 from onyx.connectors.confluence.onyx_confluence import OnyxConfluence
 from onyx.connectors.credentials_provider import OnyxDBCredentialsProvider
 from onyx.db.models import ConnectorCredentialPair
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_user_email_from_username__server,
+)
 
 logger = setup_logger()
 

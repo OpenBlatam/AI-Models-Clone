@@ -1,7 +1,10 @@
-"""
-Async utility functions for high-throughput scanning and enumeration.
-Provides connection pooling, rate limiting, performance monitoring, and async helpers.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import aiohttp
@@ -18,6 +21,12 @@ import weakref
 import threading
 from concurrent.futures import ThreadPoolExecutor
 import functools
+from typing import Any, List, Dict, Optional
+"""
+Async utility functions for high-throughput scanning and enumeration.
+Provides connection pooling, rate limiting, performance monitoring, and async helpers.
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -103,7 +112,9 @@ class AsyncRateLimiter:
     """Advanced rate limiter with token bucket algorithm."""
     
     def __init__(self, rate_per_second: int, burst_size: int = None):
-        self.rate_per_second = rate_per_second
+        
+    """__init__ function."""
+self.rate_per_second = rate_per_second
         self.burst_size = burst_size or rate_per_second
         self.tokens = self.burst_size
         self.last_update = time.time()
@@ -141,7 +152,9 @@ class AsyncConnectionPool:
     """Generic async connection pool with automatic cleanup."""
     
     def __init__(self, max_connections: int = 100, max_connections_per_host: int = 10):
-        self.max_connections = max_connections
+        
+    """__init__ function."""
+self.max_connections = max_connections
         self.max_connections_per_host = max_connections_per_host
         self.connections: Dict[str, Any] = {}
         self.connection_semaphores: Dict[str, asyncio.Semaphore] = defaultdict(
@@ -156,7 +169,7 @@ class AsyncConnectionPool:
             "connection_errors": 0
         }
     
-    async def get_connection(self, key: str, factory: Callable, *args, **kwargs) -> Any:
+    async def get_connection(self, key: str, factory: Callable, *args, **kwargs) -> Optional[Dict[str, Any]]:
         """Get or create a connection from the pool."""
         async with self.global_semaphore:
             async with self.connection_semaphores[key]:
@@ -205,7 +218,7 @@ class AsyncConnectionPool:
                 del self.connections[key]
                 self.stats["active_connections"] -= 1
     
-    async def cleanup_invalid_connections(self):
+    async def cleanup_invalid_connections(self) -> Any:
         """Clean up invalid connections."""
         invalid_keys = []
         for key, conn in self.connections.items():
@@ -218,13 +231,15 @@ class AsyncConnectionPool:
     async def start_cleanup_task(self, interval: float = 60.0):
         """Start periodic cleanup task."""
         async def cleanup_loop():
-            while True:
+            
+    """cleanup_loop function."""
+while True:
                 await asyncio.sleep(interval)
                 await self.cleanup_invalid_connections()
         
         self.cleanup_task = asyncio.create_task(cleanup_loop())
     
-    async def stop_cleanup_task(self):
+    async def stop_cleanup_task(self) -> Any:
         """Stop periodic cleanup task."""
         if self.cleanup_task:
             self.cleanup_task.cancel()
@@ -233,7 +248,7 @@ class AsyncConnectionPool:
             except asyncio.CancelledError:
                 pass
     
-    async def close_all(self):
+    async def close_all(self) -> Any:
         """Close all connections in the pool."""
         await self.stop_cleanup_task()
         
@@ -247,7 +262,9 @@ class AsyncTaskManager:
     """Manages async tasks with performance monitoring and error handling."""
     
     def __init__(self, max_concurrent_tasks: int = 100):
-        self.max_concurrent_tasks = max_concurrent_tasks
+        
+    """__init__ function."""
+self.max_concurrent_tasks = max_concurrent_tasks
         self.semaphore = asyncio.Semaphore(max_concurrent_tasks)
         self.metrics = PerformanceMetrics()
         self.active_tasks: Set[asyncio.Task] = set()
@@ -305,7 +322,9 @@ class AsyncRetryHandler:
     
     def __init__(self, max_retries: int = 3, base_delay: float = 1.0, 
                  max_delay: float = 60.0, exponential_base: float = 2.0):
-        self.max_retries = max_retries
+        
+    """__init__ function."""
+self.max_retries = max_retries
         self.base_delay = base_delay
         self.max_delay = max_delay
         self.exponential_base = exponential_base
@@ -338,7 +357,9 @@ class AsyncBatchProcessor:
     """Process items in batches with async operations."""
     
     def __init__(self, batch_size: int = 100, max_concurrent_batches: int = 10):
-        self.batch_size = batch_size
+        
+    """__init__ function."""
+self.batch_size = batch_size
         self.max_concurrent_batches = max_concurrent_batches
         self.semaphore = asyncio.Semaphore(max_concurrent_batches)
         self.metrics = PerformanceMetrics()
@@ -408,7 +429,9 @@ class AsyncCache:
     """Async cache with TTL and automatic cleanup."""
     
     def __init__(self, default_ttl: float = 300.0):
-        self.default_ttl = default_ttl
+        
+    """__init__ function."""
+self.default_ttl = default_ttl
         self.cache: Dict[str, Tuple[Any, float]] = {}
         self.lock = asyncio.Lock()
         self.cleanup_task: Optional[asyncio.Task] = None
@@ -438,12 +461,12 @@ class AsyncCache:
         async with self.lock:
             self.cache.pop(key, None)
     
-    async def clear(self):
+    async def clear(self) -> Any:
         """Clear all cache entries."""
         async with self.lock:
             self.cache.clear()
     
-    async def cleanup_expired(self):
+    async def cleanup_expired(self) -> Any:
         """Remove expired entries from cache."""
         current_time = time.time()
         async with self.lock:
@@ -457,13 +480,15 @@ class AsyncCache:
     async def start_cleanup_task(self, interval: float = 60.0):
         """Start periodic cleanup task."""
         async def cleanup_loop():
-            while True:
+            
+    """cleanup_loop function."""
+while True:
                 await asyncio.sleep(interval)
                 await self.cleanup_expired()
         
         self.cleanup_task = asyncio.create_task(cleanup_loop())
     
-    async def stop_cleanup_task(self):
+    async def stop_cleanup_task(self) -> Any:
         """Stop periodic cleanup task."""
         if self.cleanup_task:
             self.cleanup_task.cancel()
@@ -481,9 +506,9 @@ async def async_timeout(seconds: float):
 
 async def async_retry(max_retries: int = 3, delay: float = 1.0):
     """Async retry decorator."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             last_exception = None
             for attempt in range(max_retries + 1):
                 try:

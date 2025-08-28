@@ -1,7 +1,7 @@
-"""
-Experiment Tracking Classes
-Provides unified interfaces for TensorBoard, Weights & Biases, and MLflow
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import os
 import time
@@ -11,13 +11,30 @@ import structlog
 from pathlib import Path
 import json
 from datetime import datetime
+            from torch.utils.tensorboard import SummaryWriter
+                import torch
+            import wandb
+            import wandb
+            import mlflow
+            import mlflow
+            import mlflow
+            import mlflow
+                import mlflow
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Experiment Tracking Classes
+Provides unified interfaces for TensorBoard, Weights & Biases, and MLflow
+"""
+
 
 logger = structlog.get_logger(__name__)
 
 class ExperimentTracker(ABC):
     """Abstract base class for experiment trackers."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.experiment_name = None
         self.run_id = None
         self.config = None
@@ -44,7 +61,7 @@ class ExperimentTracker(ABC):
         pass
     
     @abstractmethod
-    def finalize_experiment(self):
+    def finalize_experiment(self) -> Any:
         """Finalize the experiment."""
         pass
     
@@ -95,7 +112,7 @@ class NoOpTracker(ExperimentTracker):
         if self.is_initialized:
             logger.debug("NoOpTracker logging model", model_path=model_path, model_name=model_name)
     
-    def finalize_experiment(self):
+    def finalize_experiment(self) -> Any:
         """Finalize experiment (no-op)."""
         if self.is_initialized:
             logger.info("NoOpTracker experiment finalized", experiment_name=self.experiment_name)
@@ -105,7 +122,9 @@ class TensorBoardTracker(ExperimentTracker):
     """TensorBoard experiment tracker."""
     
     def __init__(self, log_dir: str = "./logs", update_freq: int = 100, flush_secs: int = 120):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.log_dir = Path(log_dir)
         self.update_freq = update_freq
         self.flush_secs = flush_secs
@@ -123,7 +142,6 @@ class TensorBoardTracker(ExperimentTracker):
     def init_experiment(self, experiment_name: str, config: Dict[str, Any] = None) -> str:
         """Initialize TensorBoard experiment."""
         try:
-            from torch.utils.tensorboard import SummaryWriter
             
             self.experiment_name = experiment_name
             self.config = config or {}
@@ -208,7 +226,6 @@ class TensorBoardTracker(ExperimentTracker):
         try:
             # Log model graph (if it's a PyTorch model)
             if model_path.endswith('.pt') or model_path.endswith('.pth'):
-                import torch
                 model = torch.load(model_path, map_location='cpu')
                 if hasattr(model, 'forward'):
                     dummy_input = torch.randn(1, 512)  # Adjust based on your model
@@ -217,7 +234,7 @@ class TensorBoardTracker(ExperimentTracker):
         except Exception as e:
             logger.error("Failed to log model to TensorBoard", error=str(e))
     
-    def finalize_experiment(self):
+    def finalize_experiment(self) -> Any:
         """Finalize TensorBoard experiment."""
         if self.writer:
             try:
@@ -243,7 +260,9 @@ class WandbTracker(ExperimentTracker):
     def __init__(self, project: str = "key_messages", entity: Optional[str] = None,
                  tags: Optional[List[str]] = None, notes: str = "",
                  config_exclude_keys: Optional[List[str]] = None):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.project = project
         self.entity = entity
         self.tags = tags or []
@@ -259,7 +278,6 @@ class WandbTracker(ExperimentTracker):
     def init_experiment(self, experiment_name: str, config: Dict[str, Any] = None) -> str:
         """Initialize Weights & Biases experiment."""
         try:
-            import wandb
             
             self.experiment_name = experiment_name
             self.config = config or {}
@@ -328,7 +346,6 @@ class WandbTracker(ExperimentTracker):
             return
         
         try:
-            import wandb
             
             # Log model artifact
             artifact = wandb.Artifact(
@@ -342,7 +359,7 @@ class WandbTracker(ExperimentTracker):
         except Exception as e:
             logger.error("Failed to log model to Weights & Biases", error=str(e))
     
-    def finalize_experiment(self):
+    def finalize_experiment(self) -> Any:
         """Finalize Weights & Biases experiment."""
         if self.run:
             try:
@@ -374,7 +391,9 @@ class MLflowTracker(ExperimentTracker):
     
     def __init__(self, tracking_uri: str = "sqlite:///mlflow.db", 
                  experiment_name: str = "key_messages", log_models: bool = True):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.tracking_uri = tracking_uri
         self.experiment_name = experiment_name
         self.log_models = log_models
@@ -388,7 +407,6 @@ class MLflowTracker(ExperimentTracker):
     def init_experiment(self, experiment_name: str, config: Dict[str, Any] = None) -> str:
         """Initialize MLflow experiment."""
         try:
-            import mlflow
             
             self.experiment_name = experiment_name
             self.config = config or {}
@@ -428,7 +446,6 @@ class MLflowTracker(ExperimentTracker):
             return
         
         try:
-            import mlflow
             
             for name, value in metrics.items():
                 if isinstance(value, (int, float)):
@@ -445,7 +462,6 @@ class MLflowTracker(ExperimentTracker):
             return
         
         try:
-            import mlflow
             
             # Log parameters
             for key, value in config.items():
@@ -455,6 +471,10 @@ class MLflowTracker(ExperimentTracker):
             # Log full config as artifact
             config_path = "config.json"
             with open(config_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(config, f, indent=2)
             mlflow.log_artifact(config_path)
             os.remove(config_path)
@@ -468,7 +488,6 @@ class MLflowTracker(ExperimentTracker):
             return
         
         try:
-            import mlflow
             
             # Log model artifact
             mlflow.log_artifact(model_path, model_name)
@@ -476,11 +495,10 @@ class MLflowTracker(ExperimentTracker):
         except Exception as e:
             logger.error("Failed to log model to MLflow", error=str(e))
     
-    def finalize_experiment(self):
+    def finalize_experiment(self) -> Any:
         """Finalize MLflow experiment."""
         if self.run:
             try:
-                import mlflow
                 mlflow.end_run()
                 logger.info("MLflow experiment finalized", 
                            experiment_name=self.experiment_name,
@@ -500,7 +518,9 @@ class CompositeTracker(ExperimentTracker):
     """Composite tracker that combines multiple trackers."""
     
     def __init__(self, trackers: List[ExperimentTracker]):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.trackers = trackers
         
         logger.info("CompositeTracker initialized", num_trackers=len(trackers))
@@ -560,7 +580,7 @@ class CompositeTracker(ExperimentTracker):
             except Exception as e:
                 logger.error(f"Failed to log model to {type(tracker).__name__}", error=str(e))
     
-    def finalize_experiment(self):
+    def finalize_experiment(self) -> Any:
         """Finalize all trackers."""
         if not self.is_initialized:
             return

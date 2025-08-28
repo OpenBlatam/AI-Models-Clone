@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 from datetime import datetime
 from datetime import timedelta
@@ -28,6 +30,9 @@ from onyx.utils.logger import setup_logger
 from onyx.utils.telemetry import optional_telemetry
 from onyx.utils.telemetry import RecordType
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Comment out unused imports that cause mypy errors
 # from onyx.auth.models import UserRole
 # from onyx.configs.constants import MAX_LAST_VALID_CHECKPOINT_AGE_SECONDS

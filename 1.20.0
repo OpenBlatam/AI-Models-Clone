@@ -1,0 +1,14 @@
+Collecting opentelemetry-sdk
+  Using cached opentelemetry_sdk-1.36.0-py3-none-any.whl.metadata (1.5 kB)
+Requirement already satisfied: opentelemetry-api==1.36.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from opentelemetry-sdk) (1.36.0)
+Collecting opentelemetry-semantic-conventions==0.57b0 (from opentelemetry-sdk)
+  Downloading opentelemetry_semantic_conventions-0.57b0-py3-none-any.whl.metadata (2.4 kB)
+Requirement already satisfied: typing-extensions>=4.5.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from opentelemetry-sdk) (4.14.0)
+Requirement already satisfied: importlib-metadata<8.8.0,>=6.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from opentelemetry-api==1.36.0->opentelemetry-sdk) (8.7.0)
+Requirement already satisfied: zipp>=3.20 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from importlib-metadata<8.8.0,>=6.0->opentelemetry-api==1.36.0->opentelemetry-sdk) (3.23.0)
+Downloading opentelemetry_sdk-1.36.0-py3-none-any.whl (119 kB)
+   ---------------------------------------- 120.0/120.0 kB 1.2 MB/s eta 0:00:00
+Downloading opentelemetry_semantic_conventions-0.57b0-py3-none-any.whl (201 kB)
+   ---------------------------------------- 201.6/201.6 kB 4.1 MB/s eta 0:00:00
+Installing collected packages: opentelemetry-semantic-conventions, opentelemetry-sdk
+Successfully installed opentelemetry-sdk-1.36.0 opentelemetry-semantic-conventions-0.57b0

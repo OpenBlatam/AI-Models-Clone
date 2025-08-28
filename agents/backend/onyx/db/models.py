@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 import datetime
 import json
 from typing import Any
@@ -47,12 +55,6 @@ from onyx.configs.constants import DocumentSource
 from onyx.configs.constants import FileOrigin
 from onyx.configs.constants import MessageType
 from onyx.db.enums import (
-    AccessType,
-    EmbeddingPrecision,
-    IndexingMode,
-    SyncType,
-    SyncStatus,
-)
 from onyx.configs.constants import NotificationType
 from onyx.configs.constants import SearchFeedbackType
 from onyx.configs.constants import TokenRateLimitScope
@@ -74,6 +76,15 @@ from onyx.utils.encryption import encrypt_string_to_bytes
 from onyx.utils.headers import HeaderItemDict
 from shared_configs.enums import EmbeddingProvider
 from shared_configs.enums import RerankerProvider
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    AccessType,
+    EmbeddingPrecision,
+    IndexingMode,
+    SyncType,
+    SyncStatus,
+)
 
 logger = setup_logger()
 
@@ -866,7 +877,7 @@ class SearchSettings(Base):
           cloud_provider='{self.cloud_provider.provider_type if self.cloud_provider else 'None'}')>"
 
     @property
-    def api_version(self) -> str | None:
+    async def api_version(self) -> str | None:
         return (
             self.cloud_provider.api_version if self.cloud_provider is not None else None
         )
@@ -880,11 +891,11 @@ class SearchSettings(Base):
         )
 
     @property
-    def api_url(self) -> str | None:
+    async def api_url(self) -> str | None:
         return self.cloud_provider.api_url if self.cloud_provider is not None else None
 
     @property
-    def api_key(self) -> str | None:
+    async def api_key(self) -> str | None:
         return self.cloud_provider.api_key if self.cloud_provider is not None else None
 
     @property

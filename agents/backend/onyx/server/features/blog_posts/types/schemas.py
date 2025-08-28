@@ -1,12 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from pydantic import BaseModel, Field, validator
 import logging
 
+from typing import Any, List, Dict, Optional
+import asyncio
 logger = logging.getLogger("blog_posts.schemas")
 
 class InvalidTargetError(Exception):
     """Raised when a target address is invalid."""
     def __init__(self, target: str):
-        self.target = target
+        
+    """__init__ function."""
+self.target = target
         self.message = f"Invalid target address: {target}"
         super().__init__(self.message)
 
@@ -20,7 +26,7 @@ class BlogPostIn(BaseModel):
     target: str = Field(..., description="Target address for demonstration.")
 
     @validator("title")
-    def validate_title(cls, v):
+    def validate_title(cls, v) -> bool:
         if not v or not v.strip():
             logger.warning({
                 "module": "schemas",
@@ -32,7 +38,7 @@ class BlogPostIn(BaseModel):
         return v
 
     @validator("content")
-    def validate_content(cls, v):
+    def validate_content(cls, v) -> bool:
         if not v or not v.strip():
             logger.warning({
                 "module": "schemas",
@@ -44,7 +50,7 @@ class BlogPostIn(BaseModel):
         return v
 
     @validator("target")
-    def validate_target(cls, v):
+    def validate_target(cls, v) -> Optional[Dict[str, Any]]:
         if not v or not v.startswith("http"):
             logger.error({
                 "module": "schemas",

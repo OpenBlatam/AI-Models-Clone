@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import timezone
 from io import BytesIO
 from typing import Any
@@ -24,6 +26,10 @@ from onyx.file_processing.extract_file_text import extract_file_text
 from onyx.utils.logger import setup_logger
 
 
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -36,7 +42,7 @@ class DropboxConnector(LoadConnector, PollConnector):
         self.dropbox_client = Dropbox(credentials["dropbox_access_token"])
         return None
 
-    def _download_file(self, path: str) -> bytes:
+    async def _download_file(self, path: str) -> bytes:
         """Download a single file from Dropbox."""
         if self.dropbox_client is None:
             raise ConnectorMissingCredentialError("Dropbox")
@@ -170,7 +176,6 @@ class DropboxConnector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     connector = DropboxConnector()
     connector.load_credentials(

@@ -1,3 +1,31 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import os
+import time
+from contextlib import asynccontextmanager
+from dataclasses import dataclass, field
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union, Tuple, Callable
+from typing_extensions import TypedDict
+import torch
+import numpy as np
+from PIL import Image, ImageDraw, ImageFont
+import requests
+from io import BytesIO
+from diffusers import (
+from diffusers.utils import logging as diffusers_logging
+from transformers import CLIPTextModel, CLIPTokenizer
+import cv2
+from torchvision import transforms
+import psutil
+import gc
+from typing import Any, List, Dict, Optional
 """
 Diffusion Models for Cybersecurity Applications
 ==============================================
@@ -20,40 +48,18 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import logging
-import os
-import time
-from contextlib import asynccontextmanager
-from dataclasses import dataclass, field
-from enum import Enum
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, Tuple, Callable
-from typing_extensions import TypedDict
 
-import torch
-import numpy as np
-from PIL import Image, ImageDraw, ImageFont
-import requests
-from io import BytesIO
 
 # Diffusion models
-from diffusers import (
     StableDiffusionPipeline, StableDiffusionImg2ImgPipeline,
     StableDiffusionInpaintPipeline, ControlNetModel, StableDiffusionControlNetPipeline,
     DDIMScheduler, DPMSolverMultistepScheduler, EulerDiscreteScheduler,
     AutoencoderKL, UNet2DConditionModel
 )
-from diffusers.utils import logging as diffusers_logging
 
 # Transformers for text processing
-from transformers import CLIPTextModel, CLIPTokenizer
 
 # Image processing
-import cv2
-from torchvision import transforms
-import psutil
-import gc
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -427,7 +433,7 @@ class DiffusionModelsManager:
             logger.warning(f"Some optimizations failed: {str(e)}")
             return pipeline
     
-    def _get_scheduler(self, scheduler_type: SchedulerType) -> Any:
+    def _get_scheduler(self, scheduler_type: SchedulerType) -> Optional[Dict[str, Any]]:
         """Get the appropriate scheduler."""
         scheduler_map = {
             SchedulerType.DDIM: DDIMScheduler,
@@ -564,8 +570,16 @@ class DiffusionModelsManager:
             if config.image.startswith(('http://', 'https://')):
                 response = requests.get(config.image)
                 image = Image.open(BytesIO(response.content)).convert("RGB")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             else:
                 image = Image.open(config.image).convert("RGB")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         else:
             image = config.image
         

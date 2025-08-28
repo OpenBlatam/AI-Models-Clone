@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import argparse
+import os
+import sys
+import logging
+from pathlib import Path
+from gradio_app import main as launch_app
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Gradio Application Launcher
@@ -6,16 +19,10 @@ Simple launcher script for the Email Sequence AI Gradio application
 with configuration options and deployment utilities.
 """
 
-import argparse
-import os
-import sys
-import logging
-from pathlib import Path
 
 # Add the current directory to the path
 sys.path.append(str(Path(__file__).parent))
 
-from gradio_app import main as launch_app
 
 # Configure logging
 logging.basicConfig(
@@ -207,5 +214,6 @@ Examples:
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

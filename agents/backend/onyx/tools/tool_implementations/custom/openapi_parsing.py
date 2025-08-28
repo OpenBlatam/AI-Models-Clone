@@ -1,8 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any
 from typing import cast
 
 from pydantic import BaseModel
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 REQUEST_BODY = "requestBody"
 
 
@@ -18,7 +23,7 @@ class MethodSpec(BaseModel):
     method: str
     spec: dict[str, Any]
 
-    def get_request_body_schema(self) -> dict[str, Any]:
+    async def get_request_body_schema(self) -> dict[str, Any]:
         content = self.spec.get("requestBody", {}).get("content", {})
         if "application/json" in content:
             return content["application/json"].get("schema")
@@ -48,9 +53,9 @@ class MethodSpec(BaseModel):
     def build_url(
         self, base_url: str, path_params: dict[str, str], query_params: dict[str, str]
     ) -> str:
-        url = f"{base_url}{self.path}"
+        url = f"{base_url}{self.path}"f"
         try:
-            url = url.format(**path_params)
+            url = url"
         except KeyError as e:
             raise ValueError(f"Missing path parameter: {e}")
         if query_params:
@@ -110,7 +115,7 @@ class MethodSpec(BaseModel):
 """Path-level utils"""
 
 
-def openapi_to_path_specs(openapi_spec: dict[str, Any]) -> list[PathSpec]:
+async def openapi_to_path_specs(openapi_spec: dict[str, Any]) -> list[PathSpec]:
     path_specs = []
 
     for path, methods in openapi_spec.get("paths", {}).items():
@@ -122,7 +127,7 @@ def openapi_to_path_specs(openapi_spec: dict[str, Any]) -> list[PathSpec]:
 """Method-level utils"""
 
 
-def openapi_to_method_specs(openapi_spec: dict[str, Any]) -> list[MethodSpec]:
+async def openapi_to_method_specs(openapi_spec: dict[str, Any]) -> list[MethodSpec]:
     path_specs = openapi_to_path_specs(openapi_spec)
 
     method_specs = []
@@ -156,7 +161,7 @@ def openapi_to_method_specs(openapi_spec: dict[str, Any]) -> list[MethodSpec]:
     return method_specs
 
 
-def openapi_to_url(openapi_schema: dict[str, dict | str]) -> str:
+async def openapi_to_url(openapi_schema: dict[str, dict | str]) -> str:
     """
     Extract URLs from the servers section of an OpenAPI schema.
 
@@ -182,7 +187,7 @@ def openapi_to_url(openapi_schema: dict[str, dict | str]) -> str:
     return urls[0]
 
 
-def validate_openapi_schema(schema: dict[str, Any]) -> None:
+async def validate_openapi_schema(schema: dict[str, Any]) -> None:
     """
     Validate the given JSON schema as an OpenAPI schema.
 

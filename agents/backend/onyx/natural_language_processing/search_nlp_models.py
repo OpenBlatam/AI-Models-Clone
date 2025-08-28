@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import threading
 import time
 from collections.abc import Callable
@@ -19,14 +21,10 @@ from onyx.configs.app_configs import LARGE_CHUNK_RATIO
 from onyx.configs.app_configs import SKIP_WARM_UP
 from onyx.configs.model_configs import BATCH_SIZE_ENCODE_CHUNKS
 from onyx.configs.model_configs import (
-    BATCH_SIZE_ENCODE_CHUNKS_FOR_API_EMBEDDING_SERVICES,
-)
 from onyx.configs.model_configs import DOC_EMBEDDING_CONTEXT_SIZE
 from onyx.db.models import SearchSettings
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.natural_language_processing.exceptions import (
-    ModelServerRateLimitError,
-)
 from onyx.natural_language_processing.utils import get_tokenizer
 from onyx.natural_language_processing.utils import tokenizer_trim_content
 from onyx.utils.logger import setup_logger
@@ -49,6 +47,13 @@ from shared_configs.model_server_models import IntentResponse
 from shared_configs.model_server_models import RerankRequest
 from shared_configs.model_server_models import RerankResponse
 from shared_configs.utils import batch_list
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    BATCH_SIZE_ENCODE_CHUNKS_FOR_API_EMBEDDING_SERVICES,
+)
+    ModelServerRateLimitError,
+)
 
 logger = setup_logger()
 
@@ -115,13 +120,13 @@ class EmbeddingModel:
         model_server_url = build_model_server_url(server_host, server_port)
         self.embed_server_endpoint = f"{model_server_url}/encoder/bi-encoder-embed"
 
-    def _make_model_server_request(
+    async def _make_model_server_request(
         self,
         embed_request: EmbedRequest,
         tenant_id: str | None = None,
         request_id: str | None = None,
     ) -> EmbedResponse:
-        def _make_request() -> Response:
+        async def _make_request() -> Response:
             headers = {}
             if tenant_id:
                 headers["X-Onyx-Tenant-ID"] = tenant_id
@@ -454,7 +459,9 @@ class ConnectorClassificationModel:
         model_server_host: str = MODEL_SERVER_HOST,
         model_server_port: int = MODEL_SERVER_PORT,
     ):
-        model_server_url = build_model_server_url(model_server_host, model_server_port)
+        
+    """__init__ function."""
+model_server_url = build_model_server_url(model_server_host, model_server_port)
         self.connector_classification_endpoint = (
             model_server_url + "/custom/connector-classification"
         )
@@ -531,6 +538,10 @@ def warm_up_bi_encoder(
 
     if non_blocking:
         threading.Thread(target=_warm_up, daemon=True).start()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         logger.debug(
             f"Started non-blocking warm-up for encoder model: {embedding_model.model_name}"
         )
@@ -563,6 +574,10 @@ def warm_up_cross_encoder(
 
     if non_blocking:
         threading.Thread(target=_warm_up, daemon=True).start()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         logger.debug(
             f"Started non-blocking warm-up for reranking model: {rerank_model_name}"
         )

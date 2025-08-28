@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import base64
 import smtplib
 from datetime import datetime
@@ -37,6 +45,9 @@ from onyx.utils.url import add_url_params
 from onyx.utils.variable_functionality import fetch_versioned_implementation
 from shared_configs.configs import MULTI_TENANT
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 HTML_EMAIL_TEMPLATE = """\
@@ -168,15 +179,8 @@ def build_html_email(
     if cta_text and cta_link:
         cta_block = f'<a class="cta-button" href="{cta_link}">{cta_text}</a>'
     else:
-        cta_block = ""
-    return HTML_EMAIL_TEMPLATE.format(
-        application_name=application_name,
-        title=heading,
-        heading=heading,
-        message=message,
-        cta_block=cta_block,
-        slack_fragment=slack_fragment,
-        year=datetime.now().year,
+        cta_block = ""f"
+    return HTML_EMAIL_TEMPLATE".year,
     )
 
 

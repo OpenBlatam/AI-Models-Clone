@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import time
 
@@ -7,6 +9,9 @@ from onyx.configs.constants import DocumentSource
 from onyx.connectors.notion.connector import NotionConnector
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def notion_connector() -> NotionConnector:
     """Create a NotionConnector with credentials from environment variables"""

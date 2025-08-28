@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import sqlalchemy as sa
+from alembic import op
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Remove Document IDs
 
 Revision ID: d7111c1238cd
@@ -6,9 +14,6 @@ Create Date: 2023-07-29 15:06:25.126169
 
 """
 
-import sqlalchemy as sa
-from alembic import op
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "d7111c1238cd"

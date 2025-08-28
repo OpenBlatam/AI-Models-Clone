@@ -1,12 +1,17 @@
-"""
-Cache Mixin - Onyx Integration
-Caching functionality for models.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, ClassVar, Optional
 from functools import lru_cache
 import time
 from .base_types import CACHE_TTL, CACHE_SIZE
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Cache Mixin - Onyx Integration
+Caching functionality for models.
+"""
 
 class CacheMixin:
     """Mixin for caching functionality."""

@@ -1,6 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import List, Dict, Callable, Any, Optional
 import asyncio
 
+from typing import Any, List, Dict, Optional
+import logging
 # --- Helpers batch para status ---
 def batch_get_status(ids: List[str], use_onyx: bool, cache) -> (Dict[str, Any], List[str], Callable):
     """Obtiene los jobs en caché y la lista de IDs no cacheados."""
@@ -9,13 +13,13 @@ def batch_get_status(ids: List[str], use_onyx: bool, cache) -> (Dict[str, Any], 
     uncached = [rid for rid, val in cached.items() if val is None]
     return cached, uncached, cache_key
 
-async def batch_fetch_status(uncached: List[str], use_onyx: bool, get_system, VIDEO_STATUS, cache, cache_key, max_concurrency: int = 10) -> Dict[str, Any]:
+async async def batch_fetch_status(uncached: List[str], use_onyx: bool, get_system, VIDEO_STATUS, cache, cache_key, max_concurrency: int = 10) -> Dict[str, Any]:
     """
     Obtiene el status de los jobs no cacheados, actualiza caché y retorna dict.
     Usa asyncio.Semaphore para limitar la concurrencia máxima.
     """
     semaphore = asyncio.Semaphore(max_concurrency)
-    async def get_status(rid):
+    async def get_status(rid) -> Optional[Dict[str, Any]]:
         async with semaphore:
             try:
                 if use_onyx:
@@ -48,13 +52,13 @@ def batch_get_logs(ids: List[str], use_onyx: bool, cache) -> (Dict[str, Any], Li
     uncached = [rid for rid, val in cached.items() if val is None]
     return cached, uncached, cache_key
 
-async def batch_fetch_logs(uncached: List[str], use_onyx: bool, get_system, VIDEO_LOGS, cache, cache_key, max_concurrency: int = 10) -> Dict[str, Any]:
+async async def batch_fetch_logs(uncached: List[str], use_onyx: bool, get_system, VIDEO_LOGS, cache, cache_key, max_concurrency: int = 10) -> Dict[str, Any]:
     """
     Obtiene los logs de los jobs no cacheados, actualiza caché y retorna dict.
     Usa asyncio.Semaphore para limitar la concurrencia máxima.
     """
     semaphore = asyncio.Semaphore(max_concurrency)
-    async def get_logs(rid):
+    async def get_logs(rid) -> Optional[Dict[str, Any]]:
         async with semaphore:
             try:
                 if use_onyx:

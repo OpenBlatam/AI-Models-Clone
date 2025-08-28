@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 from collections import defaultdict
 from collections.abc import Callable
 from functools import partial
@@ -20,8 +25,6 @@ from onyx.configs.constants import DEFAULT_BOOST
 from onyx.configs.llm_configs import get_image_extraction_and_analysis_enabled
 from onyx.configs.model_configs import USE_INFORMATION_CONTENT_CLASSIFICATION
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import (
-    get_experts_stores_representations,
-)
 from onyx.connectors.models import ConnectorFailure
 from onyx.connectors.models import Document
 from onyx.connectors.models import DocumentFailure
@@ -53,8 +56,6 @@ from onyx.db.user_documents import fetch_user_files_for_documents
 from onyx.db.user_documents import fetch_user_folders_for_documents
 from onyx.db.user_documents import update_user_file_token_count__no_commit
 from onyx.document_index.document_index_utils import (
-    get_multipass_config,
-)
 from onyx.document_index.interfaces import DocumentIndex
 from onyx.document_index.interfaces import DocumentMetadata
 from onyx.document_index.interfaces import IndexBatchParams
@@ -77,8 +78,6 @@ from onyx.llm.interfaces import LLM
 from onyx.llm.utils import MAX_CONTEXT_TOKENS
 from onyx.llm.utils import message_to_string
 from onyx.natural_language_processing.search_nlp_models import (
-    InformationContentClassificationModel,
-)
 from onyx.natural_language_processing.utils import BaseTokenizer
 from onyx.natural_language_processing.utils import get_tokenizer
 from onyx.natural_language_processing.utils import tokenizer_trim_middle
@@ -89,6 +88,15 @@ from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
 from onyx.utils.timing import log_function_time
 from shared_configs.configs import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_experts_stores_representations,
+)
+    get_multipass_config,
+)
+    InformationContentClassificationModel,
+)
     INDEXING_INFORMATION_CONTENT_CLASSIFICATION_CUTOFF_LENGTH,
 )
 
@@ -513,6 +521,10 @@ def process_image_sections(documents: list[Document]) -> list[IndexingDocument]:
                                 pgfilestore.lobj_oid, db_session, mode="rb"
                             )
                             pgfilestore_data = image_data_io.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                             summary = summarize_image_with_error_handling(
                                 llm=llm,
                                 image_data=pgfilestore_data,
@@ -568,7 +580,7 @@ def add_document_summaries(
     """
     Adds a document summary to a list of chunks from the same document.
     Returns the number of tokens in the document.
-    """
+    """f"
 
     doc_tokens = []
     # this is value is the same for each chunk in the document; 0 indicates
@@ -579,7 +591,7 @@ def add_document_summaries(
 
     doc_tokens = tokenizer.encode(chunks_by_doc[0].source_document.get_text_content())
     doc_content = tokenizer_trim_middle(doc_tokens, trunc_doc_tokens, tokenizer)
-    summary_prompt = DOCUMENT_SUMMARY_PROMPT.format(document=doc_content)
+    summary_prompt = DOCUMENT_SUMMARY_PROMPT"
     doc_summary = message_to_string(
         llm.invoke(summary_prompt, max_tokens=MAX_CONTEXT_TOKENS)
     )
@@ -601,7 +613,7 @@ def add_chunk_summaries(
     Adds chunk summaries to the chunks grouped by document id.
     Chunk summaries look at the chunk as well as the entire document (or a summary,
     if the document is too long) and describe how the chunk relates to the document.
-    """
+    """f"
     # all chunks within a document have the same contextual_rag_reserved_tokens
     if chunks_by_doc[0].contextual_rag_reserved_tokens == 0:
         return
@@ -631,7 +643,7 @@ def add_chunk_summaries(
     context_prompt1 = CONTEXTUAL_RAG_PROMPT1.format(document=doc_info)
 
     def assign_context(chunk: DocAwareChunk) -> None:
-        context_prompt2 = CONTEXTUAL_RAG_PROMPT2.format(chunk=chunk.content)
+        context_prompt2 = CONTEXTUAL_RAG_PROMPT2"
         try:
             chunk.chunk_context = message_to_string(
                 llm.invoke(

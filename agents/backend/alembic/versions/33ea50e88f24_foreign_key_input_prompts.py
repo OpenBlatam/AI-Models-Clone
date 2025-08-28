@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """foreign key input prompts
 
 Revision ID: 33ea50e88f24
@@ -6,12 +12,11 @@ Create Date: 2025-01-29 10:54:22.141765
 
 """
 
-from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision = "33ea50e88f24"
-down_revision = "a6df6b88ef81"
+revision: str = "33ea50e88f24"
+down_revision: str = "a6df6b88ef81"
 branch_labels = None
 depends_on = None
 
@@ -38,7 +43,7 @@ def upgrade() -> None:
         "inputprompt",
         ["input_prompt_id"],
         ["id"],
-        ondelete="CASCADE",
+        ondelete: str = "CASCADE",
     )
 
     op.create_foreign_key(
@@ -47,7 +52,7 @@ def upgrade() -> None:
         "user",
         ["user_id"],
         ["id"],
-        ondelete="CASCADE",
+        ondelete: str = "CASCADE",
     )
 
 
@@ -56,12 +61,12 @@ def downgrade() -> None:
     op.drop_constraint(
         "inputprompt__user_input_prompt_id_fkey",
         "inputprompt__user",
-        type_="foreignkey",
+        type_: str = "foreignkey",
     )
     op.drop_constraint(
         "inputprompt__user_user_id_fkey",
         "inputprompt__user",
-        type_="foreignkey",
+        type_: str = "foreignkey",
     )
 
     # Recreate them without cascading

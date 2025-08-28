@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import os
 from datetime import datetime
 from io import BytesIO
@@ -29,6 +37,9 @@ from onyx.file_processing.extract_file_text import extract_file_text
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 _SLIM_BATCH_SIZE = 1000
 
@@ -87,7 +98,7 @@ class HighspotConnector(LoadConnector, PollConnector, SlimConnector):
         self.secret = credentials.get("highspot_secret")
         return None
 
-    def _fetch_spots(self) -> list[HighspotSpot]:
+    async def _fetch_spots(self) -> list[HighspotSpot]:
         """
         Populate the spot ID map with all available spots.
         Keys are stored as lowercase for case-insensitive lookups.
@@ -97,7 +108,7 @@ class HighspotConnector(LoadConnector, PollConnector, SlimConnector):
             for spot in self.client.get_spots()
         ]
 
-    def _fetch_spots_to_process(self) -> list[HighspotSpot]:
+    async def _fetch_spots_to_process(self) -> list[HighspotSpot]:
         """
         Fetch spots to process based on the configured spot names.
         """

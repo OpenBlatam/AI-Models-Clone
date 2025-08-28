@@ -1,8 +1,13 @@
-"""
-Middleware System - FastAPI Middleware for Logging, Error Monitoring, and Performance
-Comprehensive middleware system providing logging, error monitoring, performance optimization,
-security, and observability features for FastAPI applications.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -16,7 +21,6 @@ from dataclasses import dataclass, field
 from enum import Enum
 from collections import defaultdict, deque
 import statistics
-
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -30,6 +34,15 @@ from pydantic import BaseModel, Field
 import structlog
 from prometheus_client import Counter, Histogram, Gauge, generate_latest
 import redis.asyncio as redis
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Middleware System - FastAPI Middleware for Logging, Error Monitoring, and Performance
+Comprehensive middleware system providing logging, error monitoring, performance optimization,
+security, and observability features for FastAPI applications.
+"""
+
+
 
 logger = structlog.get_logger(__name__)
 
@@ -93,7 +106,7 @@ class MiddlewareConfig(BaseModel):
 class PerformanceMetrics:
     """Performance metrics collection using Prometheus."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Request counters
         self.request_total = Counter(
             'http_requests_total',
@@ -169,7 +182,9 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     """Comprehensive request/response logging middleware."""
     
     def __init__(self, app: ASGIApp, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.logger = structlog.get_logger(__name__)
     
@@ -231,7 +246,7 @@ class LoggingMiddleware(BaseHTTPMiddleware):
             return forwarded_for.split(",")[0].strip()
         return request.client.host if request.client else None
     
-    def _get_request_size(self, request: Request) -> int:
+    async def _get_request_size(self, request: Request) -> int:
         """Get request size in bytes."""
         size = 0
         # URL size
@@ -320,7 +335,9 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
     """Performance monitoring and metrics collection middleware."""
     
     def __init__(self, app: ASGIApp, config: MiddlewareConfig, metrics: PerformanceMetrics):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.metrics = metrics
         self.logger = structlog.get_logger(__name__)
@@ -448,7 +465,7 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
             return forwarded_for.split(",")[0].strip()
         return request.client.host if request.client else None
     
-    def get_slow_requests_summary(self) -> Dict[str, Any]:
+    async def get_slow_requests_summary(self) -> Dict[str, Any]:
         """Get summary of slow requests."""
         if not self.slow_requests:
             return {"count": 0, "requests": []}
@@ -470,7 +487,9 @@ class ErrorMonitoringMiddleware(BaseHTTPMiddleware):
     """Error monitoring and alerting middleware."""
     
     def __init__(self, app: ASGIApp, config: MiddlewareConfig, redis_client: Optional[redis.Redis] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.redis_client = redis_client
         self.logger = structlog.get_logger(__name__)
@@ -569,7 +588,9 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
     """Rate limiting middleware using Redis or in-memory storage."""
     
     def __init__(self, app: ASGIApp, config: MiddlewareConfig, redis_client: Optional[redis.Redis] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.redis_client = redis_client
         self.logger = structlog.get_logger(__name__)
@@ -671,7 +692,7 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
         self.local_limits[client_id].append(current_time)
         return False
     
-    async def _get_remaining_requests(self, client_id: str) -> int:
+    async async def _get_remaining_requests(self, client_id: str) -> int:
         """Get remaining requests for client."""
         current_time = time.time()
         
@@ -702,7 +723,9 @@ class SecurityMiddleware(BaseHTTPMiddleware):
     """Security middleware for headers and basic protection."""
     
     def __init__(self, app: ASGIApp, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.logger = structlog.get_logger(__name__)
     
@@ -739,7 +762,9 @@ class MiddlewareManager:
     """Manager for configuring and applying middleware."""
     
     def __init__(self, config: MiddlewareConfig, redis_client: Optional[redis.Redis] = None):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.redis_client = redis_client
         self.metrics = PerformanceMetrics() if config.performance_metrics_enabled else None
         self.logger = structlog.get_logger(__name__)

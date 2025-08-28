@@ -1,10 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .brute_forcers import *
+from .exploiters import *
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Attackers module for cybersecurity tools.
 Contains brute_forcers and exploiters submodules.
 """
 
-from .brute_forcers import *
-from .exploiters import *
 
 __all__ = [
     # Brute forcers

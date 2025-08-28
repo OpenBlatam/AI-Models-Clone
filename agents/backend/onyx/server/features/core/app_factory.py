@@ -1,14 +1,19 @@
-"""
-FastAPI Application Factory - Onyx Integration
-Centralized application factory for creating optimized FastAPI applications.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
 from contextlib import asynccontextmanager
 from typing import Dict, List, Optional, Any, Callable
 from pathlib import Path
-
 from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -22,8 +27,17 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from prometheus_fastapi_instrumentator import Instrumentator
 import structlog
-
 from ..utils.error_system import (
+from .notifications.api import router as notifications_router
+from .integrated.api import router as integrated_router
+from typing import Any, List, Dict, Optional
+"""
+FastAPI Application Factory - Onyx Integration
+Centralized application factory for creating optimized FastAPI applications.
+"""
+
+
+
     error_factory,
     ErrorContext,
     ValidationError,
@@ -76,7 +90,9 @@ class FastAPIFactory:
     """Factory for creating optimized FastAPI applications."""
     
     def __init__(self, config: Optional[FastAPIConfig] = None):
-        self.config = config or FastAPIConfig()
+        
+    """__init__ function."""
+self.config = config or FastAPIConfig()
         self.rate_limiter = None
         self.startup_events: List[Callable] = []
         self.shutdown_events: List[Callable] = []
@@ -106,7 +122,9 @@ class FastAPIFactory:
         
         @asynccontextmanager
         async def lifespan(app: FastAPI):
-            # Startup
+            
+    """lifespan function."""
+# Startup
             logger.info("Starting FastAPI application", 
                        title=self.config.title, 
                        version=self.config.version)
@@ -167,7 +185,9 @@ class FastAPIFactory:
         if self.config.security_headers_enabled:
             @app.middleware("http")
             async def add_security_headers(request: Request, call_next):
-                response = await call_next(request)
+                
+    """add_security_headers function."""
+response = await call_next(request)
                 response.headers["X-Content-Type-Options"] = "nosniff"
                 response.headers["X-Frame-Options"] = "DENY"
                 response.headers["X-XSS-Protection"] = "1; mode=block"
@@ -194,7 +214,9 @@ class FastAPIFactory:
         # Request logging middleware
         @app.middleware("http")
         async def log_requests(request: Request, call_next):
-            start_time = asyncio.get_event_loop().time()
+            
+    """log_requests function."""
+start_time = asyncio.get_event_loop().time()
             
             # Log request
             logger.info("Incoming request",
@@ -427,8 +449,6 @@ def create_test_app(
 # Example usage:
 """
 # Create a production app with routers
-from .notifications.api import router as notifications_router
-from .integrated.api import router as integrated_router
 
 app = create_production_app(
     title="Blatam Academy API",

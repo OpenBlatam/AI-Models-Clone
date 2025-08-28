@@ -1,8 +1,7 @@
-"""
-HTML Reporter
-
-Provides HTML-based reporting with modern styling and interactive elements.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 from typing import Dict, Any, List, Optional, Union
@@ -12,6 +11,14 @@ import time
 from datetime import datetime
 import json
 import base64
+from typing import Any, List, Dict, Optional
+import logging
+"""
+HTML Reporter
+
+Provides HTML-based reporting with modern styling and interactive elements.
+"""
+
 
 class HTMLReportTemplate(str, Enum):
     """Enumeration of HTML report templates."""
@@ -34,7 +41,7 @@ class HTMLReportRequest(BaseModel):
     custom_js: Optional[str] = Field(None, description="Custom JavaScript")
     
     @validator('scan_results', 'vulnerability_data', 'enumeration_data', 'attack_data')
-    def validate_data(cls, v):
+    def validate_data(cls, v) -> bool:
         if v is not None and not v:
             raise ValueError("Data cannot be empty if provided")
         return v
@@ -167,12 +174,9 @@ async def generate_html_report_async(data: HTMLReportRequest) -> HTMLReportResul
     
     # Generate HTML
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    content = "\n".join(content_parts)
+    content = "\n"f".join(content_parts)
     
-    html_content = MODERN_TEMPLATE.format(
-        timestamp=timestamp,
-        content=content
-    )
+    html_content = MODERN_TEMPLATE"
     
     # Add custom CSS/JS if provided
     if data.custom_css:

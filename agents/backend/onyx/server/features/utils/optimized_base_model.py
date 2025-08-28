@@ -1,7 +1,13 @@
-"""
-Optimized Base Model - Pydantic v2 Best Practices
-Production-ready base model with performance optimizations, caching, and monitoring.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, Callable, Generic
@@ -11,13 +17,20 @@ import logging
 import time
 from functools import lru_cache, wraps
 from collections import defaultdict
-
 from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator, model_validator
 import orjson
 import structlog
 import zstandard as zstd
 import brotli
 from cachetools import TTLCache, LRUCache
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Optimized Base Model - Pydantic v2 Best Practices
+Production-ready base model with performance optimizations, caching, and monitoring.
+"""
+
+
 
 logger = structlog.get_logger(__name__)
 
@@ -26,7 +39,7 @@ T = TypeVar('T', bound='OptimizedBaseModel')
 class PydanticMetrics:
     """Performance metrics collector for Pydantic models."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.validation_times: List[tuple[str, float]] = []
         self.serialization_times: List[tuple[str, float]] = []
         self.error_counts: defaultdict[str, int] = defaultdict(int)
@@ -96,7 +109,7 @@ _metrics = PydanticMetrics()
 def measure_validation_time(func: Callable) -> Callable:
     """Decorator to measure validation time."""
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         start_time = time.perf_counter()
         try:
             result = func(*args, **kwargs)
@@ -157,14 +170,14 @@ class OptimizedBaseModel(BaseModel):
         cls._logger.debug("Cache set", key=key)
 
     @classmethod
-    def cache_get(cls, key: str, default: Any = None) -> Any:
+    def cache_get(cls, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Get value from ultra-fast memory cache (TTLCache)."""
         value = cls._cache.get(key, default)
         cls._logger.debug("Cache get", key=key, hit=value is not None)
         return value
 
     @classmethod
-    def cache_clear(cls):
+    def cache_clear(cls) -> Any:
         """Clear the ultra-fast memory cache."""
         cls._cache.clear()
         cls._logger.info("Cache cleared")

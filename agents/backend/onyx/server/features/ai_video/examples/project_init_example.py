@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import sys
+import os
+from pathlib import Path
+from project_init import (
+    import pandas as pd
+    import numpy as np
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Project Initialization Example
 =============================
@@ -15,14 +32,10 @@ This will:
 4. Generate comprehensive reports
 """
 
-import sys
-import os
-from pathlib import Path
 
 # Add the parent directory to the path to import the project_init module
 sys.path.append(str(Path(__file__).parent.parent))
 
-from project_init import (
     ProblemDefinition, 
     DatasetAnalyzer, 
     ProjectInitializer,
@@ -106,8 +119,6 @@ def example_ai_video_project():
     sample_data_dir.mkdir(parents=True, exist_ok=True)
     
     # Create sample metadata file
-    import pandas as pd
-    import numpy as np
     
     sample_metadata = pd.DataFrame({
         'video_id': [f'video_{i:03d}' for i in range(100)],
@@ -248,5 +259,6 @@ def main():
     return project_dir
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

@@ -1,10 +1,7 @@
-#!/usr/bin/env python3
-"""
-Dependency Installation Script for Email Sequence AI System
-
-This script provides an interactive way to install dependencies with different profiles
-and handles common installation issues.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import os
 import sys
@@ -13,12 +10,26 @@ import platform
 import argparse
 from pathlib import Path
 from typing import List, Dict, Optional
+                import torch
+                import memory_profiler
+                import line_profiler
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Dependency Installation Script for Email Sequence AI System
+
+This script provides an interactive way to install dependencies with different profiles
+and handles common installation issues.
+"""
+
 
 
 class DependencyInstaller:
     """Manages dependency installation for the Email Sequence AI System."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.project_root = Path(__file__).parent.parent
         self.system = platform.system().lower()
         self.python_version = sys.version_info
@@ -249,7 +260,6 @@ class DependencyInstaller:
         # Profile-specific verifications
         if profile in ["gpu", "all"]:
             try:
-                import torch
                 if torch.cuda.is_available():
                     print(f"✅ CUDA is available: {torch.cuda.device_count()} GPUs")
                 else:
@@ -259,8 +269,6 @@ class DependencyInstaller:
         
         if profile in ["profiling", "all"]:
             try:
-                import memory_profiler
-                import line_profiler
                 print("✅ Profiling tools available")
             except ImportError:
                 print("❌ Profiling tools not available")
@@ -268,7 +276,7 @@ class DependencyInstaller:
         print("✅ Installation verification completed.")
         return True
     
-    def interactive_install(self):
+    def interactive_install(self) -> Any:
         """Run interactive installation."""
         print("🚀 Email Sequence AI System - Interactive Installation")
         print("=" * 60)
@@ -393,5 +401,6 @@ def main():
     sys.exit(0 if success else 1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

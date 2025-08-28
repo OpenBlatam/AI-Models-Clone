@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import json
 import random
 import secrets
@@ -115,6 +120,11 @@ from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
 from shared_configs.contextvars import get_current_tenant_id
 
+            from fastapi import HTTPException, status
+        from onyx.auth.oauth_refresher import check_and_refresh_oauth_tokens
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -607,7 +617,7 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
 
         send_forgot_password_email(user.email, tenant_id=tenant_id, token=token)
 
-    async def on_after_request_verify(
+    async async def on_after_request_verify(
         self, user: User, token: str, request: Optional[Request] = None
     ) -> None:
         verify_email_domain(user.email)
@@ -697,7 +707,6 @@ class UserManager(UUIDIDMixin, BaseUserManager[User, uuid.UUID]):
         )
         if not verified:
             # Raise some HTTPException (or your custom exception) if old password is invalid:
-            from fastapi import HTTPException, status
 
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -752,7 +761,9 @@ class TenantAwareRedisStrategy(RedisStrategy[User, uuid.UUID]):
         lifetime_seconds: Optional[int] = SESSION_EXPIRE_TIME_SECONDS,
         key_prefix: str = REDIS_AUTH_KEY_PREFIX,
     ):
-        self.lifetime_seconds = lifetime_seconds
+        
+    """__init__ function."""
+self.lifetime_seconds = lifetime_seconds
         self.key_prefix = key_prefix
 
     async def write_token(self, user: User) -> str:
@@ -831,7 +842,9 @@ class RefreshableDatabaseStrategy(DatabaseStrategy[User, uuid.UUID, AccessToken]
         access_token_db: AccessTokenDatabase[AccessToken],
         lifetime_seconds: Optional[int] = None,
     ):
-        super().__init__(access_token_db, lifetime_seconds)
+        
+    """__init__ function."""
+super().__init__(access_token_db, lifetime_seconds)
         self._access_token_db = access_token_db
 
     async def refresh_token(self, token: Optional[str], user: User) -> str:
@@ -925,7 +938,6 @@ class FastAPIUserWithLogoutRouter(FastAPIUsers[models.UP, models.ID]):
         Provide a router for session token refreshing.
         """
         # Import the oauth_refresher here to avoid circular imports
-        from onyx.auth.oauth_refresher import check_and_refresh_oauth_tokens
 
         router = APIRouter()
 

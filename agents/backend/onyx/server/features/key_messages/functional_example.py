@@ -1,17 +1,27 @@
-"""
-Functional programming examples for Key Messages feature.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import asyncio
 from typing import List, Dict, Any, Callable
 from functools import partial, reduce, compose
 from datetime import datetime
-
 from .models import KeyMessageRequest, MessageType, MessageTone
 from .service import (
+from .utils import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Functional programming examples for Key Messages feature.
+"""
+
     startup_service, shutdown_service, generate_response, analyze_message,
     generate_batch, ServiceConfig
 )
-from .utils import (
     pipe, compose, filter_with_predicate, map_with_index, group_by,
     sort_by, chunk_list, flatten_list, unique_items, create_pipeline,
     create_conditional_pipeline, create_error_handler, safe_execute
@@ -340,5 +350,6 @@ async def run_functional_examples():
     except Exception as e:
         print(f"   Service example failed: {e}\n")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(run_functional_examples()) 

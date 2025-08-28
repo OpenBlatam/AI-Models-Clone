@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import pytest
+import asyncio
+from datetime import datetime
+from unittest.mock import Mock, AsyncMock
+from ..models.facebook_models import (
+from ..core.facebook_engine import FacebookPostEngine
+from ..services.langchain_service import FacebookLangChainService
+from ..utils.facebook_utils import FacebookUtils
+from ..config.langchain_config import FacebookLangChainConfig
+        import time
+        import time
+from typing import Any, List, Dict, Optional
+import logging
 """
 🧪 Facebook Posts Tests
 ======================
@@ -5,26 +26,17 @@
 Tests básicos para el sistema de Facebook posts con LangChain.
 """
 
-import pytest
-import asyncio
-from datetime import datetime
-from unittest.mock import Mock, AsyncMock
 
 # Import models
-from ..models.facebook_models import (
     FacebookRequest, FacebookPost, FacebookAnalysis, FacebookFingerprint,
     FacebookTone, FacebookPostType, FacebookAudience, EngagementLevel
 )
-from ..core.facebook_engine import FacebookPostEngine
-from ..services.langchain_service import FacebookLangChainService
-from ..utils.facebook_utils import FacebookUtils
-from ..config.langchain_config import FacebookLangChainConfig
 
 
 class TestFacebookModels:
     """Tests para modelos de Facebook."""
     
-    def test_facebook_fingerprint_creation(self):
+    def test_facebook_fingerprint_creation(self) -> Any:
         """Test creación de fingerprint."""
         content = "Test Facebook post content"
         fingerprint = FacebookFingerprint.create(content)
@@ -35,7 +47,7 @@ class TestFacebookModels:
         assert fingerprint.platform_version == "facebook_v1.0"
         assert isinstance(fingerprint.timestamp, datetime)
     
-    def test_facebook_request_validation(self):
+    async def test_facebook_request_validation(self) -> Any:
         """Test validación de FacebookRequest."""
         # Valid request
         request = FacebookRequest(
@@ -50,7 +62,7 @@ class TestFacebookModels:
         assert request.post_type == FacebookPostType.TEXT
         assert request.tone == FacebookTone.CASUAL
     
-    def test_facebook_request_max_length_validation(self):
+    async def test_facebook_request_max_length_validation(self) -> Any:
         """Test validación de longitud máxima."""
         with pytest.raises(ValueError):
             FacebookRequest(
@@ -64,7 +76,7 @@ class TestFacebookModels:
                 max_length=3000  # Too long
             )
     
-    def test_facebook_post_creation(self):
+    def test_facebook_post_creation(self) -> Any:
         """Test creación de FacebookPost."""
         fingerprint = FacebookFingerprint.create("Test content")
         
@@ -82,7 +94,7 @@ class TestFacebookModels:
         assert len(post.hashtags) == 2
         assert post.is_within_limits()
     
-    def test_facebook_analysis_score_calculation(self):
+    def test_facebook_analysis_score_calculation(self) -> Any:
         """Test cálculo de score general."""
         analysis = FacebookAnalysis(
             engagement_prediction=0.8,
@@ -104,7 +116,7 @@ class TestFacebookModels:
 class TestFacebookUtils:
     """Tests para utilidades de Facebook."""
     
-    def test_extract_hashtags(self):
+    def test_extract_hashtags(self) -> Any:
         """Test extracción de hashtags."""
         content = "Check out this amazing #technology post about #AI and #MachineLearning!"
         hashtags = FacebookUtils.extract_hashtags(content)
@@ -114,7 +126,7 @@ class TestFacebookUtils:
         assert "MachineLearning" in hashtags
         assert len(hashtags) == 3
     
-    def test_extract_mentions(self):
+    def test_extract_mentions(self) -> Any:
         """Test extracción de menciones."""
         content = "Thanks @john_doe and @tech_company for the inspiration!"
         mentions = FacebookUtils.extract_mentions(content)
@@ -123,7 +135,7 @@ class TestFacebookUtils:
         assert "tech_company" in mentions
         assert len(mentions) == 2
     
-    def test_clean_content_for_display(self):
+    def test_clean_content_for_display(self) -> Any:
         """Test limpieza de contenido."""
         content = "Great post about AI! #technology #innovation #AI"
         cleaned = FacebookUtils.clean_content_for_display(content, separate_hashtags=True)
@@ -131,7 +143,7 @@ class TestFacebookUtils:
         assert cleaned == "Great post about AI!"
         assert "#technology" not in cleaned
     
-    def test_validate_post_length(self):
+    def test_validate_post_length(self) -> bool:
         """Test validación de longitud."""
         short_content = "Short post"
         long_content = "x" * 2500
@@ -144,7 +156,7 @@ class TestFacebookUtils:
         assert is_valid_long is False
         assert count_long == 2500
     
-    def test_analyze_post_structure(self):
+    def test_analyze_post_structure(self) -> Any:
         """Test análisis de estructura."""
         content = "What do you think about AI? 🤖 It's amazing! #AI #technology"
         analysis = FacebookUtils.analyze_post_structure(content)
@@ -156,7 +168,7 @@ class TestFacebookUtils:
         assert analysis['has_question'] is True
         assert analysis['has_exclamation'] is True
     
-    def test_calculate_readability_score(self):
+    def test_calculate_readability_score(self) -> Any:
         """Test cálculo de legibilidad."""
         easy_content = "This is easy to read. Short sentences. Clear message."
         hard_content = "This is an extraordinarily complicated sentence with unnecessarily complex vocabulary and excessively long constructions that make comprehension difficult."
@@ -168,7 +180,7 @@ class TestFacebookUtils:
         assert 0.0 <= hard_score <= 1.0
         assert easy_score > hard_score  # Easy content should score higher
     
-    def test_optimize_hashtags(self):
+    def test_optimize_hashtags(self) -> Any:
         """Test optimización de hashtags."""
         hashtags = ["AI", "technology", "AI", "innovation", "tech", "future", "ai", "trending"]
         optimized = FacebookUtils.optimize_hashtags(hashtags, max_hashtags=5)
@@ -176,7 +188,7 @@ class TestFacebookUtils:
         assert len(optimized) <= 5
         assert len(set(tag.lower() for tag in optimized)) == len(optimized)  # No duplicates
     
-    def test_validate_facebook_compliance(self):
+    def test_validate_facebook_compliance(self) -> bool:
         """Test validación de cumplimiento."""
         good_content = "Sharing some insights about technology and innovation!"
         spam_content = "FREE MONEY NOW!!! CLICK HERE!!! GUARANTEED!!!"
@@ -192,7 +204,7 @@ class TestFacebookUtils:
 class TestFacebookLangChainConfig:
     """Tests para configuración de LangChain."""
     
-    def test_config_creation(self):
+    def test_config_creation(self) -> Any:
         """Test creación de configuración."""
         config = FacebookLangChainConfig(
             model_name="gpt-3.5-turbo",
@@ -205,7 +217,7 @@ class TestFacebookLangChainConfig:
         assert config.max_tokens == 1000
         assert config.use_onyx_llm is True  # Default
     
-    def test_config_validation(self):
+    def test_config_validation(self) -> Any:
         """Test validación de configuración."""
         # Temperature validation
         with pytest.raises(ValueError):
@@ -226,7 +238,7 @@ class TestFacebookEngineAsync:
     """Tests asíncronos para FacebookPostEngine."""
     
     @pytest.fixture
-    def mock_langchain_service(self):
+    def mock_langchain_service(self) -> Any:
         """Mock LangChain service."""
         service = Mock(spec=FacebookLangChainService)
         service.generate_facebook_post = AsyncMock(return_value={
@@ -258,12 +270,12 @@ class TestFacebookEngineAsync:
         return service
     
     @pytest.fixture
-    def facebook_engine(self, mock_langchain_service):
+    def facebook_engine(self, mock_langchain_service) -> Any:
         """Facebook engine con mock service."""
         return FacebookPostEngine(mock_langchain_service)
     
     @pytest.mark.asyncio
-    async def test_generate_post_success(self, facebook_engine):
+    async def test_generate_post_success(self, facebook_engine) -> Any:
         """Test generación exitosa de post."""
         request = FacebookRequest(
             content_topic="Artificial Intelligence trends",
@@ -281,7 +293,7 @@ class TestFacebookEngineAsync:
         assert len(result.recommendations) > 0
     
     @pytest.mark.asyncio
-    async def test_analyze_post_success(self, facebook_engine):
+    async def test_analyze_post_success(self, facebook_engine) -> Any:
         """Test análisis exitoso de post."""
         fingerprint = FacebookFingerprint.create("Test content")
         post = FacebookPost(
@@ -300,7 +312,7 @@ class TestFacebookEngineAsync:
         assert analysis.predicted_likes > 0
         assert len(analysis.strengths) > 0
     
-    def test_get_analytics(self, facebook_engine):
+    def test_get_analytics(self, facebook_engine) -> Optional[Dict[str, Any]]:
         """Test obtención de analytics."""
         analytics = facebook_engine.get_analytics()
         
@@ -310,7 +322,7 @@ class TestFacebookEngineAsync:
         assert 'cache_hits' in analytics
         assert 'cache_size' in analytics
     
-    def test_cache_functionality(self, facebook_engine):
+    def test_cache_functionality(self, facebook_engine) -> Any:
         """Test funcionalidad de cache."""
         # Clear cache first
         facebook_engine.clear_cache()
@@ -327,7 +339,7 @@ class TestFacebookEngineAsync:
 class TestIntegration:
     """Tests de integración."""
     
-    def test_end_to_end_flow(self):
+    def test_end_to_end_flow(self) -> Any:
         """Test flujo completo end-to-end."""
         # Create request
         request = FacebookRequest(
@@ -376,9 +388,8 @@ class TestIntegration:
 class TestPerformance:
     """Tests de performance."""
     
-    def test_hashtag_extraction_performance(self):
+    def test_hashtag_extraction_performance(self) -> Any:
         """Test performance de extracción de hashtags."""
-        import time
         
         # Large content with many hashtags
         content = " ".join([f"#hashtag{i}" for i in range(100)])
@@ -390,9 +401,8 @@ class TestPerformance:
         assert len(hashtags) == 100
         assert processing_time < 100  # Should be under 100ms
     
-    def test_content_analysis_performance(self):
+    def test_content_analysis_performance(self) -> Any:
         """Test performance de análisis de contenido."""
-        import time
         
         # Large content
         content = "This is a test post. " * 100  # 2000+ characters
@@ -405,5 +415,6 @@ class TestPerformance:
         assert processing_time < 50  # Should be under 50ms
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from datetime import datetime
 from typing import Any
 from typing import cast
@@ -10,6 +15,9 @@ from onyx.configs.constants import CELERY_INDEXING_WATCHDOG_CONNECTOR_TIMEOUT
 from onyx.configs.constants import OnyxRedisConstants
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class RedisConnectorIndexPayload(BaseModel):
     index_attempt_id: int | None
     started: datetime | None

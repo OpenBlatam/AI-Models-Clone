@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from datetime import datetime
 from datetime import timezone
@@ -20,6 +22,9 @@ from tests.integration.common_utils.test_models import DATestSettings
 from tests.integration.common_utils.test_models import DATestUser
 from tests.integration.common_utils.vespa import vespa_fixture
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 FILE_NAME = "Sample.pdf"
 FILE_PATH = "tests/integration/common_utils/test_files"
 

@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import time
 from collections.abc import Callable
 from typing import Any
@@ -7,6 +15,9 @@ from urllib.parse import quote
 
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -55,7 +66,7 @@ def __raise_if_error(response: dict[str, Any]) -> None:
         )
 
 
-def call_api(fun: Callable, *args: Any, **kwargs: Any) -> Dict[str, Any]:
+async def call_api(fun: Callable, *args: Any, **kwargs: Any) -> Dict[str, Any]:
     response = __call_with_retry(fun, *args, **kwargs)
     __raise_if_error(response)
     return response

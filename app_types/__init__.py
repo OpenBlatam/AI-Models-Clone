@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from enum import Enum
+from typing import Dict, List, Optional, Any, Union
+from dataclasses import dataclass, field
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 MODULAR ADS - Types Module
 ========================
@@ -6,9 +20,6 @@ Tipos, enums y definiciones de datos para el sistema de ads modular.
 Módulo independiente y reutilizable.
 """
 
-from enum import Enum
-from typing import Dict, List, Optional, Any, Union
-from dataclasses import dataclass, field
 
 class AdType(Enum):
     """Tipos de ads soportados en el sistema modular"""
@@ -46,7 +57,9 @@ class PerformanceTier(Enum):
     STANDARD = ("STANDARD", 0.0)
     
     def __init__(self, display_name: str, threshold: float):
-        self.display_name = display_name
+        
+    """__init__ function."""
+self.display_name = display_name
         self.threshold = threshold
 
 class AdStatus(Enum):

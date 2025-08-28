@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any
 from typing import cast
 from typing import IO
@@ -13,10 +15,13 @@ from onyx.key_value_store.interface import KvKeyNotFoundError
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
-def get_unstructured_api_key() -> str | None:
+async def get_unstructured_api_key() -> str | None:
     kv_store = get_kv_store()
     try:
         return cast(str, kv_store.load(KV_UNSTRUCTURED_API_KEY))
@@ -24,17 +29,17 @@ def get_unstructured_api_key() -> str | None:
         return None
 
 
-def update_unstructured_api_key(api_key: str) -> None:
+async def update_unstructured_api_key(api_key: str) -> None:
     kv_store = get_kv_store()
     kv_store.store(KV_UNSTRUCTURED_API_KEY, api_key)
 
 
-def delete_unstructured_api_key() -> None:
+async def delete_unstructured_api_key() -> None:
     kv_store = get_kv_store()
     kv_store.delete(KV_UNSTRUCTURED_API_KEY)
 
 
-def _sdk_partition_request(
+async def _sdk_partition_request(
     file: IO[Any], file_name: str, **kwargs: Any
 ) -> operations.PartitionRequest:
     file.seek(0, 0)
@@ -42,6 +47,10 @@ def _sdk_partition_request(
         request = operations.PartitionRequest(
             partition_parameters=shared.PartitionParameters(
                 files=shared.Files(content=file.read(), file_name=file_name),
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 **kwargs,
             ),
         )

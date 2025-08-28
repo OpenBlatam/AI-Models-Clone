@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from datetime import datetime
+from typing import Optional, Dict, Any, List
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, JSON, Text
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declared_attr
+from onyx.db.base import Base
+from onyx.db.users import User
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Database models for ads functionality.
 
@@ -102,19 +114,12 @@ fastapi-limiter==0.1.6
 prometheus_fastapi_instrumentator==7.1.0
 sendgrid==6.11.0
 """
-from datetime import datetime
-from typing import Optional, Dict, Any, List
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, ForeignKey, JSON, Text
-from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declared_attr
 
-from onyx.db.base import Base
-from onyx.db.users import User
 
 class BaseModelMixin:
     """Mixin for shared model fields."""
     @declared_attr
-    def user_id(cls):
+    def user_id(cls) -> Any:
         return Column(Integer, ForeignKey("users.id"), nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

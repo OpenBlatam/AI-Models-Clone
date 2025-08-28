@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -7,6 +9,9 @@ from onyx.db.engine import get_session_with_current_tenant
 from onyx.db.seeding.chat_history_seeding import seed_chat_history
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def test_usage_reports(reset: None) -> None:
     EXPECTED_SESSIONS = 2048
     MESSAGES_PER_SESSION = 4

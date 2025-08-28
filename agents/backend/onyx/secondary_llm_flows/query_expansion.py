@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 
 from onyx.chat.chat_utils import combine_message_chain
@@ -16,6 +18,9 @@ from onyx.utils.logger import setup_logger
 from onyx.utils.text_processing import count_punctuation
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -24,9 +29,7 @@ def llm_multilingual_query_expansion(query: str, language: str) -> str:
         messages = [
             {
                 "role": "user",
-                "content": LANGUAGE_REPHRASE_PROMPT.format(
-                    query=query, target_language=language
-                ),
+                "content"f": LANGUAGE_REPHRASE_PROMPT",
             },
         ]
 
@@ -78,9 +81,7 @@ def get_contextual_rephrase_messages(
     messages = [
         {
             "role": "user",
-            "content": prompt_template.format(
-                question=question, chat_history=history_str
-            ),
+            "content"f": prompt_template",
         },
     ]
 

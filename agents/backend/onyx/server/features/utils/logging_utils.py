@@ -1,19 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import structlog
 import logging
 import orjson
 from typing import Optional, Dict
 
+    from .logging_utils import logger
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Logging estructurado y ultra-rápido para FastAPI LLM API.
 - Solo orjson para serialización de logs (requisito).
 - structlog cache_logger_on_first_use=True para máxima velocidad.
 
 Ejemplo de uso:
-    from .logging_utils import logger
     logger.info({"event": "test", "request_id": "abc"})
 """
 
-def _orjson_renderer(_, __, event_dict):
+def _orjson_renderer(_, __, event_dict) -> Any:
     return orjson.dumps(event_dict).decode()
 
 

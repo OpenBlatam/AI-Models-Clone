@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from ee.onyx.server.query_and_chat.models import OneShotQAResponse
 from onyx.chat.models import AllCitations
 from onyx.chat.models import LLMRelevanceFilterResponse
@@ -9,8 +11,16 @@ from onyx.server.query_and_chat.models import ChatMessageDetail
 from onyx.utils.timing import log_function_time
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @log_function_time()
-def gather_stream_for_answer_api(
+async async def gather_stream_for_answer_api(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     packets: ChatPacketStream,
 ) -> OneShotQAResponse:
     response = OneShotQAResponse()

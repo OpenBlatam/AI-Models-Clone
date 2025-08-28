@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import time
+import unittest
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+import torch
+import torch.nn as nn
+import numpy as np
+import pytest
+from unittest.mock import Mock, patch, MagicMock
+from noise_schedulers_and_sampling import (
+            import psutil
+from typing import Any, List, Dict, Optional
 """
 Comprehensive Tests for Noise Schedulers and Sampling Methods
 ============================================================
@@ -17,21 +42,9 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import logging
-import time
-import unittest
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
-import torch
-import torch.nn as nn
-import numpy as np
-import pytest
-from unittest.mock import Mock, patch, MagicMock
 
 # Import our noise schedulers and sampling methods
-from noise_schedulers_and_sampling import (
     NoiseScheduleType, SamplingMethod, NoiseSchedulerConfig, SamplingConfig,
     NoiseSchedulerFactory, SamplerFactory, AdvancedSamplingManager,
     BaseNoiseScheduler, BaseSampler, LinearNoiseScheduler, CosineNoiseScheduler,
@@ -49,7 +62,9 @@ class MockDiffusionModel(nn.Module):
     """Mock diffusion model for testing."""
     
     def __init__(self, in_channels: int = 4, out_channels: int = 4, hidden_size: int = 64):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.hidden_size = hidden_size
@@ -93,7 +108,7 @@ class MockDiffusionModel(nn.Module):
 class TestNoiseSchedulers(unittest.TestCase):
     """Test cases for noise schedulers."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.config = NoiseSchedulerConfig(
@@ -102,7 +117,7 @@ class TestNoiseSchedulers(unittest.TestCase):
             beta_end=0.02
         )
     
-    def test_linear_noise_scheduler(self):
+    def test_linear_noise_scheduler(self) -> Any:
         """Test linear noise scheduler."""
         scheduler = LinearNoiseScheduler(self.config)
         
@@ -124,7 +139,7 @@ class TestNoiseSchedulers(unittest.TestCase):
         # Check monotonicity
         self.assertTrue(torch.all(scheduler.alphas_cumprod[:-1] >= scheduler.alphas_cumprod[1:]))
     
-    def test_cosine_noise_scheduler(self):
+    def test_cosine_noise_scheduler(self) -> Any:
         """Test cosine noise scheduler."""
         scheduler = CosineNoiseScheduler(self.config)
         
@@ -141,7 +156,7 @@ class TestNoiseSchedulers(unittest.TestCase):
         self.assertTrue(torch.all(scheduler.alphas_cumprod > 0))
         self.assertTrue(torch.all(scheduler.alphas_cumprod <= 1))
     
-    def test_quadratic_noise_scheduler(self):
+    def test_quadratic_noise_scheduler(self) -> Any:
         """Test quadratic noise scheduler."""
         scheduler = QuadraticNoiseScheduler(self.config)
         
@@ -156,7 +171,7 @@ class TestNoiseSchedulers(unittest.TestCase):
         self.assertTrue(torch.all(scheduler.alphas > 0))
         self.assertTrue(torch.all(scheduler.alphas < 1))
     
-    def test_sigmoid_noise_scheduler(self):
+    def test_sigmoid_noise_scheduler(self) -> Any:
         """Test sigmoid noise scheduler."""
         scheduler = SigmoidNoiseScheduler(self.config)
         
@@ -171,7 +186,7 @@ class TestNoiseSchedulers(unittest.TestCase):
         self.assertTrue(torch.all(scheduler.alphas > 0))
         self.assertTrue(torch.all(scheduler.alphas < 1))
     
-    def test_exponential_noise_scheduler(self):
+    def test_exponential_noise_scheduler(self) -> Any:
         """Test exponential noise scheduler."""
         scheduler = ExponentialNoiseScheduler(self.config)
         
@@ -186,7 +201,7 @@ class TestNoiseSchedulers(unittest.TestCase):
         self.assertTrue(torch.all(scheduler.alphas > 0))
         self.assertTrue(torch.all(scheduler.alphas < 1))
     
-    def test_custom_noise_scheduler(self):
+    def test_custom_noise_scheduler(self) -> Any:
         """Test custom noise scheduler."""
         # Test with custom betas
         custom_betas = torch.linspace(0.001, 0.01, 100)
@@ -212,7 +227,7 @@ class TestNoiseSchedulers(unittest.TestCase):
         # Check that alphas_cumprod matches
         torch.testing.assert_close(scheduler.alphas_cumprod, custom_alphas_cumprod[:-1])
     
-    def test_custom_noise_scheduler_validation(self):
+    def test_custom_noise_scheduler_validation(self) -> Any:
         """Test custom noise scheduler validation."""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -223,7 +238,7 @@ class TestNoiseSchedulers(unittest.TestCase):
         with self.assertRaises(ValueError):
             CustomNoiseScheduler(config)
     
-    def test_noise_scheduler_factory(self):
+    def test_noise_scheduler_factory(self) -> Any:
         """Test noise scheduler factory."""
         # Test all schedule types
         for schedule_type in NoiseScheduleType:
@@ -245,14 +260,14 @@ class TestNoiseSchedulers(unittest.TestCase):
             
             self.assertIsInstance(scheduler, expected_class)
     
-    def test_noise_scheduler_factory_invalid_type(self):
+    def test_noise_scheduler_factory_invalid_type(self) -> Any:
         """Test noise scheduler factory with invalid type."""
         config = NoiseSchedulerConfig(schedule_type="invalid")
         
         with self.assertRaises(ValueError):
             NoiseSchedulerFactory.create(config)
     
-    def test_get_schedule_info(self):
+    def test_get_schedule_info(self) -> Optional[Dict[str, Any]]:
         """Test getting schedule information."""
         scheduler = LinearNoiseScheduler(self.config)
         info = scheduler.get_schedule_info()
@@ -272,7 +287,7 @@ class TestNoiseSchedulers(unittest.TestCase):
 class TestSamplers(unittest.TestCase):
     """Test cases for samplers."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.scheduler_config = NoiseSchedulerConfig(
@@ -292,7 +307,7 @@ class TestSamplers(unittest.TestCase):
         self.scheduler = LinearNoiseScheduler(self.scheduler_config)
         self.model = MockDiffusionModel().to(self.device)
     
-    def test_ddpm_sampler(self):
+    def test_ddpm_sampler(self) -> Any:
         """Test DDPM sampler."""
         sampler = DDPMSampler(self.scheduler, self.sampling_config)
         
@@ -319,7 +334,7 @@ class TestSamplers(unittest.TestCase):
         # Check timesteps
         self.assertEqual(len(result.timesteps), self.sampling_config.num_inference_steps)
     
-    def test_ddim_sampler(self):
+    def test_ddim_sampler(self) -> Any:
         """Test DDIM sampler."""
         config = SamplingConfig(
             method=SamplingMethod.DDIM,
@@ -342,7 +357,7 @@ class TestSamplers(unittest.TestCase):
         self.assertEqual(result.samples.shape, latents.shape)
         self.assertEqual(result.metadata["method"], "ddim")
     
-    def test_dpm_solver_sampler(self):
+    def test_dpm_solver_sampler(self) -> Any:
         """Test DPM-Solver sampler."""
         config = SamplingConfig(
             method=SamplingMethod.DPM_SOLVER,
@@ -365,7 +380,7 @@ class TestSamplers(unittest.TestCase):
         self.assertEqual(result.samples.shape, latents.shape)
         self.assertEqual(result.metadata["method"], "dpm_solver")
     
-    def test_euler_sampler(self):
+    def test_euler_sampler(self) -> Any:
         """Test Euler sampler."""
         config = SamplingConfig(
             method=SamplingMethod.EULER,
@@ -388,7 +403,7 @@ class TestSamplers(unittest.TestCase):
         self.assertEqual(result.samples.shape, latents.shape)
         self.assertEqual(result.metadata["method"], "euler")
     
-    def test_sampler_factory(self):
+    def test_sampler_factory(self) -> Any:
         """Test sampler factory."""
         # Test all supported methods
         methods = [SamplingMethod.DDPM, SamplingMethod.DDIM, SamplingMethod.DPM_SOLVER, SamplingMethod.EULER]
@@ -407,14 +422,14 @@ class TestSamplers(unittest.TestCase):
             
             self.assertIsInstance(sampler, expected_class)
     
-    def test_sampler_factory_invalid_method(self):
+    def test_sampler_factory_invalid_method(self) -> Any:
         """Test sampler factory with invalid method."""
         config = SamplingConfig(method="invalid")
         
         with self.assertRaises(ValueError):
             SamplerFactory.create(self.scheduler, config)
     
-    def test_classifier_free_guidance(self):
+    def test_classifier_free_guidance(self) -> Any:
         """Test classifier-free guidance."""
         sampler = DDPMSampler(self.scheduler, self.sampling_config)
         
@@ -437,7 +452,7 @@ class TestSamplers(unittest.TestCase):
 class TestAdvancedSamplingManager(unittest.TestCase):
     """Test cases for advanced sampling manager."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.scheduler_config = NoiseSchedulerConfig(
@@ -456,7 +471,7 @@ class TestAdvancedSamplingManager(unittest.TestCase):
         self.manager = AdvancedSamplingManager(self.scheduler_config, self.sampling_config)
         self.model = MockDiffusionModel().to(self.device)
     
-    def test_advanced_sampling_manager_initialization(self):
+    def test_advanced_sampling_manager_initialization(self) -> Any:
         """Test advanced sampling manager initialization."""
         self.assertIsInstance(self.manager.scheduler, BaseNoiseScheduler)
         self.assertIsInstance(self.manager.sampler, BaseSampler)
@@ -465,7 +480,7 @@ class TestAdvancedSamplingManager(unittest.TestCase):
         self.assertEqual(self.manager.scheduler_config, self.scheduler_config)
         self.assertEqual(self.manager.sampling_config, self.sampling_config)
     
-    def test_advanced_sampling_manager_sample(self):
+    def test_advanced_sampling_manager_sample(self) -> Any:
         """Test advanced sampling manager sampling."""
         latents = torch.randn(1, 4, 32, 32, device=self.device)
         prompt_embeds = torch.randn(1, 77, 768, device=self.device)
@@ -479,7 +494,7 @@ class TestAdvancedSamplingManager(unittest.TestCase):
         self.assertIsInstance(result.samples, torch.Tensor)
         self.assertEqual(result.samples.shape, latents.shape)
     
-    def test_advanced_sampling_manager_get_schedule_info(self):
+    def test_advanced_sampling_manager_get_schedule_info(self) -> Optional[Dict[str, Any]]:
         """Test getting schedule information from manager."""
         info = self.manager.get_schedule_info()
         
@@ -488,7 +503,7 @@ class TestAdvancedSamplingManager(unittest.TestCase):
         for key in required_keys:
             self.assertIn(key, info)
     
-    def test_advanced_sampling_manager_compare_methods(self):
+    def test_advanced_sampling_manager_compare_methods(self) -> Any:
         """Test comparing different sampling methods."""
         latents = torch.randn(1, 4, 32, 32, device=self.device)
         prompt_embeds = torch.randn(1, 77, 768, device=self.device)
@@ -513,7 +528,7 @@ class TestAdvancedSamplingManager(unittest.TestCase):
 class TestUtilityFunctions(unittest.TestCase):
     """Test cases for utility functions."""
     
-    def test_create_noise_scheduler(self):
+    def test_create_noise_scheduler(self) -> Any:
         """Test create_noise_scheduler utility function."""
         scheduler = create_noise_scheduler(NoiseScheduleType.LINEAR)
         
@@ -532,7 +547,7 @@ class TestUtilityFunctions(unittest.TestCase):
         self.assertEqual(scheduler.config.beta_start, 0.001)
         self.assertEqual(scheduler.config.beta_end, 0.01)
     
-    def test_create_sampler(self):
+    def test_create_sampler(self) -> Any:
         """Test create_sampler utility function."""
         sampler = create_sampler(NoiseScheduleType.LINEAR, SamplingMethod.DDPM)
         
@@ -552,7 +567,7 @@ class TestUtilityFunctions(unittest.TestCase):
         self.assertEqual(sampler.config.num_inference_steps, 20)
         self.assertEqual(sampler.config.guidance_scale, 10.0)
     
-    def test_create_advanced_sampling_manager(self):
+    def test_create_advanced_sampling_manager(self) -> Any:
         """Test create_advanced_sampling_manager utility function."""
         manager = create_advanced_sampling_manager(
             NoiseScheduleType.LINEAR,
@@ -581,12 +596,12 @@ class TestUtilityFunctions(unittest.TestCase):
 class TestPerformanceAndMemory(unittest.TestCase):
     """Test cases for performance and memory usage."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = MockDiffusionModel().to(self.device)
     
-    def test_memory_usage(self):
+    def test_memory_usage(self) -> Any:
         """Test memory usage during sampling."""
         # Create configurations
         scheduler_config = NoiseSchedulerConfig(
@@ -610,7 +625,6 @@ class TestPerformanceAndMemory(unittest.TestCase):
             torch.cuda.empty_cache()
             memory_before = torch.cuda.memory_allocated()
         else:
-            import psutil
             process = psutil.Process()
             memory_before = process.memory_info().rss
         
@@ -631,7 +645,7 @@ class TestPerformanceAndMemory(unittest.TestCase):
         # Check that memory usage is reasonable (less than 1GB for this test)
         self.assertLess(memory_used, 1024 * 1024 * 1024)  # 1GB
     
-    def test_sampling_speed(self):
+    def test_sampling_speed(self) -> Any:
         """Test sampling speed."""
         # Create configurations
         scheduler_config = NoiseSchedulerConfig(
@@ -670,12 +684,12 @@ class TestPerformanceAndMemory(unittest.TestCase):
 class TestEdgeCases(unittest.TestCase):
     """Test cases for edge cases and error conditions."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test fixtures."""
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model = MockDiffusionModel().to(self.device)
     
-    def test_zero_timesteps(self):
+    def test_zero_timesteps(self) -> Any:
         """Test with zero timesteps."""
         config = NoiseSchedulerConfig(
             num_train_timesteps=0,
@@ -685,7 +699,7 @@ class TestEdgeCases(unittest.TestCase):
         with self.assertRaises(ValueError):
             LinearNoiseScheduler(config)
     
-    def test_negative_timesteps(self):
+    def test_negative_timesteps(self) -> Any:
         """Test with negative timesteps."""
         config = NoiseSchedulerConfig(
             num_train_timesteps=-1,
@@ -695,7 +709,7 @@ class TestEdgeCases(unittest.TestCase):
         with self.assertRaises(ValueError):
             LinearNoiseScheduler(config)
     
-    def test_invalid_beta_range(self):
+    def test_invalid_beta_range(self) -> Any:
         """Test with invalid beta range."""
         config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -708,7 +722,7 @@ class TestEdgeCases(unittest.TestCase):
         scheduler = LinearNoiseScheduler(config)
         self.assertIsInstance(scheduler, LinearNoiseScheduler)
     
-    def test_large_timesteps(self):
+    def test_large_timesteps(self) -> Any:
         """Test with large number of timesteps."""
         config = NoiseSchedulerConfig(
             num_train_timesteps=10000,
@@ -719,7 +733,7 @@ class TestEdgeCases(unittest.TestCase):
         scheduler = LinearNoiseScheduler(config)
         self.assertEqual(len(scheduler.betas), 10000)
     
-    def test_single_timestep(self):
+    def test_single_timestep(self) -> Any:
         """Test with single timestep."""
         config = NoiseSchedulerConfig(
             num_train_timesteps=1,
@@ -729,7 +743,7 @@ class TestEdgeCases(unittest.TestCase):
         scheduler = LinearNoiseScheduler(config)
         self.assertEqual(len(scheduler.betas), 1)
     
-    def test_empty_latents(self):
+    def test_empty_latents(self) -> Any:
         """Test with empty latents."""
         scheduler_config = NoiseSchedulerConfig(
             num_train_timesteps=100,
@@ -748,7 +762,7 @@ class TestEdgeCases(unittest.TestCase):
         with self.assertRaises(RuntimeError):
             manager.sample(self.model, latents)
     
-    def test_mismatched_shapes(self):
+    def test_mismatched_shapes(self) -> Any:
         """Test with mismatched shapes."""
         scheduler_config = NoiseSchedulerConfig(
             num_train_timesteps=100,

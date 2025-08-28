@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import logging
+from typing import Dict, List, Any, Optional
+from datetime import datetime
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Query
+from fastapi.responses import JSONResponse
+import time
+from ..models.facebook_models import (
+from ..core.facebook_engine import FacebookPostEngine
+from ..services.langchain_service import FacebookLangChainService
+from ..config.langchain_config import get_facebook_langchain_config
+from ..utils.facebook_utils import FacebookUtils
+from ...auth.authentication import get_current_user
+from ...db.database import get_database_session
+        from ..models.facebook_models import FacebookFingerprint
+        from ..models.facebook_models import FacebookFingerprint
+from typing import Any, List, Dict, Optional
 """
 🎯 Facebook Posts API
 =====================
@@ -5,29 +30,15 @@
 API endpoints para el sistema de Facebook posts integrado con Onyx y LangChain.
 """
 
-import asyncio
-import logging
-from typing import Dict, List, Any, Optional
-from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks, Query
-from fastapi.responses import JSONResponse
-import time
 
 # Onyx imports
-from ..models.facebook_models import (
     FacebookRequest, FacebookPost, FacebookPostResponse, 
     FacebookAnalysis, FacebookAnalysisResponse, FacebookTone, 
     FacebookPostType, FacebookAudience, EngagementLevel
 )
-from ..core.facebook_engine import FacebookPostEngine
-from ..services.langchain_service import FacebookLangChainService
-from ..config.langchain_config import get_facebook_langchain_config
-from ..utils.facebook_utils import FacebookUtils
 
 # Dependencies for Onyx integration
-from ...auth.authentication import get_current_user
-from ...db.database import get_database_session
 
 logger = logging.getLogger(__name__)
 
@@ -179,7 +190,6 @@ async def analyze_facebook_post(
             )
         
         # Create mock post for analysis
-        from ..models.facebook_models import FacebookFingerprint
         fingerprint = FacebookFingerprint.create(content, post_type)
         
         mock_post = FacebookPost(
@@ -313,7 +323,6 @@ async def optimize_facebook_post(
         })
         
         # Create optimized post
-        from ..models.facebook_models import FacebookFingerprint
         fingerprint = FacebookFingerprint.create(optimized_result['content'])
         
         optimized_post = FacebookPost(

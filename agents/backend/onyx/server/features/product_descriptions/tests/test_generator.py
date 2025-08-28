@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import pytest
+import asyncio
+from unittest.mock import Mock, patch
+import torch
+from product_descriptions.core.generator import ProductDescriptionGenerator
+from product_descriptions.core.config import ProductDescriptionConfig, ModelConfig
+from typing import Any, List, Dict, Optional
+import logging
 """
 Tests for Product Description Generator
 =======================================
@@ -5,20 +15,14 @@ Tests for Product Description Generator
 Unit and integration tests for the generator functionality.
 """
 
-import pytest
-import asyncio
-from unittest.mock import Mock, patch
-import torch
 
-from product_descriptions.core.generator import ProductDescriptionGenerator
-from product_descriptions.core.config import ProductDescriptionConfig, ModelConfig
 
 
 class TestProductDescriptionGenerator:
     """Test suite for ProductDescriptionGenerator."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Test configuration."""
         return ProductDescriptionConfig(
             model=ModelConfig(
@@ -29,13 +33,13 @@ class TestProductDescriptionGenerator:
         )
     
     @pytest.fixture
-    async def generator(self, config):
+    async def generator(self, config) -> Any:
         """Initialized generator for testing."""
         gen = ProductDescriptionGenerator(config)
         await gen.initialize()
         return gen
     
-    def test_generator_initialization(self, config):
+    def test_generator_initialization(self, config) -> Any:
         """Test generator initialization."""
         generator = ProductDescriptionGenerator(config)
         assert generator.config == config
@@ -43,7 +47,7 @@ class TestProductDescriptionGenerator:
         assert generator.model is None
     
     @pytest.mark.asyncio
-    async def test_async_initialization(self, config):
+    async def test_async_initialization(self, config) -> Any:
         """Test async initialization."""
         generator = ProductDescriptionGenerator(config)
         result = await generator.initialize()
@@ -53,7 +57,7 @@ class TestProductDescriptionGenerator:
         assert generator.model is not None
     
     @pytest.mark.asyncio
-    async def test_generate_description(self, generator):
+    async def test_generate_description(self, generator) -> Any:
         """Test basic description generation."""
         results = generator.generate(
             product_name="Test Product",
@@ -75,7 +79,7 @@ class TestProductDescriptionGenerator:
         assert metadata["brand"] == "TestBrand"
     
     @pytest.mark.asyncio
-    async def test_generate_multiple_variations(self, generator):
+    async def test_generate_multiple_variations(self, generator) -> Any:
         """Test generating multiple variations."""
         results = generator.generate(
             product_name="Test Product",
@@ -90,7 +94,7 @@ class TestProductDescriptionGenerator:
         assert len(set(descriptions)) >= 2  # At least 2 should be different
     
     @pytest.mark.asyncio
-    async def test_async_generation(self, generator):
+    async def test_async_generation(self, generator) -> Any:
         """Test async generation."""
         results = await generator.generate_async(
             product_name="Async Test Product",
@@ -100,7 +104,7 @@ class TestProductDescriptionGenerator:
         assert len(results) == 1
         assert "description" in results[0]
     
-    def test_batch_generation(self, generator):
+    def test_batch_generation(self, generator) -> Any:
         """Test batch generation."""
         products = [
             {
@@ -122,7 +126,7 @@ class TestProductDescriptionGenerator:
         assert len(results[1]) == 1
     
     @pytest.mark.asyncio
-    async def test_batch_async_generation(self, generator):
+    async def test_batch_async_generation(self, generator) -> Any:
         """Test async batch generation."""
         products = [
             {
@@ -141,7 +145,7 @@ class TestProductDescriptionGenerator:
         
         assert len(results) == 2
     
-    def test_preset_generation(self, generator):
+    def test_preset_generation(self, generator) -> Any:
         """Test preset-based generation."""
         results = generator.generate_with_preset(
             product_name="Preset Test Product",
@@ -152,7 +156,7 @@ class TestProductDescriptionGenerator:
         assert len(results) == 1
         assert "description" in results[0]
     
-    def test_invalid_preset(self, generator):
+    def test_invalid_preset(self, generator) -> Any:
         """Test invalid preset handling."""
         with pytest.raises(ValueError, match="Unknown preset"):
             generator.generate_with_preset(
@@ -161,7 +165,7 @@ class TestProductDescriptionGenerator:
                 preset="invalid_preset"
             )
     
-    def test_caching(self, generator):
+    def test_caching(self, generator) -> Any:
         """Test caching functionality."""
         # First generation
         results1 = generator.generate(
@@ -184,7 +188,7 @@ class TestProductDescriptionGenerator:
         stats = generator.get_stats()
         assert stats["cache_hits"] > 0
     
-    def test_cache_disable(self, generator):
+    def test_cache_disable(self, generator) -> Any:
         """Test disabling cache."""
         results1 = generator.generate(
             product_name="No Cache Test",
@@ -202,7 +206,7 @@ class TestProductDescriptionGenerator:
         assert "description" in results1[0]
         assert "description" in results2[0]
     
-    def test_stats_tracking(self, generator):
+    def test_stats_tracking(self, generator) -> Any:
         """Test statistics tracking."""
         initial_stats = generator.get_stats()
         
@@ -217,7 +221,7 @@ class TestProductDescriptionGenerator:
         assert final_stats["total_generations"] > initial_stats["total_generations"]
         assert final_stats["total_time"] > initial_stats["total_time"]
     
-    def test_clear_cache(self, generator):
+    def test_clear_cache(self, generator) -> Any:
         """Test cache clearing."""
         # Generate and cache something
         generator.generate(
@@ -236,7 +240,7 @@ class TestProductDescriptionGenerator:
         assert stats_after["cache_size"] == 0
         assert stats_after["cache_size"] < cache_size_before
     
-    def test_error_handling(self, generator):
+    def test_error_handling(self, generator) -> Any:
         """Test error handling for invalid inputs."""
         # Empty features should still work but might produce different results
         results = generator.generate(
@@ -249,7 +253,7 @@ class TestProductDescriptionGenerator:
         assert len(results) == 1
     
     @pytest.mark.asyncio
-    async def test_uninitialized_generator(self, config):
+    async def test_uninitialized_generator(self, config) -> Any:
         """Test using uninitialized generator."""
         generator = ProductDescriptionGenerator(config)
         
@@ -266,7 +270,7 @@ class TestGeneratorIntegration:
     
     @pytest.mark.slow
     @pytest.mark.asyncio
-    async def test_full_pipeline(self):
+    async def test_full_pipeline(self) -> Any:
         """Test complete generation pipeline."""
         config = ProductDescriptionConfig()
         generator = ProductDescriptionGenerator(config)

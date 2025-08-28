@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import datetime
 import time
 from typing import List
@@ -30,6 +32,9 @@ from onyx.server.documents.models import ConnectorBase
 from onyx.server.documents.models import CredentialBase
 from onyx.server.models import StatusResponse
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 USER_FILE_CONSTANT = "USER_FILE_CONNECTOR"
 
 
@@ -66,7 +71,7 @@ def create_user_files(
     return user_files
 
 
-def upload_files_to_user_files_with_indexing(
+async def upload_files_to_user_files_with_indexing(
     files: List[UploadFile],
     folder_id: int | None,
     user: User,
@@ -270,7 +275,7 @@ def unshare_folder_with_assistant(
             unshare_file_with_assistant(file.id, assistant_id, db_session)
 
 
-def fetch_user_files_for_documents(
+async def fetch_user_files_for_documents(
     document_ids: list[str],
     db_session: Session,
 ) -> dict[str, int | None]:
@@ -330,7 +335,7 @@ def fetch_user_files_for_documents(
     return result
 
 
-def fetch_user_folders_for_documents(
+async def fetch_user_folders_for_documents(
     document_ids: list[str],
     db_session: Session,
 ) -> dict[str, int | None]:
@@ -396,7 +401,7 @@ def get_user_file_from_id(db_session: Session, user_file_id: int) -> UserFile | 
     return db_session.query(UserFile).filter(UserFile.id == user_file_id).first()
 
 
-# def fetch_user_files_for_documents(
+# async def fetch_user_files_for_documents(
 # #     document_ids: list[str],
 # #     db_session: Session,
 # # ) -> dict[str, int | None]:

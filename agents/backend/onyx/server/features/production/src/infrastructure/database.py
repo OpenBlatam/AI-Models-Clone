@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import logging
+from typing import Optional, Dict, Any, List
+from contextlib import asynccontextmanager
+import asyncpg
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
+from sqlalchemy.orm import declarative_base
+from sqlalchemy import text, MetaData
+import redis.asyncio as redis
+from src.core.config import DatabaseSettings, RedisSettings
+from src.core.exceptions import DatabaseException
+        import hashlib
+from typing import Any, List, Dict, Optional
 """
 🗄️ Ultra-Optimized Database Manager
 ===================================
@@ -10,19 +31,8 @@ Production-grade database management with:
 - Performance monitoring
 """
 
-import asyncio
-import logging
-from typing import Optional, Dict, Any, List
-from contextlib import asynccontextmanager
 
-import asyncpg
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sessionmaker
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import text, MetaData
-import redis.asyncio as redis
 
-from src.core.config import DatabaseSettings, RedisSettings
-from src.core.exceptions import DatabaseException
 
 
 Base = declarative_base()
@@ -35,7 +45,9 @@ class DatabaseManager:
     """
     
     def __init__(self, db_settings: DatabaseSettings):
-        self.settings = db_settings
+        
+    """__init__ function."""
+self.settings = db_settings
         self.logger = logging.getLogger(__name__)
         
         # Database engine and session factory
@@ -60,7 +72,7 @@ class DatabaseManager:
         
         self.logger.info("Database Manager initialized")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize database connections and pools"""
         
         self.logger.info("Initializing Database Manager...")
@@ -103,7 +115,7 @@ class DatabaseManager:
             self.logger.error(f"Failed to initialize Database Manager: {e}")
             raise DatabaseException("initialization", reason=str(e))
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup database connections"""
         
         self.logger.info("Cleaning up Database Manager...")
@@ -127,7 +139,7 @@ class DatabaseManager:
             self.logger.error(f"Error during database cleanup: {e}")
     
     @asynccontextmanager
-    async def get_session(self):
+    async def get_session(self) -> Optional[Dict[str, Any]]:
         """Get database session with automatic cleanup"""
         
         session = None
@@ -351,7 +363,7 @@ class DatabaseManager:
             self.logger.error(f"Database backup failed: {e}")
             return False
     
-    async def _test_connection(self):
+    async def _test_connection(self) -> Any:
         """Test database connection"""
         
         try:
@@ -365,7 +377,7 @@ class DatabaseManager:
             self.logger.error(f"Database connection test failed: {e}")
             raise DatabaseException("connection test", reason=str(e))
     
-    async def _initialize_pool(self):
+    async def _initialize_pool(self) -> Any:
         """Initialize connection pool"""
         
         try:
@@ -384,7 +396,7 @@ class DatabaseManager:
             self.logger.error(f"Failed to initialize connection pool: {e}")
             raise DatabaseException("pool initialization", reason=str(e))
     
-    async def _run_migrations(self):
+    async def _run_migrations(self) -> Any:
         """Run database migrations"""
         
         try:
@@ -514,7 +526,6 @@ class DatabaseManager:
     def _generate_cache_key(self, query: str, params: Optional[Dict[str, Any]]) -> str:
         """Generate cache key for query"""
         
-        import hashlib
         
         key_data = {
             "query": query,

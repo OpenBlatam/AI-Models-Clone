@@ -1,22 +1,42 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from .tracker import (
+from .checkpointing import (
+from .metrics import (
+from ml.experiment_tracking import create_tracker, create_checkpoint_manager
+from ml.config import get_config
+from ml.experiment_tracking import TensorBoardTracker, WandbTracker
+from ml.experiment_tracking import CompositeTracker, TensorBoardTracker, WandbTracker
+from ml.experiment_tracking import CheckpointManager, CheckpointStrategy
+from ml.experiment_tracking import MetricsTracker, MetricLogger
+from ml.experiment_tracking import create_tracker, create_checkpoint_manager
+from ml.config import get_config
+from ml.experiment_tracking import create_tracker, create_checkpoint_manager
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Experiment Tracking Module for Key Messages ML Pipeline
 Provides unified interfaces for TensorBoard, Weights & Biases, and MLflow
 """
 
-from .tracker import (
     ExperimentTracker,
     TensorBoardTracker,
     WandbTracker,
     MLflowTracker,
     CompositeTracker
 )
-from .checkpointing import (
     CheckpointManager,
     ModelCheckpoint,
     TrainingCheckpoint,
     CheckpointStrategy
 )
-from .metrics import (
     MetricsTracker,
     MetricLogger,
     MetricAggregator
@@ -137,8 +157,6 @@ def example_usage():
 
 ## 1. Basic Experiment Tracking Setup
 ```python
-from ml.experiment_tracking import create_tracker, create_checkpoint_manager
-from ml.config import get_config
 
 # Load configuration
 config = get_config("production")
@@ -181,7 +199,6 @@ for epoch in range(num_epochs):
 
 ## 2. Using Individual Trackers
 ```python
-from ml.experiment_tracking import TensorBoardTracker, WandbTracker
 
 # TensorBoard only
 tb_tracker = TensorBoardTracker(
@@ -207,7 +224,6 @@ wandb_tracker.log_metrics({"loss": 0.5}, step=100)
 
 ## 3. Composite Tracking
 ```python
-from ml.experiment_tracking import CompositeTracker, TensorBoardTracker, WandbTracker
 
 # Create multiple trackers
 trackers = [
@@ -224,7 +240,6 @@ composite_tracker.log_metrics({"loss": 0.5}, step=100)
 
 ## 4. Advanced Checkpointing
 ```python
-from ml.experiment_tracking import CheckpointManager, CheckpointStrategy
 
 # Custom checkpoint strategy
 strategy = CheckpointStrategy(
@@ -266,7 +281,6 @@ model.load_state_dict(best_checkpoint.model_state)
 
 ## 5. Metrics Tracking
 ```python
-from ml.experiment_tracking import MetricsTracker, MetricLogger
 
 # Create metrics tracker
 metrics_tracker = MetricsTracker()
@@ -294,15 +308,14 @@ avg_loss = metrics_tracker.get_average("loss", window=100)
 
 ## 6. Integration with Training Loop
 ```python
-from ml.experiment_tracking import create_tracker, create_checkpoint_manager
 
 class TrainingManager:
-    def __init__(self, config):
+    def __init__(self, config) -> Any:
         self.tracker = create_tracker(config["experiment_tracking"])
         self.checkpoint_manager = create_checkpoint_manager(config["training"]["default"])
         self.metrics_tracker = MetricsTracker()
         
-    def train(self, model, train_loader, val_loader, num_epochs):
+    def train(self, model, train_loader, val_loader, num_epochs) -> Any:
         # Initialize experiment
         self.tracker.init_experiment("training_run", config)
         
@@ -372,8 +385,6 @@ training:
 
 ```python
 # Usage with configuration
-from ml.config import get_config
-from ml.experiment_tracking import create_tracker, create_checkpoint_manager
 
 config = get_config("production")
 tracker = create_tracker(config["experiment_tracking"])
@@ -381,5 +392,6 @@ checkpoint_manager = create_checkpoint_manager(config["training"]["default"])
 ```
 """)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     example_usage() 

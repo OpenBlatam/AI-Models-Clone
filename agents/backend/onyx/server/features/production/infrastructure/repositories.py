@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+import json
+import asyncpg
+from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import Column, String, Integer, Float, DateTime, Text, JSON, Boolean
+from sqlalchemy.ext.declarative import declarative_base
+from domain.entities import (
+from domain.interfaces import CopywritingRepository
+from typing import Any, List, Dict, Optional
 """
 Infrastructure Repositories
 ===========================
@@ -5,19 +20,8 @@ Infrastructure Repositories
 Repository implementations for data persistence.
 """
 
-import asyncio
-import logging
-from typing import List, Optional, Dict, Any
-from datetime import datetime
-import json
 
-import asyncpg
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy import Column, String, Integer, Float, DateTime, Text, JSON, Boolean
-from sqlalchemy.ext.declarative import declarative_base
 
-from domain.entities import (
     CopywritingRequest,
     CopywritingResponse,
     PerformanceMetrics,
@@ -25,7 +29,6 @@ from domain.entities import (
     CopywritingStyle,
     CopywritingTone
 )
-from domain.interfaces import CopywritingRepository
 
 logger = logging.getLogger(__name__)
 
@@ -87,14 +90,16 @@ class PostgresCopywritingRepository(CopywritingRepository):
     """PostgreSQL implementation of copywriting repository."""
     
     def __init__(self, database_url: str, pool_size: int = 20, max_overflow: int = 30):
-        self.database_url = database_url
+        
+    """__init__ function."""
+self.database_url = database_url
         self.pool_size = pool_size
         self.max_overflow = max_overflow
         self.engine = None
         self.session_factory = None
         self._initialized = False
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize database connection and create tables."""
         if self._initialized:
             return
@@ -126,14 +131,14 @@ class PostgresCopywritingRepository(CopywritingRepository):
             logger.error(f"Failed to initialize PostgreSQL repository: {e}")
             raise
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup database connections."""
         if self.engine:
             await self.engine.dispose()
             self._initialized = False
             logger.info("PostgreSQL repository cleaned up")
     
-    async def save_request(self, request: CopywritingRequest) -> CopywritingRequest:
+    async async def save_request(self, request: CopywritingRequest) -> CopywritingRequest:
         """Save a copywriting request."""
         if not self._initialized:
             raise RuntimeError("Repository not initialized")
@@ -197,7 +202,7 @@ class PostgresCopywritingRepository(CopywritingRepository):
             logger.error(f"Error saving response {response.id}: {e}")
             raise
     
-    async def get_request_by_id(self, request_id: str) -> Optional[CopywritingRequest]:
+    async async def get_request_by_id(self, request_id: str) -> Optional[CopywritingRequest]:
         """Get request by ID."""
         if not self._initialized:
             raise RuntimeError("Repository not initialized")
@@ -239,7 +244,7 @@ class PostgresCopywritingRepository(CopywritingRepository):
             logger.error(f"Error getting response {response_id}: {e}")
             raise
     
-    async def get_responses_by_request_id(self, request_id: str) -> List[CopywritingResponse]:
+    async async def get_responses_by_request_id(self, request_id: str) -> List[CopywritingResponse]:
         """Get all responses for a request."""
         if not self._initialized:
             raise RuntimeError("Repository not initialized")
@@ -257,7 +262,7 @@ class PostgresCopywritingRepository(CopywritingRepository):
             logger.error(f"Error getting responses for request {request_id}: {e}")
             raise
     
-    async def update_request_status(self, request_id: str, status: RequestStatus) -> bool:
+    async async def update_request_status(self, request_id: str, status: RequestStatus) -> bool:
         """Update request status."""
         if not self._initialized:
             raise RuntimeError("Repository not initialized")
@@ -293,7 +298,7 @@ class PostgresCopywritingRepository(CopywritingRepository):
             logger.error(f"Error getting history for user {user_id}: {e}")
             raise
     
-    async def get_requests_by_status(self, status: RequestStatus) -> List[CopywritingRequest]:
+    async async def get_requests_by_status(self, status: RequestStatus) -> List[CopywritingRequest]:
         """Get requests by status."""
         if not self._initialized:
             raise RuntimeError("Repository not initialized")
@@ -311,7 +316,7 @@ class PostgresCopywritingRepository(CopywritingRepository):
             logger.error(f"Error getting requests by status {status.value}: {e}")
             raise
     
-    async def delete_request(self, request_id: str) -> bool:
+    async async def delete_request(self, request_id: str) -> bool:
         """Delete a request."""
         if not self._initialized:
             raise RuntimeError("Repository not initialized")
@@ -381,7 +386,7 @@ class PostgresCopywritingRepository(CopywritingRepository):
             logger.error(f"Error getting statistics: {e}")
             raise
     
-    def _row_to_request(self, row) -> CopywritingRequest:
+    async def _row_to_request(self, row) -> CopywritingRequest:
         """Convert database row to CopywritingRequest entity."""
         return CopywritingRequest(
             id=row.id,

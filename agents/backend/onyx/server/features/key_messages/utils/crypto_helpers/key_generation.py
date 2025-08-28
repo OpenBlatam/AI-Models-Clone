@@ -1,6 +1,14 @@
-"""
-Key generation utilities for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
 from typing import Dict, Optional, Tuple
 from pydantic import BaseModel, field_validator
 import structlog
@@ -11,6 +19,12 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.backends import default_backend
 import os
 import base64
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Key generation utilities for cybersecurity tools.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -22,14 +36,14 @@ class KeyGenerationInput(BaseModel):
     encoding: str = "utf-8"
     
     @field_validator('key_type')
-    def validate_key_type(cls, v):
+    def validate_key_type(cls, v) -> bool:
         valid_types = ["RSA", "Ed25519", "X25519"]
         if v not in valid_types:
             raise ValueError(f"Key type must be one of: {valid_types}")
         return v
     
     @field_validator('key_size')
-    def validate_key_size(cls, v):
+    def validate_key_size(cls, v) -> bool:
         if v < 1024 or v > 4096:
             raise ValueError("Key size must be between 1024 and 4096 bits")
         return v

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from collections.abc import Generator
 from datetime import datetime
@@ -24,19 +26,22 @@ from onyx.tools.message import ToolCallSummary
 from onyx.tools.models import ToolResponse
 from onyx.tools.tool import Tool
 from onyx.tools.tool_implementations.internet_search.models import (
-    InternetSearchResponse,
-)
 from onyx.tools.tool_implementations.internet_search.models import (
-    InternetSearchResult,
-)
 from onyx.tools.tool_implementations.search_like_tool_utils import (
-    build_next_prompt_for_search_like_tool,
-)
 from onyx.tools.tool_implementations.search_like_tool_utils import (
-    FINAL_CONTEXT_DOCUMENTS_ID,
-)
 from onyx.utils.logger import setup_logger
 from onyx.utils.special_types import JSON_ro
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    InternetSearchResponse,
+)
+    InternetSearchResult,
+)
+    build_next_prompt_for_search_like_tool,
+)
+    FINAL_CONTEXT_DOCUMENTS_ID,
+)
 
 logger = setup_logger()
 
@@ -157,7 +162,7 @@ class InternetSearchTool(Tool[None]):
                             "description": "Query to search on the internet",
                         },
                     },
-                    "required": ["internet_search_query"],
+                    "required": ["internet_search_query"f"],
                 },
             },
         }
@@ -171,10 +176,7 @@ class InternetSearchTool(Tool[None]):
         history_str = combine_message_chain(
             messages=history, token_limit=GEN_AI_HISTORY_CUTOFF
         )
-        prompt = INTERNET_SEARCH_TEMPLATE.format(
-            chat_history=history_str,
-            final_query=query,
-        )
+        prompt = INTERNET_SEARCH_TEMPLATE"
         use_internet_search_output = message_to_string(llm.invoke(prompt))
 
         logger.debug(

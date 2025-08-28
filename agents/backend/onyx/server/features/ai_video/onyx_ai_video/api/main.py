@@ -1,9 +1,10 @@
-"""
-Onyx AI Video System - Main API
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Main API module for the Onyx AI Video system with unified initialization,
-request processing, and system management.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -11,7 +12,6 @@ from typing import Any, Dict, List, Optional, Union
 from dataclasses import dataclass, field
 from datetime import datetime
 import logging
-
 from ..core.exceptions import AIVideoError, ValidationError, SecurityError
 from ..core.models import VideoRequest, VideoResponse, SystemStatus, PerformanceMetrics
 from ..core.integration import OnyxIntegrationManager, onyx_integration
@@ -21,6 +21,15 @@ from ..config.config_manager import OnyxConfigManager, get_config
 from ..utils.logger import OnyxLogger, get_logger, get_performance_logger
 from ..utils.performance import PerformanceMonitor, get_performance_monitor
 from ..utils.security import SecurityManager, get_security_manager
+from typing import Any, List, Dict, Optional
+"""
+Onyx AI Video System - Main API
+
+Main API module for the Onyx AI Video system with unified initialization,
+request processing, and system management.
+"""
+
+
 
 
 @dataclass
@@ -53,7 +62,9 @@ class OnyxAIVideoSystem:
     """
     
     def __init__(self, config_path: Optional[str] = None):
-        self.config_path = config_path
+        
+    """__init__ function."""
+self.config_path = config_path
         self.config: Optional[Any] = None
         self.logger: Optional[OnyxLogger] = None
         self.performance_monitor: Optional[PerformanceMonitor] = None
@@ -432,11 +443,11 @@ class OnyxAIVideoSystem:
             self.logger.error(f"Failed to get metrics: {e}")
             raise AIVideoError(f"Metrics retrieval failed: {e}")
     
-    async def get_active_requests(self) -> Dict[str, Dict[str, Any]]:
+    async async def get_active_requests(self) -> Dict[str, Dict[str, Any]]:
         """Get active requests."""
         return self.active_requests.copy()
     
-    async def cancel_request(self, request_id: str, user_id: str) -> bool:
+    async async def cancel_request(self, request_id: str, user_id: str) -> bool:
         """Cancel an active request."""
         try:
             if request_id not in self.active_requests:
@@ -571,13 +582,13 @@ async def reload_config() -> None:
     await system.reload_config()
 
 
-async def cancel_request(request_id: str, user_id: str) -> bool:
+async async def cancel_request(request_id: str, user_id: str) -> bool:
     """Cancel a request."""
     system = await get_system()
     return await system.cancel_request(request_id, user_id)
 
 
-async def get_active_requests() -> Dict[str, Dict[str, Any]]:
+async async def get_active_requests() -> Dict[str, Dict[str, Any]]:
     """Get active requests."""
     system = await get_system()
     return await system.get_active_requests()

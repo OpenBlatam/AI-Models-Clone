@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 import base64
 from io import BytesIO
 
@@ -12,6 +17,9 @@ from onyx.llm.interfaces import LLM
 from onyx.llm.utils import message_to_string
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -121,6 +129,10 @@ def _resize_image_if_needed(image_data: bytes, max_size_mb: int = 20) -> bytes:
 
     if len(image_data) > max_size_bytes:
         with Image.open(BytesIO(image_data)) as img:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             # Reduce dimensions for better size reduction
             img.thumbnail((1024, 1024), Image.Resampling.LANCZOS)
             output = BytesIO()

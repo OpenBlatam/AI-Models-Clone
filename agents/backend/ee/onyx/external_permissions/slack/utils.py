@@ -1,9 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from slack_sdk import WebClient
 
 from onyx.connectors.slack.utils import make_paginated_slack_api_call
 
 
-def fetch_user_id_to_email_map(
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+async def fetch_user_id_to_email_map(
     slack_client: WebClient,
 ) -> dict[str, str]:
     user_id_to_email_map = {}

@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from alembic import op
+    import json
+    from sqlalchemy import text
+    from slack_sdk import WebClient
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """delete workspace
 
 Revision ID: c0aab6edb6dd
@@ -6,7 +18,6 @@ Create Date: 2024-12-17 14:37:07.660631
 
 """
 
-from alembic import op
 
 
 # revision identifiers, used by Alembic.
@@ -27,9 +38,6 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    import json
-    from sqlalchemy import text
-    from slack_sdk import WebClient
 
     conn = op.get_bind()
 
@@ -38,6 +46,16 @@ def downgrade() -> None:
         text("SELECT id, credential_json FROM credential WHERE source = 'SLACK'")
     )
     all_slack_creds = creds_result.fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     if not all_slack_creds:
         return
 

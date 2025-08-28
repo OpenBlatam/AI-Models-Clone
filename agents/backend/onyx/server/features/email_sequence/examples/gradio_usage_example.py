@@ -1,9 +1,10 @@
-"""
-Gradio Interface Usage Example
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-This example demonstrates how to use the Gradio interface
-programmatically and integrate it with other systems.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -11,14 +12,22 @@ import logging
 from pathlib import Path
 from typing import Dict, List, Any
 import sys
-
-# Add the parent directory to the path
-sys.path.append(str(Path(__file__).parent.parent))
-
 from gradio_app import GradioEmailSequenceApp
 from models.sequence import EmailSequence, SequenceStep
 from models.subscriber import Subscriber
 from models.template import EmailTemplate
+from typing import Any, List, Dict, Optional
+"""
+Gradio Interface Usage Example
+
+This example demonstrates how to use the Gradio interface
+programmatically and integrate it with other systems.
+"""
+
+
+# Add the parent directory to the path
+sys.path.append(str(Path(__file__).parent.parent))
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -28,11 +37,11 @@ logger = logging.getLogger(__name__)
 class GradioInterfaceExample:
     """Example class demonstrating Gradio interface usage"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = GradioEmailSequenceApp()
         logger.info("Gradio Interface Example initialized")
     
-    async def example_sequence_generation(self):
+    async def example_sequence_generation(self) -> Any:
         """Example of sequence generation workflow"""
         
         logger.info("=== Sequence Generation Example ===")
@@ -167,7 +176,7 @@ class GradioInterfaceExample:
         
         return evaluation_results
     
-    async def example_training_workflow(self):
+    async def example_training_workflow(self) -> Any:
         """Example of training workflow"""
         
         logger.info("=== Training Workflow Example ===")
@@ -234,7 +243,7 @@ class GradioInterfaceExample:
         
         return "\n".join(log_lines)
     
-    async def example_gradient_management(self):
+    async def example_gradient_management(self) -> Any:
         """Example of gradient management workflow"""
         
         logger.info("=== Gradient Management Example ===")
@@ -287,7 +296,7 @@ class GradioInterfaceExample:
         
         return "\n".join(log_lines)
     
-    async def example_complete_workflow(self):
+    async def example_complete_workflow(self) -> Any:
         """Complete workflow example combining all features"""
         
         logger.info("=== Complete Workflow Example ===")
@@ -409,6 +418,10 @@ class GradioInterfaceExample:
         output_path.parent.mkdir(parents=True, exist_ok=True)
         
         with open(output_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(results, f, indent=2, default=str)
         
         logger.info(f"Results saved to: {output_path}")

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import html
 import time
 from collections.abc import Callable
@@ -22,6 +24,9 @@ from onyx.connectors.models import TextSection
 from onyx.file_processing.html_utils import parse_html_page_basic
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class BookstackConnector(LoadConnector, PollConnector):
     def __init__(
         self,

@@ -1,15 +1,10 @@
-"""
-Comprehensive Training Logging System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-This module provides robust logging for ML training progress and errors with:
-- Structured logging for training metrics and progress
-- Error categorization and tracking
-- Performance monitoring and resource usage
-- Cybersecurity-specific event logging
-- Integration with existing robust operations
-- Real-time progress visualization
-- Log persistence and analysis tools
-"""
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -26,7 +21,6 @@ import functools
 from datetime import datetime, timedelta
 import hashlib
 import uuid
-
 import numpy as np
 import pandas as pd
 import torch
@@ -41,9 +35,25 @@ from rich.table import Table
 from rich.progress import Progress, SpinnerColumn, TextColumn, BarColumn, TimeElapsedColumn
 from rich.live import Live
 from rich.panel import Panel
-
 from error_handling_debugging import ErrorHandlingDebuggingSystem, ErrorSeverity, ErrorCategory
 from robust_operations import RobustOperations, OperationResult
+        import psutil
+from typing import Any, List, Dict, Optional
+"""
+Comprehensive Training Logging System
+
+This module provides robust logging for ML training progress and errors with:
+- Structured logging for training metrics and progress
+- Error categorization and tracking
+- Performance monitoring and resource usage
+- Cybersecurity-specific event logging
+- Integration with existing robust operations
+- Real-time progress visualization
+- Log persistence and analysis tools
+"""
+
+
+
 
 # Configure structlog
 structlog.configure(
@@ -231,7 +241,7 @@ class TrainingLogger:
                    log_dir=str(self.log_dir),
                    log_level=self.log_level.value)
     
-    def _setup_loggers(self):
+    def _setup_loggers(self) -> Any:
         """Setup different loggers for different purposes."""
         # Main training logger
         self.training_logger = structlog.get_logger("training")
@@ -249,7 +259,7 @@ class TrainingLogger:
         if self.enable_file:
             self._setup_file_handlers()
     
-    def _setup_file_handlers(self):
+    def _setup_file_handlers(self) -> Any:
         """Setup file handlers for different log types."""
         # Training logs
         training_log_file = self.log_dir / f"training_{self.session_id}.log"
@@ -674,7 +684,7 @@ class TrainingLogger:
         
         logger.info(f"Training curves saved to {save_path}")
     
-    def cleanup(self):
+    def cleanup(self) -> Any:
         """Cleanup resources."""
         if self.enable_rich:
             self.progress.stop()
@@ -684,7 +694,7 @@ class TrainingLogger:
         
         logger.info("TrainingLogger cleanup completed")
     
-    def _rotate_log_files(self):
+    def _rotate_log_files(self) -> Any:
         """Rotate log files if they exceed size limit."""
         for log_file in self.log_dir.glob("*.log"):
             if log_file.stat().st_size > self.log_rotation_size:
@@ -699,13 +709,12 @@ class TrainingLogger:
 class PerformanceMonitor:
     """Monitor system performance during training."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.start_time = time.time()
         self.metrics_history: List[PerformanceMetrics] = []
     
     def get_current_metrics(self) -> PerformanceMetrics:
         """Get current performance metrics."""
-        import psutil
         
         cpu_usage = psutil.cpu_percent(interval=1)
         memory_usage = psutil.virtual_memory().percent
@@ -748,11 +757,13 @@ class TrainingLoggerDecorator:
     """Decorator for automatic training logging."""
     
     def __init__(self, logger: TrainingLogger):
-        self.logger = logger
+        
+    """__init__ function."""
+self.logger = logger
     
     def __call__(self, func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             
             try:
@@ -817,7 +828,7 @@ def log_training_progress(logger: TrainingLogger):
     """Decorator for logging training progress."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # Extract training parameters
             model = kwargs.get('model') or (args[0] if args else None)
             dataloader = kwargs.get('dataloader') or (args[1] if len(args) > 1 else None)
@@ -846,7 +857,7 @@ if __name__ == "__main__":
     
     # Example training loop with logging
     @log_training_progress(logger)
-    def train_model(model, dataloader, epochs=10):
+    def train_model(model, dataloader, epochs=10) -> Any:
         for epoch in range(epochs):
             logger.start_epoch(epoch)
             

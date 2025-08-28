@@ -1,0 +1,98 @@
+# Configuración del Sistema de Integración Modular
+# Sistema de Acumulación de Gradientes Avanzado
+
+# Configuración general del sistema
+enable_optimization: true
+enable_monitoring: true
+enable_config_management: true
+auto_reload_config: true
+
+# Archivo de configuración
+config_file: "integration_config.yaml"
+
+# Nivel de logging
+log_level: "INFO"
+
+# Intervalos de operación (en segundos)
+metrics_interval: 1.0
+optimization_interval: 5.0
+
+# Configuración de optimización
+optimization:
+  memory_threshold: 0.75
+  cpu_threshold: 0.80
+  gpu_threshold: 0.85
+  enable_adaptive: true
+  enable_mixed_precision: true
+  enable_gradient_clipping: true
+  gradient_clip_norm: 1.0
+
+# Configuración de monitoreo
+monitoring:
+  enable_real_time: true
+  enable_metrics_storage: true
+  metrics_storage_path: "./metrics_data"
+  alert_thresholds:
+    memory_critical: 0.95
+    cpu_critical: 0.90
+    gpu_critical: 0.95
+    memory_warning: 0.80
+    cpu_warning: 0.75
+    gpu_warning: 0.80
+
+# Configuración de memoria
+memory:
+  enable_profiling: true
+  enable_optimization: true
+  threshold_gpu: 0.75
+  threshold_cpu: 0.80
+  enable_garbage_collection: true
+  gc_interval: 10.0
+
+# Configuración de rendimiento
+performance:
+  enable_compile: true
+  enable_noise_injection: false
+  noise_scale: 1e-5
+  enable_checkpointing: true
+  checkpoint_interval: 100
+
+# Configuración de entrenamiento
+training:
+  batch_size: 16
+  effective_batch_size: 64
+  gradient_accumulation_steps: 4
+  learning_rate: 1e-4
+  weight_decay: 1e-5
+  enable_early_stopping: true
+  patience: 10
+
+# Configuración de logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "integration_system.log"
+  max_size: "10MB"
+  backup_count: 5
+
+# Configuración de alertas
+alerts:
+  enable_email: false
+  enable_webhook: false
+  webhook_url: ""
+  email_recipients: []
+  alert_cooldown: 300  # 5 minutos
+
+# Configuración de persistencia
+persistence:
+  enable_state_saving: true
+  state_file: "system_state.json"
+  save_interval: 60  # 1 minuto
+  max_backups: 10
+
+# Configuración de desarrollo
+development:
+  enable_debug_mode: false
+  enable_profiling: false
+  enable_mock_data: false
+  log_verbose: false

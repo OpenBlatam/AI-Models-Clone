@@ -1,18 +1,21 @@
-"""
-🛡️ GUARD CLAUSES - EARLY ERROR HANDLING & VALIDATION
-====================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Sistema de guard clauses para manejo temprano de errores y casos edge.
-Implementa el principio "fail fast" con validación al inicio de funciones.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import logging
 import time
 import asyncio
 from typing import (
-    Any, Optional, Union, Dict, List, Tuple, Callable, 
-    TypeVar, Generic, Protocol, runtime_checkable
-)
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from pathlib import Path
@@ -23,8 +26,22 @@ from functools import wraps
 import inspect
 import weakref
 from contextlib import contextmanager
-
 from .error_handling import (
+            import torch
+        import threading
+from typing import Any, List, Dict, Optional
+"""
+🛡️ GUARD CLAUSES - EARLY ERROR HANDLING & VALIDATION
+====================================================
+
+Sistema de guard clauses para manejo temprano de errores y casos edge.
+Implementa el principio "fail fast" con validación al inicio de funciones.
+"""
+
+    Any, Optional, Union, Dict, List, Tuple, Callable, 
+    TypeVar, Generic, Protocol, runtime_checkable
+)
+
     AIVideoError, ErrorCategory, ErrorSeverity, ErrorContext,
     ValidationError, MemoryError, SystemError, ConfigurationError,
     ModelLoadingError, VideoProcessingError, DataValidationError
@@ -71,7 +88,7 @@ def guard_validation(
     """Decorador para guard clauses de validación."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # Ejecutar validaciones al inicio
             for validator in validators:
                 try:
@@ -94,7 +111,7 @@ def guard_validation(
             return func(*args, **kwargs)
         
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Ejecutar validaciones al inicio
             for validator in validators:
                 try:
@@ -132,7 +149,7 @@ def guard_resources(
     """Decorador para guard clauses de recursos."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # Verificar recursos al inicio
             _check_memory(required_memory_mb, error_category)
             _check_disk_space(required_disk_gb, error_category)
@@ -141,7 +158,7 @@ def guard_resources(
             return func(*args, **kwargs)
         
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Verificar recursos al inicio
             _check_memory(required_memory_mb, error_category)
             _check_disk_space(required_disk_gb, error_category)
@@ -160,7 +177,7 @@ def guard_state(
     """Decorador para guard clauses de estado."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # Verificar estado al inicio
             if not state_checker(*args, **kwargs):
                 raise SystemError(
@@ -172,7 +189,7 @@ def guard_state(
             return func(*args, **kwargs)
         
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Verificar estado al inicio
             if asyncio.iscoroutinefunction(state_checker):
                 state_ok = await state_checker(*args, **kwargs)
@@ -322,7 +339,6 @@ class ResourceGuards:
     def check_gpu_memory(required_mb: float) -> bool:
         """Verificar memoria de GPU."""
         try:
-            import torch
             if torch.cuda.is_available():
                 gpu_memory = torch.cuda.memory_stats()
                 allocated = gpu_memory.get('allocated_bytes.all.current', 0) / (1024 * 1024)
@@ -345,7 +361,6 @@ class ResourceGuards:
     @staticmethod
     def check_thread_count(max_threads: int = 100) -> bool:
         """Verificar número de threads."""
-        import threading
         return threading.active_count() < max_threads
 
 # =============================================================================
@@ -355,7 +370,7 @@ class ResourceGuards:
 class StateGuards:
     """Guard clauses para estado del sistema."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._initialized = False
         self._processing = False
         self._models_loaded = set()
@@ -472,7 +487,7 @@ class SanityGuards:
 class GuardClauseManager:
     """Gestor centralizado de guard clauses."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.validation_guards = ValidationGuards()
         self.resource_guards = ResourceGuards()
         self.state_guards = StateGuards()

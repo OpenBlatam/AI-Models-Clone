@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Dict, List, Any, Optional
+from pydantic import BaseSettings, Field
+import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 ⚙️ ULTRA LANDING PAGE CONFIG - SETTINGS
 ======================================
@@ -6,9 +25,6 @@ Configuración completa para landing pages ultra-optimizadas
 con integración LangChain y configuraciones de performance.
 """
 
-from typing import Dict, List, Any, Optional
-from pydantic import BaseSettings, Field
-import os
 
 
 class UltraLandingPageSettings(BaseSettings):
@@ -86,7 +102,8 @@ class UltraLandingPageSettings(BaseSettings):
     allowed_file_types: List[str] = ["jpg", "jpeg", "png", "webp", "svg"]
     max_file_size_mb: int = 10
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_prefix = "LANDING_PAGE_"
 

@@ -1,16 +1,18 @@
-"""
-Refactored Main Application
-==========================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Clean Architecture FastAPI application with proper separation of concerns.
-Professional, maintainable, and production-ready implementation.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
 from contextlib import asynccontextmanager
 from typing import Dict, Any
-
 import structlog
 import uvicorn
 from fastapi import FastAPI, Request, HTTPException, status
@@ -19,9 +21,25 @@ from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
-
 from .config_refactored import config
 from .services_refactored import services
+    from .routers_refactored import (
+    import subprocess
+        from .schemas_refactored import ProductCreateRequest, AIDescriptionRequest
+        from .schemas_refactored import ProductSearchRequest
+    import sys
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Refactored Main Application
+==========================
+
+Clean Architecture FastAPI application with proper separation of concerns.
+Professional, maintainable, and production-ready implementation.
+"""
+
+
+
 
 # Configure structured logging
 structlog.configure(
@@ -48,7 +66,9 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """Request logging middleware with structured logging."""
     
     async def dispatch(self, request: Request, call_next):
-        start_time = time.time()
+        
+    """dispatch function."""
+start_time = time.time()
         
         # Log request
         logger.info("Request started", 
@@ -85,7 +105,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Security headers middleware."""
     
     async def dispatch(self, request: Request, call_next):
-        response = await call_next(request)
+        
+    """dispatch function."""
+response = await call_next(request)
         
         # Add security headers
         response.headers["X-Content-Type-Options"] = "nosniff"
@@ -103,12 +125,16 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
     """Simple rate limiting middleware (demo implementation)."""
     
     def __init__(self, app, requests_per_minute: int = 100):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.requests_per_minute = requests_per_minute
         self.client_requests: Dict[str, list] = {}
     
     async def dispatch(self, request: Request, call_next):
-        if not config.rate_limit_enabled:
+        
+    """dispatch function."""
+if not config.rate_limit_enabled:
             return await call_next(request)
         
         # Get client IP
@@ -236,7 +262,6 @@ def _setup_routers(app: FastAPI):
     """Setup application routers."""
     
     # Import routers (inline to avoid circular imports)
-    from .routers_refactored import (
         products_router,
         ai_router,
         health_router,
@@ -356,7 +381,6 @@ def run_development():
 
 def run_production():
     """Run production server with Gunicorn."""
-    import subprocess
     
     logger.info("Starting production server...")
     
@@ -399,7 +423,6 @@ async def demo_refactored_api():
         print("\n✅ Services initialized")
         
         # Test product creation
-        from .schemas_refactored import ProductCreateRequest, AIDescriptionRequest
         
         product_request = ProductCreateRequest(
             name="Refactored Widget Pro",
@@ -429,7 +452,6 @@ async def demo_refactored_api():
         print(f"   Services: {health.services}")
         
         # Test search
-        from .schemas_refactored import ProductSearchRequest
         
         search_request = ProductSearchRequest(query="widget", per_page=5)
         results = await product_service.search_products(search_request)
@@ -442,7 +464,6 @@ async def demo_refactored_api():
 
 
 if __name__ == "__main__":
-    import sys
     
     if len(sys.argv) > 1:
         command = sys.argv[1]

@@ -1,15 +1,34 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Dict, Any, List, Optional, Union
+from pydantic import BaseModel, Field, validator, root_validator
+from datetime import datetime
+import re
+from .models import (
+            import ipaddress
+            import ipaddress
+            import ipaddress
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Pydantic Schemas
 
 Validation and serialization schemas for the cybersecurity toolkit.
 """
 
-from typing import Dict, Any, List, Optional, Union
-from pydantic import BaseModel, Field, validator, root_validator
-from datetime import datetime
-import re
 
-from .models import (
     # Base Models
     BaseRequest, BaseResult, BaseConfig,
     
@@ -53,7 +72,7 @@ class ScanRequestSchema(BaseModel):
     scan_config: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Scan configuration")
     
     @validator('targets')
-    def validate_targets(cls, v):
+    def validate_targets(cls, v) -> Optional[Dict[str, Any]]:
         """Validate target format and count."""
         if len(v) > 1000:
             raise ValueError("Maximum 1000 targets allowed")
@@ -64,7 +83,7 @@ class ScanRequestSchema(BaseModel):
         return v
     
     @validator('ports')
-    def validate_ports(cls, v):
+    def validate_ports(cls, v) -> bool:
         """Validate port numbers."""
         if v:
             if len(v) > 65535:
@@ -79,13 +98,13 @@ class ScanRequestSchema(BaseModel):
     def _is_valid_ip(ip_str: str) -> bool:
         """Check if string is valid IP address."""
         try:
-            import ipaddress
             ipaddress.ip_address(ip_str)
             return True
         except ValueError:
             return False
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "scan_type": "port_scan",
@@ -107,14 +126,14 @@ class AttackRequestSchema(BaseModel):
     attack_config: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Attack configuration")
     
     @validator('target')
-    def validate_target(cls, v):
+    def validate_target(cls, v) -> Optional[Dict[str, Any]]:
         """Validate target format."""
         if not re.match(r'^[a-zA-Z0-9.-:]+$', v):
             raise ValueError(f"Invalid target format: {v}")
         return v
     
     @validator('credentials')
-    def validate_credentials(cls, v):
+    def validate_credentials(cls, v) -> bool:
         """Validate credentials format."""
         if v:
             required_fields = ['username', 'password']
@@ -123,7 +142,8 @@ class AttackRequestSchema(BaseModel):
                     raise ValueError(f"Missing required credential field: {field}")
         return v
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "attack_type": "brute_force",
@@ -148,14 +168,14 @@ class EnumerationRequestSchema(BaseModel):
     enumeration_config: Optional[Dict[str, Any]] = Field(default_factory=dict, description="Enumeration configuration")
     
     @validator('target')
-    def validate_target(cls, v):
+    def validate_target(cls, v) -> Optional[Dict[str, Any]]:
         """Validate target format."""
         if not re.match(r'^[a-zA-Z0-9.-]+$', v):
             raise ValueError(f"Invalid target format: {v}")
         return v
     
     @validator('ports')
-    def validate_ports(cls, v):
+    def validate_ports(cls, v) -> bool:
         """Validate port numbers."""
         if v:
             for port in v:
@@ -163,7 +183,8 @@ class EnumerationRequestSchema(BaseModel):
                     raise ValueError(f"Invalid port number: {port}")
         return v
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "enumeration_type": "port_enumeration",
@@ -187,13 +208,14 @@ class ReportRequestSchema(BaseModel):
     template: Optional[str] = Field(None, description="Report template to use")
     
     @validator('sections')
-    def validate_sections(cls, v):
+    def validate_sections(cls, v) -> bool:
         """Validate report sections."""
         if not v:
             v = [ReportSection.EXECUTIVE_SUMMARY, ReportSection.FINDINGS, ReportSection.RECOMMENDATIONS]
         return v
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "report_format": "html",
@@ -217,14 +239,14 @@ class CryptoRequestSchema(BaseModel):
     iterations: int = Field(default=100000, ge=1000, le=1000000, description="PBKDF2 iterations")
     
     @validator('data')
-    def validate_data(cls, v):
+    def validate_data(cls, v) -> bool:
         """Validate data is not empty."""
         if not v:
             raise ValueError("Data cannot be empty")
         return v
     
     @root_validator
-    def validate_operation_requirements(cls, values):
+    def validate_operation_requirements(cls, values) -> bool:
         """Validate operation-specific requirements."""
         operation = values.get('operation')
         algorithm = values.get('algorithm')
@@ -238,7 +260,8 @@ class CryptoRequestSchema(BaseModel):
         
         return values
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "operation": "hash",
@@ -256,13 +279,14 @@ class NetworkRequestSchema(BaseModel):
     retries: int = Field(default=3, ge=1, le=10, description="Number of retries")
     
     @validator('target')
-    def validate_target(cls, v):
+    def validate_target(cls, v) -> Optional[Dict[str, Any]]:
         """Validate target format."""
         if not re.match(r'^[a-zA-Z0-9.-:/]+$', v):
             raise ValueError(f"Invalid target format: {v}")
         return v
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "operation": "dns_lookup",
@@ -289,7 +313,8 @@ class ScanResponseSchema(BaseModel):
     timestamp: datetime = Field(..., description="Response timestamp")
     error_message: Optional[str] = Field(None, description="Error message if failed")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -323,7 +348,8 @@ class AttackResponseSchema(BaseModel):
     duration: float = Field(..., ge=0, description="Operation duration")
     error_message: Optional[str] = Field(None, description="Error message if failed")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -364,7 +390,8 @@ class EnumerationResponseSchema(BaseModel):
     duration: float = Field(..., ge=0, description="Operation duration")
     error_message: Optional[str] = Field(None, description="Error message if failed")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -402,7 +429,8 @@ class ReportResponseSchema(BaseModel):
     duration: float = Field(..., ge=0, description="Operation duration")
     error_message: Optional[str] = Field(None, description="Error message if failed")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -434,7 +462,8 @@ class CryptoResponseSchema(BaseModel):
     duration: float = Field(..., ge=0, description="Operation duration")
     error_message: Optional[str] = Field(None, description="Error message if failed")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -464,7 +493,8 @@ class NetworkResponseSchema(BaseModel):
     duration: float = Field(..., ge=0, description="Operation duration")
     error_message: Optional[str] = Field(None, description="Error message if failed")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -505,7 +535,8 @@ class ScannerConfigSchema(BaseModel):
     os_detection: bool = Field(default=False, description="Enable OS detection")
     script_scanning: bool = Field(default=False, description="Enable script scanning")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "name": "default_scanner",
@@ -535,7 +566,8 @@ class AttackerConfigSchema(BaseModel):
     payload_directory: Optional[str] = Field(None, description="Directory containing payloads")
     rate_limit: int = Field(default=10, ge=1, le=1000, description="Requests per second")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "name": "default_attacker",
@@ -565,7 +597,8 @@ class ReporterConfigSchema(BaseModel):
     include_screenshots: bool = Field(default=True, description="Include screenshots in reports")
     include_logs: bool = Field(default=True, description="Include logs in reports")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "name": "default_reporter",
@@ -595,7 +628,8 @@ class UtilsConfigSchema(BaseModel):
     temp_directory: str = Field(default="/tmp", description="Temporary directory")
     log_level: str = Field(default="INFO", regex="^(DEBUG|INFO|WARNING|ERROR|CRITICAL)$", description="Log level")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "name": "default_utils",
@@ -621,7 +655,7 @@ class TargetValidationSchema(BaseModel):
     target_type: str = Field(..., regex="^(ip|domain|url|network)$", description="Target type")
     
     @validator('target')
-    def validate_target_format(cls, v, values):
+    def validate_target_format(cls, v, values) -> Optional[Dict[str, Any]]:
         """Validate target format based on type."""
         target_type = values.get('target_type')
         
@@ -644,7 +678,6 @@ class TargetValidationSchema(BaseModel):
     def _is_valid_ip(ip_str: str) -> bool:
         """Check if string is valid IP address."""
         try:
-            import ipaddress
             ipaddress.ip_address(ip_str)
             return True
         except ValueError:
@@ -654,13 +687,13 @@ class TargetValidationSchema(BaseModel):
     def _is_valid_network(network_str: str) -> bool:
         """Check if string is valid network."""
         try:
-            import ipaddress
             ipaddress.ip_network(network_str, strict=False)
             return True
         except ValueError:
             return False
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "target": "192.168.1.1",
@@ -673,7 +706,8 @@ class PortValidationSchema(BaseModel):
     port: int = Field(..., ge=1, le=65535, description="Port number")
     protocol: str = Field(default="tcp", regex="^(tcp|udp)$", description="Protocol")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "port": 80,
@@ -688,13 +722,14 @@ class CredentialValidationSchema(BaseModel):
     domain: Optional[str] = Field(None, description="Domain (for Windows)")
     
     @validator('username')
-    def validate_username(cls, v):
+    def validate_username(cls, v) -> bool:
         """Validate username format."""
         if not re.match(r'^[a-zA-Z0-9._-]+$', v):
             raise ValueError("Username contains invalid characters")
         return v
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "username": "admin",
@@ -711,14 +746,15 @@ class PayloadValidationSchema(BaseModel):
     size_limit: int = Field(default=1048576, ge=1, le=10485760, description="Maximum payload size in bytes")
     
     @validator('content')
-    def validate_content_size(cls, v, values):
+    def validate_content_size(cls, v, values) -> bool:
         """Validate payload content size."""
         size_limit = values.get('size_limit', 1048576)
         if len(v.encode('utf-8')) > size_limit:
             raise ValueError(f"Payload content exceeds size limit of {size_limit} bytes")
         return v
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "payload_type": "sql_injection",
@@ -739,7 +775,8 @@ class JSONExportSchema(BaseModel):
     include_metadata: bool = Field(default=True, description="Include metadata")
     compression: bool = Field(default=False, description="Enable compression")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "data": {"key": "value"},
@@ -758,13 +795,14 @@ class CSVExportSchema(BaseModel):
     encoding: str = Field(default="utf-8", description="File encoding")
     
     @validator('delimiter')
-    def validate_delimiter(cls, v):
+    def validate_delimiter(cls, v) -> bool:
         """Validate CSV delimiter."""
         if len(v) != 1:
             raise ValueError("Delimiter must be a single character")
         return v
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "data": [{"name": "John", "age": 30}, {"name": "Jane", "age": 25}],
@@ -784,13 +822,14 @@ class XMLExportSchema(BaseModel):
     include_declaration: bool = Field(default=True, description="Include XML declaration")
     
     @validator('root_element')
-    def validate_root_element(cls, v):
+    def validate_root_element(cls, v) -> bool:
         """Validate root element name."""
         if not re.match(r'^[a-zA-Z_][a-zA-Z0-9_-]*$', v):
             raise ValueError("Invalid XML element name")
         return v
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "data": {"user": {"name": "John", "age": 30}},
@@ -810,7 +849,8 @@ class HTMLExportSchema(BaseModel):
     include_js: bool = Field(default=False, description="Include JavaScript")
     encoding: str = Field(default="utf-8", description="File encoding")
     
-    class Config:
+    @dataclass
+class Config:
         schema_extra = {
             "example": {
                 "data": {"title": "Report", "content": "Hello World"},

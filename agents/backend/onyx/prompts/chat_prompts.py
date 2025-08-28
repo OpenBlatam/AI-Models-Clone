@@ -1,6 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.prompts.constants import GENERAL_SEP_PAT
 from onyx.prompts.constants import QUESTION_PAT
 
+from the history that is relevant to provide the relevant context for the search query, \
+from the history that is relevant to provide the relevant context for the search query, \
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 REQUIRE_CITATION_STATEMENT = """
 Cite relevant statements INLINE using the format [1], [2], [3], etc. to reference the document number. \
 DO NOT provide any links following the citations. In other words, avoid using the format [1](https://example.com). \
@@ -269,7 +276,6 @@ QUERY_SEMANTIC_EXPANSION_WITH_HISTORY_PROMPT = """
 Following a previous message history, a user created a follow-up question/query.
 Please rephrase that question/query as a semantic query \
 that would be appropriate for a SEARCH ENGINE. Only use the information provided \
-from the history that is relevant to provide the relevant context for the search query, \
 meaning that the rephrased search query should be a suitable stand-alone search query.
 
 Note:
@@ -311,7 +317,6 @@ QUERY_KEYWORD_EXPANSION_WITH_HISTORY_PROMPT = """
 Following a previous message history, a user created a follow-up question/query.
 Please rephrase that question/query as a keyword query \
 that would be appropriate for a SEARCH ENGINE. Only use the information provided \
-from the history that is relevant to provide the relevant context for the search query, \
 meaning that the rephrased search query should be a suitable stand-alone search query.
 
 Here is the relevant previous message history:

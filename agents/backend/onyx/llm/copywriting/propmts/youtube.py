@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 YOUTUBE_AD_PROMPT = """
 You are an expert copywriter specializing in creating compelling YouTube ad copy. Your task is to create engaging and persuasive ad copy that will capture viewers' attention and drive action.
 

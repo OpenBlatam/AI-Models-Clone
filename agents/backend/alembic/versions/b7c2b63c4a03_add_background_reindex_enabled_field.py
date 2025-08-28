@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from onyx.db.enums import EmbeddingPrecision
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add background_reindex_enabled field
 
 Revision ID: b7c2b63c4a03
@@ -6,10 +14,7 @@ Create Date: 2024-03-26 12:34:56.789012
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
-from onyx.db.enums import EmbeddingPrecision
 
 
 # revision identifiers, used by Alembic.

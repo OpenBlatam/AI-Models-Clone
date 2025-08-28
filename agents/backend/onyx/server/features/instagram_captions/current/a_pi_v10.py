@@ -1,27 +1,20 @@
-from typing_extensions import Literal, TypedDict
-from typing import Any, List, Dict, Optional, Union, Tuple
-# Constants
-MAX_CONNECTIONS = 1000
-
-# Constants
-MAX_RETRIES = 100
-
-# Constants
-TIMEOUT_SECONDS = 60
-
+from typing import Any, List, Dict, Optional
 import time
 import logging
-from typing import Dict, Any, Optional
+import asyncio
 from fastapi import FastAPI, HTTPException, Request, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import uvicorn
+
 from .core_v10 import (
+    RefactoredConfig, RefactoredCaptionRequest, RefactoredCaptionResponse,
+    BatchRefactoredRequest, RefactoredUtils, Metrics, RefactoredAIEngine
+)
 from .ai_service_v10 import refactored_ai_service
-    import uvicorn
-from typing import Any, List, Dict, Optional
-import asyncio
+
 """
 Instagram Captions API v10.0 - Refactored Architecture
 
@@ -29,19 +22,12 @@ Complete API solution consolidating v9.0 ultra-advanced capabilities
 into a clean, maintainable, and deployable architecture.
 """
 
-
-# Import refactored components
-    config, RefactoredCaptionRequest, RefactoredCaptionResponse,
-    BatchRefactoredRequest, RefactoredUtils, metrics
-)
-
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Security
 security = HTTPBearer()
-
 
 # =============================================================================
 # MIDDLEWARE & SECURITY
@@ -57,14 +43,12 @@ def verify_api_key(credentials: HTTPAuthorizationCredentials = Depends(security)
         )
     return api_key
 
-
 async def rate_limit_middleware(request: Request, call_next):
     """Simple rate limiting middleware."""
     # In production, implement proper rate limiting with Redis/database
     response = await call_next(request)
     response.headers["X-RateLimit-Remaining"] = "9999"
     return response
-
 
 # =============================================================================
 # REFACTORED API APPLICATION
@@ -76,7 +60,10 @@ class RefactoredCaptionsAPI:
     with the simplicity and maintainability of refactored architecture.
     """
     
-    def __init__(self) -> Any:
+    def __init__(self) -> None:
+        self.config = RefactoredConfig()
+        self.metrics = Metrics()
+        self.ai_engine = RefactoredAIEngine(self.config)
         self.app = self._create_app()
         self._setup_middleware()
         self._setup_routes()
@@ -92,292 +79,212 @@ class RefactoredCaptionsAPI:
             openapi_url="/openapi.json"
         )
     
-    def _setup_middleware(self) -> Any:
+    def _setup_middleware(self) -> None:
         """Setup essential middleware stack."""
         
         # CORS
         self.app.add_middleware(
             CORSMiddleware,
-            allow_origins=["*"],
+            allow_origins=["*"],  # Configure appropriately for production
             allow_credentials=True,
             allow_methods=["*"],
-            allow_headers=["*"]
+            allow_headers=["*"],
         )
         
-        # Compression
+        # Gzip compression
         self.app.add_middleware(GZipMiddleware, minimum_size=1000)
         
-        # Custom middleware
+        # Rate limiting
         self.app.middleware("http")(rate_limit_middleware)
     
-    def _setup_routes(self) -> Any:
+    def _setup_routes(self) -> None:
         """Setup API routes."""
         
-        @self.app.post(
-            "/api/v10/generate",
-            response_model=RefactoredCaptionResponse,
-            summary="Generate Single Caption",
-            description="Generate a single Instagram caption with advanced AI analysis"
-        )
-        async def generate_single_caption(
+        @self.app.get("/", tags=["Root"])
+        async def root():
+            """Root endpoint with API information."""
+            return {
+                "message": "Instagram Captions API v10.0",
+                "version": self.config.API_VERSION,
+                "status": "running",
+                "docs": "/docs",
+                "health": "/health"
+            }
+        
+        @self.app.get("/health", tags=["Health"])
+        async def health_check():
+            """Health check endpoint."""
+            return {
+                "status": "healthy",
+                "timestamp": time.time(),
+                "version": self.config.API_VERSION,
+                "environment": self.config.ENVIRONMENT
+            }
+        
+        @self.app.post("/generate", tags=["Captions"], response_model=RefactoredCaptionResponse)
+        async def generate_caption(
             request: RefactoredCaptionRequest,
             api_key: str = Depends(verify_api_key)
-        ) -> RefactoredCaptionResponse:
-            """Generate a single caption with full advanced analysis."""
+        ):
+            """Generate a single Instagram caption."""
+            start_time = time.time()
             
             try:
-                logger.info(f"🎯 Single caption request from client: {request.client_id}")
-                
                 # Sanitize input
-                request.content_description = RefactoredUtils.sanitize_content(request.content_description)
+                request.text = RefactoredUtils.sanitize_text(request.text)
                 
                 # Generate caption
-                response = await refactored_ai_service.generate_single_caption(request)
+                response = await self.ai_engine.generate_caption(request)
+                
+                # Record metrics
+                processing_time = time.time() - start_time
+                self.metrics.record_request(True, processing_time)
                 
                 return response
                 
             except Exception as e:
-                logger.error(f"❌ Single caption generation failed: {e}")
+                logger.error(f"Error generating caption: {e}")
+                processing_time = time.time() - start_time
+                self.metrics.record_request(False, processing_time)
+                
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Caption generation failed: {str(e)}"
+                    detail=f"Failed to generate caption: {str(e)}"
                 )
         
-        @self.app.post(
-            "/api/v10/batch",
-            summary="Generate Batch Captions",
-            description="Generate multiple captions efficiently with batch processing"
-        )
+        @self.app.post("/generate/batch", tags=["Captions"])
         async def generate_batch_captions(
             batch_request: BatchRefactoredRequest,
             api_key: str = Depends(verify_api_key)
-        ) -> Dict[str, Any]:
-            """Generate multiple captions with advanced batch processing."""
+        ):
+            """Generate multiple Instagram captions in batch."""
+            start_time = time.time()
             
             try:
-                logger.info(f"📦 Batch request: {batch_request.batch_id} with {len(batch_request.requests)} items")
-                
-                # Sanitize all requests
+                results = []
                 for req in batch_request.requests:
-                    req.content_description = RefactoredUtils.sanitize_content(req.content_description)
+                    # Sanitize input
+                    req.text = RefactoredUtils.sanitize_text(req.text)
+                    
+                    # Generate caption
+                    response = await self.ai_engine.generate_caption(req)
+                    results.append(response)
                 
-                # Process batch
-                response = await refactored_ai_service.generate_batch_captions(batch_request)
+                # Record metrics
+                processing_time = time.time() - start_time
+                self.metrics.record_request(True, processing_time)
                 
-                return response
-                
-            except ValueError as ve:
-                logger.error(f"❌ Batch validation error: {ve}")
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail=str(ve)
-                )
-            except Exception as e:
-                logger.error(f"❌ Batch processing failed: {e}")
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Batch processing failed: {str(e)}"
-                )
-        
-        @self.app.get(
-            "/health",
-            summary="Health Check",
-            description="Comprehensive health check of the API and AI services"
-        )
-        async def health_check() -> Dict[str, Any]:
-            """Comprehensive health check."""
-            
-            try:
-                health_data = await refactored_ai_service.health_check()
-                
-                # Add API-specific health info
-                health_data.update({
-                    "api_status": "operational",
-                    "api_version": "10.0.0",
-                    "endpoints_available": [
-                        "/api/v10/generate",
-                        "/api/v10/batch", 
-                        "/health",
-                        "/metrics"
-                    ]
-                })
-                
-                return health_data
-                
-            except Exception as e:
-                logger.error(f"❌ Health check failed: {e}")
                 return {
-                    "api_status": "unhealthy",
-                    "error": str(e),
-                    "api_version": "10.0.0",
-                    "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+                    "batch_id": batch_request.batch_id,
+                    "total_requests": len(batch_request.requests),
+                    "results": results,
+                    "processing_time": processing_time
                 }
-        
-        @self.app.get(
-            "/metrics",
-            summary="Performance Metrics",
-            description="Get comprehensive performance metrics and statistics"
-        )
-        async def get_metrics() -> Dict[str, Any]:
-            """Get comprehensive performance metrics."""
-            
-            try:
-                # Get service metrics
-                service_metrics = metrics.get_metrics_summary()
-                
-                # Get AI engine status
-                ai_status = refactored_ai_service.stats
-                
-                # Combine metrics
-                combined_metrics = {
-                    "api_metrics": service_metrics,
-                    "service_stats": ai_status,
-                    "system_performance": {
-                        "grade": service_metrics["performance_grade"],
-                        "health_status": service_metrics["system_health"],
-                        "uptime_hours": round((time.time() - ai_status["service_started"]) / 3600, 2)
-                    },
-                    "capabilities": {
-                        "max_batch_size": config.MAX_BATCH_SIZE,
-                        "ai_workers": config.AI_WORKERS,
-                        "cache_size": config.CACHE_SIZE
-                    },
-                    "api_version": "10.0.0",
-                    "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
-                }
-                
-                return combined_metrics
                 
             except Exception as e:
-                logger.error(f"❌ Metrics retrieval failed: {e}")
+                logger.error(f"Error generating batch captions: {e}")
+                processing_time = time.time() - start_time
+                self.metrics.record_request(False, processing_time)
+                
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail=f"Failed to retrieve metrics: {str(e)}"
+                    detail=f"Failed to generate batch captions: {str(e)}"
                 )
         
-        @self.app.get(
-            "/api/v10/info",
-            summary="API Information",
-            description="Get detailed information about the API capabilities and features"
-        )
-        async async def get_api_info() -> Dict[str, Any]:
-            """Get comprehensive API information."""
-            
+        @self.app.get("/metrics", tags=["Monitoring"])
+        async def get_metrics(api_key: str = Depends(verify_api_key)):
+            """Get API metrics and statistics."""
+            return self.metrics.get_stats()
+        
+        @self.app.get("/config", tags=["Configuration"])
+        async def get_config(api_key: str = Depends(verify_api_key)):
+            """Get current configuration (non-sensitive)."""
             return {
-                "api_name": "Instagram Captions API v10.0",
-                "version": "10.0.0",
-                "architecture": "Refactored Ultra-Advanced",
-                "description": "Consolidated AI service with essential capabilities from v9.0",
-                
-                "key_features": [
-                    "🤖 Real Transformer Models (DistilGPT-2)",
-                    "⚡ JIT Optimization with Numba",
-                    "📊 Advanced Quality Analysis",
-                    "🏷️ Intelligent Hashtag Generation",
-                    "💾 Smart Caching System",
-                    "📈 Performance Monitoring",
-                    "🔄 Efficient Batch Processing",
-                    "🛡️ Robust Error Handling"
-                ],
-                
-                "api_endpoints": {
-                    "POST /api/v10/generate": "Generate single caption",
-                    "POST /api/v10/batch": "Generate multiple captions",
-                    "GET /health": "Health check",
-                    "GET /metrics": "Performance metrics",
-                    "GET /api/v10/info": "API information"
-                },
-                
-                "performance_specs": {
-                    "max_batch_size": config.MAX_BATCH_SIZE,
-                    "concurrent_workers": config.AI_WORKERS,
-                    "cache_capacity": config.CACHE_SIZE,
-                    "cache_ttl_seconds": config.CACHE_TTL
-                },
-                
-                "supported_styles": [
-                    "casual", "professional", "playful", "inspirational"
-                ],
-                
-                "supported_providers": [
-                    "huggingface", "openai", "fallback"
-                ],
-                
-                "refactoring_benefits": [
-                    "Simplified architecture from v9.0",
-                    "Essential libraries only (no 50+ dependencies)",
-                    "Better maintainability",
-                    "Easier deployment",
-                    "Improved performance",
-                    "Cleaner codebase"
-                ],
-                
-                "timestamp": time.strftime("%Y-%m-%d %H:%M:%S")
+                "api_version": self.config.API_VERSION,
+                "environment": self.config.ENVIRONMENT,
+                "ai_model": self.config.AI_MODEL_NAME,
+                "max_tokens": self.config.MAX_TOKENS,
+                "temperature": self.config.TEMPERATURE,
+                "cache_size": self.config.CACHE_SIZE,
+                "rate_limit_per_minute": self.config.RATE_LIMIT_PER_MINUTE
             }
-    
-    def get_app(self) -> FastAPI:
-        """Get the FastAPI application instance."""
-        return self.app
-
+        
+        @self.app.post("/ai-service/test", tags=["AI Service"])
+        async def test_ai_service(api_key: str = Depends(verify_api_key)):
+            """Test AI service functionality."""
+            try:
+                result = await refactored_ai_service.test_service()
+                return {"status": "success", "result": result}
+            except Exception as e:
+                logger.error(f"AI service test failed: {e}")
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail=f"AI service test failed: {str(e)}"
+                )
 
 # =============================================================================
-# APPLICATION INSTANCE
+# API INSTANCE
 # =============================================================================
 
-# Create refactored API instance
-refactored_api = RefactoredCaptionsAPI()
-app = refactored_api.get_app()
+# Create API instance
+api_instance = RefactoredCaptionsAPI()
+app = api_instance.app
 
+# =============================================================================
+# ERROR HANDLERS
+# =============================================================================
 
-# Startup event
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    """Global exception handler for unhandled errors."""
+    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    return JSONResponse(
+        status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        content={
+            "error": "Internal server error",
+            "detail": "An unexpected error occurred",
+            "timestamp": time.time()
+        }
+    )
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """HTTP exception handler."""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={
+            "error": exc.detail,
+            "status_code": exc.status_code,
+            "timestamp": time.time()
+        }
+    )
+
+# =============================================================================
+# STARTUP AND SHUTDOWN EVENTS
+# =============================================================================
+
 @app.on_event("startup")
 async def startup_event():
-    """Initialize the refactored API on startup."""
-    print("=" * 80)
-    print(f"🚀 {config.API_NAME}")
-    print("=" * 80)
-    print(f"🏗️  Architecture: Refactored (3 core modules)")
-    print(f"📦 Consolidates: v9.0 ultra-advanced → v10.0 simplified")
-    print(f"⚡ Performance: Essential libraries only")
-    print(f"🔧 Configuration: {config.AI_WORKERS} workers, {config.CACHE_SIZE} cache")
-    print(f"🤖 AI Model: {config.AI_MODEL}")
-    print("=" * 80)
-    print("✨ REFACTORING ACHIEVEMENTS:")
-    print("   • Simplified from 50+ libraries to essential 10-15")
-    print("   • Maintained all advanced capabilities")
-    print("   • Improved deployment and maintenance")
-    print("   • Clean, readable architecture")
-    print("=" * 80)
+    """Application startup event."""
+    logger.info("🚀 Instagram Captions API v10.0 starting up...")
+    logger.info(f"📊 Environment: {api_instance.config.ENVIRONMENT}")
+    logger.info(f"🔧 AI Model: {api_instance.config.AI_MODEL_NAME}")
+    logger.info(f"🌐 Server: {api_instance.config.HOST}:{api_instance.config.PORT}")
 
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Application shutdown event."""
+    logger.info("🛑 Instagram Captions API v10.0 shutting down...")
 
-# Export the app
-__all__ = ['app', 'refactored_api']
-
+# =============================================================================
+# MAIN ENTRY POINT
+# =============================================================================
 
 if __name__ == "__main__":
-    
-    print("=" * 80)
-    print(f"🚀 {config.API_NAME}")
-    print("=" * 80)
-    print("🏗️  REFACTORED ARCHITECTURE v10.0:")
-    print("   • core_v10.py        - Configuration, schemas, AI engine")
-    print("   • ai_service_v10.py  - Consolidated AI service")
-    print("   • api_v10.py         - API endpoints + middleware")
-    print("=" * 80)
-    print("✨ REFACTORING SUCCESS:")
-    print("   • 3 modules (vs complex v9.0 structure)")
-    print("   • Essential libraries only")
-    print("   • Maintained advanced features")
-    print("   • Better performance & maintainability")
-    print("=" * 80)
-    print(f"🌐 Server: http://{config.HOST}:{config.PORT}")
-    print(f"📚 Docs: http://{config.HOST}:{config.PORT}/docs")
-    print("=" * 80)
-    
     uvicorn.run(
         "api_v10:app",
-        host=config.HOST,
-        port=config.PORT,
-        log_level="info",
-        access_log=False
+        host=api_instance.config.HOST,
+        port=api_instance.config.PORT,
+        reload=api_instance.config.ENVIRONMENT == "development",
+        log_level="info"
     ) 

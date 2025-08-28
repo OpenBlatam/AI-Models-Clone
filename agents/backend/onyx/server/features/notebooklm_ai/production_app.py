@@ -1,10 +1,13 @@
-#!/usr/bin/env python3
-"""
-NotebookLM AI - Production Application v7.0
-🚀 Ultra-optimized production-ready application with enterprise-grade features
-⚡ Maximum performance, security, and scalability
-🎯 Clean architecture with separation of concerns
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -21,8 +24,6 @@ from typing import Dict, Any, Optional, List, Union, AsyncGenerator
 from datetime import datetime, timedelta
 from functools import wraps
 from pathlib import Path
-
-# FastAPI and web framework
 import uvicorn
 from fastapi import FastAPI, Request, Response, HTTPException, Depends, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,41 +35,53 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel, Field, validator
 import pydantic
-
-# Monitoring and observability
 import prometheus_client
 from prometheus_client import Counter, Histogram, Gauge, Summary, generate_latest
 import structlog
 from structlog import get_logger
+    import orjson
+    import uvloop
+    import aioredis
+    import torch
+    import transformers
+                import redis as sync_redis
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+NotebookLM AI - Production Application v7.0
+🚀 Ultra-optimized production-ready application with enterprise-grade features
+⚡ Maximum performance, security, and scalability
+🎯 Clean architecture with separation of concerns
+"""
+
+
+# FastAPI and web framework
+
+# Monitoring and observability
 
 # Performance libraries
 try:
-    import orjson
     ORJSON_AVAILABLE = True
 except ImportError:
     ORJSON_AVAILABLE = False
 
 try:
-    import uvloop
     UVLOOP_AVAILABLE = True
 except ImportError:
     UVLOOP_AVAILABLE = False
 
 try:
-    import aioredis
     AIOREDIS_AVAILABLE = True
 except ImportError:
     AIOREDIS_AVAILABLE = False
 
 # ML/AI libraries
 try:
-    import torch
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
 
 try:
-    import transformers
     TRANSFORMERS_AVAILABLE = True
 except ImportError:
     TRANSFORMERS_AVAILABLE = False
@@ -187,7 +200,9 @@ class HealthResponse(BaseModel):
 # Core domain models
 class User:
     def __init__(self, id: str, username: str, email: str, is_active: bool = True):
-        self.id = id
+        
+    """__init__ function."""
+self.id = id
         self.username = username
         self.email = email
         self.is_active = is_active
@@ -196,7 +211,9 @@ class User:
 
 class Notebook:
     def __init__(self, id: str, title: str, user_id: str, description: str = "", is_public: bool = False):
-        self.id = id
+        
+    """__init__ function."""
+self.id = id
         self.title = title
         self.user_id = user_id
         self.description = description
@@ -207,7 +224,9 @@ class Notebook:
 
 class Document:
     def __init__(self, id: str, title: str, content: str, notebook_id: str, document_type: str = "txt"):
-        self.id = id
+        
+    """__init__ function."""
+self.id = id
         self.title = title
         self.content = content
         self.notebook_id = notebook_id
@@ -220,11 +239,13 @@ class RedisManager:
     """Redis connection manager with connection pooling."""
     
     def __init__(self, redis_url: str):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.redis = None
         self._lock = asyncio.Lock()
     
-    async def connect(self):
+    async def connect(self) -> Any:
         """Connect to Redis."""
         if AIOREDIS_AVAILABLE:
             try:
@@ -243,7 +264,6 @@ class RedisManager:
         else:
             logger.warning("aioredis not available, using sync redis")
             try:
-                import redis as sync_redis
                 self.redis = sync_redis.from_url(redis_url, decode_responses=True)
                 logger.info("Sync Redis connected successfully")
             except Exception as e:
@@ -298,7 +318,9 @@ class CacheManager:
     """Multi-level cache manager with memory and Redis."""
     
     def __init__(self, redis_manager: RedisManager):
-        self.redis = redis_manager
+        
+    """__init__ function."""
+self.redis = redis_manager
         self.memory_cache = {}
         self.cache_ttl = CACHE_TTL
         self.max_memory_size = MEMORY_CACHE_SIZE
@@ -385,7 +407,9 @@ class RateLimiter:
     """Rate limiter using Redis with sliding window."""
     
     def __init__(self, redis_manager: RedisManager):
-        self.redis = redis_manager
+        
+    """__init__ function."""
+self.redis = redis_manager
         self.window = RATE_LIMIT_WINDOW
         self.max_requests = RATE_LIMIT_MAX_REQUESTS
     
@@ -434,7 +458,9 @@ class AIEngine:
     """AI engine with multiple model support and caching."""
     
     def __init__(self, cache_manager: CacheManager):
-        self.cache = cache_manager
+        
+    """__init__ function."""
+self.cache = cache_manager
         self.model_name = AI_MODEL_NAME
         self.max_tokens = AI_MAX_TOKENS
         self.temperature = AI_TEMPERATURE
@@ -528,7 +554,9 @@ class NotebookService:
     """Notebook service with business logic."""
     
     def __init__(self, cache_manager: CacheManager, ai_engine: AIEngine):
-        self.cache = cache_manager
+        
+    """__init__ function."""
+self.cache = cache_manager
         self.ai_engine = ai_engine
         self.notebooks = {}  # In-memory storage (replace with database)
         self.documents = {}  # In-memory storage (replace with database)
@@ -998,7 +1026,9 @@ async def stream_query(
     ai_engine = app.state.ai_engine
     
     async def generate_response():
-        async for chunk in ai_engine.generate_streaming_response(
+        
+    """generate_response function."""
+async for chunk in ai_engine.generate_streaming_response(
             query=query_data.query,
             context=query_data.context
         ):

@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import os
+import sys
+import logging
+import time
+from typing import List, Dict, Optional, Tuple, Any
+import numpy as np
+import torch
+import torch.nn as nn
+import torch.optim as optim
+import gradio as gr
+from PIL import Image, ImageDraw, ImageFont
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+from production_code import MultiGPUTrainer, TrainingConfiguration
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Accessibility-Focused Interfaces
@@ -13,21 +31,9 @@ This module provides interfaces designed with accessibility in mind:
 - Simplified layouts for cognitive accessibility
 """
 
-import os
-import sys
-import logging
-import time
-from typing import List, Dict, Optional, Tuple, Any
-import numpy as np
-import torch
-import gradio as gr
-from PIL import Image, ImageDraw, ImageFont
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 
 # Add the current directory to the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
-from production_code import MultiGPUTrainer, TrainingConfiguration
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -37,7 +43,7 @@ logger = logging.getLogger(__name__)
 class AccessibilityInterfaces:
     """Accessibility-focused interfaces for inclusive AI experiences"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = TrainingConfiguration(
             enable_gradio_demo=True,
             gradio_port=7864,
@@ -288,7 +294,7 @@ class AccessibilityInterfaces:
     def create_keyboard_navigation_interface(self) -> gr.Interface:
         """Create interface optimized for keyboard navigation"""
         
-        def process_request(request_type: str, content: str) -> Tuple[str, str]:
+        async def process_request(request_type: str, content: str) -> Tuple[str, str]:
             """Process request with keyboard-friendly feedback"""
             try:
                 if request_type == 'text':
@@ -714,5 +720,6 @@ def main():
     interfaces.launch_accessibility_showcase(port=7864, share=False)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

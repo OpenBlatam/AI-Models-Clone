@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import threading
 import time
 from typing import Any
@@ -14,6 +22,9 @@ from onyx.connectors.slack.utils import ONYX_SLACK_LOCK_TOTAL_BLOCKING_TIMEOUT
 from onyx.connectors.slack.utils import ONYX_SLACK_LOCK_TTL
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -38,7 +49,7 @@ class OnyxSlackWebClient(WebClient):
         self.num_requests: int = 0
         self._lock = threading.Lock()
 
-    def _perform_urllib_http_request(
+    async def _perform_urllib_http_request(
         self, *, url: str, args: Dict[str, Dict[str, Any]]
     ) -> Dict[str, Any]:
         """By locking around the base class method, we ensure that both the delay from
@@ -85,7 +96,7 @@ class OnyxSlackWebClient(WebClient):
 
         return result
 
-    def _perform_urllib_http_request_internal(
+    async def _perform_urllib_http_request_internal(
         self,
         url: str,
         req: Request,

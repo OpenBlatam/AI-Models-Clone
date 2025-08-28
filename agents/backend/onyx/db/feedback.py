@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from datetime import datetime
 from datetime import timezone
 from uuid import UUID
@@ -29,10 +34,13 @@ from onyx.db.models import UserGroup__ConnectorCredentialPair
 from onyx.db.models import UserRole
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
-def _fetch_db_doc_by_id(doc_id: str, db_session: Session) -> DbDocument:
+async def _fetch_db_doc_by_id(doc_id: str, db_session: Session) -> DbDocument:
     stmt = select(DbDocument).where(DbDocument.id == doc_id)
     result = db_session.execute(stmt)
     doc = result.scalar_one_or_none()
@@ -107,7 +115,7 @@ def _add_user_filters(
     return stmt.where(where_clause)
 
 
-def fetch_docs_ranked_by_boost_for_user(
+async def fetch_docs_ranked_by_boost_for_user(
     db_session: Session,
     user: User | None,
     ascending: bool = False,

@@ -1,6 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import base64
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def get_image_type_from_bytes(raw_b64_bytes: bytes) -> str:
     magic_number = raw_b64_bytes[:4]
 

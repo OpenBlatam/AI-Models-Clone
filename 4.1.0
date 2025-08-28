@@ -1,0 +1,6 @@
+Collecting line-profiler
+  Downloading line_profiler-5.0.0-cp311-cp311-win_amd64.whl.metadata (31 kB)
+Downloading line_profiler-5.0.0-cp311-cp311-win_amd64.whl (462 kB)
+   ---------------------------------------- 463.0/463.0 kB 3.6 MB/s eta 0:00:00
+Installing collected packages: line-profiler
+Successfully installed line-profiler-5.0.0

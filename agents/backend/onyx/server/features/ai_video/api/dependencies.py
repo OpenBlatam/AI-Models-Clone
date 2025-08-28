@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from fastapi import Depends, Request, HTTPException, status
+from .video_service import video_service, VideoService
+        import time
+    import logging
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🚀 FASTAPI DEPENDENCIES - AI VIDEO SYSTEM
 =========================================
@@ -5,8 +22,6 @@
 Dependency injection functions for FastAPI endpoints.
 """
 
-from fastapi import Depends, Request, HTTPException, status
-from .video_service import video_service, VideoService
 
 # ============================================================================
 # SERVICE DEPENDENCIES
@@ -124,7 +139,9 @@ class RateLimiter:
     """Simple rate limiter for API endpoints."""
     
     def __init__(self, max_requests: int = 100, window_seconds: int = 3600):
-        self.max_requests = max_requests
+        
+    """__init__ function."""
+self.max_requests = max_requests
         self.window_seconds = window_seconds
         self.requests = {}
     
@@ -138,7 +155,6 @@ class RateLimiter:
         Returns:
             bool: True if request is allowed
         """
-        import time
         current_time = time.time()
         
         if user_id not in self.requests:
@@ -195,7 +211,6 @@ async def log_request(request: Request, current_user: dict = Depends(get_current
     Returns:
         dict: Request logging information
     """
-    import logging
     
     logger = logging.getLogger(__name__)
     

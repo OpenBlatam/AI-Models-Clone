@@ -1,13 +1,17 @@
-"""
-Integrated API Models - Onyx Integration
-Enhanced models for integrated API with advanced features and proper error handling.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, List, Optional, Union, Any, TypeVar, Generic
 from datetime import datetime
 import logging
 from pydantic import Field, validator, root_validator, ValidationError as PydanticValidationError
 from ...utils.base_model import OnyxBaseModel
 from ..utils.error_system import (
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Integrated API Models - Onyx Integration
+Enhanced models for integrated API with advanced features and proper error handling.
+"""
     error_factory,
     ErrorContext,
     ValidationError,
@@ -346,7 +350,7 @@ class IntegratedRequest(OnyxBaseModel):
     search_fields = ["metadata"]
     
     @root_validator
-    def validate_request_types(cls, values: Dict[str, Any]) -> Dict[str, Any]:
+    async def validate_request_types(cls, values: Dict[str, Any]) -> Dict[str, Any]:
         """Validate that at least one request type is provided with user-friendly error messages."""
         request_types = [
             "document_request",

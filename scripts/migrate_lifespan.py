@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-"""
-Lifespan Migration Script
-Automatically migrates FastAPI applications from @app.on_event() decorators
-to modern lifespan context managers.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import ast
 import os
 import re
@@ -13,6 +8,18 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Optional, Set
 import argparse
 import logging
+from typing import AsyncGenerator
+from fastapi import FastAPI
+import logging
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Lifespan Migration Script
+Automatically migrates FastAPI applications from @app.on_event() decorators
+to modern lifespan context managers.
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -22,7 +29,9 @@ class LifespanMigrator:
     """Migrates FastAPI apps from app.on_event() to lifespan context managers."""
     
     def __init__(self, target_dir: str):
-        self.target_dir = Path(target_dir)
+        
+    """__init__ function."""
+self.target_dir = Path(target_dir)
         self.migration_stats = {
             'files_processed': 0,
             'files_migrated': 0,
@@ -48,7 +57,15 @@ class LifespanMigrator:
         """Parse a Python file and return the AST."""
         try:
             with open(file_path, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             return ast.parse(content)
         except Exception as e:
             logger.error(f"Failed to parse {file_path}: {e}")
@@ -60,10 +77,10 @@ class LifespanMigrator:
         events = []
         
         class OnEventVisitor(ast.NodeVisitor):
-            def __init__(self):
+            def __init__(self) -> Any:
                 self.events = []
             
-            def visit_FunctionDef(self, node):
+            def visit_FunctionDef(self, node) -> Any:
                 # Check if function has decorators
                 for decorator in node.decorator_list:
                     if isinstance(decorator, ast.Call):
@@ -193,9 +210,6 @@ class LifespanMigrator:
     def generate_imports(self) -> str:
         """Generate necessary imports for lifespan."""
         return """from contextlib import asynccontextmanager
-from typing import AsyncGenerator
-from fastapi import FastAPI
-import logging
 
 logger = logging.getLogger(__name__)"""
     
@@ -210,6 +224,10 @@ logger = logging.getLogger(__name__)"""
         
         # Read source lines for code extraction
         with open(file_path, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             source_lines = f.readlines()
         
         # Find on_event decorators
@@ -229,7 +247,15 @@ logger = logging.getLogger(__name__)"""
         
         # Read the original file
         with open(file_path, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         # Generate new content
         new_content = self.migrate_content(content, startup_events, shutdown_events, source_lines)
@@ -237,11 +263,27 @@ logger = logging.getLogger(__name__)"""
         # Write backup
         backup_path = file_path.with_suffix('.py.backup')
         with open(backup_path, 'w', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         # Write migrated content
         with open(file_path, 'w', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(new_content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         logger.info(f"Migrated {file_path} (backup saved to {backup_path})")
         return True
@@ -379,5 +421,6 @@ def main():
         if stats['errors']:
             sys.exit(1)
 
-if __name__ == '__main__':
+match __name__:
+    case '__main__':
     main() 

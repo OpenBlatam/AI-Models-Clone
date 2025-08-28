@@ -1,6 +1,11 @@
-"""
-Tests for Evaluation Module
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 import torch
 import numpy as np
@@ -10,24 +15,30 @@ from unittest.mock import Mock, patch, MagicMock
 import tempfile
 import os
 from pathlib import Path
-
 from ..evaluation import (
+from ..models import BaseMessageModel, ModelConfig
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Tests for Evaluation Module
+"""
+
     ModelEvaluator,
     EvaluationManager
 )
-from ..models import BaseMessageModel, ModelConfig
 
 class MockDataset(Dataset):
     """Mock dataset for testing."""
     
-    def __init__(self, size=100, task_type="generation"):
+    def __init__(self, size=100, task_type="generation") -> Any:
         self.size = size
         self.task_type = task_type
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return self.size
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         if self.task_type == "generation":
             return {
                 'original_message': f'Prompt {idx}',
@@ -52,21 +63,21 @@ class MockDataset(Dataset):
 class MockModel(BaseMessageModel):
     """Mock model for testing."""
     
-    def __init__(self, config, task_type="generation"):
+    def __init__(self, config, task_type="generation") -> Any:
         super().__init__(config)
         self.task_type = task_type
         self.linear = torch.nn.Linear(10, 1000)
     
-    def forward(self, input_ids, attention_mask=None):
+    def forward(self, input_ids, attention_mask=None) -> Any:
         batch_size, seq_len = input_ids.shape
         return type('obj', (object,), {
             'logits': self.linear(input_ids.float())
         })
     
-    def generate(self, prompt, **kwargs):
+    def generate(self, prompt, **kwargs) -> Any:
         return f"Generated response for: {prompt}"
     
-    def classify(self, text):
+    def classify(self, text) -> Any:
         return {
             "negative": 0.1,
             "neutral": 0.2,
@@ -75,13 +86,13 @@ class MockModel(BaseMessageModel):
             "very_negative": 0.1
         }
     
-    def load_model(self, path):
+    def load_model(self, path) -> Any:
         pass
 
 class TestModelEvaluator:
     """Test ModelEvaluator class."""
     
-    def test_evaluator_initialization(self):
+    def test_evaluator_initialization(self) -> Any:
         """Test ModelEvaluator initialization."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -95,7 +106,7 @@ class TestModelEvaluator:
         assert evaluator.true_labels == []
         assert evaluator.confidence_scores == []
     
-    def test_evaluate_model_generation(self):
+    def test_evaluate_model_generation(self) -> Any:
         """Test generation task evaluation."""
         config = ModelConfig(model_name="test")
         model = MockModel(config, task_type="generation")
@@ -128,7 +139,7 @@ class TestModelEvaluator:
         assert 'total_generation_time' in metrics
         assert 'samples_per_second' in metrics
     
-    def test_evaluate_model_classification(self):
+    def test_evaluate_model_classification(self) -> Any:
         """Test classification task evaluation."""
         config = ModelConfig(model_name="test")
         model = MockModel(config, task_type="classification")
@@ -157,7 +168,7 @@ class TestModelEvaluator:
         assert 'class_recall' in metrics
         assert 'class_f1' in metrics
     
-    def test_evaluate_model_regression(self):
+    def test_evaluate_model_regression(self) -> Any:
         """Test regression task evaluation."""
         config = ModelConfig(model_name="test")
         model = MockModel(config, task_type="regression")
@@ -183,7 +194,7 @@ class TestModelEvaluator:
         assert 'r2_score' in metrics
         assert 'correlation' in metrics
     
-    def test_evaluate_model_invalid_task_type(self):
+    def test_evaluate_model_invalid_task_type(self) -> Any:
         """Test evaluation with invalid task type."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -196,7 +207,7 @@ class TestModelEvaluator:
         with pytest.raises(ValueError, match="Unknown task type"):
             evaluator.evaluate_model(test_loader, task_type="invalid")
     
-    def test_calculate_generation_metrics(self):
+    def test_calculate_generation_metrics(self) -> Any:
         """Test generation metrics calculation."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -229,7 +240,7 @@ class TestModelEvaluator:
         assert 0 <= metrics['unique_ratio'] <= 1
         assert 0 <= metrics['coherence_score'] <= 1
     
-    def test_calculate_classification_metrics(self):
+    def test_calculate_classification_metrics(self) -> Any:
         """Test classification metrics calculation."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -255,7 +266,7 @@ class TestModelEvaluator:
         assert metrics['recall'] == 1.0
         assert metrics['f1_score'] == 1.0
     
-    def test_calculate_regression_metrics(self):
+    def test_calculate_regression_metrics(self) -> Any:
         """Test regression metrics calculation."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -280,7 +291,7 @@ class TestModelEvaluator:
         assert metrics['r2_score'] == 1.0
         assert metrics['correlation'] == 1.0
     
-    def test_calculate_bleu_score(self):
+    def test_calculate_bleu_score(self) -> Any:
         """Test BLEU score calculation."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -295,7 +306,7 @@ class TestModelEvaluator:
         assert isinstance(bleu_score, float)
         assert 0 <= bleu_score <= 1
     
-    def test_calculate_coherence_score(self):
+    def test_calculate_coherence_score(self) -> Any:
         """Test coherence score calculation."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -313,7 +324,7 @@ class TestModelEvaluator:
         assert isinstance(coherence_score, float)
         assert 0 <= coherence_score <= 1
     
-    def test_move_batch_to_device(self):
+    def test_move_batch_to_device(self) -> Any:
         """Test batch device movement."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -334,7 +345,7 @@ class TestModelEvaluator:
         assert device_batch['labels'].device == torch.device("cpu")
         assert device_batch['text'] == 'test'  # Non-tensor unchanged
     
-    def test_generate_evaluation_report(self):
+    def test_generate_evaluation_report(self) -> Any:
         """Test evaluation report generation."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -364,7 +375,7 @@ class TestModelEvaluator:
         assert 'avg_generated_length' in report
         assert 'bleu_score' in report
     
-    def test_generate_evaluation_report_with_output_path(self):
+    def test_generate_evaluation_report_with_output_path(self) -> Any:
         """Test evaluation report generation with file output."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -389,7 +400,7 @@ class TestModelEvaluator:
             assert os.path.exists(output_path)
             assert isinstance(report, str)
     
-    def test_generate_evaluation_report_no_results(self):
+    def test_generate_evaluation_report_no_results(self) -> Any:
         """Test evaluation report generation without results."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -399,7 +410,7 @@ class TestModelEvaluator:
         with pytest.raises(ValueError, match="No evaluation results available"):
             evaluator.generate_evaluation_report()
     
-    def test_create_visualizations(self):
+    def test_create_visualizations(self) -> Any:
         """Test visualization creation."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -423,7 +434,7 @@ class TestModelEvaluator:
             plots_dir = Path(temp_dir) / "plots"
             assert plots_dir.exists()
     
-    def test_create_visualizations_no_results(self):
+    def test_create_visualizations_no_results(self) -> Any:
         """Test visualization creation without results."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -436,7 +447,7 @@ class TestModelEvaluator:
 class TestEvaluationManager:
     """Test EvaluationManager class."""
     
-    def test_evaluation_manager_initialization(self):
+    def test_evaluation_manager_initialization(self) -> Any:
         """Test EvaluationManager initialization."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -446,7 +457,7 @@ class TestEvaluationManager:
         assert manager.evaluator is not None
         assert isinstance(manager.evaluator, ModelEvaluator)
     
-    def test_run_comprehensive_evaluation(self):
+    def test_run_comprehensive_evaluation(self) -> Any:
         """Test comprehensive evaluation pipeline."""
         config = ModelConfig(model_name="test")
         model = MockModel(config, task_type="generation")
@@ -474,7 +485,7 @@ class TestEvaluationManager:
             assert os.path.exists(os.path.join(temp_dir, "evaluation_results.json"))
             assert os.path.exists(os.path.join(temp_dir, "plots"))
     
-    def test_run_comprehensive_evaluation_classification(self):
+    def test_run_comprehensive_evaluation_classification(self) -> Any:
         """Test comprehensive evaluation for classification."""
         config = ModelConfig(model_name="test")
         model = MockModel(config, task_type="classification")
@@ -497,7 +508,7 @@ class TestEvaluationManager:
             assert 'predictions' in results
             assert 'true_labels' in results
     
-    def test_run_comprehensive_evaluation_regression(self):
+    def test_run_comprehensive_evaluation_regression(self) -> Any:
         """Test comprehensive evaluation for regression."""
         config = ModelConfig(model_name="test")
         model = MockModel(config, task_type="regression")
@@ -523,7 +534,7 @@ class TestEvaluationManager:
 class TestEvaluationEdgeCases:
     """Test edge cases in evaluation."""
     
-    def test_evaluation_with_empty_dataset(self):
+    def test_evaluation_with_empty_dataset(self) -> Any:
         """Test evaluation with empty dataset."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -540,7 +551,7 @@ class TestEvaluationEdgeCases:
         assert 'metrics' in results
         # Should handle empty dataset gracefully
     
-    def test_evaluation_with_single_sample(self):
+    def test_evaluation_with_single_sample(self) -> Any:
         """Test evaluation with single sample."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -557,7 +568,7 @@ class TestEvaluationEdgeCases:
         assert 'metrics' in results
         assert len(results['generated_texts']) == 1
     
-    def test_evaluation_with_missing_labels(self):
+    def test_evaluation_with_missing_labels(self) -> Any:
         """Test evaluation with missing labels."""
         config = ModelConfig(model_name="test")
         model = MockModel(config, task_type="classification")
@@ -566,7 +577,7 @@ class TestEvaluationEdgeCases:
         
         # Create dataset without labels
         class DatasetWithoutLabels(MockDataset):
-            def __getitem__(self, idx):
+            def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
                 return {
                     'input_ids': torch.randint(0, 1000, (10,)),
                     'attention_mask': torch.ones(10),
@@ -582,16 +593,16 @@ class TestEvaluationEdgeCases:
         assert 'metrics' in results
         # Should handle missing labels gracefully
     
-    def test_evaluation_with_model_errors(self):
+    def test_evaluation_with_model_errors(self) -> Any:
         """Test evaluation with model errors."""
         config = ModelConfig(model_name="test")
         
         # Create model that raises errors
         class ErrorModel(MockModel):
-            def generate(self, prompt, **kwargs):
+            def generate(self, prompt, **kwargs) -> Any:
                 raise Exception("Generation failed")
             
-            def classify(self, text):
+            def classify(self, text) -> Any:
                 raise Exception("Classification failed")
         
         model = ErrorModel(config, task_type="generation")
@@ -609,7 +620,7 @@ class TestEvaluationEdgeCases:
 class TestEvaluationMetrics:
     """Test specific evaluation metrics."""
     
-    def test_bleu_score_perfect_match(self):
+    def test_bleu_score_perfect_match(self) -> Any:
         """Test BLEU score with perfect matches."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -624,7 +635,7 @@ class TestEvaluationMetrics:
         # Perfect matches should give high BLEU score
         assert bleu_score > 0.5
     
-    def test_bleu_score_no_match(self):
+    def test_bleu_score_no_match(self) -> Any:
         """Test BLEU score with no matches."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -639,7 +650,7 @@ class TestEvaluationMetrics:
         # No matches should give low BLEU score
         assert bleu_score < 0.5
     
-    def test_coherence_score_varied_texts(self):
+    def test_coherence_score_varied_texts(self) -> Any:
         """Test coherence score with varied text lengths."""
         config = ModelConfig(model_name="test")
         model = MockModel(config)
@@ -657,5 +668,6 @@ class TestEvaluationMetrics:
         assert isinstance(coherence_score, float)
         assert 0 <= coherence_score <= 1
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__]) 

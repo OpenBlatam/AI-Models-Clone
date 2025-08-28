@@ -1,12 +1,39 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from functools import lru_cache
 
 import jwt
 import requests
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from fastapi import Depends
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from fastapi import HTTPException
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from fastapi import Request
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from fastapi import status
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from jwt import decode as jwt_decode
 from jwt import InvalidTokenError
 from jwt import PyJWTError
@@ -28,16 +55,24 @@ from onyx.db.models import User
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
 @lru_cache()
-def get_public_key() -> str | None:
+async def get_public_key() -> str | None:
     if JWT_PUBLIC_KEY_URL is None:
         logger.error("JWT_PUBLIC_KEY_URL is not set")
         return None
 
     response = requests.get(JWT_PUBLIC_KEY_URL)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     response.raise_for_status()
     return response.text
 
@@ -77,12 +112,22 @@ def verify_auth_setting() -> None:
 
 async def optional_user_(
     request: Request,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     user: User | None,
     async_db_session: AsyncSession,
 ) -> User | None:
     # Check if the user has a session cookie from SAML
     if AUTH_TYPE == AuthType.SAML:
         saved_cookie = extract_hashed_cookie(request)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
         if saved_cookie:
             saml_account = await get_saml_account(
@@ -93,6 +138,11 @@ async def optional_user_(
     # If user is still None, check for JWT in Authorization header
     if user is None and JWT_PUBLIC_KEY_URL is not None:
         auth_header = request.headers.get("Authorization")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         if auth_header and auth_header.startswith("Bearer "):
             token = auth_header[len("Bearer ") :].strip()
             user = await verify_jwt_token(token, async_db_session)
@@ -100,7 +150,7 @@ async def optional_user_(
     return user
 
 
-def get_default_admin_user_emails_() -> list[str]:
+async def get_default_admin_user_emails_() -> list[str]:
     seed_config = get_seed_config()
     if seed_config and seed_config.admin_user_emails:
         return seed_config.admin_user_emails
@@ -109,10 +159,25 @@ def get_default_admin_user_emails_() -> list[str]:
 
 async def current_cloud_superuser(
     request: Request,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     user: User | None = Depends(current_admin_user),
 ) -> User | None:
     api_key = request.headers.get("Authorization", "").replace("Bearer ", "")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     if api_key != SUPER_CLOUD_API_KEY:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         raise HTTPException(status_code=401, detail="Invalid API key")
 
     if user and user.email not in SUPER_USERS:

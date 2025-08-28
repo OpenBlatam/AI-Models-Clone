@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import logging
 import multiprocessing
 import os
@@ -47,6 +52,9 @@ from shared_configs.configs import SENTRY_DSN
 from shared_configs.configs import TENANT_ID_PREFIX
 from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
 
+    from their respective tasksets. This allows us to track the progress of document set
+from typing import Any, List, Dict, Optional
+import asyncio
 logger = setup_logger()
 
 task_logger = get_task_logger(__name__)
@@ -106,7 +114,6 @@ def on_task_postrun(
     **kwds: Any,
 ) -> None:
     """We handle this signal in order to remove completed tasks
-    from their respective tasksets. This allows us to track the progress of document set
     and user group syncs.
 
     This function runs after any task completes (both success and failure)

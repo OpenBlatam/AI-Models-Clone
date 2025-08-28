@@ -1,9 +1,7 @@
-"""
-Enhanced Middleware Stack
-========================
-
-Comprehensive middleware for security, performance, and monitoring.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import uuid
@@ -11,6 +9,16 @@ from typing import Callable
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 import structlog
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Enhanced Middleware Stack
+========================
+
+Comprehensive middleware for security, performance, and monitoring.
+"""
+
 
 logger = structlog.get_logger(__name__)
 

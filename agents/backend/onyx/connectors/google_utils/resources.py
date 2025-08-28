@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from typing import Any
 
@@ -9,6 +11,9 @@ from googleapiclient.discovery import Resource  # type: ignore
 
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -43,11 +48,13 @@ class RefreshableDriveObject:
         creds: ServiceAccountCredentials | OAuthCredentials,
         creds_getter: Callable[..., ServiceAccountCredentials | OAuthCredentials],
     ):
-        self.call_stack = call_stack
+        
+    """__init__ function."""
+self.call_stack = call_stack
         self.creds = creds
         self.creds_getter = creds_getter
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name: str) -> Optional[Dict[str, Any]]:
         if name == "execute":
             return self.make_refreshable_execute()
         return RefreshableDriveObject(

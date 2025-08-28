@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import contextvars
 import copy
 import itertools
@@ -22,10 +27,7 @@ from slack_sdk.errors import SlackApiError
 from slack_sdk.http_retry import ConnectionErrorRetryHandler
 from slack_sdk.http_retry import RetryHandler
 from slack_sdk.http_retry.builtin_interval_calculators import (
-    FixedValueRetryIntervalCalculator,
-)
 from typing_extensions import override
-
 from onyx.configs.app_configs import ENABLE_EXPENSIVE_EXPERT_CALLS
 from onyx.configs.app_configs import INDEX_BATCH_SIZE
 from onyx.configs.app_configs import SLACK_NUM_THREADS
@@ -59,6 +61,16 @@ from onyx.connectors.slack.utils import SlackTextCleaner
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.redis.redis_pool import get_redis_client
 from onyx.utils.logger import setup_logger
+    import os
+    import time
+    from onyx.connectors.credentials_provider import OnyxStaticCredentialsProvider
+    from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    FixedValueRetryIntervalCalculator,
+)
+
 
 logger = setup_logger()
 
@@ -162,6 +174,10 @@ def get_channel_messages(
 
 
 def get_thread(client: WebClient, channel_id: str, thread_id: str) -> ThreadType:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     """Get all messages in a thread"""
     threads: list[MessageType] = []
     for result in make_paginated_slack_api_call(
@@ -390,6 +406,10 @@ def _message_to_doc(
             return None
 
         thread = get_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             client=client, channel_id=channel["id"], thread_id=thread_ts
         )
         filtered_thread = [
@@ -957,10 +977,6 @@ class SlackConnector(
 
 
 if __name__ == "__main__":
-    import os
-    import time
-    from onyx.connectors.credentials_provider import OnyxStaticCredentialsProvider
-    from shared_configs.contextvars import get_current_tenant_id
 
     slack_channel = os.environ.get("SLACK_CHANNEL")
     connector = SlackConnector(

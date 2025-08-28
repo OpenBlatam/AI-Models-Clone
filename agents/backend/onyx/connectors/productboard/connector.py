@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from collections.abc import Generator
 from itertools import chain
 from typing import Any
@@ -20,6 +25,11 @@ from onyx.connectors.models import TextSection
 from onyx.utils.logger import setup_logger
 
 
+    import os
+    import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -60,14 +70,14 @@ class ProductboardConnector(PollConnector):
             return None
         return owner_dict.get("email")
 
-    def _fetch_documents(
+    async def _fetch_documents(
         self,
         initial_link: str,
     ) -> Generator[dict[str, Any], None, None]:
         headers = self._build_headers()
 
         @retry(tries=3, delay=1, backoff=2)
-        def fetch(link: str) -> dict[str, Any]:
+        async def fetch(link: str) -> dict[str, Any]:
             response = requests.get(link, headers=headers)
             if not response.ok:
                 # rate-limiting is at 50 requests per second.
@@ -258,8 +268,6 @@ class ProductboardConnector(PollConnector):
 
 
 if __name__ == "__main__":
-    import os
-    import time
 
     connector = ProductboardConnector()
     connector.load_credentials(

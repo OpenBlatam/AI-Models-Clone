@@ -1,10 +1,13 @@
-"""
-🎯 Facebook Posts - Domain Entities (Onyx Compatible)
-====================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Entidades del dominio refactorizadas siguiendo arquitectura de features Onyx.
-Compatible con Clean Architecture y patterns establecidos.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import List, Optional, Dict, Any, Union
 from datetime import datetime
@@ -13,6 +16,18 @@ from enum import Enum
 import uuid
 import hashlib
 from pydantic import BaseModel, Field, validator
+import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+🎯 Facebook Posts - Domain Entities (Onyx Compatible)
+====================================================
+
+Entidades del dominio refactorizadas siguiendo arquitectura de features Onyx.
+Compatible con Clean Architecture y patterns establecidos.
+"""
+
 
 
 # ===== DOMAIN ENUMS =====
@@ -167,11 +182,11 @@ class PostContent(BaseModel):
     link_url: Optional[str] = None
     
     @validator('text')
-    def validate_text(cls, v):
+    def validate_text(cls, v) -> bool:
         return v.strip()
     
     @validator('hashtags')
-    def validate_hashtags(cls, v):
+    def validate_hashtags(cls, v) -> bool:
         return [tag.strip().replace('#', '').lower() for tag in v if tag.strip()]
     
     def get_display_text(self) -> str:
@@ -183,7 +198,6 @@ class PostContent(BaseModel):
     
     def calculate_metrics(self) -> ContentMetrics:
         """Calcular métricas usando NLP optimizado."""
-        import re
         
         text = self.text
         words = text.split()
@@ -252,7 +266,7 @@ class PostSpecification(BaseModel):
     include_trending_topics: bool = Field(True)
     
     @validator('keywords')
-    def validate_keywords(cls, v):
+    def validate_keywords(cls, v) -> bool:
         return [kw.strip().lower() for kw in v if kw.strip()]
 
 

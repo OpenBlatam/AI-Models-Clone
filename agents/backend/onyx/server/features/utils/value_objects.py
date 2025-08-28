@@ -1,13 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from pydantic import BaseModel, Field
 from decimal import Decimal
 from typing import Dict, Any, List, Optional
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class Money(BaseModel):
     amount: Decimal = Field(..., gt=0, description="Monto positivo")
     currency: str = Field("USD", min_length=3, max_length=3, description="Código de moneda ISO 4217")
 
     @classmethod
-    def validate_currency(cls, v):
+    def validate_currency(cls, v) -> bool:
         if len(v) != 3:
             raise ValueError("Código de moneda debe tener 3 caracteres")
         return v

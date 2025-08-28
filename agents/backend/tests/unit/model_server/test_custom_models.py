@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from typing import Any
 from unittest.mock import Mock
 from unittest.mock import patch
@@ -8,11 +16,14 @@ import pytest
 
 from model_server.custom_models import run_content_classification_inference
 from shared_configs.configs import (
-    INDEXING_INFORMATION_CONTENT_CLASSIFICATION_CUTOFF_LENGTH,
-)
 from shared_configs.configs import INDEXING_INFORMATION_CONTENT_CLASSIFICATION_MAX
 from shared_configs.configs import INDEXING_INFORMATION_CONTENT_CLASSIFICATION_MIN
 from shared_configs.model_server_models import ContentClassificationPrediction
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    INDEXING_INFORMATION_CONTENT_CLASSIFICATION_CUTOFF_LENGTH,
+)
 
 
 @pytest.fixture
@@ -35,7 +46,7 @@ def mock_content_model() -> Mock:
         def numpy(self) -> npt.NDArray[Any]:
             return self.value
 
-        def __getitem__(self, idx: Any) -> Any:
+        def __getitem__(self, idx: Any) -> Optional[Dict[str, Any]]:
             result = self.value[idx]
             # Wrap scalar values back in MockTensor
             if isinstance(result, (np.float64, np.int64)):

@@ -1,15 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from bs4 import BeautifulSoup
 import requests
 import re
 from typing import Optional, Dict, Any
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 class VideoScraper:
     """Scraper for extracting video information from YouTube URLs"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }

@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from datetime import datetime
+from typing import Dict, List, Any, Optional
+from pydantic import BaseModel, Field, validator
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🧠 NLP MODELS - NATURAL LANGUAGE PROCESSING EXTENSIONS
 =====================================================
@@ -10,10 +22,6 @@ Modelos Pydantic ultra-avanzados para análisis NLP de landing pages:
 - Scoring de calidad semántica
 """
 
-from datetime import datetime
-from typing import Dict, List, Any, Optional
-from pydantic import BaseModel, Field, validator
-from enum import Enum
 
 
 # =============================================================================
@@ -101,7 +109,7 @@ class SentimentAnalysisModel(BaseModel):
     conversion_sentiment_score: float = Field(..., ge=0.0, le=100.0, description="Score optimizado para conversión")
     
     @validator('emotion_scores')
-    def validate_emotion_scores(cls, v):
+    def validate_emotion_scores(cls, v) -> bool:
         """Valida que hay al menos una emoción analizada."""
         if not v:
             return [EmotionScore(
@@ -199,7 +207,7 @@ class ReadabilityAnalysisModel(BaseModel):
     audience_optimization_score: float = Field(..., ge=0.0, le=100.0, description="Optimización para audiencia")
     
     @validator('improvement_suggestions')
-    def validate_suggestions(cls, v):
+    def validate_suggestions(cls, v) -> bool:
         """Asegura que hay al menos una sugerencia."""
         if not v:
             return ["Texto optimizado para la audiencia objetivo"]

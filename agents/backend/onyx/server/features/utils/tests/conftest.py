@@ -1,12 +1,20 @@
-"""
-Test Configuration - Onyx Integration
-Shared test configuration and fixtures.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import pytest
 import redis
 from datetime import datetime
 from pydantic import BaseModel
 from ..redis_config import RedisConfig
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Test Configuration - Onyx Integration
+Shared test configuration and fixtures.
+"""
 
 # Test models
 class UserModel(BaseModel):
@@ -36,7 +44,7 @@ def redis_config():
     )
 
 @pytest.fixture(scope="session", autouse=True)
-def check_redis(redis_config):
+def check_redis(redis_config) -> Any:
     """Check Redis connection before tests."""
     try:
         redis_client = redis.Redis(
@@ -87,7 +95,7 @@ def test_products():
     ]
 
 @pytest.fixture
-def test_data(test_users):
+def test_data(test_users) -> Any:
     """Create test data dictionary."""
     return {
         "user_1": test_users[0],

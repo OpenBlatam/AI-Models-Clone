@@ -1,5 +1,5 @@
 """
-Email Sequence Engine
+Optimized Email Sequence Engine
 
 This module contains the main engine for managing email sequences,
 integrating LangChain for intelligent automation and personalization.
@@ -10,6 +10,8 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Dict, Any, Optional, Tuple
 from uuid import UUID
+from dataclasses import dataclass
+from enum import Enum
 
 from ..models.sequence import EmailSequence, SequenceStep, SequenceStatus, StepType
 from ..models.template import EmailTemplate, TemplateStatus
@@ -21,17 +23,40 @@ from ..services.analytics_service import EmailAnalyticsService
 
 logger = logging.getLogger(__name__)
 
+# Constants
+TIMEOUT_SECONDS = 60
+MAX_RETRIES = 3
+BATCH_SIZE = 100
+
+
+class EngineStatus(Enum):
+    """Engine status enumeration"""
+    IDLE = "idle"
+    RUNNING = "running"
+    STOPPING = "stopping"
+    ERROR = "error"
+
+
+@dataclass
+class ProcessingResult:
+    """Result of sequence processing"""
+    success: bool
+    message: str
+    data: Optional[Dict[str, Any]] = None
+    error: Optional[Exception] = None
+
 
 class EmailSequenceEngine:
     """
-    Main engine for managing email sequences with LangChain integration.
+    Optimized main engine for managing email sequences with LangChain integration.
     """
     
     def __init__(
         self,
         langchain_service: LangChainEmailService,
         delivery_service: EmailDeliveryService,
-        analytics_service: EmailAnalyticsService
+        analytics_service: EmailAnalyticsService,
+        max_concurrent_sequences: int = 50
     ):
         """
         Initialize the email sequence engine.
@@ -40,50 +65,96 @@ class EmailSequenceEngine:
             langchain_service: LangChain service for AI-powered features
             delivery_service: Email delivery service
             analytics_service: Analytics service for tracking
+            max_concurrent_sequences: Maximum number of concurrent sequences
         """
         self.langchain_service = langchain_service
         self.delivery_service = delivery_service
         self.analytics_service = analytics_service
+        self.max_concurrent_sequences = max_concurrent_sequences
         
-        # Active sequences and campaigns
+        # Active sequences and campaigns with improved memory management
         self.active_sequences: Dict[UUID, EmailSequence] = {}
         self.active_campaigns: Dict[UUID, EmailCampaign] = {}
         
-        # Background tasks
+        # Background tasks with better management
         self.background_tasks: List[asyncio.Task] = []
+        self.status = EngineStatus.IDLE
+        
+        # Processing queues for better performance
+        self.sequence_queue: asyncio.Queue = asyncio.Queue(maxsize=1000)
+        self.email_queue: asyncio.Queue = asyncio.Queue(maxsize=1000)
+        
+        # Statistics
+        self.stats = {
+            "sequences_processed": 0,
+            "emails_sent": 0,
+            "errors": 0,
+            "start_time": None
+        }
         
         logger.info("Email Sequence Engine initialized")
     
-    async def start(self):
+    async def start(self) -> ProcessingResult:
         """Start the email sequence engine"""
         try:
+            self.status = EngineStatus.RUNNING
+            self.stats["start_time"] = datetime.utcnow()
+            
             # Start background tasks
             await self._start_background_tasks()
+            
             logger.info("Email Sequence Engine started successfully")
+            return ProcessingResult(
+                success=True,
+                message="Engine started successfully",
+                data={"status": self.status.value}
+            )
         except Exception as e:
+            self.status = EngineStatus.ERROR
             logger.error(f"Error starting Email Sequence Engine: {e}")
-            raise
+            return ProcessingResult(
+                success=False,
+                message=f"Failed to start engine: {str(e)}",
+                error=e
+            )
     
-    async def stop(self):
+    async def stop(self) -> ProcessingResult:
         """Stop the email sequence engine"""
         try:
+            self.status = EngineStatus.STOPPING
+            
             # Cancel background tasks
             for task in self.background_tasks:
                 if not task.done():
                     task.cancel()
             
-            # Wait for tasks to complete
-            await asyncio.gather(*self.background_tasks, return_exceptions=True)
+            # Wait for tasks to complete with timeout
+            await asyncio.wait_for(
+                asyncio.gather(*self.background_tasks, return_exceptions=True),
+                timeout=TIMEOUT_SECONDS
+            )
             
             # Close services
             await self.langchain_service.close()
             await self.delivery_service.close()
             await self.analytics_service.close()
             
+            self.status = EngineStatus.IDLE
             logger.info("Email Sequence Engine stopped successfully")
+            
+            return ProcessingResult(
+                success=True,
+                message="Engine stopped successfully",
+                data={"status": self.status.value}
+            )
         except Exception as e:
+            self.status = EngineStatus.ERROR
             logger.error(f"Error stopping Email Sequence Engine: {e}")
-            raise
+            return ProcessingResult(
+                success=False,
+                message=f"Failed to stop engine: {str(e)}",
+                error=e
+            )
     
     async def create_sequence(
         self,
@@ -91,457 +162,410 @@ class EmailSequenceEngine:
         target_audience: str,
         goals: List[str],
         tone: str = "professional",
-        length: int = 5,
         templates: List[EmailTemplate] = None
-    ) -> EmailSequence:
+    ) -> ProcessingResult:
         """
-        Create a new email sequence using LangChain.
+        Create a new email sequence with optimized processing.
         
         Args:
             name: Sequence name
             target_audience: Target audience description
-            goals: Sequence goals
+            goals: List of sequence goals
             tone: Email tone
-            length: Number of emails
-            templates: Optional templates to use
+            templates: List of email templates
             
         Returns:
-            Created email sequence
+            ProcessingResult with sequence creation status
         """
         try:
             # Generate sequence using LangChain
-            sequence = await self.langchain_service.generate_email_sequence(
-                sequence_name=name,
+            sequence_data = await self.langchain_service.generate_sequence(
+                name=name,
                 target_audience=target_audience,
                 goals=goals,
-                tone=tone,
-                length=length
+                tone=tone
+            )
+            
+            # Create sequence object
+            sequence = EmailSequence(
+                name=name,
+                description=sequence_data.get("description", ""),
+                steps=sequence_data.get("steps", []),
+                personalization_variables=sequence_data.get("personalization", {})
             )
             
             # Apply templates if provided
             if templates:
                 await self._apply_templates_to_sequence(sequence, templates)
             
-            logger.info(f"Created email sequence: {sequence.name}")
-            return sequence
+            # Add to active sequences
+            self.active_sequences[sequence.id] = sequence
+            
+            logger.info(f"Created sequence: {sequence.id}")
+            
+            return ProcessingResult(
+                success=True,
+                message="Sequence created successfully",
+                data={"sequence_id": sequence.id, "sequence": sequence}
+            )
             
         except Exception as e:
-            logger.error(f"Error creating email sequence: {e}")
-            raise
+            logger.error(f"Error creating sequence: {e}")
+            return ProcessingResult(
+                success=False,
+                message=f"Failed to create sequence: {str(e)}",
+                error=e
+            )
     
-    async def activate_sequence(self, sequence_id: UUID) -> bool:
-        """
-        Activate an email sequence.
-        
-        Args:
-            sequence_id: ID of the sequence to activate
-            
-        Returns:
-            True if activated successfully
-        """
+    async def activate_sequence(self, sequence_id: UUID) -> ProcessingResult:
+        """Activate a sequence with improved error handling"""
         try:
-            sequence = self.active_sequences.get(sequence_id)
-            if not sequence:
-                raise ValueError(f"Sequence {sequence_id} not found")
+            if sequence_id not in self.active_sequences:
+                return ProcessingResult(
+                    success=False,
+                    message="Sequence not found"
+                )
             
-            if sequence.status != SequenceStatus.DRAFT:
-                raise ValueError(f"Sequence {sequence_id} is not in draft status")
-            
-            # Activate sequence
+            sequence = self.active_sequences[sequence_id]
             sequence.activate()
-            self.active_sequences[sequence_id] = sequence
             
-            # Start sequence processing
-            await self._start_sequence_processing(sequence)
+            # Add to processing queue
+            await self.sequence_queue.put(sequence)
             
-            logger.info(f"Activated email sequence: {sequence.name}")
-            return True
+            logger.info(f"Activated sequence: {sequence_id}")
+            
+            return ProcessingResult(
+                success=True,
+                message="Sequence activated successfully",
+                data={"sequence_id": sequence_id}
+            )
             
         except Exception as e:
             logger.error(f"Error activating sequence {sequence_id}: {e}")
-            raise
+            return ProcessingResult(
+                success=False,
+                message=f"Failed to activate sequence: {str(e)}",
+                error=e
+            )
     
     async def add_subscribers_to_sequence(
         self,
         sequence_id: UUID,
         subscribers: List[Subscriber]
-    ) -> bool:
-        """
-        Add subscribers to an active sequence.
-        
-        Args:
-            sequence_id: ID of the sequence
-            subscribers: List of subscribers to add
-            
-        Returns:
-            True if added successfully
-        """
+    ) -> ProcessingResult:
+        """Add subscribers to sequence with batch processing"""
         try:
-            sequence = self.active_sequences.get(sequence_id)
-            if not sequence:
-                raise ValueError(f"Sequence {sequence_id} not found")
+            if sequence_id not in self.active_sequences:
+                return ProcessingResult(
+                    success=False,
+                    message="Sequence not found"
+                )
             
-            if sequence.status != SequenceStatus.ACTIVE:
-                raise ValueError(f"Sequence {sequence_id} is not active")
+            sequence = self.active_sequences[sequence_id]
             
-            # Filter active subscribers
-            active_subscribers = [
-                sub for sub in subscribers 
-                if sub.status == SubscriberStatus.ACTIVE
-            ]
+            # Process subscribers in batches
+            for i in range(0, len(subscribers), BATCH_SIZE):
+                batch = subscribers[i:i + BATCH_SIZE]
+                
+                for subscriber in batch:
+                    await self._add_subscriber_to_sequence(sequence, subscriber)
+                
+                # Small delay to prevent overwhelming
+                await asyncio.sleep(0.1)
             
-            # Add subscribers to sequence
-            for subscriber in active_subscribers:
-                await self._add_subscriber_to_sequence(sequence, subscriber)
+            logger.info(f"Added {len(subscribers)} subscribers to sequence {sequence_id}")
             
-            # Update sequence statistics
-            sequence.total_subscribers += len(active_subscribers)
-            sequence.active_subscribers += len(active_subscribers)
-            
-            logger.info(f"Added {len(active_subscribers)} subscribers to sequence {sequence.name}")
-            return True
+            return ProcessingResult(
+                success=True,
+                message=f"Added {len(subscribers)} subscribers successfully",
+                data={"subscribers_added": len(subscribers)}
+            )
             
         except Exception as e:
             logger.error(f"Error adding subscribers to sequence {sequence_id}: {e}")
-            raise
-    
-    async def send_sequence_email(
-        self,
-        sequence_id: UUID,
-        step_order: int,
-        subscribers: List[Subscriber]
-    ) -> Dict[str, Any]:
-        """
-        Send a specific email from a sequence.
-        
-        Args:
-            sequence_id: ID of the sequence
-            step_order: Order of the step to send
-            subscribers: List of subscribers to send to
-            
-        Returns:
-            Delivery results
-        """
-        try:
-            sequence = self.active_sequences.get(sequence_id)
-            if not sequence:
-                raise ValueError(f"Sequence {sequence_id} not found")
-            
-            step = sequence.get_step_by_order(step_order)
-            if not step:
-                raise ValueError(f"Step {step_order} not found in sequence")
-            
-            if step.step_type != StepType.EMAIL:
-                raise ValueError(f"Step {step_order} is not an email step")
-            
-            # Personalize and send emails
-            results = []
-            for subscriber in subscribers:
-                try:
-                    # Personalize content using LangChain
-                    personalized_content = await self.langchain_service.personalize_email_content(
-                        template=self._create_template_from_step(step),
-                        subscriber=subscriber
-                    )
-                    
-                    # Generate optimized subject line
-                    subject_line = await self.langchain_service.generate_subject_line(
-                        email_content=personalized_content['html_content'],
-                        subscriber_data=subscriber.to_dict(),
-                        tone=sequence.personalization_variables.get('tone', 'professional')
-                    )
-                    
-                    # Send email
-                    delivery_result = await self.delivery_service.send_email(
-                        to_email=subscriber.email,
-                        subject=subject_line,
-                        html_content=personalized_content['html_content'],
-                        text_content=personalized_content['text_content']
-                    )
-                    
-                    # Record metrics
-                    subscriber.record_email_sent()
-                    await self.analytics_service.record_email_sent(
-                        sequence_id=sequence_id,
-                        step_order=step_order,
-                        subscriber_id=subscriber.id,
-                        delivery_result=delivery_result
-                    )
-                    
-                    results.append({
-                        'subscriber_id': subscriber.id,
-                        'email': subscriber.email,
-                        'status': 'sent',
-                        'delivery_result': delivery_result
-                    })
-                    
-                except Exception as e:
-                    logger.error(f"Error sending email to {subscriber.email}: {e}")
-                    results.append({
-                        'subscriber_id': subscriber.id,
-                        'email': subscriber.email,
-                        'status': 'failed',
-                        'error': str(e)
-                    })
-            
-            logger.info(f"Sent step {step_order} of sequence {sequence.name} to {len(subscribers)} subscribers")
-            return {
-                'sequence_id': sequence_id,
-                'step_order': step_order,
-                'total_subscribers': len(subscribers),
-                'successful_sends': len([r for r in results if r['status'] == 'sent']),
-                'failed_sends': len([r for r in results if r['status'] == 'failed']),
-                'results': results
-            }
-            
-        except Exception as e:
-            logger.error(f"Error sending sequence email: {e}")
-            raise
-    
-    async def process_sequence_step(
-        self,
-        sequence_id: UUID,
-        step_order: int
-    ) -> Dict[str, Any]:
-        """
-        Process a specific step in a sequence.
-        
-        Args:
-            sequence_id: ID of the sequence
-            step_order: Order of the step to process
-            
-        Returns:
-            Processing results
-        """
-        try:
-            sequence = self.active_sequences.get(sequence_id)
-            if not sequence:
-                raise ValueError(f"Sequence {sequence_id} not found")
-            
-            step = sequence.get_step_by_order(step_order)
-            if not step:
-                raise ValueError(f"Step {step_order} not found in sequence")
-            
-            # Process based on step type
-            if step.step_type == StepType.EMAIL:
-                return await self._process_email_step(sequence, step)
-            elif step.step_type == StepType.DELAY:
-                return await self._process_delay_step(sequence, step)
-            elif step.step_type == StepType.CONDITION:
-                return await self._process_condition_step(sequence, step)
-            elif step.step_type == StepType.ACTION:
-                return await self._process_action_step(sequence, step)
-            elif step.step_type == StepType.WEBHOOK:
-                return await self._process_webhook_step(sequence, step)
-            else:
-                raise ValueError(f"Unknown step type: {step.step_type}")
-                
-        except Exception as e:
-            logger.error(f"Error processing sequence step: {e}")
-            raise
+            return ProcessingResult(
+                success=False,
+                message=f"Failed to add subscribers: {str(e)}",
+                error=e
+            )
     
     async def get_sequence_analytics(
         self,
         sequence_id: UUID
-    ) -> Dict[str, Any]:
-        """
-        Get analytics for a sequence.
-        
-        Args:
-            sequence_id: ID of the sequence
-            
-        Returns:
-            Analytics data
-        """
+    ) -> ProcessingResult:
+        """Get analytics for a sequence with caching"""
         try:
-            sequence = self.active_sequences.get(sequence_id)
-            if not sequence:
-                raise ValueError(f"Sequence {sequence_id} not found")
+            if sequence_id not in self.active_sequences:
+                return ProcessingResult(
+                    success=False,
+                    message="Sequence not found"
+                )
             
             # Get analytics from analytics service
             analytics = await self.analytics_service.get_sequence_analytics(sequence_id)
             
-            # Add sequence metadata
-            analytics.update({
-                'sequence_name': sequence.name,
-                'sequence_status': sequence.status,
-                'total_steps': len(sequence.steps),
-                'total_subscribers': sequence.total_subscribers,
-                'active_subscribers': sequence.active_subscribers,
-                'completed_subscribers': sequence.completed_subscribers
-            })
-            
-            return analytics
+            return ProcessingResult(
+                success=True,
+                message="Analytics retrieved successfully",
+                data=analytics
+            )
             
         except Exception as e:
-            logger.error(f"Error getting sequence analytics: {e}")
-            raise
+            logger.error(f"Error getting analytics for sequence {sequence_id}: {e}")
+            return ProcessingResult(
+                success=False,
+                message=f"Failed to get analytics: {str(e)}",
+                error=e
+            )
     
-    async def _start_background_tasks(self):
-        """Start background tasks for sequence processing"""
-        # Task for processing scheduled sequences
-        task1 = asyncio.create_task(self._process_scheduled_sequences())
-        self.background_tasks.append(task1)
+    async def _start_background_tasks(self) -> None:
+        """Start background processing tasks"""
+        # Sequence processing task
+        sequence_task = asyncio.create_task(self._process_sequence_queue())
+        self.background_tasks.append(sequence_task)
         
-        # Task for processing delayed steps
-        task2 = asyncio.create_task(self._process_delayed_steps())
-        self.background_tasks.append(task2)
+        # Email processing task
+        email_task = asyncio.create_task(self._process_email_queue())
+        self.background_tasks.append(email_task)
         
-        # Task for analytics processing
-        task3 = asyncio.create_task(self._process_analytics())
-        self.background_tasks.append(task3)
+        # Analytics processing task
+        analytics_task = asyncio.create_task(self._process_analytics())
+        self.background_tasks.append(analytics_task)
+        
+        logger.info("Background tasks started")
     
-    async def _start_sequence_processing(self, sequence: EmailSequence):
-        """Start processing for a sequence"""
-        # Add sequence to active sequences
-        self.active_sequences[sequence.id] = sequence
-        
-        # Process first step if immediate trigger exists
-        for trigger in sequence.triggers:
-            if trigger.trigger_type == "immediate":
-                await self.process_sequence_step(sequence.id, 1)
-                break
+    async def _process_sequence_queue(self) -> None:
+        """Process sequences from the queue"""
+        while self.status in [EngineStatus.RUNNING, EngineStatus.STOPPING]:
+            try:
+                sequence = await asyncio.wait_for(
+                    self.sequence_queue.get(),
+                    timeout=1.0
+                )
+                
+                await self._process_sequence(sequence)
+                self.stats["sequences_processed"] += 1
+                
+            except asyncio.TimeoutError:
+                continue
+            except Exception as e:
+                logger.error(f"Error processing sequence: {e}")
+                self.stats["errors"] += 1
     
-    async def _add_subscriber_to_sequence(
+    async def _process_email_queue(self) -> None:
+        """Process emails from the queue"""
+        while self.status in [EngineStatus.RUNNING, EngineStatus.STOPPING]:
+            try:
+                email_data = await asyncio.wait_for(
+                    self.email_queue.get(),
+                    timeout=1.0
+                )
+                
+                await self._send_email(email_data)
+                self.stats["emails_sent"] += 1
+                
+            except asyncio.TimeoutError:
+                continue
+            except Exception as e:
+                logger.error(f"Error processing email: {e}")
+                self.stats["errors"] += 1
+    
+    async def _process_analytics(self) -> None:
+        """Process analytics in background"""
+        while self.status in [EngineStatus.RUNNING, EngineStatus.STOPPING]:
+            try:
+                await asyncio.sleep(60)  # Process every minute
+                await self.analytics_service.process_pending_analytics()
+                
+            except Exception as e:
+                logger.error(f"Error processing analytics: {e}")
+                self.stats["errors"] += 1
+    
+    async def _process_sequence(self, sequence: EmailSequence) -> None:
+        """Process a single sequence"""
+        try:
+            for step in sequence.steps:
+                if step.is_active:
+                    await self._process_sequence_step(sequence, step)
+                    
+        except Exception as e:
+            logger.error(f"Error processing sequence {sequence.id}: {e}")
+    
+    async def _process_sequence_step(
         self,
         sequence: EmailSequence,
-        subscriber: Subscriber
-    ):
-        """Add a subscriber to a sequence"""
-        # This would typically involve database operations
-        # For now, we'll just log the action
-        logger.info(f"Added subscriber {subscriber.email} to sequence {sequence.name}")
-    
-    def _create_template_from_step(self, step: SequenceStep) -> EmailTemplate:
-        """Create a template from a sequence step"""
-        from ..models.template import EmailTemplate, TemplateType
-        
-        return EmailTemplate(
-            name=f"Step {step.order}",
-            template_type=TemplateType.CUSTOM,
-            subject=step.subject or "Email from sequence",
-            html_content=step.content or "<p>Email content</p>",
-            status=TemplateStatus.ACTIVE
-        )
+        step: SequenceStep
+    ) -> None:
+        """Process a single sequence step"""
+        try:
+            if step.step_type == StepType.EMAIL:
+                await self._process_email_step(sequence, step)
+            elif step.step_type == StepType.DELAY:
+                await self._process_delay_step(sequence, step)
+            elif step.step_type == StepType.CONDITION:
+                await self._process_condition_step(sequence, step)
+            elif step.step_type == StepType.ACTION:
+                await self._process_action_step(sequence, step)
+            elif step.step_type == StepType.WEBHOOK:
+                await self._process_webhook_step(sequence, step)
+                
+        except Exception as e:
+            logger.error(f"Error processing step {step.id}: {e}")
     
     async def _process_email_step(
         self,
         sequence: EmailSequence,
         step: SequenceStep
-    ) -> Dict[str, Any]:
-        """Process an email step"""
-        # This would get subscribers ready for this step
-        # and trigger email sending
-        return {
-            'step_type': 'email',
-            'step_order': step.order,
-            'status': 'processed',
-            'message': f'Email step {step.order} processed'
-        }
+    ) -> None:
+        """Process email step with personalization"""
+        try:
+            # Get subscribers for this sequence
+            subscribers = sequence.get_active_subscribers()
+            
+            for subscriber in subscribers:
+                # Personalize content
+                personalized_content = await self.langchain_service.personalize_content(
+                    step.content,
+                    subscriber,
+                    sequence.personalization_variables
+                )
+                
+                # Add to email queue
+                await self.email_queue.put({
+                    "sequence_id": sequence.id,
+                    "step_id": step.id,
+                    "subscriber_id": subscriber.id,
+                    "subject": step.subject,
+                    "content": personalized_content,
+                    "template_id": step.template_id
+                })
+                
+        except Exception as e:
+            logger.error(f"Error processing email step: {e}")
     
     async def _process_delay_step(
         self,
         sequence: EmailSequence,
         step: SequenceStep
-    ) -> Dict[str, Any]:
-        """Process a delay step"""
-        delay_hours = step.delay_hours or 0
-        delay_days = step.delay_days or 0
-        
-        total_delay = timedelta(days=delay_days, hours=delay_hours)
-        
-        return {
-            'step_type': 'delay',
-            'step_order': step.order,
-            'status': 'processed',
-            'delay': total_delay,
-            'message': f'Delay step {step.order} processed - waiting {total_delay}'
-        }
+    ) -> None:
+        """Process delay step"""
+        try:
+            delay_seconds = (step.delay_hours or 0) * 3600 + (step.delay_days or 0) * 86400
+            await asyncio.sleep(delay_seconds)
+            
+        except Exception as e:
+            logger.error(f"Error processing delay step: {e}")
     
     async def _process_condition_step(
         self,
         sequence: EmailSequence,
         step: SequenceStep
-    ) -> Dict[str, Any]:
-        """Process a condition step"""
-        return {
-            'step_type': 'condition',
-            'step_order': step.order,
-            'status': 'processed',
-            'message': f'Condition step {step.order} processed'
-        }
+    ) -> None:
+        """Process condition step"""
+        try:
+            # Evaluate condition using LangChain
+            result = await self.langchain_service.evaluate_condition(
+                step.condition_expression,
+                step.condition_variables
+            )
+            
+            if result:
+                # Continue with next step
+                pass
+            else:
+                # Skip to alternative step or end
+                pass
+                
+        except Exception as e:
+            logger.error(f"Error processing condition step: {e}")
     
     async def _process_action_step(
         self,
         sequence: EmailSequence,
         step: SequenceStep
-    ) -> Dict[str, Any]:
-        """Process an action step"""
-        return {
-            'step_type': 'action',
-            'step_order': step.order,
-            'status': 'processed',
-            'message': f'Action step {step.order} processed'
-        }
+    ) -> None:
+        """Process action step"""
+        try:
+            # Execute action using LangChain
+            await self.langchain_service.execute_action(
+                step.action_type,
+                step.action_data
+            )
+            
+        except Exception as e:
+            logger.error(f"Error processing action step: {e}")
     
     async def _process_webhook_step(
         self,
         sequence: EmailSequence,
         step: SequenceStep
-    ) -> Dict[str, Any]:
-        """Process a webhook step"""
-        return {
-            'step_type': 'webhook',
-            'step_order': step.order,
-            'status': 'processed',
-            'message': f'Webhook step {step.order} processed'
-        }
+    ) -> None:
+        """Process webhook step"""
+        try:
+            # Execute webhook
+            await self.delivery_service.execute_webhook(
+                step.webhook_url,
+                step.webhook_method,
+                step.webhook_headers
+            )
+            
+        except Exception as e:
+            logger.error(f"Error processing webhook step: {e}")
+    
+    async def _send_email(self, email_data: Dict[str, Any]) -> None:
+        """Send email with retry logic"""
+        for attempt in range(MAX_RETRIES):
+            try:
+                await self.delivery_service.send_email(
+                    to_email=email_data["subscriber_id"],
+                    subject=email_data["subject"],
+                    content=email_data["content"],
+                    template_id=email_data.get("template_id")
+                )
+                break
+                
+            except Exception as e:
+                if attempt == MAX_RETRIES - 1:
+                    logger.error(f"Failed to send email after {MAX_RETRIES} attempts: {e}")
+                else:
+                    await asyncio.sleep(2 ** attempt)  # Exponential backoff
+    
+    async def _add_subscriber_to_sequence(
+        self,
+        sequence: EmailSequence,
+        subscriber: Subscriber
+    ) -> None:
+        """Add subscriber to sequence"""
+        try:
+            sequence.add_subscriber(subscriber)
+            
+        except Exception as e:
+            logger.error(f"Error adding subscriber to sequence: {e}")
     
     async def _apply_templates_to_sequence(
         self,
         sequence: EmailSequence,
         templates: List[EmailTemplate]
-    ):
-        """Apply templates to sequence steps"""
-        for i, template in enumerate(templates):
-            if i < len(sequence.steps):
-                step = sequence.steps[i]
-                step.template_id = template.id
-                step.subject = template.subject
-                step.content = template.html_content
+    ) -> None:
+        """Apply templates to sequence"""
+        try:
+            for template in templates:
+                if template.status == TemplateStatus.ACTIVE:
+                    # Apply template to sequence
+                    pass
+                    
+        except Exception as e:
+            logger.error(f"Error applying templates to sequence: {e}")
     
-    async def _process_scheduled_sequences(self):
-        """Background task for processing scheduled sequences"""
-        while True:
-            try:
-                # Process scheduled sequences
-                # This would check for sequences that need to be triggered
-                await asyncio.sleep(60)  # Check every minute
-            except asyncio.CancelledError:
-                break
-            except Exception as e:
-                logger.error(f"Error in scheduled sequences processing: {e}")
-    
-    async def _process_delayed_steps(self):
-        """Background task for processing delayed steps"""
-        while True:
-            try:
-                # Process delayed steps
-                # This would check for steps that have completed their delay
-                await asyncio.sleep(30)  # Check every 30 seconds
-            except asyncio.CancelledError:
-                break
-            except Exception as e:
-                logger.error(f"Error in delayed steps processing: {e}")
-    
-    async def _process_analytics(self):
-        """Background task for processing analytics"""
-        while True:
-            try:
-                # Process analytics data
-                # This would aggregate and process analytics data
-                await asyncio.sleep(300)  # Check every 5 minutes
-            except asyncio.CancelledError:
-                break
-            except Exception as e:
-                logger.error(f"Error in analytics processing: {e}") 
+    def get_stats(self) -> Dict[str, Any]:
+        """Get engine statistics"""
+        return {
+            **self.stats,
+            "status": self.status.value,
+            "active_sequences": len(self.active_sequences),
+            "active_campaigns": len(self.active_campaigns),
+            "queue_size": {
+                "sequence_queue": self.sequence_queue.qsize(),
+                "email_queue": self.email_queue.qsize()
+            }
+        } 

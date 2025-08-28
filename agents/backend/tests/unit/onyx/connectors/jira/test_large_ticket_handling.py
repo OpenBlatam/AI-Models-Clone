@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from collections.abc import Generator
 from typing import Any
 from unittest.mock import MagicMock
@@ -11,6 +19,9 @@ from onyx.connectors.onyx_jira.connector import _perform_jql_search
 from onyx.connectors.onyx_jira.connector import process_jira_issue
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def mock_jira_client() -> MagicMock:
     return MagicMock()
@@ -61,7 +72,7 @@ def mock_issue_large() -> MagicMock:
 
 
 @pytest.fixture
-def mock_jira_api_version() -> Generator[Any, Any, Any]:
+async def mock_jira_api_version() -> Generator[Any, Any, Any]:
     with patch("onyx.connectors.onyx_jira.connector.JIRA_API_VERSION", "2"):
         yield
 
@@ -73,7 +84,7 @@ def patched_environment(
     yield
 
 
-def test_fetch_jira_issues_batch_small_ticket(
+async def test_fetch_jira_issues_batch_small_ticket(
     mock_jira_client: MagicMock,
     mock_issue_small: MagicMock,
     patched_environment: MockFixture,
@@ -98,7 +109,7 @@ def test_fetch_jira_issues_batch_small_ticket(
     assert "Small comment 2" in doc.sections[0].text
 
 
-def test_fetch_jira_issues_batch_large_ticket(
+async def test_fetch_jira_issues_batch_large_ticket(
     mock_jira_client: MagicMock,
     mock_issue_large: MagicMock,
     patched_environment: MockFixture,
@@ -116,7 +127,7 @@ def test_fetch_jira_issues_batch_large_ticket(
     assert len(docs) == 0  # The large ticket should be skipped
 
 
-def test_fetch_jira_issues_batch_mixed_tickets(
+async def test_fetch_jira_issues_batch_mixed_tickets(
     mock_jira_client: MagicMock,
     mock_issue_small: MagicMock,
     mock_issue_large: MagicMock,
@@ -139,7 +150,7 @@ def test_fetch_jira_issues_batch_mixed_tickets(
 
 
 @patch("onyx.connectors.onyx_jira.connector.JIRA_CONNECTOR_MAX_TICKET_SIZE", 50)
-def test_fetch_jira_issues_batch_custom_size_limit(
+async def test_fetch_jira_issues_batch_custom_size_limit(
     mock_jira_client: MagicMock,
     mock_issue_small: MagicMock,
     mock_issue_large: MagicMock,

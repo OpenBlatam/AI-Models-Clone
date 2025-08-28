@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import ClassVar
 
 from onyx.configs.app_configs import INDEX_BATCH_SIZE
@@ -5,6 +7,9 @@ from onyx.configs.constants import DocumentSource
 from onyx.connectors.mediawiki import wiki
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class WikipediaConnector(wiki.MediaWikiConnector):
     """Connector for Wikipedia."""
 

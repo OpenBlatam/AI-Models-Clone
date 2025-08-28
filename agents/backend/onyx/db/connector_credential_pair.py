@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from typing import TypeVarTuple
 
@@ -36,6 +38,9 @@ from onyx.server.models import StatusResponse
 from onyx.utils.logger import setup_logger
 from onyx.utils.variable_functionality import fetch_ee_implementation_or_noop
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 R = TypeVarTuple("R")
@@ -619,7 +624,7 @@ def remove_credential_from_connector(
     )
 
 
-def fetch_connector_credential_pairs(
+async def fetch_connector_credential_pairs(
     db_session: Session,
     include_user_files: bool = False,
 ) -> list[ConnectorCredentialPair]:

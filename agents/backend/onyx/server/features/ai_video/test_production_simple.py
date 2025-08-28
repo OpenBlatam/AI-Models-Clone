@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+import os
+import sys
+from pathlib import Path
+        from production_ready_system import ProductionConfig, ProductionMetrics
+        from refactored_optimization_system import (
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Simple Production System Test
@@ -5,11 +15,6 @@ Simple Production System Test
 This script tests the core production system components without full initialization.
 """
 
-import asyncio
-import logging
-import os
-import sys
-from pathlib import Path
 
 # Add current directory to Python path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -29,7 +34,6 @@ async def test_production_components():
     
     # Test 1: Import production modules
     try:
-        from production_ready_system import ProductionConfig, ProductionMetrics
         logger.info("✅ Production modules imported successfully")
     except ImportError as e:
         logger.error(f"❌ Failed to import production modules: {e}")
@@ -93,7 +97,6 @@ async def test_refactored_system():
     logger.info("🧪 Testing Refactored Optimization System...")
     
     try:
-        from refactored_optimization_system import (
             OptimizationManager, create_optimization_manager
         )
         logger.info("✅ Refactored optimization system imported")

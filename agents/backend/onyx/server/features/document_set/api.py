@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -25,6 +27,9 @@ from onyx.server.features.document_set.models import DocumentSetUpdateRequest
 from onyx.utils.variable_functionality import fetch_ee_implementation_or_noop
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 router = APIRouter(prefix="/manage")
 
 

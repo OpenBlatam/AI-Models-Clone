@@ -1,13 +1,15 @@
-# THIS IS NO LONGER IN USE
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import math
 import re
 from collections.abc import Generator
 from json import JSONDecodeError
 from typing import Optional
-
 import regex
 from pydantic import BaseModel
-
 from onyx.chat.models import LlmDoc
 from onyx.chat.models import OnyxAnswer
 from onyx.chat.models import OnyxAnswerPiece
@@ -20,6 +22,12 @@ from onyx.utils.text_processing import clean_model_quote
 from onyx.utils.text_processing import clean_up_code_blocks
 from onyx.utils.text_processing import extract_embedded_json
 from onyx.utils.text_processing import shared_precompare_cleanup
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# THIS IS NO LONGER IN USE
+
+
 
 
 logger = setup_logger()
@@ -221,7 +229,9 @@ class QuotesProcessor:
         context_docs: list[LlmDoc],
         is_json_prompt: bool = True,
     ):
-        self.context_docs = context_docs
+        
+    """__init__ function."""
+self.context_docs = context_docs
         self.is_json_prompt = is_json_prompt
 
         self.found_answer_start = False if is_json_prompt else True

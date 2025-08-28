@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+    from alembic import op
+    from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """force lowercase all users
 
 Revision ID: f11b408e39d3
@@ -15,7 +22,6 @@ depends_on = None
 
 def upgrade() -> None:
     # 1) Convert all existing user emails to lowercase
-    from alembic import op
 
     op.execute(
         """
@@ -30,6 +36,5 @@ def upgrade() -> None:
 
 def downgrade() -> None:
     # Drop the check constraint
-    from alembic import op
 
     op.drop_constraint("ensure_lowercase_email", "user", type_="check")

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 from datetime import datetime
 from uuid import UUID
@@ -42,6 +44,9 @@ from onyx.server.features.persona.models import PersonaUpsertRequest
 from onyx.utils.logger import setup_logger
 from onyx.utils.variable_functionality import fetch_versioned_implementation
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -114,7 +119,7 @@ def _add_user_filters(
     return stmt.where(where_clause)
 
 
-def fetch_persona_by_id_for_user(
+async def fetch_persona_by_id_for_user(
     db_session: Session, persona_id: int, user: User | None, get_editable: bool = True
 ) -> Persona:
     stmt = select(Persona).where(Persona.id == persona_id).distinct()

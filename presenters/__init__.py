@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import json
+import logging
+from typing import Dict, List, Optional, Any
+from dataclasses import asdict
+from datetime import datetime
+from ..interfaces import (
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 ONYX BLOG POSTS - Presenters
 ============================
@@ -6,13 +25,7 @@ Presentation layer for formatting and presenting blog post data.
 Clean Architecture presentation adapters.
 """
 
-import json
-import logging
-from typing import Dict, List, Optional, Any
-from dataclasses import asdict
-from datetime import datetime
 
-from ..interfaces import (
     IBlogPresenter, BlogResult, GenerationStatus, BlogContent, 
     SEOData, GenerationMetrics, BlogSpec
 )
@@ -471,12 +484,12 @@ class ExportPresenter:
 class UnifiedBlogPresenter:
     """Unified presenter that combines all presentation formats"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.api_presenter = APIResponsePresenter()
         self.dashboard_presenter = DashboardPresenter()
         self.export_presenter = ExportPresenter()
     
-    async def present_for_api(self, result: BlogResult) -> Dict[str, Any]:
+    async async def present_for_api(self, result: BlogResult) -> Dict[str, Any]:
         """Present for API consumption"""
         return await self.api_presenter.present_blog_result(result)
     
@@ -495,7 +508,7 @@ class UnifiedBlogPresenter:
         else:
             raise ValueError(f"Unsupported export format: {format}")
     
-    async def present_batch_for_api(self, results: List[BlogResult]) -> Dict[str, Any]:
+    async async def present_batch_for_api(self, results: List[BlogResult]) -> Dict[str, Any]:
         """Present batch results for API"""
         return await self.api_presenter.present_batch_results(results)
     

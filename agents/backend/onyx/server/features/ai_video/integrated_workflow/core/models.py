@@ -1,25 +1,32 @@
-"""
-Integrated Workflow - Core Models
-
-Data models and structures for the integrated AI video workflow system.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import logging
 from datetime import datetime
 from typing import Optional, Dict, Any, List, Callable, Union
 from dataclasses import dataclass, field
 from enum import Enum
-
-# Import existing components
 from ...video_workflow import VideoWorkflow, WorkflowState, WorkflowStatus, WorkflowHooks
 from ...web_extract import WebContentExtractor, ExtractedContent
 from ...suggestions import ContentSuggestions, SuggestionEngine
 from ...video_generator import VideoGenerator, VideoGenerationResult
 from ...state_repository import StateRepository, FileStateRepository
 from ...models import AIVideo
+from ...plugins import BasePlugin
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Integrated Workflow - Core Models
+
+Data models and structures for the integrated AI video workflow system.
+"""
+
+
+# Import existing components
 
 # Import plugin system
-from ...plugins import BasePlugin
 
 logger = logging.getLogger(__name__)
 

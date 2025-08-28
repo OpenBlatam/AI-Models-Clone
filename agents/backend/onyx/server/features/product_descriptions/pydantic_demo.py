@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Pydantic Validation Demo
-Product Descriptions Feature - Comprehensive Input/Output Validation and Response Schema Demonstration
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -11,9 +13,16 @@ import logging
 import requests
 from typing import Dict, Any, List
 from datetime import datetime
+from pydantic_schemas import (
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Pydantic Validation Demo
+Product Descriptions Feature - Comprehensive Input/Output Validation and Response Schema Demonstration
+"""
+
 
 # Import Pydantic schemas
-from pydantic_schemas import (
     # Base models
     BaseRequestModel,
     BaseResponseModel,
@@ -77,7 +86,9 @@ class PydanticValidationDemo:
     """Comprehensive Pydantic validation demonstration"""
     
     def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.session = requests.Session()
         self.results: List[Dict[str, Any]] = []
     
@@ -734,6 +745,10 @@ class PydanticValidationDemo:
         """Save test results to file"""
         try:
             with open(filename, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(self.results, f, indent=2)
             logger.info(f"Results saved to {filename}")
         except Exception as e:
@@ -779,5 +794,6 @@ async def main():
     print("Demo completed! Check pydantic_validation_demo_results.json for detailed results.")
     print("=" * 70)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

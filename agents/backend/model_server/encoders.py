@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import json
 import time
@@ -46,6 +48,9 @@ from shared_configs.model_server_models import RerankResponse
 from shared_configs.utils import batch_list
 
 
+    from sentence_transformers import SentenceTransformer  # type: ignore
+from typing import Any, List, Dict, Optional
+import logging
 logger = setup_logger()
 
 router = APIRouter(prefix="/encoder")
@@ -114,7 +119,9 @@ class AuthenticationError(Exception):
     """Raised when authentication fails with a provider."""
 
     def __init__(self, provider: str, message: str = "API key is invalid or expired"):
-        self.provider = provider
+        
+    """__init__ function."""
+self.provider = provider
         self.message = message
         super().__init__(f"{provider} authentication failed: {message}")
 
@@ -371,7 +378,6 @@ def get_embedding_model(
     model_name: str,
     max_context_length: int,
 ) -> "SentenceTransformer":
-    from sentence_transformers import SentenceTransformer  # type: ignore
 
     global _GLOBAL_MODELS_DICT  # A dictionary to store models
 
@@ -533,7 +539,7 @@ async def local_rerank(query: str, docs: list[str], model_name: str) -> list[flo
     )
 
 
-async def cohere_rerank_api(
+async async def cohere_rerank_api(
     query: str, docs: list[str], model_name: str, api_key: str
 ) -> list[float]:
     cohere_client = CohereAsyncClient(api_key=api_key)
@@ -574,6 +580,10 @@ async def cohere_rerank_aws(
 
         # Read the response asynchronously
         response_body = json.loads(await response["body"].read())
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
         # Extract and sort the results
         results = response_body.get("results", [])
@@ -612,7 +622,7 @@ async def route_bi_encoder_embed(
     return await process_embed_request(embed_request, request.app.state.gpu_type)
 
 
-async def process_embed_request(
+async async def process_embed_request(
     embed_request: EmbedRequest, gpu_type: str = "UNKNOWN"
 ) -> EmbedResponse:
     if not embed_request.texts:
@@ -667,7 +677,7 @@ async def process_embed_request(
 
 
 @router.post("/cross-encoder-scores")
-async def process_rerank_request(rerank_request: RerankRequest) -> RerankResponse:
+async async def process_rerank_request(rerank_request: RerankRequest) -> RerankResponse:
     """Cross encoders can be purely black box from the app perspective"""
     if INDEXING_ONLY:
         raise RuntimeError("Indexing model server should not call intent endpoint")

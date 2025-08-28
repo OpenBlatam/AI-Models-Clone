@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-HTTP Exception Handling Demo
-Product Descriptions Feature - Comprehensive HTTP Exception Handling Demonstration
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -11,6 +13,13 @@ import logging
 from typing import Dict, Any, List
 import requests
 from pathlib import Path
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+HTTP Exception Handling Demo
+Product Descriptions Feature - Comprehensive HTTP Exception Handling Demonstration
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +29,9 @@ class HTTPExceptionDemo:
     """Comprehensive HTTP exception handling demonstration"""
     
     def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.session = requests.Session()
         self.results: List[Dict[str, Any]] = []
     
@@ -525,6 +536,10 @@ class HTTPExceptionDemo:
         """Save test results to file"""
         try:
             with open(filename, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(self.results, f, indent=2)
             logger.info(f"Results saved to {filename}")
         except Exception as e:
@@ -570,5 +585,6 @@ async def main():
     print("Demo completed! Check http_exception_demo_results.json for detailed results.")
     print("=" * 60)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

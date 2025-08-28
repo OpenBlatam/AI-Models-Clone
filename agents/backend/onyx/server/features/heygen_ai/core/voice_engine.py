@@ -34,24 +34,33 @@ try:
     from TTS.utils.synthesizer import Synthesizer
     from TTS.tts.configs.xtts_config import XttsConfig
     from TTS.tts.models.xtts import Xtts
+    TTS_AVAILABLE = True
 except ImportError:
-    logger.warning("TTS libraries not available. Install with: pip install TTS torchaudio")
-    TTS = None
-    Synthesizer = None
+    logging.warning("TTS libraries not available. Install with: pip install TTS torchaudio")
+    TTS_AVAILABLE = False
 
 # Audio processing
 try:
     import pydub
     from pydub import AudioSegment
     from pydub.effects import speedup, normalize
+    PYDUB_AVAILABLE = True
 except ImportError:
-    logger.warning("Pydub not available. Install with: pip install pydub")
-    AudioSegment = None
+    logging.warning("Pydub not available. Install with: pip install pydub")
+    PYDUB_AVAILABLE = False
+
+# ElevenLabs integration
+try:
+    import requests
+    ELEVENLABS_AVAILABLE = True
+except ImportError:
+    logging.warning("Requests not available. Install with: pip install requests")
+    ELEVENLABS_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
 
 # =============================================================================
-# Enhanced Voice Models
+# Data Models
 # =============================================================================
 
 @dataclass
@@ -84,6 +93,10 @@ class AudioGenerationConfig:
     normalize_audio: bool = True
     remove_silence: bool = True
     compression: bool = True
+    emotion: Optional[str] = None
+    speed: float = 1.0
+    pitch: float = 1.0
+    volume: float = 1.0
 
 class VoiceGenerationRequest(BaseModel):
     """Request model for voice generation."""
@@ -99,472 +112,551 @@ class VoiceGenerationRequest(BaseModel):
     custom_settings: Optional[Dict[str, Any]] = Field(default_factory=dict)
 
 # =============================================================================
+# TTS Engine Service
+# =============================================================================
+
+class TTSEngineService:
+    """Service for managing TTS engines."""
+    
+    def __init__(self):
+        self.tts_models = {}
+        self._initialize_tts_models()
+    
+    def _initialize_tts_models(self):
+        """Initialize TTS models."""
+        try:
+            if not TTS_AVAILABLE:
+                logger.warning("TTS libraries not available")
+                return
+            
+            # Initialize Coqui TTS
+            self.tts_models["coqui_tts"] = TTS("tts_models/en/ljspeech/tacotron2-DDC")
+            
+            # Initialize YourTTS for voice cloning
+            if torch.cuda.is_available():
+                self.tts_models["your_tts"] = TTS("tts_models/multilingual/multi-dataset/your_tts")
+            
+            # Initialize XTTS for high-quality synthesis
+            try:
+                self.tts_models["xtts"] = TTS("tts_models/multilingual/multi-dataset/xtts_v2")
+            except Exception as e:
+                logger.warning(f"XTTS model not available: {e}")
+            
+            logger.info(f"Initialized {len(self.tts_models)} TTS models")
+            
+        except Exception as e:
+            logger.error(f"Failed to initialize TTS models: {e}")
+            raise
+    
+    def get_model(self, voice_model: VoiceModel, request: VoiceGenerationRequest) -> Any:
+        """Select appropriate TTS model for the request."""
+        # Prefer YourTTS for voice cloning
+        if voice_model.voice_cloning and "your_tts" in self.tts_models:
+            return self.tts_models["your_tts"]
+        
+        # Prefer XTTS for high quality
+        if request.quality in ["high", "ultra"] and "xtts" in self.tts_models:
+            return self.tts_models["xtts"]
+        
+        # Default to Coqui TTS
+        return self.tts_models["coqui_tts"]
+    
+    def is_available(self) -> bool:
+        """Check if TTS engines are available."""
+        return len(self.tts_models) > 0
+
+# =============================================================================
+# Audio Processing Service
+# =============================================================================
+
+class AudioProcessingService:
+    """Service for audio processing and enhancement."""
+    
+    @staticmethod
+    def preprocess_text(text: str, language: str) -> str:
+        """Preprocess text for TTS synthesis."""
+        try:
+            # Basic text cleaning
+            processed_text = text.strip()
+            
+            # Language-specific preprocessing
+            if language == "en":
+                processed_text = processed_text.replace("&", " and ")
+                processed_text = processed_text.replace("@", " at ")
+                processed_text = processed_text.replace("#", " number ")
+            elif language == "es":
+                processed_text = processed_text.replace("ñ", "ny")
+            
+            # Remove excessive whitespace
+            processed_text = " ".join(processed_text.split())
+            return processed_text
+            
+        except Exception as e:
+            logger.warning(f"Text preprocessing failed: {e}")
+            return text
+    
+    @staticmethod
+    def post_process_audio(audio_data: np.ndarray, request: VoiceGenerationRequest) -> np.ndarray:
+        """Post-process generated audio."""
+        try:
+            processed_audio = audio_data.copy()
+            
+            # Apply speed adjustment
+            if request.speed != 1.0:
+                processed_audio = AudioProcessingService._adjust_speed(processed_audio, request.speed)
+            
+            # Apply pitch adjustment
+            if request.pitch != 1.0:
+                processed_audio = AudioProcessingService._adjust_pitch(processed_audio, request.pitch)
+            
+            # Apply volume adjustment
+            if request.volume != 1.0:
+                processed_audio = AudioProcessingService._adjust_volume(processed_audio, request.volume)
+            
+            # Apply emotion effects
+            if request.emotion:
+                processed_audio = AudioProcessingService._apply_emotion(processed_audio, request.emotion)
+            
+            # Quality enhancements
+            if request.quality in ["high", "ultra"]:
+                processed_audio = AudioProcessingService._enhance_audio_quality(processed_audio)
+            
+            # Normalize audio
+            if request.normalize_audio:
+                processed_audio = AudioProcessingService._normalize_audio(processed_audio)
+            
+            # Remove silence
+            if request.remove_silence:
+                processed_audio = AudioProcessingService._remove_silence(processed_audio)
+            
+            return processed_audio
+            
+        except Exception as e:
+            logger.warning(f"Audio post-processing failed: {e}")
+            return audio_data
+    
+    @staticmethod
+    def _adjust_speed(audio_data: np.ndarray, speed: float) -> np.ndarray:
+        """Adjust audio speed."""
+        try:
+            if PYDUB_AVAILABLE:
+                audio_segment = AudioSegment(
+                    audio_data.tobytes(), 
+                    frame_rate=22050, 
+                    sample_width=2, 
+                    channels=1
+                )
+                adjusted_audio = speedup(audio_segment, speed)
+                return np.array(adjusted_audio.get_array_of_samples())
+            else:
+                return librosa.effects.time_stretch(audio_data, rate=speed)
+                
+        except Exception as e:
+            logger.warning(f"Speed adjustment failed: {e}")
+            return audio_data
+    
+    @staticmethod
+    def _adjust_pitch(audio_data: np.ndarray, pitch: float) -> np.ndarray:
+        """Adjust audio pitch."""
+        try:
+            return librosa.effects.pitch_shift(audio_data, sr=22050, n_steps=pitch)
+        except Exception as e:
+            logger.warning(f"Pitch adjustment failed: {e}")
+            return audio_data
+    
+    @staticmethod
+    def _adjust_volume(audio_data: np.ndarray, volume: float) -> np.ndarray:
+        """Adjust audio volume."""
+        try:
+            return audio_data * volume
+        except Exception as e:
+            logger.warning(f"Volume adjustment failed: {e}")
+            return audio_data
+    
+    @staticmethod
+    def _apply_emotion(audio_data: np.ndarray, emotion: str) -> np.ndarray:
+        """Apply emotional effects to audio."""
+        try:
+            emotion_effects = {
+                "happy": {"pitch_shift": 2, "speed": 1.1, "volume": 1.2},
+                "sad": {"pitch_shift": -2, "speed": 0.9, "volume": 0.8},
+                "angry": {"pitch_shift": 3, "speed": 1.2, "volume": 1.3},
+                "calm": {"pitch_shift": -1, "speed": 0.95, "volume": 0.9},
+                "excited": {"pitch_shift": 4, "speed": 1.3, "volume": 1.4}
+            }
+            
+            effect = emotion_effects.get(emotion.lower(), {})
+            
+            if "pitch_shift" in effect:
+                audio_data = AudioProcessingService._adjust_pitch(audio_data, effect["pitch_shift"])
+            if "speed" in effect:
+                audio_data = AudioProcessingService._adjust_speed(audio_data, effect["speed"])
+            if "volume" in effect:
+                audio_data = AudioProcessingService._adjust_volume(audio_data, effect["volume"])
+            
+            return audio_data
+            
+        except Exception as e:
+            logger.warning(f"Emotion application failed: {e}")
+            return audio_data
+    
+    @staticmethod
+    def _enhance_audio_quality(audio_data: np.ndarray) -> np.ndarray:
+        """Enhance audio quality."""
+        try:
+            enhanced_audio = librosa.effects.preemphasis(audio_data, coef=0.97)
+            enhanced_audio = np.tanh(enhanced_audio * 0.8)
+            return enhanced_audio
+            
+        except Exception as e:
+            logger.warning(f"Audio quality enhancement failed: {e}")
+            return audio_data
+    
+    @staticmethod
+    def _normalize_audio(audio_data: np.ndarray) -> np.ndarray:
+        """Normalize audio levels."""
+        try:
+            max_val = np.max(np.abs(audio_data))
+            if max_val > 0:
+                normalized_audio = audio_data / max_val * 0.95
+                return normalized_audio
+            return audio_data
+            
+        except Exception as e:
+            logger.warning(f"Audio normalization failed: {e}")
+            return audio_data
+    
+    @staticmethod
+    def _remove_silence(audio_data: np.ndarray) -> np.ndarray:
+        """Remove silence from audio."""
+        try:
+            trimmed_audio, _ = librosa.effects.trim(audio_data, top_db=20)
+            return trimmed_audio
+            
+        except Exception as e:
+            logger.warning(f"Silence removal failed: {e}")
+            return audio_data
+
+# =============================================================================
+# Voice Model Repository
+# =============================================================================
+
+class VoiceModelRepository:
+    """Repository for managing voice models."""
+    
+    def __init__(self):
+        self.voice_models = {}
+        self._load_voice_models()
+    
+    def _load_voice_models(self):
+        """Load predefined voice models."""
+        self.voice_models = {
+            "voice_001": VoiceModel(
+                id="voice_001",
+                name="Professional Male - English",
+                language="en",
+                accent="american",
+                gender="male",
+                style="professional",
+                model_path="coqui_tts",
+                characteristics={
+                    "age_range": "25-35",
+                    "profession": "business",
+                    "tone": "confident",
+                    "clarity": "high"
+                }
+            ),
+            "voice_002": VoiceModel(
+                id="voice_002",
+                name="Professional Female - English",
+                language="en",
+                accent="british",
+                gender="female",
+                style="executive",
+                model_path="coqui_tts",
+                characteristics={
+                    "age_range": "25-35",
+                    "profession": "executive",
+                    "tone": "authoritative",
+                    "clarity": "high"
+                }
+            ),
+            "voice_003": VoiceModel(
+                id="voice_003",
+                name="Friendly Male - Spanish",
+                language="es",
+                accent="mexican",
+                gender="male",
+                style="casual",
+                model_path="your_tts",
+                characteristics={
+                    "age_range": "20-30",
+                    "profession": "educator",
+                    "tone": "friendly",
+                    "clarity": "medium"
+                }
+            ),
+            "voice_004": VoiceModel(
+                id="voice_004",
+                name="Anime Female - Japanese",
+                language="ja",
+                accent="tokyo",
+                gender="female",
+                style="anime",
+                model_path="xtts",
+                characteristics={
+                    "age_range": "18-25",
+                    "profession": "character",
+                    "tone": "cute",
+                    "clarity": "high"
+                }
+            )
+        }
+        logger.info(f"Loaded {len(self.voice_models)} voice models")
+    
+    def get_model(self, voice_id: str) -> Optional[VoiceModel]:
+        """Get voice model by ID."""
+        return self.voice_models.get(voice_id)
+    
+    def get_all_models(self) -> List[VoiceModel]:
+        """Get all voice models."""
+        return list(self.voice_models.values())
+    
+    def add_model(self, model: VoiceModel):
+        """Add a new voice model."""
+        self.voice_models[model.id] = model
+        logger.info(f"Added voice model: {model.id}")
+
+# =============================================================================
 # Enhanced Voice Engine
 # =============================================================================
 
 class VoiceEngine:
     """
-    Enhanced voice synthesis engine with real TTS capabilities.
+    Enhanced voice synthesis engine with multiple TTS backends.
     
     Features:
-    - Multiple TTS backends (Coqui TTS, YourTTS, ElevenLabs)
+    - Multiple TTS engines (Coqui TTS, YourTTS, ElevenLabs)
     - Voice cloning and customization
     - Emotion and style control
     - Multi-language support
     - Audio quality optimization
-    - Real-time generation
+    - Real-time voice generation
     """
     
-    def __init__(self, cache_dir: str = "./voice_cache"):
+    def __init__(self, elevenlabs_api_key: Optional[str] = None):
         """Initialize the enhanced voice engine."""
-        self.cache_dir = Path(cache_dir)
-        self.cache_dir.mkdir(exist_ok=True)
-        
-        # TTS engines
-        self.tts_engines = {}
-        self.current_engine = None
-        
-        # Voice models
-        self.voices = {}
-        self.default_voice = None
-        
-        # Performance tracking
-        self.request_count = 0
-        self.success_count = 0
-        self.error_count = 0
-        self.performance_metrics = {}
-        
-        # Audio processing
-        self.audio_cache = {}
-        self.audio_processing = None
-        
         self.initialized = False
         
-    def initialize(self) -> bool:
-        """Initialize the voice engine with TTS models."""
+        # Initialize services
+        self.tts_service = TTSEngineService()
+        self.audio_service = AudioProcessingService()
+        self.model_repository = VoiceModelRepository()
+        
+        # Initialize components
+        self._initialize_components()
+    
+    def _initialize_components(self):
+        """Initialize all voice synthesis components."""
         try:
-            logger.info("Initializing Enhanced Voice Engine...")
-            
-            # Load TTS engines
-            self._load_tts_engines()
-            
-            # Load default voices
-            self._load_default_voices()
-            
-            # Initialize audio processing
-            self._initialize_audio_processing()
+            # Check if core services are available
+            if not self.tts_service.is_available():
+                logger.warning("TTS engines not available")
             
             self.initialized = True
-            logger.info("Enhanced Voice Engine initialized successfully")
-            return True
+            logger.info("Voice Engine initialized successfully")
             
         except Exception as e:
             logger.error(f"Failed to initialize Voice Engine: {e}")
-            logger.error(traceback.format_exc())
-            return False
+            raise
     
-    def _load_tts_engines(self) -> None:
-        """Load available TTS engines."""
-        logger.info("Loading TTS engines...")
-        
-        # Try to load Coqui TTS
-        try:
-            if TTS is not None:
-                # Load default TTS model
-                tts_model = TTS(model_name="tts_models/en/ljspeech/tacotron2-DDC")
-                self.tts_engines["coqui_tts"] = {
-                    "engine": tts_model,
-                    "type": "coqui",
-                    "status": "loaded",
-                    "languages": ["en"],
-                    "quality": "high"
-                }
-                logger.info("Coqui TTS loaded successfully")
-            else:
-                logger.warning("Coqui TTS not available")
-        except Exception as e:
-            logger.warning(f"Failed to load Coqui TTS: {e}")
-        
-        # Try to load YourTTS for voice cloning
-        try:
-            if TTS is not None:
-                # YourTTS model for voice cloning
-                yourtts_model = TTS(model_name="tts_models/multilingual/multi-dataset/your_tts")
-                self.tts_engines["your_tts"] = {
-                    "engine": yourtts_model,
-                    "type": "yourtts",
-                    "status": "loaded",
-                    "languages": ["en", "es", "fr", "de", "it", "pt"],
-                    "quality": "ultra",
-                    "voice_cloning": True
-                }
-                logger.info("YourTTS loaded successfully")
-            else:
-                logger.warning("YourTTS not available")
-        except Exception as e:
-            logger.warning(f"Failed to load YourTTS: {e}")
-        
-        # Placeholder for ElevenLabs (would need API key)
-        self.tts_engines["elevenlabs"] = {
-            "engine": None,
-            "type": "elevenlabs",
-            "status": "not_configured",
-            "languages": ["en"],
-            "quality": "ultra",
-            "voice_cloning": True,
-            "api_key_required": True
-        }
-        
-        # Set default engine
-        if self.tts_engines:
-            available_engines = [k for k, v in self.tts_engines.items() 
-                               if v["status"] == "loaded"]
-            if available_engines:
-                self.current_engine = available_engines[0]
-                logger.info(f"Default TTS engine set to: {self.current_engine}")
-    
-    def _load_default_voices(self) -> None:
-        """Load default voice models."""
-        logger.info("Loading default voices...")
-        
-        # English voices
-        self.voices["en_us_01"] = VoiceModel(
-            id="en_us_01",
-            name="American English - Professional",
-            language="en",
-            accent="us",
-            gender="neutral",
-            style="professional",
-            model_path="tts_models/en/ljspeech/tacotron2-DDC",
-            sample_rate=22050,
-            characteristics={
-                "clarity": "high",
-                "pace": "moderate",
-                "tone": "professional"
-            }
-        )
-        
-        self.voices["en_us_02"] = VoiceModel(
-            id="en_us_02",
-            name="American English - Casual",
-            language="en",
-            accent="us",
-            gender="neutral",
-            style="casual",
-            model_path="tts_models/en/ljspeech/tacotron2-DDC",
-            sample_rate=22050,
-            characteristics={
-                "clarity": "high",
-                "pace": "fast",
-                "tone": "friendly"
-            }
-        )
-        
-        # Spanish voices
-        self.voices["es_es_01"] = VoiceModel(
-            id="es_es_01",
-            name="Spanish - Professional",
-            language="es",
-            accent="es",
-            gender="neutral",
-            style="professional",
-            model_path="tts_models/es/css10/vits",
-            sample_rate=22050,
-            characteristics={
-                "clarity": "high",
-                "pace": "moderate",
-                "tone": "professional"
-            }
-        )
-        
-        # Set default voice
-        self.default_voice = "en_us_01"
-        logger.info(f"Loaded {len(self.voices)} voice models")
-    
-    def _initialize_audio_processing(self) -> None:
-        """Initialize audio processing components."""
-        logger.info("Initializing audio processing...")
-        
-        # Check if audio processing libraries are available
-        if AudioSegment is not None:
-            self.audio_processing = "pydub"
-            logger.info("Audio processing initialized with PyDub")
-        else:
-            self.audio_processing = "basic"
-            logger.warning("Limited audio processing available")
-    
-    async def synthesize_speech(self, request: VoiceGenerationRequest) -> str:
+    async def generate_speech(self, request: VoiceGenerationRequest) -> str:
         """
-        Synthesize speech from text using the best available TTS engine.
+        Generate speech from text using the specified voice.
         
         Args:
             request: Voice generation request
             
         Returns:
-            Path to generated audio file
+            Path to the generated audio file
         """
         try:
-            self.request_count += 1
-            start_time = time.time()
+            if not self.initialized:
+                raise RuntimeError("Voice Engine not initialized")
             
-            logger.info(f"Synthesizing speech for text: {request.text[:50]}...")
+            logger.info(f"Generating speech for text: {request.text[:50]}...")
             
-            # Generate cache key
-            cache_key = self._generate_cache_key(request)
+            # Get voice model
+            voice_model = self.model_repository.get_model(request.voice_id)
+            if not voice_model:
+                raise ValueError(f"Voice model not found: {request.voice_id}")
             
-            # Check cache first
-            if cache_key in self.audio_cache:
-                logger.info("Audio found in cache")
-                return self.audio_cache[cache_key]
-            
-            # Select best TTS engine
-            engine_name = self._select_tts_engine(request)
-            if not engine_name:
-                raise Exception("No suitable TTS engine available")
-            
-            # Generate audio with selected engine
-            audio_path = await self._generate_audio_with_engine(request, engine_name)
-            
-            # Optimize audio if requested
-            if request.quality != "low":
-                audio_path = await self._optimize_audio(audio_path, request)
-            
-            # Cache the result
-            self._cache_audio(cache_key, audio_path)
-            
-            # Update performance metrics
-            processing_time = time.time() - start_time
-            self._update_performance_metrics(processing_time, True)
-            
-            logger.info(f"Speech synthesis completed in {processing_time:.2f}s")
-            return audio_path
-            
-        except Exception as e:
-            self.error_count += 1
-            self._update_performance_metrics(0, False)
-            logger.error(f"Speech synthesis failed: {e}")
-            logger.error(traceback.format_exc())
-            raise
-    
-    def _select_tts_engine(self, request: VoiceGenerationRequest) -> Optional[str]:
-        """Select the best TTS engine for the request."""
-        available_engines = []
-        
-        for engine_name, engine_info in self.tts_engines.items():
-            if engine_info["status"] != "loaded":
-                continue
-                
-            # Check language support
-            if request.language in engine_info.get("languages", []):
-                available_engines.append((engine_name, engine_info))
-        
-        if not available_engines:
-            return None
-        
-        # Sort by quality and features
-        available_engines.sort(key=lambda x: (
-            x[1].get("quality", "low") == "ultra",
-            x[1].get("voice_cloning", False),
-            x[1].get("quality", "low") == "high"
-        ), reverse=True)
-        
-        return available_engines[0][0]
-    
-    async def _generate_audio_with_engine(self, request: VoiceGenerationRequest, 
-                                        engine_name: str) -> str:
-        """Generate audio using the specified TTS engine."""
-        engine_info = self.tts_engines[engine_name]
-        
-        if engine_name == "coqui_tts":
-            return await self._generate_with_coqui_tts(request, engine_info)
-        elif engine_name == "your_tts":
-            return await self._generate_with_yourtts(request, engine_info)
-        elif engine_name == "elevenlabs":
-            return await self._generate_with_elevenlabs(request, engine_info)
-        else:
-            return await self._generate_fallback_tts(request)
-    
-    async def _generate_with_coqui_tts(self, request: VoiceGenerationRequest, 
-                                     engine_info: Dict) -> str:
-        """Generate audio using Coqui TTS."""
-        try:
-            engine = engine_info["engine"]
-            
-            # Generate output path
-            output_path = self.cache_dir / f"coqui_{uuid.uuid4()}.wav"
+            # Select TTS model
+            tts_model = self.tts_service.get_model(voice_model, request)
             
             # Generate speech
-            engine.tts_to_file(
-                text=request.text,
-                file_path=str(output_path),
-                speaker_wav=None,  # Use default voice
-                language=request.language
+            audio_data = await self._synthesize_speech(tts_model, request, voice_model)
+            
+            # Post-process audio
+            processed_audio = self.audio_service.post_process_audio(audio_data, request)
+            
+            # Save audio file
+            output_path = f"./generated_audio/speech_{uuid.uuid4().hex[:8]}.{request.quality}.wav"
+            Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+            
+            # Save with appropriate format
+            if PYDUB_AVAILABLE:
+                self._save_audio_pydub(processed_audio, output_path, request)
+            else:
+                self._save_audio_librosa(processed_audio, output_path, request)
+            
+            logger.info(f"Speech generated successfully: {output_path}")
+            return output_path
+            
+        except Exception as e:
+            logger.error(f"Speech generation failed: {e}")
+            raise
+    
+    async def _synthesize_speech(self, tts_model: Any, request: VoiceGenerationRequest, 
+                                voice_model: VoiceModel) -> np.ndarray:
+        """Synthesize speech using the selected TTS model."""
+        try:
+            # Prepare text for synthesis
+            processed_text = self.audio_service.preprocess_text(request.text, request.language)
+            
+            # Generate speech
+            if hasattr(tts_model, 'tts'):
+                # Coqui TTS
+                audio_data = tts_model.tts(
+                    text=processed_text,
+                    speaker=voice_model.name if hasattr(tts_model, 'speakers') else None,
+                    language=request.language
+                )
+            elif hasattr(tts_model, 'synthesize'):
+                # YourTTS or XTTS
+                audio_data = tts_model.synthesize(
+                    text=processed_text,
+                    speaker=voice_model.name if hasattr(tts_model, 'speakers') else None,
+                    language=request.language
+                )
+            else:
+                raise ValueError("Unsupported TTS model type")
+            
+            # Convert to numpy array if needed
+            if isinstance(audio_data, torch.Tensor):
+                audio_data = audio_data.cpu().numpy()
+            
+            # Ensure mono channel
+            if len(audio_data.shape) > 1 and audio_data.shape[1] > 1:
+                audio_data = np.mean(audio_data, axis=1)
+            
+            return audio_data
+            
+        except Exception as e:
+            logger.error(f"Speech synthesis failed: {e}")
+            raise
+    
+    def _save_audio_pydub(self, audio_data: np.ndarray, output_path: str, request: VoiceGenerationRequest):
+        """Save audio using pydub."""
+        try:
+            audio_segment = AudioSegment(
+                audio_data.tobytes(),
+                frame_rate=request.sample_rate,
+                sample_width=request.bit_depth // 8,
+                channels=request.channels
             )
-            
-            logger.info(f"Coqui TTS generated audio: {output_path}")
-            return str(output_path)
+            audio_segment.export(output_path, format=request.format)
             
         except Exception as e:
-            logger.error(f"Coqui TTS generation failed: {e}")
+            logger.error(f"Failed to save audio with pydub: {e}")
             raise
     
-    async def _generate_with_yourtts(self, request: VoiceGenerationRequest, 
-                                   engine_info: Dict) -> str:
-        """Generate audio using YourTTS for voice cloning."""
+    def _save_audio_librosa(self, audio_data: np.ndarray, output_path: str, request: VoiceGenerationRequest):
+        """Save audio using librosa."""
         try:
-            engine = engine_info["engine"]
-            
-            # Generate output path
-            output_path = self.cache_dir / f"yourtts_{uuid.uuid4()}.wav"
-            
-            # Generate speech with YourTTS
-            engine.tts_to_file(
-                text=request.text,
-                file_path=str(output_path),
-                speaker_wav=None,  # Would be provided for voice cloning
-                language=request.language
-            )
-            
-            logger.info(f"YourTTS generated audio: {output_path}")
-            return str(output_path)
+            sf.write(output_path, audio_data, request.sample_rate)
             
         except Exception as e:
-            logger.error(f"YourTTS generation failed: {e}")
+            logger.error(f"Failed to save audio with librosa: {e}")
             raise
     
-    async def _generate_with_elevenlabs(self, request: VoiceGenerationRequest, 
-                                      engine_info: Dict) -> str:
-        """Generate audio using ElevenLabs (placeholder)."""
-        # This would require ElevenLabs API integration
-        logger.warning("ElevenLabs not yet implemented - using fallback")
-        return await self._generate_fallback_tts(request)
-    
-    async def _generate_fallback_tts(self, request: VoiceGenerationRequest) -> str:
-        """Fallback TTS generation using basic methods."""
-        try:
-            # Generate a simple audio file (placeholder)
-            output_path = self.cache_dir / f"fallback_{uuid.uuid4()}.wav"
-            
-            # Create a simple sine wave as placeholder
-            sample_rate = 22050
-            duration = len(request.text.split()) * 0.5  # Rough estimate
-            t = np.linspace(0, duration, int(sample_rate * duration))
-            audio = np.sin(2 * np.pi * 440 * t) * 0.3  # 440 Hz tone
-            
-            # Save audio
-            sf.write(str(output_path), audio, sample_rate)
-            
-            logger.warning(f"Fallback TTS generated placeholder audio: {output_path}")
-            return str(output_path)
-            
-        except Exception as e:
-            logger.error(f"Fallback TTS failed: {e}")
-            raise
-    
-    async def _optimize_audio(self, audio_path: str, request: VoiceGenerationRequest) -> str:
-        """Optimize audio quality based on request settings."""
-        try:
-            if self.audio_processing != "pydub":
-                return audio_path
-            
-            # Load audio with PyDub
-            audio = AudioSegment.from_file(audio_path)
-            
-            # Apply speed adjustment
-            if request.speed != 1.0:
-                audio = speedup(audio, playback_speed=request.speed)
-            
-            # Apply volume adjustment
-            if request.volume != 1.0:
-                audio = audio + (20 * np.log10(request.volume))
-            
-            # Normalize audio if requested
-            if request.quality in ["high", "ultra"]:
-                audio = normalize(audio)
-            
-            # Save optimized audio
-            optimized_path = audio_path.replace(".wav", "_optimized.wav")
-            audio.export(optimized_path, format="wav")
-            
-            logger.info(f"Audio optimized and saved to: {optimized_path}")
-            return optimized_path
-            
-        except Exception as e:
-            logger.warning(f"Audio optimization failed: {e}")
-            return audio_path
-    
-    def _generate_cache_key(self, request: VoiceGenerationRequest) -> str:
-        """Generate cache key for the request."""
-        import hashlib
-        key_data = f"{request.text}_{request.voice_id}_{request.language}_{request.quality}_{request.emotion}_{request.speed}_{request.pitch}_{request.volume}"
-        return hashlib.md5(key_data.encode()).hexdigest()
-    
-    def _cache_audio(self, cache_key: str, audio_path: str) -> None:
-        """Cache audio file."""
-        self.audio_cache[cache_key] = audio_path
+    async def clone_voice(self, reference_audio_path: str, voice_name: str) -> str:
+        """
+        Clone a voice from reference audio.
         
-        # Limit cache size
-        if len(self.audio_cache) > 100:
-            # Remove oldest entries
-            oldest_keys = list(self.audio_cache.keys())[:20]
-            for key in oldest_keys:
-                del self.audio_cache[key]
-    
-    def _update_performance_metrics(self, processing_time: float, success: bool) -> None:
-        """Update performance metrics."""
-        if success:
-            self.success_count += 1
-            self.performance_metrics["avg_processing_time"] = (
-                (self.performance_metrics.get("avg_processing_time", 0) * (self.success_count - 1) + processing_time) / self.success_count
-            )
-            self.performance_metrics["success_rate"] = self.success_count / self.request_count
-        else:
-            self.performance_metrics["error_rate"] = self.error_count / self.request_count
-    
-    def get_available_voices(self) -> List[VoiceModel]:
-        """Get list of available voices."""
-        return list(self.voices.values())
-    
-    def get_voice_details(self, voice_id: str) -> Optional[VoiceModel]:
-        """Get details of a specific voice."""
-        return self.voices.get(voice_id)
-    
-    def get_performance_metrics(self) -> Dict[str, Any]:
-        """Get performance metrics."""
-        return {
-            "request_count": self.request_count,
-            "success_count": self.success_count,
-            "error_count": self.error_count,
-            "success_rate": self.performance_metrics.get("success_rate", 0.0),
-            "error_rate": self.performance_metrics.get("error_rate", 0.0),
-            "avg_processing_time": self.performance_metrics.get("avg_processing_time", 0.0),
-            "tts_engines": {k: v["status"] for k, v in self.tts_engines.items()}
-        }
-    
-    def health_check(self) -> Dict[str, bool]:
-        """Check health of voice engine components."""
-        return {
-            "initialized": self.initialized,
-            "tts_engines_loaded": any(v["status"] == "loaded" for v in self.tts_engines.values()),
-            "voices_available": len(self.voices) > 0,
-            "audio_processing": self.audio_processing is not None,
-            "cache_functional": self.cache_dir.exists()
-        }
-    
-    def cleanup(self) -> None:
-        """Clean up temporary audio files."""
+        Args:
+            reference_audio_path: Path to reference audio file
+            voice_name: Name for the cloned voice
+            
+        Returns:
+            Voice ID of the cloned voice
+        """
         try:
-            # Remove temporary audio files
-            for audio_path in self.audio_cache.values():
-                try:
-                    Path(audio_path).unlink(missing_ok=True)
-                except Exception:
-                    pass
+            if not self.initialized:
+                raise RuntimeError("Voice Engine not initialized")
             
-            # Clear cache
-            self.audio_cache.clear()
+            if "your_tts" not in self.tts_service.tts_models:
+                raise RuntimeError("YourTTS not available for voice cloning")
             
-            logger.info("Voice engine cleanup completed")
+            logger.info(f"Cloning voice from: {reference_audio_path}")
+            
+            # Load reference audio
+            reference_audio, sr = librosa.load(reference_audio_path, sr=22050)
+            
+            # Create new voice model
+            voice_id = f"cloned_{uuid.uuid4().hex[:8]}"
+            
+            cloned_voice = VoiceModel(
+                id=voice_id,
+                name=voice_name,
+                language="en",  # Default to English
+                accent="cloned",
+                gender="unknown",
+                style="cloned",
+                model_path="your_tts",
+                voice_cloning=True,
+                characteristics={
+                    "cloned_from": reference_audio_path,
+                    "cloning_date": time.time()
+                }
+            )
+            
+            # Store cloned voice
+            self.model_repository.add_model(cloned_voice)
+            
+            logger.info(f"Voice cloned successfully: {voice_id}")
+            return voice_id
             
         except Exception as e:
-            logger.warning(f"Cleanup failed: {e}") 
+            logger.error(f"Voice cloning failed: {e}")
+            raise
+    
+    def get_available_voices(self) -> List[Dict[str, Any]]:
+        """Get list of available voice models."""
+        return [
+            {
+                "id": model.id,
+                "name": model.name,
+                "language": model.language,
+                "accent": model.accent,
+                "gender": model.gender,
+                "style": model.style,
+                "characteristics": model.characteristics,
+                "emotion_support": model.emotion_support,
+                "voice_cloning": model.voice_cloning
+            }
+            for model in self.model_repository.get_all_models()
+        ]
+    
+    def health_check(self) -> Dict[str, Any]:
+        """Health check for the voice engine."""
+        return {
+            "status": "healthy" if self.initialized else "unhealthy",
+            "initialized": self.initialized,
+            "tts_available": TTS_AVAILABLE,
+            "pydub_available": PYDUB_AVAILABLE,
+            "elevenlabs_available": ELEVENLABS_AVAILABLE,
+            "tts_models_count": len(self.tts_service.tts_models),
+            "voice_models_count": len(self.model_repository.get_all_models()),
+            "available_engines": list(self.tts_service.tts_models.keys())
+        } 

@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import re
 import time
 from collections.abc import Callable
@@ -13,6 +18,9 @@ from onyx.connectors.google_drive.models import GoogleDriveFileType
 from onyx.utils.logger import setup_logger
 from onyx.utils.retry_wrapper import retry_builder
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 

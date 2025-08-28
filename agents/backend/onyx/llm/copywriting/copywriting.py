@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+from sqlalchemy.orm import registry
+from sqlalchemy import Column, Integer, String, Text, DateTime, func
+from pydantic import BaseModel
+from typing import Optional
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Copywriting database model and helpers for Onyx backend.
 
@@ -102,14 +113,11 @@ fastapi-limiter==0.1.6
 prometheus_fastapi_instrumentator==7.1.0
 sendgrid==6.11.0
 """
-from sqlalchemy.orm import registry
-from sqlalchemy import Column, Integer, String, Text, DateTime, func
-from pydantic import BaseModel
-from typing import Optional
 
 mapper_registry = registry()
 
 @mapper_registry.mapped
+@dataclass
 class Copywriting:
     __tablename__ = "copywriting"
     id = Column(Integer, primary_key=True, index=True)
@@ -128,10 +136,11 @@ class CopywritingRead(BaseModel):
     input_data: str
     output_data: str
     created_at: Optional[str]
-    class Config:
+    @dataclass
+class Config:
         orm_mode = True
 
-def create_copywriting_table(engine):
+def create_copywriting_table(engine) -> Any:
     """Create the copywriting table in the database."""
     mapper_registry.metadata.create_all(engine)
 

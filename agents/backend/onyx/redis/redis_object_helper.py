@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from abc import ABC
 from abc import abstractmethod
 
@@ -9,13 +11,18 @@ from sqlalchemy.orm import Session
 from onyx.redis.redis_pool import get_redis_client
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class RedisObjectHelper(ABC):
     PREFIX = "base"
     FENCE_PREFIX = PREFIX + "_fence"
     TASKSET_PREFIX = PREFIX + "_taskset"
 
     def __init__(self, tenant_id: str, id: str):
-        self._tenant_id: str = tenant_id
+        
+    """__init__ function."""
+self._tenant_id: str = tenant_id
         self._id: str = id
         self.redis = get_redis_client(tenant_id=tenant_id)
 

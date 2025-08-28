@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Motor de Embeddings Avanzado - NotebookLM AI
-🔗 Generación de embeddings vectoriales con múltiples modelos
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -14,13 +16,25 @@ from collections import defaultdict, OrderedDict
 import structlog
 import threading
 from concurrent.futures import ThreadPoolExecutor
+                from sentence_transformers import SentenceTransformer
+        import hashlib
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Motor de Embeddings Avanzado - NotebookLM AI
+🔗 Generación de embeddings vectoriales con múltiples modelos
+"""
+
 
 logger = structlog.get_logger()
 
 # Cache LRU thread-safe
 class LRUCache:
     def __init__(self, maxsize: int = 1000):
-        self.maxsize = maxsize
+        
+    """__init__ function."""
+self.maxsize = maxsize
         self.cache = OrderedDict()
         self.lock = threading.Lock()
     
@@ -33,14 +47,16 @@ class LRUCache:
             return None
     
     def put(self, key: str, value: Any):
-        with self.lock:
+        
+    """put function."""
+with self.lock:
             if key in self.cache:
                 self.cache.pop(key)
             elif len(self.cache) >= self.maxsize:
                 self.cache.popitem(last=False)
             self.cache[key] = value
     
-    def clear(self):
+    def clear(self) -> Any:
         with self.lock:
             self.cache.clear()
 
@@ -70,7 +86,9 @@ class EmbeddingEngine:
     """Motor de embeddings avanzado."""
     
     def __init__(self, config: EmbeddingConfig = None):
-        self.config = config or EmbeddingConfig()
+        
+    """__init__ function."""
+self.config = config or EmbeddingConfig()
         self.stats = defaultdict(int)
         self.cache = LRUCache(self.config.cache_maxsize) if self.config.enable_caching else None
         self.executor = ThreadPoolExecutor(max_workers=self.config.max_workers)
@@ -96,14 +114,13 @@ class EmbeddingEngine:
         content = f"{text}:{model_name}:{self.config.max_length}"
         return hashlib.md5(content.encode()).hexdigest()
     
-    def _load_model(self):
+    def _load_model(self) -> Any:
         """Carga el modelo de embeddings bajo demanda."""
         if self.model is not None:
             return
         
         try:
             if self.config.model_type == "sentence-transformers":
-                from sentence_transformers import SentenceTransformer
                 self.model = SentenceTransformer(self.config.model_name, device=self.config.device)
                 logger.info(f"Modelo cargado: {self.config.model_name}")
             else:
@@ -194,7 +211,6 @@ class EmbeddingEngine:
     async def _generate_fallback_embeddings(self, text: str) -> List[float]:
         """Genera embeddings simulados como fallback."""
         # Embeddings simulados basados en características del texto
-        import hashlib
         
         # Hash del texto para generar vector consistente
         text_hash = hashlib.md5(text.encode()).hexdigest()
@@ -246,7 +262,7 @@ class EmbeddingEngine:
             "model_loaded": self.model is not None
         }
     
-    def clear_cache(self):
+    def clear_cache(self) -> Any:
         """Limpia el cache."""
         if self.cache:
             self.cache.clear()

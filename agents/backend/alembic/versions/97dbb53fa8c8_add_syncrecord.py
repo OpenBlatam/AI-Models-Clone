@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add SyncRecord
 
 Revision ID: 97dbb53fa8c8
@@ -6,8 +13,6 @@ Create Date: 2025-01-11 19:39:50.426302
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "97dbb53fa8c8"
@@ -53,6 +58,16 @@ def upgrade() -> None:
     )
 
     # Add index for fetch_latest_sync_record query
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     op.create_index(
         "ix_sync_record_entity_id_sync_type_sync_start_time",
         "sync_record",

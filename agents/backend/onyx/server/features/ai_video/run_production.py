@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import os
+import sys
+from pathlib import Path
+        from production_ready_system import ProductionWorkflowManager, ProductionAPI, ProductionConfig
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Production Runner - Complete AI Video System
@@ -5,10 +14,6 @@ Production Runner - Complete AI Video System
 Simple script to run the production system with all optimizations.
 """
 
-import asyncio
-import os
-import sys
-from pathlib import Path
 
 # Setup environment
 os.environ.update({
@@ -33,7 +38,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 async def main():
     """Run production system."""
     try:
-        from production_ready_system import ProductionWorkflowManager, ProductionAPI, ProductionConfig
         
         print("🚀 Starting AI Video Production System...")
         

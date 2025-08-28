@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import copy
 import os
 from collections.abc import Iterator
@@ -35,6 +37,10 @@ from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import parallel_yield
 from onyx.utils.threadpool_concurrency import run_with_timeout
 
+    from tests.daily.connectors.utils import load_everything_from_checkpoint_connector
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -331,7 +337,7 @@ def _convert_thread_to_document(
     return doc
 
 
-def _update_request_url(request: RequestOptions, next_url: str) -> None:
+async def _update_request_url(request: RequestOptions, next_url: str) -> None:
     request.url = next_url
 
 
@@ -549,7 +555,6 @@ def _should_process_message(
 
 
 if __name__ == "__main__":
-    from tests.daily.connectors.utils import load_everything_from_checkpoint_connector
 
     app_id = os.environ["TEAMS_APPLICATION_ID"]
     dir_id = os.environ["TEAMS_DIRECTORY_ID"]

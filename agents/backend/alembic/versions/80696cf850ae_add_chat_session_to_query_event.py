@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add chat session to query_event
 
 Revision ID: 80696cf850ae
@@ -6,8 +13,6 @@ Create Date: 2023-11-26 02:38:35.008070
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "80696cf850ae"

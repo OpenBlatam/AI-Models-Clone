@@ -1,10 +1,13 @@
-"""
-Evaluation Metrics for Email Sequence System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Comprehensive evaluation metrics for email sequence models including
-content quality, engagement prediction, personalization effectiveness,
-and business impact metrics.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import logging
@@ -14,13 +17,35 @@ from collections import defaultdict
 import math
 import time
 from pathlib import Path
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 import pandas as pd
 from sklearn.metrics import (
+from sklearn.preprocessing import StandardScaler, LabelEncoder
+import matplotlib.pyplot as plt
+import seaborn as sns
+from tqdm import tqdm
+import nltk
+from nltk.tokenize import word_tokenize, sent_tokenize
+from nltk.corpus import stopwords
+from nltk.sentiment import SentimentIntensityAnalyzer
+import textstat
+from textblob import TextBlob
+from ..models.sequence import EmailSequence, SequenceStep
+from ..models.subscriber import Subscriber
+from ..models.template import EmailTemplate
+from typing import Any, List, Dict, Optional
+"""
+Evaluation Metrics for Email Sequence System
+
+Comprehensive evaluation metrics for email sequence models including
+content quality, engagement prediction, personalization effectiveness,
+and business impact metrics.
+"""
+
+
     mean_squared_error,
     mean_absolute_error,
     r2_score,
@@ -36,20 +61,7 @@ from sklearn.metrics import (
     log_loss,
     brier_score_loss
 )
-from sklearn.preprocessing import StandardScaler, LabelEncoder
-import matplotlib.pyplot as plt
-import seaborn as sns
-from tqdm import tqdm
-import nltk
-from nltk.tokenize import word_tokenize, sent_tokenize
-from nltk.corpus import stopwords
-from nltk.sentiment import SentimentIntensityAnalyzer
-import textstat
-from textblob import TextBlob
 
-from ..models.sequence import EmailSequence, SequenceStep
-from ..models.subscriber import Subscriber
-from ..models.template import EmailTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -107,7 +119,9 @@ class ContentQualityMetrics:
     """Content quality evaluation metrics"""
     
     def __init__(self, config: MetricsConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.stop_words = set(stopwords.words('english'))
         self.sentiment_analyzer = SentimentIntensityAnalyzer()
         
@@ -395,7 +409,9 @@ class EngagementMetrics:
     """Engagement prediction and analysis metrics"""
     
     def __init__(self, config: MetricsConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         
         # Engagement keywords and patterns
         self.engagement_keywords = {
@@ -585,7 +601,9 @@ class BusinessImpactMetrics:
     """Business impact and conversion metrics"""
     
     def __init__(self, config: MetricsConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         
         # Conversion indicators
         self.conversion_keywords = [
@@ -727,7 +745,9 @@ class TechnicalMetrics:
     """Technical performance and model metrics"""
     
     def __init__(self, config: MetricsConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.metrics_history = defaultdict(list)
         
         logger.info("Technical Metrics initialized")
@@ -855,7 +875,9 @@ class EmailSequenceEvaluator:
     """Comprehensive email sequence evaluation system"""
     
     def __init__(self, config: MetricsConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.content_metrics = ContentQualityMetrics(config)
         self.engagement_metrics = EngagementMetrics(config)
         self.business_metrics = BusinessImpactMetrics(config)

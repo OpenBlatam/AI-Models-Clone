@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from datetime import timedelta
 from typing import Any
 
@@ -18,6 +23,9 @@ from onyx.utils.variable_functionality import fetch_versioned_implementation
 from shared_configs.configs import IGNORED_SYNCING_TENANT_LIST
 from shared_configs.configs import MULTI_TENANT
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 task_logger = get_task_logger(__name__)
 
 celery_app = Celery(__name__)

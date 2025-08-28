@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+from typing import List, Optional, Dict, Any, Tuple
+from uuid import UUID
+from datetime import datetime, timedelta
+from src.domain.entities import (
+from src.domain.interfaces import (
+from src.core.exceptions import (
+from typing import Any, List, Dict, Optional
 """
 🎯 Application Use Cases
 =======================
@@ -6,21 +26,13 @@ Production-ready business logic implementing clean architecture
 with proper error handling, validation, and performance optimization.
 """
 
-import asyncio
-import logging
-from typing import List, Optional, Dict, Any, Tuple
-from uuid import UUID
-from datetime import datetime, timedelta
 
-from src.domain.entities import (
     User, ContentRequest, GeneratedContent, ContentTemplate, UsageMetrics,
     Status, ContentType, Language, Tone
 )
-from src.domain.interfaces import (
     UserRepository, ContentRepository, TemplateRepository, MetricsRepository,
     AIService, EventPublisher, CacheService, RateLimiter
 )
-from src.core.exceptions import (
     BusinessException, ValidationException, NotFoundException,
     UnauthorizedException, InsufficientCreditsException, AIServiceUnavailableException
 )
@@ -38,7 +50,9 @@ class GenerateContentUseCase:
         cache_service: CacheService,
         rate_limiter: RateLimiter
     ):
-        self.user_repo = user_repo
+        
+    """__init__ function."""
+self.user_repo = user_repo
         self.content_repo = content_repo
         self.ai_service = ai_service
         self.event_publisher = event_publisher
@@ -89,7 +103,7 @@ class GenerateContentUseCase:
             await self._handle_generation_error(request, str(e))
             raise
     
-    async def _create_content_request(self, user_id: UUID, request_data: Dict[str, Any]) -> ContentRequest:
+    async async def _create_content_request(self, user_id: UUID, request_data: Dict[str, Any]) -> ContentRequest:
         """Create and validate content request"""
         
         # Validate required fields
@@ -348,7 +362,9 @@ class GetUserContentUseCase:
     """Use case for retrieving user content"""
     
     def __init__(self, content_repo: ContentRepository, cache_service: CacheService):
-        self.content_repo = content_repo
+        
+    """__init__ function."""
+self.content_repo = content_repo
         self.cache_service = cache_service
         self.logger = logging.getLogger(__name__)
     
@@ -374,7 +390,9 @@ class SearchContentUseCase:
     """Use case for searching content"""
     
     def __init__(self, content_repo: ContentRepository, cache_service: CacheService):
-        self.content_repo = content_repo
+        
+    """__init__ function."""
+self.content_repo = content_repo
         self.cache_service = cache_service
         self.logger = logging.getLogger(__name__)
     
@@ -409,7 +427,9 @@ class CreateTemplateUseCase:
     """Use case for creating content templates"""
     
     def __init__(self, template_repo: TemplateRepository, cache_service: CacheService):
-        self.template_repo = template_repo
+        
+    """__init__ function."""
+self.template_repo = template_repo
         self.cache_service = cache_service
         self.logger = logging.getLogger(__name__)
     
@@ -450,7 +470,9 @@ class GetUserMetricsUseCase:
     """Use case for retrieving user metrics"""
     
     def __init__(self, metrics_repo: MetricsRepository, cache_service: CacheService):
-        self.metrics_repo = metrics_repo
+        
+    """__init__ function."""
+self.metrics_repo = metrics_repo
         self.cache_service = cache_service
         self.logger = logging.getLogger(__name__)
     
@@ -481,7 +503,9 @@ class UpdateUserCreditsUseCase:
     """Use case for updating user credits"""
     
     def __init__(self, user_repo: UserRepository, event_publisher: EventPublisher):
-        self.user_repo = user_repo
+        
+    """__init__ function."""
+self.user_repo = user_repo
         self.event_publisher = event_publisher
         self.logger = logging.getLogger(__name__)
     

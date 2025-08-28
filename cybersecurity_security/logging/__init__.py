@@ -1,10 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .security_logger import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Security Logging and Monitoring Module
 
 Provides comprehensive security logging and monitoring capabilities.
 """
 
-from .security_logger import (
     SecurityEvent,
     LoggerConfig,
     LoggingResult,

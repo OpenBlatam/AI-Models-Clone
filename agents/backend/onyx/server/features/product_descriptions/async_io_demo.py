@@ -1,8 +1,7 @@
-#!/usr/bin/env python3
-"""
-Async I/O Demo
-Product Descriptions Feature - Comprehensive Asynchronous I/O Operations Demonstration
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -15,9 +14,17 @@ import asyncpg
 import aiosqlite
 import aioredis
 from pathlib import Path
+from async_io_manager import (
+        import shutil
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Async I/O Demo
+Product Descriptions Feature - Comprehensive Asynchronous I/O Operations Demonstration
+"""
+
 
 # Import async I/O manager
-from async_io_manager import (
     AsyncIOManager,
     ConnectionConfig,
     ConnectionType,
@@ -41,7 +48,7 @@ logger = logging.getLogger(__name__)
 class AsyncIODemo:
     """Comprehensive async I/O operations demonstration"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.results: List[Dict[str, Any]] = []
         self.io_manager = AsyncIOManager()
         
@@ -70,7 +77,7 @@ class AsyncIODemo:
         self.results.append(result)
         logger.info(f"Test: {test_name} - {'PASS' if success else 'FAIL'} ({duration:.3f}s)")
     
-    async def setup(self):
+    async def setup(self) -> Any:
         """Setup demo environment"""
         # Create test directories
         Path("test_data").mkdir(exist_ok=True)
@@ -87,12 +94,11 @@ class AsyncIODemo:
         
         logger.info("Async I/O demo environment setup completed")
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup demo environment"""
         await cleanup_io_connections()
         
         # Cleanup test files
-        import shutil
         if Path("test_data").exists():
             shutil.rmtree("test_data")
         if Path("test_cache").exists():
@@ -100,7 +106,7 @@ class AsyncIODemo:
         
         logger.info("Async I/O demo environment cleanup completed")
     
-    async def _create_test_tables(self):
+    async def _create_test_tables(self) -> Any:
         """Create test database tables"""
         try:
             # Create users table
@@ -193,7 +199,7 @@ class AsyncIODemo:
             self.log_result("Database Connections", False, {"error": str(e)}, duration)
             return {"error": str(e)}
     
-    async def test_api_sessions(self) -> Dict[str, Any]:
+    async async def test_api_sessions(self) -> Dict[str, Any]:
         """Test API session initialization"""
         start_time = time.time()
         
@@ -435,7 +441,7 @@ class AsyncIODemo:
             self.log_result("Database Transactions", False, {"error": str(e)}, duration)
             return {"error": str(e)}
     
-    async def test_api_requests(self) -> Dict[str, Any]:
+    async async def test_api_requests(self) -> Dict[str, Any]:
         """Test async API requests"""
         start_time = time.time()
         
@@ -482,7 +488,7 @@ class AsyncIODemo:
             self.log_result("API Requests", False, {"error": str(e)}, duration)
             return {"error": str(e)}
     
-    async def test_batch_api_requests(self) -> Dict[str, Any]:
+    async async def test_batch_api_requests(self) -> Dict[str, Any]:
         """Test batch API requests"""
         start_time = time.time()
         
@@ -589,7 +595,9 @@ class AsyncIODemo:
             # Test timed decorator
             @async_io_timed("test_operation")
             async def test_db_operation():
-                await asyncio.sleep(0.1)
+                
+    """test_db_operation function."""
+await asyncio.sleep(0.1)
                 return await self.io_manager.execute_query(
                     "postgres",
                     "SELECT 1 as test",
@@ -599,7 +607,9 @@ class AsyncIODemo:
             # Test retry decorator
             @async_io_retry(max_attempts=2, delay=0.1)
             async def test_api_operation():
-                await asyncio.sleep(0.05)
+                
+    """test_api_operation function."""
+await asyncio.sleep(0.05)
                 return await self.io_manager.make_api_request(
                     "test_external_api",
                     "GET",
@@ -782,6 +792,10 @@ class AsyncIODemo:
         """Save test results to file"""
         try:
             with open(filename, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(self.results, f, indent=2)
             logger.info(f"Results saved to {filename}")
         except Exception as e:
@@ -827,5 +841,6 @@ async def main():
     print("Demo completed! Check async_io_demo_results.json for detailed results.")
     print("=" * 70)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

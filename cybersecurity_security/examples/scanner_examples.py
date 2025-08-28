@@ -1,15 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from typing import Dict, Any
+from ..scanners import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Scanner Examples
 
 Demonstrates how to use the comprehensive scanner modules.
 """
 
-import asyncio
-import time
-from typing import Dict, Any
 
 # Import scanner modules
-from ..scanners import (
     # Port Scanner
     PortScanRequest, PortRangeScanRequest, scan_port_async, scan_port_range_async,
     
@@ -276,5 +283,6 @@ async def main():
         print(f"❌ Error running scanner examples: {e}")
         raise
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

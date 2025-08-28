@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Dict, Any
+from ...core.interfaces.metrics_interface import IMetricsService
+from ...core.entities.metrics import MetricsData
+import logging
+    from prometheus_client import Counter, Histogram, Gauge, CollectorRegistry, generate_latest
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Prometheus Metrics Implementation
 =================================
@@ -5,15 +14,10 @@ Prometheus Metrics Implementation
 Concrete implementation of metrics service using Prometheus.
 """
 
-from typing import Dict, Any
-from ...core.interfaces.metrics_interface import IMetricsService
-from ...core.entities.metrics import MetricsData
-import logging
 
 logger = logging.getLogger(__name__)
 
 try:
-    from prometheus_client import Counter, Histogram, Gauge, CollectorRegistry, generate_latest
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
@@ -23,7 +27,7 @@ except ImportError:
 class PrometheusMetricsService(IMetricsService):
     """Prometheus-based metrics service implementation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics_data = MetricsData.create_empty()
         
         if PROMETHEUS_AVAILABLE:
@@ -32,7 +36,7 @@ class PrometheusMetricsService(IMetricsService):
         else:
             self.registry = None
     
-    def _init_prometheus_metrics(self):
+    def _init_prometheus_metrics(self) -> Any:
         """Initialize Prometheus metrics."""
         self.request_count = Counter(
             'api_requests_total',

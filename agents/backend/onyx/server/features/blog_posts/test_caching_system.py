@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import pytest
+import asyncio
+import time
+import json
+from typing import Dict, List, Tuple, Any
+from unittest.mock import Mock, patch, AsyncMock, MagicMock
+import tempfile
+import os
+from caching_system import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 🧪 COMPREHENSIVE CACHING SYSTEM TESTS
 ====================================
@@ -24,16 +46,7 @@ Features:
 - Configuration testing
 """
 
-import pytest
-import asyncio
-import time
-import json
-from typing import Dict, List, Tuple, Any
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
-import tempfile
-import os
 
-from caching_system import (
     CacheConfig, CacheStrategy, CacheTier, CacheKeyGenerator,
     CacheSerializer, InMemoryCache, RedisCache, MultiTierCache,
     CacheWarmer, CacheMonitor, CacheManager, cached, cache_invalidate,
@@ -94,7 +107,7 @@ def test_data():
 class TestCacheConfig:
     """Test cache configuration."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration values."""
         config = CacheConfig()
         
@@ -109,7 +122,7 @@ class TestCacheConfig:
         assert config.enable_compression is True
         assert config.enable_monitoring is True
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration values."""
         config = CacheConfig(
             redis_url="redis://test:6379",
@@ -125,7 +138,7 @@ class TestCacheConfig:
         assert config.enable_multi_tier is False
         assert config.cache_tier == CacheTier.L1
     
-    def test_config_validation(self):
+    def test_config_validation(self) -> Any:
         """Test configuration validation."""
         # Should not raise validation error
         config = CacheConfig()
@@ -139,7 +152,7 @@ class TestCacheConfig:
 class TestCacheKeyGenerator:
     """Test cache key generation."""
     
-    def test_generate_key(self):
+    def test_generate_key(self) -> Any:
         """Test basic key generation."""
         generator = CacheKeyGenerator(prefix="test", separator=":")
         
@@ -149,7 +162,7 @@ class TestCacheKeyGenerator:
         key = generator.generate_key("user", 123, active=True)
         assert key == "test:user:123:active=True"
     
-    def test_generate_key_with_kwargs(self):
+    def test_generate_key_with_kwargs(self) -> Any:
         """Test key generation with keyword arguments."""
         generator = CacheKeyGenerator()
         
@@ -160,7 +173,7 @@ class TestCacheKeyGenerator:
         key2 = generator.generate_key("user", active=True, user_id=123)
         assert key == key2
     
-    def test_generate_hash_key(self):
+    def test_generate_hash_key(self) -> Any:
         """Test hash-based key generation."""
         generator = CacheKeyGenerator()
         
@@ -171,7 +184,7 @@ class TestCacheKeyGenerator:
         assert len(key1) == 32  # MD5 hash length
         assert key1.isalnum()  # Should be alphanumeric
     
-    def test_generate_pattern_key(self):
+    def test_generate_pattern_key(self) -> Any:
         """Test pattern-based key generation."""
         generator = CacheKeyGenerator()
         
@@ -185,7 +198,7 @@ class TestCacheKeyGenerator:
 class TestCacheSerializer:
     """Test cache serialization."""
     
-    def test_serialize_deserialize(self, test_data):
+    def test_serialize_deserialize(self, test_data) -> Any:
         """Test basic serialization and deserialization."""
         serializer = CacheSerializer()
         
@@ -195,7 +208,7 @@ class TestCacheSerializer:
             
             assert deserialized == value
     
-    def test_serialize_none(self):
+    def test_serialize_none(self) -> Any:
         """Test serialization of None values."""
         serializer = CacheSerializer()
         
@@ -204,7 +217,7 @@ class TestCacheSerializer:
         
         assert deserialized is None
     
-    def test_compression(self):
+    def test_compression(self) -> Any:
         """Test data compression."""
         serializer = CacheSerializer(enable_compression=True, compression_threshold=10)
         
@@ -222,7 +235,7 @@ class TestCacheSerializer:
         deserialized = serializer.deserialize(serialized)
         assert deserialized == large_data
     
-    def test_compression_disabled(self):
+    def test_compression_disabled(self) -> Any:
         """Test with compression disabled."""
         serializer = CacheSerializer(enable_compression=False)
         
@@ -240,7 +253,7 @@ class TestCacheSerializer:
 class TestInMemoryCache:
     """Test in-memory cache functionality."""
     
-    def test_initialization(self, memory_cache_config):
+    def test_initialization(self, memory_cache_config) -> Any:
         """Test cache initialization."""
         cache = InMemoryCache(memory_cache_config)
         
@@ -250,7 +263,7 @@ class TestInMemoryCache:
         assert cache.stats["hits"] == 0
         assert cache.stats["misses"] == 0
     
-    def test_get_set(self, memory_cache_config, test_data):
+    def test_get_set(self, memory_cache_config, test_data) -> Optional[Dict[str, Any]]:
         """Test basic get and set operations."""
         cache = InMemoryCache(memory_cache_config)
         
@@ -265,7 +278,7 @@ class TestInMemoryCache:
         # Test cache miss
         assert cache.get("nonexistent") is None
     
-    def test_delete(self, memory_cache_config, test_data):
+    def test_delete(self, memory_cache_config, test_data) -> Any:
         """Test delete operations."""
         cache = InMemoryCache(memory_cache_config)
         
@@ -284,7 +297,7 @@ class TestInMemoryCache:
         success = cache.delete("nonexistent")
         assert success is False
     
-    def test_clear(self, memory_cache_config, test_data):
+    def test_clear(self, memory_cache_config, test_data) -> Any:
         """Test cache clearing."""
         cache = InMemoryCache(memory_cache_config)
         
@@ -300,7 +313,7 @@ class TestInMemoryCache:
         for key in test_data.keys():
             assert cache.get(key) is None
     
-    def test_stats(self, memory_cache_config):
+    def test_stats(self, memory_cache_config) -> Any:
         """Test cache statistics."""
         cache = InMemoryCache(memory_cache_config)
         
@@ -325,7 +338,7 @@ class TestInMemoryCache:
         assert stats["deletes"] == 1
         assert stats["hit_rate"] == 0.5
     
-    def test_ttl_expiration(self):
+    def test_ttl_expiration(self) -> Any:
         """Test TTL-based expiration."""
         config = CacheConfig(
             memory_cache_strategy=CacheStrategy.TTL,
@@ -348,7 +361,7 @@ class TestRedisCache:
     """Test Redis cache functionality."""
     
     @pytest.mark.asyncio
-    async def test_initialization(self, cache_config):
+    async def test_initialization(self, cache_config) -> Any:
         """Test Redis cache initialization."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -359,7 +372,7 @@ class TestRedisCache:
             assert cache.serializer is not None
     
     @pytest.mark.asyncio
-    async def test_initialization_no_redis(self):
+    async def test_initialization_no_redis(self) -> Any:
         """Test initialization without Redis."""
         config = CacheConfig(redis_url=None)
         cache = RedisCache(config)
@@ -367,7 +380,7 @@ class TestRedisCache:
         assert cache.redis_client is None
     
     @pytest.mark.asyncio
-    async def test_get_set(self, cache_config, test_data):
+    async def test_get_set(self, cache_config, test_data) -> Optional[Dict[str, Any]]:
         """Test Redis get and set operations."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_client = AsyncMock()
@@ -390,7 +403,7 @@ class TestRedisCache:
             mock_client.get.assert_called_once_with("test_key")
     
     @pytest.mark.asyncio
-    async def test_get_miss(self, cache_config):
+    async def test_get_miss(self, cache_config) -> Optional[Dict[str, Any]]:
         """Test Redis cache miss."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_client = AsyncMock()
@@ -405,7 +418,7 @@ class TestRedisCache:
             assert result is None
     
     @pytest.mark.asyncio
-    async def test_delete(self, cache_config):
+    async def test_delete(self, cache_config) -> Any:
         """Test Redis delete operations."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_client = AsyncMock()
@@ -427,7 +440,7 @@ class TestRedisCache:
             assert success is False
     
     @pytest.mark.asyncio
-    async def test_clear_pattern(self, cache_config):
+    async def test_clear_pattern(self, cache_config) -> Any:
         """Test Redis pattern clearing."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_client = AsyncMock()
@@ -445,7 +458,7 @@ class TestRedisCache:
             mock_client.delete.assert_called_once_with(b"key1", b"key2", b"key3")
     
     @pytest.mark.asyncio
-    async def test_error_handling(self, cache_config):
+    async def test_error_handling(self, cache_config) -> Any:
         """Test Redis error handling."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_client = AsyncMock()
@@ -468,7 +481,7 @@ class TestMultiTierCache:
     """Test multi-tier cache functionality."""
     
     @pytest.mark.asyncio
-    async def test_initialization(self, cache_config):
+    async def test_initialization(self, cache_config) -> Any:
         """Test multi-tier cache initialization."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -480,7 +493,7 @@ class TestMultiTierCache:
             assert cache.key_generator is not None
     
     @pytest.mark.asyncio
-    async def test_get_l1_hit(self, cache_config, test_data):
+    async def test_get_l1_hit(self, cache_config, test_data) -> Optional[Dict[str, Any]]:
         """Test L1 cache hit."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -494,7 +507,7 @@ class TestMultiTierCache:
             assert result == test_data["string"]
     
     @pytest.mark.asyncio
-    async def test_get_l2_hit(self, cache_config, test_data):
+    async def test_get_l2_hit(self, cache_config, test_data) -> Optional[Dict[str, Any]]:
         """Test L2 cache hit with L1 population."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_client = AsyncMock()
@@ -515,7 +528,7 @@ class TestMultiTierCache:
             assert l1_result == test_data["string"]
     
     @pytest.mark.asyncio
-    async def test_get_l2_only(self, cache_config, test_data):
+    async def test_get_l2_only(self, cache_config, test_data) -> Optional[Dict[str, Any]]:
         """Test L2-only cache access."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_client = AsyncMock()
@@ -535,7 +548,7 @@ class TestMultiTierCache:
             assert l1_result is None
     
     @pytest.mark.asyncio
-    async def test_set_both_tiers(self, cache_config, test_data):
+    async def test_set_both_tiers(self, cache_config, test_data) -> Any:
         """Test setting in both cache tiers."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_client = AsyncMock()
@@ -558,7 +571,7 @@ class TestMultiTierCache:
             mock_client.setex.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_delete_both_tiers(self, cache_config):
+    async def test_delete_both_tiers(self, cache_config) -> Any:
         """Test deleting from both cache tiers."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_client = AsyncMock()
@@ -584,7 +597,7 @@ class TestMultiTierCache:
             mock_client.delete.assert_called_once_with("test_key")
     
     @pytest.mark.asyncio
-    async def test_clear_pattern(self, cache_config):
+    async def test_clear_pattern(self, cache_config) -> Any:
         """Test clearing cache patterns."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_client = AsyncMock()
@@ -612,7 +625,7 @@ class TestCacheDecorators:
     """Test cache decorators."""
     
     @pytest.mark.asyncio
-    async def test_cached_decorator(self, cache_config):
+    async def test_cached_decorator(self, cache_config) -> Any:
         """Test cached decorator functionality."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -622,7 +635,9 @@ class TestCacheDecorators:
             
             @cached(ttl=3600, key_prefix="test", cache_instance=cache)
             async def expensive_function(user_id: int, active: bool = True):
-                nonlocal call_count
+                
+    """expensive_function function."""
+nonlocal call_count
                 call_count += 1
                 return {"user_id": user_id, "active": active, "data": "expensive_result"}
             
@@ -642,7 +657,7 @@ class TestCacheDecorators:
             assert call_count == 2
     
     @pytest.mark.asyncio
-    async def test_cache_invalidate_decorator(self, cache_config):
+    async def test_cache_invalidate_decorator(self, cache_config) -> bool:
         """Test cache invalidation decorator."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -654,7 +669,9 @@ class TestCacheDecorators:
             
             @cache_invalidate("user:*", cache_instance=cache)
             async def update_user(user_id: int, data: dict):
-                return {"user_id": user_id, **data}
+                
+    """update_user function."""
+return {"user_id": user_id, **data}
             
             # Execute function
             result = await update_user(123, {"name": "Updated"})
@@ -672,7 +689,7 @@ class TestCacheWarmer:
     """Test cache warming functionality."""
     
     @pytest.mark.asyncio
-    async def test_warm_cache(self, cache_config):
+    async def test_warm_cache(self, cache_config) -> Any:
         """Test cache warming."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -681,7 +698,9 @@ class TestCacheWarmer:
             
             # Mock data source
             async def data_source():
-                return [
+                
+    """data_source function."""
+return [
                     ("user:1", {"id": 1, "name": "Alice"}),
                     ("user:2", {"id": 2, "name": "Bob"}),
                     ("user:3", {"id": 3, "name": "Charlie"})
@@ -708,7 +727,7 @@ class TestCacheMonitor:
     """Test cache monitoring functionality."""
     
     @pytest.mark.asyncio
-    async def test_monitor_start_stop(self, cache_config):
+    async def test_monitor_start_stop(self, cache_config) -> Any:
         """Test monitor start and stop."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -724,7 +743,7 @@ class TestCacheMonitor:
             assert monitor.monitoring_task is None
     
     @pytest.mark.asyncio
-    async def test_monitor_loop(self, cache_config):
+    async def test_monitor_loop(self, cache_config) -> Any:
         """Test monitoring loop."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -748,7 +767,7 @@ class TestCacheManager:
     """Test cache manager functionality."""
     
     @pytest.mark.asyncio
-    async def test_initialization(self, cache_config):
+    async def test_initialization(self, cache_config) -> Any:
         """Test cache manager initialization."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -759,7 +778,7 @@ class TestCacheManager:
             assert manager.key_generator is not None
     
     @pytest.mark.asyncio
-    async def test_start_stop(self, cache_config):
+    async def test_start_stop(self, cache_config) -> Any:
         """Test cache manager start and stop."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -772,7 +791,7 @@ class TestCacheManager:
             await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_basic_operations(self, cache_config, test_data):
+    async def test_basic_operations(self, cache_config, test_data) -> Any:
         """Test basic cache operations through manager."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -795,7 +814,7 @@ class TestCacheManager:
             assert result is None
     
     @pytest.mark.asyncio
-    async def test_manager_decorators(self, cache_config):
+    async def test_manager_decorators(self, cache_config) -> Any:
         """Test cache manager decorators."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -805,7 +824,9 @@ class TestCacheManager:
             
             @manager.cached(ttl=3600, key_prefix="manager_test")
             async def test_function(param: str):
-                nonlocal call_count
+                
+    """test_function function."""
+nonlocal call_count
                 call_count += 1
                 return f"result_{param}"
             
@@ -827,7 +848,7 @@ class TestCacheIntegration:
     """Test cache integration scenarios."""
     
     @pytest.mark.asyncio
-    async def test_complete_workflow(self, cache_config):
+    async def test_complete_workflow(self, cache_config) -> Any:
         """Test complete caching workflow."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -841,7 +862,9 @@ class TestCacheIntegration:
             
             @manager.cached(ttl=3600, key_prefix="workflow")
             async def expensive_operation(user_id: int, operation: str):
-                nonlocal call_count
+                
+    """expensive_operation function."""
+nonlocal call_count
                 call_count += 1
                 await asyncio.sleep(0.1)  # Simulate work
                 return {"user_id": user_id, "operation": operation, "result": "success"}
@@ -859,7 +882,9 @@ class TestCacheIntegration:
             # Invalidate cache
             @manager.cache_invalidate("workflow:*")
             async def update_user(user_id: int):
-                return {"user_id": user_id, "updated": True}
+                
+    """update_user function."""
+return {"user_id": user_id, "updated": True}
             
             await update_user(123)
             
@@ -876,7 +901,7 @@ class TestCacheIntegration:
             await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_multi_user_scenario(self, cache_config):
+    async def test_multi_user_scenario(self, cache_config) -> Any:
         """Test multi-user caching scenario."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -887,12 +912,16 @@ class TestCacheIntegration:
             # Simulate user data operations
             @manager.cached(ttl=1800, key_prefix="user_profile")
             async def get_user_profile(user_id: int):
-                await asyncio.sleep(0.05)  # Simulate DB call
+                
+    """get_user_profile function."""
+await asyncio.sleep(0.05)  # Simulate DB call
                 return {"user_id": user_id, "profile": f"profile_{user_id}"}
             
             @manager.cache_invalidate("user_profile:*")
             async def update_user_profile(user_id: int, profile_data: dict):
-                return {"user_id": user_id, "updated": True}
+                
+    """update_user_profile function."""
+return {"user_id": user_id, "updated": True}
             
             # Multiple users accessing profiles
             users = [1, 2, 3, 4, 5]
@@ -924,7 +953,7 @@ class TestCachePerformance:
     """Test cache performance."""
     
     @pytest.mark.asyncio
-    async def test_cache_performance(self, cache_config):
+    async def test_cache_performance(self, cache_config) -> Any:
         """Test cache performance with multiple operations."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -950,7 +979,7 @@ class TestCachePerformance:
             await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_decorator_performance(self, cache_config):
+    async def test_decorator_performance(self, cache_config) -> Any:
         """Test decorator performance."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -962,7 +991,9 @@ class TestCachePerformance:
             
             @manager.cached(ttl=3600, key_prefix="perf_test")
             async def performance_test_function(param: int):
-                nonlocal call_count
+                
+    """performance_test_function function."""
+nonlocal call_count
                 call_count += 1
                 await asyncio.sleep(0.01)  # Simulate work
                 return param * 2
@@ -996,7 +1027,7 @@ class TestCacheErrorHandling:
     """Test cache error handling."""
     
     @pytest.mark.asyncio
-    async def test_redis_connection_error(self):
+    async def test_redis_connection_error(self) -> Any:
         """Test handling of Redis connection errors."""
         config = CacheConfig(redis_url="redis://invalid:6379")
         
@@ -1014,7 +1045,7 @@ class TestCacheErrorHandling:
         await manager.stop()
     
     @pytest.mark.asyncio
-    async def test_serialization_error(self, cache_config):
+    async def test_serialization_error(self, cache_config) -> Any:
         """Test handling of serialization errors."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -1039,7 +1070,7 @@ class TestCacheErrorHandling:
 class TestUtilityFunctions:
     """Test utility functions."""
     
-    def test_create_cache_config(self):
+    def test_create_cache_config(self) -> Any:
         """Test cache config creation."""
         config = create_cache_config(
             redis_url="redis://test:6379",
@@ -1050,7 +1081,7 @@ class TestUtilityFunctions:
         assert config.memory_cache_size == 500
     
     @pytest.mark.asyncio
-    async def test_create_cache_manager(self):
+    async def test_create_cache_manager(self) -> Any:
         """Test cache manager creation."""
         with patch('caching_system.redis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -1061,5 +1092,6 @@ class TestUtilityFunctions:
             await manager.start()
             await manager.stop()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

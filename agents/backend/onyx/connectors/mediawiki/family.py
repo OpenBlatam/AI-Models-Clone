@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from __future__ import annotations
 
 import builtins
@@ -17,6 +25,10 @@ from pywikibot.scripts.generate_user_files import pywikibot  # type: ignore[impo
 from onyx.utils.logger import setup_logger
 
 
+        import pywikibot.families.wikipedia_family  # type: ignore[import-untyped]
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 pywikibot.config.base_dir = tempfile.TemporaryDirectory().name
@@ -134,7 +146,6 @@ def family_class_dispatch(url: str, name: str) -> type[family.Family]:
 
     """
     if "wikipedia" in url:
-        import pywikibot.families.wikipedia_family  # type: ignore[import-untyped]
 
         return pywikibot.families.wikipedia_family.Family
     # TODO: Support additional families pre-defined in `pywikibot.families.*_family.py` files

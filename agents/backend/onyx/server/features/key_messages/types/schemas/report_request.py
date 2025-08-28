@@ -1,10 +1,21 @@
-"""
-Report request API schemas for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Report request API schemas for cybersecurity tools.
+"""
 
 class ReportType(str, Enum):
     """Types of security reports."""
@@ -62,25 +73,25 @@ class CreateReportRequest(BaseModel):
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
     @field_validator('title')
-    def validate_title(cls, v):
+    def validate_title(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Title cannot be empty or whitespace only")
         return v.strip()
     
     @field_validator('executive_summary')
-    def validate_executive_summary(cls, v):
+    def validate_executive_summary(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Executive summary cannot be empty or whitespace only")
         return v.strip()
     
     @field_validator('scope')
-    def validate_scope(cls, v):
+    def validate_scope(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Scope cannot be empty")
         return v.strip()
     
     @field_validator('methodology')
-    def validate_methodology(cls, v):
+    def validate_methodology(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Methodology cannot be empty")
         return v.strip()

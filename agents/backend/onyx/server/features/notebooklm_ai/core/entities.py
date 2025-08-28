@@ -1,8 +1,5 @@
-"""
-Core Entities - NotebookLM AI Domain Models
-Advanced document intelligence with AI-powered analysis and citation.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from dataclasses import dataclass, field
 from typing import List, Optional, Dict, Any, Union
 from datetime import datetime
@@ -10,6 +7,14 @@ from enum import Enum
 import uuid
 from pydantic import BaseModel, Field
 import json
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Core Entities - NotebookLM AI Domain Models
+Advanced document intelligence with AI-powered analysis and citation.
+"""
+
 
 
 class DocumentType(str, Enum):
@@ -111,7 +116,7 @@ class Document:
     is_processed: bool = False
     processing_errors: List[str] = field(default_factory=list)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize computed fields."""
         self.word_count = len(self.content.split())
         self.character_count = len(self.content)

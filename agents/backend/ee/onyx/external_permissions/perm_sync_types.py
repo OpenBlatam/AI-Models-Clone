@@ -1,19 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from collections.abc import Generator
 from typing import Optional
 from typing import Protocol
 from typing import TYPE_CHECKING
 
-# Avoid circular imports
-if TYPE_CHECKING:
     from ee.onyx.db.external_perm import ExternalUserGroup  # noqa
     from onyx.access.models import DocExternalAccess  # noqa
     from onyx.db.models import ConnectorCredentialPair  # noqa
     from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface  # noqa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# Avoid circular imports
+if TYPE_CHECKING:
 
 
 class FetchAllDocumentsFunction(Protocol):
     """Protocol for a function that fetches all document IDs for a connector credential pair."""
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     def __call__(self) -> list[str]:
         """

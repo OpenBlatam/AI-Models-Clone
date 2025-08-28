@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from collections.abc import Iterator
 from datetime import datetime
@@ -18,6 +20,9 @@ from onyx.connectors.models import TextSection
 from onyx.file_processing.html_utils import parse_html_page_basic
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 _FRESHDESK_ID_PREFIX = "FRESHDESK_"
@@ -165,7 +170,7 @@ class FreshdeskConnector(PollConnector, LoadConnector):
         self.domain = str(domain)
         self.password = str(password)
 
-    def _fetch_tickets(
+    async def _fetch_tickets(
         self, start: datetime | None = None, end: datetime | None = None
     ) -> Iterator[List[dict]]:
         """

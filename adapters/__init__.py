@@ -1,3 +1,43 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS: int = 1000
+
+# Constants
+MAX_RETRIES: int = 100
+
+# Constants
+TIMEOUT_SECONDS: int = 60
+
+import asyncio
+import json
+import logging
+import time
+import hashlib
+import aiohttp
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+import ssl
+from typing import Dict, List, Optional, Any, Union
+from dataclasses import asdict, replace
+from datetime import datetime, timedelta
+import weakref
+from contextlib import asynccontextmanager
+from ..interfaces import (
+from typing import Any, List, Dict, Optional
 """
 ONYX BLOG POSTS - Production Adapters Layer
 ===========================================
@@ -9,20 +49,7 @@ Architecture: Infrastructure Layer (Outermost circle)
 Dependencies: Interfaces layer only
 """
 
-import asyncio
-import json
-import logging
-import time
-import hashlib
-import aiohttp
-import ssl
-from typing import Dict, List, Optional, Any, Union
-from dataclasses import asdict, replace
-from datetime import datetime, timedelta
-import weakref
-from contextlib import asynccontextmanager
 
-from ..interfaces import (
     IAIProvider, IPromptBuilder, IContentParser, ICacheProvider,
     IOnyxIntegration, IMetricsCollector, AIModel, BlogSpec, GenerationParams,
     BlogContent, SEOData, BlogResult, BlogType, BlogTone, BlogLength,
@@ -39,14 +66,51 @@ class ProductionOpenRouterAdapter:
     def __init__(
         self, 
         api_key: str, 
-        base_url: str = "https://openrouter.ai/api/v1",
-        app_name: str = "onyx-blog-posts",
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+        base_url: str: str = "https://openrouter.ai/api/v1",
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+        app_name: str: str = "onyx-blog-posts",
         max_retries: int = 3,
         timeout: int = 120,
         rate_limit_per_minute: int = 60,
-        max_concurrent: int = 10
-    ):
-        self.api_key = api_key
+        max_concurrent: int: int = 10
+    ) -> Any:
+        
+    """__init__ function."""
+self.api_key = api_key
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         self.base_url = base_url
         self.app_name = app_name
         self.max_retries = max_retries
@@ -56,21 +120,96 @@ class ProductionOpenRouterAdapter:
         
         # Session management
         self.session: Optional[aiohttp.ClientSession] = None
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         self._session_lock = asyncio.Lock()
         
         # Rate limiting
         self._rate_limiter = asyncio.Semaphore(max_concurrent)
-        self._last_requests = []
+        self._last_requests: List[Any] = []
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         self._request_lock = asyncio.Lock()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         
         # Metrics tracking
-        self._total_requests = 0
-        self._failed_requests = 0
-        self._total_tokens = 0
+        self._total_requests: int = 0
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+        self._failed_requests: int = 0
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+        self._total_tokens: int = 0
         self._total_cost = 0.0
         
         # Model pricing (updated rates)
-        self.model_pricing = {
+        self.model_pricing: Dict[str, Any] = {
             "openai/gpt-4-turbo": {"prompt": 0.01, "completion": 0.03},
             "openai/gpt-4o": {"prompt": 0.005, "completion": 0.015},
             "openai/gpt-4o-mini": {"prompt": 0.00015, "completion": 0.0006},
@@ -83,36 +222,111 @@ class ProductionOpenRouterAdapter:
             "mistralai/mistral-medium": {"prompt": 0.0027, "completion": 0.0081}
         }
     
-    async def _get_session(self) -> aiohttp.ClientSession:
+    async async async async def _get_session(self) -> aiohttp.ClientSession:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         """Get or create aiohttp session with production settings"""
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         async with self._session_lock:
             if self.session is None or self.session.closed:
                 # Production SSL context
                 ssl_context = ssl.create_default_context()
-                ssl_context.check_hostname = True
+                ssl_context.check_hostname: bool = True
                 ssl_context.verify_mode = ssl.CERT_REQUIRED
                 
                 # Production connector with connection pooling
                 connector = aiohttp.TCPConnector(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                     limit=100,  # Total connection pool size
                     limit_per_host=20,  # Per host limit
                     ttl_dns_cache=300,  # DNS cache TTL
                     use_dns_cache=True,
                     ssl=ssl_context,
-                    enable_cleanup_closed=True
+                    enable_cleanup_closed: bool = True
                 )
                 
                 # Production timeout settings
                 timeout_config = aiohttp.ClientTimeout(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                     total=self.timeout,
                     connect=30,
-                    sock_read=60
+                    sock_read: int = 60
                 )
                 
                 self.session = aiohttp.ClientSession(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                     connector=connector,
                     timeout=timeout_config,
-                    headers={
+                    headers: Dict[str, Any] = {
                         "User-Agent": f"{self.app_name}/1.0",
                         "Accept": "application/json",
                         "Content-Type": "application/json"
@@ -123,29 +337,174 @@ class ProductionOpenRouterAdapter:
             
             return self.session
     
-    async def _check_rate_limit(self):
+    async def _check_rate_limit(self) -> Any:
         """Production rate limiting with sliding window"""
         async with self._request_lock:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             now = time.time()
             # Remove old requests (older than 1 minute)
-            self._last_requests = [req_time for req_time in self._last_requests if now - req_time < 60]
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+            self._last_requests: List[Any] = [req_time for req_time in self._last_requests if now - req_time < 60]
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             
             # Check if we're within rate limit
             if len(self._last_requests) >= self.rate_limit_per_minute:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                 sleep_time = 60 - (now - self._last_requests[0])
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                 if sleep_time > 0:
                     logger.warning(f"Rate limit reached, sleeping for {sleep_time:.2f}s")
                     await asyncio.sleep(sleep_time)
             
             self._last_requests.append(now)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     
-    async def _make_request_with_retry(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async async async async async def _make_request_with_retry(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         """Make HTTP request with production retry logic"""
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         session = await self._get_session()
         
-        headers = {
+        headers: Dict[str, Any] = {
             "Authorization": f"Bearer {self.api_key}",
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             "HTTP-Referer": "https://onyx.blatam.com",
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             "X-Title": self.app_name
         }
         
@@ -165,9 +524,54 @@ class ProductionOpenRouterAdapter:
                     ) as response:
                         
                         request_time = time.time() - start_time
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                         self._total_requests += 1
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                         
                         logger.debug(f"OpenRouter request completed in {request_time:.2f}s (attempt {attempt + 1})")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                         
                         if response.status == 200:
                             return await response.json()
@@ -194,6 +598,21 @@ class ProductionOpenRouterAdapter:
                         raise AIProviderError(f"API error {response.status}: {error_text}", "openrouter")
                         
             except aiohttp.ClientError as e:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                 last_exception = e
                 if attempt < self.max_retries:
                     wait_time = min(10, (2 ** attempt))
@@ -204,13 +623,58 @@ class ProductionOpenRouterAdapter:
             except Exception as e:
                 last_exception = e
                 logger.error(f"Unexpected error in OpenRouter request: {e}")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                 break
         
         self._failed_requests += 1
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         raise AIProviderError(f"Request failed after {self.max_retries + 1} attempts: {last_exception}")
     
     def _calculate_cost(self, model: str, prompt_tokens: int, completion_tokens: int) -> float:
         """Calculate request cost with accurate pricing"""
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         pricing = self.model_pricing.get(model, {"prompt": 0.001, "completion": 0.001})
         
         prompt_cost = (prompt_tokens / 1000) * pricing["prompt"]
@@ -232,14 +696,39 @@ class ProductionOpenRouterAdapter:
         """Generate text with production error handling and monitoring"""
         
         if not self.api_key:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             raise ConfigurationError("OpenRouter API key not configured")
         
         if not prompt.strip():
             raise AIProviderError("Empty prompt provided")
         
-        messages = [{"role": "user", "content": prompt}]
+        messages: List[Any] = [{"role": "user", "content": prompt}]
         
-        request_data = {
+        request_data: Dict[str, Any] = {
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             "model": model.value,
             "messages": messages,
             "temperature": max(0.0, min(2.0, temperature)),
@@ -251,9 +740,24 @@ class ProductionOpenRouterAdapter:
             logger.info(f"Generating text with {model.value} (temp: {temperature})")
             
             response = await self._make_request_with_retry(request_data)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             
             # Extract response data
-            content = ""
+            content: str = ""
             if response.get("choices") and len(response["choices"]) > 0:
                 message = response["choices"][0].get("message", {})
                 content = message.get("content", "")
@@ -286,16 +790,26 @@ class ProductionOpenRouterAdapter:
             logger.error(f"Text generation failed: {e}")
             raise
     
-    async def get_available_models(self) -> List[str]:
+    async async async async def get_available_models(self) -> List[str]:
         """Get available models with caching"""
         try:
             session = await self._get_session()
-            headers = {"Authorization": f"Bearer {self.api_key}"}
+            headers: Dict[str, Any] = {"Authorization": f"Bearer {self.api_key}"}
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             
             async with session.get(f"{self.base_url}/models", headers=headers) as response:
                 if response.status == 200:
                     data = await response.json()
-                    models = [model["id"] for model in data.get("data", [])]
+                    models: List[Any] = [model["id"] for model in data.get("data", [])]
                     logger.info(f"Retrieved {len(models)} available models")
                     return models
                 else:
@@ -319,20 +833,80 @@ class ProductionOpenRouterAdapter:
         
         return self._calculate_cost(model.value, int(estimated_prompt_tokens), estimated_completion_tokens)
     
-    async def get_metrics(self) -> Dict[str, Any]:
+    async async async async def get_metrics(self) -> Dict[str, Any]:
         """Get adapter metrics"""
         success_rate = ((self._total_requests - self._failed_requests) / self._total_requests * 100) if self._total_requests > 0 else 0
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         
         return {
             "total_requests": self._total_requests,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             "failed_requests": self._failed_requests,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             "success_rate": success_rate,
             "total_tokens": self._total_tokens,
             "total_cost_usd": self._total_cost,
             "average_cost_per_request": self._total_cost / self._total_requests if self._total_requests > 0 else 0
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         }
     
-    async def close(self):
+    async def close(self) -> Any:
         """Clean shutdown"""
         if self.session and not self.session.closed:
             await self.session.close()
@@ -343,8 +917,8 @@ class ProductionOpenRouterAdapter:
 class ProductionPromptBuilder:
     """Production prompt builder with optimized templates"""
     
-    def __init__(self):
-        self.system_prompts = {
+    def __init__(self) -> Any:
+        self.system_prompts: Dict[str, Any] = {
             BlogType.TECHNICAL: "You are a senior technical writer with 10+ years creating comprehensive, accurate technical content for developers and engineers.",
             BlogType.TUTORIAL: "You are an expert educator who excels at creating clear, step-by-step tutorials that help readers achieve specific learning outcomes.",
             BlogType.GUIDE: "You are an experienced guide writer who creates actionable, comprehensive guides that solve real problems.",
@@ -361,7 +935,7 @@ class ProductionPromptBuilder:
         system_prompt = self.system_prompts.get(spec.blog_type, self.system_prompts[BlogType.TECHNICAL])
         
         # Build comprehensive prompt
-        sections = [
+        sections: List[Any] = [
             f"{system_prompt}",
             "",
             f"Create a {spec.blog_type.display_name.lower()} blog post about: \"{spec.topic}\"",
@@ -480,19 +1054,21 @@ Focus on: content depth, structure, keyword integration, readability, and action
 class ProductionCacheAdapter:
     """Production-grade LRU cache with TTL and compression"""
     
-    def __init__(self, max_size: int = 5000, default_ttl: int = 3600):
-        self.max_size = max_size
+    def __init__(self, max_size: int = 5000, default_ttl: int = 3600) -> Any:
+        
+    """__init__ function."""
+self.max_size = max_size
         self.default_ttl = default_ttl
         self.cache: Dict[str, Dict[str, Any]] = {}
         self.access_order: List[str] = []
         self._lock = asyncio.Lock()
         
         # Metrics
-        self._hits = 0
-        self._misses = 0
-        self._evictions = 0
+        self._hits: int = 0
+        self._misses: int = 0
+        self._evictions: int = 0
     
-    async def get(self, key: str) -> Optional[Any]:
+    async async async async def get(self, key: str) -> Optional[Any]:
         """Get with LRU tracking"""
         async with self._lock:
             if key in self.cache:
@@ -546,7 +1122,7 @@ class ProductionCacheAdapter:
             
             logger.debug(f"Cached key: {key[:20]}... (TTL: {ttl}s)")
     
-    async def delete(self, key: str) -> None:
+    async async async async def delete(self, key: str) -> None:
         """Delete entry"""
         async with self._lock:
             self.cache.pop(key, None)
@@ -560,10 +1136,40 @@ class ProductionCacheAdapter:
             self.access_order.clear()
             logger.info("Cache cleared")
     
-    async def get_metrics(self) -> Dict[str, Any]:
+    async async async async def get_metrics(self) -> Dict[str, Any]:
         """Get cache metrics"""
         total_requests = self._hits + self._misses
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         hit_rate = (self._hits / total_requests * 100) if total_requests > 0 else 0
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         
         return {
             "size": len(self.cache),
@@ -576,7 +1182,7 @@ class ProductionCacheAdapter:
 
 # === EXPORTS ===
 
-__all__ = [
+__all__: List[Any] = [
     'ProductionOpenRouterAdapter',
     'ProductionPromptBuilder',
     'ProductionCacheAdapter'

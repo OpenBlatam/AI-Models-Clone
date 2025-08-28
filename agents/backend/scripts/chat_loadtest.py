@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import argparse
+import asyncio
+import logging
+import statistics
+import time
+from collections.abc import AsyncGenerator
+from dataclasses import dataclass
+from logging import getLogger
+from uuid import UUID
+import aiohttp
+from typing import Any, List, Dict, Optional
 """Basic Usage:
 
 python scripts/chat_loadtest.py --api-key <api-key> --url <onyx-url>/api
@@ -9,17 +22,7 @@ python chat_loadtest.py --api-key <api-key> --url localhost:8080
 For more options, checkout the bottom of the file.
 """
 
-import argparse
-import asyncio
-import logging
-import statistics
-import time
-from collections.abc import AsyncGenerator
-from dataclasses import dataclass
-from logging import getLogger
-from uuid import UUID
 
-import aiohttp
 
 # Configure logging
 logging.basicConfig(
@@ -49,7 +52,9 @@ class ChatLoadTester:
         num_concurrent: int,
         messages_per_session: int,
     ):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.headers = {"Authorization": f"Bearer {api_key}"} if api_key else {}
         self.num_concurrent = num_concurrent
         self.messages_per_session = messages_per_session
@@ -223,5 +228,6 @@ def main() -> None:
     asyncio.run(load_tester.run_load_test())
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main()

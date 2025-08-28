@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from langchain.schema import BaseMessage
 from langchain.schema import HumanMessage
 from langchain.schema import SystemMessage
@@ -19,6 +21,9 @@ from onyx.prompts.chat_prompts import SKIP_SEARCH
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -58,9 +63,7 @@ def check_if_need_search(
         messages = [
             {
                 "role": "user",
-                "content": AGGRESSIVE_SEARCH_TEMPLATE.format(
-                    final_query=question, chat_history=history_str
-                ).strip(),
+                "content"f": AGGRESSIVE_SEARCH_TEMPLATE".strip(),
             },
         ]
 

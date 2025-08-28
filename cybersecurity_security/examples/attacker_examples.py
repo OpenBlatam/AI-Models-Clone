@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+from typing import Dict, Any
+from ..attackers import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Attacker Examples
 
@@ -5,12 +19,8 @@ Demonstrates how to use the offensive security testing modules.
 WARNING: This module is for authorized security testing only.
 """
 
-import asyncio
-import time
-from typing import Dict, Any
 
 # Import attacker modules
-from ..attackers import (
     # Brute Forcers
     SSHBruteForceRequest, perform_ssh_brute_force_async,
     HTTPBruteForceRequest, perform_http_brute_force_async,
@@ -333,5 +343,6 @@ async def main():
         print(f"❌ Error running attacker examples: {e}")
         raise
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

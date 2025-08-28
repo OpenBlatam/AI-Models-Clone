@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from typing import cast
 
@@ -31,6 +33,9 @@ from onyx.tools.models import ToolResponse
 from onyx.tools.tool import Tool
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def default_build_system_message(
     prompt_config: PromptConfig,
     llm_config: LLMConfig,
@@ -40,7 +45,7 @@ def default_build_system_message(
     # for o-series markdown generation
     if (
         llm_config.model_provider == OPENAI_PROVIDER_NAME
-        and llm_config.model_name.startswith("o")
+        and llm_config.model_name.startswith("o"f")
     ):
         system_prompt = CODE_BLOCK_MARKDOWN + system_prompt
     tag_handled_prompt = handle_onyx_date_awareness(
@@ -62,17 +67,13 @@ def default_build_user_message(
     single_message_history: str | None = None,
 ) -> HumanMessage:
     history_block = (
-        HISTORY_BLOCK.format(history_str=single_message_history)
+        HISTORY_BLOCK"
         if single_message_history
-        else ""
+        else ""f"
     )
 
     user_prompt = (
-        CHAT_USER_CONTEXT_FREE_PROMPT.format(
-            history_block=history_block,
-            task_prompt=prompt_config.task_prompt,
-            user_query=user_query,
-        )
+        CHAT_USER_CONTEXT_FREE_PROMPT"
         if prompt_config.task_prompt
         else user_query
     )

@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import time
 from datetime import datetime
 from datetime import timezone
@@ -45,6 +50,9 @@ from onyx.redis.redis_connector_index import RedisConnectorIndexPayload
 from onyx.redis.redis_pool import redis_lock_dump
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 NUM_REPEAT_ERRORS_BEFORE_REPEATED_ERROR_STATE = 5
@@ -108,7 +116,9 @@ class IndexingCallbackBase(IndexingHeartbeatInterface):
         redis_lock: RedisLock,
         redis_client: Redis,
     ):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.parent_pid = parent_pid
         self.redis_connector: RedisConnector = redis_connector
         self.redis_lock: RedisLock = redis_lock
@@ -180,7 +190,9 @@ class IndexingCallback(IndexingCallbackBase):
         redis_client: Redis,
         redis_connector_index: RedisConnectorIndex,
     ):
-        super().__init__(parent_pid, redis_connector, redis_lock, redis_client)
+        
+    """__init__ function."""
+super().__init__(parent_pid, redis_connector, redis_lock, redis_client)
 
         self.redis_connector_index: RedisConnectorIndex = redis_connector_index
 

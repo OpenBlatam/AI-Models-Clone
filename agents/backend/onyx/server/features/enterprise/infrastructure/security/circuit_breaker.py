@@ -1,9 +1,7 @@
-"""
-Circuit Breaker Implementation
-==============================
-
-Concrete implementation of circuit breaker pattern.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import asyncio
@@ -11,6 +9,14 @@ from typing import Callable, Any
 from ...core.interfaces.circuit_breaker_interface import ICircuitBreaker, CircuitState
 from ...core.exceptions.api_exceptions import CircuitBreakerOpenException
 import logging
+from typing import Any, List, Dict, Optional
+"""
+Circuit Breaker Implementation
+==============================
+
+Concrete implementation of circuit breaker pattern.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +26,9 @@ class CircuitBreakerService(ICircuitBreaker):
     
     def __init__(self, failure_threshold: int = 5, timeout: int = 60, 
                  half_open_max_calls: int = 5):
-        self.failure_threshold = failure_threshold
+        
+    """__init__ function."""
+self.failure_threshold = failure_threshold
         self.timeout = timeout
         self.half_open_max_calls = half_open_max_calls
         
@@ -67,7 +75,7 @@ class CircuitBreakerService(ICircuitBreaker):
             await self._on_failure()
             raise
     
-    async def _on_success(self):
+    async def _on_success(self) -> Any:
         """Handle successful call."""
         self.successful_calls += 1
         
@@ -78,7 +86,7 @@ class CircuitBreakerService(ICircuitBreaker):
         self.failure_count = 0
         self.half_open_calls = 0
     
-    async def _on_failure(self):
+    async def _on_failure(self) -> Any:
         """Handle failed call."""
         self.failure_count += 1
         self.last_failure_time = time.time()
@@ -95,7 +103,7 @@ class CircuitBreakerService(ICircuitBreaker):
         """Get current failure count."""
         return self.failure_count
     
-    async def reset(self):
+    async def reset(self) -> Any:
         """Manually reset circuit breaker."""
         self.state = CircuitState.CLOSED
         self.failure_count = 0

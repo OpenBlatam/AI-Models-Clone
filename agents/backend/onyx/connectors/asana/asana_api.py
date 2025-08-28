@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import time
 from collections.abc import Iterator
 from datetime import datetime
@@ -7,6 +12,9 @@ import asana  # type: ignore
 
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -189,7 +197,7 @@ class AsanaAPI:
         text += "\n"
         return text
 
-    def _fetch_and_add_comments(self, task_gid: str) -> str:
+    async def _fetch_and_add_comments(self, task_gid: str) -> str:
         text = ""
         stories_opts: Dict[str, str] = {}
         story_start = time.time()

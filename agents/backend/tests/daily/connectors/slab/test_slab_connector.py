@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import os
 import time
@@ -10,9 +12,16 @@ from onyx.connectors.models import Document
 from onyx.connectors.slab.connector import SlabConnector
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def load_test_data(file_name: str = "test_slab_data.json") -> dict[str, str]:
     current_dir = Path(__file__).parent
     with open(current_dir / file_name, "r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         return json.load(f)
 
 

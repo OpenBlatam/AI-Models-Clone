@@ -1,11 +1,15 @@
-"""
-SSH brute force attack module.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, List, Optional
 from pydantic import BaseModel, field_validator
 import asyncio
 import paramiko
 import structlog
+from typing import Any, List, Dict, Optional
+import logging
+"""
+SSH brute force attack module.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -19,25 +23,25 @@ class SSHBruteForceInput(BaseModel):
     max_concurrent: int = 5
     
     @field_validator('target_host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         if not v or len(v.strip()) == 0:
             raise ValueError("Target host cannot be empty")
         return v.strip()
     
     @field_validator('target_port')
-    def validate_port(cls, v):
+    def validate_port(cls, v) -> bool:
         if not 1 <= v <= 65535:
             raise ValueError("Port must be between 1 and 65535")
         return v
     
     @field_validator('username_list')
-    def validate_usernames(cls, v):
+    def validate_usernames(cls, v) -> bool:
         if not v or len(v) == 0:
             raise ValueError("Username list cannot be empty")
         return v
     
     @field_validator('password_list')
-    def validate_passwords(cls, v):
+    def validate_passwords(cls, v) -> bool:
         if not v or len(v) == 0:
             raise ValueError("Password list cannot be empty")
         return v

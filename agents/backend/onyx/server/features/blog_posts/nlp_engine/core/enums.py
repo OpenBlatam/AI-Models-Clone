@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from enum import Enum, auto
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 DOMAIN ENUMS - Tipos del Dominio NLP
 ======================================
@@ -5,7 +14,6 @@
 Enumeraciones que definen los tipos y constantes del dominio.
 """
 
-from enum import Enum, auto
 
 
 class AnalysisType(Enum):

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import os
 import traceback
@@ -29,8 +31,6 @@ from onyx.configs.app_configs import LOG_DANSWER_MODEL_INTERACTIONS
 from onyx.configs.app_configs import MOCK_LLM_RESPONSE
 from onyx.configs.chat_configs import QA_TIMEOUT
 from onyx.configs.model_configs import (
-    DISABLE_LITELLM_STREAMING,
-)
 from onyx.configs.model_configs import GEN_AI_TEMPERATURE
 from onyx.configs.model_configs import LITELLM_EXTRA_BODY
 from onyx.llm.interfaces import LLM
@@ -41,6 +41,11 @@ from onyx.llm.utils import model_is_reasoning_model
 from onyx.server.utils import mask_string
 from onyx.utils.logger import setup_logger
 from onyx.utils.long_term_log import LongTermLogger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    DISABLE_LITELLM_STREAMING,
+)
 
 
 logger = setup_logger()
@@ -262,7 +267,9 @@ class DefaultMultiLLM(LLM):
         model_kwargs: dict[str, Any] | None = None,
         long_term_logger: LongTermLogger | None = None,
     ):
-        self._timeout = timeout
+        
+    """__init__ function."""
+self._timeout = timeout
         if timeout is None:
             if model_is_reasoning_model(model_name):
                 self._timeout = QA_TIMEOUT * 10  # Reasoning models are slow

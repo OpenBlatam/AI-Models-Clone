@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from collections.abc import Callable
 from typing import Any
 from unittest.mock import MagicMock
@@ -8,6 +13,9 @@ from onyx.connectors.models import Document
 from onyx.connectors.models import SlimDocument
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 _THREAD_1_START_TIME = 1730568700
 _THREAD_1_END_TIME = 1730569000
 

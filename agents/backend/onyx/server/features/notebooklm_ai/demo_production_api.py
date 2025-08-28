@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import aiohttp
+import json
+import time
+from typing import Dict, Any, List
+import logging
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 NotebookLM AI - Production API Demo
@@ -6,12 +21,6 @@ NotebookLM AI - Production API Demo
 🎯 Production-ready examples with proper error handling
 """
 
-import asyncio
-import aiohttp
-import json
-import time
-from typing import Dict, Any, List
-import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -21,7 +30,9 @@ class ProductionAPIClient:
     """Client for the NotebookLM AI Production API."""
     
     def __init__(self, base_url: str = "http://localhost:8000", api_token: str = "your-token-here"):
-        self.base_url = base_url.rstrip('/')
+        
+    """__init__ function."""
+self.base_url = base_url.rstrip('/')
         self.api_token = api_token
         self.headers = {
             "Authorization": f"Bearer {api_token}",
@@ -441,5 +452,6 @@ async def main():
         print(f"\n❌ Demo failed: {e}")
         logger.error(f"Demo error: {e}", exc_info=True)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -7,11 +9,7 @@ from onyx.connectors.models import ConnectorFailure
 from onyx.connectors.models import Document
 from tests.daily.connectors.google_drive.consts_and_utils import ADMIN_FOLDER_3_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import (
-    assert_expected_docs_in_retrieved_docs,
-)
 from tests.daily.connectors.google_drive.consts_and_utils import (
-    DONWLOAD_REVOKED_FILE_ID,
-)
 from tests.daily.connectors.google_drive.consts_and_utils import FOLDER_1_1_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import FOLDER_1_2_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import FOLDER_1_FILE_IDS
@@ -19,11 +17,18 @@ from tests.daily.connectors.google_drive.consts_and_utils import FOLDER_1_URL
 from tests.daily.connectors.google_drive.consts_and_utils import FOLDER_3_URL
 from tests.daily.connectors.google_drive.consts_and_utils import load_all_docs
 from tests.daily.connectors.google_drive.consts_and_utils import (
-    load_all_docs_with_failures,
-)
 from tests.daily.connectors.google_drive.consts_and_utils import SHARED_DRIVE_1_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import TEST_USER_1_EMAIL
 from tests.daily.connectors.google_drive.consts_and_utils import TEST_USER_1_FILE_IDS
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    assert_expected_docs_in_retrieved_docs,
+)
+    DONWLOAD_REVOKED_FILE_ID,
+)
+    load_all_docs_with_failures,
+)
 
 
 def _check_for_error(

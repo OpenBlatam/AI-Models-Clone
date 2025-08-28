@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 
 from sqlalchemy import exists
@@ -18,6 +20,9 @@ from onyx.db.models import UserRole
 from onyx.server.token_rate_limits.models import TokenRateLimitArgs
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _add_user_filters(
     stmt: Select, user: User | None, get_editable: bool = True
 ) -> Select:
@@ -73,7 +78,12 @@ def _add_user_filters(
     return stmt.where(where_clause)
 
 
-def fetch_all_user_group_token_rate_limits_by_group(
+async async def fetch_all_user_group_token_rate_limits_by_group(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
 ) -> Sequence[Row[tuple[TokenRateLimit, str]]]:
     query = (
@@ -111,7 +121,12 @@ def insert_user_group_token_rate_limit(
     return token_limit
 
 
-def fetch_user_group_token_rate_limits_for_user(
+async async def fetch_user_group_token_rate_limits_for_user(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
     group_id: int,
     user: User | None,

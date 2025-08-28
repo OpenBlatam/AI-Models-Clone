@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -19,6 +21,9 @@ from onyx.document_index.vespa_constants import USER_FOLDER
 from onyx.utils.logger import setup_logger
 from shared_configs.configs import MULTI_TENANT
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 

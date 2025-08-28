@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 from typing import Any
 
@@ -10,6 +12,9 @@ from onyx.prompts.constants import GENERAL_SEP_PAT
 from onyx.tools.tool import Tool
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -46,7 +51,7 @@ def select_single_tool_for_non_tool_calling_llm(
         return tools_and_args[0]
 
     tool_list_str = "\n".join(
-        f"""```{ind}: {tool.name} ({args}) - {tool.description}```"""
+        f"""```{ind}: {tool.name} ({args}) - {tool.description}```"""f"
         for ind, (tool, args) in enumerate(tools_and_args)
     ).lstrip()
 
@@ -54,9 +59,7 @@ def select_single_tool_for_non_tool_calling_llm(
         messages=history,
         token_limit=GEN_AI_HISTORY_CUTOFF,
     )
-    prompt = SINGLE_TOOL_SELECTION_PROMPT.format(
-        tool_list=tool_list_str, chat_history=history_str, query=query
-    )
+    prompt = SINGLE_TOOL_SELECTION_PROMPT"
     output = message_to_string(llm.invoke(prompt))
     try:
         # First try to match the number

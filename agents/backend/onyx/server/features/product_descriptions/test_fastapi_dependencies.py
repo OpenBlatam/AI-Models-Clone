@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import uuid
+from typing import Dict, List, Any, Optional
+import pytest
+from fastapi.testclient import TestClient
+from unittest.mock import AsyncMock, MagicMock, patch
+from fastapi_dependency_injection import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test script for FastAPI Dependency Injection System
 
@@ -12,16 +30,8 @@ This script tests:
 - Testing utilities
 """
 
-import asyncio
-import time
-import uuid
-from typing import Dict, List, Any, Optional
 
-import pytest
-from fastapi.testclient import TestClient
-from unittest.mock import AsyncMock, MagicMock, patch
 
-from fastapi_dependency_injection import (
     DependencyConfig, DependencyManager, create_app,
     get_lazy_manager_dependency, get_loader_dependency,
     get_config, get_stats_dependency, get_request_id,
@@ -184,7 +194,7 @@ async def test_request_scoped_dependencies():
     
     # Create mock request
     class MockRequest:
-        def __init__(self):
+        def __init__(self) -> Any:
             self.state = type('State', (), {})()
             self.state.request_id = str(uuid.uuid4())
             self.state.user_id = "user_123"
@@ -409,7 +419,9 @@ async def test_concurrent_access():
         print("1. Testing concurrent loader access...")
         
         async def access_loader(loader_name: str):
-            loader = manager.get_loader(loader_name)
+            
+    """access_loader function."""
+loader = manager.get_loader(loader_name)
             # Simulate some work
             await asyncio.sleep(0.1)
             return loader is not None
@@ -429,7 +441,9 @@ async def test_concurrent_access():
         print("\n2. Testing concurrent data source access...")
         
         async def access_data_source(source_name: str):
-            source = manager.get_data_source(source_name)
+            
+    """access_data_source function."""
+source = manager.get_data_source(source_name)
             await asyncio.sleep(0.1)
             return source is not None
         

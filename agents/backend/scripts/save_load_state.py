@@ -1,12 +1,10 @@
-# This file is purely for development use, not included in any builds
-# Remember to first to send over the schema information (run API Server)
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import argparse
 import json
 import os
 import subprocess
-
 import requests
-
 from alembic import command
 from alembic.config import Config
 from onyx.configs.app_configs import POSTGRES_DB
@@ -16,6 +14,13 @@ from onyx.configs.app_configs import POSTGRES_PORT
 from onyx.configs.app_configs import POSTGRES_USER
 from onyx.document_index.vespa.index import DOCUMENT_ID_ENDPOINT
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# This file is purely for development use, not included in any builds
+# Remember to first to send over the schema information (run API Server)
+
+
 
 logger = setup_logger()
 
@@ -24,6 +29,10 @@ def save_postgres(filename: str, container_name: str) -> None:
     logger.notice("Attempting to take Postgres snapshot")
     cmd = f"docker exec {container_name} pg_dump -U {POSTGRES_USER} -h {POSTGRES_HOST} -p {POSTGRES_PORT} -W -F t {POSTGRES_DB}"
     with open(filename, "w") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         subprocess.run(
             cmd,
             shell=True,
@@ -74,14 +83,26 @@ def save_vespa(filename: str) -> None:
             doc_jsons.append(doc_json)
 
     with open(filename, "w") as jsonl_file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         for doc in doc_jsons:
             json_str = json.dumps(doc)
             jsonl_file.write(json_str + "\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 def load_vespa(filename: str) -> None:
     headers = {"Content-Type": "application/json"}
     with open(filename, "r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         for line in f:
             new_doc = json.loads(line.strip())
             doc_id = new_doc["update"].split("::")[-1]

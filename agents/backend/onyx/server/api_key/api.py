@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import APIRouter
 from fastapi import Depends
 from sqlalchemy.orm import Session
@@ -14,6 +16,9 @@ from onyx.db.models import User
 from onyx.server.api_key.models import APIKeyArgs
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 router = APIRouter(prefix="/admin/api-key")
 
 

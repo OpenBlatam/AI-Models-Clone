@@ -1,0 +1,6 @@
+Collecting ujson
+  Downloading ujson-5.11.0-cp311-cp311-win_amd64.whl.metadata (9.6 kB)
+Downloading ujson-5.11.0-cp311-cp311-win_amd64.whl (43 kB)
+   ---------------------------------------- 43.7/43.7 kB 360.0 kB/s eta 0:00:00
+Installing collected packages: ujson
+Successfully installed ujson-5.11.0

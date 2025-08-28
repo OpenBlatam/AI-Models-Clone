@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from uuid import UUID
 
 from sqlalchemy.orm import Session
@@ -11,6 +13,9 @@ from onyx.db.models import User__UserGroup
 from onyx.db.models import UserGroup
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def make_doc_set_private(
     document_set_id: int,
     user_ids: list[UUID] | None,
@@ -20,9 +25,19 @@ def make_doc_set_private(
     db_session.query(DocumentSet__User).filter(
         DocumentSet__User.document_set_id == document_set_id
     ).delete(synchronize_session="fetch")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session.query(DocumentSet__UserGroup).filter(
         DocumentSet__UserGroup.document_set_id == document_set_id
     ).delete(synchronize_session="fetch")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     if user_ids:
         for user_uuid in user_ids:
@@ -39,19 +54,34 @@ def make_doc_set_private(
             )
 
 
-def delete_document_set_privacy__no_commit(
+async def delete_document_set_privacy__no_commit(
     document_set_id: int, db_session: Session
 ) -> None:
     db_session.query(DocumentSet__User).filter(
         DocumentSet__User.document_set_id == document_set_id
     ).delete(synchronize_session="fetch")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     db_session.query(DocumentSet__UserGroup).filter(
         DocumentSet__UserGroup.document_set_id == document_set_id
     ).delete(synchronize_session="fetch")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
 
-def fetch_document_sets(
+async async def fetch_document_sets(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     user_id: UUID | None,
     db_session: Session,
     include_outdated: bool = True,  # Parameter only for versioned implementation, unused

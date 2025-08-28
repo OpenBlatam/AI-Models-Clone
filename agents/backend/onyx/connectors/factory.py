@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Any
 from typing import Type
 
@@ -64,6 +69,9 @@ from onyx.db.models import Credential
 from shared_configs.contextvars import get_current_tenant_id
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class ConnectorMissingException(Exception):
     pass
 

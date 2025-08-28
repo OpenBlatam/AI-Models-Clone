@@ -1,3 +1,51 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+import uuid
+import json
+import hashlib
+import logging
+import traceback
+from typing import (
+from collections import defaultdict, deque
+from contextlib import asynccontextmanager
+from datetime import datetime, timedelta
+from dataclasses import dataclass, field
+from functools import wraps
+import weakref
+from fastapi import (
+from fastapi.middleware.base import BaseHTTPMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+import structlog
+from pydantic import BaseModel, Field, validator
+import uvicorn
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
+import psutil
+import asyncio
+from prometheus_client import Counter, Histogram, Gauge, Summary
+import redis.asyncio as redis
+from cachetools import TTLCache
+            from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+from typing import Any, List, Dict, Optional
 """
 🔧 COMPREHENSIVE MIDDLEWARE SYSTEM
 =================================
@@ -21,45 +69,13 @@ Features:
 - Security hardening
 """
 
-import asyncio
-import time
-import uuid
-import json
-import hashlib
-import logging
-import traceback
-from typing import (
     Dict, List, Optional, Any, Callable, Awaitable,
     Union, Tuple, Set, Deque
 )
-from collections import defaultdict, deque
-from contextlib import asynccontextmanager
-from datetime import datetime, timedelta
-from dataclasses import dataclass, field
-from functools import wraps
-import weakref
 
-from fastapi import (
     FastAPI, Request, Response, HTTPException, status,
     BackgroundTasks, Depends
 )
-from fastapi.middleware.base import BaseHTTPMiddleware
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-import structlog
-from pydantic import BaseModel, Field, validator
-import uvicorn
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
-import psutil
-import asyncio
-from prometheus_client import Counter, Histogram, Gauge, Summary
-import redis.asyncio as redis
-from cachetools import TTLCache
 
 # ============================================================================
 # CONFIGURATION MODELS
@@ -184,7 +200,7 @@ class HealthStatus(BaseModel):
 class MetricsCollector:
     """Prometheus metrics collector."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         # Request metrics
         self.request_count = Counter(
             'http_requests_total',
@@ -260,19 +276,19 @@ class MetricsCollector:
         """Record error metrics."""
         self.error_count.labels(method=method, endpoint=endpoint, error_type=error_type).inc()
     
-    def record_cache_hit(self):
+    def record_cache_hit(self) -> Any:
         """Record cache hit."""
         self.cache_hits.inc()
     
-    def record_cache_miss(self):
+    def record_cache_miss(self) -> Any:
         """Record cache miss."""
         self.cache_misses.inc()
     
-    def record_rate_limit_exceeded(self):
+    def record_rate_limit_exceeded(self) -> Any:
         """Record rate limit violation."""
         self.rate_limit_exceeded.inc()
     
-    def update_system_metrics(self):
+    def update_system_metrics(self) -> Any:
         """Update system metrics."""
         memory = psutil.virtual_memory()
         cpu = psutil.cpu_percent()
@@ -288,7 +304,9 @@ class ResponseCache:
     """Response caching system."""
     
     def __init__(self, ttl_seconds: int = 300, max_size: int = 1000):
-        self.cache = TTLCache(maxsize=max_size, ttl=ttl_seconds)
+        
+    """__init__ function."""
+self.cache = TTLCache(maxsize=max_size, ttl=ttl_seconds)
         self.metrics_collector = MetricsCollector()
     
     def generate_cache_key(self, request: Request) -> str:
@@ -336,7 +354,9 @@ class ErrorMonitor:
     """Error monitoring and alerting system."""
     
     def __init__(self, alert_threshold: int = 10, alert_window_minutes: int = 5):
-        self.alert_threshold = alert_threshold
+        
+    """__init__ function."""
+self.alert_threshold = alert_threshold
         self.alert_window = timedelta(minutes=alert_window_minutes)
         self.error_events: Deque[ErrorEvent] = deque()
         self.alerted_errors: Set[str] = set()
@@ -434,7 +454,9 @@ class PerformanceMonitor:
     """Performance monitoring system."""
     
     def __init__(self, slow_request_threshold_ms: int = 1000):
-        self.slow_request_threshold = slow_request_threshold_ms
+        
+    """__init__ function."""
+self.slow_request_threshold = slow_request_threshold_ms
         self.request_times: Deque[float] = deque(maxlen=1000)
         self.start_time = datetime.now()
         self.metrics_collector = MetricsCollector()
@@ -513,7 +535,9 @@ class RateLimiter:
     """Rate limiting system."""
     
     def __init__(self, requests_per_minute: int = 100, window_seconds: int = 60):
-        self.requests_per_minute = requests_per_minute
+        
+    """__init__ function."""
+self.requests_per_minute = requests_per_minute
         self.window_seconds = window_seconds
         self.requests: Dict[str, Deque[datetime]] = defaultdict(lambda: deque())
         self.metrics_collector = MetricsCollector()
@@ -567,12 +591,14 @@ class LoggingMiddleware(BaseHTTPMiddleware):
     """Comprehensive logging middleware."""
     
     def __init__(self, app, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.logger = structlog.get_logger("request_logger")
         self._setup_logging()
     
-    def _setup_logging(self):
+    def _setup_logging(self) -> Any:
         """Setup structured logging."""
         processors = [
             structlog.stdlib.filter_by_level,
@@ -681,7 +707,9 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
     """Performance monitoring middleware."""
     
     def __init__(self, app, config: MiddlewareConfig, performance_monitor: PerformanceMonitor):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.performance_monitor = performance_monitor
     
@@ -733,7 +761,9 @@ class ErrorMonitoringMiddleware(BaseHTTPMiddleware):
     """Error monitoring middleware."""
     
     def __init__(self, app, config: MiddlewareConfig, error_monitor: ErrorMonitor):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.error_monitor = error_monitor
     
@@ -763,7 +793,9 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
     """Rate limiting middleware."""
     
     def __init__(self, app, config: MiddlewareConfig, rate_limiter: RateLimiter):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.rate_limiter = rate_limiter
     
@@ -804,7 +836,9 @@ class CachingMiddleware(BaseHTTPMiddleware):
     """Response caching middleware."""
     
     def __init__(self, app, config: MiddlewareConfig, response_cache: ResponseCache):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
         self.response_cache = response_cache
     
@@ -842,7 +876,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Security headers middleware."""
     
     def __init__(self, app, config: MiddlewareConfig):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.config = config
     
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
@@ -869,7 +905,9 @@ class MiddlewareManager:
     """Centralized middleware management system."""
     
     def __init__(self, config: MiddlewareConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.metrics_collector = MetricsCollector()
         self.error_monitor = ErrorMonitor(
             alert_threshold=config.error_alert_threshold,
@@ -892,7 +930,7 @@ class MiddlewareManager:
         if config.redis_url:
             self._init_redis()
     
-    def _init_redis(self):
+    def _init_redis(self) -> Any:
         """Initialize Redis client."""
         try:
             self.redis_client = redis.from_url(self.config.redis_url)
@@ -1022,7 +1060,6 @@ class MiddlewareManager:
             self.metrics_collector.update_system_metrics()
             
             # Return metrics in Prometheus format
-            from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
             
             return Response(
                 content=generate_latest(),
@@ -1065,7 +1102,7 @@ def setup_middleware_system(app: FastAPI, config: Optional[MiddlewareConfig] = N
     
     return manager
 
-def get_request_metrics(request: Request) -> Dict[str, Any]:
+async def get_request_metrics(request: Request) -> Dict[str, Any]:
     """Get request metrics from request state."""
     return {
         "request_id": getattr(request.state, "request_id", None),
@@ -1129,7 +1166,9 @@ def create_app_with_middleware() -> FastAPI:
     # Add your routes here
     @app.get("/")
     async def root():
-        return {"message": "Blatam Academy NLP API with comprehensive middleware"}
+        
+    """root function."""
+return {"message": "Blatam Academy NLP API with comprehensive middleware"}
     
     @app.get("/api/status")
     async def api_status():

@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from datetime import datetime
 from datetime import timedelta
 from io import BytesIO
@@ -18,6 +23,9 @@ from onyx.file_store.file_store import get_default_file_store
 from onyx.utils.logger import setup_logger
 from onyx.utils.object_size_check import deep_getsizeof
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 _NUM_RECENT_ATTEMPTS_TO_CONSIDER = 50
@@ -59,6 +67,10 @@ def load_checkpoint(
     file_store = get_default_file_store(db_session)
     checkpoint_io = file_store.read_file(checkpoint_pointer, mode="rb")
     checkpoint_data = checkpoint_io.read().decode("utf-8")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     if isinstance(connector, CheckpointedConnector):
         return connector.validate_checkpoint_json(checkpoint_data)
     return ConnectorCheckpoint.model_validate_json(checkpoint_data)

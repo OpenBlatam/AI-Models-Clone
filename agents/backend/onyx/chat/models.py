@@ -1,3 +1,7 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
 from collections import OrderedDict
 from collections.abc import Callable
 from collections.abc import Iterator
@@ -27,8 +31,11 @@ from onyx.tools.models import ToolCallKickoff
 from onyx.tools.models import ToolResponse
 from onyx.tools.tool_implementations.custom.base_tool_types import ToolResultType
 
-if TYPE_CHECKING:
     from onyx.db.models import Prompt
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+if TYPE_CHECKING:
 
 
 class LlmDoc(BaseModel):
@@ -413,7 +420,8 @@ class AnswerPostInfo(BaseModel):
     tool_result: ToolCallFinalResult | None = None
     message_specific_citations: MessageSpecificCitations | None = None
 
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
 
 

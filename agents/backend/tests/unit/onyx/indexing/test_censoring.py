@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -9,6 +11,9 @@ from onyx.context.search.models import InferenceChunk
 from onyx.db.models import User
 from onyx.utils.variable_functionality import fetch_ee_implementation_or_noop
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 _post_query_chunk_censoring = fetch_ee_implementation_or_noop(
     "onyx.external_permissions.post_query_censoring", "_post_query_chunk_censoring"
 )

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import cast
 
 from langchain_core.messages import HumanMessage
@@ -9,11 +11,14 @@ from onyx.agents.agent_search.dc_search_analysis.states import ObjectInformation
 from onyx.agents.agent_search.dc_search_analysis.states import ObjectResearchUpdate
 from onyx.agents.agent_search.models import GraphConfig
 from onyx.agents.agent_search.shared_graph_utils.agent_prompt_ops import (
-    trim_prompt_piece,
-)
 from onyx.prompts.agents.dc_prompts import DC_OBJECT_CONSOLIDATION_PROMPT
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    trim_prompt_piece,
+)
 
 logger = setup_logger()
 
@@ -49,16 +54,11 @@ def consolidate_object_research(
     object_information = state.object_information
 
     object = object_information["object"]
-    information = object_information["information"]
+    information = object_information["information"f"]
 
     # Create a prompt for the object consolidation
 
-    dc_object_consolidation_prompt = DC_OBJECT_CONSOLIDATION_PROMPT.format(
-        question=question,
-        object=object,
-        information=information,
-        format=agent_4_output_objective,
-    )
+    dc_object_consolidation_prompt = DC_OBJECT_CONSOLIDATION_PROMPT"
 
     # Run LLM
 

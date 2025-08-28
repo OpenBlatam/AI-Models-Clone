@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import sys
+from pathlib import Path
+        from pydantic_schemas import (
+        from pydantic_schemas import VideoGenerationInput
+        from pydantic import ValidationError
+        from pydantic_validation import (
+        from pydantic_schemas import (
+        from pydantic_validation import ValidationPerformanceMonitor
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Test Pydantic Validation System
@@ -6,9 +22,6 @@ Test Pydantic Validation System
 Quick test to verify the Pydantic validation system works correctly.
 """
 
-import asyncio
-import sys
-from pathlib import Path
 
 # Add the current directory to Python path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -18,7 +31,6 @@ def test_basic_validation():
     print("🧪 Testing Basic Pydantic Validation...")
     
     try:
-        from pydantic_schemas import (
             VideoGenerationInput, VideoGenerationResponse,
             VideoStatus, QualityLevel, ModelType
         )
@@ -55,8 +67,6 @@ def test_validation_errors():
     print("\n🧪 Testing Validation Errors...")
     
     try:
-        from pydantic_schemas import VideoGenerationInput
-        from pydantic import ValidationError
         
         # Test invalid input
         try:
@@ -80,7 +90,6 @@ def test_middleware_creation():
     print("\n🧪 Testing Middleware Creation...")
     
     try:
-        from pydantic_validation import (
             ValidationConfig, create_validation_middleware,
             ValidationPerformanceMonitor, create_performance_monitor
         )
@@ -112,7 +121,6 @@ def test_utility_functions():
     print("\n🧪 Testing Utility Functions...")
     
     try:
-        from pydantic_schemas import (
             create_video_id, create_batch_id,
             create_error_response, create_success_response,
             VideoStatus
@@ -151,7 +159,6 @@ async def test_async_validation():
     print("\n🧪 Testing Async Validation...")
     
     try:
-        from pydantic_validation import ValidationPerformanceMonitor
         
         # Create performance monitor
         monitor = create_performance_monitor()

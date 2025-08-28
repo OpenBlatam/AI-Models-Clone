@@ -1,8 +1,6 @@
-"""
-Pydantic models for Image Process feature.
-"""
+from typing import Any, Dict, List, Optional
 from pydantic import BaseModel, Field, root_validator
-from typing import Optional, List, Dict, Any
+"""Pydantic models for Image Process feature."""
 
 class ImageBaseRequest(BaseModel):
     """Request base para operaciones de imagen. Debe incluir image_url o image_base64."""
@@ -18,7 +16,7 @@ class ImageBaseRequest(BaseModel):
     )
 
     @root_validator(skip_on_failure=True)
-    def at_least_one_source(cls, values):
+    def at_least_one_source(cls, values) -> Any:
         if not values.get("image_url") and not values.get("image_base64"):
             raise ValueError("Debes proporcionar image_url o image_base64")
         return values

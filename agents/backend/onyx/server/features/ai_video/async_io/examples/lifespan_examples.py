@@ -1,9 +1,7 @@
-"""
-🔄 LIFESPAN MIGRATION EXAMPLES
-==============================
-
-Practical examples showing migration from @app.on_event() to lifespan context managers.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -18,6 +16,15 @@ import torch
 import psutil
 import signal
 import sys
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+🔄 LIFESPAN MIGRATION EXAMPLES
+==============================
+
+Practical examples showing migration from @app.on_event() to lifespan context managers.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -31,13 +38,17 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup_event():
-    app.state.redis = redis.Redis()
+    
+    """startup_event function."""
+app.state.redis = redis.Redis()
     app.state.db = create_engine("postgresql://...")
     logger.info("Application started")
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    await app.state.redis.close()
+    
+    """shutdown_event function."""
+await app.state.redis.close()
     app.state.db.dispose()
     logger.info("Application shutdown")
 """
@@ -351,16 +362,16 @@ async def comprehensive_lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 class BackgroundTaskManager:
     """Background task management system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.tasks = set()
         self.is_running = False
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start background task manager."""
         self.is_running = True
         logger.info("Background task manager started")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop all background tasks."""
         self.is_running = False
         
@@ -375,7 +386,7 @@ class BackgroundTaskManager:
         
         logger.info("Background task manager stopped")
     
-    async def add_task(self, coro):
+    async def add_task(self, coro) -> Any:
         """Add a new background task."""
         if self.is_running:
             task = asyncio.create_task(coro)
@@ -386,16 +397,16 @@ class BackgroundTaskManager:
 class PerformanceMonitor:
     """Performance monitoring system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.is_running = False
         self.metrics = {}
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start performance monitoring."""
         self.is_running = True
         logger.info("Performance monitoring started")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop performance monitoring."""
         self.is_running = False
         logger.info("Performance monitoring stopped")
@@ -430,7 +441,7 @@ async def load_diffusion_pipeline():
     await asyncio.sleep(1.5)  # Simulate pipeline loading
     return {"pipeline": "stable_diffusion", "loaded": True}
 
-async def unload_model(model):
+async def unload_model(model) -> Any:
     """Unload AI model."""
     logger.info("Unloading model...")
     await asyncio.sleep(0.3)  # Simulate model unloading
@@ -526,7 +537,7 @@ async def run_health_checks(app: FastAPI) -> Dict[str, Any]:
 def setup_signal_handlers(app: FastAPI):
     """Set up signal handlers for graceful shutdown."""
     
-    def signal_handler(signum, frame):
+    def signal_handler(signum, frame) -> Any:
         logger.info(f"Received signal {signum}, initiating graceful shutdown...")
         sys.exit(0)
     
@@ -546,7 +557,9 @@ def create_basic_app() -> FastAPI:
     
     @app.get("/health")
     async def health_check():
-        return {"status": "healthy"}
+        
+    """health_check function."""
+return {"status": "healthy"}
     
     return app
 
@@ -559,7 +572,9 @@ def create_ai_model_app() -> FastAPI:
     
     @app.get("/models")
     async def list_models():
-        return {
+        
+    """list_models function."""
+return {
             "video_model": app.state.video_model,
             "text_model": app.state.text_model,
             "diffusion_pipeline": app.state.diffusion_pipeline
@@ -576,17 +591,23 @@ def create_comprehensive_app() -> FastAPI:
     
     @app.get("/health")
     async def health_check():
-        return await run_health_checks(app)
+        
+    """health_check function."""
+return await run_health_checks(app)
     
     @app.get("/metrics")
     async def get_metrics():
-        if hasattr(app.state, 'performance_monitor'):
+        
+    """get_metrics function."""
+if hasattr(app.state, 'performance_monitor'):
             return await app.state.performance_monitor.collect_metrics()
         return {"error": "Performance monitor not available"}
     
     @app.get("/status")
     async def get_status():
-        return {
+        
+    """get_status function."""
+return {
             "status": "running",
             "uptime": time.time() - app.state.startup_time,
             "version": app.state.version,
@@ -608,13 +629,17 @@ def migrate_from_on_event_to_lifespan():
 
     @app.on_event("startup")
     async def startup_event():
-        app.state.redis = redis.Redis()
+        
+    """startup_event function."""
+app.state.redis = redis.Redis()
         app.state.db = create_engine("postgresql://...")
         logger.info("Application started")
 
     @app.on_event("shutdown")
     async def shutdown_event():
-        await app.state.redis.close()
+        
+    """shutdown_event function."""
+await app.state.redis.close()
         app.state.db.dispose()
         logger.info("Application shutdown")
     '''
@@ -655,7 +680,8 @@ if __name__ == "__main__":
     
     @app.get("/")
     async def root():
-        return {"message": "AI Video API with comprehensive lifespan management"}
+        
+    """root function."""
+return {"message": "AI Video API with comprehensive lifespan management"}
     
-    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000) 

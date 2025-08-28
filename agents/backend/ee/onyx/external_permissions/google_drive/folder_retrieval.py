@@ -1,17 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Iterator
 
 from googleapiclient.discovery import Resource  # type: ignore
 
 from ee.onyx.external_permissions.google_drive.models import GoogleDrivePermission
 from ee.onyx.external_permissions.google_drive.permission_retrieval import (
-    get_permissions_by_ids,
-)
 from onyx.connectors.google_drive.constants import DRIVE_FOLDER_TYPE
 from onyx.connectors.google_drive.file_retrieval import generate_time_range_filter
 from onyx.connectors.google_drive.models import GoogleDriveFileType
 from onyx.connectors.google_utils.google_utils import execute_paginated_retrieval
 from onyx.connectors.interfaces import SecondsSinceUnixEpoch
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_permissions_by_ids,
+)
 
 logger = setup_logger()
 

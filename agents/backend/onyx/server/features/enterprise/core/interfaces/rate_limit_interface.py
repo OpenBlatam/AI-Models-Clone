@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from ..entities.rate_limit import RateLimitInfo
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Rate Limit Service Interface
 ============================
@@ -5,8 +12,6 @@ Rate Limit Service Interface
 Abstract interface for rate limiting operations.
 """
 
-from abc import ABC, abstractmethod
-from ..entities.rate_limit import RateLimitInfo
 
 
 class IRateLimitService(ABC):
@@ -23,7 +28,7 @@ class IRateLimitService(ABC):
         pass
     
     @abstractmethod
-    async def get_remaining_requests(self, identifier: str) -> int:
+    async async def get_remaining_requests(self, identifier: str) -> int:
         """Get remaining requests for identifier."""
         pass
     

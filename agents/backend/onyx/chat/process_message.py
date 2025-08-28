@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 import traceback
 from collections import defaultdict
@@ -59,8 +61,6 @@ from onyx.context.search.enums import SearchType
 from onyx.context.search.models import InferenceSection
 from onyx.context.search.models import RetrievalDetails
 from onyx.context.search.retrieval.search_runner import (
-    inference_sections_from_ids,
-)
 from onyx.context.search.utils import chunks_or_sections_to_search_docs
 from onyx.context.search.utils import dedupe_documents
 from onyx.context.search.utils import drop_llm_indices
@@ -116,38 +116,18 @@ from onyx.tools.tool_constructor import ImageGenerationToolConfig
 from onyx.tools.tool_constructor import InternetSearchToolConfig
 from onyx.tools.tool_constructor import SearchToolConfig
 from onyx.tools.tool_implementations.custom.custom_tool import (
-    CUSTOM_TOOL_RESPONSE_ID,
-)
 from onyx.tools.tool_implementations.custom.custom_tool import CustomToolCallSummary
 from onyx.tools.tool_implementations.images.image_generation_tool import (
-    IMAGE_GENERATION_RESPONSE_ID,
-)
 from onyx.tools.tool_implementations.images.image_generation_tool import (
-    ImageGenerationResponse,
-)
 from onyx.tools.tool_implementations.internet_search.internet_search_tool import (
-    INTERNET_SEARCH_RESPONSE_ID,
-)
 from onyx.tools.tool_implementations.internet_search.internet_search_tool import (
-    internet_search_response_to_search_docs,
-)
 from onyx.tools.tool_implementations.internet_search.internet_search_tool import (
-    InternetSearchResponse,
-)
 from onyx.tools.tool_implementations.internet_search.internet_search_tool import (
-    InternetSearchTool,
-)
 from onyx.tools.tool_implementations.search.search_tool import (
-    FINAL_CONTEXT_DOCUMENTS_ID,
-)
 from onyx.tools.tool_implementations.search.search_tool import (
-    SEARCH_RESPONSE_SUMMARY_ID,
-)
 from onyx.tools.tool_implementations.search.search_tool import SearchResponseSummary
 from onyx.tools.tool_implementations.search.search_tool import SearchTool
 from onyx.tools.tool_implementations.search.search_tool import (
-    SECTION_RELEVANCE_LIST_ID,
-)
 from onyx.tools.tool_runner import ToolCallFinalResult
 from onyx.utils.logger import setup_logger
 from onyx.utils.long_term_log import LongTermLogger
@@ -155,6 +135,31 @@ from onyx.utils.telemetry import mt_cloud_telemetry
 from onyx.utils.timing import log_function_time
 from onyx.utils.timing import log_generator_function_time
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    inference_sections_from_ids,
+)
+    CUSTOM_TOOL_RESPONSE_ID,
+)
+    IMAGE_GENERATION_RESPONSE_ID,
+)
+    ImageGenerationResponse,
+)
+    INTERNET_SEARCH_RESPONSE_ID,
+)
+    internet_search_response_to_search_docs,
+)
+    InternetSearchResponse,
+)
+    InternetSearchTool,
+)
+    FINAL_CONTEXT_DOCUMENTS_ID,
+)
+    SEARCH_RESPONSE_SUMMARY_ID,
+)
+    SECTION_RELEVANCE_LIST_ID,
+)
 
 logger = setup_logger()
 ERROR_TYPE_CANCELLED = "cancelled"

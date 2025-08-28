@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+from typing import Callable, List, Dict, Any, Optional, Tuple
+from functools import reduce, partial
+import torch
+import numpy as np
+import logging
+        import torch.nn.functional as F
+    from typing import Union, Tuple
+            import time
+        import time
+        import time
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Functional Programming Examples for AI Video
 ===========================================
@@ -5,17 +28,12 @@ Functional Programming Examples for AI Video
 Comprehensive examples demonstrating functional programming patterns.
 """
 
-from typing import Callable, List, Dict, Any, Optional, Tuple
-from functools import reduce, partial
-import torch
-import numpy as np
-import logging
 
 logger = logging.getLogger(__name__)
 
-def compose(*functions):
+def compose(*functions) -> Any:
     """Compose multiple functions: compose(f, g, h)(x) = f(g(h(x)))."""
-    def inner(arg):
+    def inner(arg) -> Any:
         return reduce(lambda acc, f: f(acc), reversed(functions), arg)
     return inner
 
@@ -31,7 +49,6 @@ def example_data_pipeline():
         return torch.randn(16, 3, 512, 512)
     
     def resize_frames(frames: torch.Tensor, size: Tuple[int, int]) -> torch.Tensor:
-        import torch.nn.functional as F
         return F.interpolate(frames, size=size, mode='bilinear')
     
     def normalize_frames(frames: torch.Tensor) -> torch.Tensor:
@@ -224,7 +241,6 @@ def example_config_management():
 def example_error_handling():
     """Example of functional error handling."""
     
-    from typing import Union, Tuple
     
     Result = Union[Tuple[None, Exception], Tuple[Any, None]]
     
@@ -278,7 +294,7 @@ def example_caching():
     def memoize(func: Callable) -> Callable:
         cache = {}
         
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             key = str(args) + str(sorted(kwargs.items()))
             if key not in cache:
                 cache[key] = func(*args, **kwargs)
@@ -287,11 +303,12 @@ def example_caching():
         return wrapper
     
     def cache_with_ttl(ttl_seconds: int):
-        def decorator(func: Callable) -> Callable:
+        
+    """cache_with_ttl function."""
+def decorator(func: Callable) -> Callable:
             cache = {}
-            import time
             
-            def wrapper(*args, **kwargs):
+            def wrapper(*args, **kwargs) -> Any:
                 key = str(args) + str(sorted(kwargs.items()))
                 now = time.time()
                 
@@ -310,13 +327,11 @@ def example_caching():
     # Example expensive function
     @memoize
     def expensive_computation(x: int) -> int:
-        import time
         time.sleep(0.1)  # Simulate expensive computation
         return x * x
     
     @cache_with_ttl(5)  # 5 second TTL
-    def expensive_api_call(user_id: str) -> Dict[str, Any]:
-        import time
+    async def expensive_api_call(user_id: str) -> Dict[str, Any]:
         time.sleep(0.1)  # Simulate API call
         return {'user_id': user_id, 'data': 'some_data'}
     
@@ -477,5 +492,6 @@ def run_all_examples():
     print("ALL EXAMPLES COMPLETED")
     print("=" * 60)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     run_all_examples() 

@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
 import torch
 import time
 import psutil
@@ -6,11 +14,15 @@ from transformers import AutoModel, AutoTokenizer
 from diffusers import TextToVideoPipeline
 import numpy as np
 
+        from transformers import BitsAndBytesConfig
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class PerformanceBenchmark:
-    def __init__(self):
+    def __init__(self) -> Any:
         self.results = {}
     
-    def benchmark_pytorch_features(self):
+    def benchmark_pytorch_features(self) -> Any:
         """Benchmark PyTorch 2.0+ features."""
         print("Benchmarking PyTorch features...")
         
@@ -52,12 +64,11 @@ class PerformanceBenchmark:
         self.results['attention_time'] = attention_time
         print(f"Attention time: {attention_time:.4f}s")
     
-    def benchmark_transformers(self):
+    def benchmark_transformers(self) -> Any:
         """Benchmark Transformers optimizations."""
         print("Benchmarking Transformers...")
         
         # Test quantization
-        from transformers import BitsAndBytesConfig
         
         bnb_config = BitsAndBytesConfig(
             load_in_4bit=True,
@@ -86,7 +97,7 @@ class PerformanceBenchmark:
         self.results['transformers_inference_time'] = inference_time
         print(f"Transformers inference time: {inference_time:.4f}s")
     
-    def benchmark_diffusers(self):
+    def benchmark_diffusers(self) -> Any:
         """Benchmark Diffusers pipeline."""
         print("Benchmarking Diffusers...")
         
@@ -114,7 +125,7 @@ class PerformanceBenchmark:
         self.results['video_generation_time'] = video_time
         print(f"Video generation time: {video_time:.2f}s")
     
-    def get_system_stats(self):
+    def get_system_stats(self) -> Optional[Dict[str, Any]]:
         """Get system performance stats."""
         stats = {
             "cpu_percent": psutil.cpu_percent(interval=1),
@@ -136,7 +147,7 @@ class PerformanceBenchmark:
         self.results['system_stats'] = stats
         return stats
     
-    def run_all_benchmarks(self):
+    def run_all_benchmarks(self) -> Any:
         """Run all benchmarks."""
         print("🚀 Starting Performance Benchmarks")
         print("=" * 50)

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import cast
 
 import requests
@@ -11,12 +13,15 @@ from ee.onyx.server.tenants.models import SubscriptionStatusResponse
 from onyx.configs.app_configs import CONTROL_PLANE_API_BASE_URL
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 stripe.api_key = STRIPE_SECRET_KEY
 
 logger = setup_logger()
 
 
-def fetch_stripe_checkout_session(tenant_id: str) -> str:
+async def fetch_stripe_checkout_session(tenant_id: str) -> str:
     token = generate_data_plane_token()
     headers = {
         "Authorization": f"Bearer {token}",
@@ -29,7 +34,7 @@ def fetch_stripe_checkout_session(tenant_id: str) -> str:
     return response.json()["sessionId"]
 
 
-def fetch_tenant_stripe_information(tenant_id: str) -> dict:
+async def fetch_tenant_stripe_information(tenant_id: str) -> dict:
     token = generate_data_plane_token()
     headers = {
         "Authorization": f"Bearer {token}",
@@ -42,7 +47,7 @@ def fetch_tenant_stripe_information(tenant_id: str) -> dict:
     return response.json()
 
 
-def fetch_billing_information(
+async def fetch_billing_information(
     tenant_id: str,
 ) -> BillingInformation | SubscriptionStatusResponse:
     logger.info("Fetching billing information")

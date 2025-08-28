@@ -1,9 +1,20 @@
-"""
-Tests for Key Messages models.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 from datetime import datetime
 from onyx.server.features.key_messages.models import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Tests for Key Messages models.
+"""
     KeyMessageRequest,
     GeneratedResponse,
     KeyMessageResponse,
@@ -17,7 +28,7 @@ from onyx.server.features.key_messages.models import (
 class TestMessageType:
     """Test MessageType enum."""
     
-    def test_message_types(self):
+    def test_message_types(self) -> Any:
         """Test that all message types are available."""
         types = [mt.value for mt in MessageType]
         expected_types = [
@@ -29,7 +40,7 @@ class TestMessageType:
 class TestMessageTone:
     """Test MessageTone enum."""
     
-    def test_message_tones(self):
+    def test_message_tones(self) -> Any:
         """Test that all message tones are available."""
         tones = [mt.value for mt in MessageTone]
         expected_tones = [
@@ -41,7 +52,7 @@ class TestMessageTone:
 class TestKeyMessageRequest:
     """Test KeyMessageRequest model."""
     
-    def test_valid_request(self):
+    async def test_valid_request(self) -> Any:
         """Test creating a valid request."""
         request = KeyMessageRequest(
             message="Test message",
@@ -57,7 +68,7 @@ class TestKeyMessageRequest:
         assert request.target_audience == "Test audience"
         assert request.keywords == ["test", "keyword"]
     
-    def test_default_values(self):
+    def test_default_values(self) -> Any:
         """Test default values."""
         request = KeyMessageRequest(message="Test")
         
@@ -68,7 +79,7 @@ class TestKeyMessageRequest:
         assert request.context is None
         assert request.max_length is None
     
-    def test_message_validation(self):
+    def test_message_validation(self) -> Any:
         """Test message validation."""
         # Empty message should raise validation error
         with pytest.raises(ValueError):
@@ -81,7 +92,7 @@ class TestKeyMessageRequest:
 class TestGeneratedResponse:
     """Test GeneratedResponse model."""
     
-    def test_valid_response(self):
+    def test_valid_response(self) -> Any:
         """Test creating a valid response."""
         response = GeneratedResponse(
             id="test-id",
@@ -103,7 +114,7 @@ class TestGeneratedResponse:
         assert response.character_count == 18
         assert response.processing_time == 0.5
     
-    def test_default_values(self):
+    def test_default_values(self) -> Any:
         """Test default values."""
         response = GeneratedResponse(
             id="test-id",
@@ -125,7 +136,7 @@ class TestGeneratedResponse:
 class TestKeyMessageResponse:
     """Test KeyMessageResponse model."""
     
-    def test_successful_response(self):
+    def test_successful_response(self) -> Any:
         """Test successful response."""
         generated_response = GeneratedResponse(
             id="test-id",
@@ -150,7 +161,7 @@ class TestKeyMessageResponse:
         assert response.processing_time == 0.5
         assert response.suggestions == []
     
-    def test_error_response(self):
+    def test_error_response(self) -> Any:
         """Test error response."""
         response = KeyMessageResponse(
             success=False,
@@ -166,7 +177,7 @@ class TestKeyMessageResponse:
 class TestBatchKeyMessageRequest:
     """Test BatchKeyMessageRequest model."""
     
-    def test_valid_batch_request(self):
+    async def test_valid_batch_request(self) -> Any:
         """Test creating a valid batch request."""
         messages = [
             KeyMessageRequest(message="Message 1"),
@@ -181,7 +192,7 @@ class TestBatchKeyMessageRequest:
         assert len(request.messages) == 2
         assert request.batch_size == 10
     
-    def test_default_batch_size(self):
+    def test_default_batch_size(self) -> Any:
         """Test default batch size."""
         messages = [KeyMessageRequest(message="Test")]
         request = BatchKeyMessageRequest(messages=messages)
@@ -191,7 +202,7 @@ class TestBatchKeyMessageRequest:
 class TestBatchKeyMessageResponse:
     """Test BatchKeyMessageResponse model."""
     
-    def test_successful_batch_response(self):
+    def test_successful_batch_response(self) -> Any:
         """Test successful batch response."""
         results = [
             KeyMessageResponse(success=True, processing_time=0.1),
@@ -212,7 +223,7 @@ class TestBatchKeyMessageResponse:
         assert response.failed_count == 0
         assert response.processing_time == 0.5
     
-    def test_failed_batch_response(self):
+    def test_failed_batch_response(self) -> Any:
         """Test failed batch response."""
         results = [
             KeyMessageResponse(success=True, processing_time=0.1),
@@ -234,7 +245,7 @@ class TestBatchKeyMessageResponse:
 class TestMessageAnalysis:
     """Test MessageAnalysis model."""
     
-    def test_valid_analysis(self):
+    def test_valid_analysis(self) -> Any:
         """Test creating a valid analysis."""
         analysis = MessageAnalysis(
             sentiment="positive",
@@ -252,7 +263,7 @@ class TestMessageAnalysis:
         assert analysis.keyword_optimization == 0.6
         assert len(analysis.suggestions) == 2
     
-    def test_default_suggestions(self):
+    def test_default_suggestions(self) -> Any:
         """Test default suggestions."""
         analysis = MessageAnalysis(
             sentiment="neutral",

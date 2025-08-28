@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import copy
 import threading
 from collections.abc import Callable
@@ -25,14 +27,10 @@ from onyx.connectors.exceptions import CredentialExpiredError
 from onyx.connectors.exceptions import InsufficientPermissionsError
 from onyx.connectors.google_drive.doc_conversion import build_slim_document
 from onyx.connectors.google_drive.doc_conversion import (
-    convert_drive_item_to_document,
-)
 from onyx.connectors.google_drive.doc_conversion import onyx_document_id_from_drive_file
 from onyx.connectors.google_drive.file_retrieval import crawl_folders_for_files
 from onyx.connectors.google_drive.file_retrieval import get_all_files_for_oauth
 from onyx.connectors.google_drive.file_retrieval import (
-    get_all_files_in_my_drive_and_shared,
-)
 from onyx.connectors.google_drive.file_retrieval import get_files_in_shared_drive
 from onyx.connectors.google_drive.file_retrieval import get_root_folder_id
 from onyx.connectors.google_drive.models import DriveRetrievalStage
@@ -48,8 +46,6 @@ from onyx.connectors.google_utils.resources import get_admin_service
 from onyx.connectors.google_utils.resources import get_drive_service
 from onyx.connectors.google_utils.resources import GoogleDriveService
 from onyx.connectors.google_utils.shared_constants import (
-    DB_CREDENTIALS_PRIMARY_ADMIN_KEY,
-)
 from onyx.connectors.google_utils.shared_constants import MISSING_SCOPES_ERROR_STR
 from onyx.connectors.google_utils.shared_constants import ONYX_SCOPE_INSTRUCTIONS
 from onyx.connectors.google_utils.shared_constants import SLIM_BATCH_SIZE
@@ -69,6 +65,15 @@ from onyx.utils.retry_wrapper import retry_builder
 from onyx.utils.threadpool_concurrency import parallel_yield
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
 from onyx.utils.threadpool_concurrency import ThreadSafeDict
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    convert_drive_item_to_document,
+)
+    get_all_files_in_my_drive_and_shared,
+)
+    DB_CREDENTIALS_PRIMARY_ADMIN_KEY,
+)
 
 logger = setup_logger()
 # TODO: Improve this by using the batch utility: https://googleapis.github.io/google-api-python-client/docs/batch.html
@@ -92,7 +97,7 @@ def _extract_ids_from_urls(urls: list[str]) -> list[str]:
     return [urlparse(url).path.strip("/").split("/")[-1] for url in urls]
 
 
-def _clean_requested_drive_ids(
+async def _clean_requested_drive_ids(
     requested_drive_ids: set[str],
     requested_folder_ids: set[str],
     all_drive_ids_available: set[str],
@@ -999,7 +1004,7 @@ class GoogleDriveConnector(SlimConnector, CheckpointedConnector[GoogleDriveCheck
 
         checkpoint.completion_stage = DriveRetrievalStage.DONE
 
-    def _fetch_drive_items(
+    async def _fetch_drive_items(
         self,
         is_slim: bool,
         checkpoint: GoogleDriveCheckpoint,

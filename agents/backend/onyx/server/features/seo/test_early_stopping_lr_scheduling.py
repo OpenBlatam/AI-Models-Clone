@@ -1,165 +1,202 @@
-from typing_extensions import Literal, TypedDict
-from typing import Any, List, Dict, Optional, Union, Tuple
-# Constants
-MAX_RETRIES = 100
-
-# Constants
-TIMEOUT_SECONDS = 60
-
-import torch
-import torch.nn as nn
-import torch.optim as optim
-from torch.utils.data import DataLoader, TensorDataset
-import numpy as np
-        from early_stopping_lr_scheduling import (
-        from early_stopping_lr_scheduling import EarlyStoppingConfig, LRSchedulerConfig
-        from early_stopping_lr_scheduling import (
-        import traceback
-from typing import Any, List, Dict, Optional
-import logging
-import asyncio
 #!/usr/bin/env python3
 """
-Simple test script for early stopping and learning rate scheduling framework
+Test script for Early Stopping and Learning Rate Scheduling in the Advanced LLM SEO Engine
 """
 
+import torch
+from torch.utils.data import DataLoader
+import sys
+import os
 
-def test_imports():
-    """Test that all imports work correctly"""
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+
+from advanced_llm_seo_engine import (
+    SEOConfig, DataLoaderConfig, SEODataset, 
+    DataLoaderManager, AdvancedLLMSEOEngine, EarlyStopping
+)
+
+def test_early_stopping():
+    """Test EarlyStopping class functionality."""
+    print("🧪 Testing EarlyStopping class...")
+    
+    # Test early stopping with patience=3, monitoring val_loss (min mode)
+    early_stopping = EarlyStopping(patience=3, min_delta=0.001, monitor="val_loss", mode="min")
+    
+    # Simulate training with improving then stagnating loss
+    val_losses = [0.5, 0.4, 0.35, 0.35, 0.35, 0.35, 0.35]
+    
+    for i, loss in enumerate(val_losses):
+        should_stop = early_stopping(loss)
+        print(f"Epoch {i+1}: Val Loss: {loss:.3f}, Should Stop: {should_stop}")
+        
+        if should_stop:
+            print(f"✅ Early stopping triggered at epoch {i+1}")
+            break
+    
+    # Test reset functionality
+    early_stopping.reset()
+    print("✅ Early stopping reset successfully")
+    
+    # Test with accuracy monitoring (max mode)
+    acc_early_stopping = EarlyStopping(patience=2, min_delta=0.01, monitor="val_accuracy", mode="max")
+    accuracies = [0.7, 0.75, 0.75, 0.75]
+    
+    for i, acc in enumerate(accuracies):
+        should_stop = acc_early_stopping(acc)
+        print(f"Epoch {i+1}: Val Accuracy: {acc:.3f}, Should Stop: {should_stop}")
+        
+        if should_stop:
+            print(f"✅ Early stopping triggered at epoch {i+1}")
+            break
+
+def test_learning_rate_scheduling():
+    """Test learning rate scheduling functionality."""
+    print("\n🧪 Testing Learning Rate Scheduling...")
+    
     try:
-            EarlyStoppingConfig, LRSchedulerConfig, TrainingMetrics,
-            EarlyStopping, AdvancedLRScheduler, TrainingMonitor, TrainingOptimizer
+        config = SEOConfig(
+            batch_size=8,
+            learning_rate=1e-4,
+            lr_scheduler="cosine",
+            warmup_steps=10,
+            use_mixed_precision=False,
+            use_diffusion=False
         )
-        print("✓ All imports successful")
-        return True
+        
+        engine = AdvancedLLMSEOEngine(config)
+        print("✅ Engine created successfully")
+        
+        # Test different scheduler types
+        schedulers_to_test = ["cosine", "linear", "exponential", "step", "plateau"]
+        
+        for scheduler_type in schedulers_to_test:
+            print(f"\nTesting {scheduler_type} scheduler...")
+            config.lr_scheduler = scheduler_type
+            engine.config = config
+            
+            # Reinitialize scheduler
+            engine._initialize_optimizer()
+            engine._initialize_scheduler()
+            
+            lr_info = engine.get_learning_rate_info()
+            print(f"  Scheduler: {lr_info['scheduler_type']}")
+            print(f"  Current LR: {lr_info['current_lr']:.2e}")
+            print(f"  Scheduler State: {lr_info['scheduler_state']}")
+        
+        print("✅ Learning rate scheduling test passed!")
+        
     except Exception as e:
-        print(f"✗ Import error: {e}")
-        return False
+        print(f"❌ Learning rate scheduling test failed: {e}")
+        import traceback
+        traceback.print_exc()
 
-def test_configs():
-    """Test configuration classes"""
+def test_training_with_early_stopping():
+    """Test training with early stopping."""
+    print("\n🧪 Testing Training with Early Stopping...")
+    
     try:
-        
-        # Test early stopping config
-        early_stopping_config = EarlyStoppingConfig(
-            patience=10,
-            monitor="val_loss",
-            mode="min"
-        )
-        print("✓ Early stopping config created")
-        
-        # Test LR scheduler config
-        lr_scheduler_config = LRSchedulerConfig(
-            scheduler_type="cosine",
-            initial_lr=1e-3,
-            T_max=100
-        )
-        print("✓ LR scheduler config created")
-        
-        return True
-    except Exception as e:
-        print(f"✗ Config error: {e}")
-        return False
-
-def test_basic_functionality():
-    """Test basic functionality with a simple model"""
-    try:
-            EarlyStoppingConfig, LRSchedulerConfig, TrainingOptimizer
+        config = SEOConfig(
+            batch_size=4,
+            learning_rate=1e-3,
+            lr_scheduler="cosine",
+            warmup_steps=5,
+            early_stopping_patience=2,
+            early_stopping_min_delta=0.001,
+            early_stopping_monitor="val_loss",
+            early_stopping_mode="min",
+            use_mixed_precision=False,
+            use_diffusion=False
         )
         
-        # Create simple model
-        model = nn.Sequential(
-            nn.Linear(10, 64),
-            nn.ReLU(),
-            nn.Linear(64, 2)
-        )
-        
-        # Create optimizer
-        optimizer = optim.Adam(model.parameters(), lr=1e-3)
-        criterion = nn.CrossEntropyLoss()
-        
-        # Create configurations
-        early_stopping_config = EarlyStoppingConfig(
-            patience=5,
-            monitor="val_loss",
-            mode="min",
-            verbose=False
-        )
-        
-        lr_scheduler_config = LRSchedulerConfig(
-            scheduler_type="cosine",
-            initial_lr=1e-3,
-            T_max=10,
-            verbose=False
-        )
-        
-        # Create training optimizer
-        trainer = TrainingOptimizer(
-            model=model,
-            optimizer=optimizer,
-            early_stopping_config=early_stopping_config,
-            lr_scheduler_config=lr_scheduler_config
-        )
-        
-        print("✓ Training optimizer created")
+        engine = AdvancedLLMSEOEngine(config)
+        print("✅ Engine created successfully")
         
         # Create simple dataset
-        X = torch.randn(100, 10)
-        y = torch.randint(0, 2, (100,))
-        dataset = TensorDataset(X, y)
+        texts = ["Sample text " + str(i) for i in range(20)]
+        labels = [i % 2 for i in range(20)]
         
-        train_size = int(0.8 * len(dataset))
-        val_size = len(dataset) - train_size
-        train_dataset, val_dataset = torch.utils.data.random_split(dataset, [train_size, val_size])
+        # Create dataloaders
+        train_loader, val_loader = engine.create_training_dataloaders(texts, labels, "test_training", 0.3)
+        print(f"✅ DataLoaders created: train={len(train_loader)}, val={len(val_loader)}")
         
-        train_loader = DataLoader(train_dataset, batch_size=16, shuffle=True)
-        val_loader = DataLoader(val_dataset, batch_size=16, shuffle=False)
+        # Test training with early stopping
+        results = engine.train_with_early_stopping(train_loader, val_loader, max_epochs=10)
         
-        # Train for a few epochs
-        device = torch.device("cpu")
-        model.to(device)
+        print("✅ Training with early stopping completed!")
+        print(f"  Epochs completed: {results['epochs_completed']}")
+        print(f"  Best val loss: {results['best_val_loss']:.4f}")
+        print(f"  Best epoch: {results['best_epoch']}")
+        print(f"  Early stopping triggered: {results['early_stopping_triggered']}")
         
-        summary = trainer.train(train_loader, val_loader, criterion, device, max_epochs=3)
-        
-        print("✓ Training completed successfully")
-        print(f"  Best validation loss: {summary['early_stopping']['best_score']:.4f}")
-        print(f"  Best epoch: {summary['early_stopping']['best_epoch']}")
-        
-        return True
     except Exception as e:
-        print(f"✗ Basic functionality error: {e}")
+        print(f"❌ Training with early stopping test failed: {e}")
+        import traceback
         traceback.print_exc()
-        return False
+
+def test_checkpoint_functionality():
+    """Test checkpoint saving and loading."""
+    print("\n🧪 Testing Checkpoint Functionality...")
+    
+    try:
+        config = SEOConfig(
+            batch_size=4,
+            learning_rate=1e-3,
+            save_checkpoints=True,
+            checkpoint_dir="./test_checkpoints",
+            use_mixed_precision=False,
+            use_diffusion=False
+        )
+        
+        engine = AdvancedLLMSEOEngine(config)
+        print("✅ Engine created successfully")
+        
+        # Create simple dataset and train for one epoch
+        texts = ["Checkpoint test text " + str(i) for i in range(10)]
+        labels = [i % 2 for i in range(10)]
+        
+        train_loader, val_loader = engine.create_training_dataloaders(texts, labels, "checkpoint_test", 0.3)
+        
+        # Train one epoch
+        engine.train_epoch(train_loader, val_loader)
+        
+        # Save checkpoint
+        engine.save_checkpoint("test_checkpoint.pt")
+        print("✅ Checkpoint saved successfully")
+        
+        # Load checkpoint
+        engine.load_checkpoint("./test_checkpoints/test_checkpoint.pt")
+        print("✅ Checkpoint loaded successfully")
+        
+        # Clean up
+        import shutil
+        if os.path.exists("./test_checkpoints"):
+            shutil.rmtree("./test_checkpoints")
+        print("✅ Test checkpoints cleaned up")
+        
+    except Exception as e:
+        print(f"❌ Checkpoint functionality test failed: {e}")
+        import traceback
+        traceback.print_exc()
 
 def main():
-    """Run all tests"""
-    print("Testing Early Stopping and Learning Rate Scheduling Framework")
-    print("=" * 60)
+    """Run all tests."""
+    print("🚀 Starting Early Stopping and Learning Rate Scheduling tests...\n")
     
-    tests = [
-        ("Import Test", test_imports),
-        ("Config Test", test_configs),
-        ("Basic Functionality Test", test_basic_functionality)
-    ]
+    try:
+        test_early_stopping()
+        test_learning_rate_scheduling()
+        test_training_with_early_stopping()
+        test_checkpoint_functionality()
+        
+        print("\n🎉 All tests passed successfully!")
+        
+    except Exception as e:
+        print(f"\n❌ Test failed: {e}")
+        import traceback
+        traceback.print_exc()
+        return 1
     
-    passed = 0
-    total = len(tests)
-    
-    for test_name, test_func in tests:
-        print(f"\n{test_name}:")
-        if test_func():
-            passed += 1
-        else:
-            print(f"  {test_name} failed")
-    
-    print(f"\n{'=' * 60}")
-    print(f"Tests passed: {passed}/{total}")
-    
-    if passed == total:
-        print("✓ All tests passed! Framework is working correctly.")
-    else:
-        print("✗ Some tests failed. Please check the implementation.")
+    return 0
 
-match __name__:
-    case "__main__":
-    main() 
+if __name__ == "__main__":
+    exit(main()) 

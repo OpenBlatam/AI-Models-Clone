@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import subprocess
+import sys
+import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Install Latest Library Versions
@@ -6,9 +14,6 @@ Install Latest Library Versions
 Automated installation script for the latest stable versions of all required libraries.
 """
 
-import subprocess
-import sys
-import os
 
 def install_libraries():
     """Install all required libraries with latest versions."""
@@ -49,5 +54,6 @@ def install_libraries():
     
     print("Installation completed!")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     install_libraries() 

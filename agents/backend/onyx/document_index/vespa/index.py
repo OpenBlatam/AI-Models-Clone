@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import concurrent.futures
 import io
 import logging
@@ -41,8 +49,6 @@ from onyx.document_index.interfaces import VespaDocumentFields
 from onyx.document_index.interfaces import VespaDocumentUserFields
 from onyx.document_index.vespa.chunk_retrieval import batch_search_api_retrieval
 from onyx.document_index.vespa.chunk_retrieval import (
-    parallel_visit_api_retrieval,
-)
 from onyx.document_index.vespa.chunk_retrieval import query_vespa
 from onyx.document_index.vespa.deletion import delete_vespa_chunks
 from onyx.document_index.vespa.indexing_utils import BaseHTTPXClientContext
@@ -53,11 +59,7 @@ from onyx.document_index.vespa.indexing_utils import GlobalHTTPXClientContext
 from onyx.document_index.vespa.indexing_utils import TemporaryHTTPXClientContext
 from onyx.document_index.vespa.shared_utils.utils import get_vespa_http_client
 from onyx.document_index.vespa.shared_utils.utils import (
-    replace_invalid_doc_id_characters,
-)
 from onyx.document_index.vespa.shared_utils.vespa_request_builders import (
-    build_vespa_filters,
-)
 from onyx.document_index.vespa_constants import ACCESS_CONTROL_LIST
 from onyx.document_index.vespa_constants import BATCH_SIZE
 from onyx.document_index.vespa_constants import BOOST
@@ -77,6 +79,14 @@ from onyx.utils.batching import batch_generator
 from onyx.utils.logger import setup_logger
 from shared_configs.configs import MULTI_TENANT
 from shared_configs.model_server_models import Embedding
+from typing import Any, List, Dict, Optional
+import asyncio
+    parallel_visit_api_retrieval,
+)
+    replace_invalid_doc_id_characters,
+)
+    build_vespa_filters,
+)
 
 
 logger = setup_logger()
@@ -193,10 +203,18 @@ class VespaIndex(DocumentIndex):
         )
 
         with open(services_jinja_file, "r") as services_f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             schema_names = [self.index_name, self.secondary_index_name]
             doc_lines = _create_document_xml_lines(schema_names)
 
             services_template_str = services_f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             services_template = jinja_env.from_string(services_template_str)
             services = services_template.render(
                 document_elements=doc_lines,
@@ -214,7 +232,15 @@ class VespaIndex(DocumentIndex):
         # Vespa requires an override to erase data including the indices we're no longer using
         # It also has a 30 day cap from current so we set it to 7 dynamically
         with open(overrides_jinja_file, "r") as overrides_f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             overrides_template_str = overrides_f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             overrides_template = jinja_env.from_string(overrides_template_str)
 
             now = datetime.now()
@@ -230,7 +256,15 @@ class VespaIndex(DocumentIndex):
         }
 
         with open(schema_jinja_file, "r") as schema_f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             template_str = schema_f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
         template = jinja_env.from_string(template_str)
         schema = template.render(
@@ -297,10 +331,18 @@ class VespaIndex(DocumentIndex):
 
         # Generate schema names from index settings
         with open(services_jinja_file, "r") as services_f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             schema_names = [index_name for index_name in indices]
             doc_lines = _create_document_xml_lines(schema_names)
 
             services_template_str = services_f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             services_template = jinja_env.from_string(services_template_str)
             services = services_template.render(
                 document_elements=doc_lines,
@@ -318,7 +360,15 @@ class VespaIndex(DocumentIndex):
         # Vespa requires an override to erase data including the indices we're no longer using
         # It also has a 30 day cap from current so we set it to 7 dynamically
         with open(overrides_jinja_file, "r") as overrides_f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             overrides_template_str = overrides_f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             overrides_template = jinja_env.from_string(overrides_template_str)
 
             now = datetime.now()
@@ -334,7 +384,15 @@ class VespaIndex(DocumentIndex):
         }
 
         with open(schema_jinja_file, "r") as schema_f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             schema_template_str = schema_f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
         schema_template = jinja_env.from_string(schema_template_str)
 
@@ -572,7 +630,7 @@ class VespaIndex(DocumentIndex):
                     processed_updates_requests.append(
                         _VespaUpdateRequest(
                             document_id=doc_info.doc_id,
-                            url=f"{DOCUMENT_ID_ENDPOINT.format(index_name=self.index_name)}/{doc_chunk_id}",
+                            url=f"f"{DOCUMENT_ID_ENDPOINT"}/{doc_chunk_id}",
                             update_request=update_dict,
                         )
                     )
@@ -636,7 +694,7 @@ class VespaIndex(DocumentIndex):
             return
 
         vespa_url = (
-            f"{DOCUMENT_ID_ENDPOINT.format(index_name=index_name)}/{doc_chunk_id}"
+            f"f"{DOCUMENT_ID_ENDPOINT"}/{doc_chunk_id}"
             "?create=true"
         )
 
@@ -667,7 +725,7 @@ class VespaIndex(DocumentIndex):
         """Note: if the document id does not exist, the update will be a no-op and the
         function will complete with no errors or exceptions.
         Handle other exceptions if you wish to implement retry behavior
-        """
+        """f"
         doc_chunk_count = 0
 
         doc_id = replace_invalid_doc_id_characters(doc_id)
@@ -807,7 +865,7 @@ class VespaIndex(DocumentIndex):
         target_hits = max(10 * num_to_retrieve, 1000)
 
         yql = (
-            YQL_BASE.format(index_name=self.index_name)
+            YQL_BASE"
             + vespa_where_clauses
             + f"(({{targetHits: {target_hits}}}nearestNeighbor(embeddings, query_embedding)) "
             + f"or ({{targetHits: {target_hits}}}nearestNeighbor(title_embedding, query_embedding)) "
@@ -840,7 +898,7 @@ class VespaIndex(DocumentIndex):
             "hits": num_to_retrieve,
             "offset": offset,
             "ranking.profile": ranking_profile,
-            "timeout": VESPA_TIMEOUT,
+            "timeout"f": VESPA_TIMEOUT,
         }
 
         return query_vespa(params)
@@ -854,7 +912,7 @@ class VespaIndex(DocumentIndex):
     ) -> list[InferenceChunkUncleaned]:
         vespa_where_clauses = build_vespa_filters(filters, include_hidden=True)
         yql = (
-            YQL_BASE.format(index_name=self.index_name)
+            YQL_BASE"
             + vespa_where_clauses
             + '({grammar: "weakAnd"}userInput(@query) '
             # `({defaultIndex: "content_summary"}userInput(@query))` section is
@@ -1081,10 +1139,10 @@ class VespaIndex(DocumentIndex):
 
         This method is currently used for random chunk retrieval in the context of
         assistant starter message creation (passed as sample context for usage by the assistant).
-        """
+        """f"
         vespa_where_clauses = build_vespa_filters(filters, remove_trailing_and=True)
 
-        yql = YQL_BASE.format(index_name=self.index_name) + vespa_where_clauses
+        yql = YQL_BASE" + vespa_where_clauses
 
         random_seed = random.randint(0, 1000000)
 

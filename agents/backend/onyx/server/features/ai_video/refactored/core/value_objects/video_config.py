@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+from enum import Enum
+from typing import Dict, Optional
+from uuid import UUID
+from pydantic import BaseModel, Field, field_validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Video Configuration Value Object
 ===============================
@@ -5,11 +26,7 @@ Video Configuration Value Object
 Immutable value object representing video configuration settings.
 """
 
-from enum import Enum
-from typing import Dict, Optional
-from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
 
 
 class VideoQuality(str, Enum):

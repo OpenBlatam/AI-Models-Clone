@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from collections.abc import Generator
 from typing import Any
@@ -13,6 +15,9 @@ from onyx.tools.tool import Tool
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 R = TypeVar("R")
 
 
@@ -20,7 +25,9 @@ class ToolRunner(Generic[R]):
     def __init__(
         self, tool: Tool[R], args: dict[str, Any], override_kwargs: R | None = None
     ):
-        self.tool = tool
+        
+    """__init__ function."""
+self.tool = tool
         self.args = args
         self.override_kwargs = override_kwargs
 

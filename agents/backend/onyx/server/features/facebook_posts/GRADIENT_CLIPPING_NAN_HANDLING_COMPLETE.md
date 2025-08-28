@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document provides a comprehensive overview of the gradient clipping and NaN/Inf value handling system that implements advanced numerical stability techniques for deep learning applications.
+This document provides a comprehensive overview of the gradient clipping and NaN/Inf value handling system that implements advanced numerical stability techniques for deep learning applications, now enhanced with **PyTorch built-in debugging tools** and **enterprise-grade performance optimization**.
 
 ## Table of Contents
 
@@ -10,10 +10,12 @@ This document provides a comprehensive overview of the gradient clipping and NaN
 2. [Gradient Clipping](#gradient-clipping)
 3. [NaN/Inf Handling](#naninf-handling)
 4. [Numerical Stability Manager](#numerical-stability-manager)
-5. [Configuration Options](#configuration-options)
-6. [Usage Examples](#usage-examples)
-7. [Best Practices](#best-practices)
-8. [Monitoring and Visualization](#monitoring-and-visualization)
+5. [PyTorch Debugging Integration](#pytorch-debugging-integration)
+6. [Performance Optimization Integration](#performance-optimization-integration)
+7. [Configuration Options](#configuration-options)
+8. [Usage Examples](#usage-examples)
+9. [Best Practices](#best-practices)
+10. [Monitoring and Visualization](#monitoring-and-visualization)
 
 ## System Architecture
 
@@ -37,6 +39,25 @@ class NaNHandlingType(Enum):
     SKIP = "skip"  # Skip update
     RESTORE = "restore"  # Restore from checkpoint
     GRADIENT_ZEROING = "gradient_zeroing"  # Zero gradients
+
+
+class PyTorchDebuggingConfig:
+    """Configuration for PyTorch built-in debugging tools."""
+    enable_autograd_anomaly: bool = False      # Autograd anomaly detection
+    enable_grad_check: bool = False            # Gradient numerical checking
+    enable_memory_debugging: bool = False      # Memory usage monitoring
+    enable_cuda_debugging: bool = False        # CUDA operation debugging
+    enable_performance_debugging: bool = False # Performance profiling
+
+
+class PerformanceOptimizationConfig:
+    """Configuration for performance optimization integration."""
+    enable_performance_optimization: bool = True    # Enable performance optimization
+    optimization_level: str = "advanced"           # "basic", "advanced", "ultra"
+    integrate_with_stability: bool = True          # Integrate with stability framework
+    enable_mixed_precision: bool = True            # Enable mixed precision training
+    enable_model_compilation: bool = True          # Enable PyTorch compilation
+    enable_memory_optimization: bool = True        # Enable memory optimization
 ```
 
 ### Configuration Classes
@@ -589,6 +610,303 @@ def _calculate_stability_score(self, nan_stats: Dict[str, Any],
     return max(0.0, score)
 ```
 
+## PyTorch Debugging Integration
+
+### Overview
+
+The system now includes comprehensive integration with PyTorch's built-in debugging tools, providing advanced debugging capabilities for deep learning training:
+
+- **Autograd Anomaly Detection**: Automatic detection of gradient computation anomalies
+- **Gradient Checking**: Numerical validation of gradient computations
+- **Memory Debugging**: CUDA and CPU memory usage monitoring
+- **Performance Profiling**: Training performance analysis and optimization
+- **Enhanced Logging**: Detailed debugging information with centralized logging
+
+### PyTorchDebuggingManager
+
+```python
+class PyTorchDebuggingManager:
+    """Manager for PyTorch built-in debugging tools."""
+    
+    def __init__(self, config: PyTorchDebuggingConfig):
+        self.config = config
+        self.logger = get_logger('pytorch_debugging')
+        
+        # Debug state
+        self.debug_enabled = False
+        self.anomaly_detector_enabled = False
+        self.grad_check_enabled = False
+        self.memory_debug_enabled = False
+        
+        # Setup debugging if enabled
+        if config.enable_autograd_anomaly or config.enable_grad_check or config.enable_memory_debugging:
+            self._setup_debugging()
+```
+
+### Key Debugging Features
+
+#### **1. Autograd Anomaly Detection**
+```python
+def _enable_autograd_anomaly(self):
+    """Enable autograd anomaly detection."""
+    if self.config.autograd_anomaly_mode == "detect":
+        torch.autograd.set_detect_anomaly(True)
+        self.anomaly_detector_enabled = True
+    elif self.config.autograd_anomaly_mode == "raise":
+        torch.autograd.set_detect_anomaly(True)
+        self.anomaly_detector_enabled = True
+```
+
+**Modes**:
+- **`detect`**: Log anomalies without stopping execution
+- **`raise`**: Stop execution when anomalies are detected
+
+#### **2. Gradient Checking**
+```python
+def _enable_grad_check(self):
+    """Enable gradient checking."""
+    if self.config.grad_check_numerical:
+        torch.autograd.gradcheck.enable()
+        self.grad_check_enabled = True
+    
+    if self.config.grad_check_sparse_numerical:
+        torch.autograd.gradcheck.enable_sparse_numerical()
+```
+
+**Features**:
+- Numerical gradient validation
+- Sparse gradient handling
+- Automatic validation during training
+
+#### **3. Memory Debugging**
+```python
+def _check_memory_usage(self) -> Dict[str, Any]:
+    """Check memory usage and CUDA memory."""
+    memory_info = {
+        "cpu_memory": {},
+        "cuda_memory": {}
+    }
+    
+    # CPU memory info
+    import psutil
+    process = psutil.Process()
+    memory_info["cpu_memory"] = {
+        "rss": process.memory_info().rss / 1024 / 1024,  # MB
+        "vms": process.memory_info().vms / 1024 / 1024,  # MB
+        "percent": process.memory_percent()
+    }
+    
+    # CUDA memory info
+    if torch.cuda.is_available():
+        memory_info["cuda_memory"] = {
+            "allocated": torch.cuda.memory_allocated() / 1024 / 1024,  # MB
+            "cached": torch.cuda.memory_reserved() / 1024 / 1024,  # MB
+            "max_allocated": torch.cuda.max_memory_allocated() / 1024 / 1024,  # MB
+            "device_count": torch.cuda.device_count()
+        }
+    
+    return memory_info
+```
+
+### Enhanced NumericalStabilityManager
+
+The `NumericalStabilityManager` now integrates PyTorch debugging:
+
+```python
+class NumericalStabilityManager:
+    def __init__(self, clipping_config: GradientClippingConfig, 
+                 nan_config: NaNHandlingConfig,
+                 debug_config: PyTorchDebuggingConfig = None):
+        # ... existing initialization ...
+        
+        # Initialize PyTorch debugging manager if config provided
+        self.debug_manager = None
+        if debug_config is not None:
+            self.debug_manager = PyTorchDebuggingManager(debug_config)
+            self.logger.info("PyTorch debugging manager initialized")
+        
+        # Enhanced stability history
+        self.stability_history = {
+            'steps': [],
+            'clipping_stats': [],
+            'nan_stats': [],
+            'stability_scores': [],
+            'debug_info': []  # New: debug information
+        }
+    
+    def step(self, model: nn.Module, loss: torch.Tensor, 
+             optimizer: Optimizer) -> Dict[str, Any]:
+        """Perform one step with numerical stability checks and debugging."""
+        # ... existing stability checks ...
+        
+        # Check debugging status if enabled
+        debug_info = {}
+        if self.debug_manager is not None:
+            debug_info = self.debug_manager.check_debug_status(model, loss, optimizer)
+            
+            # Log debug information
+            if debug_info.get('anomalies_detected', False):
+                self.logger.warning(f"Debug anomalies detected in step {self.current_step}: {debug_info.get('anomaly_details', [])}")
+            
+            # Update debug history
+            self.stability_history['debug_info'].append(debug_info)
+        
+        # ... rest of the method ...
+        
+        return {
+            'nan_stats': nan_stats,
+            'clipping_stats': clipping_stats,
+            'stability_score': stability_score,
+            'debug_info': debug_info  # New: include debug information
+        }
+```
+
+### Debug Session Management
+
+```python
+def start_debug_session(self, session_name: str = None):
+    """Start a PyTorch debugging session if enabled."""
+    if self.debug_manager is not None:
+        self.debug_manager.start_debug_session(session_name)
+        self.logger.info(f"Debug session started: {session_name}")
+
+def stop_debug_session(self):
+    """Stop the current PyTorch debugging session if active."""
+    if self.debug_manager is not None:
+        self.debug_manager.stop_debug_session()
+        self.logger.info("Debug session stopped")
+
+def get_debug_summary(self) -> Dict[str, Any]:
+    """Get a summary of debugging information if available."""
+    if self.debug_manager is not None:
+        return self.debug_manager.get_debug_summary()
+    else:
+        return {"debug_enabled": False, "message": "Debug manager not initialized"}
+```
+
+### Performance Optimization Integration
+
+The `NumericalStabilityManager` now also integrates performance optimization:
+
+```python
+class NumericalStabilityManager:
+    def __init__(self, clipping_config: GradientClippingConfig, 
+                 nan_config: NaNHandlingConfig,
+                 debug_config: PyTorchDebuggingConfig = None,
+                 performance_config: PerformanceOptimizationConfig = None):  # New parameter
+        # ... existing initialization ...
+        
+        # Initialize performance optimization if available
+        self.performance_optimizer = None
+        if (self.performance_config.enable_performance_optimization and 
+            PERFORMANCE_OPTIMIZATION_AVAILABLE):
+            self._setup_performance_optimization()
+        
+        # Enhanced stability history with performance metrics
+        self.stability_history = {
+            'steps': [],
+            'clipping_stats': [],
+            'nan_stats': [],
+            'stability_scores': [],
+            'debug_info': [],
+            'performance_metrics': []  # New: performance metrics
+        }
+    
+    def _setup_performance_optimization(self):
+        """Setup performance optimization system."""
+        # Creates PerformanceConfig based on optimization level
+        # Initializes PerformanceOptimizer with appropriate settings
+    
+    def step(self, model: nn.Module, loss: torch.Tensor, 
+             optimizer: Optimizer) -> Dict[str, Any]:
+        """Perform one step with numerical stability checks, debugging, and performance optimization."""
+        # ... existing stability and debug checks ...
+        
+        # Apply performance optimizations if enabled
+        performance_metrics = {}
+        if self.performance_optimizer is not None:
+            # Monitor memory usage and record performance metrics
+            memory_info = self.performance_optimizer.memory_manager.monitor_memory(self.current_step)
+            # Store performance metrics in stability history
+        
+        # ... rest of the method ...
+        
+        return {
+            'nan_stats': nan_stats,
+            'clipping_stats': clipping_stats,
+            'stability_score': stability_score,
+            'debug_info': debug_info,
+            'performance_metrics': performance_metrics  # New: include performance metrics
+        }
+    
+    def get_performance_summary(self) -> Dict[str, Any]:
+        """Get performance optimization summary if available."""
+        if self.performance_optimizer is not None:
+            return self.performance_optimizer.get_optimization_status()
+        else:
+            return {"performance_optimization": False, "message": "Performance optimizer not initialized"}
+    
+    def optimize_model(self, model: nn.Module) -> nn.Module:
+        """Apply performance optimizations to the model if available."""
+        if self.performance_optimizer is not None:
+            try:
+                optimized_model = self.performance_optimizer.model_optimizer.optimize_model(model)
+                self.logger.info("Model performance optimizations applied")
+                return optimized_model
+            except Exception as e:
+                self.logger.warning(f"Model performance optimization failed: {e}")
+                return model
+        else:
+            return model
+```
+
+### Enhanced Visualization
+
+The plotting system now includes debug information:
+
+```python
+def plot_stability_history(self, save_path: Optional[str] = None):
+    """Plot numerical stability history with debug information."""
+    # Create subplots - add one more if debug info is available
+    debug_available = any(info.get('debug_enabled', False) for info in self.stability_history['debug_info'])
+    num_plots = 3 if debug_available else 2
+    fig, axes = plt.subplots(2, num_plots, figsize=(15, 10))
+    
+    # ... existing plots ...
+    
+    # Plot debug anomalies if available
+    if debug_available:
+        debug_anomalies = [info.get('anomalies_detected', False) for info in self.stability_history['debug_info']]
+        anomaly_steps = [step for step, anomaly in zip(self.stability_history['steps'], debug_anomalies) if anomaly]
+        anomaly_values = [1] * len(anomaly_steps)
+        
+        axes[0, 2].scatter(anomaly_steps, anomaly_values, color='red', s=100, alpha=0.7, label='Debug Anomalies')
+        axes[0, 2].set_title('PyTorch Debug Anomalies')
+        axes[0, 2].set_xlabel('Step')
+        axes[0, 2].set_ylabel('Anomaly Detected')
+        axes[0, 2].set_ylim(0, 2)
+        axes[0, 2].legend()
+        axes[0, 2].grid(True)
+    
+    # Plot debug information if available
+    if debug_available:
+        # Plot gradient statistics over time
+        grad_norms = []
+        for info in self.stability_history['debug_info']:
+            if info.get('gradient_stats', {}).get('total_norm'):
+                grad_norms.append(info['gradient_stats']['total_norm'])
+            else:
+                grad_norms.append(0.0)
+        
+        axes[1, 2].plot(self.stability_history['steps'], grad_norms, 
+                        label='Total Gradient Norm', color='purple', alpha=0.7)
+        axes[1, 2].set_title('Gradient Norms Over Time (Debug)')
+        axes[1, 2].set_xlabel('Step')
+        axes[1, 2].set_ylabel('Gradient Norm')
+        axes[1, 2].legend()
+        axes[1, 2].grid(True)
+```
+
 ## Configuration Options
 
 ### Gradient Clipping Configuration
@@ -636,6 +954,43 @@ def _calculate_stability_score(self, nan_stats: Dict[str, Any],
 - `nan_threshold`: NaN detection threshold (default: 1e-6)
 - `inf_threshold`: Inf detection threshold (default: 1e6)
 - `overflow_threshold`: Overflow detection threshold (default: 1e6)
+
+### PyTorch Debugging Configuration
+
+#### **1. Autograd Anomaly Detection**
+- `enable_autograd_anomaly`: Enable autograd anomaly detection (default: False)
+- `autograd_anomaly_mode`: Detection mode - "detect" or "raise" (default: "detect")
+
+#### **2. Gradient Checking**
+- `enable_grad_check`: Enable gradient checking (default: False)
+- `grad_check_numerical`: Enable numerical gradient checking (default: True)
+- `grad_check_sparse_numerical`: Enable sparse gradient checking (default: True)
+
+#### **3. Memory Debugging**
+- `enable_memory_debugging`: Enable memory debugging (default: False)
+- `memory_tracking`: Enable memory tracking (default: False)
+- `memory_profiling`: Enable memory profiling (default: False)
+
+#### **4. CUDA Debugging**
+- `enable_cuda_debugging`: Enable CUDA debugging (default: False)
+- `cuda_synchronize`: Enable CUDA synchronization (default: False)
+- `cuda_memory_fraction`: CUDA memory fraction limit (default: 1.0)
+
+#### **5. Performance Debugging**
+- `enable_performance_debugging`: Enable performance debugging (default: False)
+- `profile_autograd`: Profile autograd operations (default: False)
+- `profile_memory`: Profile memory usage (default: False)
+
+#### **6. Debug Settings**
+- `debug_level`: Debug level - "info", "warning", "error" (default: "info")
+- `verbose_logging`: Enable verbose logging (default: False)
+- `max_debug_iterations`: Maximum debug iterations (default: 1000)
+- `debug_timeout`: Debug session timeout in seconds (default: 300.0)
+
+#### **7. Output Settings**
+- `save_debug_info`: Save debug information to files (default: True)
+- `debug_output_dir`: Debug output directory (default: "debug_output")
+- `debug_file_prefix`: Debug file prefix (default: "pytorch_debug")
 
 ## Usage Examples
 
@@ -758,6 +1113,102 @@ for epoch in range(num_epochs):
         print(f"Stability score: {stability_result['stability_score']:.4f}")
         print(f"Clipping ratio: {stability_result['clipping_stats']['clipping_ratio']:.4f}")
         print(f"NaN detected: {stability_result['nan_stats']['nan_detected']}")
+```
+
+### PyTorch Debugging Integration
+
+```python
+# Create PyTorch debugging configuration
+debug_config = PyTorchDebuggingConfig(
+    enable_autograd_anomaly=True,
+    autograd_anomaly_mode="detect",
+    enable_grad_check=True,
+    enable_memory_debugging=True,
+    enable_cuda_debugging=True,
+    cuda_memory_fraction=0.8,
+    debug_level="info",
+    verbose_logging=True,
+    save_debug_info=True
+)
+
+# Create stability manager with debugging
+stability_manager = NumericalStabilityManager(
+    clipping_config=clipping_config,
+    nan_config=nan_config,
+    debug_config=debug_config
+)
+
+# Start debugging session
+stability_manager.start_debug_session("production_training_session")
+
+# Use in training loop with debugging
+for epoch in range(num_epochs):
+    for batch in dataloader:
+        # Forward pass
+        output = model(input_data)
+        loss = criterion(output, target)
+        
+        # Backward pass
+        loss.backward()
+        
+        # Apply numerical stability measures with debugging
+        stability_result = stability_manager.step(model, loss, optimizer)
+        
+        # Check debug information
+        debug_info = stability_result.get('debug_info', {})
+        if debug_info.get('anomalies_detected', False):
+            print(f"Debug anomalies detected: {debug_info['anomaly_details']}")
+        
+        if debug_info.get('gradient_stats'):
+            grad_stats = debug_info['gradient_stats']
+            print(f"Gradient norm: {grad_stats.get('total_norm', 0.0):.4f}")
+        
+        # Optimizer step
+        optimizer.step()
+        optimizer.zero_grad()
+
+# Stop debugging session
+stability_manager.stop_debug_session()
+
+# Get debug summary
+debug_summary = stability_manager.get_debug_summary()
+print(f"Debug session completed:")
+print(f"  Total iterations: {debug_summary['total_iterations']}")
+print(f"  Anomalies detected: {debug_summary['anomalies_detected']}")
+print(f"  Gradient checks: {debug_summary['gradient_checks']}")
+print(f"  Memory checks: {debug_summary['memory_checks']}")
+```
+
+### Training Wrapper with Debugging
+
+```python
+# Create training wrapper with debugging
+wrapper = create_training_wrapper(
+    clipping_config=clipping_config,
+    nan_config=nan_config,
+    debug_config=debug_config
+)
+
+# Use in training loop
+for epoch in range(num_epochs):
+    for batch in dataloader:
+        # Forward pass
+        output = model(input_data)
+        loss = criterion(output, target)
+        
+        # Backward pass
+        loss.backward()
+        
+        # Apply stability measures with automatic debugging
+        stability_result = wrapper(model, loss, optimizer)
+        
+        # Optimizer step
+        optimizer.step()
+        optimizer.zero_grad()
+
+# Get debug summary and stop debugging
+debug_summary = wrapper.get_debug_summary()
+wrapper.stop_debug_session()
 ```
 
 ### Different Clipping Strategies

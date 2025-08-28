@@ -1,7 +1,14 @@
-"""
-Redis Tests - Onyx Integration
-Tests for Redis integration in Onyx.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import pytest
 import asyncio
 from typing import Dict, Any, List
@@ -15,6 +22,12 @@ from fastapi import FastAPI, Request, Response
 from starlette.testclient import TestClient
 import redis
 from ..redis_manager import RedisManager
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Redis Tests - Onyx Integration
+Tests for Redis integration in Onyx.
+"""
 
 # Test models
 class UserModel(BaseModel):
@@ -41,7 +54,7 @@ def redis_config():
     )
 
 @pytest.fixture
-def redis_manager(redis_config):
+def redis_manager(redis_config) -> Any:
     """Create a Redis manager instance for testing."""
     manager = RedisManager(
         host=redis_config.host,
@@ -56,12 +69,12 @@ class TestRedisUtils:
     """Tests for Redis utilities."""
     
     @pytest.fixture
-    def redis_utils(self, redis_config):
+    def redis_utils(self, redis_config) -> Any:
         """Create Redis utilities instance."""
         return RedisUtils(redis_config)
     
     @pytest.fixture
-    def test_data(self):
+    def test_data(self) -> Any:
         """Create test data."""
         return {
             "user_1": UserModel(
@@ -76,7 +89,7 @@ class TestRedisUtils:
             )
         }
     
-    def test_cache_data(self, redis_utils, test_data):
+    def test_cache_data(self, redis_utils, test_data) -> Any:
         """Test caching data."""
         # Cache data
         redis_utils.cache_data(
@@ -97,7 +110,7 @@ class TestRedisUtils:
         assert cached_data.name == test_data["user_1"].name
         assert cached_data.email == test_data["user_1"].email
     
-    def test_cache_batch(self, redis_utils, test_data):
+    def test_cache_batch(self, redis_utils, test_data) -> Any:
         """Test caching batch data."""
         # Cache batch data
         redis_utils.cache_batch(
@@ -116,7 +129,7 @@ class TestRedisUtils:
         assert cached_batch["user_1"].id == test_data["user_1"].id
         assert cached_batch["user_2"].id == test_data["user_2"].id
     
-    def test_delete_batch(self, redis_utils, test_data):
+    def test_delete_batch(self, redis_utils, test_data) -> Any:
         """Test deleting batch keys."""
         # Cache batch data
         redis_utils.cache_batch(
@@ -138,7 +151,7 @@ class TestRedisUtils:
         
         assert len(cached_batch) == 0
     
-    def test_scan_keys(self, redis_utils, test_data):
+    def test_scan_keys(self, redis_utils, test_data) -> Any:
         """Test scanning keys."""
         # Cache data
         redis_utils.cache_data(
@@ -156,7 +169,7 @@ class TestRedisUtils:
         assert len(keys) == 1
         assert keys[0].endswith("user_1")
     
-    def test_get_memory_usage(self, redis_utils):
+    def test_get_memory_usage(self, redis_utils) -> Optional[Dict[str, Any]]:
         """Test getting memory usage."""
         memory_usage = redis_utils.get_memory_usage()
         
@@ -164,7 +177,7 @@ class TestRedisUtils:
         assert "used_memory" in memory_usage
         assert "used_memory_peak" in memory_usage
     
-    def test_get_stats(self, redis_utils):
+    def test_get_stats(self, redis_utils) -> Optional[Dict[str, Any]]:
         """Test getting Redis stats."""
         stats = redis_utils.get_stats()
         
@@ -177,7 +190,7 @@ class TestRedisMiddleware:
     """Tests for Redis middleware."""
     
     @pytest.fixture
-    def app(self):
+    def app(self) -> Any:
         """Create FastAPI app."""
         app = FastAPI()
         
@@ -195,20 +208,24 @@ class TestRedisMiddleware:
         # Add test routes
         @app.get("/api/test")
         async def test_route():
-            return {"message": "test"}
+            
+    """test_route function."""
+return {"message": "test"}
         
         @app.get("/admin/test")
         async def admin_route():
-            return {"message": "admin"}
+            
+    """admin_route function."""
+return {"message": "admin"}
         
         return app
     
     @pytest.fixture
-    def client(self, app):
+    def client(self, app) -> Any:
         """Create test client."""
         return TestClient(app)
     
-    def test_cached_response(self, client):
+    def test_cached_response(self, client) -> Any:
         """Test cached response."""
         # First request
         response1 = client.get("/api/test")
@@ -222,7 +239,7 @@ class TestRedisMiddleware:
         assert response2.json() == {"message": "test"}
         assert response2.headers["X-Cache"] == "HIT"
     
-    def test_excluded_path(self, client):
+    def test_excluded_path(self, client) -> Any:
         """Test excluded path."""
         # First request
         response1 = client.get("/admin/test")
@@ -240,12 +257,12 @@ class TestRedisDecorators:
     """Tests for Redis decorators."""
     
     @pytest.fixture
-    def redis_decorators(self, redis_config):
+    def redis_decorators(self, redis_config) -> Any:
         """Create Redis decorators instance."""
         return RedisDecorators(redis_config)
     
     @pytest.fixture
-    def test_data(self):
+    def test_data(self) -> Any:
         """Create test data."""
         return {
             "user_1": UserModel(
@@ -261,7 +278,7 @@ class TestRedisDecorators:
         }
     
     @pytest.mark.asyncio
-    async def test_cache_decorator(self, redis_decorators, test_data):
+    async def test_cache_decorator(self, redis_decorators, test_data) -> Any:
         """Test cache decorator."""
         @redis_decorators.cache(
             prefix="test",
@@ -279,7 +296,7 @@ class TestRedisDecorators:
         assert data2["id"] == test_data["user_1"].id
     
     @pytest.mark.asyncio
-    async def test_cache_model_decorator(self, redis_decorators, test_data):
+    async def test_cache_model_decorator(self, redis_decorators, test_data) -> Any:
         """Test cache model decorator."""
         @redis_decorators.cache_model(
             prefix="test",
@@ -297,7 +314,7 @@ class TestRedisDecorators:
         assert model2.id == test_data["user_1"].id
     
     @pytest.mark.asyncio
-    async def test_cache_batch_decorator(self, redis_decorators, test_data):
+    async def test_cache_batch_decorator(self, redis_decorators, test_data) -> Any:
         """Test cache batch decorator."""
         @redis_decorators.cache_batch(
             prefix="test",
@@ -317,7 +334,7 @@ class TestRedisDecorators:
         assert batch2["user_1"].id == test_data["user_1"].id
     
     @pytest.mark.asyncio
-    async def test_invalidate_decorator(self, redis_decorators, test_data):
+    async def test_invalidate_decorator(self, redis_decorators, test_data) -> bool:
         """Test invalidate decorator."""
         @redis_decorators.cache(
             prefix="test",
@@ -386,7 +403,7 @@ def test_get_config():
     assert prod_config.max_connections == 50
 
 # Test Redis Manager
-def test_cache_model(redis_manager):
+def test_cache_model(redis_manager) -> Any:
     """Test caching and retrieving a model."""
     model = TestModel(id="1", name="Test", value=42)
     
@@ -410,7 +427,7 @@ def test_cache_model(redis_manager):
     assert cached_model.name == model.name
     assert cached_model.value == model.value
 
-def test_cache_context(redis_manager):
+def test_cache_context(redis_manager) -> Any:
     """Test caching and retrieving context data."""
     context = {"user_id": "123", "action": "test"}
     
@@ -432,7 +449,7 @@ def test_cache_context(redis_manager):
     assert cached_context["user_id"] == context["user_id"]
     assert cached_context["action"] == context["action"]
 
-def test_cache_prompt(redis_manager):
+def test_cache_prompt(redis_manager) -> Any:
     """Test caching and retrieving a prompt."""
     prompt = "Test prompt"
     
@@ -452,7 +469,7 @@ def test_cache_prompt(redis_manager):
     
     assert cached_prompt == prompt
 
-def test_cache_metrics(redis_manager):
+def test_cache_metrics(redis_manager) -> Any:
     """Test caching and retrieving metrics."""
     metrics = {"clicks": 100, "views": 1000}
     
@@ -474,7 +491,7 @@ def test_cache_metrics(redis_manager):
     assert cached_metrics["clicks"] == metrics["clicks"]
     assert cached_metrics["views"] == metrics["views"]
 
-def test_increment_counter(redis_manager):
+def test_increment_counter(redis_manager) -> Any:
     """Test counter operations."""
     # Increment counter
     value = redis_manager.increment_counter(
@@ -491,7 +508,7 @@ def test_increment_counter(redis_manager):
     )
     assert counter_value == 1
 
-def test_set_operations(redis_manager):
+def test_set_operations(redis_manager) -> Any:
     """Test set operations."""
     # Add to set
     redis_manager.add_to_set(
@@ -507,7 +524,7 @@ def test_set_operations(redis_manager):
     )
     assert "value1" in members
 
-def test_delete_key(redis_manager):
+def test_delete_key(redis_manager) -> Any:
     """Test key deletion."""
     # Cache something
     redis_manager.cache_model(
@@ -530,7 +547,7 @@ def test_delete_key(redis_manager):
     )
     assert cached_model is None
 
-def test_clear_prefix(redis_manager):
+def test_clear_prefix(redis_manager) -> Any:
     """Test clearing all keys with a prefix."""
     # Cache multiple items
     redis_manager.cache_model(

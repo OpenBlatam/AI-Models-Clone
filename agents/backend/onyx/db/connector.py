@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from datetime import timezone
 from typing import cast
@@ -21,6 +23,9 @@ from onyx.server.documents.models import ObjectCreationIdResponse
 from onyx.server.models import StatusResponse
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -32,7 +37,7 @@ def check_connectors_exist(db_session: Session) -> bool:
     return result.scalar() or False
 
 
-def fetch_connectors(
+async def fetch_connectors(
     db_session: Session,
     sources: list[DocumentSource] | None = None,
     input_types: list[InputType] | None = None,
@@ -57,14 +62,14 @@ def connector_by_name_source_exists(
     return connector is not None
 
 
-def fetch_connector_by_id(connector_id: int, db_session: Session) -> Connector | None:
+async def fetch_connector_by_id(connector_id: int, db_session: Session) -> Connector | None:
     stmt = select(Connector).where(Connector.id == connector_id)
     result = db_session.execute(stmt)
     connector = result.scalar_one_or_none()
     return connector
 
 
-def fetch_ingestion_connector_by_name(
+async def fetch_ingestion_connector_by_name(
     connector_name: str, db_session: Session
 ) -> Connector | None:
     stmt = (
@@ -164,7 +169,7 @@ def get_connector_credential_ids(
     return [association.credential.id for association in connector.credentials]
 
 
-def fetch_latest_index_attempt_by_connector(
+async def fetch_latest_index_attempt_by_connector(
     db_session: Session,
     source: DocumentSource | None = None,
 ) -> list[IndexAttempt]:
@@ -193,7 +198,7 @@ def fetch_latest_index_attempt_by_connector(
     return latest_index_attempts
 
 
-def fetch_latest_index_attempts_by_status(
+async def fetch_latest_index_attempts_by_status(
     db_session: Session,
 ) -> list[IndexAttempt]:
     subquery = (
@@ -222,7 +227,7 @@ def fetch_latest_index_attempts_by_status(
     return cast(list[IndexAttempt], query.all())
 
 
-def fetch_unique_document_sources(db_session: Session) -> list[DocumentSource]:
+async def fetch_unique_document_sources(db_session: Session) -> list[DocumentSource]:
     distinct_sources = db_session.query(Connector.source).distinct().all()
 
     sources = [

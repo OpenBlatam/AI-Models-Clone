@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+from datetime import datetime
+from typing import Dict, List, Optional
+from uuid import uuid4
+from fastapi import BackgroundTasks
+from ..schemas.video_schemas import (
+from ..utils.cache import get_cache_client
+from ..utils.metrics import record_metric, track_processing_time
+from ..utils.validation import validate_user_access
+    import random
+from typing import Any, List, Dict, Optional
+import logging
 """
 Video Service - Pure Business Logic
 ===================================
@@ -10,23 +30,14 @@ Clean service layer with:
 - Performance optimization
 """
 
-import asyncio
-from datetime import datetime
-from typing import Dict, List, Optional
-from uuid import uuid4
 
-from fastapi import BackgroundTasks
 
-from ..schemas.video_schemas import (
     BatchVideoResponse,
     ProcessingStatus,
     VideoLogsResponse,
     VideoRequest,
     VideoResponse,
 )
-from ..utils.cache import get_cache_client
-from ..utils.metrics import record_metric, track_processing_time
-from ..utils.validation import validate_user_access
 
 
 async def create_video_async(
@@ -420,6 +431,5 @@ async def simulate_video_processing(
     await asyncio.sleep(min(processing_time, 10))  # Cap at 10 seconds for demo
     
     # Simulate occasional failures for testing
-    import random
     if random.random() < 0.1:  # 10% failure rate
         raise Exception("Simulated processing failure") 

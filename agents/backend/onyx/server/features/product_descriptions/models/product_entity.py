@@ -1,9 +1,7 @@
-"""
-Product Entity - Enterprise Domain Model
-========================================
-
-Entidad de dominio para productos con Clean Architecture y funcionalidades avanzadas.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 from __future__ import annotations
 from typing import Dict, List, Optional, Set, Any
@@ -12,6 +10,16 @@ from decimal import Decimal
 from enum import Enum
 from uuid import uuid4
 from dataclasses import dataclass, field
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Product Entity - Enterprise Domain Model
+========================================
+
+Entidad de dominio para productos con Clean Architecture y funcionalidades avanzadas.
+"""
+
 
 
 class ProductStatus(str, Enum):
@@ -53,7 +61,7 @@ class Money:
     amount: Decimal
     currency: str = "USD"
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.amount < 0:
             raise ValueError("El monto no puede ser negativo")
         if len(self.currency) != 3:
@@ -156,7 +164,9 @@ class ProductEntity:
         brand_id: Optional[str] = None,
         category_id: Optional[str] = None
     ):
-        self.id = id or str(uuid4())
+        
+    """__init__ function."""
+self.id = id or str(uuid4())
         self.name = name
         self.description = description
         self.short_description = short_description

@@ -1,13 +1,31 @@
-"""
-Model Documentation - Onyx Integration
-Documentation for model operations and usage.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any, Dict, List, Optional, Set, Type, TypeVar, Union
 from datetime import datetime
 import logging
 import os
 from pathlib import Path
 from .model_types import (
+from .model_config import ModelConfig
+from .model_helpers import (
+from .model_mixins import (
+from .model_decorators import (
+from .model_exceptions import (
+from onyx.models import OnyxBaseModel, TimestampMixin, ValidationMixin
+from onyx.models import OnyxBaseModel
+from onyx.models import (
+from onyx.models import (
+from onyx.models import OnyxBaseModel, ValidationMixin
+from onyx.models import OnyxBaseModel, IndexingMixin
+from onyx.models import OnyxBaseModel, CacheMixin
+from onyx.models import OnyxBaseModel, LoggingMixin
+from onyx.models import OnyxBaseModel, ModelConfig
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Model Documentation - Onyx Integration
+Documentation for model operations and usage.
+"""
     JsonDict, JsonList, JsonValue, FieldType, FieldValue,
     ModelId, ModelKey, ModelValue, ModelData, ModelList, ModelDict,
     IndexField, IndexValue, IndexKey, IndexData, IndexList, IndexDict,
@@ -18,8 +36,6 @@ from .model_types import (
     OnyxBaseModel, ModelField, ModelSchema, ModelRegistry,
     ModelCache, ModelIndex, ModelEvent, ModelValidation, ModelFactory
 )
-from .model_config import ModelConfig
-from .model_helpers import (
     validate_email, validate_url, validate_phone, validate_date, validate_datetime,
     validate_field_type, validate_field_value, validate_model_fields,
     create_model_index, create_model_cache, create_model_event,
@@ -27,15 +43,12 @@ from .model_helpers import (
     get_model_indexes, get_model_cache, get_model_events,
     update_model_timestamps, update_model_status, update_model_version, update_model_metadata
 )
-from .model_mixins import (
     TimestampMixin, SoftDeleteMixin, VersionMixin, AuditMixin,
     ValidationMixin, CacheMixin, SerializationMixin, IndexingMixin, LoggingMixin
 )
-from .model_decorators import (
     register_model, cache_model, validate_model, track_changes,
     require_active, log_operations, enforce_version, validate_schema
 )
-from .model_exceptions import (
     OnyxModelError, ValidationError, IndexingError, CacheError,
     SerializationError, VersionError, AuditError, SoftDeleteError,
     TimestampError, RegistryError, FactoryError
@@ -69,7 +82,6 @@ pip install onyx-models
 
 ## Quick Start
 ```python
-from onyx.models import OnyxBaseModel, TimestampMixin, ValidationMixin
 
 class UserModel(OnyxBaseModel, TimestampMixin, ValidationMixin):
     name: str
@@ -311,7 +323,6 @@ The configuration system supports environment variables and files.
 
 ### Basic Model
 ```python
-from onyx.models import OnyxBaseModel
 
 class UserModel(OnyxBaseModel):
     name: str
@@ -321,7 +332,6 @@ class UserModel(OnyxBaseModel):
 
 ### Model with Mixins
 ```python
-from onyx.models import (
     OnyxBaseModel,
     TimestampMixin,
     SoftDeleteMixin,
@@ -341,7 +351,6 @@ class UserModel(
 
 ### Model with Decorators
 ```python
-from onyx.models import (
     OnyxBaseModel,
     register_model,
     cache_model,
@@ -357,14 +366,15 @@ class UserModel(OnyxBaseModel):
     @cache_model("email")
     @validate_model
     def update_profile(self, name: str, email: str, age: Optional[int] = None):
-        self.name = name
+        
+    """update_profile function."""
+self.name = name
         self.email = email
         self.age = age
 ```
 
 ### Model with Validation
 ```python
-from onyx.models import OnyxBaseModel, ValidationMixin
 
 class UserModel(OnyxBaseModel, ValidationMixin):
     name: str
@@ -382,20 +392,18 @@ class UserModel(OnyxBaseModel, ValidationMixin):
 
 ### Model with Indexing
 ```python
-from onyx.models import OnyxBaseModel, IndexingMixin
 
 class UserModel(OnyxBaseModel, IndexingMixin):
     name: str
     email: str
     age: Optional[int] = None
     
-    def index(self, indexer):
+    def index(self, indexer) -> Any:
         indexer.index_model(self, "email", self.email)
 ```
 
 ### Model with Caching
 ```python
-from onyx.models import OnyxBaseModel, CacheMixin
 
 class UserModel(OnyxBaseModel, CacheMixin):
     name: str
@@ -403,37 +411,39 @@ class UserModel(OnyxBaseModel, CacheMixin):
     age: Optional[int] = None
     
     def cache(self, key_field: str):
-        key = getattr(self, key_field)
+        
+    """cache function."""
+key = getattr(self, key_field)
         ModelCache.set(self, str(key))
 ```
 
 ### Model with Events
 ```python
-from onyx.models import OnyxBaseModel, LoggingMixin
 
 class UserModel(OnyxBaseModel, LoggingMixin):
     name: str
     email: str
     age: Optional[int] = None
     
-    def __init__(self, **data):
+    def __init__(self, **data) -> Any:
         super().__init__(**data)
         self.logger = logging.getLogger(self.__class__.__name__)
     
     def log_info(self, message: str):
-        self.logger.info(message)
+        
+    """log_info function."""
+self.logger.info(message)
 ```
 
 ### Model with Configuration
 ```python
-from onyx.models import OnyxBaseModel, ModelConfig
 
 class UserModel(OnyxBaseModel):
     name: str
     email: str
     age: Optional[int] = None
     
-    def __init__(self, **data):
+    def __init__(self, **data) -> Any:
         super().__init__(**data)
         self.version = ModelConfig.MODEL_VERSION
 ```

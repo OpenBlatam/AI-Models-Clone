@@ -1,385 +1,432 @@
-# 🚀 Blatam Academy
-
-A modern, high-performance React Native learning management application built with cutting-edge technologies and best practices.
-
-## ✨ Features
-
-### 🎓 Learning Management
-- **Course Management**: Create, edit, and organize courses with rich content
-- **Progress Tracking**: Monitor student progress with detailed analytics
-- **Interactive Lessons**: Engaging multimedia content with quizzes and assessments
-- **Instructor Dashboard**: Comprehensive tools for course management and student monitoring
-
-### 🌍 Internationalization (i18n)
-- **Multi-language Support**: English, Spanish, French, German, and more
-- **RTL Support**: Full right-to-left language support (Arabic ready)
-- **Dynamic Language Switching**: Real-time language changes without app restart
-- **Device Language Detection**: Automatic detection of user's preferred language
-- **Persistent Language Storage**: Language preferences saved locally
-- **Performance Optimized**: Lazy loading of translation resources
-
-### ⚡ Performance Optimizations
-- **Performance Monitoring**: Real-time performance tracking and bottleneck detection
-- **Optimized Components**: High-performance list rendering with FlashList
-- **Image Optimization**: Fast image loading with react-native-fast-image
-- **Memory Management**: Efficient state management with Zustand
-- **Caching Strategy**: Smart data caching with React Query
-- **Bundle Optimization**: Code splitting and lazy loading
-
-### 🎨 Modern UI/UX
-- **Responsive Design**: Adapts to all screen sizes and orientations
-- **Accessibility**: Full accessibility support for screen readers
-- **Dark/Light Mode**: Theme switching with system preference detection
-- **Smooth Animations**: Fluid transitions and micro-interactions
-- **Error Handling**: Graceful error boundaries and user-friendly error messages
-
-### 📊 Analytics & Monitoring
-- **User Analytics**: Track user behavior and feature usage
-- **Performance Metrics**: Monitor app performance and identify bottlenecks
-- **Error Tracking**: Comprehensive error reporting and debugging
-- **Session Management**: Detailed session tracking and analysis
-
-## 🛠 Technology Stack
-
-### Core Framework
-- **React Native**: Cross-platform mobile development
-- **Expo**: Development platform and build tools
-- **TypeScript**: Type-safe development with strict configuration
-
-### State Management & Data
-- **Zustand**: Lightweight global state management
-- **React Query**: Server state management and caching
-- **AsyncStorage**: Local data persistence
-
-### Performance Libraries
-- **@shopify/flash-list**: High-performance list rendering
-- **react-native-fast-image**: Optimized image loading
-- **react-native-skeleton-placeholder**: Loading state animations
-
-### Internationalization
-- **i18next**: Core internationalization framework
-- **react-i18next**: React integration for i18next
-- **expo-localization**: Device locale detection
-
-### Development Tools
-- **ESLint**: Code linting and style enforcement
-- **Prettier**: Code formatting
-- **Metro**: JavaScript bundler
-- **Babel**: JavaScript compiler
-
-## 📁 Project Structure
-
-```
-blatam-academy/
-├── app/                          # Expo Router screens
-│   ├── (auth)/                   # Authentication screens
-│   ├── (modals)/                 # Modal screens
-│   ├── (tabs)/                   # Tab navigation screens
-│   └── _layout.tsx              # Root layout
-├── components/                   # Reusable UI components
-│   ├── data-display/            # Data visualization components
-│   ├── i18n-components/         # Internationalization components
-│   ├── overlays/                # Modal and overlay components
-│   └── OptimizedImage.tsx       # Optimized image component
-├── hooks/                       # Custom React hooks
-│   ├── i18n-hooks/             # Internationalization hooks
-│   └── data-hooks/             # Data management hooks
-├── lib/                         # Core libraries and configurations
-├── utils/                       # Utility functions
-│   ├── i18n/                   # Internationalization utilities
-│   │   ├── translations/       # Translation files
-│   │   └── i18nConfig.ts      # i18n configuration
-│   ├── performance/            # Performance monitoring
-│   ├── error-handling/         # Error boundary components
-│   └── analytics/              # Analytics service
-├── app.json                     # Expo configuration
-├── eas.json                     # EAS Build configuration
-├── metro.config.js              # Metro bundler configuration
-├── babel.config.js              # Babel configuration
-├── tsconfig.json                # TypeScript configuration
-└── package.json                 # Dependencies and scripts
-```
-
-## 🌍 Internationalization (i18n)
-
-### Supported Languages
-- 🇺🇸 English (en)
-- 🇪🇸 Spanish (es)
-- 🇫🇷 French (fr)
-- 🇩🇪 German (de)
-- 🇵🇹 Portuguese (pt)
-- 🇸🇦 Arabic (ar) - RTL support
-- 🇨🇳 Chinese (zh)
-- 🇯🇵 Japanese (ja)
-- 🇰🇷 Korean (ko)
-- 🇷🇺 Russian (ru)
-
-### Usage
-
-#### Basic Translation
-```tsx
-import { useI18n } from '../hooks/i18n-hooks/useI18n';
-
-const MyComponent = () => {
-  const { t } = useI18n();
-  return <Text>{t('common.loading')}</Text>;
-};
-```
-
-#### Optimized Translated Text Component
-```tsx
-import { OptimizedTranslatedText } from '../components/i18n-components/OptimizedTranslatedText';
-
-const MyComponent = () => {
-  return (
-    <OptimizedTranslatedText
-      translationKey="auth.welcome"
-      values={{ name: 'John' }}
-    />
-  );
-};
-```
-
-#### Language Selector
-```tsx
-import { OptimizedLanguageSelector } from '../components/i18n-components/OptimizedLanguageSelector';
-
-const SettingsScreen = () => {
-  const handleLanguageChange = (languageCode: string) => {
-    console.log('Language changed to:', languageCode);
-  };
-
-  return (
-    <OptimizedLanguageSelector
-      onLanguageChange={handleLanguageChange}
-      showNativeNames={true}
-      showFlags={true}
-    />
-  );
-};
-```
-
-### Adding New Languages
-
-1. Create a new translation file in `utils/i18n/translations/`:
-```typescript
-// utils/i18n/translations/it.ts
-export default {
-  common: {
-    loading: 'Caricamento...',
-    // ... other translations
-  },
-  // ... other sections
-};
-```
-
-2. Add the language to the supported languages in `utils/i18n/i18nConfig.ts`:
-```typescript
-const SUPPORTED_LANGUAGES: LanguageConfig[] = [
-  // ... existing languages
-  {
-    code: 'it',
-    name: 'Italian',
-    nativeName: 'Italiano',
-    direction: 'ltr',
-    isRTL: false,
-  },
-];
-```
-
-## ⚡ Performance Features
-
-### Performance Monitoring
-```tsx
-import { measureAsync, measureSync } from '../utils/performance/PerformanceMonitor';
-
-// Measure async operations
-const data = await measureAsync('fetch_courses', async () => {
-  return await api.getCourses();
-});
-
-// Measure sync operations
-const result = measureSync('process_data', () => {
-  return processData(rawData);
-});
-```
-
-### Optimized Components
-- **FlashList**: High-performance list rendering for large datasets
-- **FastImage**: Optimized image loading with caching
-- **Skeleton Placeholder**: Smooth loading states
-- **Memoized Components**: React.memo for performance optimization
-
-## 🛡 Error Handling
-
-### Error Boundary
-```tsx
-import { ErrorBoundary } from '../utils/error-handling/ErrorBoundary';
-
-const App = () => {
-  return (
-    <ErrorBoundary
-      onError={(error, errorInfo) => {
-        console.error('App error:', error, errorInfo);
-      }}
-    >
-      <YourApp />
-    </ErrorBoundary>
-  );
-};
-```
-
-### Analytics Integration
-```tsx
-import { trackEvent, trackScreen, trackError } from '../utils/analytics/AnalyticsService';
-
-// Track user actions
-trackEvent('course_enrolled', { courseId: '123', userId: '456' });
-
-// Track screen views
-trackScreen('CourseDetails', { courseId: '123' });
-
-// Track errors
-try {
-  // Some operation
-} catch (error) {
-  trackError(error, { context: 'course_enrollment' });
-}
-```
-
-## 🚀 Getting Started
-
-### Prerequisites
-- Node.js (v16 or higher)
-- npm or yarn
-- Expo CLI
-- iOS Simulator (for iOS development)
-- Android Studio (for Android development)
-
-### Installation
-
-1. **Clone the repository**
-```bash
-git clone https://github.com/your-username/blatam-academy.git
-cd blatam-academy
-```
-
-2. **Install dependencies**
-```bash
-npm install
-```
-
-3. **Start the development server**
-```bash
-npm start
-```
-
-4. **Run on device/simulator**
-```bash
-# iOS
-npm run ios
-
-# Android
-npm run android
-```
-
-## 📱 Building & Deployment
-
-### Development Build
-```bash
-eas build --profile development --platform all
-```
-
-### Production Build
-```bash
-eas build --profile production --platform all
-```
-
-### Submit to App Stores
-```bash
-# iOS App Store
-eas submit --platform ios
-
-# Google Play Store
-eas submit --platform android
-```
-
-## 🧪 Testing
-
-### Unit Tests
-```bash
-npm test
-```
-
-### E2E Tests
-```bash
-npm run test:e2e
-```
-
-### Performance Tests
-```bash
-npm run test:performance
-```
-
-## 📊 Performance Monitoring
-
-The app includes comprehensive performance monitoring:
-
-- **Real-time Metrics**: Track component render times and user interactions
-- **Memory Usage**: Monitor memory consumption and leaks
-- **Network Performance**: Track API call performance
-- **Bundle Analysis**: Analyze JavaScript bundle size and optimization
-
-## 🔧 Configuration
-
-### Environment Variables
-Create a `.env` file in the root directory:
-```env
-API_BASE_URL=https://api.blatam-academy.com
-ANALYTICS_KEY=your_analytics_key
-SENTRY_DSN=your_sentry_dsn
-```
-
-### Metro Configuration
-The Metro bundler is configured for optimal performance:
-- **Hermes Engine**: JavaScript engine optimization
-- **Bundle Splitting**: Code splitting for faster loading
-- **Asset Optimization**: Image and font optimization
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-### Development Guidelines
-- Follow TypeScript strict mode
-- Use functional components with hooks
-- Implement proper error boundaries
-- Add comprehensive tests
-- Follow accessibility guidelines
-- Optimize for performance
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-- **Documentation**: [docs.blatam-academy.com](https://docs.blatam-academy.com)
-- **Issues**: [GitHub Issues](https://github.com/your-username/blatam-academy/issues)
-- **Discussions**: [GitHub Discussions](https://github.com/your-username/blatam-academy/discussions)
-- **Email**: support@blatam-academy.com
-
-## 🙏 Acknowledgments
-
-- **Expo Team**: For the amazing development platform
-- **React Native Community**: For the excellent ecosystem
-- **i18next Team**: For the robust internationalization framework
-- **Shopify**: For the high-performance FlashList component
+# 🚀 **SISTEMA DE GESTIÓN DE RECURSOS INTELIGENTE**
+
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch](https://img.shields.io/badge/PyTorch-2.1+-red.svg)](https://pytorch.org/)
+[![Gradio](https://img.shields.io/badge/Gradio-4.0+-green.svg)](https://gradio.app/)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)](https://www.docker.com/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+Sistema avanzado de gestión automática e inteligente de recursos del sistema con optimización predictiva, monitoreo en tiempo real y arquitectura modular escalable.
+
+## 📋 **TABLA DE CONTENIDOS**
+
+- [🚀 Características](#-características)
+- [🏗️ Arquitectura](#️-arquitectura)
+- [📦 Instalación](#-instalación)
+- [🎮 Uso Rápido](#-uso-rápido)
+- [🔧 Configuración](#-configuración)
+- [🐳 Docker](#-docker)
+- [🧪 Testing](#-testing)
+- [📊 Monitoreo](#-monitoreo)
+- [🔮 Roadmap](#-roadmap)
+- [🤝 Contribución](#-contribución)
+- [📄 Licencia](#-licencia)
 
 ---
 
-**Built with ❤️ by the Blatam Academy Team**
+## 🚀 **CARACTERÍSTICAS**
+
+### **🧠 Inteligencia Artificial Avanzada**
+- **Predicción de Recursos**: Análisis predictivo de uso de CPU, GPU y memoria
+- **Optimización Automática**: 4 niveles de optimización basados en prioridades
+- **Aprendizaje Continuo**: Sistema que mejora automáticamente con el tiempo
+- **Gestión Inteligente**: Toma de decisiones automática basada en IA
+
+### **📊 Monitoreo en Tiempo Real**
+- **Métricas Avanzadas**: Uso actual, pico, promedio, tendencias y predicciones
+- **Alertas Inteligentes**: Notificaciones proactivas antes de problemas
+- **Visualización Interactiva**: Interfaz Gradio moderna y responsiva
+- **Historial Completo**: Trazabilidad de todas las optimizaciones
+
+### **⚡ Optimización Automática**
+- **4 Niveles de Prioridad**:
+  - 🆘 **Emergencia**: Limpieza forzada y optimización inmediata
+  - ⚡ **Crítico**: Optimización agresiva con múltiples estrategias
+  - 🛡️ **Alto**: Optimización preventiva y monitoreo intensivo
+  - 🔧 **Bajo**: Mantenimiento rutinario y ajustes menores
+
+### **🏗️ Arquitectura Modular**
+- **Microservicios**: Componentes independientes y escalables
+- **Plugin System**: Sistema de plugins dinámico y extensible
+- **Event-Driven**: Arquitectura basada en eventos asíncronos
+- **Distributed**: Soporte para sistemas distribuidos
+
+---
+
+## 🏗️ **ARQUITECTURA**
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    🎮 INTERFAZ GRADIO                       │
+│                    (Puerto 7860)                           │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────────┐
+│              🧠 ORQUESTADOR INTELIGENTE                     │
+│              IntelligentResourceOrchestrator                │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────────┐
+│              🔧 GESTORES DE RECURSOS                        │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────┐ │
+│  │ CPUMemoryManager│  │ GPUMemoryManager│  │ Otros...     │ │
+│  └─────────────────┘  └─────────────────┘  └──────────────┘ │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────────┐
+│              📊 SISTEMA DE MÉTRICAS                         │
+│  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────┐ │
+│  │   Recolección   │  │   Análisis      │  │  Predicción  │ │
+│  └─────────────────┘  └─────────────────┘  └──────────────┘ │
+└─────────────────────┬───────────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────────┐
+│              🔄 COLA DE OPTIMIZACIÓN                        │
+│              (Priorización Automática)                      │
+└─────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📦 **INSTALACIÓN**
+
+### **Requisitos del Sistema**
+- Python 3.9+
+- CUDA 12.1+ (opcional, para GPU)
+- Docker & Docker Compose (recomendado)
+- 8GB+ RAM
+- 4+ núcleos CPU
+
+### **Instalación Rápida**
+
+#### **1. Clonar Repositorio**
+```bash
+git clone https://github.com/intelligent-system/resource-manager.git
+cd resource-manager
+```
+
+#### **2. Instalar Dependencias**
+
+**Opción A: Instalación Completa**
+```bash
+pip install -r requirements_optimized.txt
+```
+
+**Opción B: Instalación Modular**
+```bash
+# Core + Desarrollo
+pip install -e ".[dev]"
+
+# Con soporte GPU
+pip install -e ".[gpu]"
+
+# Con monitoreo avanzado
+pip install -e ".[monitoring]"
+
+# Todo incluido
+pip install -e ".[all]"
+```
+
+#### **3. Verificar Instalación**
+```bash
+python -c "import torch; print(f'PyTorch: {torch.__version__}')"
+python -c "import gradio; print(f'Gradio: {gradio.__version__}')"
+python -c "import psutil; print('psutil: OK')"
+```
+
+---
+
+## 🎮 **USO RÁPIDO**
+
+### **1. Ejecutar Sistema Principal**
+```bash
+# Sistema completo con interfaz Gradio
+python resource_manager_demo.py
+
+# Solo sistema de gestión (sin interfaz)
+python intelligent_resource_manager.py
+```
+
+### **2. Ejecutar Tests**
+```bash
+# Tests completos
+python test_intelligent_resource_manager.py
+
+# Tests con pytest
+pytest test_intelligent_resource_manager.py -v
+
+# Tests con cobertura
+pytest test_intelligent_resource_manager.py --cov=. --cov-report=html
+```
+
+### **3. Configuración Personalizada**
+```bash
+# Editar configuración
+nano resource_config.yaml
+
+# Ejecutar con configuración personalizada
+python intelligent_resource_manager.py --config custom_config.yaml
+```
+
+---
+
+## 🔧 **CONFIGURACIÓN**
+
+### **Archivo de Configuración (`resource_config.yaml`)**
+
+```yaml
+# Configuración de recursos
+resources:
+  cpu_memory:
+    max_usage: 0.85          # Uso máximo permitido
+    optimal_usage: 0.65      # Uso óptimo
+    critical_threshold: 0.92 # Umbral crítico
+    auto_optimize: true      # Optimización automática
+    
+  gpu:
+    max_usage: 0.80
+    optimal_usage: 0.60
+    critical_threshold: 0.90
+    auto_optimize: true
+
+# Configuración de optimización
+optimization:
+  priority_levels:
+    0: "emergency"      # Máxima prioridad
+    1: "critical"       # Crítico
+    2: "high"           # Alto
+    3: "low"            # Bajo
+
+# Configuración de monitoreo
+monitoring:
+  metrics_history_size: 100
+  alert_thresholds:
+    warning: 0.75
+    critical: 0.90
+    emergency: 0.95
+```
+
+### **Variables de Entorno**
+
+```bash
+# Configuración básica
+export GRADIO_SERVER_NAME=0.0.0.0
+export GRADIO_SERVER_PORT=7860
+export MONITORING_ENABLED=true
+export GPU_ENABLED=true
+
+# Configuración avanzada
+export REDIS_URL=redis://localhost:6379
+export LOG_LEVEL=INFO
+export PROFILING_ENABLED=false
+```
+
+---
+
+## 🐳 **DOCKER**
+
+### **Ejecución Rápida con Docker**
+
+#### **1. Construir Imagen**
+```bash
+# Construir imagen de producción
+docker build -t intelligent-resource-manager .
+
+# Construir imagen de desarrollo
+docker build --target development -t intelligent-resource-manager:dev .
+```
+
+#### **2. Ejecutar Contenedor**
+```bash
+# Ejecutar con GPU
+docker run --gpus all -p 7860:7860 intelligent-resource-manager
+
+# Ejecutar en modo desarrollo
+docker run -it -p 7860:7860 -v $(pwd):/app intelligent-resource-manager:dev
+
+# Ejecutar tests
+docker run intelligent-resource-manager:test
+```
+
+### **Docker Compose Completo**
+
+#### **1. Iniciar Sistema Completo**
+```bash
+# Sistema completo con monitoreo
+docker-compose up -d
+
+# Solo servicios principales
+docker-compose up resource-manager-ui resource-manager-core redis
+
+# Modo desarrollo
+docker-compose --profile development up -d
+```
+
+#### **2. Servicios Disponibles**
+- **🎮 UI Principal**: http://localhost:7860 (Gradio)
+- **📊 Grafana**: http://localhost:3000 (admin/admin123)
+- **📈 Prometheus**: http://localhost:9090
+- **🌸 Flower**: http://localhost:5555 (Celery)
+- **📚 Jupyter**: http://localhost:8888 (token: resource_manager_2024)
+
+#### **3. Comandos Útiles**
+```bash
+# Ver logs
+docker-compose logs -f resource-manager-ui
+
+# Reiniciar servicio
+docker-compose restart resource-manager-core
+
+# Escalar workers
+docker-compose up -d --scale celery-worker=3
+
+# Limpiar todo
+docker-compose down -v
+```
+
+---
+
+## 🧪 **TESTING**
+
+### **Ejecutar Tests**
+
+```bash
+# Tests unitarios
+pytest test_intelligent_resource_manager.py -v
+
+# Tests con cobertura
+pytest test_intelligent_resource_manager.py --cov=. --cov-report=html
+
+# Tests específicos
+pytest test_intelligent_resource_manager.py::TestCPUMemoryManager -v
+
+# Tests de integración
+pytest test_intelligent_resource_manager.py::TestIntegration -v
+
+# Tests de rendimiento
+pytest test_intelligent_resource_manager.py -m "slow" -v
+```
+
+### **Cobertura de Tests**
+
+```bash
+# Generar reporte de cobertura
+coverage run -m pytest test_intelligent_resource_manager.py
+coverage report
+coverage html  # Abrir htmlcov/index.html
+```
+
+### **Tests con Docker**
+
+```bash
+# Ejecutar tests en contenedor
+docker-compose --profile testing up testing
+
+# Tests con GPU
+docker run --gpus all intelligent-resource-manager:test
+```
+
+---
+
+## 📊 **MONITOREO**
+
+### **Métricas Disponibles**
+
+- **CPU**: Uso, frecuencia, temperatura
+- **Memoria**: Uso, swap, fragmentación
+- **GPU**: Uso, memoria, temperatura
+- **Red**: Ancho de banda, latencia
+- **Disco**: I/O, espacio, velocidad
+
+### **Alertas Configurables**
+
+- **Advertencia**: 75% de uso
+- **Crítico**: 90% de uso
+- **Emergencia**: 95% de uso
+
+### **Dashboards**
+
+- **Grafana**: Dashboards predefinidos para recursos
+- **Prometheus**: Métricas históricas y alertas
+- **Gradio**: Interfaz interactiva en tiempo real
+
+---
+
+## 🔮 **ROADMAP**
+
+### **Versión 2.0 (Próximamente)**
+- [ ] **Machine Learning Avanzado**: Predicciones más precisas
+- [ ] **Auto-scaling**: Escalado automático de recursos
+- [ ] **Integración Cloud**: AWS, GCP, Azure
+- [ ] **Kubernetes**: Orquestación nativa de K8s
+
+### **Versión 3.0 (Futuro)**
+- [ ] **Edge Computing**: Optimización para dispositivos edge
+- [ ] **Federated Learning**: Aprendizaje distribuido
+- [ ] **Quantum Optimization**: Optimización cuántica
+- [ ] **AI Agents**: Agentes autónomos de optimización
+
+---
+
+## 🤝 **CONTRIBUCIÓN**
+
+### **Cómo Contribuir**
+
+1. **Fork** el repositorio
+2. **Crea** una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. **Commit** tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. **Push** a la rama (`git push origin feature/AmazingFeature`)
+5. **Abre** un Pull Request
+
+### **Estándares de Código**
+
+```bash
+# Formatear código
+black intelligent_resource_manager.py
+isort intelligent_resource_manager.py
+
+# Verificar tipos
+mypy intelligent_resource_manager.py
+
+# Linting
+flake8 intelligent_resource_manager.py
+
+# Pre-commit hooks
+pre-commit install
+pre-commit run --all-files
+```
+
+### **Reportar Bugs**
+
+- Usa el [Issue Tracker](https://github.com/intelligent-system/resource-manager/issues)
+- Incluye logs y configuración
+- Describe pasos para reproducir
+
+---
+
+## 📄 **LICENCIA**
+
+Este proyecto está licenciado bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
+
+---
+
+## 🙏 **AGRADECIMIENTOS**
+
+- **PyTorch Team** por el framework de deep learning
+- **Gradio Team** por la interfaz interactiva
+- **Hugging Face** por las librerías de transformers
+- **NVIDIA** por el soporte CUDA
+- **Docker Team** por la containerización
+
+---
+
+## 📞 **CONTACTO**
+
+- **Email**: dev@intelligent-system.com
+- **GitHub**: [@intelligent-system](https://github.com/intelligent-system)
+- **Documentación**: [ReadTheDocs](https://intelligent-resource-manager.readthedocs.io)
+- **Issues**: [GitHub Issues](https://github.com/intelligent-system/resource-manager/issues)
+
+---
+
+**⭐ ¡No olvides dar una estrella al proyecto si te resulta útil! ⭐**

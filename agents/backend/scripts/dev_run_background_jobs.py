@@ -1,7 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import subprocess
 import threading
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def monitor_process(process_name: str, process: subprocess.Popen) -> None:
     assert process.stdout is not None
 
@@ -108,22 +113,42 @@ def run_jobs() -> None:
 
     # spawn processes
     worker_primary_process = subprocess.Popen(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         cmd_worker_primary, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
     )
 
     worker_light_process = subprocess.Popen(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         cmd_worker_light, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
     )
 
     worker_heavy_process = subprocess.Popen(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         cmd_worker_heavy, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
     )
 
     worker_indexing_process = subprocess.Popen(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         cmd_worker_indexing, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
     )
 
     worker_user_files_indexing_process = subprocess.Popen(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         cmd_worker_user_files_indexing,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -131,6 +156,10 @@ def run_jobs() -> None:
     )
 
     worker_monitoring_process = subprocess.Popen(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         cmd_worker_monitoring,
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
@@ -138,30 +167,62 @@ def run_jobs() -> None:
     )
 
     beat_process = subprocess.Popen(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         cmd_beat, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True
     )
 
     # monitor threads
     worker_primary_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         target=monitor_process, args=("PRIMARY", worker_primary_process)
     )
     worker_light_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         target=monitor_process, args=("LIGHT", worker_light_process)
     )
     worker_heavy_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         target=monitor_process, args=("HEAVY", worker_heavy_process)
     )
     worker_indexing_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         target=monitor_process, args=("INDEX", worker_indexing_process)
     )
     worker_user_files_indexing_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         target=monitor_process,
         args=("USER_FILES_INDEX", worker_user_files_indexing_process),
     )
     worker_monitoring_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         target=monitor_process, args=("MONITORING", worker_monitoring_process)
     )
     beat_thread = threading.Thread(target=monitor_process, args=("BEAT", beat_process))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
     worker_primary_thread.start()
     worker_light_thread.start()
@@ -180,5 +241,6 @@ def run_jobs() -> None:
     beat_thread.join()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     run_jobs()

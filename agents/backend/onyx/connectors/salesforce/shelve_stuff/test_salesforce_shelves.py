@@ -1,18 +1,32 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import csv
 import os
 import shutil
 
 from onyx.connectors.salesforce.shelve_stuff.shelve_functions import find_ids_by_type
 from onyx.connectors.salesforce.shelve_stuff.shelve_functions import (
-    get_affected_parent_ids_by_type,
-)
 from onyx.connectors.salesforce.shelve_stuff.shelve_functions import get_child_ids
 from onyx.connectors.salesforce.shelve_stuff.shelve_functions import get_record
 from onyx.connectors.salesforce.shelve_stuff.shelve_functions import (
-    update_sf_db_with_csv,
-)
 from onyx.connectors.salesforce.utils import BASE_DATA_PATH
 from onyx.connectors.salesforce.utils import get_object_type_path
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_affected_parent_ids_by_type,
+)
+    update_sf_db_with_csv,
+)
 
 _VALID_SALESFORCE_IDS = [
     "001bm00000fd9Z3AAI",
@@ -146,6 +160,10 @@ def create_csv_file(
     # Create CSV file
     csv_path = os.path.join(get_object_type_path(object_type), filename)
     with open(csv_path, "w", newline="", encoding="utf-8") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         writer = csv.DictWriter(f, fieldnames=fields)
         writer.writeheader()
         for record in records:
@@ -733,5 +751,6 @@ def main_build() -> None:
     test_get_affected_parent_ids()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main_build()

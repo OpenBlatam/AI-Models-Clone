@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import re
 import time
 from typing import cast
@@ -11,6 +16,9 @@ from onyx.configs.app_configs import VESPA_REQUEST_TIMEOUT
 from onyx.document_index.vespa_constants import VESPA_APP_CONTAINER_URL
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 # NOTE: This does not seem to be used in reality despite the Vespa Docs pointing to this code
@@ -62,7 +70,7 @@ def remove_invalid_unicode_chars(text: str) -> str:
     return _illegal_xml_chars_RE.sub("", text)
 
 
-def get_vespa_http_client(no_timeout: bool = False, http2: bool = True) -> httpx.Client:
+async def get_vespa_http_client(no_timeout: bool = False, http2: bool = True) -> httpx.Client:
     """
     Configure and return an HTTP client for communicating with Vespa,
     including authentication if needed.

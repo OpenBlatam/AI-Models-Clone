@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 from typing import cast
 
@@ -11,6 +13,9 @@ from onyx.connectors.salesforce.sqlite_functions import OnyxSalesforceSQLite
 from onyx.connectors.salesforce.utils import SalesforceObject
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 ID_PREFIX = "SALESFORCE_"

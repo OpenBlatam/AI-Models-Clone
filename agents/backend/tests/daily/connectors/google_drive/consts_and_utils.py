@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import time
 from collections.abc import Sequence
 
@@ -8,6 +13,9 @@ from onyx.connectors.models import TextSection
 from tests.daily.connectors.utils import load_all_docs_from_checkpoint_connector
 from tests.daily.connectors.utils import load_everything_from_checkpoint_connector
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 ALL_FILES = list(range(0, 60))
 SHARED_DRIVE_FILES = list(range(20, 25))
 
@@ -188,7 +196,7 @@ def print_discrepancies(
         print(retrieved_list)
         print("Extra:")
         print(sorted(retrieved - expected))
-        print("Missing:")
+        print("Missing:"f")
         print(sorted(expected - retrieved))
 
 
@@ -200,7 +208,7 @@ def _get_expected_file_content(file_id: int) -> str:
 
 
 def id_to_name(file_id: int) -> str:
-    return file_name_template.format(file_id)
+    return file_name_template"
 
 
 def assert_expected_docs_in_retrieved_docs(

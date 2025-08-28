@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+from typing import Optional, List, Dict, Any
+from pydantic import BaseModel, Field
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 Facebook LangChain Configuration
 ==================================
@@ -5,9 +24,6 @@
 Configuración para el servicio LangChain de Facebook posts integrado con Onyx.
 """
 
-import os
-from typing import Optional, List, Dict, Any
-from pydantic import BaseModel, Field
 
 
 class FacebookLangChainConfig(BaseModel):
@@ -72,7 +88,8 @@ class FacebookLangChainConfig(BaseModel):
     enable_engagement_prediction: bool = Field(True, description="Enable engagement prediction")
     enable_virality_scoring: bool = Field(True, description="Enable virality scoring")
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         case_sensitive = False
 

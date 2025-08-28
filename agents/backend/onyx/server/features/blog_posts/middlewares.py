@@ -1,16 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 import logging
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
+from typing import Any, List, Dict, Optional
+import asyncio
 logger = logging.getLogger("blog_system")
 
 # Métrica global de throughput
 request_count = 0
 
 async def performance_middleware(request: Request, call_next):
-    global request_count
+    
+    """performance_middleware function."""
+global request_count
     start = time.time()
     response: Response = await call_next(request)
     process_time = time.time() - start
@@ -21,7 +27,9 @@ async def performance_middleware(request: Request, call_next):
     return response
 
 async def error_handling_middleware(request: Request, call_next):
-    try:
+    
+    """error_handling_middleware function."""
+try:
         return await call_next(request)
     except ValidationError as exc:
         logger.error(f"Validation error: {exc}")
@@ -31,7 +39,9 @@ async def error_handling_middleware(request: Request, call_next):
         return JSONResponse(status_code=500, content={"detail": "Internal server error. Please try again later."})
 
 async def logging_and_timing_middleware(request: Request, call_next):
-    logger.info(f"Request: {request.method} {request.url}")
+    
+    """logging_and_timing_middleware function."""
+logger.info(f"Request: {request.method} {request.url}")
     response = await call_next(request)
     logger.info(f"Response status: {response.status_code}")
     return response 

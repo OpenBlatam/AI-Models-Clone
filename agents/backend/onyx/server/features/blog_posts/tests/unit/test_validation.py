@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import time
+import re
+from typing import Dict, List, Any
+from test_simple import SimplifiedBlogAnalyzer, BlogFingerprint, BlogAnalysisResult
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 ✅ VALIDATION TESTS - Blog Model
 ===============================
@@ -6,16 +21,12 @@ Tests de validación completos para verificar la correctitud
 y robustez del sistema de análisis de contenido de blog.
 """
 
-import time
-import re
-from typing import Dict, List, Any
-from test_simple import SimplifiedBlogAnalyzer, BlogFingerprint, BlogAnalysisResult
 
 
 class BlogValidationSuite:
     """Suite de validación completa para blogs."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.analyzer = SimplifiedBlogAnalyzer()
         self.validation_results = []
     

@@ -1,6 +1,11 @@
-"""
-Port scanning utilities for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, field_validator
 import structlog
@@ -9,6 +14,15 @@ import asyncio
 import concurrent.futures
 from dataclasses import dataclass
 from enum import Enum
+        import time
+        import time
+        import socket
+        import time
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Port scanning utilities for cybersecurity tools.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -37,19 +51,19 @@ class PortCheckInput(BaseModel):
     get_banner: bool = False
     
     @field_validator('host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         if not v:
             raise ValueError("Host cannot be empty")
         return v
     
     @field_validator('port')
-    def validate_port(cls, v):
+    def validate_port(cls, v) -> bool:
         if v < 1 or v > 65535:
             raise ValueError("Port must be between 1 and 65535")
         return v
     
     @field_validator('timeout')
-    def validate_timeout(cls, v):
+    def validate_timeout(cls, v) -> bool:
         if v <= 0:
             raise ValueError("Timeout must be positive")
         return v
@@ -64,13 +78,13 @@ class PortScanInput(BaseModel):
     get_banners: bool = False
     
     @field_validator('host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         if not v:
             raise ValueError("Host cannot be empty")
         return v
     
     @field_validator('ports')
-    def validate_ports(cls, v):
+    def validate_ports(cls, v) -> bool:
         if not v:
             raise ValueError("Ports list cannot be empty")
         for port in v:
@@ -79,7 +93,7 @@ class PortScanInput(BaseModel):
         return v
     
     @field_validator('max_workers')
-    def validate_max_workers(cls, v):
+    def validate_max_workers(cls, v) -> bool:
         if v < 1 or v > 100:
             raise ValueError("Max workers must be between 1 and 100")
         return v
@@ -113,7 +127,6 @@ def check_port_status(input_data: PortCheckInput) -> PortCheckResult:
     Check the status of a specific port.
     """
     try:
-        import time
         start_time = time.time()
         
         # Create socket
@@ -176,7 +189,6 @@ def scan_ports(input_data: PortScanInput) -> PortScanResult:
     Scan multiple ports on a host.
     """
     try:
-        import time
         start_time = time.time()
         
         # Use ThreadPoolExecutor for concurrent scanning
@@ -248,7 +260,6 @@ def scan_ports(input_data: PortScanInput) -> PortScanResult:
 def get_service_name(port: int) -> Optional[str]:
     """Get service name for a port."""
     try:
-        import socket
         
         # Common port to service mapping
         common_services = {
@@ -317,7 +328,6 @@ async def check_port_status_async(input_data: PortCheckInput) -> PortCheckResult
 async def scan_ports_async(input_data: PortScanInput) -> PortScanResult:
     """Async version of port scanning."""
     try:
-        import time
         start_time = time.time()
         
         # Create tasks for each port

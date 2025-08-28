@@ -1,6 +1,10 @@
-"""
-Gestor de modelos ML ultra-optimizado y refactorizado.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -11,30 +15,35 @@ from dataclasses import dataclass, field
 from concurrent.futures import ThreadPoolExecutor
 from cachetools import LRUCache
 import weakref
-
 from .config import NLPConfig, ModelType
-
-# Importaciones condicionales organizadas
-try:
     from transformers import (
-        AutoTokenizer, AutoModel, pipeline,
-        DistilBertTokenizer, DistilBertModel
-    )
     import torch
     from torch.quantization import quantize_dynamic
     import torch.nn as nn
+    from sentence_transformers import SentenceTransformer
+    import spacy
+from typing import Any, List, Dict, Optional
+"""
+Gestor de modelos ML ultra-optimizado y refactorizado.
+"""
+
+
+
+# Importaciones condicionales organizadas
+try:
+        AutoTokenizer, AutoModel, pipeline,
+        DistilBertTokenizer, DistilBertModel
+    )
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
 
 try:
-    from sentence_transformers import SentenceTransformer
     SENTENCE_TRANSFORMERS_AVAILABLE = True
 except ImportError:
     SENTENCE_TRANSFORMERS_AVAILABLE = False
 
 try:
-    import spacy
     SPACY_AVAILABLE = True
 except ImportError:
     SPACY_AVAILABLE = False
@@ -136,7 +145,9 @@ class ModelLoader:
     """Cargador especializado de modelos."""
     
     def __init__(self, config: NLPConfig, executor: ThreadPoolExecutor):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.executor = executor
         self.logger = logging.getLogger(f"{__name__}.ModelLoader")
     
@@ -280,7 +291,7 @@ class ModelLoader:
         
         return model_info
     
-    def _quantize_sync(self, model):
+    def _quantize_sync(self, model) -> Any:
         """Quantizar modelo síncronamente."""
         if hasattr(model, 'model'):
             quantized = quantize_dynamic(
@@ -295,7 +306,9 @@ class ModelManager:
     """Gestor principal de modelos ML refactorizado."""
     
     def __init__(self, config: NLPConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.models: Dict[str, ModelInfo] = {}
         self.loading_locks: Dict[str, asyncio.Lock] = {}
         self.model_cache = LRUCache(maxsize=config.models.cache_size)
@@ -311,7 +324,7 @@ class ModelManager:
         self._initialized = False
         self.logger = logging.getLogger(f"{__name__}.ModelManager")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Inicializar gestor de modelos."""
         if self._initialized:
             return
@@ -393,7 +406,7 @@ class ModelManager:
             self.logger.warning(f"Model type {model_type} not available or supported")
             return None
     
-    async def _preload_critical_models(self):
+    async def _preload_critical_models(self) -> Any:
         """Pre-cargar modelos críticos."""
         critical_models = ['sentiment'] # Solo los más usados
         
@@ -446,7 +459,7 @@ class ModelManager:
             'model_tier': self.config.models.type.value
         }
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Limpiar recursos."""
         self.logger.info("Cleaning up ModelManager...")
         

@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Dict, List, Optional, Any
+from ..core.entities import AnalysisScore
+from ..core.enums import AnalysisType, ProcessingTier
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🔌 ANALYZER INTERFACES - Contratos para Analizadores
 ===================================================
@@ -5,10 +14,6 @@
 Interfaces que deben implementar los analizadores de NLP.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any
-from ..core.entities import AnalysisScore
-from ..core.enums import AnalysisType, ProcessingTier
 
 
 class IAnalyzer(ABC):

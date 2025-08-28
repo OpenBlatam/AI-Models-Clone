@@ -1,3 +1,33 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+import json
+import hashlib
+from typing import List, Optional, Dict, Any, Union, Tuple
+from datetime import datetime, timedelta
+from functools import wraps, lru_cache
+from dataclasses import dataclass, field
+from enum import Enum
+from fastapi import (
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, ConfigDict, validator
+import structlog
+from .functional_fastapi_components import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 🔄 Synchronous vs Asynchronous Operations in FastAPI
 ====================================================
@@ -10,25 +40,11 @@ Demonstrates proper use of:
 - Best practices for FastAPI applications
 """
 
-import asyncio
-import time
-import json
-import hashlib
-from typing import List, Optional, Dict, Any, Union, Tuple
-from datetime import datetime, timedelta
-from functools import wraps, lru_cache
-from dataclasses import dataclass, field
-from enum import Enum
 
-from fastapi import (
     FastAPI, APIRouter, Depends, HTTPException, status, 
     Request, Response, BackgroundTasks, Query, Path, Body
 )
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, ConfigDict, validator
-import structlog
 
-from .functional_fastapi_components import (
     TextAnalysisRequest, BatchAnalysisRequest, AnalysisUpdateRequest,
     AnalysisResponse, BatchAnalysisResponse, PaginatedResponse,
     AnalysisTypeEnum, OptimizationTierEnum, AnalysisStatusEnum
@@ -67,7 +83,7 @@ class CacheEntry:
         """Check if cache entry is expired."""
         return (datetime.now() - self.timestamp).total_seconds() > self.ttl_seconds
     
-    def access(self):
+    def access(self) -> Any:
         """Increment access count."""
         self.access_count += 1
 
@@ -764,7 +780,7 @@ async def process_single_text_async(
 class AnalysisCache:
     """Cache manager for analysis results."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._cache: Dict[str, CacheEntry] = {}
         self._lock = asyncio.Lock()
     
@@ -1020,7 +1036,7 @@ async def list_analyses_handler(
 class PerformanceMonitor:
     """Performance monitoring for sync/async operations."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._metrics: List[ProcessingMetrics] = []
         self._lock = asyncio.Lock()
     
@@ -1152,10 +1168,10 @@ async def example_sync_async_usage():
     
     # Mock database manager
     class MockDBManager:
-        async def create_text_analysis(self, data):
+        async def create_text_analysis(self, data) -> Any:
             return {"id": 1, **data}
         
-        async def get_text_analysis(self, analysis_id):
+        async def get_text_analysis(self, analysis_id) -> Optional[Dict[str, Any]]:
             return {"id": analysis_id, "text_content": text, "status": "completed"}
     
     db_manager = MockDBManager()
@@ -1184,5 +1200,6 @@ async def example_sync_async_usage():
     stats = await monitor.get_stats_async()
     print(f"Performance stats: {stats}")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(example_sync_async_usage()) 

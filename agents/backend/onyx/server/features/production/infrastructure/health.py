@@ -1,9 +1,10 @@
-"""
-Health Check Infrastructure
-===========================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Comprehensive health checker service for all system components.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -11,6 +12,15 @@ import time
 from typing import Dict, Any, List, Optional
 from datetime import datetime, timedelta
 from dataclasses import dataclass
+            import psutil
+from typing import Any, List, Dict, Optional
+"""
+Health Check Infrastructure
+===========================
+
+Comprehensive health checker service for all system components.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -29,7 +39,7 @@ class HealthCheck:
 class HealthChecker:
     """Comprehensive health checker for all system components."""
     
-    def __init__(self, container):
+    def __init__(self, container) -> Any:
         self.container = container
         self.health_checks = {
             "database": self._check_database,
@@ -51,7 +61,7 @@ class HealthChecker:
         
         logger.info("HealthChecker initialized")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize health checker."""
         try:
             # Start background monitoring
@@ -365,7 +375,6 @@ class HealthChecker:
     async def _check_system(self) -> Dict[str, Any]:
         """Check system health."""
         try:
-            import psutil
             
             # CPU usage
             cpu_percent = psutil.cpu_percent(interval=1)
@@ -406,7 +415,7 @@ class HealthChecker:
                 "error": str(e)
             }
     
-    async def _check_api(self) -> Dict[str, Any]:
+    async async def _check_api(self) -> Dict[str, Any]:
         """Check API health."""
         try:
             # This would typically check if the API endpoints are responding
@@ -490,7 +499,7 @@ class HealthChecker:
             logger.error(f"Error getting health summary: {e}")
             return {"error": str(e)}
     
-    async def _monitor_health(self):
+    async def _monitor_health(self) -> Any:
         """Background health monitoring."""
         while self._running:
             try:
@@ -502,7 +511,7 @@ class HealthChecker:
                 logger.error(f"Error in health monitoring: {e}")
                 await asyncio.sleep(60)  # Wait 1 minute before retrying
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup health checker."""
         try:
             self._running = False

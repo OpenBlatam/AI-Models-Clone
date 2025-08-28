@@ -1,6 +1,5 @@
-"""
-SSL certificate utilities for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, field_validator
 import structlog
@@ -10,6 +9,13 @@ import OpenSSL
 from datetime import datetime
 from dataclasses import dataclass
 from enum import Enum
+            from dateutil import parser
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+SSL certificate utilities for cybersecurity tools.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -45,19 +51,19 @@ class SSLCertificateInput(BaseModel):
     check_revocation: bool = False
     
     @field_validator('host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         if not v:
             raise ValueError("Host cannot be empty")
         return v
     
     @field_validator('port')
-    def validate_port(cls, v):
+    def validate_port(cls, v) -> bool:
         if v < 1 or v > 65535:
             raise ValueError("Port must be between 1 and 65535")
         return v
     
     @field_validator('timeout')
-    def validate_timeout(cls, v):
+    def validate_timeout(cls, v) -> bool:
         if v <= 0:
             raise ValueError("Timeout must be positive")
         return v
@@ -219,7 +225,6 @@ def parse_cert_date(date_str: str) -> datetime:
         
         # If no format matches, try to parse with dateutil
         try:
-            from dateutil import parser
             return parser.parse(date_str)
         except ImportError:
             pass

@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import abc
 from typing import Iterator, Optional
 from langchain.schema.language_model import LanguageModelInput
@@ -9,6 +17,10 @@ from onyx.llm.exceptions import GenAIDisabledException
 from onyx.utils.logger import setup_logger
 from .model import CopywritingInput, CopywritingOutput
 
+            from .model import CopywritingModel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 class CopywritingLLMConfig(LLMConfig):
@@ -22,7 +34,9 @@ class CopywritingLLM(LLM):
     """LLM interface for copywriting generation."""
     
     def __init__(self, config: Optional[CopywritingLLMConfig] = None):
-        self._config = config or CopywritingLLMConfig()
+        
+    """__init__ function."""
+self._config = config or CopywritingLLMConfig()
         super().__init__()
 
     @property
@@ -99,7 +113,6 @@ class CopywritingLLM(LLM):
     def _generate_copywriting(self, input_data: CopywritingInput) -> CopywritingOutput:
         """Generate copywriting content."""
         try:
-            from .model import CopywritingModel
             return CopywritingModel.generate(input_data)
         except GenAIDisabledException:
             logger.error("Unable to generate copywriting - Gen AI disabled")

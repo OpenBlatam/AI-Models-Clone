@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from datetime import datetime, timezone
+from enum import Enum
+from typing import Any, Dict, List, Optional
+from pydantic import BaseModel, Field, validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Enhanced API Schemas
 ===================
@@ -6,11 +23,7 @@ Comprehensive Pydantic models with advanced validation,
 following FastAPI best practices and RORO pattern.
 """
 
-from datetime import datetime, timezone
-from enum import Enum
-from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field, validator
 
 
 # =============================================================================
@@ -54,7 +67,8 @@ class ContentLanguage(str, Enum):
 class EnhancedBaseModel(BaseModel):
     """Enhanced base model with common configuration."""
     
-    class Config:
+    @dataclass
+class Config:
         use_enum_values = True
         validate_assignment = True
         str_strip_whitespace = True

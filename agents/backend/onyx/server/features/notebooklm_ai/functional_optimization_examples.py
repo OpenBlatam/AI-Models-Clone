@@ -1,10 +1,16 @@
-#!/usr/bin/env python3
-"""
-Functional Optimization Examples - Python/Cybersecurity Best Practices
-🚀 Demonstrates functional programming, descriptive naming, and modular architecture
-⚡ Uses guard clauses, early returns, and comprehensive error handling
-🎯 Follows RORO pattern and proper async/sync function usage
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import logging
@@ -17,12 +23,34 @@ import secrets
 from pathlib import Path
 from functools import wraps, partial
 from contextlib import asynccontextmanager
+    from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator
+    import asyncpg
+    from fastapi import FastAPI, HTTPException, Depends, status
+    from fastapi.responses import JSONResponse
+import structlog
+    import structlog
+        from urllib.parse import urlparse
+        from urllib.parse import urlparse
+        from urllib.parse import urlparse
+        import socket
+        import socket
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Functional Optimization Examples - Python/Cybersecurity Best Practices
+🚀 Demonstrates functional programming, descriptive naming, and modular architecture
+⚡ Uses guard clauses, early returns, and comprehensive error handling
+🎯 Follows RORO pattern and proper async/sync function usage
+"""
+
 
 # Custom exception classes for cybersecurity operations
 class SecurityToolError(Exception):
     """Base exception for security tool operations."""
     def __init__(self, message: str, error_code: str = None, details: Dict[str, Any] = None):
-        super().__init__(message)
+        
+    """__init__ function."""
+super().__init__(message)
         self.message = message
         self.error_code = error_code or "SECURITY_TOOL_ERROR"
         self.details = details or {}
@@ -30,7 +58,9 @@ class SecurityToolError(Exception):
 class InvalidTargetError(SecurityToolError):
     """Raised when target address/hostname is invalid."""
     def __init__(self, target: str, reason: str = None):
-        message = f"Invalid target: {target}"
+        
+    """__init__ function."""
+message = f"Invalid target: {target}"
         if reason:
             message += f" - {reason}"
         super().__init__(message, "INVALID_TARGET", {"target": target, "reason": reason})
@@ -38,7 +68,9 @@ class InvalidTargetError(SecurityToolError):
 class PortScanError(SecurityToolError):
     """Raised when port scanning fails."""
     def __init__(self, target: str, port: int, reason: str = None):
-        message = f"Port scan failed for {target}:{port}"
+        
+    """__init__ function."""
+message = f"Port scan failed for {target}:{port}"
         if reason:
             message += f" - {reason}"
         super().__init__(message, "PORT_SCAN_ERROR", {"target": target, "port": port, "reason": reason})
@@ -46,7 +78,9 @@ class PortScanError(SecurityToolError):
 class VulnerabilityScanError(SecurityToolError):
     """Raised when vulnerability scanning fails."""
     def __init__(self, target_url: str, scan_type: str, reason: str = None):
-        message = f"Vulnerability scan failed for {target_url} ({scan_type})"
+        
+    """__init__ function."""
+message = f"Vulnerability scan failed for {target_url} ({scan_type})"
         if reason:
             message += f" - {reason}"
         super().__init__(message, "VULNERABILITY_SCAN_ERROR", {"target_url": target_url, "scan_type": scan_type, "reason": reason})
@@ -54,7 +88,9 @@ class VulnerabilityScanError(SecurityToolError):
 class NetworkTimeoutError(SecurityToolError):
     """Raised when network operations timeout."""
     def __init__(self, operation: str, timeout_seconds: float, target: str = None):
-        message = f"Network timeout: {operation} exceeded {timeout_seconds}s"
+        
+    """__init__ function."""
+message = f"Network timeout: {operation} exceeded {timeout_seconds}s"
         if target:
             message += f" for {target}"
         super().__init__(message, "NETWORK_TIMEOUT", {"operation": operation, "timeout_seconds": timeout_seconds, "target": target})
@@ -62,7 +98,9 @@ class NetworkTimeoutError(SecurityToolError):
 class AuthenticationError(SecurityToolError):
     """Raised when authentication fails."""
     def __init__(self, service: str, reason: str = None):
-        message = f"Authentication failed for {service}"
+        
+    """__init__ function."""
+message = f"Authentication failed for {service}"
         if reason:
             message += f" - {reason}"
         super().__init__(message, "AUTHENTICATION_ERROR", {"service": service, "reason": reason})
@@ -70,7 +108,9 @@ class AuthenticationError(SecurityToolError):
 class ConfigurationError(SecurityToolError):
     """Raised when configuration is invalid."""
     def __init__(self, config_key: str, reason: str = None):
-        message = f"Configuration error: {config_key}"
+        
+    """__init__ function."""
+message = f"Configuration error: {config_key}"
         if reason:
             message += f" - {reason}"
         super().__init__(message, "CONFIGURATION_ERROR", {"config_key": config_key, "reason": reason})
@@ -78,35 +118,32 @@ class ConfigurationError(SecurityToolError):
 class RateLimitError(SecurityToolError):
     """Raised when rate limits are exceeded."""
     def __init__(self, service: str, retry_after: int = None):
-        message = f"Rate limit exceeded for {service}"
+        
+    """__init__ function."""
+message = f"Rate limit exceeded for {service}"
         if retry_after:
             message += f" - Retry after {retry_after} seconds"
         super().__init__(message, "RATE_LIMIT_ERROR", {"service": service, "retry_after": retry_after})
 
 # Pydantic v2 imports for validation
 try:
-    from pydantic import BaseModel, Field, ValidationError, field_validator, model_validator
     PYDANTIC_AVAILABLE = True
 except ImportError:
     PYDANTIC_AVAILABLE = False
 
 # Async database imports
 try:
-    import asyncpg
     ASYNCPG_AVAILABLE = True
 except ImportError:
     ASYNCPG_AVAILABLE = False
 
 # FastAPI imports
 try:
-    from fastapi import FastAPI, HTTPException, Depends, status
-    from fastapi.responses import JSONResponse
     FASTAPI_AVAILABLE = True
 except ImportError:
     FASTAPI_AVAILABLE = False
 
 # Configure structured logging
-import structlog
 
 structlog.configure(
     processors=[
@@ -130,7 +167,6 @@ logger = structlog.get_logger()
 
 # Fallback to standard logging if structlog not available
 try:
-    import structlog
     STRUCTLOG_AVAILABLE = True
 except ImportError:
     STRUCTLOG_AVAILABLE = False
@@ -411,7 +447,6 @@ def validate_url_parameters(target_url: str, scan_types: List[str]) -> Tuple[boo
     
     # Extract hostname from URL
     try:
-        from urllib.parse import urlparse
         parsed = urlparse(target_url)
         if not parsed.netloc:
             return False, "Invalid URL format: missing hostname"
@@ -593,7 +628,7 @@ async def scan_port_range(target_host: str, port_range: str, scan_type: str = "t
     # Execute scans with concurrency limit
     semaphore = asyncio.Semaphore(max_workers)
     
-    async def limited_scan(task):
+    async def limited_scan(task) -> Any:
         async with semaphore:
             return await task
     
@@ -658,7 +693,6 @@ def detect_sql_injection_vulnerability(target_url: str, payloads: List[str]) -> 
     
     # Extract and validate hostname
     try:
-        from urllib.parse import urlparse
         parsed = urlparse(target_url)
         if not parsed.netloc:
             logger.warning("Missing hostname in URL", 
@@ -750,7 +784,6 @@ def detect_xss_vulnerability(target_url: str, payloads: List[str]) -> Dict[str, 
     
     # Extract and validate hostname
     try:
-        from urllib.parse import urlparse
         parsed = urlparse(target_url)
         if not parsed.netloc:
             return {"error": "Invalid URL format: missing hostname", "vulnerabilities": []}
@@ -960,7 +993,6 @@ def is_port_open_sync(host: str, port: int, timeout: float = 5.0) -> bool:
     
     # Happy path - main sync port checking logic
     try:
-        import socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(timeout)
         result = sock.connect_ex((host, port))
@@ -1001,7 +1033,6 @@ def resolve_dns_hostname(hostname: str) -> Optional[str]:
     
     # Happy path - main DNS resolution logic
     try:
-        import socket
         ip_address = socket.gethostbyname(hostname)
         return ip_address if is_valid_ip_address(ip_address) else None
     except socket.gaierror:
@@ -1249,7 +1280,7 @@ def format_cli_error_message(exception: Exception, verbose: bool = False) -> str
     else:
         return f"❌ {error_info['message']}"
 
-def format_api_error_response(exception: Exception) -> Dict[str, Any]:
+async def format_api_error_response(exception: Exception) -> Dict[str, Any]:
     """Format exception for API response."""
     error_info = map_exception_to_user_message(exception)
     
@@ -1388,5 +1419,6 @@ async def main():
         print("Main execution error:", format_cli_error_message(e, verbose=True))
         raise
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

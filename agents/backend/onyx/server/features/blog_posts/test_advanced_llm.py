@@ -1,10 +1,7 @@
-"""
-Test Suite for Advanced LLM Integration
-======================================
-
-Comprehensive tests for advanced LLM integration with modern PyTorch practices,
-transformers, quantization, and production-ready features.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import pytest
 import torch
@@ -19,9 +16,20 @@ from unittest.mock import Mock, patch, MagicMock
 import numpy as np
 import os
 import time
+from advanced_llm_integration import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Test Suite for Advanced LLM Integration
+======================================
+
+Comprehensive tests for advanced LLM integration with modern PyTorch practices,
+transformers, quantization, and production-ready features.
+"""
+
 
 # Import the modules to test
-from advanced_llm_integration import (
     LLMConfig,
     AdvancedLLMTrainer,
     LLMPipeline
@@ -106,7 +114,7 @@ def sample_model():
 class TestLLMConfig:
     """Test LLMConfig dataclass."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration values."""
         config = LLMConfig()
         
@@ -120,7 +128,7 @@ class TestLLMConfig:
         assert config.use_peft is True
         assert config.quantization == "4bit"
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration values."""
         config = LLMConfig(
             model_name="gpt2",
@@ -140,7 +148,7 @@ class TestLLMConfig:
         assert config.use_peft is False
         assert config.quantization == "8bit"
     
-    def test_config_validation(self):
+    def test_config_validation(self) -> Any:
         """Test configuration validation."""
         # Test valid model types
         valid_types = ["causal", "sequence_classification", "conditional_generation"]
@@ -162,7 +170,7 @@ class TestLLMConfig:
 class TestAdvancedLLMTrainer:
     """Test AdvancedLLMTrainer class."""
     
-    def test_initialization(self, sample_llm_config):
+    def test_initialization(self, sample_llm_config) -> Any:
         """Test trainer initialization."""
         trainer = AdvancedLLMTrainer(sample_llm_config)
         
@@ -172,7 +180,7 @@ class TestAdvancedLLMTrainer:
         assert trainer.device is not None
         assert trainer.logger is not None
     
-    def test_load_tokenizer_gpt2(self):
+    def test_load_tokenizer_gpt2(self) -> Any:
         """Test GPT2 tokenizer loading."""
         config = LLMConfig(
             model_name="gpt2",
@@ -186,7 +194,7 @@ class TestAdvancedLLMTrainer:
         assert hasattr(trainer.tokenizer, 'decode')
         assert trainer.tokenizer.pad_token is not None
     
-    def test_load_tokenizer_bert(self):
+    def test_load_tokenizer_bert(self) -> Any:
         """Test BERT tokenizer loading."""
         config = LLMConfig(
             model_name="bert-base-uncased",
@@ -199,7 +207,7 @@ class TestAdvancedLLMTrainer:
         assert hasattr(trainer.tokenizer, 'encode')
         assert hasattr(trainer.tokenizer, 'decode')
     
-    def test_load_model_causal(self):
+    def test_load_model_causal(self) -> Any:
         """Test causal model loading."""
         config = LLMConfig(
             model_name="gpt2",
@@ -212,7 +220,7 @@ class TestAdvancedLLMTrainer:
         assert trainer.model is not None
         assert hasattr(trainer.model, 'generate')
     
-    def test_load_model_classification(self):
+    def test_load_model_classification(self) -> Any:
         """Test classification model loading."""
         config = LLMConfig(
             model_name="bert-base-uncased",
@@ -225,7 +233,7 @@ class TestAdvancedLLMTrainer:
         assert trainer.model is not None
         assert hasattr(trainer.model, 'forward')
     
-    def test_apply_optimizations(self, sample_llm_config):
+    def test_apply_optimizations(self, sample_llm_config) -> Any:
         """Test optimization application."""
         trainer = AdvancedLLMTrainer(sample_llm_config)
         
@@ -235,7 +243,7 @@ class TestAdvancedLLMTrainer:
         # Note: Some optimizations might not be available in all environments
         # We just check that the model still works
     
-    def test_setup_peft(self):
+    def test_setup_peft(self) -> Any:
         """Test PEFT setup."""
         config = LLMConfig(
             model_name="gpt2",
@@ -252,7 +260,7 @@ class TestAdvancedLLMTrainer:
         # Note: PEFT setup might fail in some environments
         # We just check that the model still works
     
-    def test_prepare_dataset_causal(self, sample_llm_config, sample_texts):
+    def test_prepare_dataset_causal(self, sample_llm_config, sample_texts) -> Any:
         """Test dataset preparation for causal models."""
         trainer = AdvancedLLMTrainer(sample_llm_config)
         
@@ -269,7 +277,7 @@ class TestAdvancedLLMTrainer:
         assert isinstance(item["attention_mask"], torch.Tensor)
         assert isinstance(item["labels"], torch.Tensor)
     
-    def test_prepare_dataset_classification(self, sample_classification_config, sample_texts, sample_labels):
+    def test_prepare_dataset_classification(self, sample_classification_config, sample_texts, sample_labels) -> Any:
         """Test dataset preparation for classification models."""
         trainer = AdvancedLLMTrainer(sample_classification_config)
         
@@ -287,7 +295,7 @@ class TestAdvancedLLMTrainer:
         assert isinstance(item["labels"], torch.Tensor)
     
     @pytest.mark.slow
-    def test_training(self, sample_llm_config, sample_texts, sample_labels, temp_dir):
+    def test_training(self, sample_llm_config, sample_texts, sample_labels, temp_dir) -> Any:
         """Test model training."""
         # Use smaller model for faster testing
         config = LLMConfig(
@@ -308,7 +316,7 @@ class TestAdvancedLLMTrainer:
         assert trainer_result is not None
         assert hasattr(trainer_result, 'train')
     
-    def test_generate_text(self, sample_llm_config):
+    def test_generate_text(self, sample_llm_config) -> Any:
         """Test text generation."""
         config = LLMConfig(
             model_name="gpt2",
@@ -325,7 +333,7 @@ class TestAdvancedLLMTrainer:
         assert isinstance(generated, str)
         assert len(generated) > 0
     
-    def test_predict_causal(self, sample_llm_config, sample_texts):
+    def test_predict_causal(self, sample_llm_config, sample_texts) -> Any:
         """Test prediction for causal models."""
         config = LLMConfig(
             model_name="gpt2",
@@ -343,7 +351,7 @@ class TestAdvancedLLMTrainer:
         assert "input_text" in predictions[0]
         assert "generated_text" in predictions[0]
     
-    def test_predict_classification(self, sample_classification_config, sample_texts, sample_labels):
+    def test_predict_classification(self, sample_classification_config, sample_texts, sample_labels) -> Any:
         """Test prediction for classification models."""
         config = LLMConfig(
             model_name="bert-base-uncased",
@@ -365,7 +373,7 @@ class TestAdvancedLLMTrainer:
         assert "predicted_class" in predictions[0]
         assert "probabilities" in predictions[0]
     
-    def test_save_load_model(self, sample_llm_config, temp_dir):
+    def test_save_load_model(self, sample_llm_config, temp_dir) -> Any:
         """Test model saving and loading."""
         config = LLMConfig(
             model_name="gpt2",
@@ -395,7 +403,7 @@ class TestAdvancedLLMTrainer:
 class TestLLMPipeline:
     """Test LLMPipeline class."""
     
-    def test_initialization(self, sample_llm_config, temp_dir):
+    def test_initialization(self, sample_llm_config, temp_dir) -> Any:
         """Test pipeline initialization."""
         # First save a model
         config = LLMConfig(
@@ -417,7 +425,7 @@ class TestLLMPipeline:
         assert pipeline.device is not None
         assert pipeline.logger is not None
     
-    def test_generate(self, sample_llm_config, temp_dir):
+    def test_generate(self, sample_llm_config, temp_dir) -> Any:
         """Test text generation with pipeline."""
         # First save a model
         config = LLMConfig(
@@ -440,7 +448,7 @@ class TestLLMPipeline:
         assert isinstance(result, str)
         assert len(result) > 0
     
-    def test_batch_generate(self, sample_llm_config, temp_dir):
+    def test_batch_generate(self, sample_llm_config, temp_dir) -> Any:
         """Test batch generation with pipeline."""
         # First save a model
         config = LLMConfig(
@@ -466,7 +474,7 @@ class TestLLMPipeline:
             assert isinstance(result, str)
             assert len(result) > 0
     
-    def test_classify(self, sample_classification_config, sample_texts, sample_labels, temp_dir):
+    def test_classify(self, sample_classification_config, sample_texts, sample_labels, temp_dir) -> Any:
         """Test classification with pipeline."""
         # First save a model
         config = LLMConfig(
@@ -499,7 +507,7 @@ class TestLLMPipeline:
 class TestIntegration:
     """Integration tests for the complete system."""
     
-    def test_end_to_end_training_and_inference(self, temp_dir):
+    def test_end_to_end_training_and_inference(self, temp_dir) -> Any:
         """Test complete training and inference pipeline."""
         # Configuration
         config = LLMConfig(
@@ -544,7 +552,7 @@ class TestIntegration:
             assert isinstance(result, str)
             assert len(result) > 0
     
-    def test_different_model_types(self, temp_dir):
+    def test_different_model_types(self, temp_dir) -> Any:
         """Test different model types."""
         model_configs = [
             ("gpt2", "causal"),
@@ -593,7 +601,7 @@ class TestIntegration:
 class TestPerformance:
     """Performance tests for LLM integration."""
     
-    def test_generation_performance(self, temp_dir):
+    def test_generation_performance(self, temp_dir) -> Any:
         """Test generation performance."""
         config = LLMConfig(
             model_name="gpt2",
@@ -620,7 +628,7 @@ class TestPerformance:
         # Generation should be reasonably fast
         assert avg_time < 5.0  # Should complete within 5 seconds per generation
     
-    def test_batch_generation_performance(self, temp_dir):
+    def test_batch_generation_performance(self, temp_dir) -> Any:
         """Test batch generation performance."""
         config = LLMConfig(
             model_name="gpt2",
@@ -657,7 +665,7 @@ class TestPerformance:
 class TestErrorHandling:
     """Test error handling in LLM integration."""
     
-    def test_invalid_model_name(self):
+    def test_invalid_model_name(self) -> Any:
         """Test handling of invalid model names."""
         config = LLMConfig(
             model_name="invalid-model-name",
@@ -667,7 +675,7 @@ class TestErrorHandling:
         with pytest.raises(Exception):
             AdvancedLLMTrainer(config)
     
-    def test_invalid_model_type(self):
+    def test_invalid_model_type(self) -> Any:
         """Test handling of invalid model types."""
         config = LLMConfig(
             model_name="gpt2",
@@ -677,7 +685,7 @@ class TestErrorHandling:
         with pytest.raises(ValueError):
             AdvancedLLMTrainer(config)
     
-    def test_empty_texts(self):
+    def test_empty_texts(self) -> Any:
         """Test handling of empty text lists."""
         config = LLMConfig(
             model_name="gpt2",
@@ -689,7 +697,7 @@ class TestErrorHandling:
         with pytest.raises(Exception):
             trainer.train([], [])
     
-    def test_mismatched_texts_labels(self):
+    def test_mismatched_texts_labels(self) -> Any:
         """Test handling of mismatched texts and labels."""
         config = LLMConfig(
             model_name="bert-base-uncased",
@@ -704,7 +712,7 @@ class TestErrorHandling:
         with pytest.raises(Exception):
             trainer.train(texts, labels)
     
-    def test_invalid_model_path(self):
+    def test_invalid_model_path(self) -> Any:
         """Test handling of invalid model paths."""
         config = LLMConfig(
             model_name="gpt2",

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import time
 
@@ -7,6 +9,9 @@ from onyx.configs.constants import DocumentSource
 from onyx.connectors.gitbook.connector import GitbookConnector
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def gitbook_connector() -> GitbookConnector:
     connector = GitbookConnector(

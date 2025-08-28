@@ -1,10 +1,5 @@
-"""
-Functional AI Video Pipeline
-============================
-
-Pure functional approach to AI video generation using declarative programming.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, List, Optional, Callable, Any, Tuple
 from dataclasses import dataclass
 import torch
@@ -14,6 +9,16 @@ import logging
 from functools import partial, reduce
 import asyncio
 from pathlib import Path
+        import time
+        import uuid
+from typing import Any, List, Dict, Optional
+"""
+Functional AI Video Pipeline
+============================
+
+Pure functional approach to AI video generation using declarative programming.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +106,7 @@ def compose(*functions: Callable) -> Callable:
 
 def with_error_handling(func: Callable) -> Callable:
     """Decorator for error handling."""
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         try:
             return func(*args, **kwargs)
         except Exception as e:
@@ -111,7 +116,7 @@ def with_error_handling(func: Callable) -> Callable:
 
 def with_logging(func: Callable) -> Callable:
     """Decorator for logging function calls."""
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         logger.info(f"Calling {func.__name__}")
         result = func(*args, **kwargs)
         logger.info(f"Completed {func.__name__}")
@@ -120,8 +125,7 @@ def with_logging(func: Callable) -> Callable:
 
 def with_timing(func: Callable) -> Callable:
     """Decorator for timing function execution."""
-    def wrapper(*args, **kwargs):
-        import time
+    def wrapper(*args, **kwargs) -> Any:
         start_time = time.time()
         result = func(*args, **kwargs)
         end_time = time.time()
@@ -150,7 +154,6 @@ def create_video_generation_pipeline() -> Callable[[VideoConfig], Result]:
         processed_frames = process_frames(frames, config)
         
         # Create output path
-        import uuid
         job_id = str(uuid.uuid4())
         output_path = create_output_path(config, job_id)
         
@@ -183,7 +186,9 @@ def process_batch(
 ) -> List[Result]:
     """Process multiple video generation requests."""
     async def process_all():
-        semaphore = asyncio.Semaphore(max_concurrent)
+        
+    """process_all function."""
+semaphore = asyncio.Semaphore(max_concurrent)
         
         async def process_with_semaphore(config: VideoConfig) -> Result:
             async with semaphore:

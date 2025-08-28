@@ -1,13 +1,20 @@
-"""
-Model Helpers - Onyx Integration
-Helper functions for model operations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any, Dict, List, Optional, Set, Type, TypeVar, Union
 from datetime import datetime
 import json
 import logging
 import re
 from .model_types import (
+from datetime import datetime
+from typing import List, Optional
+import logging
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Model Helpers - Onyx Integration
+Helper functions for model operations.
+"""
     JsonDict, JsonList, JsonValue, FieldType, FieldValue,
     ModelId, ModelKey, ModelValue, ModelData, ModelList, ModelDict,
     IndexField, IndexValue, IndexKey, IndexData, IndexList, IndexDict,
@@ -242,9 +249,6 @@ def update_model_metadata(model: T, metadata: JsonDict) -> None:
 
 # Example usage:
 """
-from datetime import datetime
-from typing import List, Optional
-import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

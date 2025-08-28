@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import pytest
+import asyncio
+import tempfile
+import os
+from typing import AsyncGenerator, Dict, Any
+from datetime import datetime, timedelta
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.orm import sessionmaker
+from .sqlalchemy_2_implementation import (
+from .sqlalchemy_migrations import MigrationManager, DataMigration
+        import time
+from typing import Any, List, Dict, Optional
+import logging
 """
 🧪 SQLAlchemy 2.0 Test Suite
 ============================
@@ -11,23 +32,13 @@ Comprehensive test suite for SQLAlchemy 2.0 implementation with:
 - Integration testing
 """
 
-import pytest
-import asyncio
-import tempfile
-import os
-from typing import AsyncGenerator, Dict, Any
-from datetime import datetime, timedelta
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.orm import sessionmaker
 
-from .sqlalchemy_2_implementation import (
     Base, DatabaseConfig, SQLAlchemy2Manager,
     TextAnalysisCreate, TextAnalysisUpdate, BatchAnalysisCreate,
     AnalysisType, AnalysisStatus, OptimizationTier,
     TextAnalysis, BatchAnalysis, ModelPerformance, CacheEntry
 )
-from .sqlalchemy_migrations import MigrationManager, DataMigration
 
 
 # ============================================================================
@@ -92,7 +103,7 @@ async def migration_manager(test_db_config: DatabaseConfig) -> AsyncGenerator[Mi
 class TestModels:
     """Test SQLAlchemy models."""
     
-    def test_text_analysis_model(self):
+    def test_text_analysis_model(self) -> Any:
         """Test TextAnalysis model creation."""
         analysis = TextAnalysis(
             text_content="Test content",
@@ -107,7 +118,7 @@ class TestModels:
         assert analysis.status == AnalysisStatus.PENDING
         assert analysis.optimization_tier == OptimizationTier.STANDARD
     
-    def test_batch_analysis_model(self):
+    def test_batch_analysis_model(self) -> Any:
         """Test BatchAnalysis model creation."""
         batch = BatchAnalysis(
             batch_name="Test Batch",
@@ -121,7 +132,7 @@ class TestModels:
         assert batch.completed_count == 0
         assert batch.error_count == 0
     
-    def test_model_to_dict(self):
+    def test_model_to_dict(self) -> Any:
         """Test model to_dict method."""
         analysis = TextAnalysis(
             text_content="Test content",
@@ -135,7 +146,7 @@ class TestModels:
         assert "analysis_type" in data
         assert data["text_content"] == "Test content"
     
-    def test_model_to_pydantic(self):
+    def test_model_to_pydantic(self) -> Any:
         """Test model to_pydantic method."""
         analysis = TextAnalysis(
             text_content="Test content",
@@ -157,7 +168,7 @@ class TestModels:
 class TestPydanticModels:
     """Test Pydantic models."""
     
-    def test_text_analysis_create(self):
+    def test_text_analysis_create(self) -> Any:
         """Test TextAnalysisCreate model."""
         data = TextAnalysisCreate(
             text_content="Test content",
@@ -169,7 +180,7 @@ class TestPydanticModels:
         assert data.analysis_type == AnalysisType.SENTIMENT
         assert data.optimization_tier == OptimizationTier.STANDARD
     
-    def test_text_analysis_update(self):
+    def test_text_analysis_update(self) -> Any:
         """Test TextAnalysisUpdate model."""
         data = TextAnalysisUpdate(
             status=AnalysisStatus.COMPLETED,
@@ -181,7 +192,7 @@ class TestPydanticModels:
         assert data.sentiment_score == 0.8
         assert data.processing_time_ms == 150.5
     
-    def test_batch_analysis_create(self):
+    def test_batch_analysis_create(self) -> Any:
         """Test BatchAnalysisCreate model."""
         data = BatchAnalysisCreate(
             batch_name="Test Batch",
@@ -192,7 +203,7 @@ class TestPydanticModels:
         assert data.batch_name == "Test Batch"
         assert data.analysis_type == AnalysisType.SENTIMENT
     
-    def test_validation_errors(self):
+    def test_validation_errors(self) -> Any:
         """Test Pydantic validation errors."""
         with pytest.raises(ValueError):
             TextAnalysisCreate(
@@ -473,7 +484,6 @@ class TestPerformance:
     @pytest.mark.asyncio
     async def test_bulk_operations(self, db_manager: SQLAlchemy2Manager):
         """Test bulk operations performance."""
-        import time
         
         # Create multiple analyses
         start_time = time.time()
@@ -511,7 +521,9 @@ class TestPerformance:
         try:
             # Create multiple concurrent operations
             async def create_analysis(i: int):
-                data = TextAnalysisCreate(
+                
+    """create_analysis function."""
+data = TextAnalysisCreate(
                     text_content=f"Concurrent content {i}",
                     analysis_type=AnalysisType.SENTIMENT
                 )
@@ -688,5 +700,6 @@ def test_enum_values():
     assert OptimizationTier.STANDARD == "standard"
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

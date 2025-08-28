@@ -1,3 +1,34 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import json
+import time
+from typing import Dict, Any, List, Optional, AsyncGenerator, Callable
+from datetime import datetime, timedelta
+import tempfile
+import os
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.responses import StreamingResponse, JSONResponse
+from pydantic import BaseModel, Field
+from integration_master import IntegrationMaster
+from production_config import get_config
+import structlog
+                import httpx
+                import base64
+from typing import Any, List, Dict, Optional
+import logging
 """
 Streaming API for Large Responses
 ================================
@@ -10,23 +41,10 @@ Streaming API endpoints for handling large responses and real-time data processi
 - Streaming analytics
 """
 
-import asyncio
-import json
-import time
-from typing import Dict, Any, List, Optional, AsyncGenerator, Callable
-from datetime import datetime, timedelta
-import tempfile
-import os
 
 # FastAPI imports
-from fastapi import APIRouter, Depends, HTTPException, status, Request
-from fastapi.responses import StreamingResponse, JSONResponse
-from pydantic import BaseModel, Field
 
 # Local imports
-from integration_master import IntegrationMaster
-from production_config import get_config
-import structlog
 
 # Setup logger
 logger = structlog.get_logger()
@@ -70,7 +88,9 @@ class ProgressTracker:
     """Track progress for streaming operations"""
     
     def __init__(self, total_items: int, operation_name: str):
-        self.total_items = total_items
+        
+    """__init__ function."""
+self.total_items = total_items
         self.processed_items = 0
         self.operation_name = operation_name
         self.start_time = time.time()
@@ -250,7 +270,7 @@ async def stream_batch_processing(
             }) + "\n"
             
             # Define processor function
-            async def processor_func(item):
+            async def processor_func(item) -> Any:
                 if request.operation_type == "text":
                     text = str(item.get('text', item))
                     return await integration_master.process_text(text, ["statistics", "sentiment"])
@@ -364,13 +384,11 @@ async def stream_file_processing(
             
             # Handle file source
             if request.file_url:
-                import httpx
                 async with httpx.AsyncClient() as client:
                     response = await client.get(request.file_url)
                     response.raise_for_status()
                     file_data = response.content
             elif request.file_base64:
-                import base64
                 file_data = base64.b64decode(request.file_base64)
             else:
                 raise ValueError("Either file_url or file_base64 must be provided")
@@ -386,6 +404,10 @@ async def stream_file_processing(
             # Save temporary file
             with tempfile.NamedTemporaryFile(delete=False, suffix=f".{request.file_type}") as temp_file:
                 temp_file.write(file_data)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 temp_file_path = temp_file.name
             
             progress_tracker.update_progress(20)  # File saved

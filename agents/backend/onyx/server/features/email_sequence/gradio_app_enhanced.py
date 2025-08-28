@@ -1,10 +1,5 @@
-"""
-Enhanced Gradio Web Interface with Error Handling
-
-A comprehensive web interface for the email sequence AI system with
-robust error handling, input validation, and debugging capabilities.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import gradio as gr
 import asyncio
 import logging
@@ -19,28 +14,36 @@ import plotly.express as px
 from datetime import datetime
 import time
 import random
+import sys
+from core.error_handling import (
+from core.sequence_generator import EmailSequenceGenerator, GeneratorConfig
+from core.evaluation_metrics import EmailSequenceEvaluator, MetricsConfig
+from core.training_optimization import (
+from core.gradient_management import GradientManager, GradientConfig
+from models.sequence import EmailSequence, SequenceStep
+from models.subscriber import Subscriber
+from models.template import EmailTemplate
+from typing import Any, List, Dict, Optional
+"""
+Enhanced Gradio Web Interface with Error Handling
+
+A comprehensive web interface for the email sequence AI system with
+robust error handling, input validation, and debugging capabilities.
+"""
+
 
 # Add the parent directory to the path to import modules
-import sys
 sys.path.append(str(Path(__file__).parent))
 
-from core.error_handling import (
     ErrorHandler, InputValidator, DataLoaderErrorHandler, 
     ModelInferenceErrorHandler, GradioErrorHandler,
     ValidationError, ModelError, DataError, ConfigurationError
 )
-from core.sequence_generator import EmailSequenceGenerator, GeneratorConfig
-from core.evaluation_metrics import EmailSequenceEvaluator, MetricsConfig
-from core.training_optimization import (
     TrainingOptimizer,
     EarlyStoppingConfig,
     LRSchedulerConfig,
     GradientManagementConfig
 )
-from core.gradient_management import GradientManager, GradientConfig
-from models.sequence import EmailSequence, SequenceStep
-from models.subscriber import Subscriber
-from models.template import EmailTemplate
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -51,7 +54,9 @@ class EnhancedGradioEmailSequenceApp:
     """Enhanced Gradio application with comprehensive error handling"""
     
     def __init__(self, debug_mode: bool = False):
-        # Initialize error handling system
+        
+    """__init__ function."""
+# Initialize error handling system
         self.error_handler = ErrorHandler(debug_mode=debug_mode)
         self.validator = InputValidator()
         self.data_handler = DataLoaderErrorHandler(self.error_handler)
@@ -165,7 +170,7 @@ class EnhancedGradioEmailSequenceApp:
         
         return len(errors) == 0, errors
     
-    def generate_sequence_interface(self):
+    def generate_sequence_interface(self) -> Any:
         """Create the sequence generation interface with error handling"""
         
         with gr.Tab("Sequence Generation"):
@@ -408,7 +413,7 @@ class EnhancedGradioEmailSequenceApp:
         
         return preview
     
-    def evaluation_interface(self):
+    def evaluation_interface(self) -> Any:
         """Create the evaluation interface with error handling"""
         
         with gr.Tab("Sequence Evaluation"):
@@ -703,7 +708,9 @@ class EnhancedGradioEmailSequenceApp:
                 error_summary_display = gr.JSON(label="Error Summary")
                 
                 def get_error_summary():
-                    return self.error_handler.get_error_summary()
+                    
+    """get_error_summary function."""
+return self.error_handler.get_error_summary()
                 
                 error_summary_btn.click(
                     fn=get_error_summary,
@@ -739,5 +746,6 @@ def main():
     )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

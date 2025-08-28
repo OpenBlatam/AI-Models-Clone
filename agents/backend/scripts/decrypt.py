@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import binascii
 import json
 import sys
@@ -5,6 +7,9 @@ import sys
 from onyx.utils.encryption import decrypt_bytes_to_string
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def decrypt_raw_credential(encrypted_value: str) -> None:
     """Decrypt and display a raw encrypted credential value
 

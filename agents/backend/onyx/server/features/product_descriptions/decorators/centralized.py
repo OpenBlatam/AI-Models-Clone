@@ -1,14 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 import logging
 from functools import wraps
 from typing import Callable, Any, TypeVar
 
+from typing import Any, List, Dict, Optional
+import asyncio
 F = TypeVar("F", bound=Callable[..., Any])
 logger = logging.getLogger("centralized.decorator")
 
 def centralized_logging_metrics_exception(func: F) -> F:
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         start_time = time.time()
         try:
             result = func(*args, **kwargs)

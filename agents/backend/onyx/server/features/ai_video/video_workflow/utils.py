@@ -1,16 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+from typing import Any, Dict, Optional
+from datetime import datetime
+from ...models import VideoRequest, VideoResponse
+from .generator import OnyxVideoGenerator
+from .core.models import GeneratorStatus
+from typing import Any, List, Dict, Optional
+import logging
 """
 Onyx Video Workflow - Utilities
 
 Utility functions and helpers for the Onyx video workflow system.
 """
 
-import asyncio
-from typing import Any, Dict, Optional
-from datetime import datetime
 
-from ...models import VideoRequest, VideoResponse
-from .generator import OnyxVideoGenerator
-from .core.models import GeneratorStatus
 
 
 # Global generator instances
@@ -102,7 +109,7 @@ async def cleanup_onyx_video_system(workflow_type: Optional[str] = None) -> None
         onyx_video_generators.clear()
 
 
-async def create_video_request(
+async async def create_video_request(
     input_text: str,
     user_id: str,
     quality: str = "medium",

@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Pydantic Schemas
-Product Descriptions Feature - Comprehensive Input/Output Validation and Response Schemas
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import logging
 from typing import Dict, Any, Optional, List, Union, Literal
@@ -10,8 +15,19 @@ from datetime import datetime, timedelta
 from enum import Enum
 from pathlib import Path
 import uuid
-
 from pydantic import (
+        import re
+        import re
+    import re
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Pydantic Schemas
+Product Descriptions Feature - Comprehensive Input/Output Validation and Response Schemas
+"""
+
+
     BaseModel, 
     Field, 
     validator, 
@@ -151,7 +167,7 @@ class GitFileInfo(BaseModel):
     staged: bool = Field(default=False, description="Whether file is staged")
     
     @validator('path')
-    def validate_path(cls, v):
+    def validate_path(cls, v) -> bool:
         if not v or not v.strip():
             raise ValueError("File path cannot be empty")
         return v.strip()
@@ -178,7 +194,7 @@ class GitStatusRequest(BaseRequestModel):
     )
     
     @validator('max_files')
-    def validate_max_files(cls, v):
+    def validate_max_files(cls, v) -> bool:
         if v is not None and (v < 1 or v > 1000):
             raise ValueError("max_files must be between 1 and 1000")
         return v
@@ -217,7 +233,7 @@ class CreateBranchRequest(BaseRequestModel):
     )
     
     @validator('branch_name')
-    def validate_branch_name(cls, v):
+    def validate_branch_name(cls, v) -> bool:
         # Git branch naming rules
         if not v or not v.strip():
             raise ValueError("Branch name cannot be empty")
@@ -236,7 +252,7 @@ class CreateBranchRequest(BaseRequestModel):
         return v.strip()
     
     @validator('base_branch')
-    def validate_base_branch(cls, v):
+    def validate_base_branch(cls, v) -> bool:
         if not v or not v.strip():
             raise ValueError("Base branch cannot be empty")
         return v.strip()
@@ -277,7 +293,7 @@ class CommitChangesRequest(BaseRequestModel):
     )
     
     @validator('message')
-    def validate_message(cls, v):
+    def validate_message(cls, v) -> bool:
         if not v or not v.strip():
             raise ValueError("Commit message cannot be empty")
         
@@ -289,7 +305,7 @@ class CommitChangesRequest(BaseRequestModel):
         return v.strip()
     
     @validator('files')
-    def validate_files(cls, v):
+    def validate_files(cls, v) -> bool:
         if v is not None:
             if not v:
                 raise ValueError("Files list cannot be empty if specified")
@@ -334,12 +350,11 @@ class ModelVersion(BaseModel):
     checksum: Optional[str] = Field(default=None, description="Model file checksum")
     
     @validator('version')
-    def validate_version(cls, v):
+    def validate_version(cls, v) -> bool:
         if not v or not v.strip():
             raise ValueError("Version cannot be empty")
         
         # Semantic versioning pattern
-        import re
         semver_pattern = r'^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$'
         if not re.match(semver_pattern, v):
             raise ValueError("Version should follow semantic versioning (e.g., 1.0.0)")
@@ -347,7 +362,7 @@ class ModelVersion(BaseModel):
         return v.strip()
     
     @validator('tags')
-    def validate_tags(cls, v):
+    def validate_tags(cls, v) -> bool:
         if v:
             # Remove duplicates and empty strings
             unique_tags = list(set(tag.strip() for tag in v if tag.strip()))
@@ -380,12 +395,11 @@ class ModelVersionRequest(BaseRequestModel):
     )
     
     @validator('model_name')
-    def validate_model_name(cls, v):
+    def validate_model_name(cls, v) -> bool:
         if not v or not v.strip():
             raise ValueError("Model name cannot be empty")
         
         # Model naming rules
-        import re
         if not re.match(r'^[a-zA-Z0-9_-]+$', v):
             raise ValueError("Model name can only contain letters, numbers, underscores, and hyphens")
         
@@ -451,7 +465,7 @@ class BatchProcessRequest(BaseRequestModel):
     )
     
     @validator('items')
-    def validate_items(cls, v):
+    def validate_items(cls, v) -> bool:
         if not v:
             raise ValueError("Items list cannot be empty")
         if len(v) > 10000:
@@ -652,7 +666,6 @@ def validate_field_length(value: str, field_name: str, min_length: int = 1, max_
 
 def validate_email_format(email: str) -> str:
     """Validate email format"""
-    import re
     email_pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     if not re.match(email_pattern, email):
         raise ValueError("Invalid email format")
@@ -665,7 +678,7 @@ def validate_url_format(url: str) -> str:
     return url
 
 # Schema factory functions
-def create_git_status_request(
+async def create_git_status_request(
     include_untracked: bool = True,
     include_ignored: bool = False,
     include_staged: bool = True,
@@ -679,7 +692,7 @@ def create_git_status_request(
         max_files=max_files
     )
 
-def create_branch_request(
+async def create_branch_request(
     branch_name: str,
     base_branch: str = "main",
     checkout: bool = True,
@@ -693,7 +706,7 @@ def create_branch_request(
         push_remote=push_remote
     )
 
-def create_commit_request(
+async def create_commit_request(
     message: str,
     files: Optional[List[str]] = None,
     include_untracked: bool = True,
@@ -707,7 +720,7 @@ def create_commit_request(
         amend=amend
     )
 
-def create_model_version_request(
+async def create_model_version_request(
     model_name: str,
     version: str,
     description: Optional[str] = None,
@@ -723,7 +736,7 @@ def create_model_version_request(
         status=status
     )
 
-def create_batch_process_request(
+async def create_batch_process_request(
     items: List[Any],
     operation: OperationType,
     batch_size: int = 10,

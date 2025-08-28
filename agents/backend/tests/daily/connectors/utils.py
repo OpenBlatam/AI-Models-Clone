@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from collections.abc import Iterator
 from typing import cast
 from typing import TypeVar
@@ -11,6 +16,9 @@ from onyx.connectors.models import Document
 from onyx.connectors.models import ImageSection
 from onyx.connectors.models import TextSection
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 _ITERATION_LIMIT = 100_000
 
 CT = TypeVar("CT", bound=ConnectorCheckpoint)

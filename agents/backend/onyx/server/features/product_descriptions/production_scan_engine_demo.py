@@ -1,7 +1,7 @@
-"""
-Production-Grade Cybersecurity Scan Engine Demo
-Comprehensive demonstration of enterprise security scanning capabilities
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import json
@@ -9,8 +9,15 @@ import time
 import uuid
 from typing import List, Dict, Any
 from dataclasses import asdict
-
 from production_scan_engine import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Production-Grade Cybersecurity Scan Engine Demo
+Comprehensive demonstration of enterprise security scanning capabilities
+"""
+
+
     ProductionScanEngine,
     ProductionScanConfiguration,
     ScanTarget,
@@ -28,11 +35,11 @@ from production_scan_engine import (
 class ProductionScanEngineDemo:
     """Comprehensive demo of production scan engine capabilities"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.engine = None
         self.demo_results = []
         
-    async def setup_engine(self):
+    async def setup_engine(self) -> Any:
         """Setup production scan engine with demo configuration"""
         print("🚀 Setting up Production Scan Engine...")
         
@@ -124,7 +131,7 @@ class ProductionScanEngineDemo:
         
         return targets
     
-    async def demo_basic_scan(self):
+    async def demo_basic_scan(self) -> Any:
         """Demo basic scanning functionality"""
         print("🔍 Demo 1: Basic Security Scan")
         print("=" * 50)
@@ -150,7 +157,7 @@ class ProductionScanEngineDemo:
         
         return results
     
-    async def demo_concurrent_scanning(self):
+    async def demo_concurrent_scanning(self) -> Any:
         """Demo concurrent scanning capabilities"""
         print("⚡ Demo 2: Concurrent Scanning")
         print("=" * 50)
@@ -175,7 +182,7 @@ class ProductionScanEngineDemo:
         
         return results
     
-    async def demo_error_handling(self):
+    async def demo_error_handling(self) -> Any:
         """Demo error handling and resilience"""
         print("🛡️ Demo 3: Error Handling & Resilience")
         print("=" * 50)
@@ -206,7 +213,7 @@ class ProductionScanEngineDemo:
         
         return results
     
-    async def demo_scan_cancellation(self):
+    async def demo_scan_cancellation(self) -> Any:
         """Demo scan cancellation functionality"""
         print("⏹️ Demo 4: Scan Cancellation")
         print("=" * 50)
@@ -245,7 +252,7 @@ class ProductionScanEngineDemo:
         print()
         return results
     
-    async def demo_health_monitoring(self):
+    async def demo_health_monitoring(self) -> Any:
         """Demo health monitoring capabilities"""
         print("🏥 Demo 5: Health Monitoring")
         print("=" * 50)
@@ -286,7 +293,7 @@ class ProductionScanEngineDemo:
         
         return health_status
     
-    async def demo_fastapi_integration(self):
+    async async def demo_fastapi_integration(self) -> Any:
         """Demo FastAPI integration"""
         print("🌐 Demo 6: FastAPI Integration")
         print("=" * 50)
@@ -468,7 +475,7 @@ class ProductionScanEngineDemo:
                 print(f"  Error: {result.error_message}")
                 print()
     
-    async def run_comprehensive_demo(self):
+    async def run_comprehensive_demo(self) -> Any:
         """Run comprehensive demo of all features"""
         print("🎯 Production-Grade Cybersecurity Scan Engine - Comprehensive Demo")
         print("=" * 80)
@@ -514,7 +521,7 @@ class ProductionScanEngineDemo:
                 await self.engine.shutdown()
                 print("🧹 Engine shutdown completed")
     
-    async def _display_final_summary(self):
+    async def _display_final_summary(self) -> Any:
         """Display final demo summary"""
         print("🎉 Demo Summary")
         print("=" * 50)

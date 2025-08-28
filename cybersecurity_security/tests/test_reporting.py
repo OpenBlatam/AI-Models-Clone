@@ -1,14 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import pytest
+import asyncio
+import json
+from unittest.mock import patch, MagicMock
+from cybersecurity_security.reporting import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Tests for Reporting Module
 
 Tests console, HTML, JSON, and report aggregation functionality.
 """
 
-import pytest
-import asyncio
-import json
-from unittest.mock import patch, MagicMock
-from cybersecurity_security.reporting import (
     # Console Reporter
     ConsoleReportRequest, ConsoleReportResult, ConsoleReportLevel,
     generate_console_report_async, print_security_summary,
@@ -37,7 +41,7 @@ from cybersecurity_security.reporting import (
 class TestConsoleReporter:
     """Test suite for console reporter."""
     
-    def test_console_report_request_creation(self):
+    async def test_console_report_request_creation(self) -> Any:
         """Test ConsoleReportRequest creation."""
         request = ConsoleReportRequest(
             scan_results={"scans": []},
@@ -51,7 +55,7 @@ class TestConsoleReporter:
         assert request.color_output is True
     
     @pytest.mark.asyncio
-    async def test_generate_console_report_async(self):
+    async def test_generate_console_report_async(self) -> Any:
         """Test console report generation."""
         request = ConsoleReportRequest(
             scan_results={
@@ -75,7 +79,7 @@ class TestConsoleReporter:
         assert "scan_results" in result.sections_processed
     
     @pytest.mark.asyncio
-    async def test_print_security_summary(self):
+    async def test_print_security_summary(self) -> Any:
         """Test security summary printing."""
         scan_results = {
             "scans": [
@@ -99,7 +103,7 @@ class TestConsoleReporter:
         assert "1/2 successful" in summary  # 1 successful scan out of 2
     
     @pytest.mark.asyncio
-    async def test_print_vulnerability_details(self):
+    async def test_print_vulnerability_details(self) -> Any:
         """Test vulnerability details printing."""
         vulnerability_data = [
             {
@@ -121,7 +125,7 @@ class TestConsoleReporter:
         assert "HIGH" in vuln_details
     
     @pytest.mark.asyncio
-    async def test_print_scan_results(self):
+    async def test_print_scan_results(self) -> Any:
         """Test scan results printing."""
         scan_results = {
             "scans": [
@@ -147,7 +151,7 @@ class TestConsoleReporter:
 class TestHTMLReporter:
     """Test suite for HTML reporter."""
     
-    def test_html_report_request_creation(self):
+    async def test_html_report_request_creation(self) -> Any:
         """Test HTMLReportRequest creation."""
         request = HTMLReportRequest(
             scan_results={"scans": []},
@@ -161,7 +165,7 @@ class TestHTMLReporter:
         assert request.include_timeline is True
     
     @pytest.mark.asyncio
-    async def test_generate_html_report_async(self):
+    async def test_generate_html_report_async(self) -> Any:
         """Test HTML report generation."""
         request = HTMLReportRequest(
             scan_results={
@@ -185,7 +189,7 @@ class TestHTMLReporter:
         assert "executive_summary" in result.sections_included
     
     @pytest.mark.asyncio
-    async def test_create_executive_summary(self):
+    async def test_create_executive_summary(self) -> Any:
         """Test executive summary creation."""
         scan_results = {
             "scans": [
@@ -208,7 +212,7 @@ class TestHTMLReporter:
         assert "2" in summary  # 2 vulnerabilities
     
     @pytest.mark.asyncio
-    async def test_create_vulnerability_table(self):
+    async def test_create_vulnerability_table(self) -> Any:
         """Test vulnerability table creation."""
         vulnerability_data = [
             {
@@ -228,7 +232,7 @@ class TestHTMLReporter:
         assert "high" in table.lower()
     
     @pytest.mark.asyncio
-    async def test_create_scan_summary(self):
+    async def test_create_scan_summary(self) -> Any:
         """Test scan summary creation."""
         scan_results = {
             "scans": [
@@ -251,7 +255,7 @@ class TestHTMLReporter:
 class TestJSONReporter:
     """Test suite for JSON reporter."""
     
-    def test_json_report_request_creation(self):
+    async def test_json_report_request_creation(self) -> Any:
         """Test JSONReportRequest creation."""
         request = JSONReportRequest(
             scan_results={"scans": []},
@@ -265,7 +269,7 @@ class TestJSONReporter:
         assert request.include_statistics is True
     
     @pytest.mark.asyncio
-    async def test_generate_json_report_async(self):
+    async def test_generate_json_report_async(self) -> Any:
         """Test JSON report generation."""
         request = JSONReportRequest(
             scan_results={
@@ -292,7 +296,7 @@ class TestJSONReporter:
         assert "scan_results" in report_data
     
     @pytest.mark.asyncio
-    async def test_export_scan_data(self):
+    async def test_export_scan_data(self) -> Any:
         """Test scan data export."""
         scan_results = {
             "scans": [
@@ -325,7 +329,7 @@ class TestJSONReporter:
         assert minimal_data["total_scans"] == 1
     
     @pytest.mark.asyncio
-    async def test_export_vulnerability_data(self):
+    async def test_export_vulnerability_data(self) -> Any:
         """Test vulnerability data export."""
         vulnerability_data = [
             {
@@ -363,7 +367,7 @@ class TestJSONReporter:
         assert minimal_data["total_vulnerabilities"] == 2
     
     @pytest.mark.asyncio
-    async def test_create_structured_report(self):
+    async def test_create_structured_report(self) -> Any:
         """Test structured report creation."""
         scan_results = {
             "scans": [
@@ -389,7 +393,7 @@ class TestJSONReporter:
 class TestReportAggregator:
     """Test suite for report aggregator."""
     
-    def test_report_aggregator_request_creation(self):
+    async def test_report_aggregator_request_creation(self) -> Any:
         """Test ReportAggregatorRequest creation."""
         request = ReportAggregatorRequest(
             console_report={"content": "test"},
@@ -404,7 +408,7 @@ class TestReportAggregator:
         assert request.generate_timeline is True
     
     @pytest.mark.asyncio
-    async def test_aggregate_reports_async(self):
+    async def test_aggregate_reports_async(self) -> Any:
         """Test report aggregation."""
         request = ReportAggregatorRequest(
             scan_results={
@@ -429,7 +433,7 @@ class TestReportAggregator:
         assert "vulnerability_data" in result.reports_combined
     
     @pytest.mark.asyncio
-    async def test_combine_scan_results(self):
+    async def test_combine_scan_results(self) -> Any:
         """Test scan results combination."""
         scan_results = {
             "scans": [
@@ -459,7 +463,7 @@ class TestReportAggregator:
         assert "vuln_scan" in combined["scan_types"]
     
     @pytest.mark.asyncio
-    async def test_merge_vulnerability_data(self):
+    async def test_merge_vulnerability_data(self) -> Any:
         """Test vulnerability data merging."""
         vulnerability_data = [
             {
@@ -492,7 +496,7 @@ class TestReportAggregator:
         assert merged["risk_assessment"]["overall_risk_level"] == "MEDIUM"
     
     @pytest.mark.asyncio
-    async def test_generate_executive_summary(self):
+    async def test_generate_executive_summary(self) -> Any:
         """Test executive summary generation."""
         scan_results = {
             "scans": [
@@ -517,7 +521,7 @@ class TestReportAggregator:
         assert summary["assessment_overview"]["overall_risk_level"] == "CRITICAL"
     
     @pytest.mark.asyncio
-    async def test_create_comprehensive_report(self):
+    async def test_create_comprehensive_report(self) -> Any:
         """Test comprehensive report creation."""
         vulnerability_data = [
             {"title": "SQL Injection", "severity": "high", "type": "injection"},
@@ -545,7 +549,7 @@ class TestReportingIntegration:
     """Integration tests for reporting modules."""
     
     @pytest.mark.asyncio
-    async def test_multiple_report_formats(self):
+    async def test_multiple_report_formats(self) -> Any:
         """Test generating multiple report formats."""
         # Sample data
         scan_results = {
@@ -591,7 +595,7 @@ class TestReportingIntegration:
         assert "report_metadata" in json.loads(json_result.json_content)
     
     @pytest.mark.asyncio
-    async def test_report_aggregation_workflow(self):
+    async def test_report_aggregation_workflow(self) -> Any:
         """Test complete report aggregation workflow."""
         # Sample data
         scan_results = {

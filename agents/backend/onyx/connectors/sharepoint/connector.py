@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import io
 import os
 from datetime import datetime
@@ -24,6 +32,9 @@ from onyx.file_processing.extract_file_text import extract_file_text
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -121,7 +132,7 @@ class SharepointConnector(LoadConnector, PollConnector):
                 )
         return site_data_list
 
-    def _fetch_driveitems(
+    async def _fetch_driveitems(
         self,
         site_descriptor: SiteDescriptor,
         start: datetime | None = None,
@@ -227,7 +238,7 @@ class SharepointConnector(LoadConnector, PollConnector):
 
         return final_driveitems
 
-    def _fetch_sites(self) -> list[SiteDescriptor]:
+    async def _fetch_sites(self) -> list[SiteDescriptor]:
         sites = self.graph_client.sites.get_all().execute_query()
         site_descriptors = [
             SiteDescriptor(
@@ -238,7 +249,7 @@ class SharepointConnector(LoadConnector, PollConnector):
         ]
         return site_descriptors
 
-    def _fetch_from_sharepoint(
+    async def _fetch_from_sharepoint(
         self, start: datetime | None = None, end: datetime | None = None
     ) -> GenerateDocumentsOutput:
         site_descriptors = self.site_descriptors or self._fetch_sites()

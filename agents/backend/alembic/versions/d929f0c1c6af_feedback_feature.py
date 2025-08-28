@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import fastapi_users_db_sqlalchemy
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Feedback Feature
 
 Revision ID: d929f0c1c6af
@@ -6,9 +19,6 @@ Create Date: 2023-08-27 13:03:54.274987
 
 """
 
-import fastapi_users_db_sqlalchemy
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
@@ -37,6 +47,11 @@ def upgrade() -> None:
         sa.Column(
             "user_id",
             fastapi_users_db_sqlalchemy.generics.GUID(),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             nullable=True,
         ),
         sa.Column(

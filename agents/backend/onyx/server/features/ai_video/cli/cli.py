@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import argparse
+import signal
+from typing import Optional
+from onyx.utils.logger import setup_logger
+from onyx.utils.telemetry import TelemetryLogger
+from .commands import (
+from ..onyx_main import get_system
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Onyx AI Video System - CLI Main Class
@@ -6,21 +18,13 @@ Main command-line interface class for the Onyx-adapted AI Video system.
 Provides initialization, shutdown, and command routing.
 """
 
-import asyncio
-import argparse
-import signal
-from typing import Optional
 
 # Onyx imports
-from onyx.utils.logger import setup_logger
-from onyx.utils.telemetry import TelemetryLogger
 
 # Local imports
-from .commands import (
     start_system, show_status, show_metrics, handle_config,
     generate_video, handle_plugins, run_tests, health_check
 )
-from ..onyx_main import get_system
 
 logger = setup_logger(__name__)
 
@@ -33,7 +37,7 @@ class OnyxAIVideoCLI:
     and video generation operations.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = setup_logger("onyx_ai_video_cli")
         self.telemetry = TelemetryLogger()
         self.system: Optional[object] = None

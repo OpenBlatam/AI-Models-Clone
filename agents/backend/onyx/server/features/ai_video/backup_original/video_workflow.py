@@ -1,3 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+import time
+from datetime import datetime
+from typing import Optional, Dict, Any, List, Callable
+from dataclasses import dataclass, field
+from enum import Enum
+from .web_extract import WebContentExtractor, ExtractedContent
+from .suggestions import ContentSuggestions, SuggestionEngine
+from .video_generator import VideoGenerator, VideoGenerationResult
+from .state_repository import StateRepository, FileStateRepository
+from .metrics import record_extraction_metrics, record_generation_metrics, record_workflow_metrics
+            from urllib.parse import urlparse
+        import uuid
+    import argparse
+    import sys
+    import asyncio
+    from pathlib import Path
+    from datetime import datetime
+            import traceback
+from typing import Any, List, Dict, Optional
 """
 AI Video Workflow - Complete Pipeline for Video Generation
 
@@ -9,19 +35,7 @@ This module orchestrates the entire video generation pipeline:
 5. Comprehensive metrics and monitoring
 """
 
-import asyncio
-import logging
-import time
-from datetime import datetime
-from typing import Optional, Dict, Any, List, Callable
-from dataclasses import dataclass, field
-from enum import Enum
 
-from .web_extract import WebContentExtractor, ExtractedContent
-from .suggestions import ContentSuggestions, SuggestionEngine
-from .video_generator import VideoGenerator, VideoGenerationResult
-from .state_repository import StateRepository, FileStateRepository
-from .metrics import record_extraction_metrics, record_generation_metrics, record_workflow_metrics
 
 logger = logging.getLogger(__name__)
 
@@ -112,7 +126,9 @@ class VideoWorkflow:
         state_repository: StateRepository,
         hooks: Optional[WorkflowHooks] = None
     ):
-        self.extractor = extractor
+        
+    """__init__ function."""
+self.extractor = extractor
         self.suggestion_engine = suggestion_engine
         self.video_generator = video_generator
         self.state_repository = state_repository
@@ -278,7 +294,6 @@ class VideoWorkflow:
     def _extract_domain(self, url: str) -> str:
         """Extract domain from URL for metrics tracking."""
         try:
-            from urllib.parse import urlparse
             return urlparse(url).netloc
         except:
             return "unknown"
@@ -301,7 +316,6 @@ async def run_full_workflow(
     
     # Generate workflow ID if not provided
     if not workflow_id:
-        import uuid
         workflow_id = f"workflow_{uuid.uuid4().hex[:8]}"
     
     # Create components
@@ -324,13 +338,8 @@ async def run_full_workflow(
 
 # --- CLI for Testing ---
 if __name__ == "__main__":
-    import argparse
-    import sys
-    import asyncio
-    from pathlib import Path
-    from datetime import datetime
 
-    async def start_workflow(args):
+    async def start_workflow(args) -> Any:
         """Start a new workflow."""
         print(f"🚀 Starting new workflow for URL: {args.url}")
         print(f"📝 Workflow ID: {args.workflow_id or 'auto-generated'}")
@@ -356,7 +365,7 @@ if __name__ == "__main__":
             print(f"❌ Workflow failed: {e}")
             sys.exit(1)
 
-    async def resume_workflow(args):
+    async def resume_workflow(args) -> Any:
         """Resume an existing workflow."""
         print(f"🔄 Resuming workflow: {args.workflow_id}")
         print("-" * 50)
@@ -377,7 +386,7 @@ if __name__ == "__main__":
             print(f"❌ Resume failed: {e}")
             sys.exit(1)
 
-    def list_workflows(args):
+    def list_workflows(args) -> List[Any]:
         """List all workflows."""
         repo = FileStateRepository(directory='.workflow_state')
         state_dir = Path('.workflow_state')
@@ -406,7 +415,7 @@ if __name__ == "__main__":
             except Exception as e:
                 print(f"❌ Error reading {workflow_file.name}: {e}")
 
-    def show_status(args):
+    def show_status(args) -> Any:
         """Show detailed status of a workflow."""
         repo = FileStateRepository(directory='.workflow_state')
         state = repo.load(args.workflow_id)
@@ -446,7 +455,7 @@ if __name__ == "__main__":
         if state.video_url:
             print(f"🎬 Video: {state.video_url}")
 
-    def clean_workflows(args):
+    def clean_workflows(args) -> Any:
         """Clean old workflow states."""
         repo = FileStateRepository(directory='.workflow_state')
         state_dir = Path('.workflow_state')
@@ -546,6 +555,5 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"❌ Unexpected error: {e}")
         if args.debug:
-            import traceback
             traceback.print_exc()
         sys.exit(1) 

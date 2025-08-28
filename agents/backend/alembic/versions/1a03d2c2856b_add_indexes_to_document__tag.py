@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add indexes to document__tag
 
 Revision ID: 1a03d2c2856b
@@ -6,11 +12,10 @@ Create Date: 2025-02-18 10:45:13.957807
 
 """
 
-from alembic import op
 
 # revision identifiers, used by Alembic.
-revision = "1a03d2c2856b"
-down_revision = "9c00a2bccb83"
+revision: str = "1a03d2c2856b"
+down_revision: str = "9c00a2bccb83"
 branch_labels: None = None
 depends_on: None = None
 
@@ -25,4 +30,4 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
-    op.drop_index(op.f("ix_document__tag_tag_id"), table_name="document__tag")
+    op.drop_index(op.f("ix_document__tag_tag_id"), table_name: str = "document__tag")

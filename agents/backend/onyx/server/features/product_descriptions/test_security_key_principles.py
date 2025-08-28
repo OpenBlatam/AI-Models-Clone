@@ -1,7 +1,13 @@
-"""
-Test Suite for Security Key Principles
-Comprehensive testing for cybersecurity key principles implementation
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -9,11 +15,18 @@ import time
 import uuid
 from unittest.mock import Mock, patch, AsyncMock
 from typing import Dict, List, Any
-
 import pytest
 from fastapi.testclient import TestClient
-
 from security_key_principles import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Test Suite for Security Key Principles
+Comprehensive testing for cybersecurity key principles implementation
+"""
+
+
+
     SecurityKeyPrinciples, SecurityControl, SecurityLayer, SecurityPrinciple,
     ThreatLevel, DefenseInDepth, ZeroTrustArchitecture, LeastPrivilegeAccess,
     SecurityByDesign, FailSecure, PrivacyByDesign, SecurityAwareness,
@@ -24,7 +37,7 @@ from security_key_principles import (
 class TestSecurityControl:
     """Test SecurityControl class"""
     
-    def test_security_control_creation(self):
+    def test_security_control_creation(self) -> Any:
         """Test security control creation"""
         control = SecurityControl(
             name="Test Firewall",
@@ -42,7 +55,7 @@ class TestSecurityControl:
         assert control.enabled is True
         assert control.id is not None
     
-    def test_security_control_defaults(self):
+    def test_security_control_defaults(self) -> Any:
         """Test security control default values"""
         control = SecurityControl()
         
@@ -54,7 +67,7 @@ class TestSecurityControl:
         assert control.enabled is True
         assert control.id is not None
     
-    def test_security_control_unique_ids(self):
+    def test_security_control_unique_ids(self) -> Any:
         """Test that security controls have unique IDs"""
         control1 = SecurityControl()
         control2 = SecurityControl()
@@ -65,11 +78,11 @@ class TestSecurityControl:
 class TestDefenseInDepth:
     """Test DefenseInDepth class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.defense = DefenseInDepth()
     
-    def test_add_control(self):
+    def test_add_control(self) -> Any:
         """Test adding security control"""
         control = SecurityControl(
             name="Test Control",
@@ -82,7 +95,7 @@ class TestDefenseInDepth:
         assert control.id in self.defense.controls
         assert control in self.defense.layers[SecurityLayer.NETWORK]
     
-    def test_remove_control(self):
+    def test_remove_control(self) -> Any:
         """Test removing security control"""
         control = SecurityControl(
             name="Test Control",
@@ -96,7 +109,7 @@ class TestDefenseInDepth:
         assert control.id not in self.defense.controls
         assert control not in self.defense.layers[SecurityLayer.NETWORK]
     
-    def test_get_layer_controls(self):
+    def test_get_layer_controls(self) -> Optional[Dict[str, Any]]:
         """Test getting controls for specific layer"""
         control1 = SecurityControl(name="Control 1", layer=SecurityLayer.NETWORK)
         control2 = SecurityControl(name="Control 2", layer=SecurityLayer.APPLICATION)
@@ -112,12 +125,12 @@ class TestDefenseInDepth:
         assert control1 in network_controls
         assert control2 in application_controls
     
-    def test_assess_layer_security_empty(self):
+    def test_assess_layer_security_empty(self) -> Any:
         """Test assessing empty layer security"""
         score = self.defense.assess_layer_security(SecurityLayer.NETWORK)
         assert score == 0.0
     
-    def test_assess_layer_security_with_controls(self):
+    def test_assess_layer_security_with_controls(self) -> Any:
         """Test assessing layer security with controls"""
         control1 = SecurityControl(effectiveness=0.8)
         control2 = SecurityControl(effectiveness=0.6)
@@ -128,7 +141,7 @@ class TestDefenseInDepth:
         score = self.defense.assess_layer_security(SecurityLayer.NETWORK)
         assert score == 0.7  # (0.8 + 0.6) / 2
     
-    def test_assess_overall_security(self):
+    def test_assess_overall_security(self) -> Any:
         """Test assessing overall security"""
         control = SecurityControl(effectiveness=0.9)
         self.defense.add_control(control)
@@ -138,7 +151,7 @@ class TestDefenseInDepth:
         assert SecurityLayer.NETWORK in scores
         assert scores[SecurityLayer.NETWORK] == 0.9
     
-    def test_get_weakest_layer(self):
+    def test_get_weakest_layer(self) -> Optional[Dict[str, Any]]:
         """Test identifying weakest layer"""
         control1 = SecurityControl(effectiveness=0.9)
         control2 = SecurityControl(effectiveness=0.3)
@@ -154,11 +167,11 @@ class TestDefenseInDepth:
 class TestZeroTrustArchitecture:
     """Test ZeroTrustArchitecture class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.zero_trust = ZeroTrustArchitecture()
     
-    def test_create_trust_zone(self):
+    def test_create_trust_zone(self) -> Any:
         """Test creating trust zone"""
         self.zero_trust.create_trust_zone("test_zone", "Test Zone", "Test description")
         
@@ -167,7 +180,7 @@ class TestZeroTrustArchitecture:
         assert zone["name"] == "Test Zone"
         assert zone["description"] == "Test description"
     
-    def test_define_access_policy(self):
+    def test_define_access_policy(self) -> Any:
         """Test defining access policy"""
         self.zero_trust.create_trust_zone("test_zone", "Test Zone", "Test description")
         
@@ -179,26 +192,26 @@ class TestZeroTrustArchitecture:
         assert policy["zone_id"] == "test_zone"
         assert policy["rules"] == rules
     
-    def test_define_access_policy_invalid_zone(self):
+    def test_define_access_policy_invalid_zone(self) -> Any:
         """Test defining access policy for invalid zone"""
         rules = [{"type": "user_identity", "allowed_users": ["admin"]}]
         
         with pytest.raises(ValueError, match="Trust zone invalid_zone does not exist"):
             self.zero_trust.define_access_policy("policy_1", "invalid_zone", rules)
     
-    def test_verify_access_no_zone(self):
+    def test_verify_access_no_zone(self) -> Any:
         """Test access verification for non-existent zone"""
         result = self.zero_trust.verify_access("user", "resource", "invalid_zone")
         assert result is False
     
-    def test_verify_access_no_policies(self):
+    def test_verify_access_no_policies(self) -> Any:
         """Test access verification with no policies"""
         self.zero_trust.create_trust_zone("test_zone", "Test Zone", "Test description")
         
         result = self.zero_trust.verify_access("user", "resource", "test_zone")
         assert result is False
     
-    def test_verify_access_with_policy(self):
+    def test_verify_access_with_policy(self) -> Any:
         """Test access verification with valid policy"""
         self.zero_trust.create_trust_zone("test_zone", "Test Zone", "Test description")
         
@@ -213,7 +226,7 @@ class TestZeroTrustArchitecture:
         result = self.zero_trust.verify_access("user", "resource", "test_zone")
         assert result is False
     
-    def test_verify_access_time_based(self):
+    def test_verify_access_time_based(self) -> Any:
         """Test time-based access verification"""
         self.zero_trust.create_trust_zone("test_zone", "Test Zone", "Test description")
         
@@ -229,7 +242,7 @@ class TestZeroTrustArchitecture:
         result = self.zero_trust.verify_access("user", "resource", "test_zone")
         assert result is True
     
-    def test_verify_access_time_expired(self):
+    def test_verify_access_time_expired(self) -> Any:
         """Test time-based access verification with expired time"""
         self.zero_trust.create_trust_zone("test_zone", "Test Zone", "Test description")
         
@@ -249,11 +262,11 @@ class TestZeroTrustArchitecture:
 class TestLeastPrivilegeAccess:
     """Test LeastPrivilegeAccess class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.least_privilege = LeastPrivilegeAccess()
     
-    def test_create_role(self):
+    def test_create_role(self) -> Any:
         """Test creating role"""
         self.least_privilege.create_role("admin", "Administrator", "Full access")
         
@@ -263,7 +276,7 @@ class TestLeastPrivilegeAccess:
         assert role["description"] == "Full access"
         assert role["enabled"] is True
     
-    def test_define_permission(self):
+    def test_define_permission(self) -> Any:
         """Test defining permission"""
         self.least_privilege.define_permission("read_data", "database", "read")
         
@@ -272,7 +285,7 @@ class TestLeastPrivilegeAccess:
         assert permission["resource"] == "database"
         assert permission["action"] == "read"
     
-    def test_assign_permission_to_role(self):
+    def test_assign_permission_to_role(self) -> Any:
         """Test assigning permission to role"""
         self.least_privilege.create_role("admin", "Administrator", "Full access")
         self.least_privilege.define_permission("read_data", "database", "read")
@@ -282,21 +295,21 @@ class TestLeastPrivilegeAccess:
         role = self.least_privilege.roles["admin"]
         assert "read_data" in role["permissions"]
     
-    def test_assign_permission_to_invalid_role(self):
+    def test_assign_permission_to_invalid_role(self) -> Any:
         """Test assigning permission to invalid role"""
         self.least_privilege.define_permission("read_data", "database", "read")
         
         with pytest.raises(ValueError, match="Role invalid_role does not exist"):
             self.least_privilege.assign_permission_to_role("invalid_role", "read_data")
     
-    def test_assign_invalid_permission_to_role(self):
+    def test_assign_invalid_permission_to_role(self) -> Any:
         """Test assigning invalid permission to role"""
         self.least_privilege.create_role("admin", "Administrator", "Full access")
         
         with pytest.raises(ValueError, match="Permission invalid_permission does not exist"):
             self.least_privilege.assign_permission_to_role("admin", "invalid_permission")
     
-    def test_assign_role_to_user(self):
+    def test_assign_role_to_user(self) -> Any:
         """Test assigning role to user"""
         self.least_privilege.create_role("admin", "Administrator", "Full access")
         
@@ -305,17 +318,17 @@ class TestLeastPrivilegeAccess:
         assert "user_123" in self.least_privilege.user_roles
         assert "admin" in self.least_privilege.user_roles["user_123"]
     
-    def test_assign_invalid_role_to_user(self):
+    def test_assign_invalid_role_to_user(self) -> Any:
         """Test assigning invalid role to user"""
         with pytest.raises(ValueError, match="Role invalid_role does not exist"):
             self.least_privilege.assign_role_to_user("user_123", "invalid_role")
     
-    def test_check_permission_no_roles(self):
+    def test_check_permission_no_roles(self) -> Any:
         """Test permission check for user with no roles"""
         result = self.least_privilege.check_permission("user", "database", "read")
         assert result is False
     
-    def test_check_permission_with_role(self):
+    def test_check_permission_with_role(self) -> Any:
         """Test permission check for user with role"""
         self.least_privilege.create_role("admin", "Administrator", "Full access")
         self.least_privilege.define_permission("read_data", "database", "read")
@@ -325,7 +338,7 @@ class TestLeastPrivilegeAccess:
         result = self.least_privilege.check_permission("user_123", "database", "read")
         assert result is True
     
-    def test_check_permission_disabled_role(self):
+    def test_check_permission_disabled_role(self) -> Any:
         """Test permission check with disabled role"""
         self.least_privilege.create_role("admin", "Administrator", "Full access")
         self.least_privilege.define_permission("read_data", "database", "read")
@@ -338,7 +351,7 @@ class TestLeastPrivilegeAccess:
         result = self.least_privilege.check_permission("user_123", "database", "read")
         assert result is False
     
-    def test_audit_user_permissions(self):
+    def test_audit_user_permissions(self) -> Any:
         """Test auditing user permissions"""
         self.least_privilege.create_role("admin", "Administrator", "Full access")
         self.least_privilege.define_permission("read_data", "database", "read")
@@ -352,7 +365,7 @@ class TestLeastPrivilegeAccess:
         assert len(audit["permissions"]) == 1
         assert audit["permission_count"] == 1
     
-    def test_audit_user_permissions_no_user(self):
+    def test_audit_user_permissions_no_user(self) -> Any:
         """Test auditing permissions for non-existent user"""
         audit = self.least_privilege.audit_user_permissions("invalid_user")
         
@@ -365,11 +378,11 @@ class TestLeastPrivilegeAccess:
 class TestSecurityByDesign:
     """Test SecurityByDesign class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.security_by_design = SecurityByDesign()
     
-    def test_define_security_requirement(self):
+    def test_define_security_requirement(self) -> Any:
         """Test defining security requirement"""
         self.security_by_design.define_security_requirement(
             "req_001", "Data Encryption", "Encrypt all sensitive data", "high", "data_protection"
@@ -381,7 +394,7 @@ class TestSecurityByDesign:
         assert req["priority"] == "high"
         assert req["category"] == "data_protection"
     
-    def test_create_threat_model(self):
+    def test_create_threat_model(self) -> Any:
         """Test creating threat model"""
         self.security_by_design.create_threat_model("web_app", "Web Application", "Customer web app")
         
@@ -390,7 +403,7 @@ class TestSecurityByDesign:
         assert model["system_name"] == "Web Application"
         assert model["description"] == "Customer web app"
     
-    def test_add_threat(self):
+    def test_add_threat(self) -> Any:
         """Test adding threat to model"""
         self.security_by_design.create_threat_model("web_app", "Web Application", "Customer web app")
         
@@ -405,14 +418,14 @@ class TestSecurityByDesign:
         assert threat["likelihood"] == "medium"
         assert threat["impact"] == "high"
     
-    def test_add_threat_invalid_model(self):
+    def test_add_threat_invalid_model(self) -> Any:
         """Test adding threat to invalid model"""
         with pytest.raises(ValueError, match="Threat model invalid_model does not exist"):
             self.security_by_design.add_threat(
                 "invalid_model", "threat", "description", "low", "medium", "mitigation"
             )
     
-    def test_define_security_pattern(self):
+    def test_define_security_pattern(self) -> Any:
         """Test defining security pattern"""
         self.security_by_design.define_security_pattern(
             "pattern_001", "Authentication Pattern", "Secure authentication", "JWT tokens", ["login", "api"]
@@ -423,7 +436,7 @@ class TestSecurityByDesign:
         assert pattern["name"] == "Authentication Pattern"
         assert len(pattern["use_cases"]) == 2
     
-    def test_conduct_code_review(self):
+    def test_conduct_code_review(self) -> Any:
         """Test conducting code review"""
         findings = [{"severity": "high", "description": "SQL injection vulnerability"}]
         
@@ -441,11 +454,11 @@ class TestSecurityByDesign:
 class TestFailSecure:
     """Test FailSecure class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.fail_secure = FailSecure()
     
-    def test_define_fail_secure_policy(self):
+    def test_define_fail_secure_policy(self) -> Any:
         """Test defining fail secure policy"""
         self.fail_secure.define_fail_secure_policy(
             "auth_failure", "auth_system", "authentication_failure", "locked_down"
@@ -456,7 +469,7 @@ class TestFailSecure:
         assert policy["system_id"] == "auth_system"
         assert policy["secure_state"] == "locked_down"
     
-    def test_handle_system_failure_with_policy(self):
+    def test_handle_system_failure_with_policy(self) -> Any:
         """Test handling system failure with defined policy"""
         self.fail_secure.define_fail_secure_policy(
             "auth_failure", "auth_system", "authentication_failure", "locked_down"
@@ -467,14 +480,14 @@ class TestFailSecure:
         assert secure_state == "locked_down"
         assert self.fail_secure.system_states["auth_system"] == "locked_down"
     
-    def test_handle_system_failure_no_policy(self):
+    def test_handle_system_failure_no_policy(self) -> Any:
         """Test handling system failure without defined policy"""
         secure_state = self.fail_secure.handle_system_failure("unknown_system", "unknown_failure")
         
         assert secure_state == "locked_down"  # Default secure state
         assert self.fail_secure.system_states["unknown_system"] == "locked_down"
     
-    def test_define_recovery_procedure(self):
+    def test_define_recovery_procedure(self) -> Any:
         """Test defining recovery procedure"""
         steps = ["Step 1", "Step 2", "Step 3"]
         
@@ -490,11 +503,11 @@ class TestFailSecure:
 class TestPrivacyByDesign:
     """Test PrivacyByDesign class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.privacy_by_design = PrivacyByDesign()
     
-    def test_define_privacy_requirement(self):
+    def test_define_privacy_requirement(self) -> Any:
         """Test defining privacy requirement"""
         self.privacy_by_design.define_privacy_requirement(
             "privacy_001", "Data Minimization", "Collect minimal data", "collection", "GDPR"
@@ -505,7 +518,7 @@ class TestPrivacyByDesign:
         assert req["title"] == "Data Minimization"
         assert req["compliance_framework"] == "GDPR"
     
-    def test_classify_data(self):
+    def test_classify_data(self) -> Any:
         """Test classifying data"""
         self.privacy_by_design.classify_data(
             "user_pii", "personal_data", "high", 365*24*3600, True
@@ -516,7 +529,7 @@ class TestPrivacyByDesign:
         assert classification["classification"] == "personal_data"
         assert classification["encryption_required"] is True
     
-    def test_manage_consent(self):
+    def test_manage_consent(self) -> Any:
         """Test managing consent"""
         consent_time = time.time()
         expiry_time = consent_time + 365*24*3600
@@ -531,7 +544,7 @@ class TestPrivacyByDesign:
         assert consent["consent_given"] is True
         assert consent["expiry_date"] == expiry_time
     
-    def test_check_data_retention_with_classification(self):
+    def test_check_data_retention_with_classification(self) -> Any:
         """Test checking data retention with classification"""
         self.privacy_by_design.classify_data(
             "user_pii", "personal_data", "high", 365*24*3600, True
@@ -541,7 +554,7 @@ class TestPrivacyByDesign:
         should_retain = self.privacy_by_design.check_data_retention("user_pii")
         assert should_retain is True
     
-    def test_check_data_retention_no_classification(self):
+    def test_check_data_retention_no_classification(self) -> Any:
         """Test checking data retention without classification"""
         should_retain = self.privacy_by_design.check_data_retention("unknown_data")
         assert should_retain is True  # Default to retain
@@ -550,11 +563,11 @@ class TestPrivacyByDesign:
 class TestSecurityAwareness:
     """Test SecurityAwareness class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.security_awareness = SecurityAwareness()
     
-    def test_create_training_program(self):
+    def test_create_training_program(self) -> Any:
         """Test creating training program"""
         modules = ["Module 1", "Module 2"]
         
@@ -567,7 +580,7 @@ class TestSecurityAwareness:
         assert program["title"] == "Phishing Awareness"
         assert program["modules"] == modules
     
-    def test_record_security_incident(self):
+    def test_record_security_incident(self) -> Any:
         """Test recording security incident"""
         incident_time = time.time()
         
@@ -580,7 +593,7 @@ class TestSecurityAwareness:
         assert incident["description"] == "Suspicious email"
         assert incident["severity"] == "low"
     
-    def test_track_awareness_metrics(self):
+    def test_track_awareness_metrics(self) -> Any:
         """Test tracking awareness metrics"""
         self.security_awareness.track_awareness_metrics(
             "metric_001", "Training Completion", 85.5, 90.0, "monthly"
@@ -596,11 +609,11 @@ class TestSecurityAwareness:
 class TestIncidentResponse:
     """Test IncidentResponse class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.incident_response = IncidentResponse()
     
-    def test_create_incident_playbook(self):
+    def test_create_incident_playbook(self) -> Any:
         """Test creating incident playbook"""
         steps = [{"step": 1, "description": "Isolate system"}]
         escalation = ["security_manager"]
@@ -614,7 +627,7 @@ class TestIncidentResponse:
         assert playbook["incident_type"] == "data_breach"
         assert playbook["steps"] == steps
     
-    def test_initiate_incident_response(self):
+    def test_initiate_incident_response(self) -> Any:
         """Test initiating incident response"""
         steps = [{"step": 1, "description": "Isolate system"}]
         escalation = ["security_manager"]
@@ -630,7 +643,7 @@ class TestIncidentResponse:
         assert playbook_id == "playbook_001"
         assert "inc_001" in self.incident_response.active_incidents
     
-    def test_initiate_incident_response_no_playbook(self):
+    def test_initiate_incident_response_no_playbook(self) -> Any:
         """Test initiating incident response without playbook"""
         playbook_id = self.incident_response.initiate_incident_response(
             "inc_001", "unknown_type", "high", "Unknown incident"
@@ -638,7 +651,7 @@ class TestIncidentResponse:
         
         assert playbook_id == ""
     
-    def test_execute_response_step(self):
+    def test_execute_response_step(self) -> Any:
         """Test executing response step"""
         steps = [
             {"step": 1, "description": "Isolate system"},
@@ -662,7 +675,7 @@ class TestIncidentResponse:
         success = self.incident_response.execute_response_step("inc_001", 10)
         assert success is False
     
-    def test_execute_response_step_invalid_incident(self):
+    def test_execute_response_step_invalid_incident(self) -> Any:
         """Test executing response step for invalid incident"""
         success = self.incident_response.execute_response_step("invalid_incident", 0)
         assert success is False
@@ -671,11 +684,11 @@ class TestIncidentResponse:
 class TestContinuousMonitoring:
     """Test ContinuousMonitoring class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.monitoring = ContinuousMonitoring()
     
-    def test_define_monitoring_rule(self):
+    def test_define_monitoring_rule(self) -> Any:
         """Test defining monitoring rule"""
         self.monitoring.define_monitoring_rule(
             "rule_001", "Failed Logins", "failed_logins > 10", "alert_security"
@@ -686,7 +699,7 @@ class TestContinuousMonitoring:
         assert rule["name"] == "Failed Logins"
         assert rule["condition"] == "failed_logins > 10"
     
-    def test_set_alert_threshold(self):
+    def test_set_alert_threshold(self) -> Any:
         """Test setting alert threshold"""
         self.monitoring.set_alert_threshold("cpu_usage", "system_cpu", 80.0, 95.0)
         
@@ -696,7 +709,7 @@ class TestContinuousMonitoring:
         assert threshold["warning_level"] == 80.0
         assert threshold["critical_level"] == 95.0
     
-    def test_record_monitoring_data(self):
+    def test_record_monitoring_data(self) -> Any:
         """Test recording monitoring data"""
         self.monitoring.record_monitoring_data("system_cpu", 85.5)
         
@@ -705,14 +718,14 @@ class TestContinuousMonitoring:
         assert len(data_points) == 1
         assert data_points[0]["value"] == 85.5
     
-    def test_check_thresholds_warning(self):
+    def test_check_thresholds_warning(self) -> Any:
         """Test threshold checking with warning level"""
         self.monitoring.set_alert_threshold("cpu_usage", "system_cpu", 80.0, 95.0)
         
         # Should trigger warning
         self.monitoring.record_monitoring_data("system_cpu", 85.0)
     
-    def test_check_thresholds_critical(self):
+    def test_check_thresholds_critical(self) -> Any:
         """Test threshold checking with critical level"""
         self.monitoring.set_alert_threshold("cpu_usage", "system_cpu", 80.0, 95.0)
         
@@ -723,12 +736,12 @@ class TestContinuousMonitoring:
 class TestSecurityKeyPrinciples:
     """Test SecurityKeyPrinciples main class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.principles = SecurityKeyPrinciples()
     
     @pytest.mark.asyncio
-    async def test_assess_security_posture(self):
+    async def test_assess_security_posture(self) -> Any:
         """Test security posture assessment"""
         # Add some controls
         control = SecurityControl(
@@ -745,7 +758,7 @@ class TestSecurityKeyPrinciples:
         assert SecurityPrinciple.LEAST_PRIVILEGE in assessments
     
     @pytest.mark.asyncio
-    async def test_generate_security_report(self):
+    async def test_generate_security_report(self) -> Any:
         """Test security report generation"""
         # Add some controls
         control = SecurityControl(
@@ -763,7 +776,7 @@ class TestSecurityKeyPrinciples:
         assert "recommendations" in report
         assert report["overall_score"] > 0
     
-    def test_generate_defense_recommendations(self):
+    def test_generate_defense_recommendations(self) -> Any:
         """Test generating defense recommendations"""
         # Add controls with different effectiveness
         control1 = SecurityControl(effectiveness=0.3)  # Low effectiveness
@@ -783,12 +796,12 @@ class TestSecurityKeyPrinciples:
 class TestIntegration:
     """Integration tests"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.principles = SecurityKeyPrinciples()
     
     @pytest.mark.asyncio
-    async def test_full_security_workflow(self):
+    async def test_full_security_workflow(self) -> Any:
         """Test complete security workflow"""
         # 1. Setup defense in depth
         control = SecurityControl(
@@ -825,7 +838,7 @@ class TestIntegration:
         assert report["overall_score"] > 0
     
     @pytest.mark.asyncio
-    async def test_incident_response_workflow(self):
+    async def test_incident_response_workflow(self) -> Any:
         """Test incident response workflow"""
         # 1. Create playbook
         steps = [{"step": 1, "description": "Isolate system"}]
@@ -856,18 +869,18 @@ class TestIntegration:
 class TestEdgeCases:
     """Edge case tests"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.principles = SecurityKeyPrinciples()
     
-    def test_empty_defense_in_depth(self):
+    def test_empty_defense_in_depth(self) -> Any:
         """Test defense in depth with no controls"""
         layer_scores = self.principles.defense_in_depth.assess_overall_security()
         
         for layer, score in layer_scores.items():
             assert score == 0.0
     
-    def test_duplicate_control_addition(self):
+    def test_duplicate_control_addition(self) -> Any:
         """Test adding duplicate controls"""
         control = SecurityControl(name="Test Control")
         
@@ -877,23 +890,23 @@ class TestEdgeCases:
         # Should only have one control
         assert len(self.principles.defense_in_depth.controls) == 1
     
-    def test_remove_nonexistent_control(self):
+    def test_remove_nonexistent_control(self) -> Any:
         """Test removing non-existent control"""
         # Should not raise exception
         self.principles.defense_in_depth.remove_control("nonexistent_id")
     
-    def test_zero_trust_no_zones(self):
+    def test_zero_trust_no_zones(self) -> Any:
         """Test zero trust with no zones"""
         result = self.principles.zero_trust.verify_access("user", "resource", "any_zone")
         assert result is False
     
-    def test_least_privilege_no_roles(self):
+    def test_least_privilege_no_roles(self) -> Any:
         """Test least privilege with no roles"""
         result = self.principles.least_privilege.check_permission("user", "resource", "action")
         assert result is False
     
     @pytest.mark.asyncio
-    async def test_assessment_with_no_controls(self):
+    async def test_assessment_with_no_controls(self) -> Any:
         """Test assessment with no controls"""
         assessments = await self.principles.assess_security_posture()
         
@@ -906,11 +919,11 @@ class TestEdgeCases:
 class TestPerformance:
     """Performance tests"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test method"""
         self.principles = SecurityKeyPrinciples()
     
-    def test_large_number_of_controls(self):
+    def test_large_number_of_controls(self) -> Any:
         """Test performance with large number of controls"""
         # Add 1000 controls
         for i in range(1000):
@@ -925,7 +938,7 @@ class TestPerformance:
         layer_scores = self.principles.defense_in_depth.assess_overall_security()
         assert layer_scores[SecurityLayer.NETWORK] == 0.8
     
-    def test_large_number_of_access_checks(self):
+    def test_large_number_of_access_checks(self) -> Any:
         """Test performance with large number of access checks"""
         # Setup zero trust
         self.principles.zero_trust.create_trust_zone("test_zone", "Test Zone", "Test")
@@ -943,7 +956,7 @@ class TestPerformance:
         # Should complete within reasonable time (less than 1 second)
         assert duration < 1.0
     
-    def test_large_number_of_permission_checks(self):
+    def test_large_number_of_permission_checks(self) -> Any:
         """Test performance with large number of permission checks"""
         # Setup least privilege
         self.principles.least_privilege.create_role("admin", "Administrator", "Full access")
@@ -963,5 +976,6 @@ class TestPerformance:
         assert duration < 1.0
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

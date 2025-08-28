@@ -10,7 +10,10 @@
       "@/utils/*": ["./utils/*"],
       "@/lib/*": ["./lib/*"],
       "@/types/*": ["./types/*"],
-      "@/assets/*": ["./assets/*"]
+      "@/assets/*": ["./assets/*"],
+      "@/constants/*": ["./constants/*"],
+      "@/services/*": ["./services/*"],
+      "@/stores/*": ["./stores/*"]
     },
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
@@ -24,7 +27,9 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "target": "esnext",
-    "types": ["node"]
+    "types": ["node"],
+    "incremental": true,
+    "tsBuildInfoFile": "./node_modules/.cache/.tsbuildinfo"
   },
   "include": [
     "**/*.ts",

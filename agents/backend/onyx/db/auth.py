@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import AsyncGenerator
 from collections.abc import Callable
 from typing import Any
@@ -23,6 +25,10 @@ from onyx.db.models import AccessToken
 from onyx.db.models import OAuthAccount
 from onyx.db.models import User
 from onyx.utils.variable_functionality import (
+    from external connectors, or API keys.
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     fetch_versioned_implementation_with_fallback,
 )
 
@@ -61,7 +67,6 @@ def get_live_users_count(db_session: Session) -> int:
     """
     Returns the number of users in the system.
     This does NOT include invited users, "users" pulled in
-    from external connectors, or API keys.
     """
     count_stmt = func.count(User.id)  # type: ignore
     select_stmt = select(count_stmt)

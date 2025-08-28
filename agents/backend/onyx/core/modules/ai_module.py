@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Dict, Any, Optional, List
+from ..modular_architecture import (
+import structlog
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🧠 AI MODULE
 ============
@@ -5,11 +13,8 @@
 Módulo modular para servicios de IA.
 """
 
-from typing import Dict, Any, Optional, List
-from ..modular_architecture import (
     ModuleInterface, ModuleMetadata, ServiceInterface, modular_service
 )
-import structlog
 
 logger = structlog.get_logger(__name__)
 

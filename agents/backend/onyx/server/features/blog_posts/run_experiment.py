@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import argparse
+import sys
+import asyncio
+from pathlib import Path
+from config_loader import (
+from model_training import create_model_trainer, DeviceManager
+import logging
+        import json
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Experiment Runner Script
@@ -6,19 +17,12 @@ Experiment Runner Script
 This script runs experiments using the configuration system and training pipeline.
 """
 
-import argparse
-import sys
-import asyncio
-from pathlib import Path
-from config_loader import (
     load_config_from_yaml, 
     create_experiment_config, 
     save_experiment_config,
     validate_config,
     quick_config_setup
 )
-from model_training import create_model_trainer, DeviceManager
-import logging
 
 def setup_logging(experiment_id: str, log_dir: str = "logs"):
     """Setup logging for the experiment."""
@@ -85,9 +89,12 @@ async def run_experiment(config_path: str, experiment_id: str = None, descriptio
         logger.info(f"Total training time: {results.get('total_training_time', 'N/A')} seconds")
         
         # Save results
-        import json
         results_path = output_dir / f"{experiment_id}_results.json"
         with open(results_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(results, f, indent=2, default=str)
         
         logger.info(f"Results saved to {results_path}")
@@ -130,7 +137,9 @@ async def run_quick_experiment(model_name: str, dataset_path: str, experiment_id
         raise
 
 def main():
-    parser = argparse.ArgumentParser(description="Run NLP training experiments")
+    
+    """main function."""
+parser = argparse.ArgumentParser(description="Run NLP training experiments")
     parser.add_argument("--config", type=str, help="Path to YAML configuration file")
     parser.add_argument("--experiment-id", type=str, help="Experiment ID")
     parser.add_argument("--description", type=str, default="", help="Experiment description")
@@ -168,5 +177,6 @@ def main():
         print("  python run_experiment.py --quick --model distilbert-base-uncased --dataset data/sentiment.csv")
         sys.exit(1)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

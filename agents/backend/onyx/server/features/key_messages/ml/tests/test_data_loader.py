@@ -1,6 +1,8 @@
-"""
-Tests for Data Loader Module
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 import pandas as pd
 import numpy as np
@@ -10,8 +12,14 @@ from unittest.mock import Mock, patch, MagicMock
 import tempfile
 import os
 from pathlib import Path
-
 from ..data_loader import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Tests for Data Loader Module
+"""
+
     MessageDataset,
     DataPreprocessor,
     TextCleaner,
@@ -24,7 +32,7 @@ from ..data_loader import (
 class TestMessageDataset:
     """Test MessageDataset class."""
     
-    def test_dataset_initialization(self):
+    def test_dataset_initialization(self) -> Any:
         """Test MessageDataset initialization."""
         # Create sample data
         data = pd.DataFrame({
@@ -50,7 +58,7 @@ class TestMessageDataset:
         assert dataset.max_length == 512
         assert dataset.label_encoder is not None
     
-    def test_dataset_getitem(self):
+    def test_dataset_getitem(self) -> Optional[Dict[str, Any]]:
         """Test MessageDataset __getitem__ method."""
         data = pd.DataFrame({
             'message_id': [1],
@@ -78,7 +86,7 @@ class TestMessageDataset:
         assert sample['generated_response'] == 'Response 1'
         assert sample['quality_score'] == 0.8
     
-    def test_dataset_with_tokenizer(self):
+    def test_dataset_with_tokenizer(self) -> Any:
         """Test MessageDataset with tokenizer."""
         # Mock tokenizer
         mock_tokenizer = Mock()
@@ -100,7 +108,7 @@ class TestMessageDataset:
         assert sample['input_ids'].shape == (10,)
         assert sample['attention_mask'].shape == (10,)
     
-    def test_dataset_tokenization_error_handling(self):
+    def test_dataset_tokenization_error_handling(self) -> Any:
         """Test MessageDataset tokenization error handling."""
         # Mock tokenizer that raises an exception
         mock_tokenizer = Mock()
@@ -123,7 +131,7 @@ class TestMessageDataset:
 class TestTextCleaner:
     """Test TextCleaner class."""
     
-    def test_text_cleaner_initialization(self):
+    def test_text_cleaner_initialization(self) -> Any:
         """Test TextCleaner initialization."""
         cleaner = TextCleaner()
         
@@ -131,7 +139,7 @@ class TestTextCleaner:
         assert cleaner.email_pattern is not None
         assert cleaner.phone_pattern is not None
     
-    def test_clean_text_basic(self):
+    def test_clean_text_basic(self) -> Any:
         """Test basic text cleaning."""
         cleaner = TextCleaner()
         
@@ -140,7 +148,7 @@ class TestTextCleaner:
         
         assert cleaned == "hello world! this is a test message."
     
-    def test_clean_text_with_urls(self):
+    def test_clean_text_with_urls(self) -> Any:
         """Test text cleaning with URLs."""
         cleaner = TextCleaner()
         
@@ -151,7 +159,7 @@ class TestTextCleaner:
         assert "https://example.com" not in cleaned
         assert "http://test.org" not in cleaned
     
-    def test_clean_text_with_emails(self):
+    def test_clean_text_with_emails(self) -> Any:
         """Test text cleaning with emails."""
         cleaner = TextCleaner()
         
@@ -162,7 +170,7 @@ class TestTextCleaner:
         assert "test@example.com" not in cleaned
         assert "support@company.org" not in cleaned
     
-    def test_clean_text_with_phone_numbers(self):
+    def test_clean_text_with_phone_numbers(self) -> Any:
         """Test text cleaning with phone numbers."""
         cleaner = TextCleaner()
         
@@ -173,7 +181,7 @@ class TestTextCleaner:
         assert "123-456-7890" not in cleaned
         assert "987.654.3210" not in cleaned
     
-    def test_clean_text_with_extra_whitespace(self):
+    def test_clean_text_with_extra_whitespace(self) -> Any:
         """Test text cleaning with extra whitespace."""
         cleaner = TextCleaner()
         
@@ -183,7 +191,7 @@ class TestTextCleaner:
         assert "    " not in cleaned
         assert cleaned == "hello world! this has extra spaces."
     
-    def test_clean_text_with_special_characters(self):
+    def test_clean_text_with_special_characters(self) -> Any:
         """Test text cleaning with special characters."""
         cleaner = TextCleaner()
         
@@ -195,7 +203,7 @@ class TestTextCleaner:
         assert "<>[]{}|\\" not in cleaned
         assert "hello world! this has special chars:" in cleaned
     
-    def test_clean_text_empty_input(self):
+    def test_clean_text_empty_input(self) -> Any:
         """Test text cleaning with empty input."""
         cleaner = TextCleaner()
         
@@ -203,7 +211,7 @@ class TestTextCleaner:
         assert cleaner.clean_text(None) == ""
         assert cleaner.clean_text(123) == ""
     
-    def test_normalize_whitespace(self):
+    def test_normalize_whitespace(self) -> Any:
         """Test whitespace normalization."""
         cleaner = TextCleaner()
         
@@ -212,7 +220,7 @@ class TestTextCleaner:
         
         assert normalized == "Hello world! This has whitespace."
     
-    def test_remove_special_chars(self):
+    def test_remove_special_chars(self) -> Any:
         """Test special character removal."""
         cleaner = TextCleaner()
         
@@ -231,13 +239,13 @@ class TestTextCleaner:
 class TestFeatureExtractor:
     """Test FeatureExtractor class."""
     
-    def test_feature_extractor_initialization(self):
+    def test_feature_extractor_initialization(self) -> Any:
         """Test FeatureExtractor initialization."""
         extractor = FeatureExtractor()
         
         assert extractor.sentiment_analyzer is None
     
-    def test_extract_text_features_basic(self):
+    def test_extract_text_features_basic(self) -> Any:
         """Test basic text feature extraction."""
         extractor = FeatureExtractor()
         
@@ -256,7 +264,7 @@ class TestFeatureExtractor:
         assert features['question_count'] == 0
         assert features['uppercase_ratio'] >= 0
     
-    def test_extract_text_features_with_hashtags_mentions(self):
+    def test_extract_text_features_with_hashtags_mentions(self) -> Any:
         """Test text feature extraction with hashtags and mentions."""
         extractor = FeatureExtractor()
         
@@ -266,7 +274,7 @@ class TestFeatureExtractor:
         assert features['hashtag_count'] == 2
         assert features['mention_count'] == 2
     
-    def test_extract_text_features_with_urls(self):
+    def test_extract_text_features_with_urls(self) -> Any:
         """Test text feature extraction with URLs."""
         extractor = FeatureExtractor()
         
@@ -275,7 +283,7 @@ class TestFeatureExtractor:
         
         assert features['url_count'] == 2
     
-    def test_extract_text_features_with_questions_exclamations(self):
+    def test_extract_text_features_with_questions_exclamations(self) -> Any:
         """Test text feature extraction with questions and exclamations."""
         extractor = FeatureExtractor()
         
@@ -285,7 +293,7 @@ class TestFeatureExtractor:
         assert features['exclamation_count'] == 2
         assert features['question_count'] == 2
     
-    def test_extract_text_features_empty_input(self):
+    def test_extract_text_features_empty_input(self) -> Any:
         """Test text feature extraction with empty input."""
         extractor = FeatureExtractor()
         
@@ -298,7 +306,7 @@ class TestFeatureExtractor:
         assert features['unique_words'] == 0
         assert features['uppercase_ratio'] == 0.0
     
-    def test_calculate_avg_word_length(self):
+    def test_calculate_avg_word_length(self) -> Any:
         """Test average word length calculation."""
         extractor = FeatureExtractor()
         
@@ -310,7 +318,7 @@ class TestFeatureExtractor:
 class TestDataPreprocessor:
     """Test DataPreprocessor class."""
     
-    def test_preprocessor_initialization(self):
+    def test_preprocessor_initialization(self) -> Any:
         """Test DataPreprocessor initialization."""
         config = {'max_length': 512}
         preprocessor = DataPreprocessor(config)
@@ -319,7 +327,7 @@ class TestDataPreprocessor:
         assert preprocessor.text_cleaner is not None
         assert preprocessor.feature_extractor is not None
     
-    def test_preprocess_data_basic(self):
+    def test_preprocess_data_basic(self) -> Any:
         """Test basic data preprocessing."""
         config = {'max_length': 512}
         preprocessor = DataPreprocessor(config)
@@ -350,7 +358,7 @@ class TestDataPreprocessor:
         assert 'audience_size' in processed_data.columns
         assert 'industry_encoded' in processed_data.columns
     
-    def test_handle_missing_values(self):
+    def test_handle_missing_values(self) -> Any:
         """Test missing value handling."""
         config = {'max_length': 512}
         preprocessor = DataPreprocessor(config)
@@ -374,7 +382,7 @@ class TestDataPreprocessor:
         assert processed_data['industry'].isna().sum() == 0
         assert processed_data['quality_score'].isna().sum() == 0
     
-    def test_extract_engagement_features(self):
+    def test_extract_engagement_features(self) -> Any:
         """Test engagement feature extraction."""
         config = {'max_length': 512}
         preprocessor = DataPreprocessor(config)
@@ -399,7 +407,7 @@ class TestDataPreprocessor:
         assert processed_data['shares'].iloc[0] == 5
         assert processed_data['comments'].iloc[0] == 3
     
-    def test_encode_audience_size(self):
+    def test_encode_audience_size(self) -> Any:
         """Test audience size encoding."""
         config = {'max_length': 512}
         preprocessor = DataPreprocessor(config)
@@ -408,7 +416,7 @@ class TestDataPreprocessor:
         assert preprocessor._encode_audience_size('large mass market') == 'large'
         assert preprocessor._encode_audience_size('medium sized') == 'medium'
     
-    def test_encode_industry(self):
+    def test_encode_industry(self) -> Any:
         """Test industry encoding."""
         config = {'max_length': 512}
         preprocessor = DataPreprocessor(config)
@@ -423,7 +431,7 @@ class TestDataPreprocessor:
 class TestDataLoaderFactory:
     """Test DataLoaderFactory class."""
     
-    def test_create_dataloader(self):
+    def test_create_dataloader(self) -> Any:
         """Test DataLoader creation."""
         # Create mock dataset
         mock_dataset = Mock()
@@ -443,7 +451,7 @@ class TestDataLoaderFactory:
         assert dataloader.num_workers == 2
         assert dataloader.pin_memory is True
     
-    def test_create_train_val_test_loaders(self):
+    def test_create_train_val_test_loaders(self) -> Any:
         """Test train/val/test data loader creation."""
         # Create mock dataset
         mock_dataset = Mock()
@@ -472,7 +480,7 @@ class TestDataLoaderFactory:
 class TestDataManager:
     """Test DataManager class."""
     
-    def test_data_manager_initialization(self):
+    def test_data_manager_initialization(self) -> Any:
         """Test DataManager initialization."""
         config = {'max_length': 512, 'cache_dir': './test_cache'}
         manager = DataManager(config)
@@ -481,7 +489,7 @@ class TestDataManager:
         assert manager.preprocessor is not None
         assert manager.cache_dir.exists()
     
-    def test_load_data_csv(self):
+    def test_load_data_csv(self) -> Any:
         """Test loading CSV data."""
         config = {'max_length': 512, 'cache_dir': './test_cache'}
         manager = DataManager(config)
@@ -489,8 +497,20 @@ class TestDataManager:
         # Create temporary CSV file
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
             f.write("original_message,message_type,tone\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("Hello world,informational,professional\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("Test message,promotional,casual\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             temp_file = f.name
         
         try:
@@ -504,7 +524,7 @@ class TestDataManager:
         finally:
             os.unlink(temp_file)
     
-    def test_load_data_json(self):
+    def test_load_data_json(self) -> Any:
         """Test loading JSON data."""
         config = {'max_length': 512, 'cache_dir': './test_cache'}
         manager = DataManager(config)
@@ -512,6 +532,10 @@ class TestDataManager:
         # Create temporary JSON file
         with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
             f.write('''[
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 {"original_message": "Hello world", "message_type": "informational"},
                 {"original_message": "Test message", "message_type": "promotional"}
             ]''')
@@ -527,13 +551,17 @@ class TestDataManager:
         finally:
             os.unlink(temp_file)
     
-    def test_load_data_unsupported_format(self):
+    def test_load_data_unsupported_format(self) -> Any:
         """Test loading unsupported file format."""
         config = {'max_length': 512, 'cache_dir': './test_cache'}
         manager = DataManager(config)
         
         with tempfile.NamedTemporaryFile(suffix='.txt', delete=False) as f:
             f.write(b"test data")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             temp_file = f.name
         
         try:
@@ -542,7 +570,7 @@ class TestDataManager:
         finally:
             os.unlink(temp_file)
     
-    def test_create_dataset(self):
+    def test_create_dataset(self) -> Any:
         """Test dataset creation."""
         config = {'max_length': 512, 'cache_dir': './test_cache'}
         manager = DataManager(config)
@@ -557,7 +585,7 @@ class TestDataManager:
         assert isinstance(dataset, MessageDataset)
         assert len(dataset) == 2
     
-    def test_get_data_loaders(self):
+    def test_get_data_loaders(self) -> Optional[Dict[str, Any]]:
         """Test data loader creation."""
         config = {'max_length': 512, 'cache_dir': './test_cache'}
         manager = DataManager(config)
@@ -577,7 +605,7 @@ class TestDataManager:
 class TestDefaultConfigurations:
     """Test default configurations."""
     
-    def test_default_data_config(self):
+    def test_default_data_config(self) -> Any:
         """Test DEFAULT_DATA_CONFIG."""
         assert DEFAULT_DATA_CONFIG['max_length'] == 512
         assert DEFAULT_DATA_CONFIG['batch_size'] == 32
@@ -588,5 +616,6 @@ class TestDefaultConfigurations:
         assert DEFAULT_DATA_CONFIG['val_ratio'] == 0.15
         assert DEFAULT_DATA_CONFIG['test_ratio'] == 0.15
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__]) 

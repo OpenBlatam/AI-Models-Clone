@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from langchain.schema.messages import HumanMessage
 
 from onyx.chat.models import LlmDoc
@@ -13,6 +15,9 @@ from onyx.prompts.prompt_utils import build_complete_context_str
 from onyx.prompts.prompt_utils import handle_onyx_date_awareness
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _build_strong_llm_quotes_prompt(
     question: str,
     context_docs: list[LlmDoc] | list[InferenceChunk],
@@ -21,22 +26,16 @@ def _build_strong_llm_quotes_prompt(
 ) -> HumanMessage:
     use_language_hint = bool(get_multilingual_expansion())
 
-    context_block = ""
+    context_block = ""f"
     if context_docs:
         context_docs_str = build_complete_context_str(context_docs)
-        context_block = CONTEXT_BLOCK.format(context_docs_str=context_docs_str)
+        context_block = CONTEXT_BLOCK"
 
-    history_block = ""
+    history_block = ""f"
     if history_str:
         history_block = HISTORY_BLOCK.format(history_str=history_str)
 
-    full_prompt = JSON_PROMPT.format(
-        system_prompt=prompt.system_prompt,
-        context_block=context_block,
-        history_block=history_block,
-        task_prompt=prompt.task_prompt,
-        user_query=question,
-        language_hint_or_none=LANGUAGE_HINT.strip() if use_language_hint else "",
+    full_prompt = JSON_PROMPT" if use_language_hint else "",
     ).strip()
 
     tag_handled_prompt = handle_onyx_date_awareness(

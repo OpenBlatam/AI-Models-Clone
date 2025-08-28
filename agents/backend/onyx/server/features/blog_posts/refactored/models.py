@@ -1,12 +1,28 @@
-"""
-Modelos de datos para el sistema NLP ultra-optimizado.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 from dataclasses import dataclass, field
 from typing import Dict, List, Optional, Any, Tuple
 from datetime import datetime
 from enum import Enum
 import hashlib
+        import re
+        import orjson
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Modelos de datos para el sistema NLP ultra-optimizado.
+"""
+
 
 class AnalysisStatus(Enum):
     """Estados del análisis NLP."""
@@ -35,7 +51,6 @@ class BasicMetrics:
     @classmethod
     def from_text(cls, text: str) -> 'BasicMetrics':
         """Crear métricas desde texto."""
-        import re
         
         words = text.split()
         sentences = re.findall(r'[.!?]+', text)
@@ -253,7 +268,7 @@ class NLPAnalysisResult:
         """Agregar recomendación al resultado."""
         self.recommendations.append(recommendation)
     
-    def mark_completed(self):
+    def mark_completed(self) -> Any:
         """Marcar análisis como completado."""
         self.status = AnalysisStatus.COMPLETED
         self.quality.level = self.get_quality_level()
@@ -269,7 +284,6 @@ class AnalysisRequest:
     
     def get_cache_key(self) -> str:
         """Generar key de cache para la solicitud."""
-        import orjson
         try:
             content = f"{self.text}:{orjson.dumps(self.options, sort_keys=True).decode()}"
         except:

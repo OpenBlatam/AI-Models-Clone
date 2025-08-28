@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import unittest
 import uuid
 from typing import Any
@@ -8,16 +10,19 @@ import pytest
 from onyx.tools.models import DynamicSchemaInfo
 from onyx.tools.models import ToolResponse
 from onyx.tools.tool_implementations.custom.custom_tool import (
-    build_custom_tools_from_openapi_schema_and_headers,
-)
 from onyx.tools.tool_implementations.custom.custom_tool import (
-    CUSTOM_TOOL_RESPONSE_ID,
-)
 from onyx.tools.tool_implementations.custom.custom_tool import CustomToolCallSummary
 from onyx.tools.tool_implementations.custom.custom_tool import (
+from onyx.utils.headers import HeaderItemDict
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    build_custom_tools_from_openapi_schema_and_headers,
+)
+    CUSTOM_TOOL_RESPONSE_ID,
+)
     validate_openapi_schema,
 )
-from onyx.utils.headers import HeaderItemDict
 
 
 class TestCustomTool(unittest.TestCase):
@@ -187,7 +192,7 @@ class TestCustomTool(unittest.TestCase):
         expected_url = f"http://localhost:8080/{self.dynamic_schema_info.chat_session_id}/test/{self.dynamic_schema_info.message_id}/assistant/123"
         mock_request.assert_called_once_with("GET", expected_url, json=None, headers={})
 
-    def test_invalid_openapi_schema(self) -> None:
+    async def test_invalid_openapi_schema(self) -> None:
         """
         Test that an invalid OpenAPI schema raises a ValueError.
         """
@@ -229,5 +234,6 @@ class TestCustomTool(unittest.TestCase):
         )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__])

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -8,17 +10,9 @@ from tests.daily.connectors.google_drive.consts_and_utils import ADMIN_EMAIL
 from tests.daily.connectors.google_drive.consts_and_utils import ADMIN_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import ADMIN_FOLDER_3_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import (
-    assert_expected_docs_in_retrieved_docs,
-)
 from tests.daily.connectors.google_drive.consts_and_utils import (
-    EXTERNAL_SHARED_DOC_SINGLETON,
-)
 from tests.daily.connectors.google_drive.consts_and_utils import (
-    EXTERNAL_SHARED_DOCS_IN_FOLDER,
-)
 from tests.daily.connectors.google_drive.consts_and_utils import (
-    EXTERNAL_SHARED_FOLDER_URL,
-)
 from tests.daily.connectors.google_drive.consts_and_utils import FOLDER_1_1_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import FOLDER_1_1_URL
 from tests.daily.connectors.google_drive.consts_and_utils import FOLDER_1_2_FILE_IDS
@@ -35,11 +29,7 @@ from tests.daily.connectors.google_drive.consts_and_utils import FOLDER_3_URL
 from tests.daily.connectors.google_drive.consts_and_utils import id_to_name
 from tests.daily.connectors.google_drive.consts_and_utils import load_all_docs
 from tests.daily.connectors.google_drive.consts_and_utils import (
-    MISC_SHARED_DRIVE_FNAMES,
-)
 from tests.daily.connectors.google_drive.consts_and_utils import (
-    RESTRICTED_ACCESS_FOLDER_URL,
-)
 from tests.daily.connectors.google_drive.consts_and_utils import SECTIONS_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import SHARED_DRIVE_1_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import SHARED_DRIVE_1_URL
@@ -50,6 +40,21 @@ from tests.daily.connectors.google_drive.consts_and_utils import TEST_USER_2_EMA
 from tests.daily.connectors.google_drive.consts_and_utils import TEST_USER_2_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import TEST_USER_3_EMAIL
 from tests.daily.connectors.google_drive.consts_and_utils import TEST_USER_3_FILE_IDS
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    assert_expected_docs_in_retrieved_docs,
+)
+    EXTERNAL_SHARED_DOC_SINGLETON,
+)
+    EXTERNAL_SHARED_DOCS_IN_FOLDER,
+)
+    EXTERNAL_SHARED_FOLDER_URL,
+)
+    MISC_SHARED_DRIVE_FNAMES,
+)
+    RESTRICTED_ACCESS_FOLDER_URL,
+)
 
 
 @patch(

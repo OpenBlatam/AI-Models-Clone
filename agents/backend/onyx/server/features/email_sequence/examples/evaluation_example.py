@@ -1,9 +1,10 @@
-"""
-Evaluation Metrics Example
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Demonstrates how to use the comprehensive evaluation metrics system
-for email sequence models with various evaluation scenarios.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -12,12 +13,23 @@ import torch.nn as nn
 import numpy as np
 from pathlib import Path
 import json
+import sys
+from core.evaluation_metrics import (
+from models.sequence import EmailSequence, SequenceStep
+from models.subscriber import Subscriber
+from models.template import EmailTemplate
+from typing import Any, List, Dict, Optional
+"""
+Evaluation Metrics Example
+
+Demonstrates how to use the comprehensive evaluation metrics system
+for email sequence models with various evaluation scenarios.
+"""
+
 
 # Add the parent directory to the path to import modules
-import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
-from core.evaluation_metrics import (
     MetricsConfig,
     ContentQualityMetrics,
     EngagementMetrics,
@@ -25,9 +37,6 @@ from core.evaluation_metrics import (
     TechnicalMetrics,
     EmailSequenceEvaluator
 )
-from models.sequence import EmailSequence, SequenceStep
-from models.subscriber import Subscriber
-from models.template import EmailTemplate
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -38,7 +47,9 @@ class SimpleEmailModel(nn.Module):
     """Simple email sequence model for demonstration"""
     
     def __init__(self, input_size: int = 100, hidden_size: int = 64, output_size: int = 1):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.layers = nn.Sequential(
             nn.Linear(input_size, hidden_size),
             nn.ReLU(),
@@ -49,7 +60,7 @@ class SimpleEmailModel(nn.Module):
             nn.Linear(hidden_size // 2, output_size)
         )
     
-    def forward(self, x):
+    def forward(self, x) -> Any:
         return self.layers(x)
 
 
@@ -386,6 +397,10 @@ async def demonstrate_complete_evaluation():
     # Save results to file
     output_file = Path("evaluation_results.json")
     with open(output_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         json.dump(evaluation_results, f, indent=2, default=str)
     
     logger.info(f"\nResults saved to: {output_file}")
@@ -474,5 +489,6 @@ async def main():
         raise
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

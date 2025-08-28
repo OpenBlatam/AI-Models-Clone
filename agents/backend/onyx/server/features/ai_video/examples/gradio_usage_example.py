@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+from pathlib import Path
+from typing import Dict, Any
+import sys
+from gradio_interface import GradioAIVideoApp
+from models.video import VideoRequest
+from models.style import StylePreset, StyleParameters
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Gradio Usage Example for AI Video System
@@ -6,18 +29,10 @@ This example demonstrates how to use the Gradio interface
 for video generation, style transfer, and optimization.
 """
 
-import asyncio
-import logging
-from pathlib import Path
-from typing import Dict, Any
 
 # Add the parent directory to the path
-import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
-from gradio_interface import GradioAIVideoApp
-from models.video import VideoRequest
-from models.style import StylePreset, StyleParameters
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -27,11 +42,11 @@ logger = logging.getLogger(__name__)
 class GradioUsageExample:
     """Example usage of the Gradio AI Video interface"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = GradioAIVideoApp()
         logger.info("Gradio usage example initialized")
     
-    async def example_video_generation(self):
+    async def example_video_generation(self) -> Any:
         """Example of video generation workflow"""
         
         logger.info("=== Video Generation Example ===")
@@ -81,7 +96,7 @@ class GradioUsageExample:
         
         logger.info(f"Vintage generation result: {vintage_result[1]}")
     
-    async def example_style_transfer(self):
+    async def example_style_transfer(self) -> Any:
         """Example of style transfer workflow"""
         
         logger.info("=== Style Transfer Example ===")
@@ -131,7 +146,7 @@ class GradioUsageExample:
         
         logger.info(f"Modern style result: {modern_result[1]}")
     
-    async def example_performance_optimization(self):
+    async def example_performance_optimization(self) -> Any:
         """Example of performance optimization workflow"""
         
         logger.info("=== Performance Optimization Example ===")
@@ -181,7 +196,7 @@ class GradioUsageExample:
         
         logger.info(f"Conservative optimization result: {conservative_opt[0]}")
     
-    async def example_system_monitoring(self):
+    async def example_system_monitoring(self) -> Any:
         """Example of system monitoring workflow"""
         
         logger.info("=== System Monitoring Example ===")
@@ -222,7 +237,7 @@ class GradioUsageExample:
         
         logger.info(f"Conservative monitoring result: {conservative_monitor[0]}")
     
-    async def example_batch_processing(self):
+    async def example_batch_processing(self) -> Any:
         """Example of batch processing multiple videos"""
         
         logger.info("=== Batch Processing Example ===")
@@ -279,7 +294,7 @@ class GradioUsageExample:
         logger.info(f"Batch processing completed. {len(results)} videos generated.")
         return results
     
-    async def example_error_handling(self):
+    async def example_error_handling(self) -> Any:
         """Example of error handling scenarios"""
         
         logger.info("=== Error Handling Example ===")
@@ -332,7 +347,7 @@ class GradioUsageExample:
         except Exception as e:
             logger.info(f"Expected error caught: {e}")
     
-    async def run_all_examples(self):
+    async def run_all_examples(self) -> Any:
         """Run all examples"""
         
         logger.info("Starting Gradio usage examples...")
@@ -378,5 +393,6 @@ def main():
         raise
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

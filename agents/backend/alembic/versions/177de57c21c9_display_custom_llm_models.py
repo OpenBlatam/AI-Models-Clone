@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from sqlalchemy import and_
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """display custom llm models
 
 Revision ID: 177de57c21c9
@@ -6,13 +15,9 @@ Create Date: 2024-11-21 11:49:04.488677
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
-from sqlalchemy import and_
 
-revision = "177de57c21c9"
-down_revision = "4ee1287bd26a"
+revision: str = "177de57c21c9"
+down_revision: str = "4ee1287bd26a"
 branch_labels = None
 depends_on = None
 depends_on = None
@@ -28,7 +33,7 @@ def upgrade() -> None:
         sa.column("display_model_names", postgresql.ARRAY(sa.String)),
     )
 
-    excluded_providers = ["openai", "bedrock", "anthropic", "azure"]
+    excluded_providers: List[Any] = ["openai", "bedrock", "anthropic", "azure"]
 
     providers_to_update = sa.select(
         llm_provider.c.id,
@@ -42,10 +47,20 @@ def upgrade() -> None:
     )
 
     results = conn.execute(providers_to_update).fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     for provider_id, model_names, display_model_names in results:
         if display_model_names is None:
-            display_model_names = []
+            display_model_names: List[Any] = []
 
         combined_model_names = list(set(display_model_names + model_names))
         update_stmt = (

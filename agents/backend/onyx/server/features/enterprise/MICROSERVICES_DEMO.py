@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+import json
+import time
+from datetime import datetime
+from typing import Dict, Any
+from infrastructure.microservices import (
+import random
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 🚀 MICROSERVICES DEMO APPLICATION
@@ -21,14 +35,7 @@ Requirements:
     pip install -r requirements-microservices.txt
 """
 
-import asyncio
-import logging
-import json
-import time
-from datetime import datetime
-from typing import Dict, Any
 
-from infrastructure.microservices import (
     # Service Discovery
     ServiceDiscoveryManager,
     ConsulServiceDiscovery,
@@ -72,14 +79,14 @@ logger = logging.getLogger(__name__)
 class MicroservicesDemo:
     """Comprehensive microservices demonstration."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.service_discovery = ServiceDiscoveryManager()
         self.message_queue = MessageQueueManager()
         self.load_balancer = LoadBalancerManager()
         self.resilience = ResilienceManager()
         self.config_manager = ConfigurationManager()
         
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize all microservices components."""
         logger.info("🚀 Initializing Microservices Demo...")
         
@@ -100,7 +107,7 @@ class MicroservicesDemo:
         
         logger.info("✅ Microservices Demo initialized successfully!")
     
-    async def _setup_service_discovery(self):
+    async def _setup_service_discovery(self) -> Any:
         """Setup service discovery with Consul."""
         logger.info("📡 Setting up Service Discovery...")
         
@@ -136,7 +143,7 @@ class MicroservicesDemo:
         except Exception as e:
             logger.warning(f"⚠️  Service Discovery setup failed (Consul not available?): {e}")
     
-    async def _setup_message_queues(self):
+    async def _setup_message_queues(self) -> Any:
         """Setup message queues with multiple backends."""
         logger.info("📨 Setting up Message Queues...")
         
@@ -156,7 +163,7 @@ class MicroservicesDemo:
         except Exception as e:
             logger.warning(f"⚠️  Redis Streams setup failed: {e}")
     
-    async def _setup_load_balancing(self):
+    async def _setup_load_balancing(self) -> Any:
         """Setup load balancing with different strategies."""
         logger.info("⚖️  Setting up Load Balancing...")
         
@@ -165,7 +172,7 @@ class MicroservicesDemo:
         
         logger.info("✅ Load Balancing configured with Round Robin strategy")
     
-    async def _setup_resilience(self):
+    async def _setup_resilience(self) -> Any:
         """Setup resilience patterns."""
         logger.info("🛡️  Setting up Resilience Patterns...")
         
@@ -206,7 +213,7 @@ class MicroservicesDemo:
         
         logger.info("✅ Resilience Patterns configured")
     
-    async def _setup_configuration(self):
+    async def _setup_configuration(self) -> Any:
         """Setup configuration management."""
         logger.info("⚙️  Setting up Configuration Management...")
         
@@ -239,7 +246,7 @@ class MicroservicesDemo:
         
         logger.info("✅ Configuration Management configured")
     
-    async def demo_service_discovery(self):
+    async def demo_service_discovery(self) -> Any:
         """Demonstrate service discovery capabilities."""
         logger.info("\n🔍 === SERVICE DISCOVERY DEMO ===")
         
@@ -258,14 +265,16 @@ class MicroservicesDemo:
         except Exception as e:
             logger.error(f"Service Discovery demo failed: {e}")
     
-    async def demo_message_queues(self):
+    async def demo_message_queues(self) -> Any:
         """Demonstrate message queue capabilities."""
         logger.info("\n📨 === MESSAGE QUEUES DEMO ===")
         
         try:
             # Define message handler
             async def message_handler(message: Message):
-                logger.info(f"Received message: {message.payload} (ID: {message.id})")
+                
+    """message_handler function."""
+logger.info(f"Received message: {message.payload} (ID: {message.id})")
             
             # Subscribe to topic
             subscriptions = await self.message_queue.subscribe("demo-topic", message_handler)
@@ -293,7 +302,7 @@ class MicroservicesDemo:
         except Exception as e:
             logger.error(f"Message Queue demo failed: {e}")
     
-    async def demo_load_balancing(self):
+    async def demo_load_balancing(self) -> Any:
         """Demonstrate load balancing capabilities."""
         logger.info("\n⚖️  === LOAD BALANCING DEMO ===")
         
@@ -330,14 +339,15 @@ class MicroservicesDemo:
         except Exception as e:
             logger.error(f"Load Balancing demo failed: {e}")
     
-    async def demo_resilience(self):
+    async def demo_resilience(self) -> Any:
         """Demonstrate resilience patterns."""
         logger.info("\n🛡️  === RESILIENCE PATTERNS DEMO ===")
         
         try:
             # Test function that fails randomly
             async def unreliable_service():
-                import random
+                
+    """unreliable_service function."""
                 if random.random() < 0.7:  # 70% failure rate
                     raise Exception("Service temporarily unavailable")
                 return {"status": "success", "data": "Hello from service!"}
@@ -358,7 +368,9 @@ class MicroservicesDemo:
             logger.info("\n--- Testing Bulkhead Pattern ---")
             
             async def api_call(call_id: int):
-                await asyncio.sleep(0.5)  # Simulate work
+                
+    """api_call function."""
+await asyncio.sleep(0.5)  # Simulate work
                 return f"API call {call_id} completed"
             
             # Make concurrent calls through bulkhead
@@ -384,7 +396,7 @@ class MicroservicesDemo:
         except Exception as e:
             logger.error(f"Resilience demo failed: {e}")
     
-    async def demo_configuration(self):
+    async def demo_configuration(self) -> Any:
         """Demonstrate configuration management."""
         logger.info("\n⚙️  === CONFIGURATION MANAGEMENT DEMO ===")
         
@@ -409,7 +421,7 @@ class MicroservicesDemo:
         except Exception as e:
             logger.error(f"Configuration demo failed: {e}")
     
-    async def run_full_demo(self):
+    async def run_full_demo(self) -> Any:
         """Run complete microservices demonstration."""
         logger.info("🎬 Starting Comprehensive Microservices Demo")
         logger.info("=" * 60)
@@ -447,7 +459,7 @@ class MicroservicesDemo:
             logger.error(f"Demo failed: {e}")
             raise
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup resources."""
         logger.info("🧹 Cleaning up resources...")
         
@@ -496,6 +508,10 @@ if __name__ == "__main__":
     }
     
     with open("demo_config.json", "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         json.dump(demo_config, f, indent=2)
     
     print("""

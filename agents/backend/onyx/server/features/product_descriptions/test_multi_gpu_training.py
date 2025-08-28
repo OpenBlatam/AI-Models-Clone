@@ -1,3 +1,33 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import json
+import os
+import tempfile
+import time
+from pathlib import Path
+from unittest.mock import Mock, patch, MagicMock
+from typing import Dict, List, Optional
+import numpy as np
+import pytest
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+from multi_gpu_training import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Tests for Multi-GPU Training System
 
@@ -11,22 +41,8 @@ This test suite covers:
 - Integration testing
 """
 
-import asyncio
-import json
-import os
-import tempfile
-import time
-from pathlib import Path
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, List, Optional
 
-import numpy as np
-import pytest
-import torch
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
 
-from multi_gpu_training import (
     MultiGPUConfig, MultiGPUTrainingManager, TrainingMode,
     DataParallelTrainer, DistributedDataParallelTrainer,
     MetricsCollector, FaultToleranceManager,
@@ -38,13 +54,15 @@ class TestDataset(Dataset):
     """Test dataset for unit testing."""
     
     def __init__(self, num_samples: int = 100, input_dim: int = 64):
-        self.data = torch.randn(num_samples, input_dim)
+        
+    """__init__ function."""
+self.data = torch.randn(num_samples, input_dim)
         self.labels = torch.randint(0, 5, (num_samples,))
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return len(self.data)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         return {
             'input_ids': self.data[idx],
             'labels': self.labels[idx]
@@ -55,10 +73,12 @@ class TestModel(nn.Module):
     """Test model for unit testing."""
     
     def __init__(self, input_dim: int = 64, num_classes: int = 5):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.linear = nn.Linear(input_dim, num_classes)
     
-    def forward(self, input_ids, labels=None):
+    def forward(self, input_ids, labels=None) -> Any:
         logits = self.linear(input_ids)
         loss = None
         if labels is not None:
@@ -69,7 +89,7 @@ class TestModel(nn.Module):
 class TestMultiGPUConfig:
     """Test MultiGPUConfig class."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration."""
         config = MultiGPUConfig()
         
@@ -80,7 +100,7 @@ class TestMultiGPUConfig:
         assert config.pin_memory is True
         assert config.enable_fault_tolerance is True
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration."""
         config = MultiGPUConfig(
             training_mode=TrainingMode.DISTRIBUTED_DATA_PARALLEL,
@@ -100,7 +120,7 @@ class TestMultiGPUConfig:
         assert config.gradient_accumulation_steps == 4
         assert config.max_grad_norm == 2.0
     
-    def test_post_init_cuda_unavailable(self):
+    def test_post_init_cuda_unavailable(self) -> Any:
         """Test post_init when CUDA is unavailable."""
         with patch('torch.cuda.is_available', return_value=False):
             config = MultiGPUConfig()
@@ -108,7 +128,7 @@ class TestMultiGPUConfig:
             assert config.training_mode == TrainingMode.SINGLE_GPU
             assert config.device_ids == []
     
-    def test_post_init_distributed(self):
+    def test_post_init_distributed(self) -> Any:
         """Test post_init for distributed training."""
         with patch.dict(os.environ, {'WORLD_SIZE': '4', 'RANK': '2', 'LOCAL_RANK': '2'}):
             config = MultiGPUConfig(training_mode=TrainingMode.DISTRIBUTED_DATA_PARALLEL)
@@ -121,7 +141,7 @@ class TestMultiGPUConfig:
 class TestMetricsCollector:
     """Test MetricsCollector class."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test MetricsCollector initialization."""
         collector = MetricsCollector()
         
@@ -130,7 +150,7 @@ class TestMetricsCollector:
         assert len(collector.current_epoch_metrics) == 0
         assert len(collector.current_validation_metrics) == 0
     
-    def test_update_training_metrics(self):
+    def test_update_training_metrics(self) -> Any:
         """Test updating training metrics."""
         collector = MetricsCollector()
         
@@ -144,7 +164,7 @@ class TestMetricsCollector:
         assert collector.current_epoch_metrics[0] == metrics1
         assert collector.current_epoch_metrics[1] == metrics2
     
-    def test_update_validation_metrics(self):
+    def test_update_validation_metrics(self) -> Any:
         """Test updating validation metrics."""
         collector = MetricsCollector()
         
@@ -154,7 +174,7 @@ class TestMetricsCollector:
         assert len(collector.current_validation_metrics) == 1
         assert collector.current_validation_metrics[0] == metrics
     
-    def test_get_epoch_metrics(self):
+    def test_get_epoch_metrics(self) -> Optional[Dict[str, Any]]:
         """Test getting aggregated epoch metrics."""
         collector = MetricsCollector()
         
@@ -172,7 +192,7 @@ class TestMetricsCollector:
         assert len(collector.training_metrics) == 1
         assert len(collector.current_epoch_metrics) == 0
     
-    def test_get_validation_metrics(self):
+    def test_get_validation_metrics(self) -> Optional[Dict[str, Any]]:
         """Test getting aggregated validation metrics."""
         collector = MetricsCollector()
         
@@ -189,7 +209,7 @@ class TestMetricsCollector:
         assert len(collector.validation_metrics) == 1
         assert len(collector.current_validation_metrics) == 0
     
-    def test_empty_metrics(self):
+    def test_empty_metrics(self) -> Any:
         """Test handling empty metrics."""
         collector = MetricsCollector()
         
@@ -203,7 +223,7 @@ class TestMetricsCollector:
 class TestFaultToleranceManager:
     """Test FaultToleranceManager class."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test FaultToleranceManager initialization."""
         config = MultiGPUConfig(enable_fault_tolerance=True)
         manager = FaultToleranceManager(config)
@@ -212,7 +232,7 @@ class TestFaultToleranceManager:
         assert manager.checkpoint_dir.exists()
         assert manager.last_checkpoint is None
     
-    def test_save_checkpoint(self, tmp_path):
+    def test_save_checkpoint(self, tmp_path) -> Any:
         """Test saving checkpoint."""
         config = MultiGPUConfig(enable_fault_tolerance=True)
         manager = FaultToleranceManager(config)
@@ -232,7 +252,7 @@ class TestFaultToleranceManager:
         assert 'model_state_dict' in checkpoint
         assert 'timestamp' in checkpoint
     
-    def test_load_checkpoint(self, tmp_path):
+    def test_load_checkpoint(self, tmp_path) -> Any:
         """Test loading checkpoint."""
         config = MultiGPUConfig(enable_fault_tolerance=True)
         manager = FaultToleranceManager(config)
@@ -254,7 +274,7 @@ class TestFaultToleranceManager:
         loaded_step = manager.load_checkpoint(model, step)
         assert loaded_step == step
     
-    def test_load_nonexistent_checkpoint(self, tmp_path):
+    def test_load_nonexistent_checkpoint(self, tmp_path) -> Any:
         """Test loading non-existent checkpoint."""
         config = MultiGPUConfig(enable_fault_tolerance=True)
         manager = FaultToleranceManager(config)
@@ -266,7 +286,7 @@ class TestFaultToleranceManager:
         loaded_step = manager.load_checkpoint(model, step)
         assert loaded_step == 0
     
-    def test_cleanup_old_checkpoints(self, tmp_path):
+    def test_cleanup_old_checkpoints(self, tmp_path) -> Any:
         """Test cleanup of old checkpoints."""
         config = MultiGPUConfig(enable_fault_tolerance=True)
         manager = FaultToleranceManager(config)
@@ -290,7 +310,7 @@ class TestFaultToleranceManager:
         remaining_checkpoints = list(tmp_path.glob("checkpoint_step_*.pt"))
         assert len(remaining_checkpoints) == 2
     
-    def test_handle_error(self):
+    def test_handle_error(self) -> Any:
         """Test error handling."""
         config = MultiGPUConfig(enable_fault_tolerance=True)
         manager = FaultToleranceManager(config)
@@ -306,7 +326,7 @@ class TestDataParallelTrainer:
     """Test DataParallelTrainer class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return MultiGPUConfig(
             training_mode=TrainingMode.DATA_PARALLEL,
@@ -315,11 +335,11 @@ class TestDataParallelTrainer:
         )
     
     @pytest.fixture
-    def trainer(self, config):
+    def trainer(self, config) -> Any:
         """Create test trainer."""
         return DataParallelTrainer(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test trainer initialization."""
         trainer = DataParallelTrainer(config)
         
@@ -329,7 +349,7 @@ class TestDataParallelTrainer:
         assert trainer.scheduler is None
         assert trainer.scaler is None
     
-    def test_setup_model_single_gpu(self, trainer):
+    def test_setup_model_single_gpu(self, trainer) -> Any:
         """Test model setup for single GPU."""
         model = TestModel()
         
@@ -344,7 +364,7 @@ class TestDataParallelTrainer:
     
     @pytest.mark.skipif(not torch.cuda.is_available() or torch.cuda.device_count() < 2,
                         reason="Requires multiple GPUs")
-    def test_setup_model_multi_gpu(self, config):
+    def test_setup_model_multi_gpu(self, config) -> Any:
         """Test model setup for multiple GPUs."""
         config.device_ids = [0, 1]
         trainer = DataParallelTrainer(config)
@@ -353,7 +373,7 @@ class TestDataParallelTrainer:
         wrapped_model = trainer.setup_model(model)
         assert isinstance(wrapped_model, DataParallel)
     
-    def test_setup_dataloader(self, trainer):
+    def test_setup_dataloader(self, trainer) -> Any:
         """Test dataloader setup."""
         dataset = TestDataset(100)
         dataloader = trainer.setup_dataloader(dataset, batch_size=16, shuffle=True)
@@ -362,7 +382,7 @@ class TestDataParallelTrainer:
         assert dataloader.batch_size == 16
         assert dataloader.dataset == dataset
     
-    def test_train_step(self, trainer):
+    def test_train_step(self, trainer) -> Any:
         """Test training step."""
         model = TestModel()
         trainer.setup_model(model)
@@ -383,7 +403,7 @@ class TestDataParallelTrainer:
         assert 'loss' in outputs
         assert outputs['loss'].requires_grad is False  # Loss should be detached
     
-    def test_validate_step(self, trainer):
+    def test_validate_step(self, trainer) -> bool:
         """Test validation step."""
         model = TestModel()
         trainer.setup_model(model)
@@ -406,7 +426,7 @@ class TestDistributedDataParallelTrainer:
     """Test DistributedDataParallelTrainer class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return MultiGPUConfig(
             training_mode=TrainingMode.DISTRIBUTED_DATA_PARALLEL,
@@ -417,11 +437,11 @@ class TestDistributedDataParallelTrainer:
         )
     
     @pytest.fixture
-    def trainer(self, config):
+    def trainer(self, config) -> Any:
         """Create test trainer."""
         return DistributedDataParallelTrainer(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test trainer initialization."""
         trainer = DistributedDataParallelTrainer(config)
         
@@ -432,7 +452,7 @@ class TestDistributedDataParallelTrainer:
         assert trainer.scaler is None
     
     @patch('torch.distributed.init_process_group')
-    def test_setup_distributed(self, mock_init_process_group, config):
+    def test_setup_distributed(self, mock_init_process_group, config) -> Any:
         """Test distributed setup."""
         trainer = DistributedDataParallelTrainer(config)
         
@@ -445,7 +465,7 @@ class TestDistributedDataParallelTrainer:
         assert trainer.world_size == 1
     
     @patch('torch.distributed.init_process_group')
-    def test_setup_distributed_failure(self, mock_init_process_group, config):
+    def test_setup_distributed_failure(self, mock_init_process_group, config) -> Any:
         """Test distributed setup failure."""
         mock_init_process_group.side_effect = Exception("Connection failed")
         
@@ -453,7 +473,7 @@ class TestDistributedDataParallelTrainer:
             DistributedDataParallelTrainer(config)
     
     @patch('torch.distributed.init_process_group')
-    def test_setup_model(self, mock_init_process_group, trainer):
+    def test_setup_model(self, mock_init_process_group, trainer) -> Any:
         """Test model setup."""
         model = TestModel()
         wrapped_model = trainer.setup_model(model)
@@ -461,7 +481,7 @@ class TestDistributedDataParallelTrainer:
         assert isinstance(wrapped_model, DistributedDataParallel)
     
     @patch('torch.distributed.init_process_group')
-    def test_setup_dataloader(self, mock_init_process_group, trainer):
+    def test_setup_dataloader(self, mock_init_process_group, trainer) -> Any:
         """Test dataloader setup."""
         dataset = TestDataset(100)
         dataloader = trainer.setup_dataloader(dataset, batch_size=16, shuffle=True)
@@ -476,7 +496,7 @@ class TestMultiGPUTrainingManager:
     """Test MultiGPUTrainingManager class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return MultiGPUConfig(
             training_mode=TrainingMode.DATA_PARALLEL,
@@ -485,11 +505,11 @@ class TestMultiGPUTrainingManager:
         )
     
     @pytest.fixture
-    def manager(self, config):
+    def manager(self, config) -> Any:
         """Create test manager."""
         return MultiGPUTrainingManager(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test manager initialization."""
         manager = MultiGPUTrainingManager(config)
         
@@ -498,21 +518,21 @@ class TestMultiGPUTrainingManager:
         assert isinstance(manager.metrics_collector, MetricsCollector)
         assert manager.fault_tolerance is not None
     
-    def test_create_trainer_data_parallel(self, config):
+    def test_create_trainer_data_parallel(self, config) -> Any:
         """Test creating DataParallel trainer."""
         config.training_mode = TrainingMode.DATA_PARALLEL
         manager = MultiGPUTrainingManager(config)
         
         assert isinstance(manager.trainer, DataParallelTrainer)
     
-    def test_create_trainer_distributed(self, config):
+    def test_create_trainer_distributed(self, config) -> Any:
         """Test creating DistributedDataParallel trainer."""
         config.training_mode = TrainingMode.DISTRIBUTED_DATA_PARALLEL
         manager = MultiGPUTrainingManager(config)
         
         assert isinstance(manager.trainer, DistributedDataParallelTrainer)
     
-    def test_setup_training(self, manager):
+    def test_setup_training(self, manager) -> Any:
         """Test training setup."""
         model = TestModel()
         dataset = TestDataset(100)
@@ -527,7 +547,7 @@ class TestMultiGPUTrainingManager:
         assert isinstance(val_loader, DataLoader)
         assert manager.trainer.optimizer == optimizer
     
-    def test_train_epoch(self, manager):
+    def test_train_epoch(self, manager) -> Any:
         """Test training epoch."""
         model = TestModel()
         dataset = TestDataset(100)
@@ -536,7 +556,7 @@ class TestMultiGPUTrainingManager:
         model, train_loader, _ = manager.setup_training(model, dataset, optimizer=optimizer)
         
         # Mock the trainer's train_step method
-        def mock_train_step(batch):
+        def mock_train_step(batch) -> Any:
             return {'loss': torch.tensor(0.5), 'logits': torch.randn(4, 5)}
         
         manager.trainer.train_step = mock_train_step
@@ -546,7 +566,7 @@ class TestMultiGPUTrainingManager:
         assert isinstance(metrics, dict)
         assert 'loss' in metrics
     
-    def test_validate_epoch(self, manager):
+    def test_validate_epoch(self, manager) -> bool:
         """Test validation epoch."""
         model = TestModel()
         dataset = TestDataset(100)
@@ -554,7 +574,7 @@ class TestMultiGPUTrainingManager:
         model, _, val_loader = manager.setup_training(model, dataset, val_dataset=dataset)
         
         # Mock the trainer's validate_step method
-        def mock_validate_step(batch):
+        def mock_validate_step(batch) -> bool:
             return {'loss': torch.tensor(0.4), 'logits': torch.randn(4, 5)}
         
         manager.trainer.validate_step = mock_validate_step
@@ -564,7 +584,7 @@ class TestMultiGPUTrainingManager:
         assert isinstance(metrics, dict)
         assert 'loss' in metrics
     
-    def test_extract_metrics(self, manager):
+    def test_extract_metrics(self, manager) -> Any:
         """Test metrics extraction."""
         outputs = {
             'loss': torch.tensor(0.5),
@@ -581,7 +601,7 @@ class TestMultiGPUTrainingManager:
         assert isinstance(metrics['logits'], float)
         assert isinstance(metrics['features'], float)
     
-    def test_cleanup(self, manager):
+    def test_cleanup(self, manager) -> Any:
         """Test cleanup."""
         # Mock distributed cleanup
         with patch('torch.distributed.destroy_process_group') as mock_destroy:
@@ -595,7 +615,7 @@ class TestIntegration:
     """Integration tests for the multi-GPU training system."""
     
     @pytest.mark.asyncio
-    async def test_end_to_end_training(self):
+    async def test_end_to_end_training(self) -> Any:
         """Test end-to-end training workflow."""
         config = MultiGPUConfig(
             training_mode=TrainingMode.DATA_PARALLEL,
@@ -623,7 +643,7 @@ class TestIntegration:
         
         manager.cleanup()
     
-    def test_memory_management(self):
+    def test_memory_management(self) -> Any:
         """Test memory management during training."""
         if not torch.cuda.is_available():
             pytest.skip("CUDA not available")
@@ -657,7 +677,7 @@ class TestIntegration:
         
         manager.cleanup()
     
-    def test_fault_tolerance_integration(self):
+    def test_fault_tolerance_integration(self) -> Any:
         """Test fault tolerance integration."""
         config = MultiGPUConfig(
             training_mode=TrainingMode.DATA_PARALLEL,
@@ -691,7 +711,7 @@ class TestIntegration:
 class TestEdgeCases:
     """Test edge cases and error conditions."""
     
-    def test_empty_dataset(self):
+    def test_empty_dataset(self) -> Any:
         """Test handling empty dataset."""
         config = MultiGPUConfig()
         manager = MultiGPUTrainingManager(config)
@@ -701,14 +721,14 @@ class TestEdgeCases:
         with pytest.raises(ValueError):
             manager.setup_training(model, dataset)
     
-    def test_invalid_device_ids(self):
+    def test_invalid_device_ids(self) -> Any:
         """Test invalid device IDs."""
         config = MultiGPUConfig(device_ids=[999])  # Invalid device ID
         
         with pytest.raises(RuntimeError):
             MultiGPUTrainingManager(config)
     
-    def test_mixed_precision_without_cuda(self):
+    def test_mixed_precision_without_cuda(self) -> Any:
         """Test mixed precision without CUDA."""
         with patch('torch.cuda.is_available', return_value=False):
             config = MultiGPUConfig(use_mixed_precision=True)
@@ -717,7 +737,7 @@ class TestEdgeCases:
             # Should not fail, but mixed precision should be disabled
             assert manager.trainer.config.use_mixed_precision is True
     
-    def test_large_batch_size(self):
+    def test_large_batch_size(self) -> Any:
         """Test handling large batch size."""
         config = MultiGPUConfig(batch_size=10000)  # Very large batch
         manager = MultiGPUTrainingManager(config)
@@ -728,7 +748,7 @@ class TestEdgeCases:
         model, train_loader, _ = manager.setup_training(model, dataset)
         assert train_loader.batch_size == 10000
     
-    def test_zero_gradient_accumulation(self):
+    def test_zero_gradient_accumulation(self) -> Any:
         """Test zero gradient accumulation steps."""
         config = MultiGPUConfig(gradient_accumulation_steps=0)
         
@@ -739,7 +759,7 @@ class TestEdgeCases:
 class TestPerformance:
     """Performance tests."""
     
-    def test_training_speed(self):
+    def test_training_speed(self) -> Any:
         """Test training speed."""
         config = MultiGPUConfig(
             training_mode=TrainingMode.DATA_PARALLEL,
@@ -771,7 +791,7 @@ class TestPerformance:
         
         manager.cleanup()
     
-    def test_memory_efficiency(self):
+    def test_memory_efficiency(self) -> Any:
         """Test memory efficiency."""
         if not torch.cuda.is_available():
             pytest.skip("CUDA not available")

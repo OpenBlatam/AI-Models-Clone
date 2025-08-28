@@ -1,11 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import time
 import uuid
 
 import httpx
 
 from onyx.background.celery.tasks.indexing.utils import (
-    NUM_REPEAT_ERRORS_BEFORE_REPEATED_ERROR_STATE,
-)
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.mock_connector.connector import MockConnectorCheckpoint
 from onyx.connectors.models import InputType
@@ -20,6 +26,11 @@ from tests.integration.common_utils.managers.index_attempt import IndexAttemptMa
 from tests.integration.common_utils.test_document_utils import create_test_document
 from tests.integration.common_utils.test_models import DATestUser
 from tests.integration.common_utils.vespa import vespa_fixture
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    NUM_REPEAT_ERRORS_BEFORE_REPEATED_ERROR_STATE,
+)
 
 
 def test_repeated_error_state_detection_and_recovery(

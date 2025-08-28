@@ -1,16 +1,23 @@
-"""
-Tests for Core Module
-
-Tests error handling, validation, logging, and monitoring functionality.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import pytest
 import asyncio
 import time
 from unittest.mock import patch, MagicMock
 from datetime import datetime, timedelta
-
 from ..core import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Tests for Core Module
+
+Tests error handling, validation, logging, and monitoring functionality.
+"""
+
+
     # Error Handling
     SecurityToolkitError, ValidationError, ConfigurationError, NetworkError,
     CryptoError, ScanError, AttackError, ReportError, TargetValidationError,
@@ -43,7 +50,7 @@ from ..core import (
 class TestErrorHandling:
     """Test suite for error handling."""
     
-    def test_base_exception_creation(self):
+    def test_base_exception_creation(self) -> Any:
         """Test base exception creation."""
         error = SecurityToolkitError(
             message="Test error",
@@ -57,7 +64,7 @@ class TestErrorHandling:
         assert error.timestamp is not None
         assert error.traceback is not None
     
-    def test_base_exception_to_dict(self):
+    def test_base_exception_to_dict(self) -> Any:
         """Test exception serialization."""
         error = SecurityToolkitError("Test error", "TEST_ERROR")
         error_dict = error.to_dict()
@@ -68,7 +75,7 @@ class TestErrorHandling:
         assert "timestamp" in error_dict
         assert "traceback" in error_dict
     
-    def test_validation_error(self):
+    def test_validation_error(self) -> Any:
         """Test validation error."""
         error = ValidationError(
             message="Invalid input",
@@ -80,7 +87,7 @@ class TestErrorHandling:
         assert error.value == "invalid@user"
         assert error.error_code == "VALIDATION_ERROR"
     
-    def test_network_error(self):
+    def test_network_error(self) -> Any:
         """Test network error."""
         error = NetworkError(
             message="Connection failed",
@@ -92,7 +99,7 @@ class TestErrorHandling:
         assert error.port == 80
         assert error.error_code == "NETWORK_ERROR"
     
-    def test_crypto_error(self):
+    def test_crypto_error(self) -> Any:
         """Test crypto error."""
         error = CryptoError(
             message="Encryption failed",
@@ -104,7 +111,7 @@ class TestErrorHandling:
         assert error.algorithm == "AES-256"
         assert error.error_code == "CRYPTO_ERROR"
     
-    def test_specific_exceptions(self):
+    def test_specific_exceptions(self) -> Any:
         """Test specific exception types."""
         # Target validation error
         target_error = TargetValidationError("Invalid target", "invalid@target")
@@ -149,7 +156,7 @@ class TestErrorHandling:
         assert not_found_error.resource_type == "file"
         assert not_found_error.resource_id == "config.json"
     
-    def test_error_context(self):
+    def test_error_context(self) -> Any:
         """Test error context creation."""
         context = ErrorContext(
             operation="test_operation",
@@ -168,7 +175,7 @@ class TestErrorHandling:
         assert context.target == "192.168.1.1"
         assert context.timestamp is not None
     
-    def test_error_context_to_dict(self):
+    def test_error_context_to_dict(self) -> Any:
         """Test error context serialization."""
         context = ErrorContext(
             operation="test_operation",
@@ -182,7 +189,7 @@ class TestErrorHandling:
         assert context_dict["function"] == "test_function"
         assert "timestamp" in context_dict
     
-    def test_error_handler(self):
+    def test_error_handler(self) -> Any:
         """Test error handler."""
         handler = ErrorHandler()
         
@@ -197,13 +204,15 @@ class TestErrorHandling:
         assert stats["total_errors"] == 1
         assert stats["error_counts"]["SecurityToolkitError"] == 1
     
-    def test_retry_strategy(self):
+    def test_retry_strategy(self) -> Any:
         """Test retry strategy."""
         strategy = RetryStrategy(max_retries=2, base_delay=0.1)
         
         # Test successful operation
         async def successful_operation():
-            return "success"
+            
+    """successful_operation function."""
+return "success"
         
         result = asyncio.run(strategy.execute(successful_operation))
         assert result == "success"
@@ -211,7 +220,9 @@ class TestErrorHandling:
         # Test failing operation
         call_count = 0
         async def failing_operation():
-            nonlocal call_count
+            
+    """failing_operation function."""
+nonlocal call_count
             call_count += 1
             if call_count < 3:
                 raise Exception("Temporary failure")
@@ -221,13 +232,15 @@ class TestErrorHandling:
         assert result == "success"
         assert call_count == 3
     
-    def test_circuit_breaker(self):
+    def test_circuit_breaker(self) -> Any:
         """Test circuit breaker."""
         breaker = CircuitBreaker(failure_threshold=2, recovery_timeout=0.1)
         
         # Test successful operation
         async def successful_operation():
-            return "success"
+            
+    """successful_operation function."""
+return "success"
         
         result = asyncio.run(breaker.execute(successful_operation))
         assert result == "success"
@@ -235,7 +248,9 @@ class TestErrorHandling:
         
         # Test failing operation
         async def failing_operation():
-            raise Exception("Failure")
+            
+    """failing_operation function."""
+raise Exception("Failure")
         
         # First failure
         with pytest.raises(Exception):
@@ -251,19 +266,23 @@ class TestErrorHandling:
         with pytest.raises(SecurityToolkitError):
             asyncio.run(breaker.execute(successful_operation))
     
-    def test_fallback_handler(self):
+    def test_fallback_handler(self) -> Any:
         """Test fallback handler."""
         async def primary_operation():
-            raise Exception("Primary failed")
+            
+    """primary_operation function."""
+raise Exception("Primary failed")
         
         async def fallback_operation():
-            return "fallback success"
+            
+    """fallback_operation function."""
+return "fallback success"
         
         handler = FallbackHandler(fallback_operation)
         result = asyncio.run(handler.execute(primary_operation))
         assert result == "fallback success"
     
-    def test_error_recovery_manager(self):
+    def test_error_recovery_manager(self) -> Any:
         """Test error recovery manager."""
         manager = ErrorRecoveryManager()
         
@@ -272,12 +291,14 @@ class TestErrorHandling:
         manager.add_retry_strategy("retry", retry_strategy)
         
         async def test_operation():
-            return "success"
+            
+    """test_operation function."""
+return "success"
         
         result = asyncio.run(manager.execute_with_recovery(test_operation, "retry"))
         assert result == "success"
     
-    def test_utility_functions(self):
+    def test_utility_functions(self) -> Any:
         """Test utility functions."""
         # Test format_error_message
         error = SecurityToolkitError("Test error", "TEST_ERROR")
@@ -292,7 +313,7 @@ class TestErrorHandling:
 class TestValidation:
     """Test suite for validation."""
     
-    def test_validation_result(self):
+    def test_validation_result(self) -> Any:
         """Test validation result."""
         result = ValidationResult(is_valid=True)
         assert result.is_valid is True
@@ -310,7 +331,7 @@ class TestValidation:
         assert len(result.warnings) == 1
         assert "Test warning" in result.warnings
     
-    def test_validation_context(self):
+    def test_validation_context(self) -> Any:
         """Test validation context."""
         context = ValidationContext(
             level=ValidationLevel.STRICT,
@@ -322,7 +343,7 @@ class TestValidation:
         assert context.mode == ValidationMode.ASYNC
         assert context.strict_mode is True
     
-    def test_target_validator(self):
+    def test_target_validator(self) -> Optional[Dict[str, Any]]:
         """Test target validator."""
         validator = TargetValidator()
         
@@ -351,7 +372,7 @@ class TestValidation:
         assert result.is_valid is False
         assert len(result.errors) > 0
     
-    def test_port_validator(self):
+    def test_port_validator(self) -> Any:
         """Test port validator."""
         validator = PortValidator()
         
@@ -373,7 +394,7 @@ class TestValidation:
         result = validator.validate_range(443, 80)
         assert result.is_valid is False
     
-    def test_credential_validator(self):
+    def test_credential_validator(self) -> Any:
         """Test credential validator."""
         validator = CredentialValidator()
         
@@ -394,7 +415,7 @@ class TestValidation:
         result = validator.validate("invalid")
         assert result.is_valid is False
     
-    def test_payload_validator(self):
+    def test_payload_validator(self) -> Any:
         """Test payload validator."""
         validator = PayloadValidator()
         
@@ -418,7 +439,7 @@ class TestValidation:
         assert result.is_valid is True
         assert len(result.warnings) > 0
     
-    def test_config_validator(self):
+    def test_config_validator(self) -> Any:
         """Test config validator."""
         validator = ConfigValidator()
         
@@ -436,7 +457,7 @@ class TestValidation:
         result = validator.validate(config)
         assert result.is_valid is False
     
-    def test_network_validator(self):
+    def test_network_validator(self) -> Any:
         """Test network validator."""
         validator = NetworkValidator()
         
@@ -457,7 +478,7 @@ class TestValidation:
         result = validator.validate("invalid:network")
         assert result.is_valid is False
     
-    def test_crypto_validator(self):
+    def test_crypto_validator(self) -> Any:
         """Test crypto validator."""
         validator = CryptoValidator()
         
@@ -475,9 +496,9 @@ class TestValidation:
         result = validator.validate(crypto)
         assert result.is_valid is False
     
-    def test_validation_rule(self):
+    def test_validation_rule(self) -> Any:
         """Test validation rule."""
-        def is_positive(value):
+        def is_positive(value) -> Any:
             return isinstance(value, (int, float)) and value > 0
         
         rule = ValidationRule("positive", is_positive, "Value must be positive")
@@ -486,9 +507,9 @@ class TestValidation:
         assert rule.apply(-1) is False
         assert "positive" in rule.get_error_message(-1)
     
-    def test_field_validator(self):
+    def test_field_validator(self) -> Any:
         """Test field validator."""
-        def is_positive(value):
+        def is_positive(value) -> Any:
             return isinstance(value, (int, float)) and value > 0
         
         rule = ValidationRule("positive", is_positive, "Value must be positive")
@@ -501,9 +522,9 @@ class TestValidation:
         assert result.is_valid is False
         assert "test_field" in result.errors[0]
     
-    def test_custom_validator(self):
+    def test_custom_validator(self) -> Any:
         """Test custom validator."""
-        def custom_check(value):
+        def custom_check(value) -> Any:
             return isinstance(value, str) and len(value) > 5
         
         validator = CustomValidator("length_check", custom_check, "String too short")
@@ -514,7 +535,7 @@ class TestValidation:
         result = validator.validate("short")
         assert result.is_valid is False
     
-    def test_composite_validator(self):
+    def test_composite_validator(self) -> Any:
         """Test composite validator."""
         target_validator = TargetValidator()
         port_validator = PortValidator()
@@ -525,12 +546,12 @@ class TestValidation:
         result = composite.validate("invalid")
         assert result.is_valid is False
     
-    def test_validation_schema(self):
+    def test_validation_schema(self) -> Any:
         """Test validation schema."""
         schema = ValidationSchema("test_schema")
         
         # Add field validator
-        def is_positive(value):
+        def is_positive(value) -> Any:
             return isinstance(value, (int, float)) and value > 0
         
         rule = ValidationRule("positive", is_positive, "Value must be positive")
@@ -547,7 +568,7 @@ class TestValidation:
         result = schema.validate(data)
         assert result.is_valid is False
     
-    def test_utility_functions(self):
+    def test_utility_functions(self) -> Any:
         """Test validation utility functions."""
         # Test validate_target
         result = validate_target("192.168.1.1")
@@ -586,7 +607,7 @@ class TestValidation:
 class TestLogging:
     """Test suite for logging."""
     
-    def test_log_config(self):
+    def test_log_config(self) -> Any:
         """Test log configuration."""
         config = LogConfig(
             level=LogLevel.INFO,
@@ -600,7 +621,7 @@ class TestLogging:
         assert config.output_file == "test.log"
         assert config.enable_console is True
     
-    def test_log_context(self):
+    def test_log_context(self) -> Any:
         """Test log context."""
         context = LogContext(
             operation="test_operation",
@@ -615,7 +636,7 @@ class TestLogging:
         assert context.request_id == "req_123"
         assert context.timestamp is not None
     
-    def test_log_metadata(self):
+    def test_log_metadata(self) -> Any:
         """Test log metadata."""
         metadata = LogMetadata(
             severity="high",
@@ -629,7 +650,7 @@ class TestLogging:
         assert "test" in metadata.tags
         assert metadata.source_ip == "192.168.1.1"
     
-    def test_security_logger(self):
+    def test_security_logger(self) -> Any:
         """Test security logger."""
         logger = SecurityLogger("test_logger")
         
@@ -646,7 +667,7 @@ class TestLogging:
         metadata = LogMetadata(severity="high", category="test")
         logger.info("Test with metadata", metadata=metadata)
     
-    def test_structured_logger(self):
+    def test_structured_logger(self) -> Any:
         """Test structured logger."""
         logger = StructuredLogger("test_structured")
         
@@ -670,7 +691,7 @@ class TestLogging:
         except Exception as e:
             logger.log_exception(e, context)
     
-    def test_log_filters(self):
+    def test_log_filters(self) -> Any:
         """Test log filters."""
         # Test basic filter
         filter_obj = LogFilter(
@@ -682,7 +703,7 @@ class TestLogging:
         security_filter = SecurityLogFilter()
         assert security_filter.include_levels == ["WARNING", "ERROR", "CRITICAL"]
     
-    def test_utility_functions(self):
+    def test_utility_functions(self) -> Any:
         """Test logging utility functions."""
         # Test setup_logging
         logger = setup_logging("test_setup")
@@ -701,7 +722,7 @@ class TestLogging:
 class TestMonitoring:
     """Test suite for monitoring."""
     
-    def test_performance_monitor(self):
+    def test_performance_monitor(self) -> Any:
         """Test performance monitor."""
         monitor = PerformanceMonitor()
         
@@ -723,13 +744,15 @@ class TestMonitoring:
         assert summary["count"] == 1
         assert summary["sum"] == 10.0
     
-    def test_health_checker(self):
+    def test_health_checker(self) -> Any:
         """Test health checker."""
         checker = HealthChecker()
         
         # Add health check
         async def test_health_check():
-            return True
+            
+    """test_health_check function."""
+return True
         
         checker.add_health_check("test_check", test_health_check)
         
@@ -740,13 +763,15 @@ class TestMonitoring:
         
         # Test failing health check
         async def failing_health_check():
-            raise Exception("Health check failed")
+            
+    """failing_health_check function."""
+raise Exception("Health check failed")
         
         checker.add_health_check("failing_check", failing_health_check)
         results = asyncio.run(checker.run_all_health_checks())
         assert results["failing_check"].status == "unhealthy"
     
-    def test_metrics_collector(self):
+    def test_metrics_collector(self) -> Any:
         """Test metrics collector."""
         collector = MetricsCollector()
         
@@ -756,13 +781,13 @@ class TestMonitoring:
         assert "memory" in metrics
         assert "disk" in metrics
     
-    def test_alert_manager(self):
+    def test_alert_manager(self) -> Any:
         """Test alert manager."""
         manager = AlertManager()
         
         # Test alert handler
         alerts_sent = []
-        def test_handler(alert):
+        def test_handler(alert) -> Any:
             alerts_sent.append(alert)
         
         manager.add_alert_handler(AlertChannel.LOG, test_handler)
@@ -781,7 +806,9 @@ class TestMonitoring:
         
         # Test alert rules
         def test_condition():
-            return True
+            
+    """test_condition function."""
+return True
         
         manager.add_alert_rule(
             "test_rule",
@@ -794,12 +821,14 @@ class TestMonitoring:
         alerts = manager.get_alerts(level=AlertLevel.INFO)
         assert len(alerts) == 1
     
-    def test_decorators(self):
+    def test_decorators(self) -> Any:
         """Test monitoring decorators."""
         # Test track_performance
         @track_performance("test_operation")
         async def test_operation():
-            await asyncio.sleep(0.1)
+            
+    """test_operation function."""
+await asyncio.sleep(0.1)
             return "success"
         
         result = asyncio.run(test_operation())
@@ -808,13 +837,15 @@ class TestMonitoring:
         # Test monitor_operation
         @monitor_operation("monitored_operation")
         async def monitored_operation():
-            await asyncio.sleep(0.1)
+            
+    """monitored_operation function."""
+await asyncio.sleep(0.1)
             return "success"
         
         result = asyncio.run(monitored_operation())
         assert result == "success"
     
-    def test_utility_functions(self):
+    def test_utility_functions(self) -> Any:
         """Test monitoring utility functions."""
         # Test send_alert
         alert = send_alert("Test Alert", "Test message", AlertLevel.INFO)
@@ -825,7 +856,7 @@ class TestMonitoring:
 class TestIntegration:
     """Integration tests for core components."""
     
-    def test_error_handling_with_validation(self):
+    def test_error_handling_with_validation(self) -> Any:
         """Test error handling with validation."""
         # Create error handler
         handler = ErrorHandler()
@@ -843,7 +874,7 @@ class TestIntegration:
         stats = handler.get_error_stats()
         assert stats["total_errors"] == 1
     
-    def test_logging_with_monitoring(self):
+    def test_logging_with_monitoring(self) -> Any:
         """Test logging with monitoring."""
         # Setup logger
         logger = SecurityLogger("integration_test")
@@ -860,7 +891,7 @@ class TestIntegration:
         assert stats["count"] == 1
         assert stats["mean"] == 1.5
     
-    def test_validation_with_logging(self):
+    def test_validation_with_logging(self) -> Any:
         """Test validation with logging."""
         # Setup logger
         logger = SecurityLogger("validation_test")
@@ -876,7 +907,7 @@ class TestIntegration:
         
         assert result.is_valid is True
     
-    def test_monitoring_with_alerting(self):
+    def test_monitoring_with_alerting(self) -> Any:
         """Test monitoring with alerting."""
         # Setup monitor
         monitor = PerformanceMonitor()
@@ -897,7 +928,7 @@ class TestIntegration:
             )
             assert alert.level == AlertLevel.WARNING
     
-    def test_comprehensive_error_handling(self):
+    def test_comprehensive_error_handling(self) -> Any:
         """Test comprehensive error handling."""
         # Setup error recovery manager
         manager = ErrorRecoveryManager()
@@ -912,7 +943,9 @@ class TestIntegration:
         # Test operation with error handling
         call_count = 0
         async def test_operation():
-            nonlocal call_count
+            
+    """test_operation function."""
+nonlocal call_count
             call_count += 1
             if call_count < 3:
                 raise NetworkError("Temporary network error", "192.168.1.1", 80)

@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from datetime import datetime
+from typing import List, Dict, Any
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 🛍️ DEMO - Product Description Generator
@@ -7,10 +24,6 @@ Demostración simple del generador de descripciones de productos con IA.
 Muestra las capacidades del sistema usando transformers y deep learning.
 """
 
-import asyncio
-import time
-from datetime import datetime
-from typing import List, Dict, Any
 
 
 class SimpleProductDescriptionGenerator:
@@ -21,7 +34,7 @@ class SimpleProductDescriptionGenerator:
     pero de forma simplificada para demostración rápida.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.stats = {
             'total_generations': 0,
             'total_time': 0.0,
@@ -47,7 +60,7 @@ class SimpleProductDescriptionGenerator:
             'persuasive': " Don't miss this opportunity to upgrade your experience with premium quality."
         }
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Simula la inicialización del modelo."""
         print("🤖 Initializing AI model...")
         await asyncio.sleep(1)  # Simula carga del modelo
@@ -131,7 +144,7 @@ class SimpleProductDescriptionGenerator:
         self, product_name: str, features: List[str], category: str, 
         brand: str, style: str, tone: str, temperature: float, variation: int
     ) -> str:
-        """Genera una descripción usando templates y variaciones."""
+        """Genera una descripción usando templates y variaciones."""f"
         
         # Procesar características
         features_text = self._format_features(features, style)
@@ -140,12 +153,7 @@ class SimpleProductDescriptionGenerator:
         base_template = self.style_templates.get(style, self.style_templates['professional'])
         
         # Generar descripción base
-        description = base_template.format(
-            product_name=product_name,
-            brand=brand,
-            category=category,
-            features_text=features_text
-        )
+        description = base_template"
         
         # Agregar modificador de tono
         tone_modifier = self.tone_modifiers.get(tone, "")

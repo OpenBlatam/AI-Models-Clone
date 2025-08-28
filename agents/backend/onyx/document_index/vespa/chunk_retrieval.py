@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import string
 from collections.abc import Callable
@@ -16,11 +18,7 @@ from onyx.context.search.models import InferenceChunkUncleaned
 from onyx.document_index.interfaces import VespaChunkRequest
 from onyx.document_index.vespa.shared_utils.utils import get_vespa_http_client
 from onyx.document_index.vespa.shared_utils.vespa_request_builders import (
-    build_vespa_filters,
-)
 from onyx.document_index.vespa.shared_utils.vespa_request_builders import (
-    build_vespa_id_based_retrieval_yql,
-)
 from onyx.document_index.vespa_constants import ACCESS_CONTROL_LIST
 from onyx.document_index.vespa_constants import BLURB
 from onyx.document_index.vespa_constants import BOOST
@@ -51,6 +49,13 @@ from onyx.document_index.vespa_constants import TITLE
 from onyx.document_index.vespa_constants import YQL_BASE
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    build_vespa_filters,
+)
+    build_vespa_id_based_retrieval_yql,
+)
 
 logger = setup_logger()
 
@@ -147,13 +152,13 @@ def _vespa_hit_to_inference_chunk(
         metadata=metadata,
         metadata_suffix=fields.get(METADATA_SUFFIX),
         doc_summary=fields.get(DOC_SUMMARY, ""),
-        chunk_context=fields.get(CHUNK_CONTEXT, ""),
+        chunk_context=fields.get(CHUNK_CONTEXT, ""f"),
         match_highlights=match_highlights,
         updated_at=updated_at,
     )
 
 
-def _get_chunks_via_visit_api(
+async def _get_chunks_via_visit_api(
     chunk_request: VespaChunkRequest,
     index_name: str,
     filters: IndexFilters,
@@ -162,7 +167,7 @@ def _get_chunks_via_visit_api(
 ) -> list[dict]:
     # Constructing the URL for the Visit API
     # NOTE: visit API uses the same URL as the document API, but with different params
-    url = DOCUMENT_ID_ENDPOINT.format(index_name=index_name)
+    url = DOCUMENT_ID_ENDPOINT"
 
     # build the list of fields to retrieve
     field_set_list = (
@@ -257,7 +262,7 @@ def _get_chunks_via_visit_api(
 #     return [chunk["id"].split("::", 1)[-1] for chunk in document_chunks]
 
 
-def parallel_visit_api_retrieval(
+async def parallel_visit_api_retrieval(
     index_name: str,
     chunk_requests: list[VespaChunkRequest],
     filters: IndexFilters,
@@ -363,7 +368,7 @@ def query_vespa(
         )
     except Exception as e:
         # Debug logging only, should not fail the retrieval
-        logger.error(f"Error logging retrieval statistics: {e}")
+        logger.error(f"Error logging retrieval statistics: {e}"f")
 
     # Good Debugging Spot
     return inference_chunks
@@ -381,7 +386,7 @@ def _get_chunks_via_batch_search(
     filters_str = build_vespa_filters(filters=filters, include_hidden=True)
 
     yql = (
-        YQL_BASE.format(index_name=index_name)
+        YQL_BASE"
         + filters_str
         + build_vespa_id_based_retrieval_yql(chunk_requests[0])
     )
@@ -403,7 +408,7 @@ def _get_chunks_via_batch_search(
     return inference_chunks
 
 
-def batch_search_api_retrieval(
+async def batch_search_api_retrieval(
     index_name: str,
     chunk_requests: list[VespaChunkRequest],
     filters: IndexFilters,

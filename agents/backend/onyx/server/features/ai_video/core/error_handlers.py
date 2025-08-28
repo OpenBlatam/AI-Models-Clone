@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import logging
+import psutil
+from typing import Any, Optional, Dict, List, Tuple
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🎯 HAPPY PATH ERROR HANDLERS - CORE MODULE
 ==========================================
@@ -6,9 +16,6 @@ Módulo que contiene todos los manejadores de errores utilizados en el patrón
 happy path last.
 """
 
-import logging
-import psutil
-from typing import Any, Optional, Dict, List, Tuple
 
 # =============================================================================
 # ERROR HANDLER FUNCTIONS
@@ -217,7 +224,7 @@ def create_error_handler(*handlers) -> callable:
 
 def handle_with_context(handler: callable, context: Dict[str, Any]) -> callable:
     """Aplicar manejador de errores con contexto adicional."""
-    def contextual_handler(*args, **kwargs):
+    def contextual_handler(*args, **kwargs) -> Any:
         # Agregar contexto a kwargs
         kwargs.update(context)
         return handler(*args, **kwargs)

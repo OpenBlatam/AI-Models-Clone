@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import json
+import time
+from typing import Dict, Any, List, Optional, Callable
+from datetime import datetime, timedelta
+from fastapi import WebSocket, WebSocketDisconnect, Depends, HTTPException, status
+from fastapi.routing import APIRouter
+from starlette.websockets import WebSocketState
+from integration_master import IntegrationMaster
+from production_config import get_config
+import structlog
+from typing import Any, List, Dict, Optional
+import logging
 """
 WebSocket API for Real-time Communication
 =========================================
@@ -10,21 +28,10 @@ WebSocket endpoints for real-time AI processing:
 - Event streaming
 """
 
-import asyncio
-import json
-import time
-from typing import Dict, Any, List, Optional, Callable
-from datetime import datetime, timedelta
 
 # FastAPI WebSocket imports
-from fastapi import WebSocket, WebSocketDisconnect, Depends, HTTPException, status
-from fastapi.routing import APIRouter
-from starlette.websockets import WebSocketState
 
 # Local imports
-from integration_master import IntegrationMaster
-from production_config import get_config
-import structlog
 
 # Setup logger
 logger = structlog.get_logger()
@@ -33,7 +40,7 @@ logger = structlog.get_logger()
 class ConnectionManager:
     """Manage WebSocket connections"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.active_connections: Dict[str, WebSocket] = {}
         self.connection_metadata: Dict[str, Dict[str, Any]] = {}
         self.logger = structlog.get_logger()

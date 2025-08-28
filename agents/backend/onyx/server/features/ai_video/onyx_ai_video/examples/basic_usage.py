@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from pathlib import Path
+from ..api.main import OnyxAIVideoSystem, get_system, generate_video, generate_video_with_vision
+from ..core.models import VideoRequest, VideoQuality, VideoFormat
+from ..config.config_manager import OnyxConfigManager
+from ..utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
 """
 Onyx AI Video System - Basic Usage Example
 
@@ -5,15 +19,8 @@ This example demonstrates basic usage of the Onyx AI Video system
 including initialization, video generation, and system management.
 """
 
-import asyncio
-import time
-from pathlib import Path
 
 # Import the main system components
-from ..api.main import OnyxAIVideoSystem, get_system, generate_video, generate_video_with_vision
-from ..core.models import VideoRequest, VideoQuality, VideoFormat
-from ..config.config_manager import OnyxConfigManager
-from ..utils.logger import setup_logger
 
 
 async def basic_video_generation():
@@ -80,7 +87,15 @@ async def video_with_vision():
     image_path = Path(__file__).parent / "sample_image.jpg"
     if image_path.exists():
         with open(image_path, 'rb') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             image_data = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         print(f"Generating video with vision for request: {request.request_id}")
         print(f"Input text: {request.input_text}")
@@ -388,5 +403,6 @@ async def main():
         raise
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

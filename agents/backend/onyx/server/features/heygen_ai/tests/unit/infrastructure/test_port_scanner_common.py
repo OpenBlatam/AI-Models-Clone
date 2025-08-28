@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.port_scanner import AsyncPortScanner
+from port_scanner import AsyncPortScanner
 
 
 @pytest.mark.asyncio
@@ -18,6 +18,7 @@ async def test_scan_common_ports_delegates_to_range(monkeypatch):
     res = await scanner.scan_common_ports("127.0.0.1")
     assert res == []
     assert called["count"] == 1
+
 
 
 

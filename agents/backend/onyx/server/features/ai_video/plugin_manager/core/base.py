@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Any, Dict
+from abc import ABC, abstractmethod
+from onyx.utils.logger import setup_logger
+from onyx.utils.threadpool_concurrency import ThreadSafeDict
+from onyx.utils.telemetry import TelemetryLogger
+from onyx.utils.gpu_utils import is_gpu_available
+from .models import OnyxPluginInfo, OnyxPluginContext
+from ..core.exceptions import PluginError
+                from datetime import datetime, timedelta
+        from datetime import datetime
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Onyx Plugin Manager - Base Plugin Class
 
@@ -5,18 +23,10 @@ Base class for Onyx plugins providing common functionality and integration
 with Onyx's infrastructure for plugin development.
 """
 
-from typing import Any, Dict
-from abc import ABC, abstractmethod
 
 # Onyx imports
-from onyx.utils.logger import setup_logger
-from onyx.utils.threadpool_concurrency import ThreadSafeDict
-from onyx.utils.telemetry import TelemetryLogger
-from onyx.utils.gpu_utils import is_gpu_available
 
 # Local imports
-from .models import OnyxPluginInfo, OnyxPluginContext
-from ..core.exceptions import PluginError
 
 
 class OnyxPluginBase(ABC):
@@ -28,7 +38,9 @@ class OnyxPluginBase(ABC):
     """
     
     def __init__(self, config: Dict[str, Any]):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.logger = setup_logger(f"onyx_plugin.{self.__class__.__name__}")
         self.telemetry = TelemetryLogger()
         self.cache: ThreadSafeDict[str, Any] = ThreadSafeDict()
@@ -124,13 +136,11 @@ class OnyxPluginBase(ABC):
         if cache_key in self.cache:
             cached_data = self.cache[cache_key]
             if 'timestamp' in cached_data:
-                from datetime import datetime, timedelta
                 cache_time = datetime.fromisoformat(cached_data['timestamp'])
                 return datetime.now() - cache_time < timedelta(seconds=max_age)
         return False
     
     def update_cache(self, cache_key: str, data: Dict[str, Any]) -> None:
         """Update plugin cache with new data."""
-        from datetime import datetime
         data['timestamp'] = datetime.now().isoformat()
         self.cache[cache_key] = data 

@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import sys
+import os
+import asyncio
+from pathlib import Path
+        from examples.code_profiling_demo import main as demo_main
+        import traceback
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Code Profiling Demo Launcher
@@ -5,10 +15,6 @@ Code Profiling Demo Launcher
 Launcher script for the comprehensive code profiling demonstration.
 """
 
-import sys
-import os
-import asyncio
-from pathlib import Path
 
 # Add the project root to the Python path
 project_root = Path(__file__).parent.parent.parent.parent
@@ -22,7 +28,6 @@ def main():
     
     try:
         # Import the demo
-        from examples.code_profiling_demo import main as demo_main
         
         # Run the demo
         asyncio.run(demo_main())
@@ -33,9 +38,9 @@ def main():
         sys.exit(1)
     except Exception as e:
         print(f"Demo failed: {e}")
-        import traceback
         traceback.print_exc()
         sys.exit(1)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

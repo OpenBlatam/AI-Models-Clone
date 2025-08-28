@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import time
 from datetime import datetime
 
@@ -8,6 +16,9 @@ from tests.integration.common_utils.managers.user import UserManager
 from tests.integration.common_utils.test_models import DATestUser
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _verify_index_attempt_pagination(
     cc_pair_id: int,
     index_attempt_ids: list[int],

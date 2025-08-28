@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 from datetime import datetime
 from datetime import timedelta
@@ -22,6 +24,9 @@ from onyx.utils.logger import setup_logger
 from onyx.utils.variable_functionality import fetch_versioned_implementation
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -68,7 +73,7 @@ def _user_is_rate_limited_by_global() -> None:
                 )
 
 
-def _fetch_global_usage(
+async def _fetch_global_usage(
     cutoff_time: datetime, db_session: Session
 ) -> Sequence[tuple[datetime, int]]:
     """

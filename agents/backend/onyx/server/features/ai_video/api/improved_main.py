@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+from contextlib import asynccontextmanager
+from typing import Any, Dict
+import uvicorn
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import ORJSONResponse
+from .middleware.error_middleware import create_error_handler
+from .middleware.logging_middleware import create_logging_middleware
+from .middleware.performance_middleware import create_performance_middleware
+from .middleware.security_middleware import create_security_middleware
+from .routers import health_router, video_router, metrics_router, template_router
+from .services.cache_service import initialize_cache, cleanup_cache
+from .services.monitoring_service import initialize_monitoring, cleanup_monitoring
+from .utils.config import get_settings
+from typing import Any, List, Dict, Optional
+import logging
 """
 Modern FastAPI Application for AI Video System
 =============================================
@@ -12,23 +31,8 @@ Clean, scalable FastAPI implementation following best practices:
 - Performance-first architecture
 """
 
-import asyncio
-from contextlib import asynccontextmanager
-from typing import Any, Dict
 
-import uvicorn
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import ORJSONResponse
 
-from .middleware.error_middleware import create_error_handler
-from .middleware.logging_middleware import create_logging_middleware
-from .middleware.performance_middleware import create_performance_middleware
-from .middleware.security_middleware import create_security_middleware
-from .routers import health_router, video_router, metrics_router, template_router
-from .services.cache_service import initialize_cache, cleanup_cache
-from .services.monitoring_service import initialize_monitoring, cleanup_monitoring
-from .utils.config import get_settings
 
 
 @asynccontextmanager

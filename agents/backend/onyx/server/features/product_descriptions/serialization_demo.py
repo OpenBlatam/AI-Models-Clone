@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+import time
+from typing import Dict, List, Optional, Any
+from decimal import Decimal
+from datetime import datetime, timedelta
+from fastapi import FastAPI, HTTPException, BackgroundTasks
+from pydantic import BaseModel, Field
+from pydantic_serialization import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Pydantic Serialization Demo
 
@@ -10,17 +32,8 @@ This demo showcases:
 - Benchmarking and comparison
 """
 
-import asyncio
-import json
-import time
-from typing import Dict, List, Optional, Any
-from decimal import Decimal
-from datetime import datetime, timedelta
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks
-from pydantic import BaseModel, Field
 
-from pydantic_serialization import (
     ProductDescription, ProductCategory, ProductTag, ProductImage, ProductVariant,
     SerializationStrategy, ValidationLevel, PydanticSerializer, StreamingSerializer,
     batch_serialize, batch_deserialize, get_global_serializer, clear_serializer_cache,
@@ -74,7 +87,7 @@ class Order(BaseModel):
 class SerializationDemoService:
     """Service demonstrating serialization features"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.serializers = {
             strategy: PydanticSerializer(strategy)
             for strategy in SerializationStrategy
@@ -212,7 +225,7 @@ class SerializationDemoService:
         return results
     
     @cached_serialization(ttl=300)
-    async def get_cached_serialized_data(self, data: Any, strategy: SerializationStrategy) -> Any:
+    async def get_cached_serialized_data(self, data: Any, strategy: SerializationStrategy) -> Optional[Dict[str, Any]]:
         """Get cached serialized data"""
         serializer = self.serializers[strategy]
         return serializer.serialize(data, strategy)
@@ -236,7 +249,9 @@ class SerializationDemoService:
     def _mock_data_stream(self, data_list: List[bytes]):
         """Mock async generator for data stream"""
         async def generator():
-            for data in data_list:
+            
+    """generator function."""
+for data in data_list:
                 yield data
         return generator()
     

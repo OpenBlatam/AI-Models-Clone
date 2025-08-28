@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import os
+import asyncio
+import logging
+from typing import List, Optional, Dict, Any
+from datetime import datetime
+from contextlib import asynccontextmanager
+from fastapi import (
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer
+from pydantic import BaseModel, Field, ConfigDict
+import uvicorn
+import structlog
+from sqlalchemy_2_implementation import (
+from typing import Any, List, Dict, Optional
 """
 🚀 FastAPI + SQLAlchemy 2.0 Integration Example
 ===============================================
@@ -6,26 +30,11 @@ Practical example showing how to integrate SQLAlchemy 2.0 with FastAPI
 for the Blatam Academy NLP system.
 """
 
-import os
-import asyncio
-import logging
-from typing import List, Optional, Dict, Any
-from datetime import datetime
-from contextlib import asynccontextmanager
 
-from fastapi import (
     FastAPI, Depends, HTTPException, status, Request, Response,
     BackgroundTasks, Query, Path, Body, Header
 )
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.security import HTTPBearer
-from pydantic import BaseModel, Field, ConfigDict
-import uvicorn
-import structlog
 
-from sqlalchemy_2_implementation import (
     DatabaseConfig, SQLAlchemy2Manager,
     TextAnalysisCreate, TextAnalysisUpdate, BatchAnalysisCreate,
     TextAnalysisResponse, BatchAnalysisResponse,
@@ -105,7 +114,7 @@ class BatchCreateRequest(BaseModel):
 class DatabaseManager:
     """Database manager singleton."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.settings = Settings()
         self._db_manager: Optional[SQLAlchemy2Manager] = None
     
@@ -123,7 +132,7 @@ class DatabaseManager:
         
         return self._db_manager
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup database manager."""
         if self._db_manager:
             await self._db_manager.cleanup()
@@ -144,10 +153,12 @@ class RequestLoggingMiddleware:
     """Request logging middleware."""
     
     def __init__(self, app: FastAPI):
-        self.app = app
+        
+    """__init__ function."""
+self.app = app
         self.logger = structlog.get_logger(__name__)
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         if scope["type"] == "http":
             start_time = datetime.now()
             request_id = f"req_{start_time.timestamp()}"
@@ -160,7 +171,7 @@ class RequestLoggingMiddleware:
                 path=scope["path"]
             )
             
-            async def send_with_logging(message):
+            async def send_with_logging(message) -> Any:
                 if message["type"] == "http.response.start":
                     end_time = datetime.now()
                     duration = (end_time - start_time).total_seconds()

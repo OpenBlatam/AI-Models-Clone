@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+import time
+from typing import Dict, List, Optional, Any
+from datetime import datetime, timedelta
+from fastapi import FastAPI, HTTPException, BackgroundTasks
+from pydantic import BaseModel, Field
+from caching_manager import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Caching Demo for Product Descriptions API
 
@@ -12,16 +33,8 @@ This demo showcases:
 - Performance optimization with caching
 """
 
-import asyncio
-import json
-import time
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks
-from pydantic import BaseModel, Field
 
-from caching_manager import (
     CacheManager, CacheConfig, CacheStrategy, EvictionPolicy,
     StaticDataCache, CacheWarmingService, CacheMonitor,
     cached, cache_invalidate, get_cache_manager, close_cache_manager
@@ -145,7 +158,9 @@ class CachedProductService:
     """Service layer with caching for product operations"""
     
     def __init__(self, cache_manager: CacheManager):
-        self.cache_manager = cache_manager
+        
+    """__init__ function."""
+self.cache_manager = cache_manager
         self.static_cache = StaticDataCache(cache_manager)
         self.warming_service = CacheWarmingService(cache_manager)
         self.monitor = CacheMonitor(cache_manager)
@@ -190,7 +205,7 @@ class CachedProductService:
         
         return True
     
-    async def warm_product_cache(self):
+    async def warm_product_cache(self) -> Any:
         """Warm cache with product data"""
         await self.warming_service.warm_cache(
             MockDataSources.get_product_catalog,
@@ -198,7 +213,7 @@ class CachedProductService:
             batch_size=50
         )
     
-    async def warm_category_cache(self):
+    async def warm_category_cache(self) -> Any:
         """Warm cache with category data"""
         await self.warming_service.warm_cache(
             MockDataSources.get_category_list,
@@ -592,7 +607,9 @@ async def demo_cache_warming():
     warming_service = CacheWarmingService(cache_manager)
     
     async def mock_data_source():
-        return {"key1": "value1", "key2": "value2", "key3": "value3"}
+        
+    """mock_data_source function."""
+return {"key1": "value1", "key2": "value2", "key3": "value3"}
     
     print("1. Warming cache with mock data...")
     await warming_service.warm_cache(mock_data_source, "demo_data", 10)

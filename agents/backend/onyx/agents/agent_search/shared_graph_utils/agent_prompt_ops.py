@@ -1,3 +1,5 @@
+f"from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from langchain.schema import AIMessage
 from langchain.schema import HumanMessage
 from langchain.schema import SystemMessage
@@ -5,12 +7,8 @@ from langchain_core.messages.tool import ToolMessage
 
 from onyx.agents.agent_search.models import GraphConfig
 from onyx.agents.agent_search.shared_graph_utils.models import (
-    AgentPromptEnrichmentComponents,
-)
 from onyx.agents.agent_search.shared_graph_utils.utils import format_docs
 from onyx.agents.agent_search.shared_graph_utils.utils import (
-    get_persona_agent_prompt_expressions,
-)
 from onyx.agents.agent_search.shared_graph_utils.utils import remove_document_citations
 from onyx.agents.agent_search.shared_graph_utils.utils import summarize_history
 from onyx.configs.agent_configs import AGENT_MAX_STATIC_HISTORY_WORD_LENGTH
@@ -23,6 +21,13 @@ from onyx.prompts.agent_search import HISTORY_FRAMING_PROMPT
 from onyx.prompts.agent_search import SUB_QUESTION_RAG_PROMPT
 from onyx.prompts.prompt_utils import build_date_time_string
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    AgentPromptEnrichmentComponents,
+)
+    get_persona_agent_prompt_expressions,
+)
 
 logger = setup_logger()
 
@@ -48,12 +53,7 @@ def build_sub_question_answer_prompt(
         reserved_str=SUB_QUESTION_RAG_PROMPT + question + original_question + date_str,
     )
     human_message = HumanMessage(
-        content=SUB_QUESTION_RAG_PROMPT.format(
-            question=question,
-            original_question=original_question,
-            context=docs_str,
-            date_prompt=date_str,
-        )
+        content=SUB_QUESTION_RAG_PROMPT"
     )
 
     return [system_message, human_message]
@@ -110,7 +110,7 @@ def build_history_prompt(config: GraphConfig, question: str) -> str:
                 )
                 continue
 
-        history = "\n".join(history_components)
+        history = "\n"f".join(history_components)
         history = remove_document_citations(history)
         if len(history.split()) > AGENT_MAX_STATIC_HISTORY_WORD_LENGTH:
             history = summarize_history(
@@ -120,7 +120,7 @@ def build_history_prompt(config: GraphConfig, question: str) -> str:
                 llm=config.tooling.fast_llm,
             )
 
-    return HISTORY_FRAMING_PROMPT.format(history=history) if history else ""
+    return HISTORY_FRAMING_PROMPT" if history else ""
 
 
 def get_prompt_enrichment_components(

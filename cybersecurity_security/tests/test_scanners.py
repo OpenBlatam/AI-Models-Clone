@@ -1,13 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import pytest
+import asyncio
+from unittest.mock import patch, MagicMock
+from cybersecurity_security.scanners import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Tests for Scanners Module
 
 Tests port scanner, vulnerability scanner, and web scanner functionality.
 """
 
-import pytest
-import asyncio
-from unittest.mock import patch, MagicMock
-from cybersecurity_security.scanners import (
     # Port Scanner
     PortScanRequest, PortScanResult, PortRangeScanRequest, PortRangeScanResult,
     scan_port, scan_port_async, scan_port_range_async, get_service_name,
@@ -26,7 +30,7 @@ from cybersecurity_security.scanners import (
 class TestPortScanner:
     """Test suite for port scanner."""
     
-    def test_port_scan_request_creation(self):
+    async def test_port_scan_request_creation(self) -> Any:
         """Test PortScanRequest creation."""
         request = PortScanRequest(
             target_host="localhost",
@@ -37,7 +41,7 @@ class TestPortScanner:
         assert request.port == 80
         assert request.timeout == 1.0
     
-    def test_port_scan_request_invalid_port(self):
+    async def test_port_scan_request_invalid_port(self) -> Any:
         """Test PortScanRequest with invalid port."""
         with pytest.raises(ValueError):
             PortScanRequest(
@@ -45,7 +49,7 @@ class TestPortScanner:
                 port=70000  # Should be <= 65535
             )
     
-    def test_get_service_name(self):
+    def test_get_service_name(self) -> Optional[Dict[str, Any]]:
         """Test service name resolution."""
         assert get_service_name(80) == "HTTP"
         assert get_service_name(443) == "HTTPS"
@@ -53,7 +57,11 @@ class TestPortScanner:
         assert get_service_name(9999) == "Unknown"
     
     @patch('socket.socket')
-    def test_scan_port_open(self, mock_socket):
+    def test_scan_port_open(self, mock_socket) -> Any:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         """Test scanning an open port."""
         mock_sock = MagicMock()
         mock_sock.connect_ex.return_value = 0
@@ -72,7 +80,7 @@ class TestPortScanner:
         assert result.service == "HTTP"
     
     @pytest.mark.asyncio
-    async def test_scan_port_async(self):
+    async def test_scan_port_async(self) -> Any:
         """Test async port scanning."""
         with patch('cybersecurity_security.scanners.port_scanner.scan_port') as mock_scan:
             mock_scan.return_value = PortScanResult(
@@ -98,7 +106,7 @@ class TestPortScanner:
 class TestVulnerabilityScanner:
     """Test suite for vulnerability scanner."""
     
-    def test_vulnerability_scan_request_creation(self):
+    async def test_vulnerability_scan_request_creation(self) -> Any:
         """Test VulnerabilityScanRequest creation."""
         request = VulnerabilityScanRequest(
             target_url="http://example.com",
@@ -110,7 +118,7 @@ class TestVulnerabilityScanner:
         assert VulnerabilityType.XSS in request.scan_types
         assert request.max_concurrent_requests == 5
     
-    def test_vulnerability_scan_request_invalid_url(self):
+    async def test_vulnerability_scan_request_invalid_url(self) -> Any:
         """Test VulnerabilityScanRequest with invalid URL."""
         with pytest.raises(ValueError, match="Target URL must start with http:// or https://"):
             VulnerabilityScanRequest(
@@ -118,7 +126,7 @@ class TestVulnerabilityScanner:
             )
     
     @pytest.mark.asyncio
-    async def test_scan_sql_injection(self):
+    async def test_scan_sql_injection(self) -> Any:
         """Test SQL injection scanning."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -141,7 +149,7 @@ class TestVulnerabilityScanner:
             assert results[0].severity == "high"
     
     @pytest.mark.asyncio
-    async def test_scan_xss_vulnerabilities(self):
+    async def test_scan_xss_vulnerabilities(self) -> Any:
         """Test XSS vulnerability scanning."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -164,7 +172,7 @@ class TestVulnerabilityScanner:
             assert results[0].severity == "high"
     
     @pytest.mark.asyncio
-    async def test_scan_vulnerabilities_async(self):
+    async def test_scan_vulnerabilities_async(self) -> Any:
         """Test comprehensive vulnerability scanning."""
         with patch('cybersecurity_security.scanners.vulnerability_scanner.scan_sql_injection') as mock_sql:
             mock_sql.return_value = []
@@ -185,7 +193,7 @@ class TestVulnerabilityScanner:
 class TestWebScanner:
     """Test suite for web scanner."""
     
-    def test_web_scan_request_creation(self):
+    async def test_web_scan_request_creation(self) -> Any:
         """Test WebScanRequest creation."""
         request = WebScanRequest(
             target_url="https://example.com",
@@ -198,7 +206,7 @@ class TestWebScanner:
         assert "admin" in request.common_directories
         assert request.max_concurrent_requests == 5
     
-    def test_web_scan_request_invalid_url(self):
+    async def test_web_scan_request_invalid_url(self) -> Any:
         """Test WebScanRequest with invalid URL."""
         with pytest.raises(ValueError, match="Target URL must start with http:// or https://"):
             WebScanRequest(
@@ -206,7 +214,7 @@ class TestWebScanner:
             )
     
     @pytest.mark.asyncio
-    async def test_scan_web_directory_enumeration(self):
+    async def test_scan_web_directory_enumeration(self) -> Any:
         """Test web directory enumeration."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -230,7 +238,7 @@ class TestWebScanner:
             assert results[0].response_code == 200
     
     @pytest.mark.asyncio
-    async def test_scan_web_robots_txt(self):
+    async def test_scan_web_robots_txt(self) -> Any:
         """Test robots.txt scanning."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -252,7 +260,7 @@ class TestWebScanner:
             assert "admin" in result.evidence
     
     @pytest.mark.asyncio
-    async def test_scan_web_headers(self):
+    async def test_scan_web_headers(self) -> Any:
         """Test security headers scanning."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -276,7 +284,7 @@ class TestWebScanner:
             assert result.response_code == 200
     
     @pytest.mark.asyncio
-    async def test_scan_web_application_async(self):
+    async def test_scan_web_application_async(self) -> Any:
         """Test comprehensive web application scanning."""
         with patch('cybersecurity_security.scanners.web_scanner.scan_web_directory_enumeration') as mock_dir:
             mock_dir.return_value = []
@@ -298,7 +306,7 @@ class TestScannerIntegration:
     """Integration tests for scanner modules."""
     
     @pytest.mark.asyncio
-    async def test_multiple_scanner_types(self):
+    async def test_multiple_scanner_types(self) -> Any:
         """Test using multiple scanner types together."""
         # Test port scanning
         port_request = PortRangeScanRequest(

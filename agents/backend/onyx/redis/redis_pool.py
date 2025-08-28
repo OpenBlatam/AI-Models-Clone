@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import functools
 import json
@@ -31,6 +33,8 @@ from onyx.utils.logger import setup_logger
 from shared_configs.configs import DEFAULT_REDIS_PREFIX
 from shared_configs.contextvars import get_current_tenant_id
 
+from typing import Any, List, Dict, Optional
+import logging
 logger = setup_logger()
 
 SCAN_ITER_COUNT_DEFAULT = 4096
@@ -99,7 +103,7 @@ class TenantRedis(redis.Redis):
 
         return wrapper
 
-    def __getattribute__(self, item: str) -> Any:
+    def __getattribute__(self, item: str) -> Optional[Dict[str, Any]]:
         original_attr = super().__getattribute__(item)
         methods_to_wrap = [
             "lock",

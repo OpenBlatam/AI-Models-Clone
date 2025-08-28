@@ -1,14 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import re
+import unicodedata
+from typing import Dict, Any, List, Optional
+from dataclasses import dataclass
+import structlog
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Procesador de Texto - NotebookLM AI
 📝 Limpieza, normalización y preprocesamiento de texto
 """
 
-import re
-import unicodedata
-from typing import Dict, Any, List, Optional
-from dataclasses import dataclass
-import structlog
 
 logger = structlog.get_logger()
 
@@ -43,7 +48,9 @@ class TextProcessor:
     """Procesador avanzado de texto."""
     
     def __init__(self, config: TextProcessorConfig = None):
-        self.config = config or TextProcessorConfig()
+        
+    """__init__ function."""
+self.config = config or TextProcessorConfig()
         self.stats = {"processed_texts": 0, "total_chars_removed": 0}
         
         # Patrones regex

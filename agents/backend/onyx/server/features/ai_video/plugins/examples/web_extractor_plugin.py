@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+import time
+from typing import Dict, List, Optional, Any, Union
+from urllib.parse import urlparse
+import aiohttp
+from bs4 import BeautifulSoup
+import trafilatura
+from newspaper import Article
+import json
+from ..base import BasePlugin, PluginMetadata
+from ...core.types import ExtractedContent, ContentType
+from ...core.exceptions import PluginError, ValidationError
+    from ...plugins import PluginManager, ManagerConfig
+from typing import Any, List, Dict, Optional
 """
 Web Extractor Plugin - Example Plugin Implementation
 
@@ -10,20 +27,7 @@ This plugin demonstrates how to create a production-ready plugin that:
 - Integrates with the plugin system
 """
 
-import asyncio
-import logging
-import time
-from typing import Dict, List, Optional, Any, Union
-from urllib.parse import urlparse
-import aiohttp
-from bs4 import BeautifulSoup
-import trafilatura
-from newspaper import Article
-import json
 
-from ..base import BasePlugin, PluginMetadata
-from ...core.types import ExtractedContent, ContentType
-from ...core.exceptions import PluginError, ValidationError
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +45,9 @@ class WebExtractorPlugin(BasePlugin):
     """
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         
         # Plugin metadata
         self.name = "web_extractor"
@@ -140,7 +146,7 @@ class WebExtractorPlugin(BasePlugin):
             logger.error(f"Configuration validation failed: {e}")
             return False
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the plugin."""
         logger.info("🚀 Initializing WebExtractorPlugin...")
         
@@ -162,7 +168,7 @@ class WebExtractorPlugin(BasePlugin):
             logger.error(f"❌ Failed to initialize WebExtractorPlugin: {e}")
             raise PluginError(f"Initialization failed: {e}")
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup plugin resources."""
         logger.info("🧹 Cleaning up WebExtractorPlugin...")
         
@@ -215,7 +221,7 @@ class WebExtractorPlugin(BasePlugin):
             logger.error(f"❌ Failed to extract content from {url}: {e}")
             raise PluginError(f"Content extraction failed: {e}")
     
-    async def _fetch_html(self, url: str) -> str:
+    async async def _fetch_html(self, url: str) -> str:
         """Fetch HTML content from URL with retry logic."""
         for attempt in range(self.config["max_retries"]):
             try:
@@ -459,7 +465,6 @@ class WebExtractorPlugin(BasePlugin):
 # Example usage
 async def example_usage():
     """Example of how to use the WebExtractorPlugin."""
-    from ...plugins import PluginManager, ManagerConfig
     
     # Create plugin manager
     config = ManagerConfig(auto_discover=False)
@@ -496,5 +501,6 @@ async def example_usage():
         await manager.shutdown()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(example_usage()) 

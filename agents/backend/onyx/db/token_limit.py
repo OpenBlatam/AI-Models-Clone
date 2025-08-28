@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 
 from sqlalchemy import select
@@ -9,7 +11,10 @@ from onyx.db.models import TokenRateLimit__UserGroup
 from onyx.server.token_rate_limits.models import TokenRateLimitArgs
 
 
-def fetch_all_user_token_rate_limits(
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+async def fetch_all_user_token_rate_limits(
     db_session: Session,
     enabled_only: bool = False,
     ordered: bool = True,
@@ -27,7 +32,7 @@ def fetch_all_user_token_rate_limits(
     return db_session.scalars(query).all()
 
 
-def fetch_all_global_token_rate_limits(
+async def fetch_all_global_token_rate_limits(
     db_session: Session,
     enabled_only: bool = False,
     ordered: bool = True,

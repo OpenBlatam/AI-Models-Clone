@@ -1,3 +1,55 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import argparse
+import json
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
+from typing import Any
+from typing import Dict
+from typing import List
+from typing import Optional
+from uuid import UUID
+from pydantic import BaseModel
+from sqlalchemy import and_
+from onyx.configs.constants import INDEX_SEPARATOR
+from onyx.context.search.models import IndexFilters
+from onyx.context.search.models import SearchRequest
+from onyx.db.engine import get_session_with_current_tenant
+from onyx.db.engine import get_session_with_tenant
+from onyx.db.engine import SqlEngine
+from onyx.db.models import ConnectorCredentialPair
+from onyx.db.models import Document
+from onyx.db.models import DocumentByConnectorCredentialPair
+from onyx.db.search_settings import get_current_search_settings
+from onyx.document_index.document_index_utils import get_document_chunk_ids
+from onyx.document_index.interfaces import EnrichedDocumentIndexingInfo
+from onyx.document_index.vespa.index import VespaIndex
+from onyx.document_index.vespa.shared_utils.utils import get_vespa_http_client
+from onyx.document_index.vespa_constants import ACCESS_CONTROL_LIST
+from onyx.document_index.vespa_constants import DOC_UPDATED_AT
+from onyx.document_index.vespa_constants import DOCUMENT_ID_ENDPOINT
+from onyx.document_index.vespa_constants import DOCUMENT_SETS
+from onyx.document_index.vespa_constants import HIDDEN
+from onyx.document_index.vespa_constants import METADATA_LIST
+from onyx.document_index.vespa_constants import SEARCH_ENDPOINT
+from onyx.document_index.vespa_constants import SOURCE_TYPE
+from onyx.document_index.vespa_constants import VESPA_APP_CONTAINER_URL
+from onyx.document_index.vespa_constants import VESPA_APPLICATION_ENDPOINT
+from onyx.utils.logger import setup_logger
+from shared_configs.configs import MULTI_TENANT
+from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
+from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
+            from sqlalchemy import func
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Vespa Debugging Tool!
 
@@ -28,48 +80,8 @@ Example:
   python vespa_debug_tool.py --action list_connector --tenant-id my_tenant --cc-pair-id 1 --n 5
 """
 
-import argparse
-import json
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
-from typing import Any
-from typing import Dict
-from typing import List
-from typing import Optional
-from uuid import UUID
 
-from pydantic import BaseModel
-from sqlalchemy import and_
 
-from onyx.configs.constants import INDEX_SEPARATOR
-from onyx.context.search.models import IndexFilters
-from onyx.context.search.models import SearchRequest
-from onyx.db.engine import get_session_with_current_tenant
-from onyx.db.engine import get_session_with_tenant
-from onyx.db.engine import SqlEngine
-from onyx.db.models import ConnectorCredentialPair
-from onyx.db.models import Document
-from onyx.db.models import DocumentByConnectorCredentialPair
-from onyx.db.search_settings import get_current_search_settings
-from onyx.document_index.document_index_utils import get_document_chunk_ids
-from onyx.document_index.interfaces import EnrichedDocumentIndexingInfo
-from onyx.document_index.vespa.index import VespaIndex
-from onyx.document_index.vespa.shared_utils.utils import get_vespa_http_client
-from onyx.document_index.vespa_constants import ACCESS_CONTROL_LIST
-from onyx.document_index.vespa_constants import DOC_UPDATED_AT
-from onyx.document_index.vespa_constants import DOCUMENT_ID_ENDPOINT
-from onyx.document_index.vespa_constants import DOCUMENT_SETS
-from onyx.document_index.vespa_constants import HIDDEN
-from onyx.document_index.vespa_constants import METADATA_LIST
-from onyx.document_index.vespa_constants import SEARCH_ENDPOINT
-from onyx.document_index.vespa_constants import SOURCE_TYPE
-from onyx.document_index.vespa_constants import VESPA_APP_CONTAINER_URL
-from onyx.document_index.vespa_constants import VESPA_APPLICATION_ENDPOINT
-from onyx.utils.logger import setup_logger
-from shared_configs.configs import MULTI_TENANT
-from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
-from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
 
 logger = setup_logger()
 
@@ -311,9 +323,9 @@ def update_document(
     # Update a specific document.
     index_name = get_index_name(tenant_id)
     logger.info(
-        f"Updating document doc_id={doc_id} in tenant={tenant_id}, connector_id={connector_id}"
+        f"Updating document doc_id={doc_id} in tenant={tenant_id}, connector_id={connector_id}"f"
     )
-    url = DOCUMENT_ID_ENDPOINT.format(index_name=index_name) + f"/{doc_id}"
+    url = DOCUMENT_ID_ENDPOINT" + f"/{doc_id}"
     update_request = {"fields": {k: {"assign": v} for k, v in fields.items()}}
     with get_vespa_http_client() as client:
         response = client.put(url, json=update_request)
@@ -326,9 +338,9 @@ def delete_document(tenant_id: str, connector_id: int, doc_id: str) -> None:
     # Delete a specific document.
     index_name = get_index_name(tenant_id)
     logger.info(
-        f"Deleting document doc_id={doc_id} in tenant={tenant_id}, connector_id={connector_id}"
+        f"Deleting document doc_id={doc_id} in tenant={tenant_id}, connector_id={connector_id}"f"
     )
-    url = DOCUMENT_ID_ENDPOINT.format(index_name=index_name) + f"/{doc_id}"
+    url = DOCUMENT_ID_ENDPOINT" + f"/{doc_id}"
     with get_vespa_http_client() as client:
         response = client.delete(url)
         response.raise_for_status()
@@ -443,7 +455,7 @@ def get_document_acls(
     )
     for doc_chunk_id in target_ids:
         document_url = (
-            f"{DOCUMENT_ID_ENDPOINT.format(index_name=index_name)}/{str(doc_chunk_id)}"
+            f"f"{DOCUMENT_ID_ENDPOINT"}/{str(doc_chunk_id)}"
         )
         response = vespa_client.get(document_url)
         if response.status_code == 200:
@@ -515,7 +527,9 @@ def get_number_of_chunks_we_think_exist(
 class VespaDebugging:
     # Class for managing Vespa debugging actions.
     def __init__(self, tenant_id: str = POSTGRES_DEFAULT_SCHEMA):
-        SqlEngine.init_engine(pool_size=20, max_overflow=5)
+        
+    """__init__ function."""
+SqlEngine.init_engine(pool_size=20, max_overflow=5)
         CURRENT_TENANT_ID_CONTEXTVAR.set(tenant_id)
         self.tenant_id = tenant_id
         self.index_name = get_index_name(self.tenant_id)
@@ -526,7 +540,6 @@ class VespaDebugging:
         no_chunks = []
         with get_session_with_current_tenant() as session:
             # Get a sample of random documents
-            from sqlalchemy import func
 
             sample_docs = (
                 session.query(Document.id, Document.link, Document.semantic_id)
@@ -823,7 +836,7 @@ def delete_documents_for_tenant(
                     )
                     continue
 
-                url = f"{DOCUMENT_ID_ENDPOINT.format(index_name=index_name)}/{doc_id_value}"
+                url = f"f"{DOCUMENT_ID_ENDPOINT"}/{doc_id_value}"
 
                 params = {}
                 if condition:
@@ -936,5 +949,6 @@ def main() -> None:
             vespa_debug.acls_by_link(args.cc_pair_id, args.link)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main()

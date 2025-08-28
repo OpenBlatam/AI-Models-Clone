@@ -1,8 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import platform
 import socket
 from enum import auto
 from enum import Enum
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 ONYX_DEFAULT_APPLICATION_NAME = "Onyx"
 ONYX_SLACK_URL = "https://join.slack.com/t/onyx-dot-app/shared_invite/zt-2twesxdr6-5iQitKZQpgq~hYIZ~dv3KA"
 ONYX_EMAILABLE_LOGO_MAX_DIM = 512
@@ -325,6 +335,7 @@ class OnyxCeleryQueues:
     MONITORING = "monitoring"
 
 
+@dataclass
 class OnyxRedisLocks:
     PRIMARY_WORKER = "da_lock:primary_worker"
     CHECK_VESPA_SYNC_BEAT_LOCK = "da_lock:check_vespa_sync_beat"
@@ -358,6 +369,7 @@ class OnyxRedisLocks:
     CLOUD_CHECK_ALEMBIC_BEAT_LOCK = "da_lock:cloud_check_alembic"
 
 
+@dataclass
 class OnyxRedisSignals:
     BLOCK_VALIDATE_INDEXING_FENCES = "signal:block_validate_indexing_fences"
     BLOCK_VALIDATE_EXTERNAL_GROUP_SYNC_FENCES = (
@@ -374,6 +386,7 @@ class OnyxRedisSignals:
     )
 
 
+@dataclass
 class OnyxRedisConstants:
     ACTIVE_FENCES = "active_fences"
 
@@ -397,6 +410,7 @@ ONYX_CLOUD_REDIS_RUNTIME = "runtime"
 CLOUD_BUILD_FENCE_LOOKUP_TABLE_INTERVAL_DEFAULT = 600
 
 
+@dataclass
 class OnyxCeleryTask:
     DEFAULT = "celery"
 

@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import json
 from collections.abc import Callable
 from collections.abc import Generator
@@ -25,6 +36,9 @@ from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -35,7 +49,7 @@ SLAB_API_URL = "https://api.slab.com/v1/graphql"
 _SLIM_BATCH_SIZE = 1000
 
 
-def run_graphql_request(
+async def run_graphql_request(
     graphql_query: dict, bot_token: str, max_tries: int = SLAB_GRAPHQL_MAX_TRIES
 ) -> str:
     headers = {"Authorization": bot_token, "Content-Type": "application/json"}

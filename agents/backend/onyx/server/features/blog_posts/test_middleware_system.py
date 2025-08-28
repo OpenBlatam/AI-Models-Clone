@@ -1,3 +1,33 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import pytest
+import asyncio
+import time
+import json
+import uuid
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional, Any
+from unittest.mock import Mock, patch, AsyncMock, MagicMock
+from collections import deque
+from fastapi import FastAPI, Request, Response, HTTPException, status
+from fastapi.testclient import TestClient
+from fastapi.responses import JSONResponse
+import structlog
+from middleware_system import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 🧪 COMPREHENSIVE MIDDLEWARE SYSTEM TESTS
 =======================================
@@ -21,22 +51,8 @@ Features:
 - Mock and fixture management
 """
 
-import pytest
-import asyncio
-import time
-import json
-import uuid
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Any
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
-from collections import deque
 
-from fastapi import FastAPI, Request, Response, HTTPException, status
-from fastapi.testclient import TestClient
-from fastapi.responses import JSONResponse
-import structlog
 
-from middleware_system import (
     MiddlewareConfig, RequestMetrics, ErrorEvent, PerformanceMetrics,
     HealthStatus, MetricsCollector, ResponseCache, ErrorMonitor,
     PerformanceMonitor, RateLimiter, LoggingMiddleware,
@@ -103,7 +119,7 @@ def fastapi_app():
     return FastAPI(title="Test API", version="1.0.0")
 
 @pytest.fixture
-def test_client(fastapi_app):
+def test_client(fastapi_app) -> Any:
     """Create test client for FastAPI app."""
     return TestClient(fastapi_app)
 
@@ -114,7 +130,7 @@ def test_client(fastapi_app):
 class TestMiddlewareConfig:
     """Test middleware configuration."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration values."""
         config = MiddlewareConfig()
         
@@ -127,7 +143,7 @@ class TestMiddlewareConfig:
         assert config.rate_limit_requests == 100
         assert config.slow_request_threshold_ms == 1000
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration values."""
         config = MiddlewareConfig(
             log_level="DEBUG",
@@ -141,7 +157,7 @@ class TestMiddlewareConfig:
         assert config.rate_limit_requests == 50
         assert config.slow_request_threshold_ms == 500
     
-    def test_config_validation(self):
+    def test_config_validation(self) -> Any:
         """Test configuration validation."""
         # Should not raise validation error
         config = MiddlewareConfig()
@@ -155,7 +171,7 @@ class TestMiddlewareConfig:
 class TestMetricsCollector:
     """Test metrics collector functionality."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test metrics collector initialization."""
         collector = MetricsCollector()
         
@@ -169,7 +185,7 @@ class TestMetricsCollector:
         assert collector.cache_misses is not None
         assert collector.rate_limit_exceeded is not None
     
-    def test_record_request(self):
+    async def test_record_request(self) -> Any:
         """Test recording request metrics."""
         collector = MetricsCollector()
         
@@ -181,7 +197,7 @@ class TestMetricsCollector:
         assert collector.request_count is not None
         assert collector.request_duration is not None
     
-    def test_record_error(self):
+    def test_record_error(self) -> Any:
         """Test recording error metrics."""
         collector = MetricsCollector()
         
@@ -191,7 +207,7 @@ class TestMetricsCollector:
         # Error metric should be recorded
         assert collector.error_count is not None
     
-    def test_record_cache_operations(self):
+    def test_record_cache_operations(self) -> Any:
         """Test recording cache operations."""
         collector = MetricsCollector()
         
@@ -204,7 +220,7 @@ class TestMetricsCollector:
         assert collector.cache_hits is not None
         assert collector.cache_misses is not None
     
-    def test_record_rate_limit_exceeded(self):
+    def test_record_rate_limit_exceeded(self) -> Any:
         """Test recording rate limit violations."""
         collector = MetricsCollector()
         
@@ -216,7 +232,7 @@ class TestMetricsCollector:
     
     @patch('psutil.virtual_memory')
     @patch('psutil.cpu_percent')
-    def test_update_system_metrics(self, mock_cpu, mock_memory):
+    def test_update_system_metrics(self, mock_cpu, mock_memory) -> Any:
         """Test updating system metrics."""
         # Mock system metrics
         mock_memory.return_value.used = 1024 * 1024 * 100  # 100MB
@@ -236,7 +252,7 @@ class TestMetricsCollector:
 class TestResponseCache:
     """Test response caching functionality."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test cache initialization."""
         cache = ResponseCache(ttl_seconds=60, max_size=100)
         
@@ -244,7 +260,7 @@ class TestResponseCache:
         assert cache.cache.ttl == 60
         assert cache.metrics_collector is not None
     
-    def test_generate_cache_key(self, mock_request):
+    def test_generate_cache_key(self, mock_request) -> Any:
         """Test cache key generation."""
         cache = ResponseCache()
         
@@ -263,7 +279,7 @@ class TestResponseCache:
         key3 = cache.generate_cache_key(mock_request)
         assert key2 != key3
     
-    def test_cache_operations(self, mock_response):
+    def test_cache_operations(self, mock_response) -> Any:
         """Test cache get/set operations."""
         cache = ResponseCache(ttl_seconds=60, max_size=10)
         
@@ -281,7 +297,7 @@ class TestResponseCache:
             cache.get("test-key")
             mock_hit.assert_called_once()
     
-    def test_cache_invalidation(self, mock_response):
+    def test_cache_invalidation(self, mock_response) -> Any:
         """Test cache invalidation."""
         cache = ResponseCache(ttl_seconds=60, max_size=10)
         
@@ -305,7 +321,7 @@ class TestResponseCache:
 class TestErrorMonitor:
     """Test error monitoring functionality."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test error monitor initialization."""
         monitor = ErrorMonitor(alert_threshold=5, alert_window_minutes=2)
         
@@ -314,7 +330,7 @@ class TestErrorMonitor:
         assert len(monitor.error_events) == 0
         assert len(monitor.alerted_errors) == 0
     
-    def test_record_error(self, mock_request):
+    def test_record_error(self, mock_request) -> Any:
         """Test recording error events."""
         monitor = ErrorMonitor()
         
@@ -332,7 +348,7 @@ class TestErrorMonitor:
         assert error_event.timestamp is not None
         assert len(monitor.error_events) == 1
     
-    def test_error_alerting(self):
+    def test_error_alerting(self) -> Any:
         """Test error alerting functionality."""
         monitor = ErrorMonitor(alert_threshold=3, alert_window_minutes=1)
         
@@ -352,7 +368,7 @@ class TestErrorMonitor:
         # Should trigger alert
         assert len(monitor.alerted_errors) > 0
     
-    def test_error_summary(self):
+    def test_error_summary(self) -> Any:
         """Test error summary generation."""
         monitor = ErrorMonitor()
         
@@ -368,7 +384,7 @@ class TestErrorMonitor:
         assert summary["error_types"]["TypeError"] == 1
         assert len(summary["recent_errors"]) == 3
     
-    def test_error_cleanup(self):
+    def test_error_cleanup(self) -> Any:
         """Test error event cleanup."""
         monitor = ErrorMonitor(alert_threshold=1, alert_window_minutes=1)
         
@@ -392,7 +408,7 @@ class TestErrorMonitor:
 class TestPerformanceMonitor:
     """Test performance monitoring functionality."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test performance monitor initialization."""
         monitor = PerformanceMonitor(slow_request_threshold_ms=500)
         
@@ -401,7 +417,7 @@ class TestPerformanceMonitor:
         assert monitor.start_time is not None
         assert monitor.metrics_collector is not None
     
-    def test_record_request(self):
+    async def test_record_request(self) -> Any:
         """Test recording request metrics."""
         monitor = PerformanceMonitor(slow_request_threshold_ms=1000)
         
@@ -428,7 +444,7 @@ class TestPerformanceMonitor:
             assert len(monitor.request_times) == 1
             assert monitor.request_times[0] == 500
     
-    def test_slow_request_detection(self):
+    async def test_slow_request_detection(self) -> Any:
         """Test slow request detection."""
         monitor = PerformanceMonitor(slow_request_threshold_ms=100)
         
@@ -454,7 +470,7 @@ class TestPerformanceMonitor:
             assert call_args["duration_ms"] == 150
             assert call_args["threshold_ms"] == 100
     
-    def test_performance_metrics(self):
+    def test_performance_metrics(self) -> Any:
         """Test performance metrics calculation."""
         monitor = PerformanceMonitor()
         
@@ -471,7 +487,7 @@ class TestPerformanceMonitor:
         assert metrics.memory_usage_mb > 0
         assert metrics.cpu_usage_percent >= 0
     
-    def test_empty_metrics(self):
+    def test_empty_metrics(self) -> Any:
         """Test metrics calculation with no requests."""
         monitor = PerformanceMonitor()
         
@@ -490,7 +506,7 @@ class TestPerformanceMonitor:
 class TestRateLimiter:
     """Test rate limiting functionality."""
     
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test rate limiter initialization."""
         limiter = RateLimiter(requests_per_minute=60, window_seconds=60)
         
@@ -498,7 +514,7 @@ class TestRateLimiter:
         assert limiter.window_seconds == 60
         assert len(limiter.requests) == 0
     
-    def test_client_identification(self, mock_request):
+    def test_client_identification(self, mock_request) -> Any:
         """Test client identification."""
         limiter = RateLimiter()
         
@@ -518,7 +534,7 @@ class TestRateLimiter:
         client_id = limiter.get_client_identifier(mock_request)
         assert client_id == "127.0.0.1"
     
-    def test_rate_limiting(self, mock_request):
+    def test_rate_limiting(self, mock_request) -> Any:
         """Test rate limiting behavior."""
         limiter = RateLimiter(requests_per_minute=2, window_seconds=60)
         
@@ -538,7 +554,7 @@ class TestRateLimiter:
         assert allowed is False
         assert info["current_requests"] == 2
     
-    def test_rate_limit_window(self, mock_request):
+    def test_rate_limit_window(self, mock_request) -> Any:
         """Test rate limit window behavior."""
         limiter = RateLimiter(requests_per_minute=1, window_seconds=1)
         
@@ -557,7 +573,7 @@ class TestRateLimiter:
         allowed, _ = limiter.is_allowed(mock_request)
         assert allowed is True
     
-    def test_multiple_clients(self):
+    def test_multiple_clients(self) -> Any:
         """Test rate limiting with multiple clients."""
         limiter = RateLimiter(requests_per_minute=1, window_seconds=60)
         
@@ -586,7 +602,7 @@ class TestRateLimiter:
 class TestLoggingMiddleware:
     """Test logging middleware functionality."""
     
-    def test_initialization(self, middleware_config):
+    def test_initialization(self, middleware_config) -> Any:
         """Test logging middleware initialization."""
         app = FastAPI()
         middleware = LoggingMiddleware(app, middleware_config)
@@ -595,7 +611,7 @@ class TestLoggingMiddleware:
         assert middleware.logger is not None
     
     @patch('structlog.configure')
-    def test_logging_setup(self, mock_configure, middleware_config):
+    def test_logging_setup(self, mock_configure, middleware_config) -> Any:
         """Test logging setup."""
         app = FastAPI()
         middleware = LoggingMiddleware(app, middleware_config)
@@ -604,13 +620,13 @@ class TestLoggingMiddleware:
         mock_configure.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_request_logging(self, mock_request, mock_response, middleware_config):
+    async async def test_request_logging(self, mock_request, mock_response, middleware_config) -> Any:
         """Test request logging functionality."""
         app = FastAPI()
         middleware = LoggingMiddleware(app, middleware_config)
         
         # Mock call_next
-        async def call_next(request):
+        async def call_next(request) -> Any:
             return mock_response
         
         # Mock logger
@@ -624,13 +640,13 @@ class TestLoggingMiddleware:
             assert response == mock_response
     
     @pytest.mark.asyncio
-    async def test_error_logging(self, mock_request, middleware_config):
+    async def test_error_logging(self, mock_request, middleware_config) -> Any:
         """Test error logging functionality."""
         app = FastAPI()
         middleware = LoggingMiddleware(app, middleware_config)
         
         # Mock call_next to raise exception
-        async def call_next(request):
+        async def call_next(request) -> Any:
             raise ValueError("Test error")
         
         # Mock logger
@@ -645,14 +661,14 @@ class TestPerformanceMonitoringMiddleware:
     """Test performance monitoring middleware functionality."""
     
     @pytest.mark.asyncio
-    async def test_performance_monitoring(self, mock_request, mock_response, middleware_config):
+    async def test_performance_monitoring(self, mock_request, mock_response, middleware_config) -> Any:
         """Test performance monitoring functionality."""
         app = FastAPI()
         performance_monitor = PerformanceMonitor()
         middleware = PerformanceMonitoringMiddleware(app, middleware_config, performance_monitor)
         
         # Mock call_next
-        async def call_next(request):
+        async def call_next(request) -> Any:
             await asyncio.sleep(0.1)  # Simulate processing time
             return mock_response
         
@@ -667,14 +683,14 @@ class TestPerformanceMonitoringMiddleware:
         assert response == mock_response
     
     @pytest.mark.asyncio
-    async def test_error_performance_monitoring(self, mock_request, middleware_config):
+    async def test_error_performance_monitoring(self, mock_request, middleware_config) -> Any:
         """Test performance monitoring with errors."""
         app = FastAPI()
         performance_monitor = PerformanceMonitor()
         middleware = PerformanceMonitoringMiddleware(app, middleware_config, performance_monitor)
         
         # Mock call_next to raise exception
-        async def call_next(request):
+        async def call_next(request) -> Any:
             await asyncio.sleep(0.1)  # Simulate processing time
             raise ValueError("Test error")
         
@@ -690,14 +706,14 @@ class TestErrorMonitoringMiddleware:
     """Test error monitoring middleware functionality."""
     
     @pytest.mark.asyncio
-    async def test_error_monitoring(self, mock_request, middleware_config):
+    async def test_error_monitoring(self, mock_request, middleware_config) -> Any:
         """Test error monitoring functionality."""
         app = FastAPI()
         error_monitor = ErrorMonitor()
         middleware = ErrorMonitoringMiddleware(app, middleware_config, error_monitor)
         
         # Mock call_next to raise exception
-        async def call_next(request):
+        async def call_next(request) -> Any:
             raise ValueError("Test error")
         
         # Process request
@@ -710,14 +726,14 @@ class TestErrorMonitoringMiddleware:
         assert error_monitor.error_events[0].request_id == mock_request.state.request_id
     
     @pytest.mark.asyncio
-    async def test_successful_request(self, mock_request, mock_response, middleware_config):
+    async async def test_successful_request(self, mock_request, mock_response, middleware_config) -> Any:
         """Test error monitoring with successful request."""
         app = FastAPI()
         error_monitor = ErrorMonitor()
         middleware = ErrorMonitoringMiddleware(app, middleware_config, error_monitor)
         
         # Mock call_next
-        async def call_next(request):
+        async def call_next(request) -> Any:
             return mock_response
         
         # Process request
@@ -733,14 +749,14 @@ class TestRateLimitingMiddleware:
     """Test rate limiting middleware functionality."""
     
     @pytest.mark.asyncio
-    async def test_rate_limiting(self, mock_request, mock_response, middleware_config):
+    async def test_rate_limiting(self, mock_request, mock_response, middleware_config) -> Any:
         """Test rate limiting functionality."""
         app = FastAPI()
         rate_limiter = RateLimiter(requests_per_minute=1, window_seconds=60)
         middleware = RateLimitingMiddleware(app, middleware_config, rate_limiter)
         
         # Mock call_next
-        async def call_next(request):
+        async def call_next(request) -> Any:
             return mock_response
         
         # First request should succeed
@@ -753,14 +769,14 @@ class TestRateLimitingMiddleware:
         assert "Rate limit exceeded" in response.body.decode()
     
     @pytest.mark.asyncio
-    async def test_rate_limit_headers(self, mock_request, mock_response, middleware_config):
+    async def test_rate_limit_headers(self, mock_request, mock_response, middleware_config) -> Any:
         """Test rate limit headers."""
         app = FastAPI()
         rate_limiter = RateLimiter(requests_per_minute=10, window_seconds=60)
         middleware = RateLimitingMiddleware(app, middleware_config, rate_limiter)
         
         # Mock call_next
-        async def call_next(request):
+        async def call_next(request) -> Any:
             return mock_response
         
         # Process request
@@ -775,14 +791,14 @@ class TestCachingMiddleware:
     """Test caching middleware functionality."""
     
     @pytest.mark.asyncio
-    async def test_caching(self, mock_request, mock_response, middleware_config):
+    async def test_caching(self, mock_request, mock_response, middleware_config) -> Any:
         """Test caching functionality."""
         app = FastAPI()
         response_cache = ResponseCache(ttl_seconds=60, max_size=10)
         middleware = CachingMiddleware(app, middleware_config, response_cache)
         
         # Mock call_next
-        async def call_next(request):
+        async def call_next(request) -> Any:
             return mock_response
         
         # First request should cache miss
@@ -794,7 +810,7 @@ class TestCachingMiddleware:
         assert response.headers.get("X-Cache") == "HIT"
     
     @pytest.mark.asyncio
-    async def test_non_get_requests(self, mock_request, mock_response, middleware_config):
+    async async def test_non_get_requests(self, mock_request, mock_response, middleware_config) -> Optional[Dict[str, Any]]:
         """Test caching with non-GET requests."""
         app = FastAPI()
         response_cache = ResponseCache()
@@ -804,7 +820,7 @@ class TestCachingMiddleware:
         mock_request.method = "POST"
         
         # Mock call_next
-        async def call_next(request):
+        async def call_next(request) -> Any:
             return mock_response
         
         # POST request should not be cached
@@ -815,13 +831,13 @@ class TestSecurityHeadersMiddleware:
     """Test security headers middleware functionality."""
     
     @pytest.mark.asyncio
-    async def test_security_headers(self, mock_request, mock_response, middleware_config):
+    async def test_security_headers(self, mock_request, mock_response, middleware_config) -> Any:
         """Test security headers functionality."""
         app = FastAPI()
         middleware = SecurityHeadersMiddleware(app, middleware_config)
         
         # Mock call_next
-        async def call_next(request):
+        async def call_next(request) -> Any:
             return mock_response
         
         # Process request
@@ -843,7 +859,7 @@ class TestSecurityHeadersMiddleware:
 class TestMiddlewareManager:
     """Test middleware manager functionality."""
     
-    def test_initialization(self, middleware_config):
+    def test_initialization(self, middleware_config) -> Any:
         """Test middleware manager initialization."""
         manager = MiddlewareManager(middleware_config)
         
@@ -854,7 +870,7 @@ class TestMiddlewareManager:
         assert manager.rate_limiter is not None
         assert manager.response_cache is not None
     
-    def test_setup_middleware(self, fastapi_app, middleware_config):
+    def test_setup_middleware(self, fastapi_app, middleware_config) -> Any:
         """Test middleware setup."""
         manager = MiddlewareManager(middleware_config)
         manager.setup_middleware(fastapi_app)
@@ -862,7 +878,7 @@ class TestMiddlewareManager:
         # Should add middleware to app
         assert len(fastapi_app.middleware_stack) > 0
     
-    def test_system_status(self, middleware_config):
+    def test_system_status(self, middleware_config) -> Any:
         """Test system status generation."""
         manager = MiddlewareManager(middleware_config)
         
@@ -882,7 +898,7 @@ class TestMiddlewareManager:
 class TestMiddlewareIntegration:
     """Test middleware integration."""
     
-    def test_complete_middleware_chain(self, fastapi_app, middleware_config):
+    def test_complete_middleware_chain(self, fastapi_app, middleware_config) -> Any:
         """Test complete middleware chain."""
         # Setup middleware system
         manager = setup_middleware_system(fastapi_app, middleware_config)
@@ -890,7 +906,9 @@ class TestMiddlewareIntegration:
         # Add test endpoint
         @fastapi_app.get("/test")
         async def test_endpoint():
-            return {"message": "test"}
+            
+    """test_endpoint function."""
+return {"message": "test"}
         
         # Create test client
         client = TestClient(fastapi_app)
@@ -906,7 +924,7 @@ class TestMiddlewareIntegration:
         assert "X-Content-Type-Options" in response.headers
         assert "X-Frame-Options" in response.headers
     
-    def test_error_handling_integration(self, fastapi_app, middleware_config):
+    def test_error_handling_integration(self, fastapi_app, middleware_config) -> Any:
         """Test error handling integration."""
         # Setup middleware system
         manager = setup_middleware_system(fastapi_app, middleware_config)
@@ -914,7 +932,9 @@ class TestMiddlewareIntegration:
         # Add error endpoint
         @fastapi_app.get("/error")
         async def error_endpoint():
-            raise ValueError("Test error")
+            
+    """error_endpoint function."""
+raise ValueError("Test error")
         
         # Create test client
         client = TestClient(fastapi_app)
@@ -927,7 +947,7 @@ class TestMiddlewareIntegration:
         assert "error" in response.json()
         assert "request_id" in response.json()
     
-    def test_rate_limiting_integration(self, fastapi_app):
+    def test_rate_limiting_integration(self, fastapi_app) -> Any:
         """Test rate limiting integration."""
         # Create config with low rate limit
         config = MiddlewareConfig(rate_limit_requests=1, rate_limit_window=60)
@@ -938,7 +958,9 @@ class TestMiddlewareIntegration:
         # Add test endpoint
         @fastapi_app.get("/test")
         async def test_endpoint():
-            return {"message": "test"}
+            
+    """test_endpoint function."""
+return {"message": "test"}
         
         # Create test client
         client = TestClient(fastapi_app)
@@ -951,7 +973,7 @@ class TestMiddlewareIntegration:
         response2 = client.get("/test")
         assert response2.status_code == 429
     
-    def test_health_check_integration(self, fastapi_app, middleware_config):
+    def test_health_check_integration(self, fastapi_app, middleware_config) -> Any:
         """Test health check integration."""
         # Setup middleware system
         manager = setup_middleware_system(fastapi_app, middleware_config)
@@ -970,7 +992,7 @@ class TestMiddlewareIntegration:
         assert "uptime_seconds" in data
         assert "components" in data
     
-    def test_metrics_integration(self, fastapi_app, middleware_config):
+    def test_metrics_integration(self, fastapi_app, middleware_config) -> Any:
         """Test metrics integration."""
         # Setup middleware system
         manager = setup_middleware_system(fastapi_app, middleware_config)
@@ -978,7 +1000,9 @@ class TestMiddlewareIntegration:
         # Add test endpoint
         @fastapi_app.get("/test")
         async def test_endpoint():
-            return {"message": "test"}
+            
+    """test_endpoint function."""
+return {"message": "test"}
         
         # Create test client
         client = TestClient(fastapi_app)
@@ -1001,7 +1025,7 @@ class TestMiddlewareIntegration:
 class TestUtilityFunctions:
     """Test utility functions."""
     
-    def test_create_middleware_config(self):
+    def test_create_middleware_config(self) -> Any:
         """Test middleware config creation."""
         config = create_middleware_config(
             log_level="DEBUG",
@@ -1011,7 +1035,7 @@ class TestUtilityFunctions:
         assert config.log_level == "DEBUG"
         assert config.enable_request_logging is False
     
-    def test_get_request_metrics(self, mock_request):
+    async def test_get_request_metrics(self, mock_request) -> Optional[Dict[str, Any]]:
         """Test request metrics extraction."""
         metrics = get_request_metrics(mock_request)
         
@@ -1020,7 +1044,7 @@ class TestUtilityFunctions:
         assert metrics["start_time"] == mock_request.state.start_time
         assert metrics["duration_ms"] is not None
     
-    def test_log_request_event(self, mock_request):
+    async def test_log_request_event(self, mock_request) -> Any:
         """Test request event logging."""
         with patch('structlog.get_logger') as mock_logger:
             mock_log = Mock()
@@ -1043,7 +1067,7 @@ class TestMiddlewarePerformance:
     """Test middleware performance."""
     
     @pytest.mark.asyncio
-    async def test_middleware_overhead(self, fastapi_app, middleware_config):
+    async def test_middleware_overhead(self, fastapi_app, middleware_config) -> Any:
         """Test middleware overhead."""
         # Setup middleware system
         manager = setup_middleware_system(fastapi_app, middleware_config)
@@ -1051,7 +1075,9 @@ class TestMiddlewarePerformance:
         # Add simple endpoint
         @fastapi_app.get("/simple")
         async def simple_endpoint():
-            return {"message": "simple"}
+            
+    """simple_endpoint function."""
+return {"message": "simple"}
         
         # Create test client
         client = TestClient(fastapi_app)
@@ -1065,7 +1091,7 @@ class TestMiddlewarePerformance:
         assert response.status_code == 200
         assert (end_time - start_time) < 1.0  # Should be much faster
     
-    def test_cache_performance(self):
+    def test_cache_performance(self) -> Any:
         """Test cache performance."""
         cache = ResponseCache(ttl_seconds=60, max_size=1000)
         
@@ -1088,7 +1114,7 @@ class TestMiddlewarePerformance:
         # Should be fast
         assert (end_time - start_time) < 1.0
     
-    def test_rate_limiter_performance(self):
+    def test_rate_limiter_performance(self) -> Any:
         """Test rate limiter performance."""
         limiter = RateLimiter(requests_per_minute=1000, window_seconds=60)
         
@@ -1116,7 +1142,7 @@ class TestMiddlewarePerformance:
 class TestEdgeCases:
     """Test edge cases and error conditions."""
     
-    def test_empty_request_headers(self):
+    async def test_empty_request_headers(self) -> Any:
         """Test handling of empty request headers."""
         request = Mock(spec=Request)
         request.client.host = "127.0.0.1"
@@ -1127,7 +1153,7 @@ class TestEdgeCases:
         
         assert client_id == "127.0.0.1"
     
-    def test_malformed_request(self):
+    async def test_malformed_request(self) -> Any:
         """Test handling of malformed requests."""
         request = Mock(spec=Request)
         request.client = None
@@ -1138,7 +1164,7 @@ class TestEdgeCases:
         
         assert client_id == "unknown"
     
-    def test_cache_key_collision(self, mock_request):
+    def test_cache_key_collision(self, mock_request) -> Any:
         """Test cache key collision handling."""
         cache = ResponseCache()
         
@@ -1149,7 +1175,7 @@ class TestEdgeCases:
         # Keys should be identical for identical requests
         assert key1 == key2
     
-    def test_error_monitor_memory_cleanup(self):
+    def test_error_monitor_memory_cleanup(self) -> Any:
         """Test error monitor memory cleanup."""
         monitor = ErrorMonitor(alert_threshold=1, alert_window_minutes=1)
         
@@ -1160,7 +1186,7 @@ class TestEdgeCases:
         # Should not grow indefinitely
         assert len(monitor.error_events) <= 1000
     
-    def test_performance_monitor_memory_cleanup(self):
+    def test_performance_monitor_memory_cleanup(self) -> Any:
         """Test performance monitor memory cleanup."""
         monitor = PerformanceMonitor()
         
@@ -1178,7 +1204,7 @@ class TestEdgeCases:
 class TestConfigurationScenarios:
     """Test different configuration scenarios."""
     
-    def test_disabled_middleware(self):
+    def test_disabled_middleware(self) -> Any:
         """Test disabled middleware configuration."""
         config = MiddlewareConfig(
             enable_request_logging=False,
@@ -1195,7 +1221,7 @@ class TestConfigurationScenarios:
         # Should still have basic middleware
         assert len(app.middleware_stack) > 0
     
-    def test_high_performance_config(self):
+    def test_high_performance_config(self) -> Any:
         """Test high performance configuration."""
         config = MiddlewareConfig(
             slow_request_threshold_ms=100,
@@ -1209,7 +1235,7 @@ class TestConfigurationScenarios:
         assert config.cache_ttl_seconds == 3600
         assert config.cache_max_size == 10000
     
-    def test_debug_config(self):
+    def test_debug_config(self) -> Any:
         """Test debug configuration."""
         config = MiddlewareConfig(
             log_level="DEBUG",
@@ -1223,5 +1249,6 @@ class TestConfigurationScenarios:
         assert config.enable_response_logging is True
         assert config.log_sensitive_headers is True
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

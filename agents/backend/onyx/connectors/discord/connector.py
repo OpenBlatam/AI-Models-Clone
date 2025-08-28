@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import asyncio
 from collections.abc import AsyncIterable
 from collections.abc import Iterable
@@ -25,6 +30,10 @@ from onyx.connectors.models import ImageSection
 from onyx.connectors.models import TextSection
 from onyx.utils.logger import setup_logger
 
+    import os
+    import time
+from typing import Any, List, Dict, Optional
+import logging
 logger = setup_logger()
 
 
@@ -85,7 +94,7 @@ def _convert_message_to_document(
     )
 
 
-async def _fetch_filtered_channels(
+async async def _fetch_filtered_channels(
     discord_client: Client,
     server_ids: list[int] | None,
     channel_names: list[str] | None,
@@ -107,7 +116,7 @@ async def _fetch_filtered_channels(
     return filtered_channels
 
 
-async def _fetch_documents_from_channel(
+async async def _fetch_documents_from_channel(
     channel: TextChannel,
     start_time: datetime | None,
     end_time: datetime | None,
@@ -193,7 +202,7 @@ def _manage_async_retrieval(
 
     end_time: datetime | None = end
 
-    async def _async_fetch() -> AsyncIterable[Document]:
+    async async def _async_fetch() -> AsyncIterable[Document]:
         intents = Intents.default()
         intents.message_content = True
         async with Client(intents=intents) as discord_client:
@@ -245,7 +254,9 @@ class DiscordConnector(PollConnector, LoadConnector):
         start_date: str | None = None,
         batch_size: int = INDEX_BATCH_SIZE,
     ):
-        self.batch_size = batch_size
+        
+    """__init__ function."""
+self.batch_size = batch_size
         self.channel_names: list[str] = channel_names if channel_names else []
         self.server_ids: list[int] = (
             [int(server_id) for server_id in server_ids] if server_ids else []
@@ -298,8 +309,6 @@ class DiscordConnector(PollConnector, LoadConnector):
 
 
 if __name__ == "__main__":
-    import os
-    import time
 
     end = time.time()
     # 1 day

@@ -1,7 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, Any, List
 from pydantic import BaseModel, Field
 import dns.resolver
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 __all__ = ["DNSConfig", "enumerate_dns"]
 
 class DNSConfig(BaseModel):

@@ -1,13 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import pytest
+import asyncio
+from unittest.mock import patch, MagicMock
+from cybersecurity_security.utils import (
+            import os
+from typing import Any, List, Dict, Optional
+import logging
 """
 Tests for Utils Module
 
 Tests crypto helpers and network helpers functionality.
 """
 
-import pytest
-import asyncio
-from unittest.mock import patch, MagicMock
-from cybersecurity_security.utils import (
     # Crypto Helpers
     CryptoRequest, CryptoResult, CryptoOperation,
     HashAlgorithm, EncryptionAlgorithm,
@@ -28,7 +42,7 @@ from cybersecurity_security.utils import (
 class TestCryptoHelpers:
     """Test suite for crypto helpers."""
     
-    def test_crypto_request_creation(self):
+    async def test_crypto_request_creation(self) -> Any:
         """Test CryptoRequest creation."""
         request = CryptoRequest(
             operation=CryptoOperation.HASH,
@@ -40,7 +54,7 @@ class TestCryptoHelpers:
         assert request.algorithm == HashAlgorithm.SHA256
     
     @pytest.mark.asyncio
-    async def test_perform_hash_async(self):
+    async def test_perform_hash_async(self) -> Any:
         """Test hash operation."""
         test_data = "test data"
         result = await perform_hash_async(test_data, HashAlgorithm.SHA256)
@@ -52,7 +66,7 @@ class TestCryptoHelpers:
         assert len(result.output_data) > 0
     
     @pytest.mark.asyncio
-    async def test_perform_hash_async_different_algorithms(self):
+    async def test_perform_hash_async_different_algorithms(self) -> Any:
         """Test hash operation with different algorithms."""
         test_data = "test data"
         
@@ -70,7 +84,7 @@ class TestCryptoHelpers:
             assert len(result.output_data) > 0
     
     @pytest.mark.asyncio
-    async def test_perform_encryption_async(self):
+    async def test_perform_encryption_async(self) -> Any:
         """Test encryption operation."""
         test_data = "secret message"
         key = "mysecretkey1234567890123456789012"  # 32 bytes for AES-256
@@ -84,7 +98,7 @@ class TestCryptoHelpers:
         assert len(result.output_data) > 0
     
     @pytest.mark.asyncio
-    async def test_perform_decryption_async(self):
+    async def test_perform_decryption_async(self) -> Any:
         """Test decryption operation."""
         test_data = "secret message"
         key = "mysecretkey1234567890123456789012"  # 32 bytes for AES-256
@@ -102,7 +116,7 @@ class TestCryptoHelpers:
         assert decrypt_result.output_data == test_data
     
     @pytest.mark.asyncio
-    async def test_generate_key_async(self):
+    async def test_generate_key_async(self) -> Any:
         """Test key generation."""
         result = await generate_key_async(EncryptionAlgorithm.AES_256_GCM)
         
@@ -112,7 +126,7 @@ class TestCryptoHelpers:
         assert len(result.output_data) > 0
     
     @pytest.mark.asyncio
-    async def test_derive_key_from_password_async(self):
+    async def test_derive_key_from_password_async(self) -> Any:
         """Test key derivation from password."""
         password = "mysecretpassword"
         salt = "mysalt123"
@@ -126,7 +140,7 @@ class TestCryptoHelpers:
         assert result.output_data["iterations"] == 1000
     
     @pytest.mark.asyncio
-    async def test_generate_random_bytes_async(self):
+    async def test_generate_random_bytes_async(self) -> Any:
         """Test random bytes generation."""
         result = await generate_random_bytes_async(32)
         
@@ -135,7 +149,7 @@ class TestCryptoHelpers:
         assert len(result.output_data) > 0
     
     @pytest.mark.asyncio
-    async def test_create_digital_signature_async(self):
+    async def test_create_digital_signature_async(self) -> Any:
         """Test digital signature creation."""
         test_data = "message to sign"
         
@@ -154,7 +168,7 @@ class TestCryptoHelpers:
         assert len(signature_result.output_data) > 0
     
     @pytest.mark.asyncio
-    async def test_verify_signature_async(self):
+    async def test_verify_signature_async(self) -> Any:
         """Test signature verification."""
         test_data = "message to sign"
         
@@ -180,7 +194,7 @@ class TestCryptoHelpers:
 class TestNetworkHelpers:
     """Test suite for network helpers."""
     
-    def test_network_request_creation(self):
+    async def test_network_request_creation(self) -> Any:
         """Test NetworkRequest creation."""
         request = NetworkRequest(
             operation=NetworkOperation.DNS_LOOKUP,
@@ -192,7 +206,7 @@ class TestNetworkHelpers:
         assert request.timeout == 10.0
     
     @pytest.mark.asyncio
-    async def test_perform_dns_lookup_async(self):
+    async def test_perform_dns_lookup_async(self) -> Any:
         """Test DNS lookup."""
         with patch('socket.gethostbyname_ex') as mock_gethostbyname:
             mock_gethostbyname.return_value = ("example.com", [], ["93.184.216.34"])
@@ -205,7 +219,7 @@ class TestNetworkHelpers:
             assert "records" in result.result_data
     
     @pytest.mark.asyncio
-    async def test_perform_http_request_async(self):
+    async async def test_perform_http_request_async(self) -> Any:
         """Test HTTP request."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -223,7 +237,7 @@ class TestNetworkHelpers:
             assert result.result_data["status_code"] == 200
     
     @pytest.mark.asyncio
-    async def test_perform_https_request_async(self):
+    async async def test_perform_https_request_async(self) -> Any:
         """Test HTTPS request."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -242,7 +256,7 @@ class TestNetworkHelpers:
             assert result.result_data["status_code"] == 200
     
     @pytest.mark.asyncio
-    async def test_check_port_availability_async(self):
+    async def test_check_port_availability_async(self) -> Any:
         """Test port availability check."""
         with patch('socket.socket') as mock_socket:
             mock_sock = MagicMock()
@@ -257,7 +271,7 @@ class TestNetworkHelpers:
             assert result.result_data["is_open"] is True
     
     @pytest.mark.asyncio
-    async def test_resolve_hostname_async(self):
+    async def test_resolve_hostname_async(self) -> Any:
         """Test hostname resolution."""
         with patch('socket.gethostbyname') as mock_gethostbyname, \
              patch('socket.gethostbyaddr') as mock_gethostbyaddr:
@@ -273,7 +287,7 @@ class TestNetworkHelpers:
             assert result.result_data["ip_address"] == "192.168.1.1"
     
     @pytest.mark.asyncio
-    async def test_get_network_info_async(self):
+    async def test_get_network_info_async(self) -> Optional[Dict[str, Any]]:
         """Test network info retrieval."""
         with patch('socket.gethostbyname') as mock_gethostbyname:
             mock_gethostbyname.return_value = "192.168.1.1"
@@ -286,7 +300,7 @@ class TestNetworkHelpers:
             assert "ip_address" in result.result_data
     
     @pytest.mark.asyncio
-    async def test_check_connectivity_async(self):
+    async def test_check_connectivity_async(self) -> Any:
         """Test connectivity check."""
         with patch('socket.socket') as mock_socket:
             mock_sock = MagicMock()
@@ -301,7 +315,7 @@ class TestNetworkHelpers:
             assert "port_check" in result.result_data
     
     @pytest.mark.asyncio
-    async def test_get_ssl_certificate_async(self):
+    async def test_get_ssl_certificate_async(self) -> Optional[Dict[str, Any]]:
         """Test SSL certificate retrieval."""
         with patch('socket.create_connection') as mock_connect, \
              patch('ssl.create_default_context') as mock_context:
@@ -331,7 +345,7 @@ class TestNetworkHelpers:
             assert "subject" in result.result_data
     
     @pytest.mark.asyncio
-    async def test_perform_whois_lookup_async(self):
+    async def test_perform_whois_lookup_async(self) -> Any:
         """Test WHOIS lookup."""
         with patch('whois.whois') as mock_whois:
             mock_whois.return_value = MagicMock(
@@ -354,7 +368,7 @@ class TestNetworkHelpers:
             assert "registrar" in result.result_data
     
     @pytest.mark.asyncio
-    async def test_get_geolocation_async(self):
+    async def test_get_geolocation_async(self) -> Optional[Dict[str, Any]]:
         """Test geolocation lookup."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -375,14 +389,14 @@ class TestNetworkHelpers:
             assert result.success is True
             assert "country" in result.result_data
     
-    def test_validate_ip_address(self):
+    def test_validate_ip_address(self) -> bool:
         """Test IP address validation."""
         assert validate_ip_address("192.168.1.1") is True
         assert validate_ip_address("2001:db8::1") is True
         assert validate_ip_address("invalid") is False
         assert validate_ip_address("256.256.256.256") is False
     
-    def test_validate_domain_name(self):
+    def test_validate_domain_name(self) -> bool:
         """Test domain name validation."""
         assert validate_domain_name("example.com") is True
         assert validate_domain_name("sub.example.com") is True
@@ -390,7 +404,7 @@ class TestNetworkHelpers:
         assert validate_domain_name("") is False
     
     @pytest.mark.asyncio
-    async def test_get_mac_address_async(self):
+    async def test_get_mac_address_async(self) -> Optional[Dict[str, Any]]:
         """Test MAC address retrieval."""
         with patch('subprocess.Popen') as mock_popen:
             mock_process = MagicMock()
@@ -408,7 +422,7 @@ class TestNetworkHelpers:
             assert "mac_address" in result.result_data
     
     @pytest.mark.asyncio
-    async def test_perform_arp_scan_async(self):
+    async def test_perform_arp_scan_async(self) -> Any:
         """Test ARP scan."""
         with patch('subprocess.Popen') as mock_popen:
             mock_process = MagicMock()
@@ -429,7 +443,7 @@ class TestUtilsIntegration:
     """Integration tests for utils modules."""
     
     @pytest.mark.asyncio
-    async def test_crypto_workflow(self):
+    async def test_crypto_workflow(self) -> Any:
         """Test complete crypto workflow."""
         # Generate key
         key_result = await generate_key_async(EncryptionAlgorithm.AES_256_GCM)
@@ -446,7 +460,7 @@ class TestUtilsIntegration:
         assert decrypt_result.output_data == test_data
     
     @pytest.mark.asyncio
-    async def test_network_workflow(self):
+    async def test_network_workflow(self) -> Any:
         """Test complete network workflow."""
         # DNS lookup
         with patch('socket.gethostbyname_ex') as mock_gethostbyname:
@@ -469,14 +483,22 @@ class TestUtilsIntegration:
                 assert connectivity_result.success is True
     
     @pytest.mark.asyncio
-    async def test_file_crypto_operations(self):
+    async def test_file_crypto_operations(self) -> Any:
         """Test file crypto operations."""
         test_content = "This is a test file content"
         test_file = "test_file.txt"
         
         # Create test file
         with open(test_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(test_content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         try:
             # Hash file
@@ -498,7 +520,6 @@ class TestUtilsIntegration:
             
         finally:
             # Cleanup
-            import os
             if os.path.exists(test_file):
                 os.remove(test_file)
             if os.path.exists(f"{test_file}.encrypted"):
@@ -507,7 +528,7 @@ class TestUtilsIntegration:
                 os.remove(f"{test_file}.decrypted")
     
     @pytest.mark.asyncio
-    async def test_multiple_network_operations(self):
+    async def test_multiple_network_operations(self) -> Any:
         """Test multiple network operations together."""
         with patch('socket.gethostbyname') as mock_gethostbyname, \
              patch('socket.socket') as mock_socket, \

@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Remove _alt suffix from model_name
 
 Revision ID: d9ec13955951
@@ -6,7 +12,6 @@ Create Date: 2024-08-20 16:31:32.955686
 
 """
 
-from alembic import op
 
 
 # revision identifiers, used by Alembic.

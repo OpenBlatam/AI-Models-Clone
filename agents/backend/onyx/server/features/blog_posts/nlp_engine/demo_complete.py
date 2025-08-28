@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import json
+from typing import List
+from . import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 🎯 DEMO COMPLETO - Motor NLP Modular Enterprise
 ===============================================
@@ -23,13 +41,8 @@ Ejecutar desde directorio nlp_engine:
   python demo_complete.py
 """
 
-import asyncio
-import time
-import json
-from typing import List
 
 # Importar la API pública del motor (desde directorio local)
-from . import (
     NLPEngine, 
     AnalysisType, 
     ProcessingTier,
@@ -341,5 +354,6 @@ async def main():
         raise
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

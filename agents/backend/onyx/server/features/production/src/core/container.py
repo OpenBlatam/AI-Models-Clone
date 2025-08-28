@@ -1,18 +1,11 @@
-"""
-🔧 Dependency Injection Container
-=================================
-
-Ultra-optimized DI container with lazy loading, singleton management,
-and automatic resource cleanup.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import logging
 from typing import Dict, Any, Type, Optional, Callable
 from contextlib import asynccontextmanager
 from functools import lru_cache
 import weakref
-
 from src.core.config import Settings
 from src.core.exceptions import ContainerError
 from src.infrastructure.database import DatabaseManager
@@ -23,6 +16,16 @@ from src.application.services.ai_service import AIService
 from src.application.services.event_publisher import EventPublisher
 from src.application.repositories.copywriting_repository import CopywritingRepository
 from src.application.repositories.user_repository import UserRepository
+from typing import Any, List, Dict, Optional
+"""
+🔧 Dependency Injection Container
+=================================
+
+Ultra-optimized DI container with lazy loading, singleton management,
+and automatic resource cleanup.
+"""
+
+
 
 
 class Container:
@@ -35,7 +38,7 @@ class Container:
     - Circular dependency detection
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._instances: Dict[str, Any] = {}
         self._factories: Dict[str, Callable] = {}
         self._singletons: Dict[str, Any] = {}
@@ -47,7 +50,7 @@ class Container:
         # Register default factories
         self._register_default_factories()
     
-    def _register_default_factories(self):
+    def _register_default_factories(self) -> Any:
         """Register default service factories"""
         
         # Core services
@@ -75,12 +78,12 @@ class Container:
         self._singletons[name] = instance
         self._logger.debug(f"Registered singleton: {name}")
     
-    def get(self, service_type: Type) -> Any:
+    def get(self, service_type: Type) -> Optional[Dict[str, Any]]:
         """Get a service instance by type"""
         service_name = service_type.__name__
         return self.get_by_name(service_name)
     
-    def get_by_name(self, name: str) -> Any:
+    def get_by_name(self, name: str) -> Optional[Dict[str, Any]]:
         """Get a service instance by name"""
         
         # Check if already instantiated
@@ -105,11 +108,11 @@ class Container:
         raise ContainerError(f"Service {name} not found")
     
     @lru_cache(maxsize=128)
-    def get_cached(self, service_type: Type) -> Any:
+    def get_cached(self, service_type: Type) -> Optional[Dict[str, Any]]:
         """Get a cached service instance"""
         return self.get(service_type)
     
-    async def init_resources(self):
+    async def init_resources(self) -> Any:
         """Initialize all async resources"""
         if self._initialized:
             return
@@ -155,7 +158,7 @@ class Container:
             await self.cleanup()
             raise
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup all resources"""
         self._logger.info("Cleaning up container resources...")
         
@@ -240,7 +243,7 @@ class Container:
         return UserRepository(db_manager, cache_service)
     
     @asynccontextmanager
-    async def lifespan(self):
+    async def lifespan(self) -> Any:
         """Context manager for container lifespan"""
         try:
             await self.init_resources()
@@ -248,11 +251,11 @@ class Container:
         finally:
             await self.cleanup()
     
-    def __enter__(self):
+    def __enter__(self) -> Any:
         """Synchronous context manager entry"""
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> Any:
         """Synchronous context manager exit"""
         if self._initialized:
             asyncio.create_task(self.cleanup())

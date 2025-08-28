@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from datetime import datetime
 from datetime import timezone
 from typing import Any
@@ -8,8 +19,6 @@ import requests
 from onyx.configs.app_configs import INDEX_BATCH_SIZE
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.cross_connector_utils.rate_limit_wrapper import (
-    rate_limit_builder,
-)
 from onyx.connectors.interfaces import GenerateDocumentsOutput
 from onyx.connectors.interfaces import LoadConnector
 from onyx.connectors.interfaces import PollConnector
@@ -19,6 +28,12 @@ from onyx.connectors.models import ConnectorMissingCredentialError
 from onyx.connectors.models import Document
 from onyx.connectors.models import TextSection
 from onyx.utils.retry_wrapper import retry_builder
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    rate_limit_builder,
+)
 
 
 CLICKUP_API_BASE_URL = "https://api.clickup.com/api/v2"
@@ -48,7 +63,7 @@ class ClickupConnector(LoadConnector, PollConnector):
 
     @retry_builder()
     @rate_limit_builder(max_calls=100, period=60)
-    def _make_request(self, endpoint: str, params: Optional[dict] = None) -> Any:
+    async def _make_request(self, endpoint: str, params: Optional[dict] = None) -> Any:
         if not self.api_token:
             raise ConnectorMissingCredentialError("Clickup")
 
@@ -200,7 +215,6 @@ class ClickupConnector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     clickup_connector = ClickupConnector()
 

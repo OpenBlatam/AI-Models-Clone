@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import logging
+from typing import Any, Dict, List, Optional, Union, Type
+from datetime import datetime
+from enum import Enum
+from dataclasses import dataclass, field
+from fastapi import HTTPException, status
+from pydantic import BaseModel, Field
+from .error_system import (
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🚨 HTTPException System
 =======================
@@ -6,16 +18,8 @@ Comprehensive HTTPException system for modeling expected errors as specific HTTP
 Integrates with the existing error system and provides consistent error handling across the application.
 """
 
-import logging
-from typing import Any, Dict, List, Optional, Union, Type
-from datetime import datetime
-from enum import Enum
-from dataclasses import dataclass, field
 
-from fastapi import HTTPException, status
-from pydantic import BaseModel, Field
 
-from .error_system import (
     OnyxBaseError, ErrorContext, ErrorCategory, ErrorSeverity,
     ValidationError, AuthenticationError, AuthorizationError,
     DatabaseError, CacheError, NetworkError, ExternalServiceError,
@@ -97,7 +101,9 @@ class OnyxHTTPException(HTTPException):
         help_url: Optional[str] = None,
         headers: Optional[Dict[str, str]] = None
     ):
-        # Create error detail
+        
+    """__init__ function."""
+# Create error detail
         error_detail = HTTPErrorDetail(
             error_code=error_code,
             message=message,
@@ -160,7 +166,7 @@ class HTTPExceptionFactory:
     """
     
     @staticmethod
-    def bad_request(
+    async def bad_request(
         message: str,
         error_code: str = "BAD_REQUEST",
         field: Optional[str] = None,
@@ -331,7 +337,7 @@ class HTTPExceptionFactory:
         )
     
     @staticmethod
-    def too_many_requests(
+    async def too_many_requests(
         message: str = "Rate limit exceeded",
         error_code: str = "RATE_LIMIT_EXCEEDED",
         limit: Optional[int] = None,
@@ -467,7 +473,7 @@ class HTTPExceptionMapper:
     }
     
     @classmethod
-    def map_onyx_error_to_http_exception(cls, onyx_error: OnyxBaseError) -> OnyxHTTPException:
+    async def map_onyx_error_to_http_exception(cls, onyx_error: OnyxBaseError) -> OnyxHTTPException:
         """Map Onyx error to appropriate HTTP exception"""
         # Try to get status code from error type first
         error_type = type(onyx_error)
@@ -484,7 +490,7 @@ class HTTPExceptionMapper:
         return OnyxHTTPException.from_onyx_error(onyx_error, status_code)
     
     @classmethod
-    def map_exception_to_http_exception(cls, exception: Exception) -> OnyxHTTPException:
+    async def map_exception_to_http_exception(cls, exception: Exception) -> OnyxHTTPException:
         """Map any exception to appropriate HTTP exception"""
         if isinstance(exception, OnyxBaseError):
             return cls.map_onyx_error_to_http_exception(exception)
@@ -528,7 +534,7 @@ class HTTPExceptionHandler:
     Centralized handler for HTTP exceptions with logging and monitoring.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = logging.getLogger(__name__)
         self.mapper = HTTPExceptionMapper()
     
@@ -570,7 +576,7 @@ class HTTPExceptionHandler:
 
 
 # Convenience functions for common HTTP exceptions
-def raise_bad_request(
+async def raise_bad_request(
     message: str,
     error_code: str = "BAD_REQUEST",
     field: Optional[str] = None,
@@ -658,7 +664,7 @@ def raise_unprocessable_entity(
     )
 
 
-def raise_too_many_requests(
+async def raise_too_many_requests(
     message: str = "Rate limit exceeded",
     error_code: str = "RATE_LIMIT_EXCEEDED",
     retry_after: Optional[int] = None,
@@ -743,5 +749,6 @@ def example_usage():
         print(f"Mapped Error: {e.status_code} - {e.detail}")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     example_usage() 

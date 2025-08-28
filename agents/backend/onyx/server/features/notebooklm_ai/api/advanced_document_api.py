@@ -1,10 +1,7 @@
-"""
-Advanced Document API
-====================
-
-A comprehensive FastAPI application that integrates all document processing
-components with advanced features, real-time processing, and intelligent routing.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import logging
@@ -14,7 +11,6 @@ from pathlib import Path
 import json
 import hashlib
 from datetime import datetime
-
 from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File, Form, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
@@ -23,14 +19,25 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from pydantic import BaseModel, Field, validator
 import redis.asyncio as redis
 from sqlalchemy.ext.asyncio import AsyncSession
-
-# Core imports
 from ..core.document_intelligence_engine import DocumentIntelligenceEngine, ProcessingConfig
 from ..core.citation_manager import CitationManager, CitationConfig
 from ..core.document_pipeline import DocumentPipeline, PipelineConfig
 from ..nlp import NLPEngine
 from ..ml_integration import MLModelManager
 from ..optimization import UltraPerformanceBoost
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Advanced Document API
+====================
+
+A comprehensive FastAPI application that integrates all document processing
+components with advanced features, real-time processing, and intelligent routing.
+"""
+
+
+
+# Core imports
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -111,7 +118,9 @@ class AdvancedDocumentAPI:
         redis_url: str = "redis://localhost:6379",
         db_session: AsyncSession = None
     ):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.db_session = db_session
         
         # Initialize FastAPI app
@@ -146,7 +155,7 @@ class AdvancedDocumentAPI:
         
         logger.info("Advanced Document API initialized")
     
-    async def startup(self):
+    async def startup(self) -> Any:
         """Initialize all components"""
         try:
             # Initialize Redis connection
@@ -220,7 +229,7 @@ class AdvancedDocumentAPI:
             logger.error(f"Failed to start Advanced Document API: {e}")
             raise
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Cleanup and shutdown"""
         try:
             if self.document_pipeline:
@@ -243,7 +252,7 @@ class AdvancedDocumentAPI:
         except Exception as e:
             logger.error(f"Error during shutdown: {e}")
     
-    def _setup_middleware(self):
+    def _setup_middleware(self) -> Any:
         """Setup FastAPI middleware"""
         # CORS middleware
         self.app.add_middleware(
@@ -260,7 +269,7 @@ class AdvancedDocumentAPI:
             allowed_hosts=["*"]
         )
     
-    def _setup_routes(self):
+    def _setup_routes(self) -> Any:
         """Setup API routes"""
         
         # Health check
@@ -735,7 +744,6 @@ async def shutdown_event():
 
 # Example usage
 if __name__ == "__main__":
-    import uvicorn
     
     uvicorn.run(
         "advanced_document_api:app",

@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from typing import List, Optional
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
+from fastapi.security import HTTPBearer
+from ..dependencies.auth import get_current_user, require_permissions
+from ..dependencies.rate_limit import check_rate_limit
+from ..dependencies.validation import validate_request_id
+from ..schemas.video_schemas import (
+from ..services.video_service import (
+from ..utils.response import create_error_response, create_success_response
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Video Router - Modern FastAPI Implementation
 ===========================================
@@ -10,15 +30,8 @@ Functional router implementation with:
 - Dependency injection
 """
 
-from typing import List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
-from fastapi.security import HTTPBearer
 
-from ..dependencies.auth import get_current_user, require_permissions
-from ..dependencies.rate_limit import check_rate_limit
-from ..dependencies.validation import validate_request_id
-from ..schemas.video_schemas import (
     APIResponse,
     BatchVideoRequest,
     BatchVideoResponse,
@@ -26,7 +39,6 @@ from ..schemas.video_schemas import (
     VideoRequest,
     VideoResponse,
 )
-from ..services.video_service import (
     cancel_video_processing,
     create_video_async,
     get_batch_video_status,
@@ -34,7 +46,6 @@ from ..services.video_service import (
     get_video_status,
     retry_video_processing,
 )
-from ..utils.response import create_error_response, create_success_response
 
 
 router = APIRouter()

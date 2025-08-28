@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import time
 from collections.abc import Callable
@@ -13,6 +15,8 @@ import torch
 from model_server.constants import GPUStatus
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
 logger = setup_logger()
 
 F = TypeVar("F", bound=Callable)

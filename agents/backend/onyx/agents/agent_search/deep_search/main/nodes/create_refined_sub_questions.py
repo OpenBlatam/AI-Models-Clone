@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from typing import cast
 
@@ -7,58 +9,61 @@ from langchain_core.runnables import RunnableConfig
 from langgraph.types import StreamWriter
 
 from onyx.agents.agent_search.deep_search.main.models import (
-    RefinementSubQuestion,
-)
 from onyx.agents.agent_search.deep_search.main.operations import dispatch_subquestion
 from onyx.agents.agent_search.deep_search.main.operations import (
-    dispatch_subquestion_sep,
-)
 from onyx.agents.agent_search.deep_search.main.states import MainState
 from onyx.agents.agent_search.deep_search.main.states import (
-    RefinedQuestionDecompositionUpdate,
-)
 from onyx.agents.agent_search.models import GraphConfig
 from onyx.agents.agent_search.shared_graph_utils.agent_prompt_ops import (
-    build_history_prompt,
-)
 from onyx.agents.agent_search.shared_graph_utils.constants import (
-    AGENT_LLM_RATELIMIT_MESSAGE,
-)
 from onyx.agents.agent_search.shared_graph_utils.constants import (
-    AGENT_LLM_TIMEOUT_MESSAGE,
-)
 from onyx.agents.agent_search.shared_graph_utils.constants import (
-    AgentLLMErrorType,
-)
 from onyx.agents.agent_search.shared_graph_utils.models import AgentErrorLog
 from onyx.agents.agent_search.shared_graph_utils.models import BaseMessage_Content
 from onyx.agents.agent_search.shared_graph_utils.models import LLMNodeErrorStrings
 from onyx.agents.agent_search.shared_graph_utils.utils import dispatch_separated
 from onyx.agents.agent_search.shared_graph_utils.utils import (
-    format_entity_term_extraction,
-)
 from onyx.agents.agent_search.shared_graph_utils.utils import (
-    get_langgraph_node_log_string,
-)
 from onyx.agents.agent_search.shared_graph_utils.utils import make_question_id
 from onyx.agents.agent_search.shared_graph_utils.utils import write_custom_event
 from onyx.chat.models import StreamingError
 from onyx.configs.agent_configs import AGENT_MAX_TOKENS_SUBQUESTION_GENERATION
 from onyx.configs.agent_configs import (
-    AGENT_TIMEOUT_CONNECT_LLM_REFINED_SUBQUESTION_GENERATION,
-)
 from onyx.configs.agent_configs import (
-    AGENT_TIMEOUT_LLM_REFINED_SUBQUESTION_GENERATION,
-)
 from onyx.llm.chat_llm import LLMRateLimitError
 from onyx.llm.chat_llm import LLMTimeoutError
 from onyx.prompts.agent_search import (
-    REFINEMENT_QUESTION_DECOMPOSITION_PROMPT_W_INITIAL_SUBQUESTION_ANSWERS,
-)
 from onyx.tools.models import ToolCallKickoff
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
 from onyx.utils.timing import log_function_time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    RefinementSubQuestion,
+)
+    dispatch_subquestion_sep,
+)
+    RefinedQuestionDecompositionUpdate,
+)
+    build_history_prompt,
+)
+    AGENT_LLM_RATELIMIT_MESSAGE,
+)
+    AGENT_LLM_TIMEOUT_MESSAGE,
+)
+    AgentLLMErrorType,
+)
+    format_entity_term_extraction,
+)
+    get_langgraph_node_log_string,
+)
+    AGENT_TIMEOUT_CONNECT_LLM_REFINED_SUBQUESTION_GENERATION,
+)
+    AGENT_TIMEOUT_LLM_REFINED_SUBQUESTION_GENERATION,
+)
+    REFINEMENT_QUESTION_DECOMPOSITION_PROMPT_W_INITIAL_SUBQUESTION_ANSWERS,
+)
 
 logger = setup_logger()
 
@@ -109,7 +114,7 @@ def create_refined_sub_questions(
     initial_question_answers = state.sub_question_results
 
     addressed_subquestions_with_answers = [
-        f"Subquestion: {x.question}\nSubanswer:\n{x.answer}"
+        f"Subquestion: {x.question}\nSubanswer:\n{x.answer}"f"
         for x in initial_question_answers
         if x.verified_high_quality and x.answer
     ]
@@ -120,14 +125,7 @@ def create_refined_sub_questions(
 
     msg = [
         HumanMessage(
-            content=REFINEMENT_QUESTION_DECOMPOSITION_PROMPT_W_INITIAL_SUBQUESTION_ANSWERS.format(
-                question=question,
-                history=history,
-                entity_term_extraction_str=entity_term_extraction_str,
-                base_answer=base_answer,
-                answered_subquestions_with_answers=_ANSWERED_SUBQUESTIONS_DIVIDER.join(
-                    addressed_subquestions_with_answers
-                ),
+            content=REFINEMENT_QUESTION_DECOMPOSITION_PROMPT_W_INITIAL_SUBQUESTION_ANSWERS",
                 failed_sub_questions="\n - ".join(failed_question_list),
             ),
         )

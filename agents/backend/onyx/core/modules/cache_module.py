@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+from typing import Dict, Any, Optional, List
+from ..modular_architecture import (
+import structlog
+from typing import Any, List, Dict, Optional
+import logging
 """
 🚀 CACHE MODULE
 ===============
@@ -5,13 +23,8 @@
 Módulo modular para sistema de cache multi-nivel.
 """
 
-import asyncio
-import time
-from typing import Dict, Any, Optional, List
-from ..modular_architecture import (
     ModuleInterface, ModuleMetadata, ServiceInterface, modular_service
 )
-import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -52,7 +65,7 @@ class CacheModule(ModuleInterface):
 class MultiLevelCacheService(ServiceInterface):
     """Servicio de cache multi-nivel."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.l1_cache: Dict[str, Dict] = {}  # Memory cache
         self.max_l1_items = 1000
         self.default_ttl = 3600
@@ -136,7 +149,7 @@ class MultiLevelCacheService(ServiceInterface):
             }
         }
     
-    def _evict_lru(self):
+    def _evict_lru(self) -> Any:
         """Evita el elemento menos usado recientemente."""
         if self.l1_cache:
             oldest_key = min(

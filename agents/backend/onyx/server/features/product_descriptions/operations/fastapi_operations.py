@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import List, Optional, Dict, Any, Union
+from fastapi import (
+from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.encoders import jsonable_encoder
+import logging
+from datetime import datetime
+from ..models.fastapi_models import (
+from ..dependencies.core import get_db_session, get_cache_manager, get_performance_monitor
+from ..dependencies.auth import get_authenticated_user, get_admin_user, require_permission
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 FastAPI Path Operations - Best Practices
 
@@ -5,8 +24,6 @@ This module implements FastAPI path operations following official documentation
 best practices for HTTP methods, status codes, response handling, and validation.
 """
 
-from typing import List, Optional, Dict, Any, Union
-from fastapi import (
     APIRouter, 
     Depends, 
     HTTPException, 
@@ -22,13 +39,8 @@ from fastapi import (
     BackgroundTasks,
     Response
 )
-from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.encoders import jsonable_encoder
-import logging
-from datetime import datetime
 
 # Import models
-from ..models.fastapi_models import (
     User, UserCreate, UserUpdate, ProductDescription, ProductDescriptionCreate,
     ProductDescriptionUpdate, ProductDescriptionRequest, ProductDescriptionResponse,
     BatchGenerationRequest, BatchGenerationResponse, PaginationParams,
@@ -36,8 +48,6 @@ from ..models.fastapi_models import (
 )
 
 # Import dependencies
-from ..dependencies.core import get_db_session, get_cache_manager, get_performance_monitor
-from ..dependencies.auth import get_authenticated_user, get_admin_user, require_permission
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -691,7 +701,9 @@ async def custom_response_example(
 async def streaming_response_example():
     """Example of streaming response."""
     async def generate_data():
-        for i in range(10):
+        
+    """generate_data function."""
+for i in range(10):
             yield f"data: {{'item': {i}, 'timestamp': '{datetime.utcnow().isoformat()}'}}\n\n"
             await asyncio.sleep(0.1)
     

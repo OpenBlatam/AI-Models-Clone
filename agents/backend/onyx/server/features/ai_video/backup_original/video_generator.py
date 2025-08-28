@@ -1,9 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import asyncio
 from abc import ABC, abstractmethod
 from typing import List, Optional
 from pydantic import HttpUrl, BaseModel
 import logging
 
+from typing import Any, List, Dict, Optional
 logger = logging.getLogger(__name__)
 
 class GenerationError(Exception):

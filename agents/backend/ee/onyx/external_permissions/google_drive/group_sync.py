@@ -1,13 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from googleapiclient.errors import HttpError  # type: ignore
 from pydantic import BaseModel
 
 from ee.onyx.db.external_perm import ExternalUserGroup
 from ee.onyx.external_permissions.google_drive.folder_retrieval import (
-    get_folder_permissions_by_ids,
-)
 from ee.onyx.external_permissions.google_drive.folder_retrieval import (
-    get_modified_folders,
-)
 from ee.onyx.external_permissions.google_drive.models import GoogleDrivePermission
 from ee.onyx.external_permissions.google_drive.models import PermissionType
 from onyx.connectors.google_drive.connector import GoogleDriveConnector
@@ -17,6 +15,13 @@ from onyx.connectors.google_utils.resources import get_admin_service
 from onyx.connectors.google_utils.resources import get_drive_service
 from onyx.db.models import ConnectorCredentialPair
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_folder_permissions_by_ids,
+)
+    get_modified_folders,
+)
 
 logger = setup_logger()
 

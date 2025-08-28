@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import fastapi_users_db_sqlalchemy
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add Chat Sessions
 
 Revision ID: 5809c0787398
@@ -6,9 +24,6 @@ Create Date: 2023-09-04 15:29:44.002164
 
 """
 
-import fastapi_users_db_sqlalchemy
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
@@ -25,6 +40,16 @@ def upgrade() -> None:
         sa.Column(
             "user_id",
             fastapi_users_db_sqlalchemy.generics.GUID(),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             nullable=True,
         ),
         sa.Column("description", sa.Text(), nullable=False),

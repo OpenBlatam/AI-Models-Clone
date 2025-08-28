@@ -1,7 +1,13 @@
-"""
-High-throughput async scanner with connection pooling for network enumeration.
-Implements asyncio-based scanning with connection reuse and rate limiting.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import aiohttp
@@ -16,6 +22,12 @@ from datetime import datetime, timedelta
 import time
 from collections import defaultdict
 import json
+from typing import Any, List, Dict, Optional
+"""
+High-throughput async scanner with connection pooling for network enumeration.
+Implements asyncio-based scanning with connection reuse and rate limiting.
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -63,7 +75,9 @@ class AsyncConnectionPool:
     """High-performance connection pool for async scanning operations."""
     
     def __init__(self, config: ConnectionPoolConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.http_session: Optional[aiohttp.ClientSession] = None
         self.ssh_connections: Dict[str, asyncssh.SSHClientConnection] = {}
         self.tcp_connections: Dict[str, asyncio.StreamWriter] = {}
@@ -80,16 +94,16 @@ class AsyncConnectionPool:
             "new_connections": 0
         }
     
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Async context manager entry."""
         await self.initialize_pool()
         return self
     
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
         """Async context manager exit with cleanup."""
         await self.cleanup_pool()
     
-    async def initialize_pool(self):
+    async def initialize_pool(self) -> Any:
         """Initialize the connection pool."""
         connector = aiohttp.TCPConnector(
             limit=self.config.max_connections,
@@ -109,7 +123,7 @@ class AsyncConnectionPool:
         
         logger.info(f"Connection pool initialized with {self.config.max_connections} max connections")
     
-    async def cleanup_pool(self):
+    async def cleanup_pool(self) -> Any:
         """Clean up all connections in the pool."""
         if self.http_session:
             await self.http_session.close()
@@ -127,7 +141,7 @@ class AsyncConnectionPool:
         
         logger.info("Connection pool cleaned up")
     
-    async def get_http_session(self) -> aiohttp.ClientSession:
+    async async def get_http_session(self) -> aiohttp.ClientSession:
         """Get the HTTP session from the pool."""
         if not self.http_session or self.http_session.closed:
             await self.initialize_pool()
@@ -222,7 +236,9 @@ class AsyncPortScanner:
     """High-throughput async port scanner with connection pooling."""
     
     def __init__(self, pool_config: ConnectionPoolConfig):
-        self.pool_config = pool_config
+        
+    """__init__ function."""
+self.pool_config = pool_config
         self.common_ports = {
             21: "ftp", 22: "ssh", 23: "telnet", 25: "smtp", 53: "dns",
             80: "http", 110: "pop3", 143: "imap", 443: "https", 993: "imaps",
@@ -329,6 +345,10 @@ class AsyncPortScanner:
             # For other ports, try to get basic banner
             writer = await pool.get_tcp_connection(host, port)
             writer.write(b"\r\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             await writer.drain()
             
             # Note: This is simplified - real banner grabbing would need more sophisticated handling
@@ -370,7 +390,9 @@ class AsyncWebEnumerator:
     """High-throughput async web enumeration with connection pooling."""
     
     def __init__(self, pool_config: ConnectionPoolConfig):
-        self.pool_config = pool_config
+        
+    """__init__ function."""
+self.pool_config = pool_config
         self.common_paths = [
             "/", "/admin", "/login", "/api", "/robots.txt", "/sitemap.xml",
             "/.well-known/security.txt", "/.git/config", "/.env", "/backup",
@@ -457,7 +479,9 @@ class AsyncNetworkScanner:
     """High-throughput async network scanner with connection pooling."""
     
     def __init__(self, pool_config: ConnectionPoolConfig):
-        self.pool_config = pool_config
+        
+    """__init__ function."""
+self.pool_config = pool_config
         self.port_scanner = AsyncPortScanner(pool_config)
         self.web_enumerator = AsyncWebEnumerator(pool_config)
     

@@ -1,12 +1,17 @@
-"""
-JSON reporting module for cybersecurity assessment results.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, field_validator
 from datetime import datetime
 import structlog
 import json
 import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+JSON reporting module for cybersecurity assessment results.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -20,13 +25,13 @@ class JSONReportInput(BaseModel):
     include_timestamps: bool = True
     
     @field_validator('scan_results')
-    def validate_scan_results(cls, v):
+    def validate_scan_results(cls, v) -> bool:
         if not v:
             raise ValueError("Scan results cannot be empty")
         return v
     
     @field_validator('target_info')
-    def validate_target_info(cls, v):
+    def validate_target_info(cls, v) -> Optional[Dict[str, Any]]:
         if not v:
             raise ValueError("Target info cannot be empty")
         return v
@@ -210,7 +215,15 @@ def save_json_to_file(json_content: str, file_path: str) -> str:
         
         # Write file
         with open(file_path, 'w', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(json_content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         return file_path
         

@@ -1,8 +1,7 @@
-"""
-JSON Reporter
-
-Provides JSON-based reporting with structured data export capabilities.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import json
@@ -12,6 +11,14 @@ from enum import Enum
 import time
 from datetime import datetime
 import base64
+from typing import Any, List, Dict, Optional
+import logging
+"""
+JSON Reporter
+
+Provides JSON-based reporting with structured data export capabilities.
+"""
+
 
 class JSONReportFormat(str, Enum):
     """Enumeration of JSON report formats."""
@@ -33,7 +40,7 @@ class JSONReportRequest(BaseModel):
     export_format: str = Field(default="json", regex="^(json|csv|xml)$", description="Export format")
     
     @validator('scan_results', 'vulnerability_data', 'enumeration_data', 'attack_data')
-    def validate_data(cls, v):
+    def validate_data(cls, v) -> bool:
         if v is not None and not v:
             raise ValueError("Data cannot be empty if provided")
         return v

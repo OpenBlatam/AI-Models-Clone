@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import math
 import uuid
 from uuid import UUID
@@ -13,6 +15,9 @@ from onyx.indexing.models import DocMetadataAwareIndexChunk
 from onyx.indexing.models import MultipassConfig
 from shared_configs.configs import MULTI_TENANT
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 DEFAULT_BATCH_SIZE = 30
 DEFAULT_INDEX_NAME = "danswer_chunk"
 

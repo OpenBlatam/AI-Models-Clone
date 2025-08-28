@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import fastapi_users_db_sqlalchemy
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add document set tables
 
 Revision ID: 57b53544726e
@@ -6,9 +24,6 @@ Create Date: 2023-09-20 16:59:39.097177
 
 """
 
-from alembic import op
-import fastapi_users_db_sqlalchemy
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "57b53544726e"
@@ -26,6 +41,16 @@ def upgrade() -> None:
         sa.Column(
             "user_id",
             fastapi_users_db_sqlalchemy.generics.GUID(),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             nullable=True,
         ),
         sa.Column("is_up_to_date", sa.Boolean(), nullable=False),

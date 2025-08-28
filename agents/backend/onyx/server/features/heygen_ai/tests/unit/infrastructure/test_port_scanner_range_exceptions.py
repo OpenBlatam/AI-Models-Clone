@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.port_scanner import AsyncPortScanner
+from port_scanner import AsyncPortScanner
 
 
 @pytest.mark.asyncio
@@ -21,7 +21,7 @@ async def test_scan_port_range_ignores_exceptions(monkeypatch):
 
         return object(), W()
 
-    import agents.backend.onyx.server.features.heygen_ai.port_scanner as mod
+    import port_scanner as mod
     monkeypatch.setattr(mod.asyncio, "open_connection", fake_open_connection)
 
     scanner = AsyncPortScanner(timeout_seconds=0.01)
@@ -30,6 +30,7 @@ async def test_scan_port_range_ignores_exceptions(monkeypatch):
     assert len(results) == 10
     # Some will be closed/open based on our fake
     assert any(r.is_port_open for r in results)
+
 
 
 

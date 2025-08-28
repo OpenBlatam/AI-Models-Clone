@@ -1,3 +1,32 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import argparse
+import logging
+import sys
+import time
+import signal
+from pathlib import Path
+from typing import Optional, Dict, Any
+from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+import psutil
+import gc
+from core.generator import ProductDescriptionGenerator
+from core.config import ProductDescriptionConfig, ECOMMERCE_CONFIG, LUXURY_CONFIG, TECHNICAL_CONFIG
+from api.service import ProductDescriptionService
+from api.gradio_interface import create_gradio_app
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 🚀 OPTIMIZED Product Description Generator - Main Entry Point
@@ -14,27 +43,10 @@ Ultra-optimized version with:
 - Real-time metrics
 """
 
-import asyncio
-import argparse
-import logging
-import sys
-import time
-import signal
-from pathlib import Path
-from typing import Optional, Dict, Any
-from contextlib import asynccontextmanager
-from dataclasses import dataclass
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
-import psutil
-import gc
 
 # Add current directory to Python path
 sys.path.append(str(Path(__file__).parent))
 
-from core.generator import ProductDescriptionGenerator
-from core.config import ProductDescriptionConfig, ECOMMERCE_CONFIG, LUXURY_CONFIG, TECHNICAL_CONFIG
-from api.service import ProductDescriptionService
-from api.gradio_interface import create_gradio_app
 
 # Setup structured logging
 logging.basicConfig(
@@ -59,7 +71,7 @@ class PerformanceMetrics:
     total_requests: int = 0
     error_count: int = 0
     
-    def update_memory_usage(self):
+    def update_memory_usage(self) -> Any:
         """Update memory usage metrics"""
         process = psutil.Process()
         self.memory_usage = process.memory_info().rss / 1024 / 1024  # MB
@@ -82,7 +94,9 @@ class OptimizedProductDescriptionGenerator:
     """Ultra-optimized generator with advanced features"""
     
     def __init__(self, config: Optional[ProductDescriptionConfig] = None):
-        self.config = config or ProductDescriptionConfig()
+        
+    """__init__ function."""
+self.config = config or ProductDescriptionConfig()
         self.generator: Optional[ProductDescriptionGenerator] = None
         self.metrics = PerformanceMetrics(time.time())
         self.is_initialized = False
@@ -97,7 +111,7 @@ class OptimizedProductDescriptionGenerator:
         # Graceful shutdown
         self._setup_signal_handlers()
     
-    def _setup_memory_management(self):
+    def _setup_memory_management(self) -> Any:
         """Setup memory optimization"""
         # Enable garbage collection
         gc.enable()
@@ -106,9 +120,9 @@ class OptimizedProductDescriptionGenerator:
         self.memory_threshold_mb = 1024  # 1GB
         self.last_gc_time = time.time()
     
-    def _setup_signal_handlers(self):
+    def _setup_signal_handlers(self) -> Any:
         """Setup graceful shutdown handlers"""
-        def signal_handler(signum, frame):
+        def signal_handler(signum, frame) -> Any:
             logger.info(f"Received signal {signum}, shutting down gracefully...")
             self.shutdown()
             sys.exit(0)
@@ -138,7 +152,7 @@ class OptimizedProductDescriptionGenerator:
             self.metrics.error_count += 1
             return False
     
-    async def _pre_warm_cache(self):
+    async def _pre_warm_cache(self) -> Any:
         """Pre-warm cache with common product patterns"""
         common_products = [
             {
@@ -198,7 +212,7 @@ class OptimizedProductDescriptionGenerator:
             logger.error(f"Generation failed: {e}")
             raise
     
-    async def _check_memory_usage(self):
+    async def _check_memory_usage(self) -> Any:
         """Check and manage memory usage"""
         if self.metrics.memory_usage > self.memory_threshold_mb:
             logger.warning(f"High memory usage: {self.metrics.memory_usage:.1f}MB")
@@ -220,7 +234,7 @@ class OptimizedProductDescriptionGenerator:
         """Optimized batch generation with concurrency control"""
         semaphore = asyncio.Semaphore(max_concurrent)
         
-        async def generate_single(product):
+        async def generate_single(product) -> Any:
             async with semaphore:
                 return await self.generate_optimized(**product)
         
@@ -243,7 +257,7 @@ class OptimizedProductDescriptionGenerator:
         self.metrics.update_memory_usage()
         return self.metrics.get_stats()
     
-    def shutdown(self):
+    def shutdown(self) -> Any:
         """Graceful shutdown with cleanup"""
         logger.info("🔄 Shutting down optimized generator...")
         
@@ -378,7 +392,9 @@ def run_optimized_cli():
         return
     
     async def generate():
-        async with get_optimized_generator() as generator:
+        
+    """generate function."""
+async with get_optimized_generator() as generator:
             print("\n🤖 Generating optimized description...")
             start_time = time.time()
             
@@ -535,5 +551,6 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

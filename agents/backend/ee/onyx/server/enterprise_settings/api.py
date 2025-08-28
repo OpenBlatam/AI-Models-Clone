@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from datetime import datetime
 from datetime import timezone
 from typing import Any
@@ -35,6 +43,9 @@ from shared_configs.configs import MULTI_TENANT
 from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 from shared_configs.contextvars import get_current_tenant_id
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 admin_router = APIRouter(prefix="/admin/enterprise-settings")
 basic_router = APIRouter(prefix="/enterprise-settings")
 
@@ -121,7 +132,7 @@ def admin_ee_put_settings(
 
 
 @basic_router.get("")
-def ee_fetch_settings() -> EnterpriseSettings:
+async def ee_fetch_settings() -> EnterpriseSettings:
     if MULTI_TENANT:
         tenant_id = get_current_tenant_id()
         if not tenant_id or tenant_id == POSTGRES_DEFAULT_SCHEMA:
@@ -140,7 +151,7 @@ def put_logo(
     upload_logo(file=file, db_session=db_session, is_logotype=is_logotype)
 
 
-def fetch_logo_helper(db_session: Session) -> Response:
+async def fetch_logo_helper(db_session: Session) -> Response:
     try:
         file_store = PostgresBackedFileStore(db_session)
         onyx_file = file_store.get_file_with_mime_type(get_logo_filename())
@@ -155,7 +166,7 @@ def fetch_logo_helper(db_session: Session) -> Response:
         return Response(content=onyx_file.data, media_type=onyx_file.mime_type)
 
 
-def fetch_logotype_helper(db_session: Session) -> Response:
+async def fetch_logotype_helper(db_session: Session) -> Response:
     try:
         file_store = PostgresBackedFileStore(db_session)
         onyx_file = file_store.get_file_with_mime_type(get_logotype_filename())
@@ -196,5 +207,5 @@ def upload_custom_analytics_script(
 
 
 @basic_router.get("/custom-analytics-script")
-def fetch_custom_analytics_script() -> str | None:
+async def fetch_custom_analytics_script() -> str | None:
     return load_analytics_script()

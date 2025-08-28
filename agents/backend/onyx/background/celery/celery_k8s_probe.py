@@ -1,9 +1,17 @@
-# script to use as a kubernetes readiness / liveness probe
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import argparse
 import sys
 import time
 from pathlib import Path
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# script to use as a kubernetes readiness / liveness probe
+
 
 
 def main_readiness(filename: str) -> int:

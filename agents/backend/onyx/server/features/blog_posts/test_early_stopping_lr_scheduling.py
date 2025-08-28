@@ -1,10 +1,13 @@
-"""
-🧪 Early Stopping & Learning Rate Scheduling Test Suite
-=======================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive test suite for early stopping and learning rate scheduling systems with
-unit tests, integration tests, and performance benchmarks.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -17,16 +20,26 @@ from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch, MagicMock
 import warnings
-
 import torch
 import torch.nn as nn
 import torch.optim as optim
 import numpy as np
 import matplotlib.pyplot as plt
-
-# Import our systems
 from .production_transformers import DeviceManager
 from .early_stopping_lr_scheduling import (
+    import asyncio
+from typing import Any, List, Dict, Optional
+"""
+🧪 Early Stopping & Learning Rate Scheduling Test Suite
+=======================================================
+
+Comprehensive test suite for early stopping and learning rate scheduling systems with
+unit tests, integration tests, and performance benchmarks.
+"""
+
+
+
+# Import our systems
     EarlyStopping, CrossValidator, TrainingMonitor,
     EarlyStoppingConfig, EarlyStoppingStrategy, EarlyStoppingMode,
     LRSchedulerConfig, LRSchedulerType, EarlyStoppingState, LRSchedulerState,
@@ -38,7 +51,7 @@ logger = logging.getLogger(__name__)
 class TestEarlyStoppingConfig(unittest.TestCase):
     """Test early stopping configuration."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration."""
         config = EarlyStoppingConfig()
         
@@ -54,7 +67,7 @@ class TestEarlyStoppingConfig(unittest.TestCase):
         self.assertEqual(config.monitor, "val_loss")
         self.assertEqual(config.min_epochs, 0)
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration."""
         config = EarlyStoppingConfig(
             enabled=False,
@@ -82,7 +95,7 @@ class TestEarlyStoppingConfig(unittest.TestCase):
         self.assertEqual(config.monitor, "val_accuracy")
         self.assertEqual(config.min_epochs, 10)
     
-    def test_invalid_config(self):
+    def test_invalid_config(self) -> Any:
         """Test invalid configuration validation."""
         # Negative patience
         with self.assertRaises(ValueError):
@@ -103,7 +116,7 @@ class TestEarlyStoppingConfig(unittest.TestCase):
 class TestLRSchedulerConfig(unittest.TestCase):
     """Test learning rate scheduler configuration."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration."""
         config = LRSchedulerConfig()
         
@@ -115,7 +128,7 @@ class TestLRSchedulerConfig(unittest.TestCase):
         self.assertEqual(config.gamma, 0.1)
         self.assertEqual(config.milestones, [30, 60, 90])
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.STEP,
@@ -135,7 +148,7 @@ class TestLRSchedulerConfig(unittest.TestCase):
         self.assertEqual(config.gamma, 0.5)
         self.assertEqual(config.milestones, [50, 100, 150])
     
-    def test_invalid_config(self):
+    def test_invalid_config(self) -> Any:
         """Test invalid configuration validation."""
         # Non-positive initial_lr
         with self.assertRaises(ValueError):
@@ -156,16 +169,16 @@ class TestLRSchedulerConfig(unittest.TestCase):
 class TestEarlyStopping(unittest.TestCase):
     """Test early stopping implementation."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_patience_strategy(self):
+    def test_patience_strategy(self) -> Any:
         """Test patience-based early stopping."""
         config = EarlyStoppingConfig(
             strategy=EarlyStoppingStrategy.PATIENCE,
@@ -191,7 +204,7 @@ class TestEarlyStopping(unittest.TestCase):
         self.assertEqual(early_stopping.state.best_epoch, 5)  # Best at epoch 5
         self.assertEqual(early_stopping.state.best_score, 0.5)
     
-    def test_delta_strategy(self):
+    def test_delta_strategy(self) -> Any:
         """Test delta-based early stopping."""
         config = EarlyStoppingConfig(
             strategy=EarlyStoppingStrategy.DELTA,
@@ -215,7 +228,7 @@ class TestEarlyStopping(unittest.TestCase):
         # Should stop when improvement is less than delta
         self.assertTrue(should_stop)
     
-    def test_percentage_strategy(self):
+    def test_percentage_strategy(self) -> Any:
         """Test percentage-based early stopping."""
         config = EarlyStoppingConfig(
             strategy=EarlyStoppingStrategy.PERCENTAGE,
@@ -239,7 +252,7 @@ class TestEarlyStopping(unittest.TestCase):
         # Should stop when improvement percentage is less than threshold
         self.assertTrue(should_stop)
     
-    def test_moving_average_strategy(self):
+    def test_moving_average_strategy(self) -> Any:
         """Test moving average-based early stopping."""
         config = EarlyStoppingConfig(
             strategy=EarlyStoppingStrategy.MOVING_AVERAGE,
@@ -263,7 +276,7 @@ class TestEarlyStopping(unittest.TestCase):
         # Should use moving average for stability
         self.assertTrue(len(early_stopping.state.moving_averages) > 0)
     
-    def test_max_mode(self):
+    def test_max_mode(self) -> Any:
         """Test early stopping in MAX mode."""
         config = EarlyStoppingConfig(
             strategy=EarlyStoppingStrategy.PATIENCE,
@@ -288,7 +301,7 @@ class TestEarlyStopping(unittest.TestCase):
         self.assertTrue(should_stop)
         self.assertEqual(early_stopping.state.best_score, 0.7)
     
-    def test_min_epochs(self):
+    def test_min_epochs(self) -> Any:
         """Test minimum epochs before stopping."""
         config = EarlyStoppingConfig(
             strategy=EarlyStoppingStrategy.PATIENCE,
@@ -313,7 +326,7 @@ class TestEarlyStopping(unittest.TestCase):
         # Should not stop before min_epochs
         self.assertFalse(should_stop)  # Should continue until min_epochs
     
-    def test_model_restoration(self):
+    def test_model_restoration(self) -> Any:
         """Test model weight restoration."""
         config = EarlyStoppingConfig(
             strategy=EarlyStoppingStrategy.PATIENCE,
@@ -346,7 +359,7 @@ class TestEarlyStopping(unittest.TestCase):
         # Check that weights were restored
         self.assertTrue(hasattr(early_stopping, '_best_model_state'))
     
-    def test_state_management(self):
+    def test_state_management(self) -> Any:
         """Test state management."""
         config = EarlyStoppingConfig(
             strategy=EarlyStoppingStrategy.PATIENCE,
@@ -384,16 +397,16 @@ class TestEarlyStopping(unittest.TestCase):
 class TestLRScheduler(unittest.TestCase):
     """Test learning rate scheduler implementation."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_step_scheduler(self):
+    def test_step_scheduler(self) -> Any:
         """Test step learning rate scheduler."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.STEP,
@@ -420,7 +433,7 @@ class TestLRScheduler(unittest.TestCase):
             else:
                 self.assertEqual(current_lr, initial_lr * (0.5 ** ((epoch - 1) // 2)))
     
-    def test_cosine_annealing_scheduler(self):
+    def test_cosine_annealing_scheduler(self) -> Any:
         """Test cosine annealing scheduler."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.COSINE_ANNEALING,
@@ -445,7 +458,7 @@ class TestLRScheduler(unittest.TestCase):
         self.assertGreater(lrs[0], lrs[5])  # LR should decrease
         self.assertLess(lrs[5], lrs[9])     # LR should increase again
     
-    def test_reduce_lr_on_plateau(self):
+    def test_reduce_lr_on_plateau(self) -> Any:
         """Test reduce LR on plateau scheduler."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.REDUCE_LR_ON_PLATEAU,
@@ -476,7 +489,7 @@ class TestLRScheduler(unittest.TestCase):
         # LR should be reduced
         self.assertLess(optimizer.param_groups[0]['lr'], initial_lr)
     
-    def test_one_cycle_scheduler(self):
+    def test_one_cycle_scheduler(self) -> Any:
         """Test one cycle scheduler."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.ONE_CYCLE,
@@ -504,7 +517,7 @@ class TestLRScheduler(unittest.TestCase):
         self.assertGreater(max(lrs[:mid_point]), lrs[0])  # Should increase
         self.assertGreater(max(lrs[:mid_point]), lrs[-1])  # Should decrease
     
-    def test_state_management(self):
+    def test_state_management(self) -> Any:
         """Test scheduler state management."""
         config = LRSchedulerConfig(
             scheduler_type=LRSchedulerType.STEP,
@@ -542,16 +555,16 @@ class TestLRScheduler(unittest.TestCase):
 class TestTrainingMonitor(unittest.TestCase):
     """Test training monitor implementation."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    async def test_monitor_initialization(self):
+    async def test_monitor_initialization(self) -> Any:
         """Test monitor initialization."""
         monitor = await create_training_monitor(self.device_manager)
         
@@ -561,7 +574,7 @@ class TestTrainingMonitor(unittest.TestCase):
         self.assertIsNotNone(monitor.logger)
         self.assertIsInstance(monitor.training_history, dict)
     
-    async def test_early_stopping_setup(self):
+    async def test_early_stopping_setup(self) -> Any:
         """Test early stopping setup."""
         monitor = await create_training_monitor(self.device_manager)
         
@@ -577,7 +590,7 @@ class TestTrainingMonitor(unittest.TestCase):
         self.assertIsNotNone(monitor.early_stopping)
         self.assertEqual(monitor.early_stopping.config.strategy, EarlyStoppingStrategy.PATIENCE)
     
-    async def test_lr_scheduler_setup(self):
+    async def test_lr_scheduler_setup(self) -> Any:
         """Test LR scheduler setup."""
         monitor = await create_training_monitor(self.device_manager)
         
@@ -594,7 +607,7 @@ class TestTrainingMonitor(unittest.TestCase):
         self.assertIsNotNone(monitor.lr_scheduler)
         self.assertIsNotNone(scheduler)
     
-    async def test_monitor_update(self):
+    async def test_monitor_update(self) -> Any:
         """Test monitor update functionality."""
         monitor = await create_training_monitor(self.device_manager)
         
@@ -636,7 +649,7 @@ class TestTrainingMonitor(unittest.TestCase):
         self.assertGreater(len(monitor.training_history['train_loss']), 0)
         self.assertGreater(len(monitor.training_history['val_loss']), 0)
     
-    async def test_training_summary(self):
+    async def test_training_summary(self) -> Any:
         """Test training summary generation."""
         monitor = await create_training_monitor(self.device_manager)
         
@@ -670,7 +683,7 @@ class TestTrainingMonitor(unittest.TestCase):
         self.assertIn('early_stopping_state', summary)
         self.assertIn('lr_scheduler_state', summary)
     
-    async def test_plot_training_curves(self):
+    async def test_plot_training_curves(self) -> Any:
         """Test training curves plotting."""
         monitor = await create_training_monitor(self.device_manager)
         
@@ -692,7 +705,7 @@ class TestTrainingMonitor(unittest.TestCase):
         # Check if plot was saved
         self.assertTrue(plot_path.exists())
     
-    async def test_reset_functionality(self):
+    async def test_reset_functionality(self) -> Any:
         """Test monitor reset functionality."""
         monitor = await create_training_monitor(self.device_manager)
         
@@ -728,16 +741,16 @@ class TestTrainingMonitor(unittest.TestCase):
 class TestIntegration(unittest.TestCase):
     """Integration tests."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    async def test_end_to_end_workflow(self):
+    async def test_end_to_end_workflow(self) -> Any:
         """Test end-to-end workflow."""
         monitor = await create_training_monitor(self.device_manager)
         
@@ -797,12 +810,12 @@ class TestIntegration(unittest.TestCase):
         self.assertIn('current_lr', lr_state)
         self.assertIn('history', lr_state)
     
-    async def test_custom_early_stopping(self):
+    async def test_custom_early_stopping(self) -> Any:
         """Test custom early stopping function."""
         monitor = await create_training_monitor(self.device_manager)
         
         # Define custom stopping function
-        def custom_stopping(epoch, metric, state):
+        def custom_stopping(epoch, metric, state) -> Any:
             return epoch >= 5  # Stop after 5 epochs
         
         es_config = EarlyStoppingConfig(
@@ -832,12 +845,12 @@ class TestIntegration(unittest.TestCase):
         # Should stop at epoch 5
         self.assertTrue(should_stop)
     
-    async def test_custom_lr_scheduler(self):
+    async def test_custom_lr_scheduler(self) -> Any:
         """Test custom learning rate scheduler."""
         monitor = await create_training_monitor(self.device_manager)
         
         # Define custom scheduler function
-        def custom_scheduler(optimizer):
+        def custom_scheduler(optimizer) -> Any:
             return optim.lr_scheduler.LambdaLR(optimizer, lambda epoch: 0.9 ** epoch)
         
         lr_config = LRSchedulerConfig(
@@ -863,16 +876,16 @@ class TestIntegration(unittest.TestCase):
 class TestPerformanceBenchmarks(unittest.TestCase):
     """Performance benchmarks."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up benchmark environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up benchmark environment."""
         shutil.rmtree(self.temp_dir)
     
-    async def benchmark_early_stopping_performance(self):
+    async def benchmark_early_stopping_performance(self) -> Any:
         """Benchmark early stopping performance."""
         es_config = create_early_stopping_config(
             enabled=True,
@@ -899,7 +912,7 @@ class TestPerformanceBenchmarks(unittest.TestCase):
         self.assertLess(early_stopping_time, 1.0)  # Should complete within 1 second
         logger.info(f"Early stopping benchmark: {early_stopping_time:.4f} seconds")
     
-    async def benchmark_lr_scheduler_performance(self):
+    async def benchmark_lr_scheduler_performance(self) -> Any:
         """Benchmark LR scheduler performance."""
         lr_config = create_lr_scheduler_config(
             scheduler_type=LRSchedulerType.COSINE_ANNEALING,
@@ -927,16 +940,16 @@ class TestPerformanceBenchmarks(unittest.TestCase):
 class TestErrorHandling(unittest.TestCase):
     """Test error handling."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_invalid_early_stopping_config(self):
+    def test_invalid_early_stopping_config(self) -> Any:
         """Test handling of invalid early stopping configuration."""
         with self.assertRaises(ValueError):
             EarlyStoppingConfig(patience=-1)
@@ -944,7 +957,7 @@ class TestErrorHandling(unittest.TestCase):
         with self.assertRaises(ValueError):
             EarlyStoppingConfig(min_delta=-0.1)
     
-    def test_invalid_lr_scheduler_config(self):
+    def test_invalid_lr_scheduler_config(self) -> Any:
         """Test handling of invalid LR scheduler configuration."""
         with self.assertRaises(ValueError):
             LRSchedulerConfig(initial_lr=0)
@@ -952,7 +965,7 @@ class TestErrorHandling(unittest.TestCase):
         with self.assertRaises(ValueError):
             LRSchedulerConfig(min_lr=1e-3, max_lr=1e-4)
     
-    def test_missing_custom_functions(self):
+    def test_missing_custom_functions(self) -> Any:
         """Test handling of missing custom functions."""
         # Missing custom stopping function
         with self.assertRaises(ValueError):
@@ -1107,10 +1120,11 @@ async def quick_lr_scheduler_test():
 
 # Example usage
 if __name__ == "__main__":
-    import asyncio
     
     async def main():
-        print("🚀 Early Stopping & Learning Rate Scheduling Test Suite")
+        
+    """main function."""
+print("🚀 Early Stopping & Learning Rate Scheduling Test Suite")
         print("=" * 70)
         
         # Run quick tests

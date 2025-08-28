@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Dict, Any, Optional
+from enum import Enum
+from ..core.interfaces.contracts import IOptimizer, ICache, INLPAnalyzer
+from ..core.entities.models import OptimizationTier
+from ..application.services.nlp_service import NLPAnalysisService
+from ..infrastructure.optimization.adapters import UltraOptimizerAdapter, ExtremeOptimizerAdapter
+from ..infrastructure.caching.adapters import MemoryCacheAdapter, OptimizedCacheAdapter
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🏭 FACTORY - Dependency Injection
 =================================
@@ -5,14 +26,7 @@
 Factory modular para crear e inyectar dependencias.
 """
 
-from typing import Dict, Any, Optional
-from enum import Enum
 
-from ..core.interfaces.contracts import IOptimizer, ICache, INLPAnalyzer
-from ..core.entities.models import OptimizationTier
-from ..application.services.nlp_service import NLPAnalysisService
-from ..infrastructure.optimization.adapters import UltraOptimizerAdapter, ExtremeOptimizerAdapter
-from ..infrastructure.caching.adapters import MemoryCacheAdapter, OptimizedCacheAdapter
 
 
 class ComponentType(Enum):
@@ -25,7 +39,7 @@ class ComponentType(Enum):
 class ModularFactory:
     """🏭 Factory modular para crear componentes."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._instances: Dict[str, Any] = {}
         self._config = self._load_default_config()
     
@@ -91,7 +105,7 @@ class ModularFactory:
         
         return self._instances[instance_key]
     
-    def get_instance(self, component_type: ComponentType, **kwargs) -> Any:
+    def get_instance(self, component_type: ComponentType, **kwargs) -> Optional[Dict[str, Any]]:
         """Obtener instancia de componente."""
         if component_type == ComponentType.OPTIMIZER:
             tier = kwargs.get('tier', OptimizationTier.ULTRA)

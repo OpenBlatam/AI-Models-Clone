@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import time
+import re
+from test_simple import SimplifiedBlogAnalyzer
+        import psutil
+        import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🔒 SECURITY TESTS - Blog Model
 =============================
@@ -6,19 +25,16 @@ Tests de seguridad para validar la robustez del sistema
 contra ataques y vulnerabilidades de seguridad.
 """
 
-import time
-import re
-from test_simple import SimplifiedBlogAnalyzer
 
 
 class SecurityTestSuite:
     """Suite de tests de seguridad."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.analyzer = SimplifiedBlogAnalyzer()
         self.security_violations = []
     
-    def test_injection_attacks(self):
+    def test_injection_attacks(self) -> Any:
         """Test contra ataques de inyección."""
         print("🔒 Testing injection attacks...")
         
@@ -85,7 +101,7 @@ class SecurityTestSuite:
             'violations': len(self.security_violations)
         }
     
-    def test_dos_attacks(self):
+    def test_dos_attacks(self) -> Any:
         """Test contra ataques de Denial of Service."""
         print("🔒 Testing DoS resistance...")
         
@@ -152,7 +168,7 @@ class SecurityTestSuite:
             'max_processing_time_ms': max_processing_time
         }
     
-    def test_data_sanitization(self):
+    def test_data_sanitization(self) -> Any:
         """Test sanitización de datos de entrada."""
         print("🔒 Testing data sanitization...")
         
@@ -216,7 +232,7 @@ class SecurityTestSuite:
             'sanitization_rate': sanitization_rate
         }
     
-    def test_information_disclosure(self):
+    def test_information_disclosure(self) -> Any:
         """Test contra filtración de información."""
         print("🔒 Testing information disclosure...")
         
@@ -259,12 +275,10 @@ class SecurityTestSuite:
             'safety_rate': safety_rate
         }
     
-    def test_resource_exhaustion(self):
+    def test_resource_exhaustion(self) -> Any:
         """Test contra agotamiento de recursos."""
         print("🔒 Testing resource exhaustion...")
         
-        import psutil
-        import os
         
         process = psutil.Process(os.getpid())
         memory_before = process.memory_info().rss / 1024 / 1024  # MB
@@ -321,7 +335,7 @@ class SecurityTestSuite:
             'safety_rate': safety_rate
         }
     
-    def generate_security_report(self):
+    def generate_security_report(self) -> Any:
         """Generar reporte de seguridad."""
         total_violations = len(self.security_violations)
         

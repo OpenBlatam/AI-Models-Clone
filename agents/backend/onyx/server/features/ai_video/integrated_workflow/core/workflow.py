@@ -1,29 +1,33 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import logging
+import time
+from typing import Optional, Dict, Any
+from datetime import datetime
+from ...video_workflow import VideoWorkflow, WorkflowHooks
+from ...state_repository import FileStateRepository
+from ...models import AIVideo
+from ...plugins import PluginManager, ManagerConfig, ValidationLevel
+from ..components.extractors import IntegratedExtractor
+from ..components.suggestions import IntegratedSuggestionEngine
+from ..components.generators import IntegratedVideoGenerator
+from .models import (
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Integrated Workflow - Core Workflow Engine
 
 Main integrated workflow engine that combines video workflow with plugin system.
 """
 
-import logging
-import time
-from typing import Optional, Dict, Any
-from datetime import datetime
 
 # Import existing components
-from ...video_workflow import VideoWorkflow, WorkflowHooks
-from ...state_repository import FileStateRepository
-from ...models import AIVideo
 
 # Import plugin system
-from ...plugins import PluginManager, ManagerConfig, ValidationLevel
 
 # Import integrated components
-from ..components.extractors import IntegratedExtractor
-from ..components.suggestions import IntegratedSuggestionEngine
-from ..components.generators import IntegratedVideoGenerator
 
 # Import models
-from .models import (
     IntegratedWorkflowStatus,
     PluginWorkflowState,
     IntegratedWorkflowHooks,
@@ -53,7 +57,9 @@ class IntegratedVideoWorkflow:
         workflow_config: Optional[WorkflowConfiguration] = None,
         hooks: Optional[IntegratedWorkflowHooks] = None
     ):
-        self.plugin_config = plugin_config or ManagerConfig(
+        
+    """__init__ function."""
+self.plugin_config = plugin_config or ManagerConfig(
             auto_discover=True,
             auto_load=True,
             validation_level=ValidationLevel.STANDARD,
@@ -112,7 +118,7 @@ class IntegratedVideoWorkflow:
             logger.error(f"❌ Failed to initialize Integrated Video Workflow: {e}")
             return False
     
-    async def _load_and_categorize_plugins(self):
+    async def _load_and_categorize_plugins(self) -> Any:
         """Load and categorize plugins by type."""
         logger.info("📦 Loading and categorizing plugins...")
         
@@ -144,7 +150,7 @@ class IntegratedVideoWorkflow:
         
         logger.info(f"✅ Loaded {len(self.extractors)} extractors, {len(self.suggestion_engines)} suggestion engines, {len(self.generators)} generators")
     
-    async def _initialize_workflow_components(self):
+    async def _initialize_workflow_components(self) -> Any:
         """Initialize core workflow components with plugin integration."""
         # Create state repository
         self.state_repository = FileStateRepository()
@@ -176,7 +182,7 @@ class IntegratedVideoWorkflow:
             hooks=workflow_hooks
         )
     
-    def _setup_plugin_events(self):
+    def _setup_plugin_events(self) -> Any:
         """Setup plugin event handlers."""
         if self.plugin_manager:
             self.plugin_manager.add_event_handler("plugin_loaded", self._on_plugin_loaded)
@@ -367,7 +373,7 @@ class IntegratedVideoWorkflow:
         """Get workflow statistics."""
         return self.statistics
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Shutdown the integrated workflow system."""
         logger.info("🔄 Shutting down Integrated Video Workflow...")
         

@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.port_scanner import AsyncPortScanner, PortScanResult
+from port_scanner import AsyncPortScanner, PortScanResult
 
 
 @pytest.mark.asyncio

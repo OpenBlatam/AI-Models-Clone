@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from datetime import timezone
 from typing import Any
@@ -17,6 +19,10 @@ from onyx.connectors.models import TextSection
 from onyx.utils.logger import setup_logger
 
 
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 GITBOOK_API_BASE = "https://api.gitbook.com/v1/"
@@ -26,7 +32,7 @@ class GitbookApiClient:
     def __init__(self, access_token: str) -> None:
         self.access_token = access_token
 
-    def get(self, endpoint: str, params: dict[str, Any] | None = None) -> Any:
+    def get(self, endpoint: str, params: dict[str, Any] | None = None) -> Optional[Dict[str, Any]]:
         headers = {
             "Authorization": f"Bearer {self.access_token}",
             "Content-Type": "application/json",
@@ -219,7 +225,7 @@ class GitbookConnector(LoadConnector, PollConnector):
         self.access_token = access_token
         self.client = GitbookApiClient(access_token)
 
-    def _fetch_all_pages(
+    async def _fetch_all_pages(
         self,
         start: datetime | None = None,
         end: datetime | None = None,
@@ -280,7 +286,6 @@ class GitbookConnector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     connector = GitbookConnector(
         space_id=os.environ["GITBOOK_SPACE_ID"],

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy.orm import Session
 
 from onyx.db.models import Persona
@@ -9,6 +11,11 @@ from onyx.tools.models import SearchToolOverrideKwargs
 from onyx.utils.logger import setup_logger
 
 
+    from onyx.db.user_documents import calculate_user_files_token_count
+    from onyx.chat.prompt_builder.citations_prompt import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -57,8 +64,6 @@ def parse_user_files(
 
     # Calculate token count for the files, need to import here to avoid circular import
     # TODO: fix this
-    from onyx.db.user_documents import calculate_user_files_token_count
-    from onyx.chat.prompt_builder.citations_prompt import (
         compute_max_document_tokens_for_persona,
     )
 

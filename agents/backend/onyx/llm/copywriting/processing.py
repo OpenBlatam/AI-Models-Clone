@@ -1,7 +1,5 @@
-"""
-Processing logic for Copywriting records, following Onyx backend conventions.
-Supports sync, async, streaming, and advanced post-processing.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy.orm import Session
 from .model import CopywritingInput, CopywritingOutput, CopywritingModel
 from .copywriting import Copywriting, CopywritingCreate
@@ -9,6 +7,12 @@ from .indexing import CopywritingIndex
 from onyx.utils.logger import setup_logger
 from typing import Iterator, AsyncIterator
 import asyncio
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Processing logic for Copywriting records, following Onyx backend conventions.
+Supports sync, async, streaming, and advanced post-processing.
+"""
 
 logger = setup_logger()
 

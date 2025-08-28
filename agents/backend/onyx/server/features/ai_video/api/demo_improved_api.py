@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import json
+import time
+from typing import List
+import httpx
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Demo Script for Improved AI Video API
@@ -6,23 +15,20 @@ Demo Script for Improved AI Video API
 Demonstrates the new API capabilities and performance improvements.
 """
 
-import asyncio
-import json
-import time
-from typing import List
-import httpx
 
 
 class APIDemo:
     def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.client = None
         
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         self.client = httpx.AsyncClient(base_url=self.base_url)
         return self
         
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
         if self.client:
             await self.client.aclose()
 
@@ -40,7 +46,7 @@ class APIDemo:
         )
         return response.json()
 
-    async def run_demo(self):
+    async def run_demo(self) -> Any:
         """Run the complete demonstration."""
         print("🎉 AI Video API Improved - Demo")
         print("=" * 50)
@@ -67,5 +73,6 @@ async def main():
         await demo.run_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

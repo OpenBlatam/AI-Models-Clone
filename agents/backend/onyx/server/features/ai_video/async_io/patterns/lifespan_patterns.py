@@ -1,10 +1,10 @@
-"""
-🔄 LIFESPAN PATTERNS - MODERN FASTAPI STARTUP/SHUTDOWN
-=====================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Replace deprecated @app.on_event() decorators with lifespan context managers
-for better resource management, error handling, and maintainability.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import logging
@@ -20,6 +20,16 @@ import torch
 import psutil
 import signal
 import sys
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+🔄 LIFESPAN PATTERNS - MODERN FASTAPI STARTUP/SHUTDOWN
+=====================================================
+
+Replace deprecated @app.on_event() decorators with lifespan context managers
+for better resource management, error handling, and maintainability.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,14 +43,18 @@ app = FastAPI()
 
 @app.on_event("startup")
 async def startup_event():
-    # Initialize resources
+    
+    """startup_event function."""
+# Initialize resources
     app.state.redis = redis.Redis()
     app.state.db = create_engine("postgresql://...")
     logger.info("Application started")
 
 @app.on_event("shutdown")
 async def shutdown_event():
-    # Cleanup resources
+    
+    """shutdown_event function."""
+# Cleanup resources
     await app.state.redis.close()
     app.state.db.dispose()
     logger.info("Application shutdown")
@@ -217,16 +231,16 @@ def create_app() -> FastAPI:
 class PerformanceMonitor:
     """Performance monitoring system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.is_running = False
         self.metrics = {}
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start performance monitoring."""
         self.is_running = True
         logger.info("Performance monitoring started")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop performance monitoring."""
         self.is_running = False
         logger.info("Performance monitoring stopped")
@@ -242,16 +256,16 @@ class PerformanceMonitor:
 class BackgroundTaskManager:
     """Background task management system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.tasks = set()
         self.is_running = False
     
-    async def start(self):
+    async def start(self) -> Any:
         """Start background task manager."""
         self.is_running = True
         logger.info("Background task manager started")
     
-    async def stop(self):
+    async def stop(self) -> Any:
         """Stop all background tasks."""
         self.is_running = False
         
@@ -266,7 +280,7 @@ class BackgroundTaskManager:
         
         logger.info("Background task manager stopped")
     
-    async def add_task(self, coro):
+    async def add_task(self, coro) -> Any:
         """Add a new background task."""
         if self.is_running:
             task = asyncio.create_task(coro)
@@ -277,7 +291,7 @@ class BackgroundTaskManager:
 def setup_signal_handlers(app: FastAPI):
     """Set up signal handlers for graceful shutdown."""
     
-    def signal_handler(signum, frame):
+    def signal_handler(signum, frame) -> Any:
         logger.info(f"Received signal {signum}, initiating graceful shutdown...")
         # The lifespan context manager will handle cleanup
         sys.exit(0)
@@ -301,12 +315,12 @@ async def load_text_model():
     await asyncio.sleep(0.5)  # Simulate model loading
     return {"model": "text_processing_model", "loaded": True}
 
-async def unload_video_model(model):
+async def unload_video_model(model) -> Any:
     """Unload video generation model."""
     logger.info("Unloading video generation model...")
     await asyncio.sleep(0.5)  # Simulate model unloading
 
-async def unload_text_model(model):
+async def unload_text_model(model) -> Any:
     """Unload text processing model."""
     logger.info("Unloading text processing model...")
     await asyncio.sleep(0.3)  # Simulate model unloading
@@ -541,7 +555,9 @@ def example_basic_lifespan():
     
     @app.get("/health")
     async def health_check():
-        return {"status": "healthy", "uptime": time.time() - app.state.startup_time}
+        
+    """health_check function."""
+return {"status": "healthy", "uptime": time.time() - app.state.startup_time}
     
     return app
 
@@ -552,7 +568,9 @@ def example_advanced_lifespan():
     
     @app.get("/health")
     async def health_check():
-        return await run_health_checks(app)
+        
+    """health_check function."""
+return await run_health_checks(app)
     
     return app
 
@@ -563,7 +581,9 @@ def example_retry_lifespan():
     
     @app.get("/status")
     async def status():
-        return {"status": "running", "retries": "configured"}
+        
+    """status function."""
+return {"status": "running", "retries": "configured"}
     
     return app
 
@@ -573,13 +593,16 @@ if __name__ == "__main__":
     
     @app.get("/")
     async def root():
-        return {"message": "AI Video API with lifespan management"}
+        
+    """root function."""
+return {"message": "AI Video API with lifespan management"}
     
     @app.get("/metrics")
     async def metrics():
-        if hasattr(app.state, 'performance_monitor'):
+        
+    """metrics function."""
+if hasattr(app.state, 'performance_monitor'):
             return await app.state.performance_monitor.collect_metrics()
         return {"error": "Performance monitor not available"}
     
-    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000) 

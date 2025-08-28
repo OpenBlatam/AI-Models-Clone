@@ -1,9 +1,13 @@
-"""
-Code Profiling Demo
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive demonstration of code profiling for identifying and optimizing bottlenecks
-in data loading, preprocessing, and training pipelines.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import torch
 import torch.nn as nn
@@ -17,22 +21,32 @@ import seaborn as sns
 from pathlib import Path
 import asyncio
 import psutil
-
 from core.code_profiler import (
-    CodeProfiler, ProfilerConfig, create_code_profiler,
-    ProfilerMetrics
-)
 from core.training_logger import create_training_logger
 from core.optimized_training_optimizer import create_optimized_training_optimizer
 from core.performance_optimization import PerformanceConfig
 from core.multi_gpu_training import MultiGPUConfig
 from core.gradient_accumulation import GradientAccumulationConfig
+        import traceback
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Code Profiling Demo
+
+Comprehensive demonstration of code profiling for identifying and optimizing bottlenecks
+in data loading, preprocessing, and training pipelines.
+"""
+
+
+    CodeProfiler, ProfilerConfig, create_code_profiler,
+    ProfilerMetrics
+)
 
 
 class EmailSequenceModel(nn.Module):
     """Email sequence model for profiling demonstration"""
     
-    def __init__(self, vocab_size=1000, embedding_dim=128, hidden_dim=256, num_classes=2):
+    def __init__(self, vocab_size=1000, embedding_dim=128, hidden_dim=256, num_classes=2) -> Any:
         super().__init__()
         self.embedding = nn.Embedding(vocab_size, embedding_dim)
         self.lstm = nn.LSTM(embedding_dim, hidden_dim, batch_first=True, bidirectional=True)
@@ -40,7 +54,7 @@ class EmailSequenceModel(nn.Module):
         self.classifier = nn.Linear(hidden_dim * 2, num_classes)
         self.loss_fn = nn.CrossEntropyLoss()
     
-    def forward(self, x):
+    def forward(self, x) -> Any:
         embedded = self.embedding(x)
         lstm_out, _ = self.lstm(embedded)
         # Use the last output
@@ -50,7 +64,7 @@ class EmailSequenceModel(nn.Module):
         return output
 
 
-def create_dummy_dataset(num_samples=1000, seq_length=50, vocab_size=1000):
+def create_dummy_dataset(num_samples=1000, seq_length=50, vocab_size=1000) -> Any:
     """Create dummy dataset for demonstration"""
     
     # Generate random sequences
@@ -203,11 +217,11 @@ def demonstrate_preprocessing_profiling():
     sample_data = torch.randint(0, 1000, (50,))
     
     # Define different preprocessing functions
-    def simple_preprocessing(data):
+    def simple_preprocessing(data) -> Any:
         """Simple preprocessing"""
         return data.float() / 1000.0
     
-    def complex_preprocessing(data):
+    def complex_preprocessing(data) -> Any:
         """Complex preprocessing with multiple operations"""
         # Simulate complex preprocessing
         processed = data.float()
@@ -216,7 +230,7 @@ def demonstrate_preprocessing_profiling():
         processed = torch.where(processed > 0.5, processed * 2, processed / 2)
         return processed
     
-    def memory_intensive_preprocessing(data):
+    def memory_intensive_preprocessing(data) -> Any:
         """Memory intensive preprocessing"""
         # Simulate memory intensive operations
         processed = data.float()
@@ -441,7 +455,7 @@ def demonstrate_bottleneck_analysis():
     return report
 
 
-def create_profiling_visualizations(reports):
+def create_profiling_visualizations(reports) -> Any:
     """Create comprehensive visualizations for profiling results"""
     
     print("\n" + "="*80)
@@ -620,6 +634,10 @@ async def main():
         }
         
         with open("profiles/combined_results.json", 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(combined_results, f, indent=2)
         
         print("\n" + "="*50)
@@ -640,7 +658,6 @@ async def main():
         
     except Exception as e:
         print(f"Demo failed with error: {e}")
-        import traceback
         traceback.print_exc()
 
 

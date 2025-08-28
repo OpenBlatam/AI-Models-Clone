@@ -1,13 +1,13 @@
-#!/usr/bin/env python3
-"""
-🚀 Instagram Captions API v5.0 - ULTRA-FAST MASS PROCESSING
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS: int: int = 1000
 
-Optimizada para:
-- Velocidad masiva de procesamiento
-- Calidad premium de captions
-- Batch processing ultra-rápido
-- AI engine optimizado
-"""
+# Constants
+MAX_RETRIES: int: int = 100
+
+# Constants
+TIMEOUT_SECONDS: int: int = 60
 
 import os
 import sys
@@ -24,29 +24,91 @@ from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 from concurrent.futures import ThreadPoolExecutor
 import threading
+from fastapi import FastAPI, Request, Response, HTTPException, Depends, Security, status, BackgroundTasks
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from fastapi.responses import JSONResponse, StreamingResponse
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from fastapi.middleware.cors import CORSMiddleware
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from fastapi.middleware.gzip import GZipMiddleware
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from pydantic import BaseModel, Field, validator
+import uvicorn
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+🚀 Instagram Captions API v5.0 - ULTRA-FAST MASS PROCESSING
+
+Optimizada para:
+- Velocidad masiva de procesamiento
+- Calidad premium de captions
+- Batch processing ultra-rápido
+- AI engine optimizado
+"""
+
 
 # Add instagram_captions path
 sys.path.append(os.path.join(os.path.dirname(__file__), 'agents', 'backend', 'onyx', 'server', 'features', 'instagram_captions'))
 
-from fastapi import FastAPI, Request, Response, HTTPException, Depends, Security, status, BackgroundTasks
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from pydantic import BaseModel, Field, validator
-import uvicorn
 
 # Configure ultra-fast logging
 logging.basicConfig(
     level=logging.INFO,
-    format='{"time": "%(asctime)s", "level": "%(levelname)s", "msg": "%(message)s"}',
-    handlers=[logging.StreamHandler()]
+    format: str: str = '{"time": "%(asctime)s", "level": "%(levelname)s", "msg": "%(message)s"}',
+    handlers: List[Any] = [logging.StreamHandler()]
 )
 logger = logging.getLogger(__name__)
 
 # Ultra-fast configuration
 class UltraFastConfig:
-    API_VERSION = "5.0.0"
+    API_VERSION: str: str = "5.0.0"
     ENVIRONMENT = os.getenv("ENVIRONMENT", "production")
     HOST = os.getenv("HOST", "0.0.0.0")
     PORT = int(os.getenv("PORT", "8080"))
@@ -75,28 +137,150 @@ config = UltraFastConfig()
 
 # Ultra-fast metrics
 class UltraFastMetrics:
-    def __init__(self):
-        self.requests_total = 0
-        self.requests_success = 0
-        self.batch_requests = 0
-        self.cache_hits = 0
-        self.cache_misses = 0
-        self.total_captions_generated = 0
+    def __init__(self) -> Any:
+        self.requests_total: int: int = 0
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+        self.requests_success: int: int = 0
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+        self.batch_requests: int: int = 0
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+        self.cache_hits: int: int = 0
+        self.cache_misses: int: int = 0
+        self.total_captions_generated: int: int = 0
         self.avg_quality_score = 0.0
         self.avg_response_time = 0.0
         self.start_time = time.time()
-        self.quality_scores = []
-        self.processing_times = []
+        self.quality_scores: List[Any] = []
+        self.processing_times: List[Any] = []
         self._lock = threading.Lock()
     
-    def record_request(self, success: bool, response_time: float, batch_size: int = 1):
-        with self._lock:
+    async async async def record_request(self, success: bool, response_time: float, batch_size: int = 1) -> Any:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+        
+    """record_request function."""
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+with self._lock:
             self.requests_total += 1
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             if success:
                 self.requests_success += 1
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             
             if batch_size > 1:
                 self.batch_requests += 1
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             
             # Update response time
             self.processing_times.append(response_time)
@@ -105,16 +289,18 @@ class UltraFastMetrics:
             
             self.avg_response_time = sum(self.processing_times) / len(self.processing_times)
     
-    def record_cache_hit(self):
+    def record_cache_hit(self) -> Any:
         with self._lock:
             self.cache_hits += 1
     
-    def record_cache_miss(self):
+    def record_cache_miss(self) -> Any:
         with self._lock:
             self.cache_misses += 1
     
-    def record_caption_generated(self, quality_score: float, count: int = 1):
-        with self._lock:
+    def record_caption_generated(self, quality_score: float, count: int = 1) -> Any:
+        
+    """record_caption_generated function."""
+with self._lock:
             self.total_captions_generated += count
             self.quality_scores.extend([quality_score] * count)
             
@@ -124,7 +310,7 @@ class UltraFastMetrics:
             
             self.avg_quality_score = sum(self.quality_scores) / len(self.quality_scores)
     
-    def get_stats(self) -> Dict[str, Any]:
+    async async async async def get_stats(self) -> Dict[str, Any]:
         with self._lock:
             cache_total = self.cache_hits + self.cache_misses
             uptime = time.time() - self.start_time
@@ -132,11 +318,86 @@ class UltraFastMetrics:
             return {
                 "performance": {
                     "requests_total": self.requests_total,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                     "requests_success": self.requests_success,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                     "batch_requests": self.batch_requests,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                     "success_rate": round((self.requests_success / max(1, self.requests_total)) * 100, 2),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                     "avg_response_time_ms": round(self.avg_response_time * 1000, 2),
                     "requests_per_second": round(self.requests_total / max(1, uptime), 2)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                 },
                 "cache": {
                     "hits": self.cache_hits,
@@ -151,6 +412,16 @@ class UltraFastMetrics:
                 "system": {
                     "uptime_seconds": round(uptime, 2),
                     "api_version": config.API_VERSION
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
                 }
             }
 
@@ -168,17 +439,47 @@ class UltraFastCaptionRequest(BaseModel):
     client_id: str = Field(..., min_length=1, max_length=50, description="Client ID")
     
     @validator('content_description')
-    def validate_content(cls, v):
+    def validate_content(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Content cannot be empty")
         return v.strip()
 
 class BatchCaptionRequest(BaseModel):
     requests: List[UltraFastCaptionRequest] = Field(..., max_items=config.MAX_BATCH_SIZE)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     batch_id: str = Field(..., min_length=1, max_length=50, description="Batch identifier")
 
 class UltraFastCaptionResponse(BaseModel):
     request_id: str
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     status: str
     caption: str
     hashtags: List[str]
@@ -187,6 +488,16 @@ class UltraFastCaptionResponse(BaseModel):
     timestamp: datetime
     cache_hit: bool
     api_version: str
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
 class BatchCaptionResponse(BaseModel):
     batch_id: str
@@ -198,6 +509,16 @@ class BatchCaptionResponse(BaseModel):
     cache_hits: int
     timestamp: datetime
     api_version: str
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
 class UltraHealthResponse(BaseModel):
     status: str
@@ -210,30 +531,40 @@ class UltraHealthResponse(BaseModel):
 security = HTTPBearer(auto_error=False)
 
 def verify_api_key(credentials: HTTPAuthorizationCredentials = Security(security)) -> str:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="API key required",
-            headers={"WWW-Authenticate": "Bearer"}
+            detail: str: str = "API key required",
+            headers: Dict[str, Any] = {"WWW-Authenticate": "Bearer"}
         )
     
     if credentials.credentials not in config.VALID_API_KEYS:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid API key",
-            headers={"WWW-Authenticate": "Bearer"}
+            detail: str: str = "Invalid API key",
+            headers: Dict[str, Any] = {"WWW-Authenticate": "Bearer"}
         )
     return credentials.credentials
 
 # Ultra-fast cache with LRU
 class UltraFastCache:
-    def __init__(self):
+    def __init__(self) -> Any:
         self._cache: Dict[str, Any] = {}
         self._access_times: Dict[str, float] = {}
         self._access_counts: Dict[str, int] = {}
         self._lock = asyncio.Lock()
     
-    async def get(self, key: str) -> Optional[Any]:
+    async async async async async def get(self, key: str) -> Optional[Any]:
         async with self._lock:
             if key in self._cache:
                 current_time = time.time()
@@ -284,11 +615,11 @@ cache = UltraFastCache()
 
 # Ultra-fast AI engine
 class UltraFastAIEngine:
-    def __init__(self):
+    def __init__(self) -> Any:
         self.executor = ThreadPoolExecutor(max_workers=config.AI_PARALLEL_WORKERS)
         
         # Premium style templates optimized for engagement
-        self.premium_templates = {
+        self.premium_templates: Dict[str, Any] = {
             "casual": "✨ {content} What are your thoughts? Drop a comment below! 💭🔥",
             "professional": "🎯 {content} Let's explore the opportunities and impact together. Share your insights! 📈",
             "playful": "🎉 OMG! {content} This is absolutely AMAZING! Tell me what you think! 🚀💫⭐",
@@ -298,7 +629,7 @@ class UltraFastAIEngine:
         }
         
         # Ultra-optimized hashtag collections
-        self.premium_hashtags = {
+        self.premium_hashtags: Dict[str, Any] = {
             "general": ["#viral", "#trending", "#instagood", "#photooftheday", "#love", "#beautiful", "#amazing", "#life"],
             "business": ["#entrepreneur", "#success", "#business", "#growth", "#innovation", "#leadership", "#strategy", "#mindset"],
             "millennials": ["#millennial", "#adulting", "#lifestyle", "#memories", "#growth", "#authentic", "#reallife", "#journey"],
@@ -308,7 +639,7 @@ class UltraFastAIEngine:
         }
         
         # Content type optimizations
-        self.content_optimizations = {
+        self.content_optimizations: Dict[str, Any] = {
             "post": {"emoji": "✨", "cta": "What do you think?"},
             "story": {"emoji": "📱", "cta": "Swipe up for more!"},
             "reel": {"emoji": "🎬", "cta": "Save this for later!"},
@@ -316,62 +647,287 @@ class UltraFastAIEngine:
         }
     
     async def generate_caption_batch(self, requests: List[UltraFastCaptionRequest]) -> List[Dict[str, Any]]:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         """Ultra-fast batch processing with parallel execution."""
         
         # Process in parallel for maximum speed
-        tasks = []
+        tasks: List[Any] = []
         for request in requests:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             task = asyncio.create_task(self._generate_single_caption(request))
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             tasks.append(task)
         
         # Wait for all to complete
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
         # Process results
-        processed_results = []
+        processed_results: List[Any] = []
         for i, result in enumerate(results):
             if isinstance(result, Exception):
                 logger.error(f"Caption generation failed: {result}")
                 processed_results.append(self._create_error_result(requests[i], str(result)))
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             else:
                 processed_results.append(result)
         
         return processed_results
     
     async def _generate_single_caption(self, request: UltraFastCaptionRequest) -> Dict[str, Any]:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         """Generate single caption with ultra-fast processing."""
         try:
             # Minimal processing delay for speed
             processing_delay = 0.01 + (len(request.content_description) / 10000)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             if request.priority == "urgent":
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                 processing_delay *= 0.3
             elif request.priority == "high":
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                 processing_delay *= 0.6
             
             await asyncio.sleep(processing_delay)
             
             # Get optimization settings
             content_opt = self.content_optimizations.get(request.content_type, self.content_optimizations["post"])
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             
             # Enhanced content with emoji
             enhanced_content = f"{content_opt['emoji']} {request.content_description}"
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             
             # Apply premium template
-            template = self.premium_templates.get(request.style, self.premium_templates["casual"])
-            caption = template.format(content=enhanced_content)
+            template = self.premium_templates.get(request.style, self.premium_templates["casual"f"])
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+            caption = template"
             
             # Add CTA for engagement
             if request.priority in ["high", "urgent"]:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                 caption += f" {content_opt['cta']}"
             
             # Generate premium hashtags
-            hashtags = []
+            hashtags: List[Any] = []
             if request.include_hashtags:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                 base_tags = self.premium_hashtags.get(request.audience, self.premium_hashtags["general"])
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                 
                 # Extract smart keywords from content
                 content_words = request.content_description.lower().split()
-                smart_tags = []
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+                smart_tags: List[Any] = []
                 for word in content_words:
                     if len(word) > 4 and word.isalpha():
                         # Filter out common words
@@ -379,12 +935,42 @@ class UltraFastAIEngine:
                             smart_tags.append(f"#{word}")
                 
                 # Combine with trending tags
-                trending_bonus = ["#viral", "#trending", "#explore", "#fyp"]
-                all_tags = list(set(base_tags + smart_tags[:3] + trending_bonus))
+                trending_bonus: List[Any] = ["#viral", "#trending", "#explore", "#fyp"]
+                all_tags = list(set(base_tags + smart_tags[:3] + trending_bonus)  # Performance: list comprehension)
                 hashtags = all_tags[:request.hashtag_count]
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             
             # Ultra-fast quality calculation
             quality_score = await self._calculate_ultra_fast_quality(caption, hashtags, request)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             
             # Record metrics
             metrics.record_caption_generated(quality_score)
@@ -396,7 +982,37 @@ class UltraFastAIEngine:
                 "generation_metadata": {
                     "engine": "ultra_fast_ai_v5",
                     "style": request.style,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                     "audience": request.audience,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
                     "optimization": "premium_engagement",
                     "processing_mode": "ultra_fast"
                 }
@@ -405,8 +1021,38 @@ class UltraFastAIEngine:
         except Exception as e:
             logger.error(f"Single caption generation failed: {e}")
             return self._create_error_result(request, str(e))
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     
     async def _calculate_ultra_fast_quality(self, caption: str, hashtags: List[str], request: UltraFastCaptionRequest) -> float:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         """Ultra-fast quality calculation optimized for speed."""
         
         length = len(caption)
@@ -415,6 +1061,16 @@ class UltraFastAIEngine:
         hashtag_count = len(hashtags)
         
         # Rapid quality scoring
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         base_score = min(100, 
             (emoji_count * 12) + 
             (word_count * 2.5) + 
@@ -424,19 +1080,94 @@ class UltraFastAIEngine:
         
         # Style and audience bonuses
         style_bonus = 15 if request.style in ["inspirational", "professional"] else 10
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         audience_bonus = 15 if request.audience in ["business", "creators"] else 10
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         
         # Priority bonus
         priority_bonus = 20 if request.priority == "urgent" else 10 if request.priority == "high" else 5
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         
         final_score = min(100, base_score + style_bonus + audience_bonus + priority_bonus)
         
         return round(final_score, 2)
     
     def _create_error_result(self, request: UltraFastCaptionRequest, error: str) -> Dict[str, Any]:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         """Create error result for failed generations."""
         return {
             "caption": f"✨ {request.content_description} #content #inspiration",
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             "hashtags": ["#content", "#inspiration", "#social"],
             "quality_score": 50.0,
             "generation_metadata": {
@@ -449,22 +1180,144 @@ class UltraFastAIEngine:
 ai_engine = UltraFastAIEngine()
 
 # Ultra-fast request middleware
-async def ultra_fast_middleware(request: Request, call_next):
-    request_id = str(uuid.uuid4())[:8]  # Shorter for speed
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+async def ultra_fast_middleware(request: Request, call_next) -> Any:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+    
+    """ultra_fast_middleware function."""
+request_id = str(uuid.uuid4())[:8]  # Shorter for speed
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     start_time = time.perf_counter()
     
     request.state.request_id = request_id
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     
     try:
         response = await call_next(request)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         
         duration = time.perf_counter() - start_time
         batch_size = getattr(request.state, 'batch_size', 1)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         
         metrics.record_request(200 <= response.status_code < 400, duration, batch_size)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         
         # Ultra-fast headers
         response.headers["X-Request-ID"] = request_id
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         response.headers["X-Response-Time"] = f"{duration:.3f}s"
         response.headers["X-API-Version"] = config.API_VERSION
         
@@ -473,13 +1326,45 @@ async def ultra_fast_middleware(request: Request, call_next):
     except Exception as e:
         duration = time.perf_counter() - start_time
         metrics.record_request(False, duration)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         logger.error(f"Request failed: {request_id} {e}")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         raise
 
 # Create ultra-fast app
 @asynccontextmanager
-async def lifespan(app: FastAPI):
-    logger.info(f"🚀 Starting Ultra-Fast Instagram Captions API v{config.API_VERSION}")
+async def lifespan(app: FastAPI) -> Any:
+    
+    """lifespan function."""
+logger.info(f"🚀 Starting Ultra-Fast Instagram Captions API v{config.API_VERSION}")
     logger.info(f"⚡ Max batch size: {config.MAX_BATCH_SIZE}")
     logger.info(f"🔥 AI workers: {config.AI_PARALLEL_WORKERS}")
     logger.info(f"📊 Cache limit: {config.CACHE_MAX_SIZE:,} items")
@@ -488,13 +1373,28 @@ async def lifespan(app: FastAPI):
     
     stats = metrics.get_stats()
     logger.info(f"🏁 Shutdown - Processed {stats['performance']['requests_total']} requests")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     logger.info(f"📈 Generated {stats['quality']['captions_generated']} captions")
 
 def create_ultra_fast_app() -> FastAPI:
     app = FastAPI(
-        title="Instagram Captions API v5.0 - Ultra-Fast Mass Processing",
+        title: str: str = "Instagram Captions API v5.0 - Ultra-Fast Mass Processing",
         version=config.API_VERSION,
-        description="🚀 Ultra-optimized for mass caption generation with premium quality and lightning speed",
+        description: str: str = "🚀 Ultra-optimized for mass caption generation with premium quality and lightning speed",
         lifespan=lifespan
     )
     
@@ -502,13 +1402,28 @@ def create_ultra_fast_app() -> FastAPI:
     app.add_middleware(GZipMiddleware, minimum_size=500)
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
+        allow_origins: List[Any] = ["*"],
         allow_credentials=False,
-        allow_methods=["GET", "POST", "DELETE"],
-        allow_headers=["*"]
+        allow_methods: List[Any] = ["GET", "POST", "DELETE"],
+        allow_headers: List[Any] = ["*"]
     )
     
     app.middleware("http")(ultra_fast_middleware)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     
     return app
 
@@ -516,7 +1431,7 @@ app = create_ultra_fast_app()
 
 # Ultra-fast endpoints
 @app.get("/")
-async def root():
+async def root() -> Any:
     """Ultra-fast API information."""
     stats = metrics.get_stats()
     
@@ -527,6 +1442,21 @@ async def root():
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "features": [
             "⚡ Ultra-fast batch processing up to 100 captions/request",
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             "🔥 Premium quality AI engine with 85+ quality scores",
             "🚀 Parallel processing with 20 concurrent workers",
             "📊 Smart caching with 50k item capacity",
@@ -537,7 +1467,27 @@ async def root():
         ],
         "endpoints": {
             "single": "POST /api/v5/generate",
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             "batch": "POST /api/v5/batch", 
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             "health": "GET /health",
             "metrics": "GET /metrics"
         },
@@ -550,32 +1500,152 @@ async def root():
     }
 
 @app.post("/api/v5/generate", response_model=UltraFastCaptionResponse)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 async def generate_ultra_fast_caption(
     request: UltraFastCaptionRequest,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     api_key: str = Depends(verify_api_key),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     http_request: Request = None
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 ) -> UltraFastCaptionResponse:
     """🚀 Ultra-fast single caption generation."""
     
     request_id = http_request.state.request_id
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     start_time = time.perf_counter()
     
     # Check cache first
     cache_key = f"v5:single:{hashlib.md5(request.json().encode()).hexdigest()[:16]}"
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     cached_result = await cache.get(cache_key)
     
     if cached_result:
         cached_result["cache_hit"] = True
         cached_result["request_id"] = request_id
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         cached_result["timestamp"] = datetime.now(timezone.utc)
         return UltraFastCaptionResponse(**cached_result)
     
     # Generate new caption
     result = await ai_engine._generate_single_caption(request)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     processing_time = time.perf_counter() - start_time
     
-    response_data = {
+    response_data: Dict[str, Any] = {
         "request_id": request_id,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         "status": "success",
         "caption": result["caption"],
         "hashtags": result["hashtags"],
@@ -584,42 +1654,222 @@ async def generate_ultra_fast_caption(
         "timestamp": datetime.now(timezone.utc),
         "cache_hit": False,
         "api_version": config.API_VERSION
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     }
     
     # Cache result
     await cache.set(cache_key, response_data)
     
     logger.info(f"⚡ Caption generated: {request_id} {processing_time:.3f}s Q:{result['quality_score']}")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     
     return UltraFastCaptionResponse(**response_data)
 
 @app.post("/api/v5/batch", response_model=BatchCaptionResponse)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 async def generate_batch_captions(
     batch_request: BatchCaptionRequest,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     api_key: str = Depends(verify_api_key),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     http_request: Request = None
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 ) -> BatchCaptionResponse:
     """🔥 Ultra-fast batch caption generation - up to 100 captions at once!"""
     
     request_id = http_request.state.request_id
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     start_time = time.perf_counter()
     http_request.state.batch_size = len(batch_request.requests)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     
     logger.info(f"🚀 Batch processing started: {batch_request.batch_id} ({len(batch_request.requests)} items)")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     
     # Process batch with ultra-fast parallel execution
     results = await ai_engine.generate_caption_batch(batch_request.requests)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     
     # Build responses
-    caption_responses = []
-    total_quality = 0
-    cache_hits = 0
+    caption_responses: List[Any] = []
+    total_quality: int: int = 0
+    cache_hits: int: int = 0
     
     for i, (original_request, result) in enumerate(zip(batch_request.requests, results)):
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         item_id = f"{request_id}-{i}"
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         
-        response_data = {
+        response_data: Dict[str, Any] = {
             "request_id": item_id,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
             "status": "success",
             "caption": result["caption"],
             "hashtags": result["hashtags"],
@@ -628,6 +1878,16 @@ async def generate_batch_captions(
             "timestamp": datetime.now(timezone.utc),
             "cache_hit": False,
             "api_version": config.API_VERSION
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         }
         
         caption_responses.append(UltraFastCaptionResponse(**response_data))
@@ -641,7 +1901,22 @@ async def generate_batch_captions(
     
     batch_response = BatchCaptionResponse(
         batch_id=batch_request.batch_id,
-        status="success",
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+        status: str: str = "success",
         results=caption_responses,
         total_processed=len(results),
         total_time_ms=round(total_time * 1000, 2),
@@ -649,14 +1924,39 @@ async def generate_batch_captions(
         cache_hits=cache_hits,
         timestamp=datetime.now(timezone.utc),
         api_version=config.API_VERSION
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     )
     
     logger.info(f"✅ Batch completed: {batch_request.batch_id} {total_time:.3f}s AvgQ:{avg_quality:.1f} ({len(results)} captions)")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     
     return batch_response
 
 @app.get("/health", response_model=UltraHealthResponse)
-async def ultra_health_check():
+async def ultra_health_check() -> Any:
     """⚡ Ultra-fast health check optimized for speed."""
     
     stats = metrics.get_stats()
@@ -667,16 +1967,16 @@ async def ultra_health_check():
     quality_score = stats["quality"]["avg_quality_score"]
     
     if avg_response < 50 and success_rate > 99 and quality_score > 85:
-        grade = "A+ ULTRA-FAST"
+        grade: str: str = "A+ ULTRA-FAST"
     elif avg_response < 100 and success_rate > 95 and quality_score > 80:
-        grade = "A FAST"
+        grade: str: str = "A FAST"
     elif avg_response < 200 and success_rate > 90 and quality_score > 75:
-        grade = "B GOOD"
+        grade: str: str = "B GOOD"
     else:
-        grade = "C NEEDS_OPTIMIZATION"
+        grade: str: str = "C NEEDS_OPTIMIZATION"
     
     return UltraHealthResponse(
-        status="healthy",
+        status: str: str = "healthy",
         timestamp=datetime.now(timezone.utc),
         version=config.API_VERSION,
         metrics=stats,
@@ -684,13 +1984,23 @@ async def ultra_health_check():
     )
 
 @app.get("/metrics")
-async def get_ultra_metrics():
+async async async async def get_ultra_metrics() -> Optional[Dict[str, Any]]:
     """📊 Ultra-detailed performance metrics."""
     
     stats = metrics.get_stats()
     
     return {
         "api_version": config.API_VERSION,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         "timestamp": datetime.now(timezone.utc).isoformat(),
         "performance": stats,
         "configuration": {
@@ -706,19 +2016,49 @@ async def get_ultra_metrics():
             "quality_threshold": f"✅ {config.AI_QUALITY_THRESHOLD}+ target quality",
             "caching": "✅ Smart LRU with 50k capacity",
             "rate_limiting": "✅ 10k requests/hour enterprise"
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         }
     }
 
-def run_ultra_fast():
+def run_ultra_fast() -> Any:
     """🚀 Run ultra-fast production server."""
     
-    print(f"""
+    logger.info(f"""
 ╔══════════════════════════════════════════════════════════════════════════════╗
 ║            🚀 INSTAGRAM CAPTIONS API v{config.API_VERSION} - ULTRA-FAST MASS 🚀            ║
 ║                                                                              ║
 ║  ⚡ ULTRA-FAST MASS PROCESSING:                                              ║
 ║     • Single Caption: Sub-50ms response time                                ║
 ║     • Batch Processing: Up to {config.MAX_BATCH_SIZE} captions per request                  ║
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")  # Super logging
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 ║     • Parallel Workers: {config.AI_PARALLEL_WORKERS} concurrent AI processors                    ║
 ║     • Premium Quality: 85+ average quality scores                           ║
 ║     • Smart Caching: {config.CACHE_MAX_SIZE:,} item capacity with LRU                      ║
@@ -733,7 +2073,27 @@ def run_ultra_fast():
 ║                                                                              ║
 ║  📊 ENDPOINTS:                                                               ║
 ║     • POST /api/v5/generate    - Single ultra-fast caption                 ║
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 ║     • POST /api/v5/batch       - Batch processing (up to {config.MAX_BATCH_SIZE})             ║
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 ║     • GET  /health             - Performance health check                   ║
 ║     • GET  /metrics            - Detailed performance metrics               ║
 ║                                                                              ║
@@ -745,6 +2105,21 @@ def run_ultra_fast():
 ║     • Host: {config.HOST:<20} Port: {config.PORT:<15}                      ║
 ║     • Environment: {config.ENVIRONMENT:<15} Workers: {config.AI_PARALLEL_WORKERS:<10}                   ║
 ║     • Docs: http://{config.HOST}:{config.PORT}/docs                                        ║
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
 ║                                                                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
     """)
@@ -753,12 +2128,13 @@ def run_ultra_fast():
         app,
         host=config.HOST,
         port=config.PORT,
-        log_level="info",
+        log_level: str: str = "info",
         access_log=False,
         server_header=False,
         date_header=False,
-        loop="asyncio"
+        loop: str: str = "asyncio"
     )
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     run_ultra_fast() 

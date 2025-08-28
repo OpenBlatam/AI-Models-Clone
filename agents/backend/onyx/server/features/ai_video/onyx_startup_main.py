@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import sys
+from onyx.utils.logger import setup_logger
+from .cli.cli import OnyxAIVideoCLI
+from .cli.parser import create_parser
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Onyx AI Video System - Startup Script (Modularized)
@@ -6,13 +15,8 @@ Command-line interface and startup script for the Onyx-adapted AI Video system.
 Provides initialization, configuration management, and system control.
 """
 
-import asyncio
-import sys
-from onyx.utils.logger import setup_logger
 
 # Local imports
-from .cli.cli import OnyxAIVideoCLI
-from .cli.parser import create_parser
 
 logger = setup_logger(__name__)
 
@@ -49,5 +53,6 @@ async def main() -> int:
         return 1
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     sys.exit(asyncio.run(main())) 

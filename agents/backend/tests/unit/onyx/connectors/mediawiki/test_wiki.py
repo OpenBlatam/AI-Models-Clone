@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 
 import datetime
@@ -10,6 +12,9 @@ from pytest_mock import MockFixture
 
 from onyx.connectors.mediawiki import wiki
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Some of these tests are disabled for now due to flakiness with wikipedia as the backend
 
 pywikibot.config.base_dir = tempfile.TemporaryDirectory().name

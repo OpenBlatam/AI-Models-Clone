@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import time
 from typing import Any
@@ -14,6 +16,9 @@ from onyx.connectors.models import Document
 from tests.daily.connectors.utils import load_all_docs_from_checkpoint_connector
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def confluence_connector(space: str) -> ConfluenceConnector:
     connector = ConfluenceConnector(

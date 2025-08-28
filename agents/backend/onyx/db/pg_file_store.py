@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import tempfile
 from io import BytesIO
 from typing import IO
@@ -15,6 +17,9 @@ from onyx.file_store.constants import MAX_IN_MEMORY_SIZE
 from onyx.file_store.constants import STANDARD_CHUNK_SIZE
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -62,9 +67,17 @@ def create_populate_lobj(
     # write in multiple chunks to avoid loading the whole file into memory
     while True:
         chunk = content.read(STANDARD_CHUNK_SIZE)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         if not chunk:
             break
         large_object.write(chunk)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
     large_object.close()
 
@@ -89,14 +102,26 @@ def read_lobj(
         temp_file = tempfile.SpooledTemporaryFile(max_size=MAX_IN_MEMORY_SIZE)
         while True:
             chunk = large_object.read(STANDARD_CHUNK_SIZE)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             if not chunk:
                 break
             temp_file.write(chunk)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         temp_file.seek(0)
         return temp_file
     else:
         # Ensure we're getting raw bytes without text decoding
         return BytesIO(large_object.read())
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 def delete_lobj_by_id(

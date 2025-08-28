@@ -1,7 +1,13 @@
-"""
-High-throughput async enumerator with connection pooling for DNS, SMB, SSH enumeration.
-Implements asyncio-based enumeration with connection reuse and intelligent rate limiting.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import aiodns
@@ -19,6 +25,12 @@ import json
 import ssl
 import hashlib
 import base64
+from typing import Any, List, Dict, Optional
+"""
+High-throughput async enumerator with connection pooling for DNS, SMB, SSH enumeration.
+Implements asyncio-based enumeration with connection reuse and intelligent rate limiting.
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -68,7 +80,9 @@ class AsyncDNSEnumerator:
     """High-performance async DNS enumerator with connection pooling."""
     
     def __init__(self, config: EnumeratorConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.resolver = aiodns.DNSResolver()
         self.resolver.nameservers = self.config.dns_servers
         self.rate_limiter = asyncio.Semaphore(config.rate_limit_per_second)
@@ -190,7 +204,9 @@ class AsyncSSHEnumerator:
     """High-performance async SSH enumerator with connection pooling."""
     
     def __init__(self, config: EnumeratorConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.connections: Dict[str, asyncssh.SSHClientConnection] = {}
         self.connection_semaphores: Dict[str, asyncio.Semaphore] = defaultdict(
             lambda: asyncio.Semaphore(5)  # Max 5 connections per host
@@ -394,7 +410,9 @@ class AsyncSMBEnumerator:
     """High-performance async SMB enumerator with connection pooling."""
     
     def __init__(self, config: EnumeratorConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.rate_limiter = asyncio.Semaphore(config.rate_limit_per_second)
         self.stats = {"connections": 0, "successful": 0, "failed": 0}
     
@@ -469,10 +487,18 @@ class AsyncSMBEnumerator:
             # Send SMB negotiation request
             negotiation_request = self._create_smb_negotiation_request()
             writer.write(negotiation_request)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             await writer.drain()
             
             # Read response
             response = await asyncio.wait_for(reader.read(1024), timeout=5.0)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             writer.close()
             await writer.wait_closed()
             
@@ -485,7 +511,7 @@ class AsyncSMBEnumerator:
         
         return smb_info
     
-    def _create_smb_negotiation_request(self) -> bytes:
+    async def _create_smb_negotiation_request(self) -> bytes:
         """Create SMB negotiation request packet."""
         # Simplified SMB negotiation request
         # In a real implementation, this would be more sophisticated
@@ -510,7 +536,9 @@ class AsyncNetworkEnumerator:
     """High-performance async network enumerator with connection pooling."""
     
     def __init__(self, config: EnumeratorConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.dns_enumerator = AsyncDNSEnumerator(config)
         self.ssh_enumerator = AsyncSSHEnumerator(config)
         self.smb_enumerator = AsyncSMBEnumerator(config)

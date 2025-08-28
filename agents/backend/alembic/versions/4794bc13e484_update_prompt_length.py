@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """update prompt length
 
 Revision ID: 4794bc13e484
@@ -6,13 +13,11 @@ Create Date: 2025-04-02 11:26:36.180328
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "4794bc13e484"
-down_revision = "f7505c5b0284"
+revision: str = "4794bc13e484"
+down_revision: str = "f7505c5b0284"
 branch_labels = None
 depends_on = None
 

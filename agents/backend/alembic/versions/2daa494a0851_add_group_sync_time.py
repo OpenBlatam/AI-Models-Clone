@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add-group-sync-time
 
 Revision ID: 2daa494a0851
@@ -6,12 +13,10 @@ Create Date: 2024-11-11 10:57:22.991157
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "2daa494a0851"
-down_revision = "c0fd6e4da83a"
+revision: str = "2daa494a0851"
+down_revision: str = "c0fd6e4da83a"
 branch_labels = None
 depends_on = None
 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from unittest.mock import Mock
 
 import pytest
@@ -6,6 +8,9 @@ from requests import HTTPError
 from onyx.connectors.confluence.utils import handle_confluence_rate_limit
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def mock_confluence_call() -> Mock:
     return Mock()

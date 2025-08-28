@@ -1,14 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import time
+from datetime import datetime, timedelta
+from ..core import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Core Examples
 
 Demonstrates error handling, validation, logging, and monitoring functionality.
 """
 
-import asyncio
-import time
-from datetime import datetime, timedelta
 
-from ..core import (
     # Error Handling
     SecurityToolkitError, ValidationError, NetworkError, CryptoError,
     TargetValidationError, PortValidationError, TimeoutError,
@@ -87,7 +100,9 @@ def demonstrate_retry_strategy():
     
     # Example 1: Successful operation
     async def successful_operation():
-        return "Operation completed successfully"
+        
+    """successful_operation function."""
+return "Operation completed successfully"
     
     result = asyncio.run(retry_strategy.execute(successful_operation))
     print(f"Successful operation: {result}")
@@ -95,7 +110,9 @@ def demonstrate_retry_strategy():
     # Example 2: Operation that fails initially then succeeds
     call_count = 0
     async def failing_then_successful():
-        nonlocal call_count
+        
+    """failing_then_successful function."""
+nonlocal call_count
         call_count += 1
         if call_count < 3:
             raise NetworkError("Temporary network issue", "192.168.1.1", 80)
@@ -107,7 +124,9 @@ def demonstrate_retry_strategy():
     
     # Example 3: Operation that always fails
     async def always_failing():
-        raise TimeoutError("Operation timeout", 5.0, "test_operation")
+        
+    """always_failing function."""
+raise TimeoutError("Operation timeout", 5.0, "test_operation")
     
     try:
         asyncio.run(retry_strategy.execute(always_failing))
@@ -126,7 +145,9 @@ def demonstrate_circuit_breaker():
     
     # Example 1: Successful operation
     async def successful_operation():
-        return "Success"
+        
+    """successful_operation function."""
+return "Success"
     
     result = asyncio.run(circuit_breaker.execute(successful_operation))
     print(f"Circuit breaker state: {circuit_breaker.state}")
@@ -134,7 +155,9 @@ def demonstrate_circuit_breaker():
     
     # Example 2: Failing operation that opens circuit
     async def failing_operation():
-        raise NetworkError("Service unavailable", "api.example.com", 443)
+        
+    """failing_operation function."""
+raise NetworkError("Service unavailable", "api.example.com", 443)
     
     # First failure
     try:
@@ -380,17 +403,23 @@ def demonstrate_monitoring():
     
     # Add health checks
     async def database_health_check():
-        # Simulate database check
+        
+    """database_health_check function."""
+# Simulate database check
         await asyncio.sleep(0.1)
         return True
     
     async def api_health_check():
-        # Simulate API check
+        
+    """api_health_check function."""
+# Simulate API check
         await asyncio.sleep(0.1)
         return {"healthy": True, "message": "API is responding"}
     
     async def failing_health_check():
-        # Simulate failing check
+        
+    """failing_health_check function."""
+# Simulate failing check
         raise Exception("Service unavailable")
     
     checker.add_health_check("database", database_health_check)
@@ -410,7 +439,7 @@ def demonstrate_monitoring():
     
     # Add alert handler
     alerts_sent = []
-    def log_alert(alert):
+    def log_alert(alert) -> Any:
         alerts_sent.append(alert)
         print(f"    Alert sent: {alert.title} ({alert.level.value})")
     
@@ -442,7 +471,9 @@ def demonstrate_monitoring():
     
     @track_performance("example_operation")
     async def example_operation():
-        await asyncio.sleep(0.1)
+        
+    """example_operation function."""
+await asyncio.sleep(0.1)
         return "Operation completed"
     
     result = await example_operation()
@@ -473,7 +504,7 @@ def demonstrate_integration():
     alert_manager = AlertManager()
     
     # Add alert handler
-    def integration_alert_handler(alert):
+    def integration_alert_handler(alert) -> Any:
         logger.security_event(
             "alert_triggered",
             f"Alert: {alert.title}",
@@ -486,7 +517,9 @@ def demonstrate_integration():
     print("Complete Operation Monitoring:")
     
     async def monitored_operation():
-        start_time = time.time()
+        
+    """monitored_operation function."""
+start_time = time.time()
         
         # Log operation start
         context = LogContext("integration_test", "integration", "test_operation")
@@ -531,7 +564,7 @@ def demonstrate_integration():
     # Example 2: Validation with error handling and logging
     print("\nValidation with Error Handling:")
     
-    def validate_with_logging(target, port, credentials):
+    def validate_with_logging(target, port, credentials) -> bool:
         context = LogContext("validation", "integration", "validate_inputs")
         
         # Validate target
@@ -581,7 +614,9 @@ def demonstrate_integration():
     retry_strategy = RetryStrategy(max_retries=2, base_delay=0.1)
     
     async def recoverable_operation():
-        # Simulate operation that might fail
+        
+    """recoverable_operation function."""
+# Simulate operation that might fail
         if time.time() % 3 < 1:  # Fail occasionally
             raise NetworkError("Temporary network issue", "api.example.com", 443)
         return "Operation succeeded"
@@ -693,5 +728,6 @@ async def main():
         print(f"❌ Error running core examples: {e}")
         raise
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

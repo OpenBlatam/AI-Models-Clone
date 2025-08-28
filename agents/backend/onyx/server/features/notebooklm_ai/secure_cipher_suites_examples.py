@@ -1,3 +1,38 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import os
+import ssl
+import time
+from dataclasses import dataclass, field
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union, Callable, Set, Tuple
+from enum import Enum
+import hashlib
+import hmac
+import secrets
+import socket
+import threading
+from contextlib import contextmanager
+    import cryptography
+    from cryptography.hazmat.primitives import hashes, serialization
+    from cryptography.hazmat.primitives.asymmetric import rsa, ec, padding
+    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
+    from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+    from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
+    from cryptography.hazmat.primitives.hmac import HMAC
+    from cryptography.hazmat.primitives.constant_time import bytes_eq
+    from cryptography.x509 import load_pem_x509_certificate, load_der_x509_certificate
+    from cryptography.x509.oid import NameOID
+    import OpenSSL
+    from OpenSSL import SSL, crypto
+    from OpenSSL.crypto import X509, X509Req, PKey
+from typing import Any, List, Dict, Optional
 """
 Secure Cipher Suites and Cryptographic Configuration Examples
 ============================================================
@@ -21,42 +56,13 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import logging
-import os
-import ssl
-import time
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, Callable, Set, Tuple
-from enum import Enum
-import hashlib
-import hmac
-import secrets
-import socket
-import threading
-from contextlib import contextmanager
 
 try:
-    import cryptography
-    from cryptography.hazmat.primitives import hashes, serialization
-    from cryptography.hazmat.primitives.asymmetric import rsa, ec, padding
-    from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-    from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-    from cryptography.hazmat.primitives.kdf.hkdf import HKDF
-    from cryptography.hazmat.primitives.kdf.scrypt import Scrypt
-    from cryptography.hazmat.primitives.hmac import HMAC
-    from cryptography.hazmat.primitives.constant_time import bytes_eq
-    from cryptography.x509 import load_pem_x509_certificate, load_der_x509_certificate
-    from cryptography.x509.oid import NameOID
     CRYPTOGRAPHY_AVAILABLE = True
 except ImportError:
     CRYPTOGRAPHY_AVAILABLE = False
 
 try:
-    import OpenSSL
-    from OpenSSL import SSL, crypto
-    from OpenSSL.crypto import X509, X509Req, PKey
     OPENSSL_AVAILABLE = True
 except ImportError:
     OPENSSL_AVAILABLE = False
@@ -953,5 +959,6 @@ def main():
     logger.info("Secure cipher suites and cryptographic security examples completed")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

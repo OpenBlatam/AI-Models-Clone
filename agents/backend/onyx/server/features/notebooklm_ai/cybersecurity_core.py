@@ -1,7 +1,13 @@
-"""
-Cybersecurity Core - Proper separation of CPU-bound and I/O-bound operations
-Uses def for pure CPU operations, async def for I/O operations
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import hashlib
 import secrets
@@ -15,6 +21,15 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 import asyncio
 import functools
+    import socket
+            import time
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Cybersecurity Core - Proper separation of CPU-bound and I/O-bound operations
+Uses def for pure CPU operations, async def for I/O operations
+"""
+
 
 # ============================================================================
 # CORE DATA STRUCTURES
@@ -268,7 +283,6 @@ async def validate_password_roro(request: SecurityRequest) -> SecurityResponse:
 
 async def scan_port_async(host: str, port: int, timeout: int) -> bool:
     """Asynchronously scan a single port - I/O-bound (network operations)"""
-    import socket
     
     try:
         loop = asyncio.get_event_loop()
@@ -394,7 +408,6 @@ def with_rate_limiting(max_requests: int = 100, window_seconds: int = 60):
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         async def wrapper(request: SecurityRequest) -> SecurityResponse:
-            import time
             current_time = time.time()
             client_id = request.metadata.get("client_id", "default")
             

@@ -1,3 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import json
+import os
+import tempfile
+import time
+from unittest.mock import Mock, patch, MagicMock
+from typing import Dict, List, Optional
+import numpy as np
+import pytest
+import torch
+import torch.nn as nn
+from torch.utils.data import Dataset, DataLoader
+from advanced_mixed_precision_training import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Tests for Advanced Mixed Precision Training System
 
@@ -11,21 +37,8 @@ This test suite covers:
 - Integration testing
 """
 
-import asyncio
-import json
-import os
-import tempfile
-import time
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, List, Optional
 
-import numpy as np
-import pytest
-import torch
-import torch.nn as nn
-from torch.utils.data import Dataset, DataLoader
 
-from advanced_mixed_precision_training import (
     MixedPrecisionConfig, PrecisionMode, ScalingStrategy,
     AdvancedGradScaler, PrecisionMonitor, StandardMixedPrecisionTrainer,
     DynamicMixedPrecisionTrainer, PerformanceOptimizedMixedPrecisionTrainer,
@@ -37,13 +50,15 @@ class TestDataset(Dataset):
     """Test dataset for unit testing."""
     
     def __init__(self, num_samples: int = 100, input_dim: int = 64):
-        self.data = torch.randn(num_samples, input_dim)
+        
+    """__init__ function."""
+self.data = torch.randn(num_samples, input_dim)
         self.labels = torch.randint(0, 5, (num_samples,))
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return len(self.data)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         return {
             'input_ids': self.data[idx],
             'labels': self.labels[idx]
@@ -54,10 +69,12 @@ class TestModel(nn.Module):
     """Test model for unit testing."""
     
     def __init__(self, input_dim: int = 64, num_classes: int = 5):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.linear = nn.Linear(input_dim, num_classes)
     
-    def forward(self, input_ids, labels=None):
+    def forward(self, input_ids, labels=None) -> Any:
         logits = self.linear(input_ids)
         loss = None
         if labels is not None:
@@ -68,7 +85,7 @@ class TestModel(nn.Module):
 class TestMixedPrecisionConfig:
     """Test MixedPrecisionConfig class."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration."""
         config = MixedPrecisionConfig()
         
@@ -80,7 +97,7 @@ class TestMixedPrecisionConfig:
         assert config.backoff_factor == 0.5
         assert config.enable_monitoring is True
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration."""
         config = MixedPrecisionConfig(
             enabled=False,
@@ -98,7 +115,7 @@ class TestMixedPrecisionConfig:
         assert config.growth_factor == 1.5
         assert config.backoff_factor == 0.8
     
-    def test_invalid_config(self):
+    def test_invalid_config(self) -> Any:
         """Test invalid configuration validation."""
         with pytest.raises(ValueError):
             MixedPrecisionConfig(init_scale=0)
@@ -109,7 +126,7 @@ class TestMixedPrecisionConfig:
         with pytest.raises(ValueError):
             MixedPrecisionConfig(backoff_factor=1.5)
     
-    def test_post_init_cuda_unavailable(self):
+    def test_post_init_cuda_unavailable(self) -> Any:
         """Test post_init when CUDA is unavailable."""
         with patch('torch.cuda.is_available', return_value=False):
             config = MixedPrecisionConfig()
@@ -120,7 +137,7 @@ class TestAdvancedGradScaler:
     """Test AdvancedGradScaler class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return MixedPrecisionConfig(
             enabled=True,
@@ -130,11 +147,11 @@ class TestAdvancedGradScaler:
         )
     
     @pytest.fixture
-    def scaler(self, config):
+    def scaler(self, config) -> Any:
         """Create test scaler."""
         return AdvancedGradScaler(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test scaler initialization."""
         scaler = AdvancedGradScaler(config)
         
@@ -143,7 +160,7 @@ class TestAdvancedGradScaler:
         assert len(scaler.scale_history) == 0
         assert len(scaler.error_history) == 0
     
-    def test_scale(self, scaler):
+    def test_scale(self, scaler) -> Any:
         """Test gradient scaling."""
         outputs = torch.tensor([1.0, 2.0, 3.0])
         scaled_outputs = scaler.scale(outputs)
@@ -151,7 +168,7 @@ class TestAdvancedGradScaler:
         assert len(scaler.scale_history) == 1
         assert scaler.get_scale() == 2**10  # Initial scale
     
-    def test_step_success(self, scaler):
+    def test_step_success(self, scaler) -> Any:
         """Test successful optimization step."""
         model = TestModel()
         optimizer = optim.Adam(model.parameters(), lr=1e-4)
@@ -165,7 +182,7 @@ class TestAdvancedGradScaler:
         assert len(scaler.error_history) == 0
     
     @patch('torch.cuda.amp.GradScaler.step')
-    def test_step_with_error(self, mock_step, scaler):
+    def test_step_with_error(self, mock_step, scaler) -> Any:
         """Test optimization step with error."""
         mock_step.side_effect = Exception("Gradient overflow")
         
@@ -180,7 +197,7 @@ class TestAdvancedGradScaler:
         scaler.step(optimizer)
         assert len(scaler.error_history) == 1
     
-    def test_update(self, scaler):
+    def test_update(self, scaler) -> Any:
         """Test scaler update."""
         old_scale = scaler.get_scale()
         new_scale = old_scale * 2
@@ -188,7 +205,7 @@ class TestAdvancedGradScaler:
         scaler.update(new_scale)
         assert scaler.get_scale() == new_scale
     
-    def test_get_scale_stats(self, scaler):
+    def test_get_scale_stats(self, scaler) -> Optional[Dict[str, Any]]:
         """Test scale statistics."""
         # Add some scale history
         scaler.scale_history = [2**10, 2**11, 2**12, 2**11]
@@ -210,16 +227,16 @@ class TestPrecisionMonitor:
     """Test PrecisionMonitor class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return MixedPrecisionConfig(enable_monitoring=True)
     
     @pytest.fixture
-    def monitor(self, config):
+    def monitor(self, config) -> Any:
         """Create test monitor."""
         return PrecisionMonitor(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test monitor initialization."""
         monitor = PrecisionMonitor(config)
         
@@ -229,7 +246,7 @@ class TestPrecisionMonitor:
         assert len(monitor.metrics['gradient_scale']) == 0
         assert monitor.metrics['fallback_count'] == 0
     
-    def test_update_metrics_with_scaler(self, monitor):
+    def test_update_metrics_with_scaler(self, monitor) -> Any:
         """Test metrics update with scaler."""
         scaler = Mock()
         scaler.get_scale.return_value = 2**10
@@ -243,7 +260,7 @@ class TestPrecisionMonitor:
         assert len(monitor.metrics['fp16_usage']) == 1
         assert monitor.metrics['fp16_usage'][0] == 1.0
     
-    def test_update_metrics_without_scaler(self, monitor):
+    def test_update_metrics_without_scaler(self, monitor) -> Any:
         """Test metrics update without scaler."""
         loss = torch.tensor(1.0, dtype=torch.float32)
         
@@ -255,7 +272,7 @@ class TestPrecisionMonitor:
     @patch('torch.cuda.is_available', return_value=True)
     @patch('torch.cuda.get_device_properties')
     @patch('torch.cuda.memory_allocated')
-    def test_update_metrics_with_memory(self, mock_allocated, mock_properties, mock_cuda, monitor):
+    def test_update_metrics_with_memory(self, mock_allocated, mock_properties, mock_cuda, monitor) -> Any:
         """Test metrics update with memory monitoring."""
         mock_properties.return_value.total_memory = 16 * 1024**3  # 16GB
         mock_allocated.return_value = 8 * 1024**3  # 8GB
@@ -270,7 +287,7 @@ class TestPrecisionMonitor:
         assert len(monitor.metrics['memory_savings']) == 1
         assert monitor.metrics['memory_savings'][0] == 0.5  # 50% savings
     
-    def test_record_numerical_error(self, monitor):
+    def test_record_numerical_error(self, monitor) -> Any:
         """Test numerical error recording."""
         monitor.record_numerical_error("gradient_overflow", 10)
         
@@ -279,7 +296,7 @@ class TestPrecisionMonitor:
         assert monitor.metrics['numerical_errors'][0]['step'] == 10
         assert monitor.metrics['fallback_count'] == 1
     
-    def test_get_precision_stats(self, monitor):
+    def test_get_precision_stats(self, monitor) -> Optional[Dict[str, Any]]:
         """Test precision statistics."""
         # Add some metrics
         monitor.metrics['gradient_scale'] = [2**10, 2**11, 2**12]
@@ -311,7 +328,7 @@ class TestStandardMixedPrecisionTrainer:
     """Test StandardMixedPrecisionTrainer class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return MixedPrecisionConfig(
             enabled=True,
@@ -319,11 +336,11 @@ class TestStandardMixedPrecisionTrainer:
         )
     
     @pytest.fixture
-    def trainer(self, config):
+    def trainer(self, config) -> Any:
         """Create test trainer."""
         return StandardMixedPrecisionTrainer(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test trainer initialization."""
         trainer = StandardMixedPrecisionTrainer(config)
         
@@ -332,7 +349,7 @@ class TestStandardMixedPrecisionTrainer:
         assert trainer.precision_monitor is not None
         assert trainer.current_step == 0
     
-    def test_train_step_with_mixed_precision(self, trainer):
+    def test_train_step_with_mixed_precision(self, trainer) -> Any:
         """Test training step with mixed precision."""
         model = TestModel()
         batch = {
@@ -350,7 +367,7 @@ class TestStandardMixedPrecisionTrainer:
         assert result['precision_mode'] == 'mixed'
         assert trainer.current_step == 1
     
-    def test_train_step_without_mixed_precision(self, config):
+    def test_train_step_without_mixed_precision(self, config) -> Any:
         """Test training step without mixed precision."""
         config.enabled = False
         trainer = StandardMixedPrecisionTrainer(config)
@@ -366,7 +383,7 @@ class TestStandardMixedPrecisionTrainer:
         
         assert result['precision_mode'] == 'fp32'
     
-    def test_validate_step(self, trainer):
+    def test_validate_step(self, trainer) -> bool:
         """Test validation step."""
         model = TestModel()
         batch = {
@@ -385,7 +402,7 @@ class TestDynamicMixedPrecisionTrainer:
     """Test DynamicMixedPrecisionTrainer class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return MixedPrecisionConfig(
             enabled=True,
@@ -394,11 +411,11 @@ class TestDynamicMixedPrecisionTrainer:
         )
     
     @pytest.fixture
-    def trainer(self, config):
+    def trainer(self, config) -> Any:
         """Create test trainer."""
         return DynamicMixedPrecisionTrainer(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test trainer initialization."""
         trainer = DynamicMixedPrecisionTrainer(config)
         
@@ -406,7 +423,7 @@ class TestDynamicMixedPrecisionTrainer:
         assert len(trainer.precision_history) == 0
         assert len(trainer.performance_metrics) == 0
     
-    def test_train_step(self, trainer):
+    def test_train_step(self, trainer) -> Any:
         """Test training step with dynamic precision."""
         model = TestModel()
         batch = {
@@ -425,7 +442,7 @@ class TestDynamicMixedPrecisionTrainer:
         assert len(trainer.precision_history) == 1
         assert len(trainer.performance_metrics) == 1
     
-    def test_determine_precision_mode(self, trainer):
+    def test_determine_precision_mode(self, trainer) -> Any:
         """Test precision mode determination."""
         # Test normal conditions
         precision_mode = trainer._determine_precision_mode()
@@ -446,7 +463,7 @@ class TestPerformanceOptimizedMixedPrecisionTrainer:
     """Test PerformanceOptimizedMixedPrecisionTrainer class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return MixedPrecisionConfig(
             enabled=True,
@@ -455,11 +472,11 @@ class TestPerformanceOptimizedMixedPrecisionTrainer:
         )
     
     @pytest.fixture
-    def trainer(self, config):
+    def trainer(self, config) -> Any:
         """Create test trainer."""
         return PerformanceOptimizedMixedPrecisionTrainer(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test trainer initialization."""
         trainer = PerformanceOptimizedMixedPrecisionTrainer(config)
         
@@ -467,7 +484,7 @@ class TestPerformanceOptimizedMixedPrecisionTrainer:
         assert trainer.performance_tracker is not None
         assert trainer.optimization_scheduler is not None
     
-    def test_train_step(self, trainer):
+    def test_train_step(self, trainer) -> Any:
         """Test training step with performance optimization."""
         model = TestModel()
         batch = {
@@ -485,7 +502,7 @@ class TestPerformanceOptimizedMixedPrecisionTrainer:
         assert 'performance_optimized' in result
         assert result['performance_optimized'] is True
     
-    def test_optimize_precision_settings(self, trainer):
+    def test_optimize_precision_settings(self, trainer) -> Any:
         """Test precision settings optimization."""
         # Mock poor performance
         trainer.performance_tracker.get_stats = lambda: {'avg_step_time': 0.2}
@@ -502,17 +519,17 @@ class TestPerformanceTracker:
     """Test PerformanceTracker class."""
     
     @pytest.fixture
-    def tracker(self):
+    def tracker(self) -> Any:
         """Create test tracker."""
         return PerformanceTracker()
     
-    def test_initialization(self, tracker):
+    def test_initialization(self, tracker) -> Any:
         """Test tracker initialization."""
         assert len(tracker.step_times) == 0
         assert len(tracker.gradient_scales) == 0
         assert len(tracker.memory_usage) == 0
     
-    def test_update(self, tracker):
+    def test_update(self, tracker) -> Any:
         """Test metrics update."""
         tracker.update(0.1, 2**10)
         
@@ -523,14 +540,14 @@ class TestPerformanceTracker:
     
     @patch('torch.cuda.is_available', return_value=True)
     @patch('torch.cuda.memory_allocated', return_value=4 * 1024**3)  # 4GB
-    def test_update_with_memory(self, mock_allocated, mock_cuda, tracker):
+    def test_update_with_memory(self, mock_allocated, mock_cuda, tracker) -> Any:
         """Test update with memory monitoring."""
         tracker.update(0.1, 2**10)
         
         assert len(tracker.memory_usage) == 1
         assert tracker.memory_usage[0] == 4.0
     
-    def test_get_stats(self, tracker):
+    def test_get_stats(self, tracker) -> Optional[Dict[str, Any]]:
         """Test statistics calculation."""
         # Add some data
         tracker.step_times = [0.1, 0.2, 0.3]
@@ -557,23 +574,23 @@ class TestOptimizationScheduler:
     """Test OptimizationScheduler class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return MixedPrecisionConfig(enabled=True)
     
     @pytest.fixture
-    def scheduler(self, config):
+    def scheduler(self, config) -> Any:
         """Create test scheduler."""
         return OptimizationScheduler(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test scheduler initialization."""
         scheduler = OptimizationScheduler(config)
         
         assert scheduler.config == config
         assert len(scheduler.optimization_history) == 0
     
-    def test_should_optimize_precision_good_performance(self, scheduler):
+    def test_should_optimize_precision_good_performance(self, scheduler) -> Any:
         """Test optimization decision with good performance."""
         performance_stats = {
             'avg_step_time': 0.05,  # Good performance
@@ -583,7 +600,7 @@ class TestOptimizationScheduler:
         should_optimize = scheduler.should_optimize_precision(performance_stats)
         assert should_optimize is False
     
-    def test_should_optimize_precision_poor_performance(self, scheduler):
+    def test_should_optimize_precision_poor_performance(self, scheduler) -> Any:
         """Test optimization decision with poor performance."""
         performance_stats = {
             'avg_step_time': 0.2,  # Poor performance
@@ -593,7 +610,7 @@ class TestOptimizationScheduler:
         should_optimize = scheduler.should_optimize_precision(performance_stats)
         assert should_optimize is True
     
-    def test_should_optimize_precision_high_memory(self, scheduler):
+    def test_should_optimize_precision_high_memory(self, scheduler) -> Any:
         """Test optimization decision with high memory usage."""
         performance_stats = {
             'avg_step_time': 0.05,
@@ -608,7 +625,7 @@ class TestAdvancedMixedPrecisionManager:
     """Test AdvancedMixedPrecisionManager class."""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration."""
         return MixedPrecisionConfig(
             enabled=True,
@@ -617,11 +634,11 @@ class TestAdvancedMixedPrecisionManager:
         )
     
     @pytest.fixture
-    def manager(self, config):
+    def manager(self, config) -> Any:
         """Create test manager."""
         return AdvancedMixedPrecisionManager(config)
     
-    def test_initialization(self, config):
+    def test_initialization(self, config) -> Any:
         """Test manager initialization."""
         manager = AdvancedMixedPrecisionManager(config)
         
@@ -629,28 +646,28 @@ class TestAdvancedMixedPrecisionManager:
         assert manager.trainer is not None
         assert manager.writer is not None
     
-    def test_create_trainer_constant(self, config):
+    def test_create_trainer_constant(self, config) -> Any:
         """Test creating constant scaling trainer."""
         config.scaling_strategy = ScalingStrategy.CONSTANT
         manager = AdvancedMixedPrecisionManager(config)
         
         assert isinstance(manager.trainer, StandardMixedPrecisionTrainer)
     
-    def test_create_trainer_dynamic(self, config):
+    def test_create_trainer_dynamic(self, config) -> Any:
         """Test creating dynamic scaling trainer."""
         config.scaling_strategy = ScalingStrategy.DYNAMIC
         manager = AdvancedMixedPrecisionManager(config)
         
         assert isinstance(manager.trainer, DynamicMixedPrecisionTrainer)
     
-    def test_create_trainer_performance_optimized(self, config):
+    def test_create_trainer_performance_optimized(self, config) -> Any:
         """Test creating performance-optimized trainer."""
         config.scaling_strategy = ScalingStrategy.PERFORMANCE_OPTIMIZED
         manager = AdvancedMixedPrecisionManager(config)
         
         assert isinstance(manager.trainer, PerformanceOptimizedMixedPrecisionTrainer)
     
-    def test_train_epoch(self, manager):
+    def test_train_epoch(self, manager) -> Any:
         """Test training epoch."""
         model = TestModel()
         dataset = TestDataset(100)
@@ -665,7 +682,7 @@ class TestAdvancedMixedPrecisionManager:
         assert 'precision_modes' in epoch_metrics
         assert 'gradient_scales' in epoch_metrics
     
-    def test_validate_epoch(self, manager):
+    def test_validate_epoch(self, manager) -> bool:
         """Test validation epoch."""
         model = TestModel()
         dataset = TestDataset(50)
@@ -677,7 +694,7 @@ class TestAdvancedMixedPrecisionManager:
         assert 'losses' in val_metrics
         assert 'precision_modes' in val_metrics
     
-    def test_get_training_stats(self, manager):
+    def test_get_training_stats(self, manager) -> Optional[Dict[str, Any]]:
         """Test training statistics."""
         stats = manager.get_training_stats()
         
@@ -687,7 +704,7 @@ class TestAdvancedMixedPrecisionManager:
         assert 'scale_stats' in stats
         assert 'config' in stats
     
-    def test_cleanup(self, manager):
+    def test_cleanup(self, manager) -> Any:
         """Test manager cleanup."""
         manager.cleanup()
         
@@ -699,7 +716,7 @@ class TestIntegration:
     """Integration tests for the advanced mixed precision training system."""
     
     @pytest.mark.asyncio
-    async def test_end_to_end_training(self):
+    async def test_end_to_end_training(self) -> Any:
         """Test end-to-end training workflow."""
         config = MixedPrecisionConfig(
             enabled=True,
@@ -724,7 +741,7 @@ class TestIntegration:
         
         manager.cleanup()
     
-    def test_mixed_precision_integration(self):
+    def test_mixed_precision_integration(self) -> Any:
         """Test mixed precision integration."""
         config = MixedPrecisionConfig(
             enabled=True,
@@ -747,7 +764,7 @@ class TestIntegration:
         assert 'outputs' in result
         manager.cleanup()
     
-    def test_performance_optimization_integration(self):
+    def test_performance_optimization_integration(self) -> Any:
         """Test performance optimization integration."""
         config = MixedPrecisionConfig(
             enabled=True,
@@ -776,22 +793,22 @@ class TestIntegration:
 class TestEdgeCases:
     """Test edge cases and error conditions."""
     
-    def test_zero_init_scale(self):
+    def test_zero_init_scale(self) -> Any:
         """Test zero init scale."""
         with pytest.raises(ValueError):
             MixedPrecisionConfig(init_scale=0)
     
-    def test_invalid_growth_factor(self):
+    def test_invalid_growth_factor(self) -> Any:
         """Test invalid growth factor."""
         with pytest.raises(ValueError):
             MixedPrecisionConfig(growth_factor=0.5)
     
-    def test_invalid_backoff_factor(self):
+    def test_invalid_backoff_factor(self) -> Any:
         """Test invalid backoff factor."""
         with pytest.raises(ValueError):
             MixedPrecisionConfig(backoff_factor=1.5)
     
-    def test_empty_dataset(self):
+    def test_empty_dataset(self) -> Any:
         """Test handling empty dataset."""
         config = MixedPrecisionConfig()
         manager = AdvancedMixedPrecisionManager(config)
@@ -801,7 +818,7 @@ class TestEdgeCases:
         assert manager is not None
         assert model is not None
     
-    def test_mixed_precision_without_cuda(self):
+    def test_mixed_precision_without_cuda(self) -> Any:
         """Test mixed precision without CUDA."""
         with patch('torch.cuda.is_available', return_value=False):
             config = MixedPrecisionConfig(enabled=True)
@@ -810,7 +827,7 @@ class TestEdgeCases:
             # Should disable mixed precision automatically
             assert manager.config.enabled is False
     
-    def test_numerical_instability(self):
+    def test_numerical_instability(self) -> Any:
         """Test numerical instability handling."""
         config = MixedPrecisionConfig(
             enabled=True,
@@ -839,7 +856,7 @@ class TestEdgeCases:
 class TestPerformance:
     """Performance tests."""
     
-    def test_training_speed(self):
+    def test_training_speed(self) -> Any:
         """Test training speed."""
         config = MixedPrecisionConfig(
             enabled=True,
@@ -869,7 +886,7 @@ class TestPerformance:
         
         manager.cleanup()
     
-    def test_memory_efficiency(self):
+    def test_memory_efficiency(self) -> Any:
         """Test memory efficiency."""
         if not torch.cuda.is_available():
             pytest.skip("CUDA not available")

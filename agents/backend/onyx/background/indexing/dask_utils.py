@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 import asyncio
 
 import psutil
@@ -6,12 +14,16 @@ from distributed import Worker
 
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
 logger = setup_logger()
 
 
 class ResourceLogger(WorkerPlugin):
     def __init__(self, log_interval: int = 60 * 5):
-        self.log_interval = log_interval
+        
+    """__init__ function."""
+self.log_interval = log_interval
 
     def setup(self, worker: Worker) -> None:
         """This method will be called when the plugin is attached to a worker."""

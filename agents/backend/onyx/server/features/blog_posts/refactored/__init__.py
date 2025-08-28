@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+    from refactored import get_nlp_engine, analyze_text_refactored
+    from refactored import RefactoredNLPEngine
+    from refactored.config import NLPConfig, ModelType, CacheBackend
+from .core import (
+from .config import (
+from .models import (
+from .cache_manager import CacheManager
+from .model_manager import ModelManager
+from .factory import AnalyzerFactory
+from .analyzers import (
+import logging
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Sistema NLP Ultra-Optimizado Refactorizado para Blatam Academy
 ==============================================================
@@ -13,7 +28,6 @@ Sistema modular y extensible de análisis de lenguaje natural con:
 
 Ejemplo de uso básico:
     ```python
-    from refactored import get_nlp_engine, analyze_text_refactored
     
     # Usando el motor completo
     engine = await get_nlp_engine()
@@ -25,8 +39,6 @@ Ejemplo de uso básico:
 
 Ejemplo de configuración personalizada:
     ```python
-    from refactored import RefactoredNLPEngine
-    from refactored.config import NLPConfig, ModelType, CacheBackend
     
     config = NLPConfig()
     config.models.type = ModelType.ADVANCED
@@ -38,14 +50,12 @@ Ejemplo de configuración personalizada:
     ```
 """
 
-from .core import (
     RefactoredNLPEngine,
     get_nlp_engine,
     analyze_text_refactored,
     analyze_batch_refactored
 )
 
-from .config import (
     NLPConfig,
     CacheConfig,
     ModelConfig,
@@ -59,7 +69,6 @@ from .config import (
     PRODUCTION_CONFIG
 )
 
-from .models import (
     NLPAnalysisResult,
     AnalysisRequest,
     BasicMetrics,
@@ -73,12 +82,8 @@ from .models import (
     QualityLevel
 )
 
-from .cache_manager import CacheManager
-from .model_manager import ModelManager
-from .factory import AnalyzerFactory
 
 # Importar analizadores para extensibilidad
-from .analyzers import (
     AnalyzerInterface,
     BaseAnalyzer,
     SentimentAnalyzer,
@@ -175,6 +180,5 @@ def get_version() -> str:
     return __version__
 
 # Configurar logging por defecto
-import logging
 
 logging.getLogger(__name__).addHandler(logging.NullHandler()) 

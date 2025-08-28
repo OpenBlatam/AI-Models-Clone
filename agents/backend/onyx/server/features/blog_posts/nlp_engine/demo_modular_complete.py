@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+import time
+from typing import Dict, List, Any, Optional, AsyncGenerator
+import logging
+from nlp_engine.core.entities import AnalysisResult, TextFingerprint, AnalysisScore
+from nlp_engine.core.enums import AnalysisType, ProcessingTier, CacheStrategy, Environment
+from nlp_engine.core.domain_services import AnalysisOrchestrator, TextProcessor, ScoreValidator
+from nlp_engine.application.dto import AnalysisRequest, BatchAnalysisRequest
+from nlp_engine.application.use_cases import AnalyzeTextUseCase, BatchAnalysisUseCase
+from nlp_engine.application.services import AnalysisService, CacheService, MetricsService
+from demo_infrastructure import (
+        from nlp_engine.application.dto import HealthCheckRequest
+from typing import Any, List, Dict, Optional
 """
 🎯 DEMO MODULAR COMPLETE - Demostración de Arquitectura Modular NLP
 ================================================================
@@ -11,24 +36,12 @@ Demostración completa del sistema modular NLP con todas las capas:
 Este demo muestra un sistema enterprise-grade completamente funcional.
 """
 
-import asyncio
-import json
-import time
-from typing import Dict, List, Any, Optional, AsyncGenerator
-import logging
 
 # Core Layer
-from nlp_engine.core.entities import AnalysisResult, TextFingerprint, AnalysisScore
-from nlp_engine.core.enums import AnalysisType, ProcessingTier, CacheStrategy, Environment
-from nlp_engine.core.domain_services import AnalysisOrchestrator, TextProcessor, ScoreValidator
 
 # Application Layer
-from nlp_engine.application.dto import AnalysisRequest, BatchAnalysisRequest
-from nlp_engine.application.use_cases import AnalyzeTextUseCase, BatchAnalysisUseCase
-from nlp_engine.application.services import AnalysisService, CacheService, MetricsService
 
 # Mock Infrastructure (for demo)
-from demo_infrastructure import (
     MockAnalyzerFactory, MockCacheRepository, MockMetricsCollector,
     MockConfigurationService, MockStructuredLogger, MockPerformanceMonitor,
     MockHealthChecker, MockCacheKeyGenerator
@@ -38,7 +51,7 @@ from demo_infrastructure import (
 class ModularNLPEngineDemo:
     """Demo completo del motor NLP modular."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = self._setup_logging()
         
         # Infrastructure Layer (Mock implementations for demo)
@@ -125,7 +138,7 @@ class ModularNLPEngineDemo:
             "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur."
         ]
     
-    async def run_complete_demo(self):
+    async def run_complete_demo(self) -> Any:
         """Ejecutar demostración completa del sistema modular."""
         print("🎯 DEMO MODULAR NLP ENGINE - Arquitectura Enterprise")
         print("=" * 60)
@@ -160,7 +173,7 @@ class ModularNLPEngineDemo:
         # Resumen final
         await self._demo_final_summary()
     
-    async def _demo_system_initialization(self):
+    async def _demo_system_initialization(self) -> Any:
         """Demo de inicialización del sistema."""
         print("\n🚀 1. INICIALIZACIÓN DEL SISTEMA")
         print("-" * 40)
@@ -186,7 +199,7 @@ class ModularNLPEngineDemo:
         except Exception as e:
             print(f"❌ Error en inicialización: {e}")
     
-    async def _demo_individual_analysis(self):
+    async def _demo_individual_analysis(self) -> Any:
         """Demo de análisis individual."""
         print("\n📝 2. ANÁLISIS INDIVIDUAL DE TEXTO")
         print("-" * 40)
@@ -230,7 +243,7 @@ class ModularNLPEngineDemo:
         except Exception as e:
             print(f"❌ Error en análisis: {e}")
     
-    async def _demo_batch_analysis(self):
+    async def _demo_batch_analysis(self) -> Any:
         """Demo de análisis en lote."""
         print("\n📋 3. ANÁLISIS EN LOTE")
         print("-" * 40)
@@ -271,7 +284,7 @@ class ModularNLPEngineDemo:
         except Exception as e:
             print(f"❌ Error en análisis en lote: {e}")
     
-    async def _demo_performance_optimization(self):
+    async def _demo_performance_optimization(self) -> Any:
         """Demo de optimización de performance."""
         print("\n⚡ 4. OPTIMIZACIÓN DE PERFORMANCE")
         print("-" * 40)
@@ -305,7 +318,7 @@ class ModularNLPEngineDemo:
         print(f"💾 Memoria: {performance_summary.get('memory_usage', {}).get('used_mb', 0):.1f}MB")
         print(f"🖥️  CPU: {performance_summary.get('cpu_usage', 0):.1f}%")
     
-    async def _demo_cache_management(self):
+    async def _demo_cache_management(self) -> Any:
         """Demo de gestión de cache."""
         print("\n🗄️  5. GESTIÓN DE CACHE")
         print("-" * 40)
@@ -332,7 +345,7 @@ class ModularNLPEngineDemo:
         else:
             print(f"❌ Error en optimización: {optimization_result.get('error')}")
     
-    async def _demo_metrics_monitoring(self):
+    async def _demo_metrics_monitoring(self) -> Any:
         """Demo de métricas y monitoreo."""
         print("\n📊 6. MÉTRICAS Y MONITOREO")
         print("-" * 40)
@@ -356,12 +369,11 @@ class ModularNLPEngineDemo:
         else:
             print(f"❌ Error obteniendo métricas: {performance_report['error']}")
     
-    async def _demo_health_checks(self):
+    async def _demo_health_checks(self) -> Any:
         """Demo de health checks."""
         print("\n🏥 7. HEALTH CHECKS")
         print("-" * 40)
         
-        from nlp_engine.application.dto import HealthCheckRequest
         
         # Health check completo del sistema
         health_request = HealthCheckRequest(
@@ -385,7 +397,7 @@ class ModularNLPEngineDemo:
         if health_response.errors:
             print(f"\n⚠️  Errores: {health_response.errors}")
     
-    async def _demo_domain_logic(self):
+    async def _demo_domain_logic(self) -> Any:
         """Demo de lógica de dominio."""
         print("\n🏗️  8. LÓGICA DE DOMINIO")
         print("-" * 40)
@@ -415,7 +427,7 @@ class ModularNLPEngineDemo:
         )
         print(f"🎯 Tier óptimo determinado: {optimal_tier.value}")
     
-    async def _demo_processing_tiers(self):
+    async def _demo_processing_tiers(self) -> Any:
         """Demo de diferentes tiers de procesamiento."""
         print("\n⚙️  9. TIERS DE PROCESAMIENTO")
         print("-" * 40)
@@ -448,7 +460,7 @@ class ModularNLPEngineDemo:
             else:
                 print(f"  ❌ Error: {response.errors}")
     
-    async def _demo_final_summary(self):
+    async def _demo_final_summary(self) -> Any:
         """Resumen final del demo."""
         print("\n🎉 10. RESUMEN FINAL")
         print("-" * 40)
@@ -498,5 +510,6 @@ async def main():
     await demo.run_complete_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

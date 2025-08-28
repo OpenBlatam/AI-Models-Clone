@@ -1,8 +1,5 @@
-"""
-Lifespan Manager - FastAPI Application Lifecycle Management
-Provides a clean way to manage startup and shutdown events using context managers.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import logging
 from contextlib import asynccontextmanager
@@ -11,9 +8,15 @@ from dataclasses import dataclass, field
 from enum import Enum
 import time
 import traceback
-
 from fastapi import FastAPI
 import structlog
+from typing import Any, List, Dict, Optional
+"""
+Lifespan Manager - FastAPI Application Lifecycle Management
+Provides a clean way to manage startup and shutdown events using context managers.
+"""
+
+
 
 logger = structlog.get_logger(__name__)
 
@@ -47,7 +50,9 @@ class LifespanManager:
     """
     
     def __init__(self, app: Optional[FastAPI] = None):
-        self.app = app
+        
+    """__init__ function."""
+self.app = app
         self.startup_events: List[LifecycleEvent] = []
         self.shutdown_events: List[LifecycleEvent] = []
         self._startup_completed = False

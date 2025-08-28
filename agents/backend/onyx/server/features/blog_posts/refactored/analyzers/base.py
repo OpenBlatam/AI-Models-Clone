@@ -1,6 +1,13 @@
-"""
-Clase base para analizadores NLP.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import logging
@@ -8,9 +15,15 @@ from abc import ABC, abstractmethod
 from typing import Any, Dict, Optional, List
 from concurrent.futures import ThreadPoolExecutor
 import asyncio
-
 from ..models import NLPAnalysisResult, AnalysisStatus
 from ..config import NLPConfig
+        import hashlib
+from typing import Any, List, Dict, Optional
+"""
+Clase base para analizadores NLP.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +59,9 @@ class BaseAnalyzer(AnalyzerInterface):
     """Clase base para analizadores con funcionalidad común."""
     
     def __init__(self, config: NLPConfig, executor: Optional[ThreadPoolExecutor] = None):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.executor = executor
         self.stats = {
             'total_analyses': 0,
@@ -56,7 +71,7 @@ class BaseAnalyzer(AnalyzerInterface):
         }
         self._setup_logging()
     
-    def _setup_logging(self):
+    def _setup_logging(self) -> Any:
         """Configurar logging específico del analizador."""
         self.logger = logging.getLogger(f"{__name__}.{self.get_name()}")
         self.logger.setLevel(getattr(logging, self.config.performance.log_level))
@@ -116,7 +131,7 @@ class BaseAnalyzer(AnalyzerInterface):
         """
         pass
     
-    async def _run_in_executor(self, func, *args):
+    async def _run_in_executor(self, func, *args) -> Any:
         """Ejecutar función CPU-intensiva en ThreadPoolExecutor."""
         if self.executor:
             loop = asyncio.get_event_loop()
@@ -234,7 +249,7 @@ class AsyncAnalyzerMixin:
 class CachedAnalyzerMixin:
     """Mixin para análisis con cache."""
     
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> Any:
         super().__init__(*args, **kwargs)
         self._cache = {}
         self._cache_hits = 0
@@ -262,7 +277,6 @@ class CachedAnalyzerMixin:
     
     def _get_cache_key(self, text: str, options: Dict[str, Any]) -> str:
         """Generar key de cache."""
-        import hashlib
         content = f"{text}:{str(sorted(options.items()))}"
         return hashlib.md5(content.encode()).hexdigest()
     

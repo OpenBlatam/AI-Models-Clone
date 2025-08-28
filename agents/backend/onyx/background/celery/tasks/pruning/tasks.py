@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 import time
 from datetime import datetime
 from datetime import timedelta
@@ -61,6 +69,10 @@ from onyx.utils.logger import LoggerContextVars
 from onyx.utils.logger import pruning_ctx
 from onyx.utils.logger import setup_logger
 
+    from the most recently pulled document ID list"""
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -338,7 +350,6 @@ def connector_pruning_generator_task(
 ) -> None:
     """connector pruning task. For a cc pair, this task pulls all document IDs from the source
     and compares those IDs to locally stored documents and deletes all locally stored IDs missing
-    from the most recently pulled document ID list"""
 
     payload_id: str | None = None
 

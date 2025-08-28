@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.server.documents.models import DocumentSource
 from tests.integration.common_utils.constants import NUM_DOCS
 from tests.integration.common_utils.managers.api_key import APIKeyManager
@@ -10,6 +12,9 @@ from tests.integration.common_utils.test_models import DATestUser
 from tests.integration.common_utils.vespa import vespa_fixture
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def test_multiple_document_sets_syncing_same_connnector(
     reset: None, vespa_client: vespa_fixture
 ) -> None:

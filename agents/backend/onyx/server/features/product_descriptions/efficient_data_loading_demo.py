@@ -1,3 +1,33 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import json
+import os
+import time
+from pathlib import Path
+from typing import Dict, List, Any
+import numpy as np
+import pandas as pd
+import torch
+from sklearn.datasets import make_classification, make_regression
+from sklearn.model_selection import train_test_split
+from efficient_data_loading import (
+        import psutil
+        import psutil
+from typing import Any, List, Dict, Optional
+import logging
 """
 Efficient Data Loading Demo
 
@@ -10,20 +40,8 @@ This demo showcases the efficient data loading system with:
 - Cross-validation and data splitting
 """
 
-import asyncio
-import json
-import os
-import time
-from pathlib import Path
-from typing import Dict, List, Any
 
-import numpy as np
-import pandas as pd
-import torch
-from sklearn.datasets import make_classification, make_regression
-from sklearn.model_selection import train_test_split
 
-from efficient_data_loading import (
     DataLoaderConfig, ThreatDetectionDataset, AnomalyDetectionDataset,
     NetworkTrafficDataset, MalwareDataset, CachedDataset, DataAugmentation,
     DataLoaderFactory, DataLoaderMonitor, MemoryOptimizedDataLoader,
@@ -35,7 +53,7 @@ from efficient_data_loading import (
 class EfficientDataLoadingDemo:
     """Comprehensive demo for efficient data loading."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.demo_dir = Path("./demo_output")
         self.demo_dir.mkdir(exist_ok=True)
         
@@ -46,7 +64,7 @@ class EfficientDataLoadingDemo:
         
         self.results = {}
         
-    async def run_comprehensive_demo(self):
+    async def run_comprehensive_demo(self) -> Any:
         """Run the complete demo showcasing all features."""
         print("🚀 Starting Efficient Data Loading Demo")
         print("=" * 80)
@@ -84,7 +102,7 @@ class EfficientDataLoadingDemo:
         print("\n✅ Demo completed successfully!")
         print(f"Results saved to: {self.demo_dir / 'demo_results.json'}")
     
-    async def _generate_synthetic_datasets(self):
+    async def _generate_synthetic_datasets(self) -> Any:
         """Generate synthetic datasets for demonstration."""
         print("\n📊 Generating Synthetic Datasets...")
         
@@ -186,7 +204,7 @@ class EfficientDataLoadingDemo:
         print(f"   - Network traffic: {len(network_df)} samples")
         print(f"   - Malware: {len(malware_df)} samples")
     
-    async def _demo_basic_data_loading(self):
+    async def _demo_basic_data_loading(self) -> Any:
         """Demo basic data loading with different dataset types."""
         print("\n📥 Demo 1: Basic Data Loading")
         print("-" * 50)
@@ -245,7 +263,7 @@ class EfficientDataLoadingDemo:
                 print(f"   ❌ {dataset_name}: Error - {e}")
                 self.results[f"{dataset_name}_basic_loading"] = {"error": str(e)}
     
-    async def _demo_performance_benchmarking(self):
+    async def _demo_performance_benchmarking(self) -> Any:
         """Demo performance benchmarking."""
         print("\n⚡ Demo 2: Performance Benchmarking")
         print("-" * 50)
@@ -282,7 +300,7 @@ class EfficientDataLoadingDemo:
             print(f"   ✅ Avg batch time: {benchmark_results['avg_batch_time_ms']:.2f} ms")
             print(f"   ✅ Memory usage: {benchmark_results['avg_memory_usage_percent']:.1f}%")
     
-    async def _demo_memory_optimization(self):
+    async def _demo_memory_optimization(self) -> Any:
         """Demo memory optimization features."""
         print("\n💾 Demo 3: Memory Optimization")
         print("-" * 50)
@@ -349,7 +367,7 @@ class EfficientDataLoadingDemo:
         print(f"✅ Regular DataLoader: {regular_time:.2f}s, Memory: +{memory_after - memory_before:.1f}MB")
         print(f"✅ Optimized DataLoader: {optimized_time:.2f}s, Memory: +{memory_after_opt - memory_before_opt:.1f}MB")
     
-    async def _demo_caching_strategies(self):
+    async def _demo_caching_strategies(self) -> Any:
         """Demo caching strategies."""
         print("\n🗄️ Demo 4: Caching Strategies")
         print("-" * 50)
@@ -420,7 +438,7 @@ class EfficientDataLoadingDemo:
         print(f"✅ Second pass (cache hit): {second_pass_time:.2f}s")
         print(f"✅ Speedup: {no_cache_time / second_pass_time:.2f}x")
     
-    async def _demo_async_data_loading(self):
+    async def _demo_async_data_loading(self) -> Any:
         """Demo async data loading."""
         print("\n🔄 Demo 5: Async Data Loading")
         print("-" * 50)
@@ -471,7 +489,7 @@ class EfficientDataLoadingDemo:
         print(f"✅ Sync loading: {sync_time:.2f}s")
         print(f"✅ Speedup: {sync_time / async_time:.2f}x")
     
-    async def _demo_cross_validation(self):
+    async def _demo_cross_validation(self) -> Any:
         """Demo cross-validation and data splitting."""
         print("\n✂️ Demo 6: Cross-Validation")
         print("-" * 50)
@@ -542,7 +560,7 @@ class EfficientDataLoadingDemo:
         
         print("✅ Cross-validation splits created and tested successfully")
     
-    async def _demo_data_augmentation(self):
+    async def _demo_data_augmentation(self) -> Any:
         """Demo data augmentation."""
         print("\n🔄 Demo 7: Data Augmentation")
         print("-" * 50)
@@ -589,13 +607,12 @@ class EfficientDataLoadingDemo:
         
         print("✅ Feature augmentation completed")
     
-    async def _demo_system_optimization(self):
+    async def _demo_system_optimization(self) -> Any:
         """Demo system resource optimization."""
         print("\n⚙️ Demo 8: System Resource Optimization")
         print("-" * 50)
         
         # Get system information
-        import psutil
         
         total_memory_gb = psutil.virtual_memory().total / (1024**3)
         num_cpus = psutil.cpu_count()
@@ -646,16 +663,15 @@ class EfficientDataLoadingDemo:
     
     def _get_memory_usage(self) -> float:
         """Get current memory usage in MB."""
-        import psutil
         process = psutil.Process()
         return process.memory_info().rss / (1024 * 1024)
     
-    def _save_demo_results(self):
+    def _save_demo_results(self) -> Any:
         """Save demo results to file."""
         results_file = self.demo_dir / "demo_results.json"
         
         # Convert numpy arrays to lists for JSON serialization
-        def convert_numpy(obj):
+        def convert_numpy(obj) -> Any:
             if isinstance(obj, np.ndarray):
                 return obj.tolist()
             elif isinstance(obj, np.integer):
@@ -670,6 +686,10 @@ class EfficientDataLoadingDemo:
         )
         
         with open(results_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(serializable_results, f, indent=2)
         
         print(f"\n📁 Demo results saved to: {results_file}")
@@ -677,88 +697,300 @@ class EfficientDataLoadingDemo:
         # Generate summary report
         self._generate_summary_report()
     
-    def _generate_summary_report(self):
+    def _generate_summary_report(self) -> Any:
         """Generate a summary report of the demo."""
         report_file = self.demo_dir / "demo_summary.md"
         
         with open(report_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("# Efficient Data Loading Demo Summary\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(f"Generated on: {time.strftime('%Y-%m-%d %H:%M:%S')}\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             f.write("## Demo Overview\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("This demo showcases efficient data loading capabilities for cybersecurity applications.\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             f.write("## Key Features Demonstrated\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("1. **Basic Data Loading** - Loading different dataset types efficiently\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("2. **Performance Benchmarking** - Comparing different configurations\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("3. **Memory Optimization** - Reducing memory usage during training\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("4. **Caching Strategies** - Improving data access speed\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("5. **Async Data Loading** - Non-blocking data loading\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("6. **Cross-Validation** - Proper data splitting for ML\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("7. **Data Augmentation** - Increasing training data diversity\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("8. **System Optimization** - Automatic resource optimization\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             f.write("## Results Summary\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             if "threat_detection_basic_loading" in self.results:
                 threat_results = self.results["threat_detection_basic_loading"]
                 f.write(f"### Threat Detection Dataset\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"- Dataset size: {threat_results.get('dataset_size', 'N/A')}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"- Load time: {threat_results.get('load_time_seconds', 0):.2f} seconds\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"- Throughput: {threat_results.get('throughput_batches_per_sec', 0):.2f} batches/sec\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             if "benchmark_config_1" in self.results:
                 f.write("### Performance Benchmarking\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 for i in range(1, 5):
                     key = f"benchmark_config_{i}"
                     if key in self.results:
                         results = self.results[key]["benchmark_results"]
                         config = self.results[key]["config"]
                         f.write(f"- Config {i} (batch_size={config['batch_size']}, workers={config['num_workers']}):\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         f.write(f"  - Throughput: {results['throughput_batches_per_sec']:.2f} batches/sec\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         f.write(f"  - Avg batch time: {results['avg_batch_time_ms']:.2f} ms\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             if "caching_strategies" in self.results:
                 cache_results = self.results["caching_strategies"]
                 f.write("### Caching Performance\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"- Speedup with caching: {cache_results.get('speedup', 0):.2f}x\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"- Cache hit rate: {cache_results.get('cache_stats', {}).get('hit_rate', 0):.2%}\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             if "memory_optimization" in self.results:
                 mem_results = self.results["memory_optimization"]
                 f.write("### Memory Optimization\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"- Regular DataLoader memory increase: {mem_results['regular_dataloader']['memory_increase_mb']:.1f} MB\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"- Optimized DataLoader memory increase: {mem_results['memory_optimized_dataloader']['memory_increase_mb']:.1f} MB\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             if "system_optimization" in self.results:
                 sys_results = self.results["system_optimization"]
                 f.write("### System Optimization\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"- Optimal batch size: {sys_results['optimal_config']['batch_size']}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"- Optimal workers: {sys_results['optimal_config']['num_workers']}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"- Optimal throughput: {sys_results['benchmark_results']['throughput_batches_per_sec']:.2f} batches/sec\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             f.write("## Best Practices\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("1. **Use appropriate batch sizes** based on available memory\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("2. **Enable caching** for frequently accessed data\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("3. **Use multiple workers** for I/O-bound operations\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("4. **Monitor memory usage** and implement garbage collection\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("5. **Use async loading** for non-blocking operations\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("6. **Implement data augmentation** for better model generalization\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("7. **Optimize system resources** automatically\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("8. **Use proper data splitting** for cross-validation\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             f.write("## Files Generated\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("- `demo_results.json` - Complete demo results\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("- `data/` - Synthetic datasets\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("- `cache/` - Cached data\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("- `logs/` - Performance logs\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             f.write("## Next Steps\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("1. Integrate with your existing training pipeline\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("2. Customize configurations for your specific use case\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("3. Monitor performance in production\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("4. Implement additional optimizations as needed\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("5. Add more dataset types and augmentation strategies\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         print(f"📋 Summary report generated: {report_file}")
 
@@ -769,5 +1001,6 @@ async def main():
     await demo.run_comprehensive_demo()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

@@ -1,7 +1,5 @@
-"""
-Error System - Onyx Integration
-Comprehensive error handling system with custom error types and error factories.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import logging
 import traceback
 from typing import Any, Dict, List, Optional, Type, Union
@@ -9,6 +7,13 @@ from datetime import datetime
 from enum import Enum
 from dataclasses import dataclass, field
 from uuid import UUID
+from .error_system import error_factory, ErrorContext, handle_errors, ErrorCategory
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Error System - Onyx Integration
+Comprehensive error handling system with custom error types and error factories.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -61,7 +66,9 @@ class OnyxBaseError(Exception):
         original_exception: Optional[Exception] = None,
         user_friendly_message: Optional[str] = None
     ):
-        self.message = message
+        
+    """__init__ function."""
+self.message = message
         self.error_code = error_code
         self.category = category
         self.severity = severity
@@ -129,7 +136,9 @@ class ValidationError(OnyxBaseError):
         validation_errors: Optional[List[str]] = None,
         context: Optional[ErrorContext] = None
     ):
-        self.field = field
+        
+    """__init__ function."""
+self.field = field
         self.value = value
         self.validation_errors = validation_errors or []
         
@@ -154,7 +163,9 @@ class AuthenticationError(OnyxBaseError):
         auth_method: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        self.auth_method = auth_method
+        
+    """__init__ function."""
+self.auth_method = auth_method
         
         error_code = f"AUTH_{auth_method.upper()}" if auth_method else "AUTH_GENERAL"
         
@@ -178,7 +189,9 @@ class AuthorizationError(OnyxBaseError):
         user_permissions: Optional[List[str]] = None,
         context: Optional[ErrorContext] = None
     ):
-        self.required_permission = required_permission
+        
+    """__init__ function."""
+self.required_permission = required_permission
         self.user_permissions = user_permissions or []
         
         error_code = f"AUTHZ_{required_permission.upper()}" if required_permission else "AUTHZ_GENERAL"
@@ -205,7 +218,9 @@ class DatabaseError(OnyxBaseError):
         context: Optional[ErrorContext] = None,
         original_exception: Optional[Exception] = None
     ):
-        self.operation = operation
+        
+    """__init__ function."""
+self.operation = operation
         self.table = table
         self.constraint = constraint
         
@@ -233,7 +248,9 @@ class CacheError(OnyxBaseError):
         context: Optional[ErrorContext] = None,
         original_exception: Optional[Exception] = None
     ):
-        self.cache_key = cache_key
+        
+    """__init__ function."""
+self.cache_key = cache_key
         self.operation = operation
         
         error_code = f"CACHE_{operation.upper()}" if operation else "CACHE_GENERAL"
@@ -261,7 +278,9 @@ class NetworkError(OnyxBaseError):
         context: Optional[ErrorContext] = None,
         original_exception: Optional[Exception] = None
     ):
-        self.url = url
+        
+    """__init__ function."""
+self.url = url
         self.status_code = status_code
         self.timeout = timeout
         
@@ -290,7 +309,9 @@ class ExternalServiceError(OnyxBaseError):
         context: Optional[ErrorContext] = None,
         original_exception: Optional[Exception] = None
     ):
-        self.service_name = service_name
+        
+    """__init__ function."""
+self.service_name = service_name
         self.endpoint = endpoint
         self.response_data = response_data or {}
         
@@ -317,7 +338,9 @@ class ResourceNotFoundError(OnyxBaseError):
         resource_id: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        self.resource_type = resource_type
+        
+    """__init__ function."""
+self.resource_type = resource_type
         self.resource_id = resource_id
         
         error_code = f"NOT_FOUND_{resource_type.upper()}"
@@ -343,7 +366,9 @@ class RateLimitError(OnyxBaseError):
         retry_after: Optional[int] = None,
         context: Optional[ErrorContext] = None
     ):
-        self.limit = limit
+        
+    """__init__ function."""
+self.limit = limit
         self.window = window
         self.retry_after = retry_after
         
@@ -368,7 +393,9 @@ class TimeoutError(OnyxBaseError):
         context: Optional[ErrorContext] = None,
         original_exception: Optional[Exception] = None
     ):
-        self.timeout_duration = timeout_duration
+        
+    """__init__ function."""
+self.timeout_duration = timeout_duration
         self.operation = operation
         
         error_code = f"TIMEOUT_{operation.upper()}" if operation else "TIMEOUT_GENERAL"
@@ -395,7 +422,9 @@ class SerializationError(OnyxBaseError):
         context: Optional[ErrorContext] = None,
         original_exception: Optional[Exception] = None
     ):
-        self.data_type = data_type
+        
+    """__init__ function."""
+self.data_type = data_type
         self.format_type = format_type
         
         error_code = f"SERIALIZATION_{data_type.upper()}" if data_type else "SERIALIZATION_GENERAL"
@@ -420,7 +449,9 @@ class BusinessLogicError(OnyxBaseError):
         business_rule: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        self.business_rule = business_rule
+        
+    """__init__ function."""
+self.business_rule = business_rule
         
         error_code = f"BUSINESS_{business_rule.upper()}" if business_rule else "BUSINESS_GENERAL"
         
@@ -444,7 +475,9 @@ class SystemError(OnyxBaseError):
         context: Optional[ErrorContext] = None,
         original_exception: Optional[Exception] = None
     ):
-        self.component = component
+        
+    """__init__ function."""
+self.component = component
         
         error_code = f"SYSTEM_{component.upper()}" if component else "SYSTEM_GENERAL"
         
@@ -610,8 +643,8 @@ def handle_errors(
     severity: ErrorSeverity = ErrorSeverity.MEDIUM
 ):
     """Decorator for consistent error handling."""
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func) -> Any:
+        def wrapper(*args, **kwargs) -> Any:
             try:
                 return func(*args, **kwargs)
             except OnyxBaseError:
@@ -674,11 +707,12 @@ def handle_errors(
 
 # Example usage:
 """
-from .error_system import error_factory, ErrorContext, handle_errors, ErrorCategory
 
 # Using error factory
 def create_user(user_data: dict, user_id: str):
-    try:
+    
+    """create_user function."""
+try:
         # User creation logic
         if not user_data.get('email'):
             context = ErrorContext(user_id=user_id, operation="create_user")
@@ -708,12 +742,16 @@ def create_user(user_data: dict, user_id: str):
 # Using decorator
 @handle_errors(ErrorCategory.DATABASE, operation="get_user")
 def get_user(user_id: str):
-    # Database operation that might fail
+    
+    """get_user function."""
+# Database operation that might fail
     return database.get_user(user_id)
 
 # Error handling in API
 def user_api_get(user_id: str):
-    try:
+    
+    """user_api_get function."""
+try:
         user = get_user(user_id)
         if not user:
             context = ErrorContext(user_id=user_id, operation="get_user")

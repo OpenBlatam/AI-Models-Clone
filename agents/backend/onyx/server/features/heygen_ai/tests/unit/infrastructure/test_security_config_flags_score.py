@@ -1,4 +1,4 @@
-from agents.backend.onyx.server.features.heygen_ai.security_config import SecurityConfigManager
+from security_config import SecurityConfigManager
 
 
 def test_is_security_feature_enabled_unknown_returns_false(tmp_path):
@@ -15,6 +15,7 @@ def test_validate_security_configuration_score_bounds(tmp_path):
     mgr.update_authentication_setting("is_multi_factor_enabled", True)
     res2 = mgr.validate_security_configuration()
     assert res2["security_score"] >= res["security_score"]
+
 
 
 

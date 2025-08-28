@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import pytest
+import json
+import time
+from typing import Dict, Any, List
+from datetime import datetime, timedelta
+from unittest.mock import AsyncMock, MagicMock, patch
+import aiohttp
+import httpx
+from fastapi import FastAPI, Depends
+from fastapi.testclient import TestClient
+import structlog
+from dependencies.shared_resources import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Tests for Shared Resources Dependency Injection System
 
@@ -12,22 +35,9 @@ This module provides comprehensive tests for the shared resources system includi
 - Error handling and edge cases
 """
 
-import asyncio
-import pytest
-import json
-import time
-from typing import Dict, Any, List
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
 
-import aiohttp
-import httpx
-from fastapi import FastAPI, Depends
-from fastapi.testclient import TestClient
-import structlog
 
 # Import shared resources
-from dependencies.shared_resources import (
     SharedResourceConfig,
     ResourceConfig,
     CryptoConfig,
@@ -104,7 +114,7 @@ def test_config() -> SharedResourceConfig:
     )
 
 @pytest.fixture
-async def shared_resources(test_config):
+async def shared_resources(test_config) -> Any:
     """Create and initialize shared resources for testing."""
     container = SharedResourcesContainer(test_config)
     await container.initialize()
@@ -118,7 +128,7 @@ async def shared_resources(test_config):
 class TestBaseResourceManager:
     """Test base resource manager functionality."""
     
-    def test_base_resource_manager_initialization(self):
+    def test_base_resource_manager_initialization(self) -> Any:
         """Test base resource manager initialization."""
         config = ResourceConfig(
             name="test",
@@ -133,7 +143,7 @@ class TestBaseResourceManager:
         assert manager.metrics.total_requests == 0
         assert manager.is_available() is True
     
-    def test_base_resource_manager_health_update(self):
+    def test_base_resource_manager_health_update(self) -> Any:
         """Test health status update."""
         config = ResourceConfig(
             name="test",
@@ -157,7 +167,7 @@ class TestBaseResourceManager:
         assert manager.health.last_error == "Test error"
         assert manager.is_available() is False
     
-    def test_base_resource_manager_metrics_update(self):
+    def test_base_resource_manager_metrics_update(self) -> Any:
         """Test metrics update."""
         config = ResourceConfig(
             name="test",
@@ -188,7 +198,7 @@ class TestHTTPSessionManager:
     """Test HTTP session manager functionality."""
     
     @pytest.fixture
-    def http_config(self):
+    async def http_config(self) -> Any:
         """Create HTTP session configuration."""
         return ResourceConfig(
             name="test_http",
@@ -199,19 +209,19 @@ class TestHTTPSessionManager:
         )
     
     @pytest.fixture
-    def http_manager(self, http_config):
+    async def http_manager(self, http_config) -> Any:
         """Create HTTP session manager."""
         return HTTPSessionManager(http_config)
     
     @pytest.mark.asyncio
-    async def test_http_session_manager_initialization(self, http_manager):
+    async async def test_http_session_manager_initialization(self, http_manager) -> Any:
         """Test HTTP session manager initialization."""
         assert http_manager._session is None
         assert http_manager._connector is None
         assert http_manager._timeout is None
     
     @pytest.mark.asyncio
-    async def test_http_session_initialization(self, http_manager):
+    async async def test_http_session_initialization(self, http_manager) -> Any:
         """Test HTTP session initialization."""
         await http_manager._initialize_session()
         
@@ -223,7 +233,7 @@ class TestHTTPSessionManager:
         assert isinstance(http_manager._timeout, aiohttp.ClientTimeout)
     
     @pytest.mark.asyncio
-    async def test_get_session(self, http_manager):
+    async def test_get_session(self, http_manager) -> Optional[Dict[str, Any]]:
         """Test getting HTTP session."""
         session = await http_manager.get_session()
         
@@ -232,7 +242,7 @@ class TestHTTPSessionManager:
         assert http_manager._session is session
     
     @pytest.mark.asyncio
-    async def test_http_session_cleanup(self, http_manager):
+    async async def test_http_session_cleanup(self, http_manager) -> Any:
         """Test HTTP session cleanup."""
         # Initialize session
         await http_manager._initialize_session()
@@ -245,7 +255,7 @@ class TestHTTPSessionManager:
         assert http_manager._timeout is None
     
     @pytest.mark.asyncio
-    async def test_http_health_check_success(self, http_manager):
+    async async def test_http_health_check_success(self, http_manager) -> Any:
         """Test successful HTTP health check."""
         with patch('aiohttp.ClientSession.get') as mock_get:
             mock_response = AsyncMock()
@@ -259,7 +269,7 @@ class TestHTTPSessionManager:
             assert health.error_count == 0
     
     @pytest.mark.asyncio
-    async def test_http_health_check_failure(self, http_manager):
+    async async def test_http_health_check_failure(self, http_manager) -> Any:
         """Test failed HTTP health check."""
         with patch('aiohttp.ClientSession.get') as mock_get:
             mock_get.side_effect = Exception("Connection failed")
@@ -278,7 +288,7 @@ class TestCryptoBackendManager:
     """Test crypto backend manager functionality."""
     
     @pytest.fixture
-    def aes_config(self):
+    def aes_config(self) -> Any:
         """Create AES crypto configuration."""
         return CryptoConfig(
             algorithm=CryptoAlgorithm.AES_256_GCM,
@@ -286,7 +296,7 @@ class TestCryptoBackendManager:
         )
     
     @pytest.fixture
-    def rsa_config(self):
+    def rsa_config(self) -> Any:
         """Create RSA crypto configuration."""
         return CryptoConfig(
             algorithm=CryptoAlgorithm.RSA_2048,
@@ -294,7 +304,7 @@ class TestCryptoBackendManager:
         )
     
     @pytest.fixture
-    def hash_config(self):
+    def hash_config(self) -> Any:
         """Create hash crypto configuration."""
         return CryptoConfig(
             algorithm=CryptoAlgorithm.SHA_256,
@@ -302,22 +312,22 @@ class TestCryptoBackendManager:
         )
     
     @pytest.fixture
-    def aes_manager(self, aes_config):
+    def aes_manager(self, aes_config) -> Any:
         """Create AES crypto backend manager."""
         return CryptoBackendManager(aes_config)
     
     @pytest.fixture
-    def rsa_manager(self, rsa_config):
+    def rsa_manager(self, rsa_config) -> Any:
         """Create RSA crypto backend manager."""
         return CryptoBackendManager(rsa_config)
     
     @pytest.fixture
-    def hash_manager(self, hash_config):
+    def hash_manager(self, hash_config) -> Any:
         """Create hash crypto backend manager."""
         return CryptoBackendManager(hash_config)
     
     @pytest.mark.asyncio
-    async def test_crypto_backend_initialization(self, aes_manager):
+    async def test_crypto_backend_initialization(self, aes_manager) -> Any:
         """Test crypto backend initialization."""
         assert aes_manager._private_key is None
         assert aes_manager._public_key is None
@@ -325,7 +335,7 @@ class TestCryptoBackendManager:
         assert aes_manager._key_generated_at is None
     
     @pytest.mark.asyncio
-    async def test_aes_encryption_decryption(self, aes_manager):
+    async def test_aes_encryption_decryption(self, aes_manager) -> Any:
         """Test AES encryption and decryption."""
         test_data = b"Hello, Crypto Backend!"
         
@@ -339,7 +349,7 @@ class TestCryptoBackendManager:
         assert decrypted == test_data
     
     @pytest.mark.asyncio
-    async def test_rsa_encryption_decryption(self, rsa_manager):
+    async def test_rsa_encryption_decryption(self, rsa_manager) -> Any:
         """Test RSA encryption and decryption."""
         test_data = b"Hello, RSA!"
         
@@ -353,7 +363,7 @@ class TestCryptoBackendManager:
         assert decrypted == test_data
     
     @pytest.mark.asyncio
-    async def test_hashing(self, hash_manager):
+    async def test_hashing(self, hash_manager) -> Any:
         """Test hashing operations."""
         test_data = b"Hello, Hashing!"
         
@@ -367,7 +377,7 @@ class TestCryptoBackendManager:
         assert hashed == hashed2
     
     @pytest.mark.asyncio
-    async def test_rsa_signing_verification(self, rsa_manager):
+    async def test_rsa_signing_verification(self, rsa_manager) -> Any:
         """Test RSA signing and verification."""
         test_data = b"Hello, Signing!"
         
@@ -386,7 +396,7 @@ class TestCryptoBackendManager:
         assert is_valid is False
     
     @pytest.mark.asyncio
-    async def test_crypto_health_check(self, aes_manager):
+    async def test_crypto_health_check(self, aes_manager) -> Any:
         """Test crypto backend health check."""
         health = await aes_manager.health_check()
         
@@ -395,7 +405,7 @@ class TestCryptoBackendManager:
         assert health.error_count == 0
     
     @pytest.mark.asyncio
-    async def test_crypto_cleanup(self, aes_manager):
+    async def test_crypto_cleanup(self, aes_manager) -> Any:
         """Test crypto backend cleanup."""
         # Generate keys first
         await aes_manager._generate_keys()
@@ -415,7 +425,7 @@ class TestSharedResourcesContainer:
     """Test shared resources container functionality."""
     
     @pytest.mark.asyncio
-    async def test_container_initialization(self, test_config):
+    async def test_container_initialization(self, test_config) -> Any:
         """Test container initialization."""
         container = SharedResourcesContainer(test_config)
         await container.initialize()
@@ -428,7 +438,7 @@ class TestSharedResourcesContainer:
         await container.shutdown()
     
     @pytest.mark.asyncio
-    async def test_get_resource(self, shared_resources):
+    async def test_get_resource(self, shared_resources) -> Optional[Dict[str, Any]]:
         """Test getting resource by name."""
         http_manager = await shared_resources.get_resource("http_session")
         assert isinstance(http_manager, HTTPSessionManager)
@@ -437,7 +447,7 @@ class TestSharedResourcesContainer:
         assert isinstance(ws_manager, WebSocketSessionManager)
     
     @pytest.mark.asyncio
-    async def test_get_crypto_backend(self, shared_resources):
+    async def test_get_crypto_backend(self, shared_resources) -> Optional[Dict[str, Any]]:
         """Test getting crypto backend by name."""
         aes_backend = await shared_resources.get_crypto_backend("test_aes")
         assert isinstance(aes_backend, CryptoBackendManager)
@@ -448,19 +458,19 @@ class TestSharedResourcesContainer:
         assert rsa_backend.crypto_config.algorithm == CryptoAlgorithm.RSA_2048
     
     @pytest.mark.asyncio
-    async def test_get_nonexistent_resource(self, shared_resources):
+    async def test_get_nonexistent_resource(self, shared_resources) -> Optional[Dict[str, Any]]:
         """Test getting non-existent resource."""
         with pytest.raises(ValueError, match="Resource 'nonexistent' not found"):
             await shared_resources.get_resource("nonexistent")
     
     @pytest.mark.asyncio
-    async def test_get_nonexistent_crypto_backend(self, shared_resources):
+    async def test_get_nonexistent_crypto_backend(self, shared_resources) -> Optional[Dict[str, Any]]:
         """Test getting non-existent crypto backend."""
         with pytest.raises(ValueError, match="Crypto backend 'nonexistent' not found"):
             await shared_resources.get_crypto_backend("nonexistent")
     
     @pytest.mark.asyncio
-    async def test_container_shutdown(self, test_config):
+    async def test_container_shutdown(self, test_config) -> Any:
         """Test container shutdown."""
         container = SharedResourcesContainer(test_config)
         await container.initialize()
@@ -483,7 +493,7 @@ class TestFastAPIDependencies:
     """Test FastAPI dependency injection."""
     
     @pytest.fixture
-    def app(self):
+    def app(self) -> Any:
         """Create FastAPI test app."""
         app = FastAPI()
         
@@ -502,7 +512,7 @@ class TestFastAPIDependencies:
         return app
     
     @pytest.mark.asyncio
-    async def test_http_session_dependency(self, app, test_config):
+    async async def test_http_session_dependency(self, app, test_config) -> Any:
         """Test HTTP session dependency injection."""
         await initialize_shared_resources(test_config)
         
@@ -518,7 +528,7 @@ class TestFastAPIDependencies:
             await shutdown_shared_resources()
     
     @pytest.mark.asyncio
-    async def test_crypto_backend_dependency(self, app, test_config):
+    async def test_crypto_backend_dependency(self, app, test_config) -> Any:
         """Test crypto backend dependency injection."""
         await initialize_shared_resources(test_config)
         
@@ -534,7 +544,7 @@ class TestFastAPIDependencies:
             await shutdown_shared_resources()
     
     @pytest.mark.asyncio
-    async def test_named_crypto_backend_dependency(self, app, test_config):
+    async def test_named_crypto_backend_dependency(self, app, test_config) -> Any:
         """Test named crypto backend dependency injection."""
         await initialize_shared_resources(test_config)
         
@@ -557,7 +567,7 @@ class TestContextManagers:
     """Test context managers for resource management."""
     
     @pytest.mark.asyncio
-    async def test_http_session_context(self, test_config):
+    async async def test_http_session_context(self, test_config) -> Any:
         """Test HTTP session context manager."""
         await initialize_shared_resources(test_config)
         
@@ -570,7 +580,7 @@ class TestContextManagers:
             await shutdown_shared_resources()
     
     @pytest.mark.asyncio
-    async def test_crypto_backend_context(self, test_config):
+    async def test_crypto_backend_context(self, test_config) -> Any:
         """Test crypto backend context manager."""
         await initialize_shared_resources(test_config)
         
@@ -596,7 +606,7 @@ class TestHealthMonitoring:
     """Test health monitoring functionality."""
     
     @pytest.mark.asyncio
-    async def test_get_resource_health(self, test_config):
+    async def test_get_resource_health(self, test_config) -> Optional[Dict[str, Any]]:
         """Test getting resource health."""
         await initialize_shared_resources(test_config)
         
@@ -616,7 +626,7 @@ class TestHealthMonitoring:
             await shutdown_shared_resources()
     
     @pytest.mark.asyncio
-    async def test_get_all_resource_health(self, test_config):
+    async def test_get_all_resource_health(self, test_config) -> Optional[Dict[str, Any]]:
         """Test getting all resource health."""
         await initialize_shared_resources(test_config)
         
@@ -643,7 +653,7 @@ class TestErrorHandling:
     """Test error handling scenarios."""
     
     @pytest.mark.asyncio
-    async def test_http_session_error_handling(self, http_config):
+    async async def test_http_session_error_handling(self, http_config) -> Any:
         """Test HTTP session error handling."""
         manager = HTTPSessionManager(http_config)
         
@@ -657,7 +667,7 @@ class TestErrorHandling:
             assert "Network error" in health.last_error
     
     @pytest.mark.asyncio
-    async def test_crypto_backend_error_handling(self, aes_config):
+    async def test_crypto_backend_error_handling(self, aes_config) -> Any:
         """Test crypto backend error handling."""
         manager = CryptoBackendManager(aes_config)
         
@@ -666,7 +676,7 @@ class TestErrorHandling:
             await manager.encrypt(None)
     
     @pytest.mark.asyncio
-    async def test_container_error_handling(self, test_config):
+    async def test_container_error_handling(self, test_config) -> Any:
         """Test container error handling."""
         container = SharedResourcesContainer(test_config)
         
@@ -685,7 +695,7 @@ class TestErrorHandling:
 class TestConfigurationValidation:
     """Test configuration validation."""
     
-    def test_valid_configuration(self):
+    def test_valid_configuration(self) -> Any:
         """Test valid configuration."""
         config = SharedResourceConfig(
             resources={
@@ -704,7 +714,7 @@ class TestConfigurationValidation:
         assert config.resources["test"].name == "test"
         assert config.crypto_configs["test"].algorithm == CryptoAlgorithm.AES_256_GCM
     
-    def test_invalid_resource_config(self):
+    def test_invalid_resource_config(self) -> Any:
         """Test invalid resource configuration."""
         with pytest.raises(ValueError):
             SharedResourceConfig(
@@ -713,7 +723,7 @@ class TestConfigurationValidation:
                 }
             )
     
-    def test_resource_config_validation(self):
+    def test_resource_config_validation(self) -> Any:
         """Test resource configuration validation."""
         config = ResourceConfig(
             name="test",
@@ -727,7 +737,7 @@ class TestConfigurationValidation:
         assert config.max_connections == 100
         assert config.timeout == 30.0
     
-    def test_crypto_config_validation(self):
+    def test_crypto_config_validation(self) -> Any:
         """Test crypto configuration validation."""
         config = CryptoConfig(
             algorithm=CryptoAlgorithm.AES_256_GCM,
@@ -747,13 +757,15 @@ class TestPerformanceAndConcurrency:
     """Test performance and concurrency scenarios."""
     
     @pytest.mark.asyncio
-    async def test_concurrent_http_sessions(self, test_config):
+    async async def test_concurrent_http_sessions(self, test_config) -> Any:
         """Test concurrent HTTP session usage."""
         await initialize_shared_resources(test_config)
         
         try:
             async def fetch_data(session_id: int):
-                async with http_session_context() as session:
+                
+    """fetch_data function."""
+async with http_session_context() as session:
                     # Simulate some work
                     await asyncio.sleep(0.1)
                     return f"session_{session_id}"
@@ -769,13 +781,15 @@ class TestPerformanceAndConcurrency:
             await shutdown_shared_resources()
     
     @pytest.mark.asyncio
-    async def test_concurrent_crypto_operations(self, test_config):
+    async def test_concurrent_crypto_operations(self, test_config) -> Any:
         """Test concurrent crypto operations."""
         await initialize_shared_resources(test_config)
         
         try:
             async def crypto_operation(data_id: int):
-                async with crypto_backend_context() as backend:
+                
+    """crypto_operation function."""
+async with crypto_backend_context() as backend:
                     test_data = f"data_{data_id}".encode('utf-8')
                     encrypted = await backend.encrypt(test_data)
                     decrypted = await backend.decrypt(encrypted)
@@ -799,7 +813,7 @@ class TestIntegrationScenarios:
     """Test integration scenarios."""
     
     @pytest.mark.asyncio
-    async def test_full_workflow(self, test_config):
+    async def test_full_workflow(self, test_config) -> Any:
         """Test complete workflow with multiple resources."""
         await initialize_shared_resources(test_config)
         
@@ -823,7 +837,7 @@ class TestIntegrationScenarios:
             await shutdown_shared_resources()
     
     @pytest.mark.asyncio
-    async def test_resource_lifecycle(self, test_config):
+    async def test_resource_lifecycle(self, test_config) -> Any:
         """Test complete resource lifecycle."""
         # Initialize
         await initialize_shared_resources(test_config)

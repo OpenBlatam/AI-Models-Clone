@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from uuid import uuid4
 
 import requests
@@ -19,6 +21,9 @@ from tests.integration.common_utils.test_models import SimpleTestDocument
 from tests.integration.common_utils.vespa import vespa_fixture
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _verify_document_permissions(
     retrieved_doc: dict,
     cc_pair: DATestCCPair,
@@ -202,7 +207,7 @@ class DocumentManager:
             )
 
     @staticmethod
-    def fetch_documents_for_cc_pair(
+    async def fetch_documents_for_cc_pair(
         cc_pair_id: int,
         db_session: Session,
         vespa_client: vespa_fixture,

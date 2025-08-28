@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import os
+from typing import List, Optional
+from functools import lru_cache
+from pydantic import BaseSettings, Field, validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Production Settings Configuration
 ================================
@@ -5,11 +23,7 @@ Production Settings Configuration
 Environment-based configuration with validation for production deployment.
 """
 
-import os
-from typing import List, Optional
-from functools import lru_cache
 
-from pydantic import BaseSettings, Field, validator
 
 
 class Settings(BaseSettings):
@@ -104,7 +118,7 @@ class Settings(BaseSettings):
     datadog_api_key: Optional[str] = Field(default=None, env="DATADOG_API_KEY")
     
     @validator("environment")
-    def validate_environment(cls, v):
+    def validate_environment(cls, v) -> bool:
         """Validate environment setting."""
         valid_environments = ["development", "staging", "production", "test"]
         if v not in valid_environments:
@@ -112,7 +126,7 @@ class Settings(BaseSettings):
         return v
     
     @validator("log_level")
-    def validate_log_level(cls, v):
+    def validate_log_level(cls, v) -> bool:
         """Validate log level setting."""
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         if v.upper() not in valid_levels:
@@ -120,7 +134,7 @@ class Settings(BaseSettings):
         return v.upper()
     
     @validator("ai_temperature")
-    def validate_temperature(cls, v):
+    def validate_temperature(cls, v) -> bool:
         """Validate AI temperature setting."""
         if not 0.0 <= v <= 2.0:
             raise ValueError("AI temperature must be between 0.0 and 2.0")

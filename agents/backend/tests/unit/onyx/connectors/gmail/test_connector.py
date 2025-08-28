@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import datetime
 import json
 import os
@@ -9,9 +11,16 @@ from onyx.connectors.gmail.connector import thread_to_document
 from onyx.connectors.models import Document
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def test_thread_to_document() -> None:
     json_path = os.path.join(os.path.dirname(__file__), "thread.json")
     with open(json_path, "r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         full_email_thread = json.load(f)
 
     doc = thread_to_document(full_email_thread)

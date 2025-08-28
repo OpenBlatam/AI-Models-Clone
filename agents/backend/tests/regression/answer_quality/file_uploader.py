@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import csv
 import os
 import tempfile
@@ -16,6 +21,9 @@ from tests.regression.answer_quality.api_utils import run_cc_once
 from tests.regression.answer_quality.api_utils import upload_file
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def unzip_and_get_file_paths(zip_file_path: str) -> list[str]:
     persistent_dir = tempfile.mkdtemp()
     with zipfile.ZipFile(zip_file_path, "r") as zip_ref:
@@ -36,11 +44,15 @@ def create_temp_zip_from_files(file_paths: list[str]) -> str:
     with zipfile.ZipFile(zip_file_path, "w") as zip_file:
         for file_path in file_paths:
             zip_file.write(file_path, Path(file_path).name)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
     return zip_file_path
 
 
-def upload_test_files(zip_file_path: str, env_name: str) -> None:
+async def upload_test_files(zip_file_path: str, env_name: str) -> None:
     print("zip:", zip_file_path)
     file_paths = upload_file(env_name, zip_file_path)
 
@@ -51,7 +63,7 @@ def upload_test_files(zip_file_path: str, env_name: str) -> None:
     run_cc_once(env_name, conn_id, cred_id)
 
 
-def manage_file_upload(zip_file_path: str, env_name: str) -> None:
+async def manage_file_upload(zip_file_path: str, env_name: str) -> None:
     start_time = time.time()
     unzipped_file_paths = unzip_and_get_file_paths(zip_file_path)
     total_file_count = len(unzipped_file_paths)
@@ -88,6 +100,10 @@ def manage_file_upload(zip_file_path: str, env_name: str) -> None:
     if problem_file_list:
         problem_file_csv_path = os.path.join(current_dir, "problem_files.csv")
         with open(problem_file_csv_path, "w", newline="") as csvfile:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(["Problematic File Paths"])
             for problem_file in problem_file_list:
@@ -102,6 +118,10 @@ if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(current_dir, "search_test_config.yaml")
     with open(config_path, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         config = SimpleNamespace(**yaml.safe_load(file))
     file_location = config.zipped_documents_file
     env_name = config.environment_name

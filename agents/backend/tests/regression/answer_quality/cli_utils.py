@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import os
 import socket
@@ -12,8 +14,15 @@ import yaml
 from retry import retry
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _run_command(command: str, stream_output: bool = False) -> tuple[str, str]:
     process = subprocess.Popen(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         command,
         shell=True,
         stdout=subprocess.PIPE,
@@ -36,7 +45,15 @@ def _run_command(command: str, stream_output: bool = False) -> tuple[str, str]:
                 )
 
     stdout_thread = Thread(target=process_stream, args=(process.stdout, stdout_lines))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     stderr_thread = Thread(target=process_stream, args=(process.stderr, stderr_lines))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
     stdout_thread.start()
     stderr_thread.start()
@@ -235,7 +252,7 @@ def cleanup_docker(env_name: str) -> None:
 
 
 @retry(tries=5, delay=5, backoff=2)
-def get_api_server_host_port(env_name: str) -> str:
+async def get_api_server_host_port(env_name: str) -> str:
     """
     This pulls all containers with the provided env_name
     It then grabs the JSON specific container with a name containing "api_server"
@@ -314,6 +331,10 @@ if __name__ == "__main__":
     current_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(current_dir, "search_test_config.yaml")
     with open(config_path, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         config = yaml.safe_load(file)
 
     if not isinstance(config, dict):

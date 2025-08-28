@@ -1,7 +1,8 @@
-"""
-Brand Kit Tests - Onyx Integration
-Comprehensive test suite for BrandKit with advanced features.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import pytest
 from datetime import datetime
 from typing import Dict, List, Any
@@ -9,6 +10,13 @@ from .model import BrandKit
 from .color import BrandKitColor
 from .typography import BrandKitTypography
 from .voice import BrandKitVoice
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Brand Kit Tests - Onyx Integration
+Comprehensive test suite for BrandKit with advanced features.
+"""
 
 # Test Data
 TEST_COLORS = [

@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add removed documents to index_attempt
 
 Revision ID: 5f4b8568a221
@@ -6,8 +13,6 @@ Create Date: 2024-02-16 15:02:03.319907
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "5f4b8568a221"

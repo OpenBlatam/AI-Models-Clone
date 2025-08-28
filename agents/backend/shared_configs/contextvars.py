@@ -1,9 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import contextvars
 
 from shared_configs.configs import MULTI_TENANT
 from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 
 
+        import traceback
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Context variable for the current tenant id
 CURRENT_TENANT_ID_CONTEXTVAR: contextvars.ContextVar[str | None] = (
     contextvars.ContextVar(
@@ -27,7 +33,6 @@ ONYX_REQUEST_ID_CONTEXTVAR: contextvars.ContextVar[str | None] = contextvars.Con
 def get_current_tenant_id() -> str:
     tenant_id = CURRENT_TENANT_ID_CONTEXTVAR.get()
     if tenant_id is None:
-        import traceback
 
         if not MULTI_TENANT:
             return POSTGRES_DEFAULT_SCHEMA

@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from pydantic import BaseModel, Field, ConfigDict, computed_field, validator
+from typing import Optional, List, Dict, Any, Union
+from datetime import datetime
+from enum import Enum
+from pathlib import Path as FilePath
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 FASTAPI MODELS - AI VIDEO SYSTEM
 ===================================
@@ -5,11 +24,6 @@
 Pydantic data models for the AI Video system following FastAPI best practices.
 """
 
-from pydantic import BaseModel, Field, ConfigDict, computed_field, validator
-from typing import Optional, List, Dict, Any, Union
-from datetime import datetime
-from enum import Enum
-from pathlib import Path as FilePath
 
 # ============================================================================
 # ENUMS

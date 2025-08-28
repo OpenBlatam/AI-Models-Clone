@@ -1,15 +1,16 @@
-"""
-🚀 ERROR MIDDLEWARE - UNEXPECTED ERRORS, LOGGING & MONITORING
-============================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive middleware system for handling unexpected errors:
-- Global error handling middleware
-- Structured logging middleware
-- Error monitoring and alerting
-- Performance tracking
-- Request/response correlation
-- Error recovery strategies
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -25,18 +26,34 @@ import hashlib
 import sys
 import os
 from datetime import datetime, timedelta
-
 from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
-
 import psutil
 import gc
-
 from .http_exceptions import (
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+from typing import Any, List, Dict, Optional
+"""
+🚀 ERROR MIDDLEWARE - UNEXPECTED ERRORS, LOGGING & MONITORING
+============================================================
+
+Comprehensive middleware system for handling unexpected errors:
+- Global error handling middleware
+- Structured logging middleware
+- Error monitoring and alerting
+- Performance tracking
+- Request/response correlation
+- Error recovery strategies
+"""
+
+
+
+
     AIVideoHTTPException,
     SystemError,
     ErrorContext,
@@ -96,7 +113,7 @@ class ErrorInfo:
 class ErrorTracker:
     """Track errors for monitoring and alerting."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_counts = {}
         self.error_timestamps = []
         self.circuit_breakers = {}
@@ -244,7 +261,9 @@ class StructuredLoggingMiddleware(BaseHTTPMiddleware):
     """Middleware for structured logging of requests and responses."""
     
     def __init__(self, app: ASGIApp, log_level: str = "INFO"):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.log_level = getattr(logging, log_level.upper())
         self.logger = logging.getLogger("request_logger")
         self.logger.setLevel(self.log_level)
@@ -322,7 +341,7 @@ class StructuredLoggingMiddleware(BaseHTTPMiddleware):
         # Check query parameters
         return request.query_params.get("video_id")
     
-    def _get_request_size(self, request: Request) -> Optional[int]:
+    async def _get_request_size(self, request: Request) -> Optional[int]:
         """Get request size in bytes."""
         try:
             content_length = request.headers.get("content-length")
@@ -408,7 +427,9 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
     """Middleware for handling unexpected errors."""
     
     def __init__(self, app: ASGIApp, error_tracker: ErrorTracker):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.error_tracker = error_tracker
         self.error_handler = HTTPExceptionHandler()
         self.error_monitor = ErrorMonitor()
@@ -696,7 +717,9 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
     """Middleware for performance monitoring."""
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.metrics = []
         self.max_metrics = 1000
         self.slow_request_threshold = 5.0  # seconds
@@ -836,7 +859,7 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
 class MiddlewareStack:
     """Stack of middleware for the application."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_tracker = ErrorTracker()
         self.middleware_stack = []
     
@@ -872,7 +895,6 @@ class MiddlewareStack:
 
 def create_app_with_middleware() -> ASGIApp:
     """Create FastAPI app with comprehensive middleware."""
-    from fastapi import FastAPI
     
     app = FastAPI(title="AI Video API with Middleware")
     
@@ -888,15 +910,21 @@ def create_app_with_middleware() -> ASGIApp:
     # Add routes
     @app.get("/health")
     async def health_check():
-        return {"status": "healthy", "timestamp": time.time()}
+        
+    """health_check function."""
+return {"status": "healthy", "timestamp": time.time()}
     
     @app.get("/errors/stats")
     async def get_error_stats():
-        return middleware_stack.get_error_stats()
+        
+    """get_error_stats function."""
+return middleware_stack.get_error_stats()
     
     @app.get("/performance/stats")
     async def get_performance_stats():
-        # This would need to be implemented to access the performance middleware
+        
+    """get_performance_stats function."""
+# This would need to be implemented to access the performance middleware
         return {"message": "Performance stats endpoint"}
     
     return app
@@ -908,7 +936,6 @@ async def example_middleware_usage():
     app = create_app_with_middleware()
     
     # Simulate some requests to see middleware in action
-    from fastapi.testclient import TestClient
     
     client = TestClient(app)
     

@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .models import (
+from .video_service import VideoService, video_service
+from .dependencies import (
+from .routers import (
+from .background_tasks import (
+from .middleware import (
+from .main import app
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 AI VIDEO API MODULE
 ======================
@@ -14,25 +26,20 @@ This module contains:
 - main: Main application
 """
 
-from .models import (
     VideoStatus, VideoQuality, ProcessingPriority,
     VideoData, VideoResponse, BatchVideoRequest, BatchVideoResponse,
     ErrorResponse, PaginationParams, VideoListResponse
 )
 
-from .video_service import VideoService, video_service
 
-from .dependencies import (
     get_video_service, get_current_user,
     validate_video_id, validate_pagination_params,
     check_rate_limit, log_request
 )
 
-from .routers import (
     video_router, analytics_router, health_router
 )
 
-from .background_tasks import (
     cleanup_temp_files, cleanup_old_videos,
     process_video_async, generate_thumbnail_async,
     send_processing_notification, send_batch_completion_notification,
@@ -41,12 +48,10 @@ from .background_tasks import (
     create_background_task, schedule_periodic_task
 )
 
-from .middleware import (
     create_middleware_stack, SecurityMiddleware, LoggingMiddleware,
     add_custom_headers, get_request_info
 )
 
-from .main import app
 
 __all__ = [
     # Models

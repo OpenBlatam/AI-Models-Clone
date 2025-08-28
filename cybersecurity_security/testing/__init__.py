@@ -1,10 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .security_testing import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Security Testing Framework Module
 
 Provides security testing and penetration testing capabilities.
 """
 
-from .security_testing import (
     SecurityTestRequest,
     SecurityTestResult,
     PenetrationTestRequest,

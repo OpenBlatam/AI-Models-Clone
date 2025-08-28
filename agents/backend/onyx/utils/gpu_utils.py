@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from functools import lru_cache
 
 import requests
@@ -9,6 +11,9 @@ from shared_configs.configs import INDEXING_MODEL_SERVER_PORT
 from shared_configs.configs import MODEL_SERVER_HOST
 from shared_configs.configs import MODEL_SERVER_PORT
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -32,11 +37,11 @@ def _get_gpu_status_from_model_server(indexing: bool) -> bool:
 
 
 @retry(tries=5, delay=5)
-def gpu_status_request(indexing: bool) -> bool:
+async def gpu_status_request(indexing: bool) -> bool:
     return _get_gpu_status_from_model_server(indexing)
 
 
 @lru_cache(maxsize=1)
-def fast_gpu_status_request(indexing: bool) -> bool:
+async def fast_gpu_status_request(indexing: bool) -> bool:
     """For use in sync flows, where we don't want to retry / we want to cache this."""
     return gpu_status_request(indexing=indexing)

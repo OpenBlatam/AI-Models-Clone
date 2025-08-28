@@ -1,9 +1,16 @@
-"""
-🔧 MIDDLEWARE EXAMPLES - PRACTICAL IMPLEMENTATIONS
-==================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Real-world examples of middleware for logging, error monitoring, and performance optimization.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import logging
@@ -15,7 +22,6 @@ import traceback
 from typing import Dict, Any, Optional, List
 from datetime import datetime, timedelta
 from contextlib import asynccontextmanager
-
 from fastapi import FastAPI, Request, Response, HTTPException, status
 from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.middleware.cors import CORSMiddleware
@@ -23,6 +29,16 @@ from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.responses import JSONResponse
 import redis.asyncio as redis
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+🔧 MIDDLEWARE EXAMPLES - PRACTICAL IMPLEMENTATIONS
+==================================================
+
+Real-world examples of middleware for logging, error monitoring, and performance optimization.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +49,7 @@ logger = logging.getLogger(__name__)
 class AIVideoLoggingMiddleware(BaseHTTPMiddleware):
     """Specialized logging middleware for AI Video API."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
         self.request_count = 0
         self.error_count = 0
@@ -269,7 +285,9 @@ class ErrorMonitoringMiddleware(BaseHTTPMiddleware):
                  alert_threshold: int = 5,
                  alert_window: int = 300,  # 5 minutes
                  error_types_to_track: List[str] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.alert_threshold = alert_threshold
         self.alert_window = alert_window
         self.error_counts = {}
@@ -341,7 +359,7 @@ class ErrorMonitoringMiddleware(BaseHTTPMiddleware):
         else:
             logger.error(f"Exception {error_type} on {request.url.path}: {str(exception)}")
     
-    async def check_alert_threshold(self):
+    async def check_alert_threshold(self) -> Any:
         """Check if error threshold has been exceeded."""
         current_time = time.time()
         cutoff_time = current_time - self.alert_window
@@ -422,7 +440,9 @@ class AIVideoCacheMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, 
                  redis_client: Optional[redis.Redis] = None,
                  default_ttl: int = 3600):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.redis_client = redis_client
         self.default_ttl = default_ttl
         self.cacheable_endpoints = {
@@ -541,7 +561,9 @@ class AIVideoRateLimitMiddleware(BaseHTTPMiddleware):
     def __init__(self, app, 
                  redis_client: Optional[redis.Redis] = None,
                  rate_limits: Dict[str, Dict[str, int]] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.redis_client = redis_client
         
         # Default rate limits
@@ -628,7 +650,7 @@ class AIVideoRateLimitMiddleware(BaseHTTPMiddleware):
             logger.error(f"Rate limit check failed: {e}")
             return True  # Allow request if rate limiting fails
     
-    async def get_remaining_requests(self, client_id: str, endpoint: str, rate_limit: Dict[str, int]) -> int:
+    async async def get_remaining_requests(self, client_id: str, endpoint: str, rate_limit: Dict[str, int]) -> int:
         """Get remaining requests for client."""
         if not self.redis_client:
             return rate_limit["requests"]
@@ -775,7 +797,9 @@ def example_basic_middleware():
     
     @app.get("/")
     async def root():
-        return {"message": "Hello AI Video API"}
+        
+    """root function."""
+return {"message": "Hello AI Video API"}
     
     return app
 
@@ -791,7 +815,9 @@ def example_performance_middleware():
     
     @app.get("/slow")
     async def slow_endpoint():
-        await asyncio.sleep(2)  # Simulate slow processing
+        
+    """slow_endpoint function."""
+await asyncio.sleep(2)  # Simulate slow processing
         return {"message": "Slow response"}
     
     return app
@@ -808,7 +834,9 @@ def example_error_monitoring():
     
     @app.get("/error")
     async def error_endpoint():
-        raise HTTPException(status_code=500, detail="Simulated error")
+        
+    """error_endpoint function."""
+raise HTTPException(status_code=500, detail="Simulated error")
     
     return app
 
@@ -816,5 +844,4 @@ if __name__ == "__main__":
     # Example usage
     app = create_ai_video_app()
     
-    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000) 

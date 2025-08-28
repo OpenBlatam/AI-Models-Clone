@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
-"""
-Mixed Precision Training System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Comprehensive mixed precision training implementation using torch.cuda.amp
-with advanced features for optimal performance and memory efficiency.
-"""
+# Constants
+BUFFER_SIZE = 1024
 
 import torch
 import torch.nn as nn
@@ -18,6 +18,16 @@ from typing import Dict, List, Optional, Any, Union, Callable, Tuple
 from dataclasses import dataclass, field
 from contextlib import contextmanager
 import gc
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+Mixed Precision Training System
+
+Comprehensive mixed precision training implementation using torch.cuda.amp
+with advanced features for optimal performance and memory efficiency.
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -30,6 +40,10 @@ class MixedPrecisionConfig:
     enabled: bool = True
     dtype: torch.dtype = torch.float16
     device_type: str = "cuda"
+    # Torch performance
+    enable_tf32: bool = True
+    enable_torch_compile: bool = True
+    torch_compile_mode: Optional[str] = None  # None|'default'|'reduce-overhead'|'max-autotune'
     
     # Performance settings
     autocast_enabled: bool = True
@@ -58,18 +72,30 @@ class MixedPrecisionConfig:
     min_scale: float = 2.0**(-16)
     scale_window: int = 2000
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Post-initialization setup."""
         if not torch.cuda.is_available():
             self.enabled = False
             self.device_type = "cpu"
             logger.warning("CUDA not available, mixed precision disabled")
+        else:
+            # Safe CUDA hints
+            if self.enable_tf32:
+                try:
+                    torch.backends.cuda.matmul.allow_tf32 = True
+                    torch.set_float32_matmul_precision('high')
+                    torch.backends.cudnn.benchmark = True
+                    torch.backends.cudnn.deterministic = False
+                except Exception:
+                    pass
 
 class MixedPrecisionManager:
     """Advanced mixed precision manager with comprehensive features."""
     
     def __init__(self, config: MixedPrecisionConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.scaler = None
         self.autocast_context = None
         self.performance_metrics = {}
@@ -81,7 +107,7 @@ class MixedPrecisionManager:
         
         logger.info(f"Mixed precision manager initialized with config: {config}")
     
-    def _initialize_mixed_precision(self):
+    def _initialize_mixed_precision(self) -> Any:
         """Initialize mixed precision components."""
         if not self.config.enabled:
             logger.info("Mixed precision disabled")
@@ -107,7 +133,7 @@ class MixedPrecisionManager:
             )
             logger.info("Autocast context initialized")
     
-    def _track_memory_usage(self):
+    def _track_memory_usage(self) -> Any:
         """Track memory usage during mixed precision training."""
         if not self.config.profile_memory:
             return
@@ -149,7 +175,7 @@ class MixedPrecisionManager:
         }
     
     @contextmanager
-    def autocast_context(self):
+    def autocast_context(self) -> Any:
         """Context manager for autocast."""
         if not self.config.enabled or not self.config.autocast_enabled:
             yield
@@ -184,7 +210,7 @@ class MixedPrecisionManager:
         
         self.scaler.step(optimizer)
     
-    def update_scaler(self):
+    def update_scaler(self) -> Any:
         """Update gradient scaler."""
         if not self.config.enabled or not self.scaler:
             return
@@ -202,7 +228,7 @@ class MixedPrecisionManager:
         """Check if mixed precision is enabled."""
         return self.config.enabled and torch.cuda.is_available()
     
-    def optimize_memory(self):
+    def optimize_memory(self) -> Any:
         """Optimize memory usage."""
         if not self.config.optimize_memory:
             return
@@ -231,9 +257,22 @@ class MixedPrecisionTrainer:
     """Trainer with integrated mixed precision training."""
     
     def __init__(self, model: nn.Module, config: MixedPrecisionConfig):
-        self.model = model
+        
+    """__init__ function."""
+self.model = model
         self.config = config
         self.mixed_precision_manager = MixedPrecisionManager(config)
+        
+        # Optional torch.compile for speedups on PyTorch 2.x
+        if getattr(torch, 'compile', None) is not None and config.enable_torch_compile:
+            try:
+                mode = config.torch_compile_mode
+                if mode is None:
+                    mode = 'max-autotune' if torch.cuda.is_available() else 'reduce-overhead'
+                model = torch.compile(model, mode=mode)
+                logger.info(f"Model compiled with torch.compile (mode={mode})")
+            except Exception as e:
+                logger.warning(f"torch.compile unavailable or failed: {e}")
         
         # Training components
         self.criterion = nn.CrossEntropyLoss()
@@ -384,7 +423,9 @@ class AdaptiveMixedPrecisionManager(MixedPrecisionManager):
     """Adaptive mixed precision manager with dynamic adjustment."""
     
     def __init__(self, config: MixedPrecisionConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.adaptation_history = []
         self.performance_threshold = 0.8
         self.adaptation_cooldown = 100
@@ -472,5 +513,6 @@ def example_usage():
     stats = trainer.get_training_stats()
     logger.info(f"Training Stats: {json.dumps(stats, indent=2, default=str)}")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     example_usage() 

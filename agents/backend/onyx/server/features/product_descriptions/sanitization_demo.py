@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from fastapi import FastAPI, APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, Field
 from typing import Dict, Any, List, Optional
@@ -6,8 +11,11 @@ import re
 import time
 from datetime import datetime
 
-# Import sanitization components
 from input_sanitization import (
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+# Import sanitization components
     InputSanitizer, SecureCommandExecutor, SanitizationLevel, InputType,
     SanitizationRequest, SanitizationResponse, CommandExecutionRequest, CommandExecutionResponse
 )
@@ -348,7 +356,6 @@ app = FastAPI(
 app.include_router(router)
 
 if __name__ == "__main__":
-    import uvicorn
     print("Input Sanitization Demo")
     print("Access API at: http://localhost:8000")
     print("API Documentation at: http://localhost:8000/docs")

@@ -1,11 +1,5 @@
-"""
-🎯 Facebook Posts - Refactored Models for Onyx Features
-======================================================
-
-Modelos refactorizados siguiendo la arquitectura de features de Onyx.
-Integración completa con Clean Architecture, LangChain y patrones enterprise.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import List, Optional, Dict, Any, Union, Protocol
 from datetime import datetime
 from dataclasses import dataclass, field
@@ -15,6 +9,17 @@ import uuid
 import hashlib
 import re
 from pydantic import BaseModel, Field, validator, root_validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+🎯 Facebook Posts - Refactored Models for Onyx Features
+======================================================
+
+Modelos refactorizados siguiendo la arquitectura de features de Onyx.
+Integración completa con Clean Architecture, LangChain y patrones enterprise.
+"""
+
 
 
 # ===== REFINED DOMAIN ENUMS =====
@@ -140,7 +145,7 @@ class FacebookRequest(BaseModel):
     video_concept: Optional[str] = Field(None, description="Concepto de video")
     
     @validator('max_length')
-    def validate_max_length(cls, v):
+    def validate_max_length(cls, v) -> bool:
         if v < 50:
             raise ValueError('max_length debe ser al menos 50 caracteres')
         if v > 2000:
@@ -219,7 +224,8 @@ class FacebookPost(BaseModel):
     langchain_metadata: Dict[str, Any] = Field(default_factory=dict, description="Metadata de LangChain")
     generation_metrics: Dict[str, Any] = Field(default_factory=dict, description="Métricas de generación")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }

@@ -1,6 +1,14 @@
-"""
-Optimized integration tests for Key Messages feature with performance testing.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import asyncio
 import time
 import pytest
@@ -13,15 +21,24 @@ import numpy as np
 from typing import List, Dict, Any
 import structlog
 from unittest.mock import AsyncMock, patch
-
 from onyx.server.features.key_messages.service import OptimizedKeyMessageService
 from onyx.server.features.key_messages.models import (
+from onyx.server.features.key_messages.config import get_settings
+        import json
+        import orjson
+        import httpx
+        from cachetools import TTLCache
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Optimized integration tests for Key Messages feature with performance testing.
+"""
+
     KeyMessageRequest,
     BatchKeyMessageRequest,
     MessageType,
     MessageTone
 )
-from onyx.server.features.key_messages.config import get_settings
 
 logger = structlog.get_logger(__name__)
 
@@ -30,16 +47,18 @@ class MockMessageDataset(Dataset):
     """Mock dataset for testing gradient accumulation."""
     
     def __init__(self, size: int = 1000):
-        self.size = size
+        
+    """__init__ function."""
+self.size = size
         self.messages = [
             f"Test message {i} for optimization testing" 
             for i in range(size)
         ]
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return self.size
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         return {
             "message": self.messages[idx],
             "type": MessageType.INFORMATIONAL.value,
@@ -51,7 +70,9 @@ class MockLLMModel(nn.Module):
     """Mock LLM model for testing gradient accumulation."""
     
     def __init__(self, vocab_size: int = 10000, hidden_size: int = 512):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.embedding = nn.Embedding(vocab_size, hidden_size)
         self.transformer = nn.TransformerEncoderLayer(
             d_model=hidden_size,
@@ -61,7 +82,7 @@ class MockLLMModel(nn.Module):
         )
         self.output = nn.Linear(hidden_size, vocab_size)
     
-    def forward(self, x):
+    def forward(self, x) -> Any:
         x = self.embedding(x)
         x = self.transformer(x)
         return self.output(x)
@@ -70,7 +91,9 @@ class GradientAccumulationTrainer:
     """Trainer with gradient accumulation for large batch sizes."""
     
     def __init__(self, model: nn.Module, accumulation_steps: int = 4):
-        self.model = model
+        
+    """__init__ function."""
+self.model = model
         self.accumulation_steps = accumulation_steps
         self.optimizer = torch.optim.AdamW(model.parameters(), lr=1e-4)
         self.criterion = nn.CrossEntropyLoss()
@@ -102,16 +125,18 @@ class MultiGPUTrainer:
     """Multi-GPU trainer using DistributedDataParallel."""
     
     def __init__(self, model: nn.Module, world_size: int = 2):
-        self.world_size = world_size
+        
+    """__init__ function."""
+self.world_size = world_size
         self.model = DDP(model, device_ids=[0, 1])
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=1e-4)
     
-    def setup_distributed(self):
+    def setup_distributed(self) -> Any:
         """Setup distributed training."""
         dist.init_process_group(backend='nccl', init_method='env://')
         torch.cuda.set_device(0)
     
-    def cleanup_distributed(self):
+    def cleanup_distributed(self) -> Any:
         """Cleanup distributed training."""
         dist.destroy_process_group()
 
@@ -130,12 +155,12 @@ def mock_llm_model():
     return MockLLMModel()
 
 @pytest.fixture
-def gradient_trainer(mock_llm_model):
+def gradient_trainer(mock_llm_model) -> Any:
     """Create gradient accumulation trainer."""
     return GradientAccumulationTrainer(mock_llm_model, accumulation_steps=4)
 
 @pytest.fixture
-def multi_gpu_trainer(mock_llm_model):
+def multi_gpu_trainer(mock_llm_model) -> Any:
     """Create multi-GPU trainer."""
     return MultiGPUTrainer(mock_llm_model, world_size=2)
 
@@ -143,7 +168,7 @@ class TestOptimizedKeyMessages:
     """Test suite for optimized key messages functionality."""
     
     @pytest.mark.asyncio
-    async def test_service_initialization(self, optimized_service):
+    async def test_service_initialization(self, optimized_service) -> Any:
         """Test service initialization with optimizations."""
         assert optimized_service is not None
         assert optimized_service.redis is not None
@@ -151,7 +176,7 @@ class TestOptimizedKeyMessages:
         assert optimized_service.memory_cache is not None
     
     @pytest.mark.asyncio
-    async def test_gradient_accumulation(self, gradient_trainer):
+    async def test_gradient_accumulation(self, gradient_trainer) -> Any:
         """Test gradient accumulation for large batch sizes."""
         # Create mock data
         batch_size = 32
@@ -170,7 +195,7 @@ class TestOptimizedKeyMessages:
             assert loss > 0
     
     @pytest.mark.asyncio
-    async def test_multi_gpu_training(self, multi_gpu_trainer):
+    async def test_multi_gpu_training(self, multi_gpu_trainer) -> Any:
         """Test multi-GPU training setup."""
         if torch.cuda.device_count() < 2:
             pytest.skip("Requires at least 2 GPUs")
@@ -183,7 +208,7 @@ class TestOptimizedKeyMessages:
             multi_gpu_trainer.cleanup_distributed()
     
     @pytest.mark.asyncio
-    async def test_batch_processing_performance(self, optimized_service):
+    async def test_batch_processing_performance(self, optimized_service) -> Any:
         """Test batch processing performance with optimizations."""
         # Create batch of requests
         requests = []
@@ -212,7 +237,7 @@ class TestOptimizedKeyMessages:
         assert processing_time < 5.0  # Should complete within 5 seconds
     
     @pytest.mark.asyncio
-    async def test_cache_performance(self, optimized_service):
+    async def test_cache_performance(self, optimized_service) -> Any:
         """Test cache performance improvements."""
         request = KeyMessageRequest(
             message="Cache performance test message",
@@ -235,7 +260,7 @@ class TestOptimizedKeyMessages:
         assert result1.data.response == result2.data.response
     
     @pytest.mark.asyncio
-    async def test_concurrent_requests(self, optimized_service):
+    async async def test_concurrent_requests(self, optimized_service) -> Any:
         """Test concurrent request handling."""
         request = KeyMessageRequest(
             message="Concurrent test message",
@@ -245,7 +270,9 @@ class TestOptimizedKeyMessages:
         
         # Create multiple concurrent requests
         async def make_request():
-            return await optimized_service.generate_response(request)
+            
+    """make_request function."""
+return await optimized_service.generate_response(request)
         
         # Run 5 concurrent requests
         start_time = time.perf_counter()
@@ -257,7 +284,7 @@ class TestOptimizedKeyMessages:
         assert total_time < 3.0  # Should complete quickly with concurrency
     
     @pytest.mark.asyncio
-    async def test_memory_optimization(self, optimized_service):
+    async def test_memory_optimization(self, optimized_service) -> Any:
         """Test memory optimization features."""
         # Test with large batch
         large_requests = []
@@ -279,7 +306,7 @@ class TestOptimizedKeyMessages:
         assert result.success
     
     @pytest.mark.asyncio
-    async def test_circuit_breaker(self, optimized_service):
+    async def test_circuit_breaker(self, optimized_service) -> Any:
         """Test circuit breaker functionality."""
         # Mock LLM API to fail
         with patch.object(optimized_service, '_call_llm_api_optimized', 
@@ -305,7 +332,7 @@ class TestOptimizedKeyMessages:
             assert processing_time < 0.1
     
     @pytest.mark.asyncio
-    async def test_health_check(self, optimized_service):
+    async def test_health_check(self, optimized_service) -> Any:
         """Test health check functionality."""
         health_status = await optimized_service.health_check()
         
@@ -314,7 +341,7 @@ class TestOptimizedKeyMessages:
         assert "timestamp" in health_status
     
     @pytest.mark.asyncio
-    async def test_cache_statistics(self, optimized_service):
+    async def test_cache_statistics(self, optimized_service) -> Any:
         """Test cache statistics functionality."""
         stats = await optimized_service.get_cache_stats()
         
@@ -326,10 +353,8 @@ class TestOptimizedKeyMessages:
 class TestPerformanceOptimizations:
     """Test suite for performance optimizations."""
     
-    def test_orjson_performance(self):
+    def test_orjson_performance(self) -> Any:
         """Test orjson performance vs standard json."""
-        import json
-        import orjson
         
         data = {
             "message": "Test message",
@@ -353,18 +378,16 @@ class TestPerformanceOptimizations:
         # orjson should be faster
         assert orjson_time < json_time
     
-    def test_connection_pooling(self):
+    def test_connection_pooling(self) -> Any:
         """Test HTTP connection pooling."""
-        import httpx
         
         # Test connection limits
         limits = httpx.Limits(max_keepalive_connections=20, max_connections=100)
         assert limits.max_keepalive_connections == 20
         assert limits.max_connections == 100
     
-    def test_memory_cache_performance(self):
+    def test_memory_cache_performance(self) -> Any:
         """Test memory cache performance."""
-        from cachetools import TTLCache
         
         cache = TTLCache(maxsize=1000, ttl=3600)
         
@@ -378,7 +401,7 @@ class TestPerformanceOptimizations:
 class TestGradientAccumulation:
     """Test suite for gradient accumulation."""
     
-    def test_gradient_accumulation_logic(self):
+    def test_gradient_accumulation_logic(self) -> Any:
         """Test gradient accumulation logic."""
         model = MockLLMModel()
         trainer = GradientAccumulationTrainer(model, accumulation_steps=4)
@@ -397,7 +420,7 @@ class TestGradientAccumulation:
             loss = trainer.train_step(batch, step)
             assert isinstance(loss, float)
     
-    def test_effective_batch_size(self):
+    def test_effective_batch_size(self) -> Any:
         """Test effective batch size calculation."""
         actual_batch_size = 8
         accumulation_steps = 4

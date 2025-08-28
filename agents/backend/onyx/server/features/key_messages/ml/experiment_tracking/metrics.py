@@ -1,7 +1,7 @@
-"""
-Metrics Tracking System for Key Messages ML Pipeline
-Provides comprehensive metric logging and aggregation capabilities
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import time
 import statistics
@@ -11,6 +11,14 @@ from dataclasses import dataclass, field
 import structlog
 import numpy as np
 import torch
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Metrics Tracking System for Key Messages ML Pipeline
+Provides comprehensive metric logging and aggregation capabilities
+"""
+
 
 logger = structlog.get_logger(__name__)
 
@@ -21,7 +29,7 @@ class MetricValue:
     step: int
     timestamp: float
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.timestamp is None:
             self.timestamp = time.time()
 
@@ -88,7 +96,7 @@ class MetricAggregator:
             'count': len(self.values)
         }
     
-    def clear(self):
+    def clear(self) -> Any:
         """Clear all values."""
         self.values.clear()
 
@@ -96,7 +104,9 @@ class MetricLogger:
     """Logs metrics with different aggregation strategies."""
     
     def __init__(self, log_frequency: int = 1):
-        self.log_frequency = log_frequency
+        
+    """__init__ function."""
+self.log_frequency = log_frequency
         self.metrics: Dict[str, MetricAggregator] = defaultdict(lambda: MetricAggregator())
         self.last_log_step = -1
         
@@ -142,7 +152,7 @@ class MetricLogger:
         """Get summaries for all metrics."""
         return {name: aggregator.get_summary() for name, aggregator in self.metrics.items()}
     
-    def clear_metrics(self):
+    def clear_metrics(self) -> Any:
         """Clear all metrics."""
         for aggregator in self.metrics.values():
             aggregator.clear()
@@ -151,7 +161,9 @@ class MetricsTracker:
     """Comprehensive metrics tracking system."""
     
     def __init__(self, log_frequency: int = 1, window_size: int = 100):
-        self.log_frequency = log_frequency
+        
+    """__init__ function."""
+self.log_frequency = log_frequency
         self.window_size = window_size
         self.metric_logger = MetricLogger(log_frequency)
         self.metrics: Dict[str, MetricAggregator] = defaultdict(lambda: MetricAggregator(window_size))
@@ -313,7 +325,7 @@ class MetricsTracker:
         """Get image logs for a metric."""
         return self.image_logs.get(name, [])
     
-    def step_metrics(self):
+    def step_metrics(self) -> Any:
         """Increment the step counter."""
         self.step += 1
     
@@ -321,7 +333,7 @@ class MetricsTracker:
         """Set the current step."""
         self.step = step
     
-    def clear_metrics(self):
+    def clear_metrics(self) -> Any:
         """Clear all metrics."""
         for aggregator in self.metrics.values():
             aggregator.clear()
@@ -394,20 +406,22 @@ class TrainingMetricsTracker(MetricsTracker):
     """Specialized metrics tracker for training."""
     
     def __init__(self, log_frequency: int = 1, window_size: int = 100):
-        super().__init__(log_frequency, window_size)
+        
+    """__init__ function."""
+super().__init__(log_frequency, window_size)
         self.epoch = 0
         self.best_metrics: Dict[str, float] = {}
         
         # Register common training metrics
         self._register_training_metrics()
     
-    def _register_training_metrics(self):
+    def _register_training_metrics(self) -> Any:
         """Register common training metrics."""
         # Learning rate tracking
         self.register_custom_metric("learning_rate", lambda optimizer: optimizer.param_groups[0]['lr'])
         
         # Gradient norm tracking
-        def compute_grad_norm(model):
+        def compute_grad_norm(model) -> Any:
             total_norm = 0
             for p in model.parameters():
                 if p.grad is not None:
@@ -487,7 +501,7 @@ class TrainingMetricsTracker(MetricsTracker):
         """Get the best metrics achieved."""
         return self.best_metrics.copy()
     
-    def reset_epoch(self):
+    def reset_epoch(self) -> Any:
         """Reset epoch counter."""
         self.epoch = 0
         self.best_metrics.clear() 

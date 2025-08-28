@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import pytest
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+import numpy as np
+from PIL import Image, ImageDraw
+from pathlib import Path
+import tempfile
+import shutil
+import time
+from unittest.mock import Mock, patch, AsyncMock
+from diffusion_processes import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Tests for Forward and Reverse Diffusion Processes
 ==============================================================
@@ -20,21 +43,8 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import pytest
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-import numpy as np
-from PIL import Image, ImageDraw
-from pathlib import Path
-import tempfile
-import shutil
-import time
-from unittest.mock import Mock, patch, AsyncMock
 
 # Import our diffusion processes
-from diffusion_processes import (
     DiffusionProcesses, SecurityDiffusionProcesses, DiffusionConfig,
     DiffusionSchedule, NoiseSchedule, DiffusionVisualizer,
     ForwardDiffusionResult, ReverseDiffusionResult
@@ -44,7 +54,7 @@ from diffusion_processes import (
 class TestDiffusionConfig:
     """Test suite for DiffusionConfig."""
     
-    def test_default_configuration(self):
+    def test_default_configuration(self) -> Any:
         """Test default configuration values."""
         config = DiffusionConfig()
         
@@ -58,7 +68,7 @@ class TestDiffusionConfig:
         assert config.prediction_type == "epsilon"
         assert config.clip_sample is False
     
-    def test_custom_configuration(self):
+    def test_custom_configuration(self) -> Any:
         """Test custom configuration values."""
         config = DiffusionConfig(
             num_timesteps=500,
@@ -95,7 +105,7 @@ class TestDiffusionProcesses:
     """Test suite for DiffusionProcesses."""
     
     @pytest.fixture
-    def diffusion_process(self):
+    def diffusion_process(self) -> Any:
         """Create a diffusion process instance for testing."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -106,11 +116,11 @@ class TestDiffusionProcesses:
         return DiffusionProcesses(config)
     
     @pytest.fixture
-    def test_image(self):
+    def test_image(self) -> Any:
         """Create a test image tensor."""
         return torch.randn(1, 3, 32, 32)  # Batch, Channels, Height, Width
     
-    def test_initialization(self, diffusion_process):
+    def test_initialization(self, diffusion_process) -> Any:
         """Test diffusion process initialization."""
         assert diffusion_process is not None
         assert hasattr(diffusion_process, 'config')
@@ -121,12 +131,12 @@ class TestDiffusionProcesses:
         assert hasattr(diffusion_process, 'variance')
         assert hasattr(diffusion_process, 'log_variance')
     
-    def test_device_detection(self, diffusion_process):
+    def test_device_detection(self, diffusion_process) -> Any:
         """Test device detection logic."""
         device = diffusion_process._detect_device()
         assert device in [torch.device('cpu'), torch.device('cuda'), torch.device('mps')]
     
-    def test_noise_schedule_linear(self):
+    def test_noise_schedule_linear(self) -> Any:
         """Test linear noise schedule."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -144,7 +154,7 @@ class TestDiffusionProcesses:
         assert torch.all(betas >= 0)
         assert torch.all(betas <= 1)
     
-    def test_noise_schedule_cosine(self):
+    def test_noise_schedule_cosine(self) -> Any:
         """Test cosine noise schedule."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -164,7 +174,7 @@ class TestDiffusionProcesses:
         linear_betas = torch.linspace(0.0001, 0.02, 100)
         assert not torch.allclose(betas, linear_betas, atol=1e-6)
     
-    def test_noise_schedule_quadratic(self):
+    def test_noise_schedule_quadratic(self) -> Any:
         """Test quadratic noise schedule."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -180,7 +190,7 @@ class TestDiffusionProcesses:
         assert torch.all(betas >= 0)
         assert torch.all(betas <= 1)
     
-    def test_noise_schedule_sigmoid(self):
+    def test_noise_schedule_sigmoid(self) -> Any:
         """Test sigmoid noise schedule."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -196,7 +206,7 @@ class TestDiffusionProcesses:
         assert torch.all(betas >= 0)
         assert torch.all(betas <= 1)
     
-    def test_invalid_schedule(self):
+    def test_invalid_schedule(self) -> Any:
         """Test error handling for invalid schedule."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -208,7 +218,7 @@ class TestDiffusionProcesses:
         with pytest.raises(Exception):
             DiffusionProcesses(config)
     
-    def test_forward_diffusion_basic(self, diffusion_process, test_image):
+    def test_forward_diffusion_basic(self, diffusion_process, test_image) -> Any:
         """Test basic forward diffusion process."""
         t = 50
         result = diffusion_process.forward_diffusion(test_image, t)
@@ -221,7 +231,7 @@ class TestDiffusionProcesses:
         assert 0 <= result.beta <= 1
         assert result.processing_time >= 0
     
-    def test_forward_diffusion_tensor_timestep(self, diffusion_process, test_image):
+    def test_forward_diffusion_tensor_timestep(self, diffusion_process, test_image) -> Any:
         """Test forward diffusion with tensor timestep."""
         t = torch.tensor([50], device=diffusion_process.device)
         result = diffusion_process.forward_diffusion(test_image, t)
@@ -230,7 +240,7 @@ class TestDiffusionProcesses:
         assert result.noisy_image.shape == test_image.shape
         assert result.timestep == [50]  # Should be a list for tensor input
     
-    def test_forward_diffusion_custom_noise(self, diffusion_process, test_image):
+    def test_forward_diffusion_custom_noise(self, diffusion_process, test_image) -> Any:
         """Test forward diffusion with custom noise."""
         t = 50
         custom_noise = torch.randn_like(test_image)
@@ -240,7 +250,7 @@ class TestDiffusionProcesses:
         assert isinstance(result, ForwardDiffusionResult)
         assert torch.allclose(result.noise, custom_noise)
     
-    def test_forward_diffusion_mathematical_properties(self, diffusion_process, test_image):
+    def test_forward_diffusion_mathematical_properties(self, diffusion_process, test_image) -> Any:
         """Test mathematical properties of forward diffusion."""
         t = 50
         result = diffusion_process.forward_diffusion(test_image, t)
@@ -252,7 +262,7 @@ class TestDiffusionProcesses:
         expected_noisy = sqrt_alpha_bar * test_image + sqrt_one_minus_alpha_bar * result.noise
         assert torch.allclose(result.noisy_image, expected_noisy, atol=1e-6)
     
-    def test_reverse_diffusion_step_basic(self, diffusion_process, test_image):
+    def test_reverse_diffusion_step_basic(self, diffusion_process, test_image) -> Any:
         """Test basic reverse diffusion step."""
         # First add noise
         forward_result = diffusion_process.forward_diffusion(test_image, 50)
@@ -271,7 +281,7 @@ class TestDiffusionProcesses:
         assert 0 <= result.beta <= 1
         assert result.processing_time >= 0
     
-    def test_reverse_diffusion_epsilon_prediction(self, diffusion_process, test_image):
+    def test_reverse_diffusion_epsilon_prediction(self, diffusion_process, test_image) -> Any:
         """Test reverse diffusion with epsilon prediction."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -290,7 +300,7 @@ class TestDiffusionProcesses:
         # Should recover original image approximately
         assert torch.allclose(result.denoised_image, test_image, atol=0.1)
     
-    def test_reverse_diffusion_v_prediction(self, diffusion_process, test_image):
+    def test_reverse_diffusion_v_prediction(self, diffusion_process, test_image) -> Any:
         """Test reverse diffusion with v prediction."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -309,7 +319,7 @@ class TestDiffusionProcesses:
         assert isinstance(result, ReverseDiffusionResult)
         assert result.denoised_image.shape == x_t.shape
     
-    def test_reverse_diffusion_sample_prediction(self, diffusion_process, test_image):
+    def test_reverse_diffusion_sample_prediction(self, diffusion_process, test_image) -> Any:
         """Test reverse diffusion with sample prediction."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -328,7 +338,7 @@ class TestDiffusionProcesses:
         assert isinstance(result, ReverseDiffusionResult)
         assert result.denoised_image.shape == x_t.shape
     
-    def test_reverse_diffusion_invalid_prediction_type(self, diffusion_process, test_image):
+    def test_reverse_diffusion_invalid_prediction_type(self, diffusion_process, test_image) -> Any:
         """Test error handling for invalid prediction type."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -343,7 +353,7 @@ class TestDiffusionProcesses:
         with pytest.raises(ValueError):
             diffusion_process.reverse_diffusion_step(x_t, 50, predicted_noise)
     
-    def test_reverse_diffusion_stochastic(self, diffusion_process, test_image):
+    def test_reverse_diffusion_stochastic(self, diffusion_process, test_image) -> Any:
         """Test stochastic reverse diffusion."""
         forward_result = diffusion_process.forward_diffusion(test_image, 50)
         x_t = forward_result.noisy_image
@@ -358,7 +368,7 @@ class TestDiffusionProcesses:
         # Results should be different for stochastic sampling
         assert not torch.allclose(result_det.denoised_image, result_stoch.denoised_image)
     
-    def test_sample_trajectory(self, diffusion_process, test_image):
+    def test_sample_trajectory(self, diffusion_process, test_image) -> Any:
         """Test sampling forward diffusion trajectory."""
         trajectory = diffusion_process.sample_trajectory(test_image, num_steps=5)
         
@@ -370,7 +380,7 @@ class TestDiffusionProcesses:
             assert result.noisy_image.shape == test_image.shape
             assert result.timestep >= 0
     
-    def test_denoise_trajectory(self, diffusion_process, test_image):
+    def test_denoise_trajectory(self, diffusion_process, test_image) -> Any:
         """Test sampling reverse diffusion trajectory."""
         # Create noisy image
         forward_result = diffusion_process.forward_diffusion(test_image, 99)
@@ -390,7 +400,7 @@ class TestDiffusionProcesses:
             assert result.denoised_image.shape == x_T.shape
             assert result.timestep >= 0
     
-    def test_get_noise_schedule_info(self, diffusion_process):
+    def test_get_noise_schedule_info(self, diffusion_process) -> Optional[Dict[str, Any]]:
         """Test getting noise schedule information."""
         info = diffusion_process.get_noise_schedule_info()
         
@@ -418,7 +428,7 @@ class TestSecurityDiffusionProcesses:
     """Test suite for SecurityDiffusionProcesses."""
     
     @pytest.fixture
-    def security_diffusion(self):
+    def security_diffusion(self) -> Any:
         """Create a security diffusion process instance for testing."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -429,11 +439,11 @@ class TestSecurityDiffusionProcesses:
         return SecurityDiffusionProcesses(config)
     
     @pytest.fixture
-    def test_image(self):
+    def test_image(self) -> Any:
         """Create a test image tensor."""
         return torch.randn(1, 3, 32, 32)
     
-    def test_initialization(self, security_diffusion):
+    def test_initialization(self, security_diffusion) -> Any:
         """Test security diffusion process initialization."""
         assert isinstance(security_diffusion, SecurityDiffusionProcesses)
         assert hasattr(security_diffusion, 'security_noise_scale')
@@ -441,7 +451,7 @@ class TestSecurityDiffusionProcesses:
         assert security_diffusion.security_noise_scale == 1.0
         assert security_diffusion.privacy_preserving is False
     
-    def test_forward_diffusion_with_privacy(self, security_diffusion, test_image):
+    def test_forward_diffusion_with_privacy(self, security_diffusion, test_image) -> Any:
         """Test privacy-preserving forward diffusion."""
         # Test different privacy levels
         for privacy_level in [0.0, 0.5, 1.0]:
@@ -457,7 +467,7 @@ class TestSecurityDiffusionProcesses:
                 noise_norm = torch.norm(result.noise).item()
                 assert noise_norm > 0
     
-    def test_security_aware_denoising(self, security_diffusion, test_image):
+    def test_security_aware_denoising(self, security_diffusion, test_image) -> Any:
         """Test security-aware denoising."""
         # Create noisy image
         forward_result = security_diffusion.forward_diffusion(test_image, 50)
@@ -485,13 +495,13 @@ class TestDiffusionVisualizer:
     """Test suite for DiffusionVisualizer."""
     
     @pytest.fixture
-    def visualizer(self):
+    def visualizer(self) -> Any:
         """Create a visualizer instance for testing."""
         with tempfile.TemporaryDirectory() as temp_dir:
             return DiffusionVisualizer(temp_dir)
     
     @pytest.fixture
-    def diffusion_process(self):
+    def diffusion_process(self) -> Any:
         """Create a diffusion process for testing."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -501,13 +511,13 @@ class TestDiffusionVisualizer:
         )
         return DiffusionProcesses(config)
     
-    def test_initialization(self, visualizer):
+    def test_initialization(self, visualizer) -> Any:
         """Test visualizer initialization."""
         assert visualizer is not None
         assert hasattr(visualizer, 'output_dir')
         assert visualizer.output_dir.exists()
     
-    def test_plot_noise_schedule(self, visualizer, diffusion_process):
+    def test_plot_noise_schedule(self, visualizer, diffusion_process) -> Any:
         """Test plotting noise schedule."""
         # This test might fail if matplotlib is not available
         try:
@@ -520,7 +530,7 @@ class TestDiffusionVisualizer:
         except ImportError:
             pytest.skip("matplotlib not available")
     
-    def test_plot_diffusion_trajectory(self, visualizer, diffusion_process):
+    def test_plot_diffusion_trajectory(self, visualizer, diffusion_process) -> Any:
         """Test plotting diffusion trajectory."""
         # Create test trajectory
         test_image = torch.randn(1, 3, 32, 32)
@@ -536,7 +546,7 @@ class TestDiffusionVisualizer:
         except ImportError:
             pytest.skip("matplotlib not available")
     
-    def test_plot_denoising_trajectory(self, visualizer, diffusion_process):
+    def test_plot_denoising_trajectory(self, visualizer, diffusion_process) -> Any:
         """Test plotting denoising trajectory."""
         # Create test trajectory
         test_image = torch.randn(1, 3, 32, 32)
@@ -561,7 +571,7 @@ class TestDiffusionVisualizer:
 class TestForwardDiffusionResult:
     """Test suite for ForwardDiffusionResult."""
     
-    def test_forward_diffusion_result_creation(self):
+    def test_forward_diffusion_result_creation(self) -> Any:
         """Test ForwardDiffusionResult creation."""
         noisy_image = torch.randn(1, 3, 32, 32)
         noise = torch.randn(1, 3, 32, 32)
@@ -584,7 +594,7 @@ class TestForwardDiffusionResult:
         assert result.alpha_bar == 0.8
         assert result.processing_time == 0.1
     
-    def test_forward_diffusion_result_defaults(self):
+    def test_forward_diffusion_result_defaults(self) -> Any:
         """Test ForwardDiffusionResult with default values."""
         noisy_image = torch.randn(1, 3, 32, 32)
         noise = torch.randn(1, 3, 32, 32)
@@ -604,7 +614,7 @@ class TestForwardDiffusionResult:
 class TestReverseDiffusionResult:
     """Test suite for ReverseDiffusionResult."""
     
-    def test_reverse_diffusion_result_creation(self):
+    def test_reverse_diffusion_result_creation(self) -> Any:
         """Test ReverseDiffusionResult creation."""
         denoised_image = torch.randn(1, 3, 32, 32)
         predicted_noise = torch.randn(1, 3, 32, 32)
@@ -627,7 +637,7 @@ class TestReverseDiffusionResult:
         assert result.alpha_bar == 0.8
         assert result.processing_time == 0.1
     
-    def test_reverse_diffusion_result_defaults(self):
+    def test_reverse_diffusion_result_defaults(self) -> Any:
         """Test ReverseDiffusionResult with default values."""
         denoised_image = torch.randn(1, 3, 32, 32)
         predicted_noise = torch.randn(1, 3, 32, 32)
@@ -648,7 +658,7 @@ class TestIntegration:
     """Integration tests for diffusion processes."""
     
     @pytest.fixture
-    def diffusion_process(self):
+    def diffusion_process(self) -> Any:
         """Create a diffusion process for integration testing."""
         config = DiffusionConfig(
             num_timesteps=100,
@@ -658,7 +668,7 @@ class TestIntegration:
         )
         return DiffusionProcesses(config)
     
-    def test_end_to_end_diffusion(self, diffusion_process):
+    def test_end_to_end_diffusion(self, diffusion_process) -> Any:
         """Test end-to-end forward and reverse diffusion."""
         # Create test image
         test_image = torch.randn(1, 3, 32, 32)
@@ -675,7 +685,7 @@ class TestIntegration:
         # Should recover original image approximately
         assert torch.allclose(reverse_result.denoised_image, test_image, atol=0.1)
     
-    def test_trajectory_consistency(self, diffusion_process):
+    def test_trajectory_consistency(self, diffusion_process) -> Any:
         """Test consistency of forward and reverse trajectories."""
         test_image = torch.randn(1, 3, 32, 32)
         
@@ -699,5 +709,6 @@ class TestIntegration:
             assert fwd.timestep >= rev.timestep
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+import fastapi_users_db_sqlalchemy
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Milestone
 
 Revision ID: 91a0a4d62b14
@@ -6,10 +25,6 @@ Create Date: 2024-12-13 19:03:30.947551
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-import fastapi_users_db_sqlalchemy
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "91a0a4d62b14"
@@ -26,6 +41,16 @@ def upgrade() -> None:
         sa.Column(
             "user_id",
             fastapi_users_db_sqlalchemy.generics.GUID(),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             nullable=True,
         ),
         sa.Column("event_type", sa.String(), nullable=False),

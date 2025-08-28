@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.configs.app_configs import AVERAGE_SUMMARY_EMBEDDINGS
 from onyx.configs.app_configs import BLURB_SIZE
 from onyx.configs.app_configs import LARGE_CHUNK_RATIO
@@ -10,8 +12,6 @@ from onyx.configs.constants import RETURN_SEPARATOR
 from onyx.configs.constants import SECTION_SEPARATOR
 from onyx.configs.model_configs import DOC_EMBEDDING_CONTEXT_SIZE
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import (
-    get_metadata_keys_to_ignore,
-)
 from onyx.connectors.models import IndexingDocument
 from onyx.connectors.models import Section
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
@@ -22,6 +22,12 @@ from onyx.utils.logger import setup_logger
 from onyx.utils.text_processing import clean_text
 from onyx.utils.text_processing import shared_precompare_cleanup
 from shared_configs.configs import STRICT_CHUNK_TOKEN_LIMIT
+        from llama_index.core.node_parser import SentenceSplitter
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_metadata_keys_to_ignore,
+)
 
 # Not supporting overlaps, we need a clean combination of chunks and it is unclear if overlaps
 # actually help quality at all
@@ -136,7 +142,6 @@ class Chunker:
         callback: IndexingHeartbeatInterface | None = None,
     ) -> None:
         # importing llama_index uses a lot of RAM, so we only import it when needed.
-        from llama_index.core.node_parser import SentenceSplitter
 
         self.include_metadata = include_metadata
         self.chunk_token_limit = chunk_token_limit

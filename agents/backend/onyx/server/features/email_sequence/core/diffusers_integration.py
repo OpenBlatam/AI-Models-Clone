@@ -1,10 +1,10 @@
-"""
-Diffusers Library Integration for Email Sequence System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Advanced integration with Hugging Face Diffusers library for state-of-the-art
-diffusion model implementations, including text-to-text, text-to-image,
-and sequence generation capabilities.
-"""
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import logging
@@ -13,13 +13,30 @@ from dataclasses import dataclass
 import math
 import random
 from pathlib import Path
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import numpy as np
 from diffusers import (
+from transformers import (
+import accelerate
+from accelerate import Accelerator
+import safetensors.torch
+from ..models.sequence import EmailSequence, SequenceStep
+from ..models.subscriber import Subscriber
+from ..models.template import EmailTemplate
+        from {subscriber.company}. Their interests include: {', '.join(subscriber.interests)}.
+from typing import Any, List, Dict, Optional
+"""
+Diffusers Library Integration for Email Sequence System
+
+Advanced integration with Hugging Face Diffusers library for state-of-the-art
+diffusion model implementations, including text-to-text, text-to-image,
+and sequence generation capabilities.
+"""
+
+
     # Core diffusion components
     DiffusionPipeline,
     StableDiffusionPipeline,
@@ -83,7 +100,6 @@ from diffusers import (
     # Utilities
     logging as diffusers_logging
 )
-from transformers import (
     CLIPTextModel,
     CLIPTokenizer,
     T5EncoderModel,
@@ -91,13 +107,7 @@ from transformers import (
     AutoTokenizer,
     AutoModel
 )
-import accelerate
-from accelerate import Accelerator
-import safetensors.torch
 
-from ..models.sequence import EmailSequence, SequenceStep
-from ..models.subscriber import Subscriber
-from ..models.template import EmailTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -152,7 +162,9 @@ class DiffusersTextGenerator:
     """Text generation using Diffusers library"""
     
     def __init__(self, config: DiffusersConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.device = torch.device(config.device)
         
         # Initialize text generation pipeline
@@ -160,7 +172,7 @@ class DiffusersTextGenerator:
         
         logger.info("Diffusers Text Generator initialized")
     
-    def _load_text_pipeline(self):
+    def _load_text_pipeline(self) -> Any:
         """Load text generation pipeline"""
         try:
             # For text generation, we'll use a custom approach with diffusers components
@@ -231,7 +243,9 @@ class DiffusersImageGenerator:
     """Image generation using Diffusers library"""
     
     def __init__(self, config: DiffusersConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.device = torch.device(config.device)
         
         # Initialize image generation pipeline
@@ -242,7 +256,7 @@ class DiffusersImageGenerator:
         
         logger.info("Diffusers Image Generator initialized")
     
-    def _load_image_pipeline(self):
+    def _load_image_pipeline(self) -> Any:
         """Load image generation pipeline"""
         try:
             pipeline = StableDiffusionPipeline.from_pretrained(
@@ -275,7 +289,7 @@ class DiffusersImageGenerator:
             logger.error(f"Failed to load image pipeline: {e}")
             raise
     
-    def _load_scheduler(self):
+    def _load_scheduler(self) -> Any:
         """Load and configure scheduler"""
         
         scheduler_map = {
@@ -338,7 +352,9 @@ class DiffusersSequenceGenerator:
     """Sequence generation using Diffusers library"""
     
     def __init__(self, config: DiffusersConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.device = torch.device(config.device)
         
         # Initialize generators
@@ -503,7 +519,6 @@ class DiffusersSequenceGenerator:
         
         prompt = f"""
         Create an email {step_desc} for {subscriber.first_name} {subscriber.last_name} 
-        from {subscriber.company}. Their interests include: {', '.join(subscriber.interests)}.
         
         Template: {template.name}
         Category: {template.category}

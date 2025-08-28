@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import inspect
+import logging
+import time
+from typing import Dict, List, Optional, Any, Tuple
+from dataclasses import dataclass, field
+from enum import Enum
+from ..core.exceptions import ValidationError, PluginError
+from ..core.types import PluginInfo
+from .base import BasePlugin
+        import re
+from typing import Any, List, Dict, Optional
 """
 Plugin Validator - Comprehensive Plugin Validation System
 
@@ -9,17 +23,7 @@ This module provides robust validation for plugins including:
 - Detailed validation reports
 """
 
-import asyncio
-import inspect
-import logging
-import time
-from typing import Dict, List, Optional, Any, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
 
-from ..core.exceptions import ValidationError, PluginError
-from ..core.types import PluginInfo
-from .base import BasePlugin
 
 logger = logging.getLogger(__name__)
 
@@ -97,7 +101,9 @@ class PluginValidator:
     """
     
     def __init__(self, validation_level: ValidationLevel = ValidationLevel.STANDARD):
-        self.validation_level = validation_level
+        
+    """__init__ function."""
+self.validation_level = validation_level
         self.validation_stats = {
             'total_validations': 0,
             'passed_validations': 0,
@@ -444,7 +450,6 @@ class PluginValidator:
     
     def _is_valid_version(self, version: str) -> bool:
         """Check if version string follows semantic versioning."""
-        import re
         pattern = r'^\d+\.\d+\.\d+(\-[a-zA-Z0-9\-\.]+)?(\+[a-zA-Z0-9\-\.]+)?$'
         return bool(re.match(pattern, version))
     

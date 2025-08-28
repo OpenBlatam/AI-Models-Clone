@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import os
 from collections.abc import Iterable
 from datetime import datetime
@@ -13,8 +18,6 @@ from onyx.configs.app_configs import JIRA_CONNECTOR_LABELS_TO_SKIP
 from onyx.configs.app_configs import JIRA_CONNECTOR_MAX_TICKET_SIZE
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import (
-    is_atlassian_date_error,
-)
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import time_str_to_utc
 from onyx.connectors.exceptions import ConnectorValidationError
 from onyx.connectors.exceptions import CredentialExpiredError
@@ -39,6 +42,12 @@ from onyx.connectors.onyx_jira.utils import extract_text_from_adf
 from onyx.connectors.onyx_jira.utils import get_comment_strs
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.logger import setup_logger
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    is_atlassian_date_error,
+)
 
 
 logger = setup_logger()
@@ -389,7 +398,6 @@ class JiraConnector(CheckpointedConnector[JiraConnectorCheckpoint], SlimConnecto
 
 
 if __name__ == "__main__":
-    import os
 
     connector = JiraConnector(
         jira_base_url=os.environ["JIRA_BASE_URL"],

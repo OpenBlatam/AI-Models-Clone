@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy import delete
 from sqlalchemy import or_
 from sqlalchemy import select
@@ -24,6 +26,9 @@ from onyx.server.manage.llm.models import LLMProviderView
 from shared_configs.enums import EmbeddingProvider
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def update_group_llm_provider_relationships__no_commit(
     llm_provider_id: int,
     group_ids: list[int] | None,
@@ -129,13 +134,13 @@ def upsert_llm_provider(
     return full_llm_provider
 
 
-def fetch_existing_embedding_providers(
+async def fetch_existing_embedding_providers(
     db_session: Session,
 ) -> list[CloudEmbeddingProviderModel]:
     return list(db_session.scalars(select(CloudEmbeddingProviderModel)).all())
 
 
-def fetch_existing_doc_sets(
+async def fetch_existing_doc_sets(
     db_session: Session, doc_ids: list[int]
 ) -> list[DocumentSet]:
     return list(
@@ -143,13 +148,13 @@ def fetch_existing_doc_sets(
     )
 
 
-def fetch_existing_tools(db_session: Session, tool_ids: list[int]) -> list[ToolModel]:
+async def fetch_existing_tools(db_session: Session, tool_ids: list[int]) -> list[ToolModel]:
     return list(
         db_session.scalars(select(ToolModel).where(ToolModel.id.in_(tool_ids))).all()
     )
 
 
-def fetch_existing_llm_providers(
+async def fetch_existing_llm_providers(
     db_session: Session,
     only_public: bool = False,
 ) -> list[LLMProviderModel]:
@@ -161,7 +166,7 @@ def fetch_existing_llm_providers(
     return list(db_session.scalars(stmt).all())
 
 
-def fetch_existing_llm_provider(
+async def fetch_existing_llm_provider(
     name: str, db_session: Session
 ) -> LLMProviderModel | None:
     provider_model = db_session.scalar(
@@ -173,7 +178,7 @@ def fetch_existing_llm_provider(
     return provider_model
 
 
-def fetch_existing_llm_providers_for_user(
+async def fetch_existing_llm_providers_for_user(
     db_session: Session,
     user: User | None = None,
 ) -> list[LLMProviderModel]:
@@ -205,7 +210,7 @@ def fetch_existing_llm_providers_for_user(
     return list(db_session.scalars(stmt).all())
 
 
-def fetch_embedding_provider(
+async def fetch_embedding_provider(
     db_session: Session, provider_type: EmbeddingProvider
 ) -> CloudEmbeddingProviderModel | None:
     return db_session.scalar(
@@ -215,7 +220,7 @@ def fetch_embedding_provider(
     )
 
 
-def fetch_default_provider(db_session: Session) -> LLMProviderView | None:
+async def fetch_default_provider(db_session: Session) -> LLMProviderView | None:
     provider_model = db_session.scalar(
         select(LLMProviderModel)
         .where(LLMProviderModel.is_default_provider == True)  # noqa: E712
@@ -226,7 +231,7 @@ def fetch_default_provider(db_session: Session) -> LLMProviderView | None:
     return LLMProviderView.from_model(provider_model)
 
 
-def fetch_default_vision_provider(db_session: Session) -> LLMProviderView | None:
+async def fetch_default_vision_provider(db_session: Session) -> LLMProviderView | None:
     provider_model = db_session.scalar(
         select(LLMProviderModel)
         .where(LLMProviderModel.is_default_vision_provider == True)  # noqa: E712
@@ -237,7 +242,7 @@ def fetch_default_vision_provider(db_session: Session) -> LLMProviderView | None
     return LLMProviderView.from_model(provider_model)
 
 
-def fetch_llm_provider_view(
+async def fetch_llm_provider_view(
     db_session: Session, provider_name: str
 ) -> LLMProviderView | None:
     provider_model = fetch_existing_llm_provider(

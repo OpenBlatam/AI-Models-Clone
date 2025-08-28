@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import cast
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.orm import Session
+from onyx.key_value_store.factory import get_kv_store
+from onyx.db.models import SlackBot
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add_multiple_slack_bot_support
 
 Revision ID: 4ee1287bd26a
@@ -6,17 +18,10 @@ Create Date: 2024-11-06 13:15:53.302644
 
 """
 
-from typing import cast
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.orm import Session
-from onyx.key_value_store.factory import get_kv_store
-from onyx.db.models import SlackBot
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "4ee1287bd26a"
-down_revision = "47e5bef3a1d7"
+revision: str = "4ee1287bd26a"
+down_revision: str = "47e5bef3a1d7"
 branch_labels: None = None
 depends_on: None = None
 
@@ -65,7 +70,7 @@ def upgrade() -> None:
     try:
         tokens = cast(dict, get_kv_store().load("slack_bot_tokens_config_key"))
     except Exception:
-        tokens = {}
+        tokens: Dict[str, Any] = {}
 
     bot_token = tokens.get("bot_token")
     app_token = tokens.get("app_token")
@@ -73,7 +78,7 @@ def upgrade() -> None:
     if bot_token and app_token:
         session = Session(bind=op.get_bind())
         new_slack_bot = SlackBot(
-            name="Slack Bot (Migrated)",
+            name: str = "Slack Bot (Migrated)",
             enabled=True,
             bot_token=bot_token,
             app_token=app_token,
@@ -109,7 +114,7 @@ def upgrade() -> None:
 
     # CTE (Common Table Expression) that transforms the old slack_bot_config table data
     # This splits up the channel_names into their own rows
-    channel_names_cte = """
+    channel_names_cte: str = """
         WITH channel_names AS (
             SELECT
                 sbc.id as config_id,
@@ -127,7 +132,7 @@ def upgrade() -> None:
     """
 
     # Insert the channel names into the new slack_channel_config table
-    insert_statement = """
+    insert_statement: str = """
         INSERT INTO slack_channel_config (
             slack_bot_id,
             persona_id,
@@ -174,7 +179,7 @@ def upgrade() -> None:
     op.alter_column(
         "slack_channel_config__standard_answer_category",
         "slack_bot_config_id",
-        new_column_name="slack_channel_config_id",
+        new_column_name: str = "slack_channel_config_id",
     )
 
     # Drop the table with CASCADE to handle dependent objects
@@ -240,7 +245,7 @@ def downgrade() -> None:
     op.alter_column(
         "slack_bot_config__standard_answer_category",
         "slack_channel_config_id",
-        new_column_name="slack_bot_config_id",
+        new_column_name: str = "slack_bot_config_id",
     )
 
     # Try to save the first bot's tokens back to KV store
@@ -255,7 +260,7 @@ def downgrade() -> None:
             .first()
         )
         if first_bot and first_bot.bot_token and first_bot.app_token:
-            tokens = {
+            tokens: Dict[str, Any] = {
                 "bot_token": first_bot.bot_token,
                 "app_token": first_bot.app_token,
             }

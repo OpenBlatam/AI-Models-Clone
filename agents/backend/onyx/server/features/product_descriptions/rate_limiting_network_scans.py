@@ -1,7 +1,16 @@
-"""
-Rate Limiting and Back-off System for Network Scans
-Implements intelligent rate limiting, back-off strategies, and detection avoidance
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import time
@@ -27,6 +36,15 @@ from pydantic import BaseModel, Field, field_validator
 import redis.asyncio as redis
 from roro_models import ScanRequestModel, ScanResponseModel, ErrorModel, ScanType, RateLimitType, BackoffStrategy
 from middleware.centralized import CentralizedMiddleware
+        import re
+from fastapi import APIRouter
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Rate Limiting and Back-off System for Network Scans
+Implements intelligent rate limiting, back-off strategies, and detection avoidance
+"""
+
 
 class ScanType(Enum):
     """Types of network scans"""
@@ -98,7 +116,7 @@ class NetworkTarget:
     failure_count: int = 0
     response_time: Optional[float] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if isinstance(self.host, str):
             self.host = self.host.strip()
 
@@ -117,7 +135,9 @@ class RateLimiter:
     """Base rate limiter class"""
     
     def __init__(self, config: RateLimitConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.logger = logging.getLogger(__name__)
         self.request_history = deque(maxlen=1000)
         self.last_request_time = 0.0
@@ -126,7 +146,7 @@ class RateLimiter:
         """Acquire permission to make a request"""
         raise NotImplementedError
     
-    async def release(self):
+    async def release(self) -> Any:
         """Release the rate limit after request completion"""
         pass
     
@@ -145,7 +165,9 @@ class FixedRateLimiter(RateLimiter):
     """Fixed rate limiter with constant rate"""
     
     def __init__(self, config: RateLimitConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.min_interval = 1.0 / config.requests_per_second
     
     async def acquire(self) -> bool:
@@ -165,7 +187,9 @@ class AdaptiveRateLimiter(RateLimiter):
     """Adaptive rate limiter that adjusts based on success/failure rates"""
     
     def __init__(self, config: RateLimitConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.current_rate = config.requests_per_second
         self.success_history = deque(maxlen=100)
         self.failure_history = deque(maxlen=100)
@@ -202,12 +226,12 @@ class AdaptiveRateLimiter(RateLimiter):
         self.rate_history.append(self.current_rate)
         return True
     
-    def record_success(self):
+    def record_success(self) -> Any:
         """Record successful request"""
         self.success_history.append(1)
         self.failure_history.append(0)
     
-    def record_failure(self):
+    def record_failure(self) -> Any:
         """Record failed request"""
         self.success_history.append(0)
         self.failure_history.append(1)
@@ -216,7 +240,9 @@ class SlidingWindowRateLimiter(RateLimiter):
     """Sliding window rate limiter"""
     
     def __init__(self, config: RateLimitConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.window_size = config.window_size
         self.max_requests = config.requests_per_minute
     
@@ -242,7 +268,9 @@ class TokenBucketRateLimiter(RateLimiter):
     """Token bucket rate limiter"""
     
     def __init__(self, config: RateLimitConfig):
-        super().__init__(config)
+        
+    """__init__ function."""
+super().__init__(config)
         self.tokens = config.token_bucket_capacity
         self.capacity = config.token_bucket_capacity
         self.rate = config.token_bucket_rate
@@ -274,7 +302,9 @@ class BackoffManager:
     """Manages back-off strategies for failed requests"""
     
     def __init__(self, config: RateLimitConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.failure_counts = defaultdict(int)
         self.last_failure_times = defaultdict(float)
         self.fibonacci_sequence = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610]
@@ -331,7 +361,9 @@ class DetectionAvoidance:
     """Implements detection avoidance techniques"""
     
     def __init__(self, config: RateLimitConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.user_agents = [
             "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
             "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",
@@ -349,7 +381,7 @@ class DetectionAvoidance:
         else:
             return self.user_agents[self.current_user_agent_index]
     
-    def rotate_user_agent(self):
+    def rotate_user_agent(self) -> Any:
         """Rotate to next user agent"""
         if self.config.vary_user_agents:
             self.current_user_agent_index = (self.current_user_agent_index + 1) % len(self.user_agents)
@@ -389,7 +421,9 @@ class NetworkScanner:
     """Network scanner with rate limiting and back-off"""
     
     def __init__(self, config: RateLimitConfig, rate_limiter_type: RateLimitType = RateLimitType.ADAPTIVE):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.logger = logging.getLogger(__name__)
         
         # Initialize rate limiter
@@ -702,7 +736,6 @@ class NetworkScanner:
     
     def _extract_title(self, html_content: str) -> str:
         """Extract title from HTML content"""
-        import re
         title_match = re.search(r'<title>(.*?)</title>', html_content, re.IGNORECASE)
         return title_match.group(1) if title_match else ""
     
@@ -765,7 +798,6 @@ class NetworkScanner:
         }
 
 # FastAPI router
-from fastapi import APIRouter
 
 router = APIRouter(prefix="/network-scanner", tags=["Network Scanner"])
 
@@ -893,7 +925,6 @@ app.add_middleware(CentralizedMiddleware)
 app.include_router(router)
 
 if __name__ == "__main__":
-    import uvicorn
     print("Network Scanner with Rate Limiting")
     print("Access API at: http://localhost:8000")
     print("API Documentation at: http://localhost:8000/docs")

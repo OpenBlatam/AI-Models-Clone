@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+    from ml_models.core.models import UltraModelFactory
+    from ml_models.training.pipeline import UltraTrainingPipeline
+    from ml_models.api.endpoints import create_ultra_api
+    from .core.models import (
+    from .training.pipeline import UltraTrainingPipeline
+    from .api.endpoints import UltraProductAPI
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 ULTRA PRODUCT AI MODELS - CONSOLIDATED PACKAGE
 ================================================
@@ -13,9 +24,6 @@ Structure:
 - docs/: Documentation and summaries
 
 Usage:
-    from ml_models.core.models import UltraModelFactory
-    from ml_models.training.pipeline import UltraTrainingPipeline
-    from ml_models.api.endpoints import create_ultra_api
 """
 
 __version__ = "2.0.0"
@@ -23,7 +31,6 @@ __author__ = "Blatam Academy AI Team"
 
 # Core imports
 try:
-    from .core.models import (
         UltraModelFactory,
         UltraConfig,
         UltraMultiModalTransformer,
@@ -31,8 +38,6 @@ try:
         ProductGraphNN,
         ProductMAMLModel
     )
-    from .training.pipeline import UltraTrainingPipeline
-    from .api.endpoints import UltraProductAPI
     
     __all__ = [
         "UltraModelFactory",
@@ -73,7 +78,7 @@ def create_ultra_model(model_type: str = "multimodal", **kwargs):
         raise ValueError(f"Unknown model type: {model_type}")
 
 # Configuration shortcuts
-def get_ultra_config(**overrides):
+def get_ultra_config(**overrides) -> Optional[Dict[str, Any]]:
     """Get ultra configuration with overrides."""
     return UltraConfig(**overrides)
 

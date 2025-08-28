@@ -1,8 +1,10 @@
-"""
-Port Scanner
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Provides network port scanning and service detection capabilities.
-"""
+# Constants
+BUFFER_SIZE = 1024
 
 import socket
 import asyncio
@@ -12,6 +14,14 @@ from typing import Dict, Any, List, Optional, Tuple
 from pydantic import BaseModel, Field, validator
 from dataclasses import dataclass
 from concurrent.futures import ThreadPoolExecutor
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Port Scanner
+
+Provides network port scanning and service detection capabilities.
+"""
+
 
 class PortScanRequest(BaseModel):
     """Pydantic model for port scan request."""
@@ -20,7 +30,7 @@ class PortScanRequest(BaseModel):
     timeout: float = Field(default=1.0, ge=0.1, le=10.0, description="Connection timeout")
     
     @validator('target_host')
-    def validate_host(cls, v):
+    def validate_host(cls, v) -> bool:
         if not v:
             raise ValueError("Target host cannot be empty")
         return v
@@ -43,7 +53,7 @@ class PortRangeScanRequest(BaseModel):
     timeout: float = Field(default=1.0, ge=0.1, le=10.0)
     
     @validator('end_port')
-    def validate_port_range(cls, v, values):
+    def validate_port_range(cls, v, values) -> bool:
         if 'start_port' in values and v < values['start_port']:
             raise ValueError("End port must be greater than start port")
         return v

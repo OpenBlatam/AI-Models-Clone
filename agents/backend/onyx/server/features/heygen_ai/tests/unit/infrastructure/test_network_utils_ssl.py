@@ -2,7 +2,7 @@ import ssl as std_ssl
 from datetime import datetime, timedelta
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
@@ -46,7 +46,7 @@ async def test_check_ssl_certificate_success(monkeypatch):
         def __exit__(self, exc_type, exc, tb):
             return False
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     # Patch create_default_context and create_connection only
     monkeypatch.setattr(mod.ssl, "create_default_context", lambda: FakeContext())
     monkeypatch.setattr(mod.socket, "create_connection", lambda addr: FakeSocket())

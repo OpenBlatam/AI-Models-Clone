@@ -1,9 +1,10 @@
-"""
-🚀 FASTAPI MIDDLEWARE - AI VIDEO SYSTEM
-=======================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
-Middleware stack for the AI Video system.
-"""
+# Constants
+BUFFER_SIZE = 1024
 
 import time
 import json
@@ -12,6 +13,15 @@ from fastapi import Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from datetime import datetime
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+🚀 FASTAPI MIDDLEWARE - AI VIDEO SYSTEM
+=======================================
+
+Middleware stack for the AI Video system.
+"""
+
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -20,7 +30,7 @@ logger = logging.getLogger(__name__)
 # MIDDLEWARE STACK
 # ============================================================================
 
-def create_middleware_stack(app):
+def create_middleware_stack(app) -> Any:
     """
     Create and configure middleware stack.
     
@@ -46,7 +56,9 @@ def create_middleware_stack(app):
     # Performance monitoring middleware
     @app.middleware("http")
     async def performance_middleware(request: Request, call_next):
-        start_time = time.time()
+        
+    """performance_middleware function."""
+start_time = time.time()
         
         # Log request
         logger.info(
@@ -83,7 +95,9 @@ def create_middleware_stack(app):
     # Error handling middleware
     @app.middleware("http")
     async def error_handling_middleware(request: Request, call_next):
-        try:
+        
+    """error_handling_middleware function."""
+try:
             response = await call_next(request)
             return response
         except Exception as e:
@@ -111,7 +125,9 @@ def create_middleware_stack(app):
     # Request validation middleware
     @app.middleware("http")
     async def validation_middleware(request: Request, call_next):
-        # Validate request size
+        
+    """validation_middleware function."""
+# Validate request size
         content_length = request.headers.get("content-length")
         if content_length and int(content_length) > 10 * 1024 * 1024:  # 10MB limit
             return Response(
@@ -149,13 +165,13 @@ def create_middleware_stack(app):
 class SecurityMiddleware:
     """Custom security middleware."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         self.app = app
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         if scope["type"] == "http":
             # Add security headers
-            async def send_with_headers(message):
+            async def send_with_headers(message) -> Any:
                 if message["type"] == "http.response.start":
                     message["headers"].extend([
                         (b"X-Content-Type-Options", b"nosniff"),
@@ -172,16 +188,16 @@ class SecurityMiddleware:
 class LoggingMiddleware:
     """Custom logging middleware."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         self.app = app
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         if scope["type"] == "http":
             # Log request details
             logger.info(f"Request: {scope['method']} {scope['path']}")
             
             # Track response
-            async def send_with_logging(message):
+            async def send_with_logging(message) -> Any:
                 if message["type"] == "http.response.start":
                     logger.info(f"Response: {message['status']}")
                 await send(message)
@@ -205,7 +221,7 @@ def add_custom_headers(response: Response, headers: dict):
     for key, value in headers.items():
         response.headers[key] = str(value)
 
-def get_request_info(request: Request) -> dict:
+async def get_request_info(request: Request) -> dict:
     """
     Extract request information for logging.
     

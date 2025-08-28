@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from datetime import datetime
+from enum import Enum
+from typing import Dict, List, Optional
+from uuid import UUID
+from pydantic import Field, field_validator
+from .base import AggregateRoot
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Script Entity
 ============
@@ -5,14 +22,8 @@ Script Entity
 Script entity representing generated scripts with timing and synchronization data.
 """
 
-from datetime import datetime
-from enum import Enum
-from typing import Dict, List, Optional
-from uuid import UUID
 
-from pydantic import Field, field_validator
 
-from .base import AggregateRoot
 
 
 class ScriptTone(str, Enum):

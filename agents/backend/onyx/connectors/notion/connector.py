@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from collections.abc import Generator
 from datetime import datetime
 from datetime import timezone
@@ -13,8 +21,6 @@ from onyx.configs.app_configs import INDEX_BATCH_SIZE
 from onyx.configs.app_configs import NOTION_CONNECTOR_DISABLE_RECURSIVE_PAGE_LOOKUP
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.cross_connector_utils.rate_limit_wrapper import (
-    rl_requests,
-)
 from onyx.connectors.exceptions import ConnectorValidationError
 from onyx.connectors.exceptions import CredentialExpiredError
 from onyx.connectors.exceptions import InsufficientPermissionsError
@@ -29,6 +35,12 @@ from onyx.connectors.models import ImageSection
 from onyx.connectors.models import TextSection
 from onyx.utils.batching import batch_generator
 from onyx.utils.logger import setup_logger
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    rl_requests,
+)
 
 logger = setup_logger()
 
@@ -102,7 +114,7 @@ class NotionConnector(LoadConnector, PollConnector):
         self.recursive_index_enabled = recursive_index_enabled or self.root_page_id
 
     @retry(tries=3, delay=1, backoff=2)
-    def _fetch_child_blocks(
+    async def _fetch_child_blocks(
         self, block_id: str, cursor: str | None = None
     ) -> dict[str, Any] | None:
         """Fetch all child blocks via the Notion API."""
@@ -137,7 +149,7 @@ class NotionConnector(LoadConnector, PollConnector):
         return res.json()
 
     @retry(tries=3, delay=1, backoff=2)
-    def _fetch_page(self, page_id: str) -> NotionPage:
+    async def _fetch_page(self, page_id: str) -> NotionPage:
         """Fetch a page from its ID via the Notion API, retry with database if page fetch fails."""
         logger.debug(f"Fetching page for ID '{page_id}'")
         page_url = f"https://api.notion.com/v1/pages/{page_id}"
@@ -158,7 +170,7 @@ class NotionConnector(LoadConnector, PollConnector):
         return NotionPage(**res.json())
 
     @retry(tries=3, delay=1, backoff=2)
-    def _fetch_database_as_page(self, database_id: str) -> NotionPage:
+    async def _fetch_database_as_page(self, database_id: str) -> NotionPage:
         """Attempt to fetch a database as a page."""
         logger.debug(f"Fetching database for ID '{database_id}' as a page")
         database_url = f"https://api.notion.com/v1/databases/{database_id}"
@@ -180,7 +192,7 @@ class NotionConnector(LoadConnector, PollConnector):
         return NotionPage(**res.json(), database_name=database_name)
 
     @retry(tries=3, delay=1, backoff=2)
-    def _fetch_database(
+    async def _fetch_database(
         self, database_id: str, cursor: str | None = None
     ) -> dict[str, Any]:
         """Fetch a database from it's ID via the Notion API."""
@@ -698,7 +710,6 @@ class NotionConnector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     root_page_id = os.environ.get("NOTION_ROOT_PAGE_ID")
     connector = NotionConnector(root_page_id=root_page_id)

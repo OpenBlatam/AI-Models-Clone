@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from simple_salesforce import Salesforce
 from sqlalchemy.orm import Session
 
@@ -5,6 +7,9 @@ from onyx.db.connector_credential_pair import get_connector_credential_pair_from
 from onyx.db.document import get_cc_pairs_for_document
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 _ANY_SALESFORCE_CLIENT: Salesforce | None = None

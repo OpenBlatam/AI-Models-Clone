@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import uuid
+import pytest
+from unittest.mock import Mock, patch, AsyncMock
+from typing import Dict, List, Any
+from performance_metrics import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test Suite for API Performance Metrics System
 
@@ -11,14 +31,7 @@ This test suite validates:
 - Performance optimization features
 """
 
-import asyncio
-import time
-import uuid
-import pytest
-from unittest.mock import Mock, patch, AsyncMock
-from typing import Dict, List, Any
 
-from performance_metrics import (
     APIPerformanceMetrics, PerformanceMonitor, PerformanceThreshold,
     PerformanceMetric, MetricSummary, MetricType, get_performance_metrics,
     set_performance_metrics, performance_tracking, track_performance,
@@ -30,7 +43,7 @@ class TestAPIPerformanceMetrics:
     """Test cases for APIPerformanceMetrics class."""
     
     @pytest.fixture
-    def metrics(self):
+    def metrics(self) -> Any:
         """Create a fresh metrics instance for each test."""
         return APIPerformanceMetrics(
             max_metrics=1000,
@@ -40,7 +53,7 @@ class TestAPIPerformanceMetrics:
         )
     
     @pytest.fixture
-    def sample_metrics(self, metrics):
+    def sample_metrics(self, metrics) -> Any:
         """Create sample metrics data."""
         # Record some sample requests
         for i in range(10):
@@ -80,7 +93,7 @@ class TestAPIPerformanceMetrics:
         
         return metrics
     
-    def test_initialization(self, metrics):
+    def test_initialization(self, metrics) -> Any:
         """Test metrics system initialization."""
         assert metrics.max_metrics == 1000
         assert metrics.window_size == 60
@@ -90,7 +103,7 @@ class TestAPIPerformanceMetrics:
         assert metrics.concurrent_requests == 0
         assert len(metrics.thresholds) > 0  # Default thresholds
     
-    def test_record_request(self, metrics):
+    async def test_record_request(self, metrics) -> Any:
         """Test recording a single request."""
         request_id = str(uuid.uuid4())
         user_id = "test_user"
@@ -120,7 +133,7 @@ class TestAPIPerformanceMetrics:
         assert metric.user_id == user_id
         assert metric.metadata["test"] == True
     
-    def test_record_request_without_optional_fields(self, metrics):
+    async def test_record_request_without_optional_fields(self, metrics) -> Any:
         """Test recording a request without optional fields."""
         metrics.record_request(
             endpoint="/api/test",
@@ -137,7 +150,7 @@ class TestAPIPerformanceMetrics:
         assert metric.user_id is None
         assert metric.metadata == {}
     
-    def test_success_and_error_counting(self, metrics):
+    def test_success_and_error_counting(self, metrics) -> Any:
         """Test success and error counting."""
         # Record successful requests
         for _ in range(5):
@@ -162,7 +175,7 @@ class TestAPIPerformanceMetrics:
         assert metrics.success_counts["/api/test"] == 5
         assert metrics.error_counts["/api/test"] == 2
     
-    def test_concurrent_requests_tracking(self, metrics):
+    async def test_concurrent_requests_tracking(self, metrics) -> Any:
         """Test concurrent requests tracking."""
         assert metrics.concurrent_requests == 0
         assert metrics.max_concurrent_requests == 0
@@ -187,7 +200,7 @@ class TestAPIPerformanceMetrics:
         assert metrics.concurrent_requests == 1
         assert metrics.max_concurrent_requests == 3  # Should remain at max
     
-    def test_cache_performance_tracking(self, metrics):
+    def test_cache_performance_tracking(self, metrics) -> Any:
         """Test cache performance tracking."""
         assert metrics.cache_hits == 0
         assert metrics.cache_misses == 0
@@ -205,7 +218,7 @@ class TestAPIPerformanceMetrics:
         hit_rate = metrics.get_cache_hit_rate()
         assert hit_rate == 0.6  # 6 hits / (6 hits + 4 misses)
     
-    def test_database_performance_tracking(self, metrics):
+    def test_database_performance_tracking(self, metrics) -> Any:
         """Test database performance tracking."""
         assert metrics.db_query_count == 0
         assert metrics.db_query_time == 0.0
@@ -223,7 +236,7 @@ class TestAPIPerformanceMetrics:
         assert stats["total_time"] == 180.0
         assert stats["avg_query_time"] == 60.0
     
-    def test_external_api_performance_tracking(self, metrics):
+    async def test_external_api_performance_tracking(self, metrics) -> Any:
         """Test external API performance tracking."""
         assert metrics.external_api_calls == 0
         assert metrics.external_api_time == 0.0
@@ -241,7 +254,7 @@ class TestAPIPerformanceMetrics:
         assert stats["total_time"] == 220.0
         assert stats["avg_call_time"] == 110.0
     
-    def test_response_time_statistics(self, sample_metrics):
+    def test_response_time_statistics(self, sample_metrics) -> Any:
         """Test response time statistics calculation."""
         stats = sample_metrics.get_response_time_stats()
         
@@ -255,7 +268,7 @@ class TestAPIPerformanceMetrics:
         assert stats.sum > 0
         assert stats.std_dev >= 0
     
-    def test_response_time_statistics_by_endpoint(self, sample_metrics):
+    def test_response_time_statistics_by_endpoint(self, sample_metrics) -> Any:
         """Test response time statistics for specific endpoints."""
         # Test overall stats
         overall_stats = sample_metrics.get_response_time_stats("*")
@@ -270,7 +283,7 @@ class TestAPIPerformanceMetrics:
         assert empty_stats.count == 0
         assert empty_stats.mean == 0.0
     
-    def test_error_rate_calculation(self, sample_metrics):
+    def test_error_rate_calculation(self, sample_metrics) -> Any:
         """Test error rate calculation."""
         # Overall error rate
         overall_error_rate = sample_metrics.get_error_rate()
@@ -284,7 +297,7 @@ class TestAPIPerformanceMetrics:
         success_endpoint_rate = sample_metrics.get_error_rate("/api/test/0")
         assert success_endpoint_rate == 0.0  # No errors for success endpoint
     
-    def test_throughput_calculation(self, sample_metrics):
+    def test_throughput_calculation(self, sample_metrics) -> Any:
         """Test throughput calculation."""
         # Simulate time passing
         sample_metrics.start_time = time.time() - 10  # 10 seconds ago
@@ -294,7 +307,7 @@ class TestAPIPerformanceMetrics:
         assert throughput > 0
         assert throughput == 50 / 10  # 5 requests per second
     
-    def test_system_metrics_collection(self, metrics):
+    def test_system_metrics_collection(self, metrics) -> Any:
         """Test system metrics collection."""
         # Mock psutil to return known values
         with patch('psutil.virtual_memory') as mock_memory, \
@@ -310,7 +323,7 @@ class TestAPIPerformanceMetrics:
             assert len(metrics.memory_usage) > 0
             assert len(metrics.cpu_usage) > 0
     
-    def test_memory_usage_calculation(self, sample_metrics):
+    def test_memory_usage_calculation(self, sample_metrics) -> Any:
         """Test memory usage calculation."""
         # Add some memory usage data
         sample_metrics.memory_usage.extend([0.5, 0.6, 0.7, 0.8, 0.9])
@@ -318,7 +331,7 @@ class TestAPIPerformanceMetrics:
         memory_usage = sample_metrics.get_memory_usage()
         assert memory_usage == 0.7  # Average of [0.5, 0.6, 0.7, 0.8, 0.9]
     
-    def test_cpu_usage_calculation(self, sample_metrics):
+    def test_cpu_usage_calculation(self, sample_metrics) -> Any:
         """Test CPU usage calculation."""
         # Add some CPU usage data
         sample_metrics.cpu_usage.extend([0.3, 0.4, 0.5, 0.6, 0.7])
@@ -326,7 +339,7 @@ class TestAPIPerformanceMetrics:
         cpu_usage = sample_metrics.get_cpu_usage()
         assert cpu_usage == 0.5  # Average of [0.3, 0.4, 0.5, 0.6, 0.7]
     
-    def test_threshold_management(self, metrics):
+    def test_threshold_management(self, metrics) -> Any:
         """Test performance threshold management."""
         initial_threshold_count = len(metrics.thresholds)
         
@@ -343,7 +356,7 @@ class TestAPIPerformanceMetrics:
         metrics.add_threshold(custom_threshold)
         assert len(metrics.thresholds) == initial_threshold_count + 1
     
-    def test_alert_generation(self, metrics):
+    def test_alert_generation(self, metrics) -> Any:
         """Test alert generation."""
         # Add threshold that will trigger
         threshold = PerformanceThreshold(
@@ -377,7 +390,7 @@ class TestAPIPerformanceMetrics:
         assert alert.current_value > threshold.threshold_value
         assert alert.severity == "warning"
     
-    def test_alert_filtering(self, metrics):
+    def test_alert_filtering(self, metrics) -> Any:
         """Test alert filtering by severity."""
         # Add different severity alerts
         warning_threshold = PerformanceThreshold(
@@ -427,7 +440,7 @@ class TestAPIPerformanceMetrics:
         for alert in error_alerts:
             assert alert.severity == "error"
     
-    def test_comprehensive_stats(self, sample_metrics):
+    def test_comprehensive_stats(self, sample_metrics) -> Any:
         """Test comprehensive statistics generation."""
         stats = sample_metrics.get_comprehensive_stats()
         
@@ -451,7 +464,7 @@ class TestAPIPerformanceMetrics:
         assert "cpu_usage" in system_stats
         assert "concurrent_requests" in system_stats
     
-    def test_metrics_cleanup(self, metrics):
+    def test_metrics_cleanup(self, metrics) -> Any:
         """Test old metrics cleanup."""
         # Add metrics with old timestamps
         old_time = time.time() - 120  # 2 minutes ago (outside 60s window)
@@ -491,7 +504,7 @@ class TestAPIPerformanceMetrics:
         assert len(remaining_metrics) == 1
         assert remaining_metrics[0].endpoint == "/api/recent"
     
-    async def test_cleanup_task_management(self, metrics):
+    async def test_cleanup_task_management(self, metrics) -> Any:
         """Test cleanup task management."""
         # Start background tasks
         metrics._start_background_tasks()
@@ -514,12 +527,12 @@ class TestPerformanceMonitor:
     """Test cases for PerformanceMonitor class."""
     
     @pytest.fixture
-    def monitor(self):
+    def monitor(self) -> Any:
         """Create a performance monitor instance."""
         return PerformanceMonitor()
     
     @pytest.fixture
-    def sample_monitor(self, monitor):
+    def sample_monitor(self, monitor) -> Any:
         """Create a monitor with sample data."""
         # Add some sample metrics
         for i in range(10):
@@ -533,7 +546,7 @@ class TestPerformanceMonitor:
         
         return monitor
     
-    def test_response_time_percentiles(self, sample_monitor):
+    def test_response_time_percentiles(self, sample_monitor) -> Any:
         """Test response time percentile calculation."""
         percentiles = sample_monitor.get_response_time_percentiles()
         
@@ -547,7 +560,7 @@ class TestPerformanceMonitor:
         assert percentiles["p95"] <= percentiles["p99"]
         assert percentiles["p99"] <= percentiles["p99.9"]
     
-    def test_response_time_percentiles_by_endpoint(self, sample_monitor):
+    def test_response_time_percentiles_by_endpoint(self, sample_monitor) -> Any:
         """Test response time percentiles for specific endpoints."""
         # Test specific endpoint
         percentiles = sample_monitor.get_response_time_percentiles("/api/test/0")
@@ -555,12 +568,12 @@ class TestPerformanceMonitor:
         assert "p95" in percentiles
         assert "p99" in percentiles
     
-    def test_throughput_trend(self, sample_monitor):
+    def test_throughput_trend(self, sample_monitor) -> Any:
         """Test throughput trend calculation."""
         trend = sample_monitor.get_throughput_trend()
         assert isinstance(trend, list)
     
-    def test_error_rate_trend(self, sample_monitor):
+    def test_error_rate_trend(self, sample_monitor) -> Any:
         """Test error rate trend calculation."""
         # Add some errors
         for _ in range(3):
@@ -576,14 +589,14 @@ class TestPerformanceMonitor:
         assert error_rate > 0
         assert error_rate <= 1.0
     
-    def test_system_health_score(self, sample_monitor):
+    def test_system_health_score(self, sample_monitor) -> Any:
         """Test system health score calculation."""
         score = sample_monitor.get_system_health_score()
         
         assert 0.0 <= score <= 100.0
         assert isinstance(score, float)
     
-    def test_system_health_score_with_poor_performance(self, monitor):
+    def test_system_health_score_with_poor_performance(self, monitor) -> Any:
         """Test system health score with poor performance indicators."""
         # Add slow response times
         for _ in range(5):
@@ -608,14 +621,14 @@ class TestPerformanceMonitor:
         score = monitor.get_system_health_score()
         assert score < 100.0  # Should be reduced due to poor performance
     
-    def test_performance_recommendations(self, sample_monitor):
+    def test_performance_recommendations(self, sample_monitor) -> Any:
         """Test performance recommendations generation."""
         recommendations = sample_monitor.get_performance_recommendations()
         
         assert isinstance(recommendations, list)
         assert all(isinstance(rec, str) for rec in recommendations)
     
-    def test_performance_recommendations_with_issues(self, monitor):
+    def test_performance_recommendations_with_issues(self, monitor) -> Any:
         """Test performance recommendations with performance issues."""
         # Add slow response times to trigger recommendations
         for _ in range(5):
@@ -649,16 +662,18 @@ class TestPerformanceDecorators:
     """Test cases for performance decorators."""
     
     @pytest.fixture
-    def metrics(self):
+    def metrics(self) -> Any:
         """Create metrics instance for decorator tests."""
         return APIPerformanceMetrics()
     
     @pytest.mark.asyncio
-    async def test_track_performance_decorator(self, metrics):
+    async def test_track_performance_decorator(self, metrics) -> Any:
         """Test track_performance decorator."""
         @track_performance("test_function")
         async def test_function():
-            await asyncio.sleep(0.1)
+            
+    """test_function function."""
+await asyncio.sleep(0.1)
             return "success"
         
         # Set metrics globally
@@ -679,11 +694,13 @@ class TestPerformanceDecorators:
         assert metric.response_time > 0
     
     @pytest.mark.asyncio
-    async def test_track_cache_performance_decorator(self, metrics):
+    async def test_track_cache_performance_decorator(self, metrics) -> Any:
         """Test track_cache_performance decorator."""
         @track_cache_performance
         async def test_cache_function():
-            return "cached_result"
+            
+    """test_cache_function function."""
+return "cached_result"
         
         # Set metrics globally
         set_performance_metrics(metrics)
@@ -698,11 +715,13 @@ class TestPerformanceDecorators:
         assert metrics.cache_misses == 1  # Should record a miss since no cache
     
     @pytest.mark.asyncio
-    async def test_track_database_performance_decorator(self, metrics):
+    async def test_track_database_performance_decorator(self, metrics) -> Any:
         """Test track_database_performance decorator."""
         @track_database_performance
         async def test_database_function():
-            await asyncio.sleep(0.05)
+            
+    """test_database_function function."""
+await asyncio.sleep(0.05)
             return "database_result"
         
         # Set metrics globally
@@ -718,11 +737,13 @@ class TestPerformanceDecorators:
         assert metrics.db_query_time > 0
     
     @pytest.mark.asyncio
-    async def test_track_external_api_performance_decorator(self, metrics):
+    async async def test_track_external_api_performance_decorator(self, metrics) -> Any:
         """Test track_external_api_performance decorator."""
         @track_external_api_performance
         async def test_external_api_function():
-            await asyncio.sleep(0.05)
+            
+    """test_external_api_function function."""
+await asyncio.sleep(0.05)
             return "api_result"
         
         # Set metrics globally
@@ -741,7 +762,7 @@ class TestPerformanceDecorators:
 class TestGlobalMetrics:
     """Test cases for global metrics management."""
     
-    def test_get_performance_metrics(self):
+    def test_get_performance_metrics(self) -> Optional[Dict[str, Any]]:
         """Test getting global performance metrics."""
         # Clear any existing metrics
         set_performance_metrics(None)
@@ -754,7 +775,7 @@ class TestGlobalMetrics:
         metrics2 = get_performance_metrics()
         assert metrics is metrics2
     
-    def test_set_performance_metrics(self):
+    def test_set_performance_metrics(self) -> Any:
         """Test setting global performance metrics."""
         # Create custom metrics
         custom_metrics = APIPerformanceMetrics(max_metrics=500)
@@ -772,7 +793,7 @@ class TestIntegration:
     """Integration tests for the performance metrics system."""
     
     @pytest.mark.asyncio
-    async def test_full_workflow(self):
+    async def test_full_workflow(self) -> Any:
         """Test complete performance metrics workflow."""
         # Initialize metrics
         metrics = APIPerformanceMetrics(enable_alerts=True)

@@ -1,10 +1,15 @@
-"""
-Enhanced Quality Configuration Module
-===================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
 
-Enterprise-grade configuration with comprehensive validation,
-type safety, and production-ready patterns.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import os
 import secrets
@@ -13,8 +18,19 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Union
 from urllib.parse import urlparse
-
 from pydantic import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Enhanced Quality Configuration Module
+===================================
+
+Enterprise-grade configuration with comprehensive validation,
+type safety, and production-ready patterns.
+"""
+
+
     BaseSettings, Field, validator, root_validator,
     PostgresDsn, RedisDsn, AnyHttpUrl, EmailStr
 )
@@ -77,7 +93,7 @@ class DatabaseConfig(BaseSettings):
     )
     
     @validator('url')
-    def validate_database_url(cls, v):
+    def validate_database_url(cls, v) -> bool:
         """Validate database URL format and scheme."""
         if not v:
             raise ValueError("Database URL cannot be empty")
@@ -89,7 +105,7 @@ class DatabaseConfig(BaseSettings):
         return v
     
     @root_validator
-    def validate_pool_settings(cls, values):
+    def validate_pool_settings(cls, values) -> bool:
         """Validate pool configuration coherence."""
         pool_size = values.get('pool_size', 10)
         max_overflow = values.get('max_overflow', 20)
@@ -144,7 +160,7 @@ class RedisConfig(BaseSettings):
     cluster_nodes: List[str] = Field(default_factory=list, env="REDIS_CLUSTER_NODES")
     
     @validator('url')
-    def validate_redis_url(cls, v):
+    def validate_redis_url(cls, v) -> bool:
         """Validate Redis URL format."""
         if not v:
             raise ValueError("Redis URL cannot be empty")
@@ -209,14 +225,14 @@ class SecurityConfig(BaseSettings):
     hsts_max_age: int = Field(default=31536000, env="HSTS_MAX_AGE")  # 1 year
     
     @validator('secret_key')
-    def validate_secret_key(cls, v):
+    def validate_secret_key(cls, v) -> bool:
         """Validate secret key strength."""
         if len(v) < 32:
             raise ValueError("Secret key must be at least 32 characters long")
         return v
     
     @validator('cors_origins')
-    def validate_cors_origins(cls, v):
+    def validate_cors_origins(cls, v) -> bool:
         """Validate CORS origins format."""
         for origin in v:
             if origin != "*" and not origin.startswith(("http://", "https://")):
@@ -224,7 +240,7 @@ class SecurityConfig(BaseSettings):
         return v
     
     @root_validator
-    def validate_rate_limits(cls, values):
+    def validate_rate_limits(cls, values) -> bool:
         """Validate rate limiting configuration."""
         per_minute = values.get('requests_per_minute', 100)
         per_hour = values.get('requests_per_hour', 1000)
@@ -286,7 +302,7 @@ class ObservabilityConfig(BaseSettings):
     )
     
     @validator('log_file')
-    def validate_log_file(cls, v):
+    def validate_log_file(cls, v) -> bool:
         """Validate log file path and ensure directory exists."""
         if v:
             log_path = Path(v)
@@ -367,7 +383,8 @@ class EnhancedAppConfig(BaseSettings):
     security: SecurityConfig = SecurityConfig()
     observability: ObservabilityConfig = ObservabilityConfig()
     
-    class Config:
+    @dataclass
+class Config:
         env_file = ".env"
         env_file_encoding = "utf-8"
         case_sensitive = False
@@ -375,14 +392,14 @@ class EnhancedAppConfig(BaseSettings):
         arbitrary_types_allowed = True
     
     @validator('environment', pre=True)
-    def validate_environment(cls, v):
+    def validate_environment(cls, v) -> bool:
         """Validate and normalize environment."""
         if isinstance(v, str):
             return v.lower()
         return v
     
     @validator('debug')
-    def validate_debug_with_environment(cls, v, values):
+    def validate_debug_with_environment(cls, v, values) -> bool:
         """Debug should be disabled in production."""
         env = values.get('environment')
         if env == Environment.PRODUCTION and v:
@@ -390,7 +407,7 @@ class EnhancedAppConfig(BaseSettings):
         return v
     
     @root_validator
-    def validate_configuration_coherence(cls, values):
+    def validate_configuration_coherence(cls, values) -> bool:
         """Validate overall configuration coherence."""
         environment = values.get('environment')
         debug = values.get('debug')

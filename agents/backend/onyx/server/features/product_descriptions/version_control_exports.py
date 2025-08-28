@@ -1,10 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .version_control_utils import (
+from .git_workflow import (
+from .pre_commit_hooks import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Named Exports for Version Control Functions
 Product Descriptions Feature - Version Control Module
 """
 
-from .version_control_utils import (
     # Core git functions
     get_git_commit_hash,
     get_git_branch_name,
@@ -38,14 +45,12 @@ from .version_control_utils import (
     ExperimentConfig
 )
 
-from .git_workflow import (
     # Git workflow automation
     GitWorkflow,
     GitConfig,
     MLModelVersioning
 )
 
-from .pre_commit_hooks import (
     # Pre-commit validation functions
     get_staged_files,
     get_python_files,

@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+import time
+from typing import Dict, List, Optional, Any, Union, Callable
+from dataclasses import dataclass
+from pathlib import Path
+from ..core.exceptions import PluginError, ValidationError
+from ..core.types import PluginInfo
+from .base import BasePlugin
+from .registry import PluginRegistry, PluginState
+from .validator import ValidationLevel
+from typing import Any, List, Dict, Optional
 """
 Plugin Manager - High-Level Plugin Management System
 
@@ -10,18 +24,7 @@ This module provides a user-friendly interface for plugin management with:
 - Performance monitoring
 """
 
-import asyncio
-import logging
-import time
-from typing import Dict, List, Optional, Any, Union, Callable
-from dataclasses import dataclass
-from pathlib import Path
 
-from ..core.exceptions import PluginError, ValidationError
-from ..core.types import PluginInfo
-from .base import BasePlugin
-from .registry import PluginRegistry, PluginState
-from .validator import ValidationLevel
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +41,7 @@ class ManagerConfig:
     enable_events: bool = True
     enable_metrics: bool = True
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.plugin_dirs is None:
             self.plugin_dirs = [
                 "./plugins",
@@ -65,7 +68,9 @@ class PluginManager:
     """
     
     def __init__(self, config: Optional[ManagerConfig] = None):
-        self.config = config or ManagerConfig()
+        
+    """__init__ function."""
+self.config = config or ManagerConfig()
         self.registry = PluginRegistry(
             auto_discover=self.config.auto_discover,
             auto_load=self.config.auto_load,
@@ -341,7 +346,7 @@ class PluginManager:
         if self.config.enable_events:
             self.registry.remove_event_handler(event, handler)
     
-    def _setup_event_handlers(self):
+    def _setup_event_handlers(self) -> Any:
         """Setup default event handlers."""
         self.registry.add_event_handler("plugin_loaded", self._on_plugin_loaded)
         self.registry.add_event_handler("plugin_initialized", self._on_plugin_initialized)
@@ -369,7 +374,7 @@ class PluginManager:
         """Handle plugin unloaded event."""
         logger.info(f"🗑️ Plugin '{plugin_name}' unloaded successfully")
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Shutdown the plugin manager."""
         logger.info("🔄 Shutting down PluginManager...")
         

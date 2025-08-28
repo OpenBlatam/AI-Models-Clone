@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.port_scanner import AsyncPortScanner
+from port_scanner import AsyncPortScanner
 
 
 @pytest.mark.asyncio
@@ -15,6 +15,7 @@ async def test_scan_single_port_generic_exception(monkeypatch):
     res = await scanner.scan_single_port("127.0.0.1", 9999)
     assert res.is_port_open is False
     assert res.error_message == "boom"
+
 
 
 

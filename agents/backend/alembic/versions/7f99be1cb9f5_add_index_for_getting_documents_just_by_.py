@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add index for getting documents just by connector id / credential id
 
 Revision ID: 7f99be1cb9f5
@@ -6,7 +12,6 @@ Create Date: 2023-10-15 22:48:15.487762
 
 """
 
-from alembic import op
 
 
 # revision identifiers, used by Alembic.

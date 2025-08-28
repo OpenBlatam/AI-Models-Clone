@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from datetime import datetime
+from decimal import Decimal
+from typing import Any, Dict, List, Optional
+from uuid import UUID
+from pydantic import BaseModel, Field, validator, root_validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Refactored Schemas Module
 ========================
@@ -6,12 +24,7 @@ Clean, type-safe Pydantic models with comprehensive validation.
 Organized by domain and separated by responsibility.
 """
 
-from datetime import datetime
-from decimal import Decimal
-from typing import Any, Dict, List, Optional
-from uuid import UUID
 
-from pydantic import BaseModel, Field, validator, root_validator
 
 
 # =============================================================================
@@ -21,7 +34,8 @@ from pydantic import BaseModel, Field, validator, root_validator
 class BaseSchema(BaseModel):
     """Base schema with common configuration."""
     
-    class Config:
+    @dataclass
+class Config:
         from_attributes = True
         str_strip_whitespace = True
         validate_assignment = True

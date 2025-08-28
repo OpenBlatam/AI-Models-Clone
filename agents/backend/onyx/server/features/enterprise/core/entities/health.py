@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass, field
+from typing import Dict, Any
+from datetime import datetime
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Health Status Entity
 ===================
@@ -5,10 +14,6 @@ Health Status Entity
 Domain entity for representing system health status.
 """
 
-from dataclasses import dataclass, field
-from typing import Dict, Any
-from datetime import datetime
-from enum import Enum
 
 
 class HealthState(Enum):
@@ -57,7 +62,7 @@ class HealthStatus:
         self.components[component.name] = component
         self._update_overall_state()
     
-    def _update_overall_state(self):
+    def _update_overall_state(self) -> Any:
         """Update overall health state based on components."""
         if not self.components:
             self.overall_state = HealthState.UNKNOWN

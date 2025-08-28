@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy.orm import Session
 
 from onyx.db.connector_credential_pair import get_connector_credential_pair
@@ -8,6 +10,9 @@ from onyx.redis.redis_connector import RedisConnector
 from onyx.server.documents.models import DeletionAttemptSnapshot
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _get_deletion_status(
     connector_id: int,
     credential_id: int,

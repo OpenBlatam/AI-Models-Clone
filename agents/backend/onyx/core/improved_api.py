@@ -1,3 +1,38 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+import time
+from contextlib import asynccontextmanager
+from datetime import datetime, timezone
+from functools import lru_cache, wraps
+from typing import Any, Dict, List, Optional, Callable, AsyncGenerator
+import uuid
+    import httpx
+    import redis.asyncio as redis
+from fastapi import (
+from fastapi.exceptions import RequestValidationError
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel, Field, validator
+from pydantic_settings import BaseSettings
+import structlog
+from .middleware import (
+from .api_schemas import (
+from .api_routers import get_api_routers
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 🚀 IMPROVED FASTAPI ARCHITECTURE - PRODUCTION READY
 ==================================================
@@ -37,45 +72,23 @@ Clean, scalable, and performant FastAPI implementation following best practices:
 - SQL injection protection
 """
 
-import asyncio
-import logging
-import time
-from contextlib import asynccontextmanager
-from datetime import datetime, timezone
-from functools import lru_cache, wraps
-from typing import Any, Dict, List, Optional, Callable, AsyncGenerator
-import uuid
 
 try:
-    import httpx
-    import redis.asyncio as redis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
     
-from fastapi import (
     FastAPI, Request, Response, HTTPException, Depends, 
     BackgroundTasks, status
 )
-from fastapi.exceptions import RequestValidationError
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, Field, validator
-from pydantic_settings import BaseSettings
-import structlog
 
 # Import our enhanced modules
-from .middleware import (
     RequestIDMiddleware, PerformanceMiddleware, 
     SecurityHeadersMiddleware, LoggingMiddleware
 )
-from .api_schemas import (
     BaseResponse, DataResponse, ErrorResponse, HealthCheckResponse,
     PaginatedResponse, MetricsResponse
 )
-from .api_routers import get_api_routers
 
 # Configure structured logging
 structlog.configure(
@@ -162,7 +175,9 @@ class ServiceContainer:
     """Dependency injection container for all services."""
     
     def __init__(self, settings: APISettings):
-        self.settings = settings
+        
+    """__init__ function."""
+self.settings = settings
         self._redis: Optional[redis.Redis] = None
         self._httpx_client: Optional[httpx.AsyncClient] = None
         self._startup_time = time.time()
@@ -215,7 +230,7 @@ class ServiceContainer:
         return self._redis
     
     @property
-    def httpx_client(self) -> httpx.AsyncClient:
+    async def httpx_client(self) -> httpx.AsyncClient:
         """Get HTTP client."""
         if self._httpx_client is None:
             raise RuntimeError("HTTP client not initialized")
@@ -256,7 +271,7 @@ async def validation_exception_handler(
         ).dict()
     )
 
-async def http_exception_handler(
+async async def http_exception_handler(
     request: Request, 
     exc: HTTPException
 ) -> JSONResponse:
@@ -586,7 +601,6 @@ def create_improved_app() -> FastAPI:
 app = create_improved_app()
 
 if __name__ == "__main__":
-    import uvicorn
     
     settings = get_settings()
     

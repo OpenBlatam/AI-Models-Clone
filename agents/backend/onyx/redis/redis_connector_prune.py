@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 from datetime import datetime
 from typing import cast
@@ -19,6 +21,9 @@ from onyx.db.connector_credential_pair import get_connector_credential_pair_from
 from onyx.redis.redis_pool import SCAN_ITER_COUNT_DEFAULT
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class RedisConnectorPrunePayload(BaseModel):
     id: str
     submitted: datetime

@@ -1,12 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.redis.redis_connector_credential_pair import (
-    RedisGlobalConnectorCredentialPair,
-)
 from onyx.redis.redis_connector_delete import RedisConnectorDelete
 from onyx.redis.redis_connector_doc_perm_sync import RedisConnectorPermissionSync
 from onyx.redis.redis_connector_index import RedisConnectorIndex
 from onyx.redis.redis_connector_prune import RedisConnectorPrune
 from onyx.redis.redis_document_set import RedisDocumentSet
 from onyx.redis.redis_usergroup import RedisUserGroup
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    RedisGlobalConnectorCredentialPair,
+)
 
 
 def is_fence(key_bytes: bytes) -> bool:

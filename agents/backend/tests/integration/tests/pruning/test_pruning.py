@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import http.server
 import os
 import shutil
@@ -22,11 +27,14 @@ from tests.integration.common_utils.managers.user import UserManager
 from tests.integration.common_utils.test_models import DATestUser
 from tests.integration.common_utils.vespa import vespa_fixture
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
 # FastAPI server for serving files
-def create_fastapi_app(directory: str) -> FastAPI:
+async def create_fastapi_app(directory: str) -> FastAPI:
     app = FastAPI()
 
     # Mount the directory to serve static files
@@ -37,7 +45,7 @@ def create_fastapi_app(directory: str) -> FastAPI:
 
 # as far as we know, this doesn't hang when crawled. This is good.
 @contextmanager
-def fastapi_server_context(
+async def fastapi_server_context(
     directory: str, port: int = 8000
 ) -> Generator[None, None, None]:
     app = create_fastapi_app(directory)
@@ -47,6 +55,10 @@ def fastapi_server_context(
 
     # Create a thread to run the FastAPI server
     server_thread = threading.Thread(target=server.run)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     server_thread.daemon = (
         True  # Ensures the thread will exit when the main program exits
     )
@@ -66,7 +78,7 @@ def fastapi_server_context(
 # not using this is python's web servers hang frequently when crawled
 # this is obviously not good for a unit test
 @contextmanager
-def http_server_context(
+async def http_server_context(
     directory: str, port: int = 8000
 ) -> Generator[http.server.ThreadingHTTPServer, None, None]:
     # Create a handler that serves files from the specified directory
@@ -82,6 +94,10 @@ def http_server_context(
 
     # Define a thread that runs the server in the background
     server_thread = threading.Thread(target=httpd.serve_forever)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     server_thread.daemon = (
         True  # Ensures the thread will exit when the main program exits
     )

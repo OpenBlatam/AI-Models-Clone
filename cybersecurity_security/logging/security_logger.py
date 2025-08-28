@@ -1,9 +1,5 @@
-"""
-Security Logging and Monitoring
-
-Provides comprehensive security logging and monitoring capabilities.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import structlog
 import secrets
@@ -14,6 +10,16 @@ from pydantic import BaseModel, Field, validator
 from dataclasses import dataclass, asdict
 import asyncio
 import aiofiles
+        import ipaddress
+        import os
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Security Logging and Monitoring
+
+Provides comprehensive security logging and monitoring capabilities.
+"""
+
 
 class SecurityEvent(BaseModel):
     """Pydantic model for security event."""
@@ -26,8 +32,7 @@ class SecurityEvent(BaseModel):
     event_id: str = Field(default_factory=lambda: secrets.token_hex(8))
     
     @validator('source_ip')
-    def validate_ip(cls, v):
-        import ipaddress
+    def validate_ip(cls, v) -> bool:
         try:
             ipaddress.ip_address(v)
             return v
@@ -41,7 +46,7 @@ class LoggerConfig(BaseModel):
     log_file_path: Optional[str] = Field(None, description="Path to log file")
     
     @validator('log_file_path')
-    def validate_log_file_path(cls, v):
+    def validate_log_file_path(cls, v) -> bool:
         if v and not v.endswith(('.log', '.json')):
             raise ValueError("Log file must have .log or .json extension")
         return v
@@ -68,8 +73,7 @@ class LogAnalysisRequest(BaseModel):
     analysis_period_hours: int = Field(default=24, ge=1, le=168, description="Analysis period in hours")
     
     @validator('log_file_path')
-    def validate_log_file_exists(cls, v):
-        import os
+    def validate_log_file_exists(cls, v) -> bool:
         if not os.path.exists(v):
             raise ValueError("Log file does not exist")
         return v
@@ -169,7 +173,15 @@ async def log_security_event_async(data: Dict[str, Any]) -> LoggingResult:
 async def write_event_to_file(event: SecurityEvent, file_path: str) -> None:
     """Write security event to file asynchronously."""
     async with aiofiles.open(file_path, 'a') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         await f.write(json.dumps(event.dict(), default=str) + '\n')
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
 async def analyze_security_logs_async(data: LogAnalysisRequest) -> LogAnalysisResult:
     """Analyze security logs for threats asynchronously (I/O-bound)."""
@@ -181,6 +193,10 @@ async def analyze_security_logs_async(data: LogAnalysisRequest) -> LogAnalysisRe
     
     try:
         async with aiofiles.open(log_file_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             async for line in f:
                 try:
                     log_entry = json.loads(line.strip())

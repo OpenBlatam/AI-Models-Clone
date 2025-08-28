@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add has_been_indexed to DocumentByConnectorCredentialPair
 
 Revision ID: c7bf5721733e
@@ -6,8 +13,6 @@ Create Date: 2025-01-13 12:39:05.831693
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "c7bf5721733e"

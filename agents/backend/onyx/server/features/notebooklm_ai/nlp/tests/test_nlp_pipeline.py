@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import pytest
 from ..core.nlp_engine import NLPEngine, NLPConfig
@@ -6,9 +8,13 @@ from ..analyzers.keyword_extractor import KeywordExtractor, KeywordConfig
 from ..analyzers.topic_modeler import TopicModeler, TopicConfig
 from ..analyzers.entity_recognizer import EntityRecognizer, EntityConfig
 
+from typing import Any, List, Dict, Optional
+import logging
 @pytest.mark.asyncio
 async def test_nlp_pipeline_end_to_end():
-    engine = NLPEngine(NLPConfig())
+    
+    """test_nlp_pipeline_end_to_end function."""
+engine = NLPEngine(NLPConfig())
     text = "John Doe works at Acme Corp. He is very happy with the new AI-powered product launched in 2024. Contact: john@example.com, https://acme.com"
     result = await engine.process_text(text, tasks=["preprocess", "tokenize", "sentiment", "keywords", "entities", "topics"])
     assert "results" in result
@@ -21,7 +27,9 @@ async def test_nlp_pipeline_end_to_end():
 
 @pytest.mark.asyncio
 async def test_sentiment_analyzer():
-    analyzer = SentimentAnalyzer(SentimentConfig())
+    
+    """test_sentiment_analyzer function."""
+analyzer = SentimentAnalyzer(SentimentConfig())
     text = "I love this product! It is fantastic."
     result = await analyzer.analyze(text, language="en")
     assert "score" in result
@@ -30,7 +38,9 @@ async def test_sentiment_analyzer():
 
 @pytest.mark.asyncio
 async def test_keyword_extractor():
-    extractor = KeywordExtractor(KeywordConfig())
+    
+    """test_keyword_extractor function."""
+extractor = KeywordExtractor(KeywordConfig())
     text = "AI, machine learning, and deep learning are revolutionizing technology."
     result = await extractor.extract(text, language="en")
     assert "keywords" in result
@@ -38,7 +48,9 @@ async def test_keyword_extractor():
 
 @pytest.mark.asyncio
 async def test_topic_modeler():
-    modeler = TopicModeler(TopicConfig())
+    
+    """test_topic_modeler function."""
+modeler = TopicModeler(TopicConfig())
     texts = [
         "AI is transforming healthcare and finance.",
         "Machine learning enables new business models.",
@@ -50,7 +62,9 @@ async def test_topic_modeler():
 
 @pytest.mark.asyncio
 async def test_entity_recognizer():
-    recognizer = EntityRecognizer(EntityConfig())
+    
+    """test_entity_recognizer function."""
+recognizer = EntityRecognizer(EntityConfig())
     text = "Contact Jane Smith at jane@company.com or visit https://company.com."
     result = await recognizer.extract(text, language="en")
     assert "entities" in result
@@ -59,7 +73,9 @@ async def test_entity_recognizer():
 
 @pytest.mark.asyncio
 async def test_health_checks():
-    engine = NLPEngine(NLPConfig())
+    
+    """test_health_checks function."""
+engine = NLPEngine(NLPConfig())
     assert (await engine.health_check())["status"] == "healthy"
     assert (await SentimentAnalyzer().health_check())["status"] == "healthy"
     assert (await KeywordExtractor().health_check())["status"] == "healthy"

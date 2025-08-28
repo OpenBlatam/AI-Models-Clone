@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from collections.abc import Iterator
 
@@ -14,6 +16,9 @@ from onyx.llm.utils import convert_lm_input_to_basic_string
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -28,7 +33,7 @@ class CustomModelServer(LLM):
     """
 
     @property
-    def requires_api_key(self) -> bool:
+    async def requires_api_key(self) -> bool:
         return False
 
     def __init__(
@@ -39,7 +44,9 @@ class CustomModelServer(LLM):
         endpoint: str,
         max_output_tokens: int = GEN_AI_NUM_RESERVED_OUTPUT_TOKENS,
     ):
-        if not endpoint:
+        
+    """__init__ function."""
+if not endpoint:
             raise ValueError(
                 "Cannot point Onyx to a custom LLM server without providing the "
                 "endpoint for the model server."

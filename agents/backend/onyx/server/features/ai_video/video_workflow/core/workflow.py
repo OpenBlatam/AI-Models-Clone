@@ -1,15 +1,9 @@
-"""
-Onyx Video Workflow - Core Workflow Engine
-
-Main workflow engine for video generation using Onyx's infrastructure.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import time
 from typing import Any, Dict, List, Optional
 from datetime import datetime
-
-# Onyx imports
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import ThreadSafeDict
 from onyx.utils.timing import time_function
@@ -17,17 +11,28 @@ from onyx.utils.retry_wrapper import retry_wrapper
 from onyx.utils.telemetry import TelemetryLogger
 from onyx.utils.text_processing import clean_text
 from onyx.utils.gpu_utils import get_gpu_info, is_gpu_available
+from .models import (
+from ...core.exceptions import AIVideoError
+from ...core.onyx_integration import onyx_integration
+        from ..steps import get_workflow_steps_by_type
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Onyx Video Workflow - Core Workflow Engine
+
+Main workflow engine for video generation using Onyx's infrastructure.
+"""
+
+
+# Onyx imports
 
 # Local imports
-from .models import (
     OnyxVideoStep, 
     OnyxVideoContext, 
     WorkflowExecutionResult,
     StepExecutionResult,
     WorkflowStatus
 )
-from ...core.exceptions import AIVideoError
-from ...core.onyx_integration import onyx_integration
 
 
 class OnyxVideoWorkflow:
@@ -39,13 +44,14 @@ class OnyxVideoWorkflow:
     """
     
     def __init__(self, workflow_type: str = "default"):
-        self.logger = setup_logger("onyx_video_workflow")
+        
+    """__init__ function."""
+self.logger = setup_logger("onyx_video_workflow")
         self.telemetry = TelemetryLogger()
         self.cache: ThreadSafeDict[str, Any] = ThreadSafeDict()
         self.workflow_type = workflow_type
         
         # Import steps dynamically to avoid circular imports
-        from ..steps import get_workflow_steps_by_type
         self.steps = get_workflow_steps_by_type(workflow_type)
     
     async def initialize(self) -> None:
@@ -71,7 +77,7 @@ class OnyxVideoWorkflow:
             raise AIVideoError(f"Workflow initialization failed: {e}")
     
     @retry_wrapper(max_attempts=3, backoff_factor=2)
-    async def process_request(self, request: Any) -> Dict[str, Any]:
+    async async def process_request(self, request: Any) -> Dict[str, Any]:
         """Process video request using Onyx workflow."""
         try:
             self.logger.info(f"Processing video request: {request.request_id}")
@@ -180,7 +186,9 @@ class OnyxVideoWorkflow:
             # Execute with retry
             @retry_wrapper(max_attempts=step.retry_attempts, backoff_factor=2)
             async def execute_with_timeout():
-                return await asyncio.wait_for(
+                
+    """execute_with_timeout function."""
+return await asyncio.wait_for(
                     self._execute_llm_step(prompt, context),
                     timeout=step.timeout
                 )

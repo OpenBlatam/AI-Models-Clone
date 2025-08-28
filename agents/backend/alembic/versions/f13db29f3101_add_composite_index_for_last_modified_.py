@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add composite index for last_modified and last_synced to document
 
 Revision ID: f13db29f3101
@@ -6,7 +12,6 @@ Create Date: 2025-02-18 22:48:11.511389
 
 """
 
-from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "f13db29f3101"

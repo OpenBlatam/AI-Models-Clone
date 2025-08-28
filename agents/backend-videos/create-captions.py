@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from langgraph.graph import END
 from langgraph.graph import START
 from langgraph.graph import StateGraph
@@ -8,6 +15,9 @@ from langchain.schema.messages import BaseMessage
 from onyx.utils.logger import setup_logger
 from onyx.utils.langchain import LangchainField
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 class VideoInput(BaseModel):
@@ -50,6 +60,7 @@ class VideoState(BaseModel):
         default={}
     )
 
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
 

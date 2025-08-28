@@ -1,9 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .ultra_performance_boost import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Ultra Performance Boost - Advanced Optimization Package
 🚀 Next-generation performance optimizations for NotebookLM AI
 """
 
-from .ultra_performance_boost import (
     UltraPerformanceBoost,
     UltraBoostConfig,
     GPUMemoryManager,

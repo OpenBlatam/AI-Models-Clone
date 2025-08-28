@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+import json
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+import torch
+import numpy as np
+import matplotlib.pyplot as plt
+import structlog
+from transformers_comprehensive_manager import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Transformers Management Demo
 
@@ -12,18 +32,8 @@ This demo showcases the complete Transformers management system with:
 - Real-world usage examples
 """
 
-import asyncio
-import time
-import json
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
-import torch
-import numpy as np
-import matplotlib.pyplot as plt
-import structlog
 
-from transformers_comprehensive_manager import (
     ComprehensiveTransformersManager, TransformersConfig, ModelType, TaskType, OptimizationLevel,
     setup_transformers_environment, get_optimal_transformers_config
 )
@@ -53,7 +63,7 @@ logger = structlog.get_logger(__name__)
 class TransformersComprehensiveDemo:
     """Comprehensive Transformers management demo."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.results = {}
         self.manager = None
         
@@ -652,7 +662,7 @@ class TransformersComprehensiveDemo:
         output_path = Path("transformers_comprehensive_results.json")
         
         # Convert numpy types to native Python types for JSON serialization
-        def convert_numpy(obj):
+        def convert_numpy(obj) -> Any:
             if isinstance(obj, (int, float, str, bool, type(None))):
                 return obj
             elif isinstance(obj, dict):
@@ -669,6 +679,10 @@ class TransformersComprehensiveDemo:
         serializable_results = convert_numpy(results)
         
         with open(output_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(serializable_results, f, indent=2)
         
         logger.info(f"Demo results saved to {output_path}")

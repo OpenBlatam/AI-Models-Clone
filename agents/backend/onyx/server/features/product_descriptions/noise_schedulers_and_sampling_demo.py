@@ -1,3 +1,32 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import time
+from pathlib import Path
+from typing import Dict, List, Optional, Tuple
+import torch
+import torch.nn as nn
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from PIL import Image
+import psutil
+import gc
+from noise_schedulers_and_sampling import (
+from typing import Any, List, Dict, Optional
 """
 Advanced Noise Schedulers and Sampling Methods Demo
 ==================================================
@@ -16,23 +45,9 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import logging
-import time
-from pathlib import Path
-from typing import Dict, List, Optional, Tuple
 
-import torch
-import torch.nn as nn
-import numpy as np
-import matplotlib.pyplot as plt
-import seaborn as sns
-from PIL import Image
-import psutil
-import gc
 
 # Import our noise schedulers and sampling methods
-from noise_schedulers_and_sampling import (
     NoiseScheduleType, SamplingMethod, NoiseSchedulerConfig, SamplingConfig,
     NoiseSchedulerFactory, SamplerFactory, AdvancedSamplingManager,
     create_noise_scheduler, create_sampler, create_advanced_sampling_manager
@@ -51,7 +66,9 @@ class MockDiffusionModel(nn.Module):
     """
     
     def __init__(self, in_channels: int = 4, out_channels: int = 4, hidden_size: int = 128):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self.in_channels = in_channels
         self.out_channels = out_channels
         self.hidden_size = hidden_size
@@ -130,7 +147,9 @@ class NoiseSchedulersAndSamplingDemo:
     """
     
     def __init__(self, output_dir: str = "noise_schedulers_demo_output"):
-        self.output_dir = Path(output_dir)
+        
+    """__init__ function."""
+self.output_dir = Path(output_dir)
         self.output_dir.mkdir(exist_ok=True)
         
         # Set up device
@@ -463,7 +482,7 @@ class NoiseSchedulersAndSamplingDemo:
             process = psutil.Process()
             return process.memory_info().rss / 1024 / 1024
     
-    def run_comprehensive_demo(self):
+    def run_comprehensive_demo(self) -> Any:
         """Run the comprehensive demo."""
         logger.info("Starting comprehensive noise schedulers and sampling demo...")
         
@@ -523,57 +542,181 @@ class NoiseSchedulersAndSamplingDemo:
         logger.info(f"Output saved to: {self.output_dir}")
         logger.info("="*50)
     
-    def _generate_summary_report(self, schedule_info, sampling_results, performance_data, guidance_results, adaptive_results):
+    def _generate_summary_report(self, schedule_info, sampling_results, performance_data, guidance_results, adaptive_results) -> Any:
         """Generate a comprehensive summary report."""
         report_path = self.output_dir / "demo_summary_report.txt"
         
         with open(report_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("NOISE SCHEDULERS AND SAMPLING METHODS DEMO SUMMARY\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("=" * 60 + "\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Noise schedules summary
             f.write("1. NOISE SCHEDULES\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("-" * 20 + "\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             for schedule_type, info in schedule_info.items():
                 f.write(f"{schedule_type.upper()}:\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Beta range: {info['betas_range']}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Alpha_cumprod range: {info['alphas_cumprod_range']}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Timesteps: {info['num_timesteps']}\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Sampling methods summary
             f.write("2. SAMPLING METHODS\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("-" * 20 + "\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             for method, result in sampling_results.items():
                 f.write(f"{method.upper()}:\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Total time: {result['total_time']:.3f}s\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Steps: {result['num_steps']}\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Avg step time: {result['avg_step_time']:.6f}s\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Sample shape: {result['final_sample_shape']}\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Performance summary
             f.write("3. PERFORMANCE COMPARISON\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("-" * 25 + "\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             for method in performance_data.keys():
                 f.write(f"{method.upper()}:\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 for steps, data in performance_data[method].items():
                     f.write(f"  - {steps} steps: {data['total_time']:.3f}s, {data['memory_usage']:.1f}MB\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write("\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Guidance summary
             f.write("4. GUIDANCE TECHNIQUES\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("-" * 22 + "\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             for scale, result in guidance_results.items():
                 f.write(f"Guidance scale {scale}:\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Total time: {result['total_time']:.3f}s\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Steps: {len(result['result'].timesteps)}\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             # Adaptive sampling summary
             f.write("5. ADAPTIVE SAMPLING\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("-" * 20 + "\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             for eta, result in adaptive_results.items():
                 f.write(f"Eta {eta}:\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Total time: {result['total_time']:.3f}s\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write(f"  - Steps: {len(result['result'].timesteps)}\n\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         logger.info(f"Summary report saved to: {report_path}")
 

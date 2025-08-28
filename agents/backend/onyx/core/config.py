@@ -1,9 +1,19 @@
-"""
-Configuration settings for Onyx.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from pydantic_settings import BaseSettings
 from typing import Optional
 import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Configuration settings for Onyx.
+"""
 
 class Settings(BaseSettings):
     """Application settings."""
@@ -51,7 +61,8 @@ class Settings(BaseSettings):
     LOG_LEVEL: str = os.getenv("LOG_LEVEL", "INFO")
     LOG_FORMAT: str = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
     
-    class Config:
+    @dataclass
+class Config:
         case_sensitive = True
         env_file = ".env"
 

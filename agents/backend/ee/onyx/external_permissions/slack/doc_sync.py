@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Generator
 
 from slack_sdk import WebClient
@@ -17,10 +19,13 @@ from onyx.utils.logger import setup_logger
 from shared_configs.contextvars import get_current_tenant_id
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
-def _fetch_workspace_permissions(
+async def _fetch_workspace_permissions(
     user_id_to_email_map: dict[str, str],
 ) -> ExternalAccess:
     user_emails = set()
@@ -35,7 +40,7 @@ def _fetch_workspace_permissions(
     )
 
 
-def _fetch_channel_permissions(
+async def _fetch_channel_permissions(
     slack_client: WebClient,
     workspace_permissions: ExternalAccess,
     user_id_to_email_map: dict[str, str],

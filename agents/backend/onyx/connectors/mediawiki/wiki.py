@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from __future__ import annotations
 
 import datetime
@@ -26,6 +31,9 @@ from onyx.connectors.models import TextSection
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 pywikibot.config.base_dir = tempfile.TemporaryDirectory().name

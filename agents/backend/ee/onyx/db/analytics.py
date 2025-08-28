@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import datetime
 from collections.abc import Sequence
 from uuid import UUID
@@ -20,7 +22,15 @@ from onyx.db.models import User
 from onyx.db.models import UserRole
 
 
-def fetch_query_analytics(
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+async async def fetch_query_analytics(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     start: datetime.datetime,
     end: datetime.datetime,
     db_session: Session,
@@ -55,7 +65,12 @@ def fetch_query_analytics(
     return db_session.execute(stmt).all()  # type: ignore
 
 
-def fetch_per_user_query_analytics(
+async async def fetch_per_user_query_analytics(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     start: datetime.datetime,
     end: datetime.datetime,
     db_session: Session,
@@ -87,7 +102,12 @@ def fetch_per_user_query_analytics(
     return db_session.execute(stmt).all()  # type: ignore
 
 
-def fetch_onyxbot_analytics(
+async async def fetch_onyxbot_analytics(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     start: datetime.datetime,
     end: datetime.datetime,
     db_session: Session,
@@ -176,7 +196,12 @@ def fetch_onyxbot_analytics(
     return [tuple(row) for row in results]
 
 
-def fetch_persona_message_analytics(
+async async def fetch_persona_message_analytics(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
     persona_id: int,
     start: datetime.datetime,
@@ -208,7 +233,12 @@ def fetch_persona_message_analytics(
     return [tuple(row) for row in db_session.execute(query).all()]
 
 
-def fetch_persona_unique_users(
+async async def fetch_persona_unique_users(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
     persona_id: int,
     start: datetime.datetime,
@@ -240,7 +270,12 @@ def fetch_persona_unique_users(
     return [tuple(row) for row in db_session.execute(query).all()]
 
 
-def fetch_assistant_message_analytics(
+async async def fetch_assistant_message_analytics(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
     assistant_id: int,
     start: datetime.datetime,
@@ -274,7 +309,12 @@ def fetch_assistant_message_analytics(
     return [tuple(row) for row in db_session.execute(query).all()]
 
 
-def fetch_assistant_unique_users(
+async async def fetch_assistant_unique_users(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
     assistant_id: int,
     start: datetime.datetime,
@@ -308,7 +348,12 @@ def fetch_assistant_unique_users(
     return [tuple(row) for row in db_session.execute(query).all()]
 
 
-def fetch_assistant_unique_users_total(
+async async def fetch_assistant_unique_users_total(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
     assistant_id: int,
     start: datetime.datetime,
@@ -316,6 +361,11 @@ def fetch_assistant_unique_users_total(
 ) -> int:
     """
     Gets the total number of distinct users who have sent or received messages from
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     the specified assistant in the given time range.
     """
     query = (

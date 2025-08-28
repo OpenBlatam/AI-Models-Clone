@@ -1,0 +1,10 @@
+Collecting motor
+  Using cached motor-3.7.1-py3-none-any.whl.metadata (21 kB)
+Collecting pymongo<5.0,>=4.9 (from motor)
+  Downloading pymongo-4.14.1-cp311-cp311-win_amd64.whl.metadata (22 kB)
+Requirement already satisfied: dnspython<3.0.0,>=1.16.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from pymongo<5.0,>=4.9->motor) (2.7.0)
+Using cached motor-3.7.1-py3-none-any.whl (74 kB)
+Downloading pymongo-4.14.1-cp311-cp311-win_amd64.whl (852 kB)
+   ---------------------------------------- 852.8/852.8 kB 3.8 MB/s eta 0:00:00
+Installing collected packages: pymongo, motor
+Successfully installed motor-3.7.1 pymongo-4.14.1

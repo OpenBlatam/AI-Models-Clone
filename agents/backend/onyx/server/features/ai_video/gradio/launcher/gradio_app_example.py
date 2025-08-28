@@ -1,10 +1,13 @@
-#!/usr/bin/env python3
-"""
-Gradio Application Example with Error Handling and Input Validation
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive example demonstrating proper error handling and input validation
-in Gradio applications for the AI Video system.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -15,16 +18,27 @@ from typing import Dict, Any, Optional, Tuple, List
 import gradio as gr
 import numpy as np
 from PIL import Image
+from .gradio_error_handling import (
+from .models import VideoRequest, VideoResponse
+from .core import (
+            from .main import get_system
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Gradio Application Example with Error Handling and Input Validation
+
+Comprehensive example demonstrating proper error handling and input validation
+in Gradio applications for the AI Video system.
+"""
+
 
 # Local imports
-from .gradio_error_handling import (
     GradioErrorHandler, GradioInputValidator, InputValidationRule,
     gradio_error_handler, gradio_input_validator,
     create_gradio_error_components, update_error_display,
     handle_gradio_error, validate_gradio_inputs
 )
-from .models import VideoRequest, VideoResponse
-from .core import (
     AIVideoError, ValidationError, ConfigurationError, WorkflowError,
     main_logger, performance_logger
 )
@@ -38,7 +52,7 @@ class AIVideoGradioApp:
     interfaces with the AI Video system.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_handler = GradioErrorHandler()
         self.input_validator = GradioInputValidator(self.error_handler)
         self.system = None
@@ -71,7 +85,6 @@ class AIVideoGradioApp:
             main_logger.info("Initializing Gradio application...")
             
             # Initialize AI Video system
-            from .main import get_system
             self.system = await get_system()
             self.is_initialized = True
             
@@ -508,7 +521,7 @@ class AIVideoGradioApp:
             )
             
             # Update error display when generation completes
-            def update_display(result):
+            def update_display(result) -> Any:
                 """Update error/success display based on result."""
                 if isinstance(result, dict) and result.get("error", False):
                     return update_error_display(
@@ -672,5 +685,6 @@ async def main():
         raise
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

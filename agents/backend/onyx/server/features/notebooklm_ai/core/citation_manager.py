@@ -1,11 +1,7 @@
-"""
-Advanced Citation and Reference Management System
-================================================
-
-A comprehensive system for automatic citation generation, validation,
-formatting, and reference management with support for multiple formats
-and academic databases.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import logging
@@ -19,16 +15,27 @@ import hashlib
 from urllib.parse import urlparse, quote
 import aiohttp
 from datetime import datetime
-
 import pandas as pd
 from pydantic import BaseModel, Field, validator
 import redis.asyncio as redis
 from sqlalchemy.ext.asyncio import AsyncSession
 import aiofiles
-
-# Core imports
 from .entities import Citation, Document, Analysis
 from ..nlp import NLPEngine
+                    import xml.etree.ElementTree as ET
+from typing import Any, List, Dict, Optional
+"""
+Advanced Citation and Reference Management System
+================================================
+
+A comprehensive system for automatic citation generation, validation,
+formatting, and reference management with support for multiple formats
+and academic databases.
+"""
+
+
+
+# Core imports
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -91,7 +98,9 @@ class CitationManager:
         redis_url: str = "redis://localhost:6379",
         db_session: AsyncSession = None
     ):
-        self.config = config or CitationConfig()
+        
+    """__init__ function."""
+self.config = config or CitationConfig()
         self.redis_url = redis_url
         self.db_session = db_session
         
@@ -120,16 +129,16 @@ class CitationManager:
         
         logger.info("Citation Manager initialized")
     
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Async context manager entry"""
         await self.startup()
         return self
     
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
         """Async context manager exit"""
         await self.shutdown()
     
-    async def startup(self):
+    async def startup(self) -> Any:
         """Initialize components"""
         try:
             # Initialize Redis connection
@@ -147,7 +156,7 @@ class CitationManager:
             logger.error(f"Failed to start Citation Manager: {e}")
             raise
     
-    async def shutdown(self):
+    async def shutdown(self) -> Any:
         """Cleanup and shutdown"""
         try:
             if hasattr(self, 'redis'):
@@ -577,7 +586,8 @@ class CitationManager:
     ) -> List[Citation]:
         """Sort citations by specified criteria"""
         try:
-            if sort_by == "authors":
+            match sort_by:
+    case "authors":
                 return sorted(citations, key=lambda x: x.authors[0] if x.authors else "")
             elif sort_by == "year":
                 return sorted(citations, key=lambda x: x.year or "0000")
@@ -703,7 +713,6 @@ class CitationManager:
                     data = await response.text()
                     
                     # Parse XML response (simplified)
-                    import xml.etree.ElementTree as ET
                     root = ET.fromstring(data)
                     
                     entry = root.find('.//{http://www.w3.org/2005/Atom}entry')
@@ -922,7 +931,7 @@ class CitationManager:
             'uptime': time.time() - getattr(self, '_start_time', time.time())
         }
     
-    async def clear_cache(self):
+    async def clear_cache(self) -> Any:
         """Clear all caches"""
         self._cache.clear()
         if hasattr(self, 'redis'):
@@ -978,5 +987,6 @@ async def main():
         print(f"\nMetrics: {metrics}")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

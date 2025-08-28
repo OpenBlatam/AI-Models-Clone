@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections import defaultdict
 
 from fastapi import APIRouter
@@ -17,6 +19,9 @@ from onyx.server.query_and_chat.token_limit import any_rate_limit_exists
 from onyx.server.token_rate_limits.models import TokenRateLimitArgs
 from onyx.server.token_rate_limits.models import TokenRateLimitDisplay
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 router = APIRouter(prefix="/admin/token-rate-limits")
 
 

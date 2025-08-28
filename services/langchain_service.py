@@ -1,19 +1,16 @@
-"""
-🎯 Facebook LangChain Service
-=============================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Servicio LangChain especializado para Facebook posts integrado con Onyx.
-Incluye chains, agents, memory y herramientas específicas para Facebook.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import logging
 from typing import Dict, List, Any, Optional
 import time
 from datetime import datetime, timedelta
-
-# LangChain imports
-try:
     from langchain.llms import OpenAI
     from langchain.chat_models import ChatOpenAI
     from langchain.chains import LLMChain, SequentialChain
@@ -28,13 +25,29 @@ try:
     from langchain.embeddings import OpenAIEmbeddings
     from langchain.vectorstores import FAISS
     from langchain.chains import RetrievalQA
+from ...llm.factory import get_default_llm_provider
+from ..config.langchain_config import FacebookLangChainConfig
+                    from ...llm.factory import get_default_llm_provider
+                import json
+                import json
+                from datetime import datetime
+from typing import Any, List, Dict, Optional
+"""
+🎯 Facebook LangChain Service
+=============================
+
+Servicio LangChain especializado para Facebook posts integrado con Onyx.
+Incluye chains, agents, memory y herramientas específicas para Facebook.
+"""
+
+
+# LangChain imports
+try:
     LANGCHAIN_AVAILABLE = True
 except ImportError:
     LANGCHAIN_AVAILABLE = False
 
 # Onyx imports
-from ...llm.factory import get_default_llm_provider
-from ..config.langchain_config import FacebookLangChainConfig
 
 logger = logging.getLogger(__name__)
 
@@ -43,7 +56,9 @@ class FacebookLangChainService:
     """Servicio LangChain especializado para Facebook posts."""
     
     def __init__(self, config: FacebookLangChainConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.llm = None
         self.chat_model = None
         self.memory = None
@@ -65,7 +80,7 @@ class FacebookLangChainService:
         self.logger = logger
         self._initialize_service()
     
-    def _initialize_service(self):
+    def _initialize_service(self) -> Any:
         """Inicializar el servicio LangChain."""
         try:
             if not LANGCHAIN_AVAILABLE:
@@ -99,13 +114,12 @@ class FacebookLangChainService:
             self.metrics['langchain_errors'] += 1
             raise
     
-    def _initialize_llm(self):
+    def _initialize_llm(self) -> Any:
         """Inicializar LLM con integración Onyx."""
         try:
             # Try to use Onyx LLM provider first
             if hasattr(self.config, 'use_onyx_llm') and self.config.use_onyx_llm:
                 try:
-                    from ...llm.factory import get_default_llm_provider
                     onyx_provider = get_default_llm_provider()
                     
                     # Adapt Onyx LLM to LangChain interface
@@ -142,12 +156,12 @@ class FacebookLangChainService:
             self.logger.error(f"Failed to initialize LLM: {e}")
             raise
     
-    def _adapt_onyx_llm(self, onyx_provider):
+    def _adapt_onyx_llm(self, onyx_provider) -> Any:
         """Adaptar Onyx LLM para LangChain."""
         # This would be a custom adapter to make Onyx LLM compatible with LangChain
         # For now, we'll use OpenAI as fallback
         class OnyxLLMAdapter:
-            def __init__(self, onyx_provider):
+            def __init__(self, onyx_provider) -> Any:
                 self.onyx_provider = onyx_provider
             
             async def agenerate(self, prompts: List[str], **kwargs) -> Any:
@@ -160,7 +174,7 @@ class FacebookLangChainService:
         
         return OnyxLLMAdapter(onyx_provider)
     
-    def _initialize_memory(self):
+    def _initialize_memory(self) -> Any:
         """Inicializar memoria conversacional."""
         if self.config.use_memory:
             self.memory = ConversationBufferMemory(
@@ -170,7 +184,7 @@ class FacebookLangChainService:
             )
             self.logger.info("Memory initialized")
     
-    def _initialize_tools(self):
+    def _initialize_tools(self) -> Any:
         """Inicializar herramientas para agents."""
         if not self.config.enable_tools:
             return
@@ -222,7 +236,7 @@ class FacebookLangChainService:
         except Exception as e:
             self.logger.error(f"Error initializing tools: {e}")
     
-    def _initialize_chains(self):
+    def _initialize_chains(self) -> Any:
         """Inicializar cadenas de LangChain."""
         try:
             # Facebook post generation chain
@@ -342,7 +356,7 @@ class FacebookLangChainService:
         except Exception as e:
             self.logger.error(f"Error initializing chains: {e}")
     
-    def _initialize_agents(self):
+    def _initialize_agents(self) -> Any:
         """Inicializar agentes si están habilitados."""
         if not self.config.enable_agents or not self.tools:
             return
@@ -364,7 +378,7 @@ class FacebookLangChainService:
         except Exception as e:
             self.logger.error(f"Error initializing agents: {e}")
     
-    def _initialize_vector_store(self):
+    def _initialize_vector_store(self) -> Any:
         """Inicializar vector store para knowledge base."""
         try:
             if self.config.openai_api_key:
@@ -474,7 +488,6 @@ class FacebookLangChainService:
             
             # Parse JSON result
             try:
-                import json
                 analysis_data = json.loads(result)
             except json.JSONDecodeError:
                 # Fallback to basic analysis
@@ -506,7 +519,6 @@ class FacebookLangChainService:
             self.metrics['total_cost'] += cb.total_cost
             
             try:
-                import json
                 recommendations = json.loads(result)
                 return {'recommendations': recommendations}
             except json.JSONDecodeError:
@@ -533,7 +545,6 @@ class FacebookLangChainService:
             
             # Parse datetime
             try:
-                from datetime import datetime
                 optimal_time = datetime.fromisoformat(result.strip())
                 return {'optimal_time': optimal_time}
             except (ValueError, AttributeError):
@@ -545,13 +556,13 @@ class FacebookLangChainService:
             self.logger.error(f"Error predicting optimal timing: {e}")
             return {'optimal_time': None}
     
-    async def _run_chain_async(self, chain, inputs):
+    async def _run_chain_async(self, chain, inputs) -> Any:
         """Ejecutar cadena de forma asíncrona."""
         # LangChain chains are not natively async, so we run them in a thread pool
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, chain.run, inputs)
     
-    async def _run_agent_async(self, agent, prompt):
+    async def _run_agent_async(self, agent, prompt) -> Any:
         """Ejecutar agente de forma asíncrona."""
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, agent.run, prompt)

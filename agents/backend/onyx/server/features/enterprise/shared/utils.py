@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import hashlib
+import time
+import json
+from typing import Any, Dict, Optional
+from datetime import datetime, timezone
+        import orjson
+        import orjson
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Shared Utilities
 ===============
@@ -5,11 +20,6 @@ Shared Utilities
 Common utility functions used across the enterprise API.
 """
 
-import hashlib
-import time
-import json
-from typing import Any, Dict, Optional
-from datetime import datetime, timezone
 
 
 def generate_cache_key(key: str, prefix: str = "enterprise") -> str:
@@ -25,7 +35,6 @@ def get_current_timestamp() -> datetime:
 def serialize_json(data: Any) -> str:
     """Serialize data to JSON string."""
     try:
-        import orjson
         return orjson.dumps(data).decode()
     except ImportError:
         return json.dumps(data, default=str)
@@ -34,15 +43,14 @@ def serialize_json(data: Any) -> str:
 def deserialize_json(data: str) -> Any:
     """Deserialize JSON string to data."""
     try:
-        import orjson
         return orjson.loads(data)
     except ImportError:
         return json.loads(data)
 
 
-def measure_time(func):
+def measure_time(func) -> Any:
     """Decorator to measure function execution time."""
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         start_time = time.perf_counter()
         result = func(*args, **kwargs)
         end_time = time.perf_counter()

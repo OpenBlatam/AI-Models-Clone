@@ -1,0 +1,96 @@
+# Multi-stage production Dockerfile for LinkedIn Posts System
+# Optimized for performance, security, and minimal size
+
+# Stage 1: Base image with system dependencies
+FROM python:3.11-slim as base
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    curl \
+    git \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create non-root user
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Stage 2: Dependencies
+FROM base as dependencies
+
+# Set work directory
+WORKDIR /app
+
+# Copy requirements
+COPY requirements.txt .
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Stage 3: Production image
+FROM base as production
+
+# Set work directory
+WORKDIR /app
+
+# Copy Python dependencies from dependencies stage
+COPY --from=dependencies /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=dependencies /usr/local/bin /usr/local/bin
+
+# Copy application code
+COPY linkedin_posts/ ./linkedin_posts/
+COPY main.py .
+COPY production_config.py .
+
+# Create necessary directories
+RUN mkdir -p logs uploads models/nlp
+
+# Set ownership to non-root user
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Expose port
+EXPOSE 8000
+
+# Run the application
+CMD ["python", "main.py", "--mode", "server", "--host", "0.0.0.0", "--port", "8000"]
+
+# Stage 4: Development image (optional)
+FROM base as development
+
+# Set work directory
+WORKDIR /app
+
+# Install development dependencies
+COPY requirements-dev.txt .
+RUN pip install --no-cache-dir -r requirements-dev.txt
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p logs uploads models/nlp
+
+# Set ownership to non-root user
+RUN chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# Expose port
+EXPOSE 8000
+
+# Run in development mode
+CMD ["python", "main.py", "--mode", "server", "--host", "0.0.0.0", "--port", "8000"] 

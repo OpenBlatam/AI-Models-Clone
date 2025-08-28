@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import aiohttp
+import json
+import time
+from typing import Dict, List, Any
+from datetime import datetime
+from typing import Any, List, Dict, Optional
+import logging
 """
 🎯 FASTAPI BEST PRACTICES - USAGE EXAMPLES
 ==========================================
@@ -13,12 +29,6 @@ Features:
 - Integration examples
 """
 
-import asyncio
-import aiohttp
-import json
-import time
-from typing import Dict, List, Any
-from datetime import datetime
 
 # ============================================================================
 # 1. API CLIENT EXAMPLES
@@ -28,17 +38,19 @@ class AIVideoAPIClient:
     """Client for interacting with the AI Video API."""
     
     def __init__(self, base_url: str = "http://localhost:8000", api_key: str = None):
-        self.base_url = base_url.rstrip('/')
+        
+    """__init__ function."""
+self.base_url = base_url.rstrip('/')
         self.api_key = api_key
         self.session = None
     
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         self.session = aiohttp.ClientSession(
             headers={"Authorization": f"Bearer {self.api_key}"} if self.api_key else {}
         )
         return self
     
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
         if self.session:
             await self.session.close()
     

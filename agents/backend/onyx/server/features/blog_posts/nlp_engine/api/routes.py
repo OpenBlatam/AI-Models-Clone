@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+import uuid
+from typing import List, Dict, Any, Optional
+import logging
+from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel, Field
+import uvicorn
+from .. import NLPEngine, AnalysisType, ProcessingTier, __version__
+from ..application.dto import AnalysisRequest, BatchAnalysisRequest
+from .middleware import RateLimitMiddleware, MetricsMiddleware, LoggingMiddleware
+from .serializers import AnalysisRequestSerializer, AnalysisResponseSerializer
+from typing import Any, List, Dict, Optional
 """
 🚀 PRODUCTION API ROUTES - Endpoints REST Enterprise
 ===================================================
@@ -9,24 +34,8 @@ API REST completa para motor NLP modular con:
 - Documentación automática con OpenAPI
 """
 
-import asyncio
-import time
-import uuid
-from typing import List, Dict, Any, Optional
-import logging
 
-from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, Field
-import uvicorn
 
-from .. import NLPEngine, AnalysisType, ProcessingTier, __version__
-from ..application.dto import AnalysisRequest, BatchAnalysisRequest
-from .middleware import RateLimitMiddleware, MetricsMiddleware, LoggingMiddleware
-from .serializers import AnalysisRequestSerializer, AnalysisResponseSerializer
 
 # ═══════════════════════════════════════════════════════════════
 # 🔧 CONFIGURACIÓN DE LA APLICACIÓN

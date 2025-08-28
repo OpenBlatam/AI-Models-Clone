@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 from collections.abc import Callable
 from collections.abc import Generator
@@ -27,6 +29,9 @@ from onyx.connectors.github.connector import SerializedRepository
 from onyx.connectors.models import Document
 from tests.unit.onyx.connectors.utils import load_everything_from_checkpoint_connector
 from tests.unit.onyx.connectors.utils import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     load_everything_from_checkpoint_connector_from_checkpoint,
 )
 
@@ -715,7 +720,7 @@ def test_load_from_checkpoint_cursor_pagination_completion(
     mock_repo2_cursor_paginator.__nextUrl = None
     pull_requests_func_invocation_count = 0
 
-    def replacement_pull_requests_func(
+    async def replacement_pull_requests_func(
         repo: Repository,
     ) -> Callable[[], PaginatedList[PullRequest]]:
         nonlocal pull_requests_func_invocation_count

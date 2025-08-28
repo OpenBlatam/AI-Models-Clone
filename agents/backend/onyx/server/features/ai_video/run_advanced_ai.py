@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import sys
+from pathlib import Path
+        from advanced_ai_system import AdvancedAISystem, AdvancedAIConfig
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Advanced AI System Runner
@@ -6,8 +17,6 @@ Simple script to run the advanced AI system with deep learning, transformers,
 diffusion models, and LLMs.
 """
 
-import sys
-from pathlib import Path
 
 # Add current directory to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -15,7 +24,6 @@ sys.path.insert(0, str(Path(__file__).parent))
 def main():
     """Run the Advanced AI System."""
     try:
-        from advanced_ai_system import AdvancedAISystem, AdvancedAIConfig
         
         print("🚀 Starting Advanced AI System...")
         print("Deep Learning, Transformers, Diffusion Models, and LLMs")

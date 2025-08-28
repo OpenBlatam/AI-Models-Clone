@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Adapted from original image-processo/extract.py
 
 def extract_text_from_url(image_url: str, **kwargs) -> str:

@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import sys
+import os
+from pathlib import Path
+        from examples.performance_optimization_demo import main as run_demo
+        import asyncio
+        import traceback
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Performance Optimization Demo Launcher
@@ -6,9 +19,6 @@ Launcher script for demonstrating comprehensive performance optimization
 techniques including memory optimization, computational efficiency, and training acceleration.
 """
 
-import sys
-import os
-from pathlib import Path
 
 # Add the project root to the Python path
 project_root = Path(__file__).parent.parent.parent.parent.parent
@@ -26,8 +36,6 @@ def main():
     
     try:
         # Import and run the demo
-        from examples.performance_optimization_demo import main as run_demo
-        import asyncio
         asyncio.run(run_demo())
         
     except ImportError as e:
@@ -40,7 +48,6 @@ def main():
         
     except Exception as e:
         print(f"Error running demo: {e}")
-        import traceback
         traceback.print_exc()
         return 1
     

@@ -1,8 +1,10 @@
-"""
-Report Aggregator
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Provides functionality to aggregate and combine multiple report types.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 from typing import Dict, Any, List, Optional, Union
@@ -11,6 +13,14 @@ from enum import Enum
 import time
 from datetime import datetime
 import json
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Report Aggregator
+
+Provides functionality to aggregate and combine multiple report types.
+"""
+
 
 class ReportType(str, Enum):
     """Enumeration of report types."""
@@ -33,7 +43,7 @@ class ReportAggregatorRequest(BaseModel):
     generate_timeline: bool = Field(default=True, description="Generate timeline")
     
     @validator('console_report', 'html_report', 'json_report')
-    def validate_reports(cls, v):
+    def validate_reports(cls, v) -> bool:
         if v is not None and not v:
             raise ValueError("Report data cannot be empty if provided")
         return v

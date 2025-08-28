@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Any, Dict, List, Optional, Union
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+import uuid
+from pydantic import BaseModel, Field, validator
+from pydantic.types import UUID4
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Onyx AI Video System - Models
 
@@ -5,14 +26,7 @@ Data models for the Onyx AI Video system with Pydantic validation
 and integration with Onyx's data patterns.
 """
 
-from typing import Any, Dict, List, Optional, Union
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
-import uuid
 
-from pydantic import BaseModel, Field, validator
-from pydantic.types import UUID4
 
 
 class VideoQuality(str, Enum):
@@ -101,28 +115,28 @@ class VideoRequest(BaseModel):
     subtitle_language: Optional[str] = Field(default=None, description="Idioma de subtítulos")
     
     @validator('input_text')
-    def validate_input_text(cls, v):
+    def validate_input_text(cls, v) -> bool:
         """Validate input text."""
         if not v.strip():
             raise ValueError("Input text cannot be empty")
         return v.strip()
     
     @validator('user_id')
-    def validate_user_id(cls, v):
+    def validate_user_id(cls, v) -> bool:
         """Validate user ID."""
         if not v.strip():
             raise ValueError("User ID cannot be empty")
         return v.strip()
     
     @validator('request_id')
-    def validate_request_id(cls, v):
+    async def validate_request_id(cls, v) -> bool:
         """Validate request ID."""
         if v and not v.strip():
             raise ValueError("Request ID cannot be empty")
         return v.strip() if v else str(uuid.uuid4())
     
     @validator('plugins')
-    def validate_plugin_conflicts(cls, v, values):
+    def validate_plugin_conflicts(cls, v, values) -> bool:
         # Validar conflictos si hay plugins y plugin_config
         plugin_config = values.get('plugin_config', {})
         if v and plugin_config:
@@ -415,7 +429,7 @@ class PluginExecutionContext:
 
 
 # Model utilities
-def create_video_request(
+async def create_video_request(
     input_text: str,
     user_id: str,
     quality: VideoQuality = VideoQuality.MEDIUM,

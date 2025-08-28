@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import httpx
 from sqlalchemy.orm import Session
 
@@ -8,6 +10,9 @@ from onyx.document_index.vespa.index import VespaIndex
 from shared_configs.configs import MULTI_TENANT
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def get_default_document_index(
     search_settings: SearchSettings,
     secondary_search_settings: SearchSettings | None,

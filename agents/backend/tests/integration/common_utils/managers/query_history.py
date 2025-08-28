@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from urllib.parse import urlencode
 from uuid import UUID
@@ -14,6 +16,9 @@ from tests.integration.common_utils.constants import GENERAL_HEADERS
 from tests.integration.common_utils.test_models import DATestUser
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class QueryHistoryManager:
     @staticmethod
     def get_query_history_page(

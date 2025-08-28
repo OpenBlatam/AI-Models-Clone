@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from collections.abc import Sequence
 from typing import cast
 from uuid import UUID
@@ -31,6 +36,9 @@ from onyx.server.features.document_set.models import DocumentSetUpdateRequest
 from onyx.utils.logger import setup_logger
 from onyx.utils.variable_functionality import fetch_versioned_implementation
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -433,7 +441,7 @@ def delete_document_set_cc_pair_relationship__no_commit(
     return result.rowcount  # type: ignore
 
 
-def fetch_document_sets(
+async def fetch_document_sets(
     user_id: UUID | None, db_session: Session, include_outdated: bool = False
 ) -> list[tuple[DocumentSetDBModel, list[ConnectorCredentialPair]]]:
     """Return is a list where each element contains a tuple of:
@@ -487,7 +495,7 @@ def fetch_document_sets(
     ]
 
 
-def fetch_all_document_sets_for_user(
+async def fetch_all_document_sets_for_user(
     db_session: Session,
     user: User | None,
     get_editable: bool = True,
@@ -497,7 +505,7 @@ def fetch_all_document_sets_for_user(
     return db_session.scalars(stmt).all()
 
 
-def fetch_documents_for_document_set_paginated(
+async def fetch_documents_for_document_set_paginated(
     document_set_id: int,
     db_session: Session,
     current_only: bool = True,
@@ -591,7 +599,7 @@ def construct_document_id_select_by_docset(
     return stmt
 
 
-def fetch_document_sets_for_document(
+async def fetch_document_sets_for_document(
     document_id: str,
     db_session: Session,
 ) -> list[str]:
@@ -608,7 +616,7 @@ def fetch_document_sets_for_document(
     return result[0][1]
 
 
-def fetch_document_sets_for_documents(
+async def fetch_document_sets_for_documents(
     document_ids: list[str],
     db_session: Session,
 ) -> Sequence[tuple[str, list[str]]]:

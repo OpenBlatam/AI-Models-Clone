@@ -1,7 +1,8 @@
-"""
-Base Model - Onyx Integration
-Production-ready base model class with repository, audit context, hooks, and robust logging.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, Callable
 from datetime import datetime
@@ -11,8 +12,6 @@ from .model_field import ModelField, FieldConfig
 from .model_schema import ModelSchema, SchemaConfig
 from .model_exceptions import OnyxModelError, ValidationError, VersionError
 from .model_mixins import (
-    TimestampMixin, SoftDeleteMixin, VersionMixin, AuditMixin, ValidationMixin, LoggingMixin
-)
 from .model_decorators import validate_model, cache_model, log_operations
 from pydantic import BaseModel, ConfigDict
 import orjson
@@ -20,6 +19,18 @@ from .batch_utils import BatchMethodsMixin
 from .value_objects import Money, Dimensions, SEOData
 from .enums import ProductStatus, ProductType, PriceType, InventoryTracking
 from .validators import not_empty_string, list_or_empty, dict_or_empty
+        from .model_repository import ModelRepository
+        from .model_service import ModelService
+from datetime import datetime, timedelta
+from typing import List, Optional
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Base Model - Onyx Integration
+Production-ready base model class with repository, audit context, hooks, and robust logging.
+"""
+    TimestampMixin, SoftDeleteMixin, VersionMixin, AuditMixin, ValidationMixin, LoggingMixin
+)
 
 T = TypeVar('T', bound='OnyxBaseModel')
 
@@ -60,7 +71,9 @@ class OnyxBaseModel(
         version: str = "1.0.0",
         user_context: Optional[Dict[str, Any]] = None
     ):
-        super().__init__()
+        
+    """__init__ function."""
+super().__init__()
         self._schema = schema
         self._id = id or str(uuid.uuid4())
         self.version = version
@@ -298,15 +311,13 @@ class OnyxBaseModel(
         self.log_info(f"Audit log: {entry}")
 
     @property
-    def _repository(self):
-        from .model_repository import ModelRepository
+    def _repository(self) -> Any:
         if not hasattr(self, '__repository'):
             self.__repository = ModelRepository()
         return self.__repository
 
     @property
-    def _service(self):
-        from .model_service import ModelService
+    def _service(self) -> Any:
         if not hasattr(self, '__service'):
             self.__service = ModelService()
         return self.__service
@@ -330,8 +341,6 @@ class OnyxGenericModel(GenericModel, Generic[T]):
 
 # Example usage:
 """
-from datetime import datetime, timedelta
-from typing import List, Optional
 
 # Create a model with specific mixins
 class UserModel(
@@ -382,7 +391,9 @@ class ProductModel(OnyxBaseModel):
 # Create a generic model
 class UserData:
     def __init__(self, name: str, email: str):
-        self.name = name
+        
+    """__init__ function."""
+self.name = name
         self.email = email
 
 user_data = UserData("John", "john@example.com")

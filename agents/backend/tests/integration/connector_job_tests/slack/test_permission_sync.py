@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from datetime import datetime
 from datetime import timezone
@@ -12,8 +14,6 @@ from tests.integration.common_utils.managers.cc_pair import CCPairManager
 from tests.integration.common_utils.managers.connector import ConnectorManager
 from tests.integration.common_utils.managers.credential import CredentialManager
 from tests.integration.common_utils.managers.document_search import (
-    DocumentSearchManager,
-)
 from tests.integration.common_utils.managers.llm_provider import LLMProviderManager
 from tests.integration.common_utils.managers.user import UserManager
 from tests.integration.common_utils.managers.user_group import UserGroupManager
@@ -23,6 +23,11 @@ from tests.integration.common_utils.test_models import DATestCredential
 from tests.integration.common_utils.test_models import DATestUser
 from tests.integration.common_utils.vespa import vespa_fixture
 from tests.integration.connector_job_tests.slack.slack_api_utils import SlackManager
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    DocumentSearchManager,
+)
 
 
 # NOTE(rkuo): it isn't yet clear if the reason these were previously xfail'd

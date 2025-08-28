@@ -1,6 +1,5 @@
-"""
-Digital signature utilities for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Optional, Union
 from pydantic import BaseModel, field_validator
 import structlog
@@ -8,6 +7,13 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import rsa, ed25519, padding
 from cryptography.hazmat.backends import default_backend
 import base64
+        import hashlib
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Digital signature utilities for cybersecurity tools.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -19,19 +25,19 @@ class SignatureInput(BaseModel):
     encoding: str = "utf-8"
     
     @field_validator('data')
-    def validate_data(cls, v):
+    def validate_data(cls, v) -> bool:
         if not v:
             raise ValueError("Data cannot be empty")
         return v
     
     @field_validator('private_key')
-    def validate_private_key(cls, v):
+    def validate_private_key(cls, v) -> bool:
         if not v:
             raise ValueError("Private key cannot be empty")
         return v
     
     @field_validator('algorithm')
-    def validate_algorithm(cls, v):
+    def validate_algorithm(cls, v) -> bool:
         valid_algorithms = ["RSA-SHA256", "RSA-SHA512", "Ed25519"]
         if v not in valid_algorithms:
             raise ValueError(f"Algorithm must be one of: {valid_algorithms}")
@@ -46,19 +52,19 @@ class VerificationInput(BaseModel):
     encoding: str = "utf-8"
     
     @field_validator('data')
-    def validate_data(cls, v):
+    def validate_data(cls, v) -> bool:
         if not v:
             raise ValueError("Data cannot be empty")
         return v
     
     @field_validator('signature')
-    def validate_signature(cls, v):
+    def validate_signature(cls, v) -> bool:
         if not v:
             raise ValueError("Signature cannot be empty")
         return v
     
     @field_validator('public_key')
-    def validate_public_key(cls, v):
+    def validate_public_key(cls, v) -> bool:
         if not v:
             raise ValueError("Public key cannot be empty")
         return v
@@ -370,7 +376,6 @@ def generate_message_digest(data: Union[str, bytes], algorithm: str = "SHA-256",
         Hex digest of the data
     """
     try:
-        import hashlib
         
         # Convert data to bytes if it's a string
         if isinstance(data, str):

@@ -3,7 +3,7 @@ import pytest
 hypothesis = pytest.importorskip("hypothesis")
 from hypothesis import given, strategies as st
 
-from agents.backend.onyx.server.features.heygen_ai.security_config import SecurityConfigManager
+from security_config import SecurityConfigManager
 import os
 import tempfile
 

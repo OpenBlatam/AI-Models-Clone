@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import re
+import logging
+from typing import List, Dict, Any, Optional, Tuple
+from datetime import datetime, timedelta
+import hashlib
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🎯 Facebook Utils
 ================
@@ -5,11 +23,6 @@
 Utilidades para procesamiento y optimización de Facebook posts.
 """
 
-import re
-import logging
-from typing import List, Dict, Any, Optional, Tuple
-from datetime import datetime, timedelta
-import hashlib
 
 
 logger = logging.getLogger(__name__)
@@ -278,7 +291,7 @@ class FacebookUtils:
     def format_engagement_metrics(likes: int, shares: int, comments: int) -> Dict[str, str]:
         """Formatear métricas de engagement para display."""
         try:
-            def format_number(num):
+            def format_number(num) -> Any:
                 if num >= 1000000:
                     return f"{num/1000000:.1f}M"
                 elif num >= 1000:

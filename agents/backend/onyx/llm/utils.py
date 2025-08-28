@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import copy
 import io
 import json
@@ -53,8 +58,11 @@ from onyx.utils.logger import setup_logger
 from shared_configs.configs import LOG_LEVEL
 
 
-if TYPE_CHECKING:
     from onyx.server.manage.llm.models import LLMProviderView
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+if TYPE_CHECKING:
 
 
 logger = setup_logger()
@@ -166,7 +174,7 @@ def _build_content(
                 # logger.warning(f"Could not decode binary file content for file type: {file.file_type}")
         file_name_section = f"DOCUMENT: {file.filename}\n" if file.filename else ""
         final_message_with_files += (
-            f"{file_name_section}{CODE_BLOCK_PAT.format(file_content.strip())}\n\n\n"
+            f"f"{file_name_section}{CODE_BLOCK_PAT")}\n\n\n"
         )
 
     return final_message_with_files + message

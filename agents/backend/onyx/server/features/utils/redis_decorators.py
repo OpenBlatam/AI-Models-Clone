@@ -1,7 +1,8 @@
-"""
-Redis Decorators - Onyx Integration
-Decorators for Redis caching in Onyx.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Any, Callable, Dict, List, Optional, Union, TypeVar, Generic
 from functools import wraps
 import inspect
@@ -11,6 +12,13 @@ import time
 import logging
 from .redis_utils import RedisUtils
 from .redis_config import get_config
+from .redis_decorators import redis_decorators
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Redis Decorators - Onyx Integration
+Decorators for Redis caching in Onyx.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -244,7 +252,6 @@ redis_decorators = RedisDecorators()
 
 # Example usage:
 """
-from .redis_decorators import redis_decorators
 
 # Cache function results
 @redis_decorators.cache(

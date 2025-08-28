@@ -1,16 +1,10 @@
-"""
-Enhanced Product API - Production Ready
-======================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-High-performance, scalable API following FastAPI best practices:
-- Async/await optimization
-- Dependency injection
-- Error handling with early returns  
-- Performance monitoring
-- Comprehensive caching
-- Rate limiting
-- Type safety
-"""
+# Constants
+MAX_RETRIES = 100
 
 from contextlib import asynccontextmanager
 from typing import Annotated, Optional, List, Dict, Any, Union
@@ -28,9 +22,24 @@ import uvicorn
 import redis.asyncio as redis
 from functools import wraps
 import hashlib
-
 from ..core.generator import ProductDescriptionGenerator
 from ..core.config import ProductDescriptionConfig
+from typing import Any, List, Dict, Optional
+"""
+Enhanced Product API - Production Ready
+======================================
+
+High-performance, scalable API following FastAPI best practices:
+- Async/await optimization
+- Dependency injection
+- Error handling with early returns  
+- Performance monitoring
+- Comprehensive caching
+- Rate limiting
+- Type safety
+"""
+
+
 
 # Configure structured logging
 logging.basicConfig(
@@ -108,21 +117,21 @@ class ProductRequest(BaseModel):
     auto_generate_description: bool = Field(False, description="Auto-generate AI description")
     
     @validator('price_range')
-    def validate_price_range(cls, v):
+    def validate_price_range(cls, v) -> bool:
         allowed = ["low", "medium", "high", "luxury"]
         if v not in allowed:
             raise ValueError(f"price_range must be one of {allowed}")
         return v
     
     @validator('style')
-    def validate_style(cls, v):
+    def validate_style(cls, v) -> bool:
         allowed = ["professional", "casual", "luxury", "technical", "creative"]
         if v not in allowed:
             raise ValueError(f"style must be one of {allowed}")
         return v
     
     @validator('tone')
-    def validate_tone(cls, v):
+    def validate_tone(cls, v) -> bool:
         allowed = ["friendly", "formal", "enthusiastic", "informative", "persuasive"]
         if v not in allowed:
             raise ValueError(f"tone must be one of {allowed}")
@@ -145,7 +154,7 @@ class PresetRequest(BaseModel):
     override_params: Optional[Dict[str, Any]] = Field(None, description="Parameter overrides")
     
     @validator('preset')
-    def validate_preset(cls, v):
+    def validate_preset(cls, v) -> bool:
         allowed = ["ecommerce", "luxury", "technical"]
         if v not in allowed:
             raise ValueError(f"preset must be one of {allowed}")
@@ -185,7 +194,9 @@ class ProductDescriptionService:
     """
     
     def __init__(self, config: Optional[ProductDescriptionConfig] = None):
-        self.config = config or ProductDescriptionConfig()
+        
+    """__init__ function."""
+self.config = config or ProductDescriptionConfig()
         self.generator: Optional[ProductDescriptionGenerator] = None
         self.app = FastAPI(
             title="Product Description Generator API",
@@ -205,7 +216,7 @@ class ProductDescriptionService:
         # Setup routes
         self._setup_routes()
     
-    def _setup_middleware(self):
+    def _setup_middleware(self) -> Any:
         """Setup FastAPI middleware."""
         
         # CORS middleware
@@ -219,7 +230,7 @@ class ProductDescriptionService:
         
         # Custom middleware for logging
         @self.app.middleware("http")
-        async def log_requests(request, call_next):
+        async async def log_requests(request, call_next) -> Any:
             start_time = time.time()
             response = await call_next(request)
             process_time = time.time() - start_time
@@ -233,7 +244,7 @@ class ProductDescriptionService:
             response.headers["X-Process-Time"] = str(process_time)
             return response
     
-    def _setup_routes(self):
+    def _setup_routes(self) -> Any:
         """Setup API routes."""
         
         @self.app.on_event("startup")
@@ -426,7 +437,7 @@ class ProductDescriptionService:
                 ]
             }
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize the service."""
         try:
             logger.info("Initializing Product Description Service...")

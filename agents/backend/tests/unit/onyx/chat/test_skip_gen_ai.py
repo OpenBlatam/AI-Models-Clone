@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any
 from unittest.mock import Mock
 from uuid import UUID
@@ -18,6 +20,9 @@ from onyx.tools.tool_implementations.search.search_tool import SearchTool
 from tests.regression.answer_quality.run_qa import _process_and_write_query_results
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.mark.parametrize(
     "config",
     [

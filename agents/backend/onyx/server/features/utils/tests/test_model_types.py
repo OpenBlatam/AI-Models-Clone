@@ -1,7 +1,5 @@
-"""
-Test Model Types - Onyx Integration
-Tests for model types and registry.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 from datetime import datetime
 from typing import Dict, Any, List
@@ -9,13 +7,20 @@ from ..base_model import OnyxBaseModel
 from ..model_schema import ModelSchema
 from ..model_field import ModelField
 from ..model_types import (
+from ..model_exceptions import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Test Model Types - Onyx Integration
+Tests for model types and registry.
+"""
     ModelRegistry,
     ModelFactory,
     ModelValidation,
     ModelStatus,
     ModelPermission
 )
-from ..model_exceptions import (
     ValidationError,
     RegistryError,
     FactoryError
@@ -71,7 +76,9 @@ def test_schema() -> ModelSchema:
 class TestModel(OnyxBaseModel):
     """Test model class."""
     def __init__(self, **data: Any):
-        super().__init__(schema=test_schema(), data=data)
+        
+    """__init__ function."""
+super().__init__(schema=test_schema(), data=data)
 
 # Test model status
 def test_model_status():

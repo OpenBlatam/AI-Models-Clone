@@ -1,34 +1,55 @@
 #!/usr/bin/env python3
 """
-Setup script for Email Sequence AI System
+Setup script for Optimized Email Sequence AI System
 """
 
-from setuptools import setup, find_packages
 import os
+from setuptools import setup, find_packages
 
-# Read the README file
-def read_readme():
-    readme_path = os.path.join(os.path.dirname(__file__), "README.md")
-    if os.path.exists(readme_path):
-        with open(readme_path, "r", encoding="utf-8") as f:
-            return f.read()
-    return "Email Sequence AI System with Advanced Optimization and Profiling"
 
-# Read requirements
-def read_requirements(filename):
+def read_file(filename: str) -> str:
+    """Read file contents safely"""
+    file_path = os.path.join(os.path.dirname(__file__), filename)
+    try:
+        if os.path.exists(file_path):
+            with open(file_path, "r", encoding="utf-8") as f:
+                return f.read()
+    except Exception as e:
+        print(f"Warning: Could not read {filename}: {e}")
+    return ""
+
+
+def read_requirements(filename: str) -> list:
+    """Read requirements from file"""
     requirements_path = os.path.join(os.path.dirname(__file__), filename)
-    if os.path.exists(requirements_path):
-        with open(requirements_path, "r", encoding="utf-8") as f:
-            return [line.strip() for line in f if line.strip() and not line.startswith("#")]
+    try:
+        if os.path.exists(requirements_path):
+            with open(requirements_path, "r", encoding="utf-8") as f:
+                return [
+                    line.strip() 
+                    for line in f 
+                    if line.strip() and not line.startswith("#")
+                ]
+    except Exception as e:
+        print(f"Warning: Could not read requirements from {filename}: {e}")
     return []
 
+
+# Read files
+README = read_file("README.md")
+LONG_DESCRIPTION = README if README else "Optimized Email Sequence AI System with Advanced Performance and Profiling"
+
+# Read requirements
+INSTALL_REQUIRES = read_requirements("requirements-minimal.txt")
+DEV_REQUIRES = read_requirements("requirements-dev.txt")
+
 setup(
-    name="email-sequence-ai",
-    version="1.0.0",
+    name="email-sequence-ai-optimized",
+    version="2.0.0",
     author="Blatam Academy",
     author_email="contact@blatamacademy.com",
-    description="Advanced Email Sequence AI System with Optimization and Profiling",
-    long_description=read_readme(),
+    description="Optimized Email Sequence AI System with Advanced Performance and Profiling",
+    long_description=LONG_DESCRIPTION,
     long_description_content_type="text/markdown",
     url="https://github.com/blatamacademy/email-sequence-ai",
     packages=find_packages(),
@@ -49,14 +70,13 @@ setup(
         "Topic :: Text Processing :: Linguistic",
     ],
     python_requires=">=3.8",
-    install_requires=read_requirements("requirements.txt"),
+    install_requires=INSTALL_REQUIRES,
     extras_require={
-        "dev": read_requirements("requirements-dev.txt"),
-        "minimal": read_requirements("requirements-minimal.txt"),
+        "dev": DEV_REQUIRES,
         "gpu": [
-            "torch>=2.0.0+cu118",
-            "torchvision>=0.15.0+cu118",
-            "torchaudio>=2.0.0+cu118",
+            "torch>=2.0.0",
+            "torchvision>=0.15.0",
+            "torchaudio>=2.0.0",
         ],
         "distributed": [
             "torch>=2.0.0",
@@ -78,41 +98,48 @@ setup(
             "py-spy>=0.3.0",
             "pyinstrument>=4.6.0",
         ],
+        "full": [
+            "torch>=2.0.0",
+            "transformers>=4.30.0",
+            "datasets>=2.12.0",
+            "numpy>=1.24.0",
+            "pandas>=2.0.0",
+            "scikit-learn>=1.3.0",
+            "gradio>=3.35.0",
+            "python-dotenv>=1.0.0",
+            "pyyaml>=6.0",
+            "loguru>=0.7.0",
+            "tqdm>=4.65.0",
+            "pydantic>=2.0.0",
+            "pytest>=7.4.0",
+            "better-exceptions>=0.3.0",
+            "prometheus-client>=0.17.0",
+            "memory-profiler>=0.61.0",
+            "line-profiler>=4.1.0",
+        ],
     },
     entry_points={
         "console_scripts": [
             "email-sequence-ai=email_sequence.cli:main",
-            "email-sequence-train=email_sequence.training:main",
-            "email-sequence-demo=email_sequence.demo:main",
-            "email-sequence-profile=email_sequence.profiling:main",
         ],
     },
     include_package_data=True,
-    package_data={
-        "email_sequence": [
-            "configs/*.yaml",
-            "configs/*.json",
-            "models/*.pkl",
-            "data/*.csv",
-            "data/*.json",
-        ],
-    },
+    zip_safe=False,
     keywords=[
         "email",
         "sequence",
         "ai",
+        "langchain",
+        "automation",
+        "personalization",
         "machine-learning",
         "nlp",
         "optimization",
-        "profiling",
-        "gradio",
-        "pytorch",
-        "transformers",
+        "performance"
     ],
     project_urls={
         "Bug Reports": "https://github.com/blatamacademy/email-sequence-ai/issues",
         "Source": "https://github.com/blatamacademy/email-sequence-ai",
-        "Documentation": "https://email-sequence-ai.readthedocs.io/",
+        "Documentation": "https://github.com/blatamacademy/email-sequence-ai/docs",
     },
-    zip_safe=False,
 ) 

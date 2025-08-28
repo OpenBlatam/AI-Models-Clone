@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Dict, Any
+from ..entities.metrics import MetricsData
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Metrics Service Interface
 ========================
@@ -5,9 +13,6 @@ Metrics Service Interface
 Abstract interface for metrics collection and reporting.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, Any
-from ..entities.metrics import MetricsData
 
 
 class IMetricsService(ABC):

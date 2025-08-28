@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import fastapi_users_db_sqlalchemy
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add Permission Syncing
 
 Revision ID: 61ff3651add4
@@ -6,11 +25,7 @@ Create Date: 2024-09-05 13:57:11.770413
 
 """
 
-import fastapi_users_db_sqlalchemy
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "61ff3651add4"
@@ -71,6 +86,16 @@ def upgrade() -> None:
         "user__external_user_group_id",
         sa.Column(
             "user_id", fastapi_users_db_sqlalchemy.generics.GUID(), nullable=False
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         ),
         sa.Column("external_user_group_id", sa.String(), nullable=False),
         sa.Column("cc_pair_id", sa.Integer(), nullable=False),

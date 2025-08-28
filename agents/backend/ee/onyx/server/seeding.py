@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import os
 from copy import deepcopy
@@ -8,15 +10,11 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from ee.onyx.db.standard_answer import (
-    create_initial_default_standard_answer_category,
-)
 from ee.onyx.server.enterprise_settings.models import AnalyticsScriptUpload
 from ee.onyx.server.enterprise_settings.models import EnterpriseSettings
 from ee.onyx.server.enterprise_settings.models import NavigationItem
 from ee.onyx.server.enterprise_settings.store import store_analytics_script
 from ee.onyx.server.enterprise_settings.store import (
-    store_settings as store_ee_settings,
-)
 from ee.onyx.server.enterprise_settings.store import upload_logo
 from onyx.context.search.enums import RecencyBiasSetting
 from onyx.db.engine import get_session_context_manager
@@ -29,6 +27,13 @@ from onyx.server.manage.llm.models import LLMProviderUpsertRequest
 from onyx.server.settings.models import Settings
 from onyx.server.settings.store import store_settings as store_base_settings
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    create_initial_default_standard_answer_category,
+)
+    store_settings as store_ee_settings,
+)
 
 
 class CustomToolSeed(BaseModel):
@@ -85,7 +90,15 @@ def _seed_custom_tools(db_session: Session, tools: List[CustomToolSeed]) -> None
                 logger.debug(f"Attempting to seed tool: {tool.name}")
                 logger.debug(f"Reading definition from: {tool.definition_path}")
                 with open(tool.definition_path, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     file_content = file.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     if not file_content.strip():
                         raise ValueError("File is empty")
                     openapi_schema = json.loads(file_content)
@@ -184,7 +197,15 @@ def _seed_enterprise_settings(seed_config: SeedConfiguration) -> None:
             final_nav_items = []
             for item in seed_config.nav_item_overrides:
                 with open(item.svg_path, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     svg_content = file.read().strip()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
                 final_nav_items.append(
                     NavigationItem(
@@ -212,7 +233,15 @@ def _seed_analytics_script(seed_config: SeedConfiguration) -> None:
         logger.notice("Seeding analytics script")
         try:
             with open(seed_config.analytics_script_path, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 script_content = file.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             analytics_script = AnalyticsScriptUpload(
                 script=script_content, secret_key=custom_analytics_secret_key
             )

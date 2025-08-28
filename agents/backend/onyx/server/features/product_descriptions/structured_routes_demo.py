@@ -1,9 +1,7 @@
-"""
-Structured Routes Demo
-
-This demo showcases the well-structured routing system with clear dependencies,
-organized route modules, and comprehensive middleware integration.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -11,12 +9,20 @@ import time
 from datetime import datetime
 from typing import Dict, Any, List
 import logging
-
-# Import the structured application
 from structured_main import app
 from routes import ROUTER_REGISTRY, get_all_routers, get_router_by_name
 from dependencies.core import get_db_manager, get_cache_manager, get_performance_monitor
 from dependencies.auth import AuthService, get_authenticated_user
+from typing import Any, List, Dict, Optional
+"""
+Structured Routes Demo
+
+This demo showcases the well-structured routing system with clear dependencies,
+organized route modules, and comprehensive middleware integration.
+"""
+
+
+# Import the structured application
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -25,11 +31,11 @@ logger = logging.getLogger(__name__)
 class StructuredRoutesDemo:
     """Demo class for showcasing structured routes and dependencies."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.demo_results = []
         self.start_time = None
     
-    async def run_demo(self):
+    async def run_demo(self) -> Any:
         """Run the complete structured routes demo."""
         logger.info("🚀 Starting Structured Routes Demo")
         self.start_time = time.time()
@@ -51,7 +57,7 @@ class StructuredRoutesDemo:
             logger.error(f"Demo failed: {e}")
             raise
     
-    async def demo_router_structure(self):
+    async def demo_router_structure(self) -> Any:
         """Demo the router structure and organization."""
         logger.info("\n📋 Demo 1: Router Structure and Organization")
         
@@ -82,7 +88,7 @@ class StructuredRoutesDemo:
         for name, info in router_info.items():
             logger.info(f"   - {name}: {info['prefix']} ({info['routes_count']} routes)")
     
-    async def demo_dependency_injection(self):
+    async def demo_dependency_injection(self) -> Any:
         """Demo the dependency injection system."""
         logger.info("\n🔧 Demo 2: Dependency Injection System")
         
@@ -129,7 +135,7 @@ class StructuredRoutesDemo:
         logger.info("   - Authentication dependencies with role-based access")
         logger.info("   - Permission-based dependency creation")
     
-    async def demo_route_organization(self):
+    async def demo_route_organization(self) -> Any:
         """Demo the route organization by functionality."""
         logger.info("\n🗂️ Demo 3: Route Organization by Functionality")
         
@@ -177,7 +183,7 @@ class StructuredRoutesDemo:
             logger.info(f"   - {name}: {info['description']}")
             logger.info(f"     Features: {', '.join(info['features'])}")
     
-    async def demo_middleware_integration(self):
+    async def demo_middleware_integration(self) -> Any:
         """Demo the middleware integration."""
         logger.info("\n🛡️ Demo 4: Middleware Integration")
         
@@ -236,7 +242,7 @@ class StructuredRoutesDemo:
         for middleware in middleware_stack:
             logger.info(f"   {middleware['order']}. {middleware['name']}: {middleware['function']}")
     
-    async def demo_error_handling(self):
+    async def demo_error_handling(self) -> Any:
         """Demo the error handling system."""
         logger.info("\n⚠️ Demo 5: Error Handling System")
         
@@ -270,7 +276,7 @@ class StructuredRoutesDemo:
         logger.info("   - Route-level error handling with try-catch")
         logger.info("   - Error monitoring and alerting system")
     
-    async def demo_performance_monitoring(self):
+    async def demo_performance_monitoring(self) -> Any:
         """Demo the performance monitoring system."""
         logger.info("\n📊 Demo 6: Performance Monitoring")
         
@@ -307,7 +313,7 @@ class StructuredRoutesDemo:
         logger.info("   - Performance alerts and notifications")
         logger.info("   - System optimization capabilities")
     
-    async def demo_admin_routes(self):
+    async def demo_admin_routes(self) -> Any:
         """Demo the admin routes and functionality."""
         logger.info("\n👨‍💼 Demo 7: Admin Routes and Management")
         
@@ -350,7 +356,7 @@ class StructuredRoutesDemo:
             logger.info(f"   - {feature}: {info['description']}")
             logger.info(f"     Features: {', '.join(info['features'])}")
     
-    async def demo_health_checks(self):
+    async def demo_health_checks(self) -> Any:
         """Demo the health check system."""
         logger.info("\n🏥 Demo 8: Health Check System")
         
@@ -392,7 +398,7 @@ class StructuredRoutesDemo:
         for check, info in health_checks.items():
             logger.info(f"   - {check}: {info['description']}")
     
-    async def print_demo_summary(self):
+    async def print_demo_summary(self) -> Any:
         """Print a summary of the demo results."""
         logger.info("\n" + "="*60)
         logger.info("📋 STRUCTURED ROUTES DEMO SUMMARY")
@@ -447,5 +453,6 @@ async def main():
     demo = StructuredRoutesDemo()
     await demo.run_demo()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

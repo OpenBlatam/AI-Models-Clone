@@ -1,16 +1,16 @@
-"""
-LangChain Email Service
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-This module provides LangChain integration for email sequence generation,
-personalization, and intelligent content creation.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
 from datetime import datetime
 from typing import List, Dict, Any, Optional, Tuple
 from uuid import UUID
-
 from langchain.chat_models import ChatOpenAI
 from langchain.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, SystemMessagePromptTemplate
 from langchain.schema import HumanMessage, SystemMessage
@@ -21,10 +21,19 @@ from langchain.tools import Tool
 from langchain.agents import initialize_agent, AgentType
 from langchain.callbacks import AsyncIteratorCallbackHandler
 from langchain.schema.runnable import RunnablePassthrough
-
 from ..models.sequence import EmailSequence, SequenceStep, StepType
 from ..models.template import EmailTemplate, TemplateVariable, VariableType
 from ..models.subscriber import Subscriber
+from typing import Any, List, Dict, Optional
+"""
+LangChain Email Service
+
+This module provides LangChain integration for email sequence generation,
+personalization, and intelligent content creation.
+"""
+
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +67,7 @@ class LangChainEmailService:
         self._setup_tools()
         self._setup_agents()
     
-    def _setup_tools(self):
+    def _setup_tools(self) -> Any:
         """Setup LangChain tools for email operations"""
         self.tools = [
             Tool(
@@ -83,7 +92,7 @@ class LangChainEmailService:
             )
         ]
     
-    def _setup_agents(self):
+    def _setup_agents(self) -> Any:
         """Setup LangChain agents"""
         self.agent = initialize_agent(
             tools=self.tools,
@@ -430,7 +439,7 @@ class LangChainEmailService:
         """Enhance email content"""
         return f"Enhanced content: {content[:100]}..."
     
-    async def close(self):
+    async def close(self) -> Any:
         """Clean up resources"""
         if hasattr(self.llm, 'close'):
             await self.llm.aclose() 

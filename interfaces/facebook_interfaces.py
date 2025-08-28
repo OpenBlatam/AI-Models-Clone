@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from abc import ABC, abstractmethod
+from typing import List, Optional, Dict, Any, Protocol
+from enum import Enum
+from dataclasses import dataclass
+from datetime import datetime
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 Facebook Posts - Domain Interfaces
 =====================================
@@ -5,11 +21,6 @@
 Interfaces y contratos del dominio para Facebook posts siguiendo arquitectura Onyx.
 """
 
-from abc import ABC, abstractmethod
-from typing import List, Optional, Dict, Any, Protocol
-from enum import Enum
-from dataclasses import dataclass
-from datetime import datetime
 
 # ===== ENUMS & VALUE OBJECTS =====
 
@@ -175,7 +186,9 @@ class FacebookPost:
         content: PostContent,
         analysis: Optional[AnalysisResult] = None
     ):
-        self._identifier = identifier
+        
+    """__init__ function."""
+self._identifier = identifier
         self._specification = specification
         self._content = content
         self._analysis = analysis

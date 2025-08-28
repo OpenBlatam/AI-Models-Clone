@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -8,6 +10,9 @@ from onyx.db.models import Milestone
 from onyx.db.models import User
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 USER_ASSISTANT_PREFIX = "user_assistants_used_"
 MULTI_ASSISTANT_USED = "multi_assistant_used"
 

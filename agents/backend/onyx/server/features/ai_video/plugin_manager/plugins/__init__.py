@@ -1,10 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .examples import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Onyx Plugin Manager - Plugins Module
 
 Example plugins and plugin management utilities.
 """
 
-from .examples import (
     OnyxContentAnalyzerPlugin,
     OnyxVisualEnhancerPlugin,
     OnyxAudioProcessorPlugin,

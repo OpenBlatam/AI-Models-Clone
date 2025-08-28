@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 from collections.abc import Callable
 from functools import wraps
@@ -9,6 +11,9 @@ import requests
 
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -37,7 +42,9 @@ class _RateLimitDecorator:
         sleep_backoff: float = 2,  # applies exponential backoff
         max_num_sleep: int = 0,
     ):
-        self.max_calls = max_calls
+        
+    """__init__ function."""
+self.max_calls = max_calls
         self.period = period
         self.sleep_time = sleep_time
         self.sleep_backoff = sleep_backoff
@@ -94,10 +101,10 @@ use the following instead"""
 R = TypeVar("R", bound=Callable[..., requests.Response])
 
 
-def wrap_request_to_handle_ratelimiting(
+async def wrap_request_to_handle_ratelimiting(
     request_fn: R, default_wait_time_sec: int = 30, max_waits: int = 30
 ) -> R:
-    def wrapped_request(*args: list, **kwargs: dict[str, Any]) -> requests.Response:
+    async def wrapped_request(*args: list, **kwargs: dict[str, Any]) -> requests.Response:
         for _ in range(max_waits):
             response = request_fn(*args, **kwargs)
             if response.status_code == 429:

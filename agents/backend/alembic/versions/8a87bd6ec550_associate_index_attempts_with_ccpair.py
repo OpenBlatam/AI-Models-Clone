@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """associate index attempts with ccpair
 
 Revision ID: 8a87bd6ec550
@@ -6,8 +13,6 @@ Create Date: 2024-07-22 15:15:52.558451
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "8a87bd6ec550"

@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import os
+from datetime import datetime
+from typing import List
+from email_sequence import (
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Email Sequence Module - Example Usage
@@ -5,13 +23,8 @@ Email Sequence Module - Example Usage
 This file demonstrates how to use the Email Sequence Module with LangChain integration.
 """
 
-import asyncio
-import os
-from datetime import datetime
-from typing import List
 
 # Import the email sequence module
-from email_sequence import (
     EmailSequenceEngine,
     LangChainEmailService,
     EmailDeliveryService,
@@ -29,13 +42,13 @@ from email_sequence import (
 class MockAnalyticsService:
     """Mock analytics service for demonstration"""
     
-    async def record_email_sent(self, sequence_id, step_order, subscriber_id, delivery_result):
+    async def record_email_sent(self, sequence_id, step_order, subscriber_id, delivery_result) -> Any:
         print(f"📧 Email sent: Sequence {sequence_id}, Step {step_order}, Subscriber {subscriber_id}")
     
-    async def record_email_opened(self, sequence_id, step_order, subscriber_id):
+    async def record_email_opened(self, sequence_id, step_order, subscriber_id) -> Any:
         print(f"👁️ Email opened: Sequence {sequence_id}, Step {step_order}, Subscriber {subscriber_id}")
     
-    async def get_sequence_analytics(self, sequence_id):
+    async def get_sequence_analytics(self, sequence_id) -> Optional[Dict[str, Any]]:
         return {
             "open_rate": 25.5,
             "click_rate": 3.2,
@@ -200,7 +213,7 @@ async def create_sample_subscribers():
     return subscribers
 
 
-async def demonstrate_personalization(template, subscribers, langchain_service):
+async def demonstrate_personalization(template, subscribers, langchain_service) -> Any:
     """Demonstrate email personalization"""
     print("🎯 Demonstrating email personalization...")
     
@@ -230,7 +243,7 @@ async def demonstrate_personalization(template, subscribers, langchain_service):
         print(f"🎯 Interests: {', '.join(subscriber.interests)}")
 
 
-async def demonstrate_ab_testing(langchain_service):
+async def demonstrate_ab_testing(langchain_service) -> Any:
     """Demonstrate A/B testing"""
     print("\n🧪 Demonstrating A/B testing...")
     
@@ -246,7 +259,7 @@ async def demonstrate_ab_testing(langchain_service):
         print(f"  Variant {i}: {variant['content']}")
 
 
-async def demonstrate_analytics(engine, sequence):
+async def demonstrate_analytics(engine, sequence) -> Any:
     """Demonstrate analytics"""
     print("\n📊 Demonstrating analytics...")
     

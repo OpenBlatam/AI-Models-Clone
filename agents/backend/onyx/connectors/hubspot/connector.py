@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from datetime import timezone
 from typing import Any
@@ -16,6 +18,10 @@ from onyx.connectors.models import Document
 from onyx.connectors.models import TextSection
 from onyx.utils.logger import setup_logger
 
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 HUBSPOT_BASE_URL = "https://app.hubspot.com/contacts/"
 HUBSPOT_API_URL = "https://api.hubapi.com/integrations/v1/me"
 
@@ -136,7 +142,6 @@ class HubSpotConnector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import os
 
     connector = HubSpotConnector()
     connector.load_credentials(

@@ -1,7 +1,16 @@
-"""
-Comprehensive tests for custom PyTorch model architectures
-Tests all custom nn.Module classes with proper shapes, gradients, and edge cases
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import torch
 import torch.nn as nn
@@ -10,9 +19,18 @@ import numpy as np
 from typing import Dict, Any, List
 import tempfile
 import os
+from custom_model_architectures import (
+        import time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Comprehensive tests for custom PyTorch model architectures
+Tests all custom nn.Module classes with proper shapes, gradients, and edge cases
+"""
+
 
 # Import custom architectures
-from custom_model_architectures import (
     PositionalEncoding, MultiHeadAttentionWithRelativePosition, TransformerBlock,
     CustomTransformer, Conv1DBlock, CNNFeatureExtractor, LSTMWithAttention,
     DotProductAttention, GeneralAttention, ConcatAttention, CNNLSTMHybrid,
@@ -24,7 +42,7 @@ from custom_model_architectures import (
 class TestPositionalEncoding:
     """Test PositionalEncoding module"""
     
-    def test_positional_encoding_shape(self):
+    def test_positional_encoding_shape(self) -> Any:
         d_model = 512
         max_len = 1000
         pe = PositionalEncoding(d_model, max_len)
@@ -35,7 +53,7 @@ class TestPositionalEncoding:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_positional_encoding_gradients(self):
+    def test_positional_encoding_gradients(self) -> Any:
         d_model = 256
         pe = PositionalEncoding(d_model)
         
@@ -48,7 +66,7 @@ class TestPositionalEncoding:
         assert x.grad is not None
         assert not torch.isnan(x.grad).any()
     
-    def test_positional_encoding_device(self):
+    def test_positional_encoding_device(self) -> Any:
         if torch.cuda.is_available():
             device = torch.device('cuda')
             d_model = 128
@@ -63,7 +81,7 @@ class TestPositionalEncoding:
 class TestMultiHeadAttentionWithRelativePosition:
     """Test MultiHeadAttentionWithRelativePosition module"""
     
-    def test_attention_shape(self):
+    def test_attention_shape(self) -> Any:
         d_model = 512
         n_heads = 8
         batch_size = 4
@@ -77,7 +95,7 @@ class TestMultiHeadAttentionWithRelativePosition:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_attention_with_mask(self):
+    def test_attention_with_mask(self) -> Any:
         d_model = 256
         n_heads = 4
         batch_size = 2
@@ -93,7 +111,7 @@ class TestMultiHeadAttentionWithRelativePosition:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_attention_gradients(self):
+    def test_attention_gradients(self) -> Any:
         d_model = 128
         n_heads = 2
         attention = MultiHeadAttentionWithRelativePosition(d_model, n_heads)
@@ -111,7 +129,7 @@ class TestMultiHeadAttentionWithRelativePosition:
 class TestTransformerBlock:
     """Test TransformerBlock module"""
     
-    def test_transformer_block_shape(self):
+    def test_transformer_block_shape(self) -> Any:
         d_model = 512
         n_heads = 8
         d_ff = 2048
@@ -124,7 +142,7 @@ class TestTransformerBlock:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_transformer_block_with_mask(self):
+    def test_transformer_block_with_mask(self) -> Any:
         d_model = 256
         n_heads = 4
         d_ff = 1024
@@ -139,7 +157,7 @@ class TestTransformerBlock:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_transformer_block_activations(self):
+    def test_transformer_block_activations(self) -> Any:
         d_model = 128
         n_heads = 2
         d_ff = 512
@@ -157,7 +175,7 @@ class TestTransformerBlock:
 class TestCustomTransformer:
     """Test CustomTransformer module"""
     
-    def test_transformer_shape(self):
+    def test_transformer_shape(self) -> Any:
         vocab_size = 10000
         d_model = 512
         n_layers = 4
@@ -172,7 +190,7 @@ class TestCustomTransformer:
         assert output.shape == (4, 20, d_model)
         assert not torch.isnan(output).any()
     
-    def test_transformer_with_mask(self):
+    def test_transformer_with_mask(self) -> Any:
         vocab_size = 5000
         d_model = 256
         transformer = CustomTransformer(vocab_size, d_model, n_layers=2, n_heads=4, d_ff=1024)
@@ -185,7 +203,7 @@ class TestCustomTransformer:
         assert output.shape == (2, 15, d_model)
         assert not torch.isnan(output).any()
     
-    def test_transformer_gradients(self):
+    def test_transformer_gradients(self) -> Any:
         vocab_size = 3000
         d_model = 128
         transformer = CustomTransformer(vocab_size, d_model, n_layers=2, n_heads=2, d_ff=512)
@@ -205,7 +223,7 @@ class TestCustomTransformer:
 class TestConv1DBlock:
     """Test Conv1DBlock module"""
     
-    def test_conv1d_block_shape(self):
+    def test_conv1d_block_shape(self) -> Any:
         in_channels = 64
         out_channels = 128
         kernel_size = 3
@@ -218,7 +236,7 @@ class TestConv1DBlock:
         assert output.shape == (4, out_channels, 20)
         assert not torch.isnan(output).any()
     
-    def test_conv1d_block_activations(self):
+    def test_conv1d_block_activations(self) -> Any:
         in_channels = 32
         out_channels = 64
         kernel_size = 5
@@ -232,7 +250,7 @@ class TestConv1DBlock:
             assert output.shape == (2, out_channels, 15)
             assert not torch.isnan(output).any()
     
-    def test_conv1d_block_no_batch_norm(self):
+    def test_conv1d_block_no_batch_norm(self) -> Any:
         in_channels = 16
         out_channels = 32
         kernel_size = 3
@@ -248,7 +266,7 @@ class TestConv1DBlock:
 class TestCNNFeatureExtractor:
     """Test CNNFeatureExtractor module"""
     
-    def test_cnn_extractor_shape(self):
+    def test_cnn_extractor_shape(self) -> Any:
         input_dim = 300
         hidden_dims = [128, 256, 512]
         kernel_sizes = [3, 4, 5]
@@ -262,7 +280,7 @@ class TestCNNFeatureExtractor:
         assert output.shape == (4, expected_dim)
         assert not torch.isnan(output).any()
     
-    def test_cnn_extractor_pool_types(self):
+    def test_cnn_extractor_pool_types(self) -> Any:
         input_dim = 200
         hidden_dims = [64, 128]
         kernel_sizes = [3, 5]
@@ -277,7 +295,7 @@ class TestCNNFeatureExtractor:
             assert output.shape == (2, expected_dim)
             assert not torch.isnan(output).any()
     
-    def test_cnn_extractor_multiple_kernels(self):
+    def test_cnn_extractor_multiple_kernels(self) -> Any:
         input_dim = 100
         hidden_dims = [64]
         kernel_sizes = [[3, 4, 5]]  # Multiple kernels for one layer
@@ -294,7 +312,7 @@ class TestCNNFeatureExtractor:
 class TestLSTMWithAttention:
     """Test LSTMWithAttention module"""
     
-    def test_lstm_attention_shape(self):
+    def test_lstm_attention_shape(self) -> Any:
         input_size = 256
         hidden_size = 128
         num_layers = 2
@@ -308,7 +326,7 @@ class TestLSTMWithAttention:
         assert output.shape == (4, 20, expected_size)
         assert not torch.isnan(output).any()
     
-    def test_lstm_attention_with_lengths(self):
+    def test_lstm_attention_with_lengths(self) -> Any:
         input_size = 128
         hidden_size = 64
         
@@ -322,7 +340,7 @@ class TestLSTMWithAttention:
         assert output.shape == (3, 15, expected_size)
         assert not torch.isnan(output).any()
     
-    def test_lstm_attention_types(self):
+    def test_lstm_attention_types(self) -> Any:
         input_size = 100
         hidden_size = 50
         
@@ -340,7 +358,7 @@ class TestLSTMWithAttention:
 class TestAttentionMechanisms:
     """Test different attention mechanisms"""
     
-    def test_dot_product_attention(self):
+    def test_dot_product_attention(self) -> Any:
         hidden_size = 128
         attention = DotProductAttention(hidden_size)
         
@@ -350,7 +368,7 @@ class TestAttentionMechanisms:
         assert output.shape == hidden_states.shape
         assert not torch.isnan(output).any()
     
-    def test_general_attention(self):
+    def test_general_attention(self) -> Any:
         hidden_size = 256
         attention = GeneralAttention(hidden_size)
         
@@ -360,7 +378,7 @@ class TestAttentionMechanisms:
         assert output.shape == hidden_states.shape
         assert not torch.isnan(output).any()
     
-    def test_concat_attention(self):
+    def test_concat_attention(self) -> Any:
         hidden_size = 64
         attention = ConcatAttention(hidden_size)
         
@@ -374,7 +392,7 @@ class TestAttentionMechanisms:
 class TestCNNLSTMHybrid:
     """Test CNNLSTMHybrid module"""
     
-    def test_cnn_lstm_hybrid_shape(self):
+    def test_cnn_lstm_hybrid_shape(self) -> Any:
         vocab_size = 10000
         embed_dim = 300
         hidden_dims = [128, 256]
@@ -391,7 +409,7 @@ class TestCNNLSTMHybrid:
         assert output.shape == (4, num_classes)
         assert not torch.isnan(output).any()
     
-    def test_cnn_lstm_hybrid_with_lengths(self):
+    def test_cnn_lstm_hybrid_with_lengths(self) -> Any:
         vocab_size = 5000
         embed_dim = 200
         hidden_dims = [64]
@@ -409,7 +427,7 @@ class TestCNNLSTMHybrid:
         assert output.shape == (3, num_classes)
         assert not torch.isnan(output).any()
     
-    def test_cnn_lstm_hybrid_gradients(self):
+    def test_cnn_lstm_hybrid_gradients(self) -> Any:
         vocab_size = 3000
         embed_dim = 100
         hidden_dims = [32]
@@ -434,7 +452,7 @@ class TestCNNLSTMHybrid:
 class TestTransformerCNN:
     """Test TransformerCNN module"""
     
-    def test_transformer_cnn_shape(self):
+    def test_transformer_cnn_shape(self) -> Any:
         vocab_size = 8000
         d_model = 256
         n_layers = 3
@@ -453,7 +471,7 @@ class TestTransformerCNN:
         assert output.shape == (3, num_classes)
         assert not torch.isnan(output).any()
     
-    def test_transformer_cnn_with_mask(self):
+    def test_transformer_cnn_with_mask(self) -> Any:
         vocab_size = 4000
         d_model = 128
         n_layers = 2
@@ -478,7 +496,7 @@ class TestTransformerCNN:
 class TestMultiTaskModel:
     """Test MultiTaskModel module"""
     
-    def test_multi_task_model_shape(self):
+    def test_multi_task_model_shape(self) -> Any:
         vocab_size = 6000
         d_model = 256
         n_layers = 3
@@ -501,7 +519,7 @@ class TestMultiTaskModel:
             assert output.shape == (4, expected_classes)
             assert not torch.isnan(output).any()
     
-    def test_multi_task_model_with_mask(self):
+    def test_multi_task_model_with_mask(self) -> Any:
         vocab_size = 3000
         d_model = 128
         n_layers = 2
@@ -522,7 +540,7 @@ class TestMultiTaskModel:
         assert output.shape == (3, 2)
         assert not torch.isnan(output).any()
     
-    def test_multi_task_model_invalid_task(self):
+    def test_multi_task_model_invalid_task(self) -> Any:
         vocab_size = 2000
         d_model = 64
         n_layers = 1
@@ -543,7 +561,7 @@ class TestMultiTaskModel:
 class TestHierarchicalAttentionNetwork:
     """Test HierarchicalAttentionNetwork module"""
     
-    def test_hierarchical_attention_shape(self):
+    def test_hierarchical_attention_shape(self) -> Any:
         vocab_size = 5000
         embed_dim = 200
         hidden_size = 128
@@ -559,7 +577,7 @@ class TestHierarchicalAttentionNetwork:
         assert output.shape == (3, num_classes)
         assert not torch.isnan(output).any()
     
-    def test_hierarchical_attention_gradients(self):
+    def test_hierarchical_attention_gradients(self) -> Any:
         vocab_size = 3000
         embed_dim = 100
         hidden_size = 64
@@ -583,7 +601,7 @@ class TestHierarchicalAttentionNetwork:
 class TestResidualBlock:
     """Test ResidualBlock module"""
     
-    def test_residual_block_shape(self):
+    def test_residual_block_shape(self) -> Any:
         channels = 64
         kernel_size = 3
         
@@ -595,7 +613,7 @@ class TestResidualBlock:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_residual_block_different_kernel_sizes(self):
+    def test_residual_block_different_kernel_sizes(self) -> Any:
         channels = 32
         kernel_sizes = [3, 5, 7]
         
@@ -611,7 +629,7 @@ class TestResidualBlock:
 class TestDeepResidualCNN:
     """Test DeepResidualCNN module"""
     
-    def test_deep_residual_cnn_shape(self):
+    def test_deep_residual_cnn_shape(self) -> Any:
         input_dim = 300
         hidden_dims = [64, 128, 256]
         num_classes = 5
@@ -624,7 +642,7 @@ class TestDeepResidualCNN:
         assert output.shape == (4, num_classes)
         assert not torch.isnan(output).any()
     
-    def test_deep_residual_cnn_different_blocks(self):
+    def test_deep_residual_cnn_different_blocks(self) -> Any:
         input_dim = 200
         hidden_dims = [32, 64]
         num_classes = 3
@@ -638,7 +656,7 @@ class TestDeepResidualCNN:
             assert output.shape == (3, num_classes)
             assert not torch.isnan(output).any()
     
-    def test_deep_residual_cnn_gradients(self):
+    def test_deep_residual_cnn_gradients(self) -> Any:
         input_dim = 100
         hidden_dims = [32]
         num_classes = 2
@@ -659,7 +677,7 @@ class TestDeepResidualCNN:
 class TestModelFactory:
     """Test ModelFactory class"""
     
-    def test_model_factory_transformer(self):
+    def test_model_factory_transformer(self) -> Any:
         config = {
             "vocab_size": 5000,
             "d_model": 256,
@@ -676,7 +694,7 @@ class TestModelFactory:
         output = model(x)
         assert output.shape == (2, 10, config["d_model"])
     
-    def test_model_factory_cnn_lstm(self):
+    def test_model_factory_cnn_lstm(self) -> Any:
         config = {
             "vocab_size": 3000,
             "embed_dim": 200,
@@ -695,7 +713,7 @@ class TestModelFactory:
         output = model(x)
         assert output.shape == (3, config["num_classes"])
     
-    def test_model_factory_invalid_type(self):
+    def test_model_factory_invalid_type(self) -> Any:
         config = {"vocab_size": 1000}
         
         with pytest.raises(ValueError):
@@ -705,7 +723,7 @@ class TestModelFactory:
 class TestModelIntegration:
     """Integration tests for model combinations"""
     
-    def test_model_serialization(self):
+    def test_model_serialization(self) -> Any:
         """Test model saving and loading"""
         vocab_size = 2000
         d_model = 128
@@ -731,7 +749,7 @@ class TestModelIntegration:
         finally:
             os.unlink(temp_path)
     
-    def test_model_device_transfer(self):
+    def test_model_device_transfer(self) -> Any:
         """Test model transfer to different devices"""
         if torch.cuda.is_available():
             vocab_size = 1000
@@ -746,7 +764,7 @@ class TestModelIntegration:
             assert output.device.type == 'cuda'
             assert not torch.isnan(output).any()
     
-    def test_model_memory_efficiency(self):
+    def test_model_memory_efficiency(self) -> Any:
         """Test model memory usage"""
         vocab_size = 500
         d_model = 32
@@ -765,9 +783,8 @@ class TestModelIntegration:
 class TestModelPerformance:
     """Performance tests for models"""
     
-    def test_model_inference_speed(self):
+    def test_model_inference_speed(self) -> Any:
         """Test model inference speed"""
-        import time
         
         vocab_size = 1000
         d_model = 64
@@ -791,7 +808,7 @@ class TestModelPerformance:
         avg_time = (end_time - start_time) / 100
         assert avg_time < 0.1  # Should be fast
     
-    def test_model_memory_usage(self):
+    def test_model_memory_usage(self) -> Any:
         """Test model memory usage"""
         vocab_size = 500
         d_model = 32

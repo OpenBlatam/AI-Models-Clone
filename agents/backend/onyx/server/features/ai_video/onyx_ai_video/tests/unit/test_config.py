@@ -1,6 +1,13 @@
-"""
-Unit tests for configuration management modules.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import pytest
 import os
@@ -9,13 +16,21 @@ import yaml
 import json
 from pathlib import Path
 from unittest.mock import Mock, patch
-
 from ...config.config_manager import (
+from ...config.settings import (
+        import onyx_ai_video.config.settings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Unit tests for configuration management modules.
+"""
+
+
     OnyxConfigManager, OnyxAIVideoConfig, get_config_manager,
     get_config, save_config, reload_config, update_config,
     create_config_file, get_default_config
 )
-from ...config.settings import (
     OnyxSettings, OnyxEnvironmentConfig, load_onyx_settings,
     get_onyx_settings, update_onyx_settings, validate_onyx_integration,
     get_onyx_environment_info, setup_onyx_environment,
@@ -27,7 +42,7 @@ class TestOnyxAIVideoConfig:
     """Test OnyxAIVideoConfig model."""
     
     @pytest.mark.unit
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration creation."""
         config = OnyxAIVideoConfig()
         
@@ -46,7 +61,7 @@ class TestOnyxAIVideoConfig:
         assert config.onyx.use_onyx_logging is True
     
     @pytest.mark.unit
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration."""
         config = OnyxAIVideoConfig(
             system_name="Custom System",
@@ -66,7 +81,7 @@ class TestOnyxAIVideoConfig:
         assert config.llm.model == "claude-3"
     
     @pytest.mark.unit
-    def test_environment_validation(self):
+    def test_environment_validation(self) -> Any:
         """Test environment validation."""
         # Valid environments
         valid_envs = ["development", "testing", "staging", "production"]
@@ -79,7 +94,7 @@ class TestOnyxAIVideoConfig:
             OnyxAIVideoConfig(environment="invalid")
     
     @pytest.mark.unit
-    def test_security_config_validation(self):
+    def test_security_config_validation(self) -> Any:
         """Test security configuration validation."""
         # Test with encryption enabled but no key
         with pytest.raises(ValueError, match="Encryption key required"):
@@ -95,7 +110,7 @@ class TestOnyxAIVideoConfig:
             assert config.security.encryption_key == "test-key"
     
     @pytest.mark.unit
-    def test_config_serialization(self):
+    def test_config_serialization(self) -> Any:
         """Test config serialization."""
         config = OnyxAIVideoConfig(
             system_name="Test System",
@@ -115,7 +130,7 @@ class TestOnyxConfigManager:
     """Test OnyxConfigManager."""
     
     @pytest.mark.unit
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test config manager initialization."""
         manager = OnyxConfigManager()
         
@@ -124,7 +139,7 @@ class TestOnyxConfigManager:
         assert manager._config_cache == {}
     
     @pytest.mark.unit
-    def test_load_config_from_file_yaml(self, temp_dir):
+    def test_load_config_from_file_yaml(self, temp_dir) -> Any:
         """Test loading config from YAML file."""
         config_data = {
             "system_name": "Test System",
@@ -136,6 +151,10 @@ class TestOnyxConfigManager:
         
         config_file = temp_dir / "test_config.yaml"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         
         manager = OnyxConfigManager(str(config_file))
@@ -148,7 +167,7 @@ class TestOnyxConfigManager:
         assert config.llm.provider == "test"
     
     @pytest.mark.unit
-    def test_load_config_from_file_json(self, temp_dir):
+    def test_load_config_from_file_json(self, temp_dir) -> Any:
         """Test loading config from JSON file."""
         config_data = {
             "system_name": "Test System",
@@ -160,6 +179,10 @@ class TestOnyxConfigManager:
         
         config_file = temp_dir / "test_config.json"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(config_data, f)
         
         manager = OnyxConfigManager(str(config_file))
@@ -172,11 +195,19 @@ class TestOnyxConfigManager:
         assert config.llm.provider == "test"
     
     @pytest.mark.unit
-    def test_load_config_unsupported_format(self, temp_dir):
+    def test_load_config_unsupported_format(self, temp_dir) -> Any:
         """Test loading config with unsupported format."""
         config_file = temp_dir / "test_config.txt"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("invalid config")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         manager = OnyxConfigManager(str(config_file))
         
@@ -184,7 +215,7 @@ class TestOnyxConfigManager:
             manager.load_config()
     
     @pytest.mark.unit
-    def test_load_config_file_not_found(self):
+    def test_load_config_file_not_found(self) -> Any:
         """Test loading config when file doesn't exist."""
         manager = OnyxConfigManager("nonexistent.yaml")
         config = manager.load_config()
@@ -194,7 +225,7 @@ class TestOnyxConfigManager:
         assert config.version == "1.0.0"
     
     @pytest.mark.unit
-    def test_override_from_env(self):
+    def test_override_from_env(self) -> Any:
         """Test environment variable override."""
         with patch.dict(os.environ, {
             "AI_VIDEO_ENVIRONMENT": "production",
@@ -211,7 +242,7 @@ class TestOnyxConfigManager:
             assert config.llm.provider == "anthropic"
     
     @pytest.mark.unit
-    def test_validate_config(self, temp_dir):
+    def test_validate_config(self, temp_dir) -> bool:
         """Test configuration validation."""
         config_data = {
             "video": {
@@ -229,6 +260,10 @@ class TestOnyxConfigManager:
         
         config_file = temp_dir / "test_config.yaml"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         
         manager = OnyxConfigManager(str(config_file))
@@ -242,7 +277,7 @@ class TestOnyxConfigManager:
         assert config.performance.max_concurrent_requests == 5
     
     @pytest.mark.unit
-    def test_validate_config_invalid(self):
+    def test_validate_config_invalid(self) -> bool:
         """Test configuration validation with invalid values."""
         manager = OnyxConfigManager()
         
@@ -265,7 +300,7 @@ class TestOnyxConfigManager:
             ))
     
     @pytest.mark.unit
-    def test_create_directories(self, temp_dir):
+    def test_create_directories(self, temp_dir) -> Any:
         """Test directory creation."""
         config_data = {
             "video": {
@@ -287,11 +322,15 @@ class TestOnyxConfigManager:
         assert (temp_dir / "plugins").exists()
     
     @pytest.mark.unit
-    def test_get_config(self, temp_dir):
+    def test_get_config(self, temp_dir) -> Optional[Dict[str, Any]]:
         """Test get_config method."""
         config_data = {"system_name": "Test System"}
         config_file = temp_dir / "test_config.yaml"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         
         manager = OnyxConfigManager(str(config_file))
@@ -300,11 +339,15 @@ class TestOnyxConfigManager:
         assert config.system_name == "Test System"
     
     @pytest.mark.unit
-    def test_reload_config(self, temp_dir):
+    def test_reload_config(self, temp_dir) -> Any:
         """Test reload_config method."""
         config_data = {"system_name": "Test System"}
         config_file = temp_dir / "test_config.yaml"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         
         manager = OnyxConfigManager(str(config_file))
@@ -313,6 +356,10 @@ class TestOnyxConfigManager:
         # Update config file
         config_data["system_name"] = "Updated System"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         
         config2 = manager.reload_config()
@@ -321,7 +368,7 @@ class TestOnyxConfigManager:
         assert config2.system_name == "Updated System"
     
     @pytest.mark.unit
-    def test_get_section(self, temp_dir):
+    def test_get_section(self, temp_dir) -> Optional[Dict[str, Any]]:
         """Test get_section method."""
         config_data = {
             "logging": {"level": "DEBUG"},
@@ -329,6 +376,10 @@ class TestOnyxConfigManager:
         }
         config_file = temp_dir / "test_config.yaml"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         
         manager = OnyxConfigManager(str(config_file))
@@ -340,10 +391,14 @@ class TestOnyxConfigManager:
         assert llm_config.provider == "test"
     
     @pytest.mark.unit
-    def test_update_config(self, temp_dir):
+    def test_update_config(self, temp_dir) -> Any:
         """Test update_config method."""
         config_file = temp_dir / "test_config.yaml"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump({"system_name": "Original"}, f)
         
         manager = OnyxConfigManager(str(config_file))
@@ -358,7 +413,7 @@ class TestOnyxConfigManager:
         assert updated_config.logging.level == "ERROR"
     
     @pytest.mark.unit
-    def test_save_config_yaml(self, temp_dir):
+    def test_save_config_yaml(self, temp_dir) -> Any:
         """Test save_config method with YAML."""
         config_file = temp_dir / "test_config.yaml"
         manager = OnyxConfigManager(str(config_file))
@@ -370,11 +425,15 @@ class TestOnyxConfigManager:
         
         assert config_file.exists()
         with open(config_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             saved_data = yaml.safe_load(f)
             assert saved_data["system_name"] == "Test System"
     
     @pytest.mark.unit
-    def test_save_config_json(self, temp_dir):
+    def test_save_config_json(self, temp_dir) -> Any:
         """Test save_config method with JSON."""
         config_file = temp_dir / "test_config.json"
         manager = OnyxConfigManager(str(config_file))
@@ -386,14 +445,22 @@ class TestOnyxConfigManager:
         
         assert config_file.exists()
         with open(config_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             saved_data = json.load(f)
             assert saved_data["system_name"] == "Test System"
     
     @pytest.mark.unit
-    def test_get_env_config(self, temp_dir):
+    def test_get_env_config(self, temp_dir) -> Optional[Dict[str, Any]]:
         """Test get_env_config method."""
         config_file = temp_dir / "test_config.yaml"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump({
                 "system_name": "Test System",
                 "logging": {"level": "DEBUG"}
@@ -408,7 +475,7 @@ class TestOnyxConfigManager:
         assert env_config["AI_VIDEO_LOGGING_LEVEL"] == "DEBUG"
     
     @pytest.mark.unit
-    def test_validate_onyx_integration(self):
+    def test_validate_onyx_integration(self) -> bool:
         """Test Onyx integration validation."""
         manager = OnyxConfigManager()
         
@@ -427,7 +494,7 @@ class TestOnyxSettings:
     """Test OnyxSettings."""
     
     @pytest.mark.unit
-    def test_default_settings(self):
+    def test_default_settings(self) -> Any:
         """Test default Onyx settings."""
         settings = OnyxSettings()
         
@@ -443,7 +510,7 @@ class TestOnyxSettings:
         assert settings.onyx_max_workers == 10
     
     @pytest.mark.unit
-    def test_custom_settings(self):
+    def test_custom_settings(self) -> Any:
         """Test custom Onyx settings."""
         settings = OnyxSettings(
             use_onyx_logging=False,
@@ -460,7 +527,7 @@ class TestOnyxSettings:
         assert settings.onyx_max_workers == 5
     
     @pytest.mark.unit
-    def test_find_onyx_root(self):
+    def test_find_onyx_root(self) -> Any:
         """Test Onyx root directory finding."""
         settings = OnyxSettings()
         
@@ -475,7 +542,7 @@ class TestOnyxSettings:
             assert settings.onyx_root_path == "/test/onyx_home"
     
     @pytest.mark.unit
-    def test_to_dict(self):
+    def test_to_dict(self) -> Any:
         """Test settings serialization."""
         settings = OnyxSettings(
             use_onyx_logging=False,
@@ -494,7 +561,7 @@ class TestOnyxEnvironmentConfig:
     """Test OnyxEnvironmentConfig."""
     
     @pytest.mark.unit
-    def test_default_environment_config(self):
+    def test_default_environment_config(self) -> Any:
         """Test default environment configuration."""
         config = OnyxEnvironmentConfig()
         
@@ -510,7 +577,7 @@ class TestOnyxEnvironmentConfig:
         assert config.ONYX_USE_LLM is True
     
     @pytest.mark.unit
-    def test_environment_override(self):
+    def test_environment_override(self) -> Any:
         """Test environment variable override."""
         with patch.dict(os.environ, {
             "ONYX_DEFAULT_LLM": "claude-3",
@@ -530,7 +597,7 @@ class TestOnyxSettingsFunctions:
     """Test Onyx settings utility functions."""
     
     @pytest.mark.unit
-    def test_load_onyx_settings(self):
+    def test_load_onyx_settings(self) -> Any:
         """Test load_onyx_settings function."""
         with patch.dict(os.environ, {
             "ONYX_DEFAULT_LLM": "test-model",
@@ -542,10 +609,9 @@ class TestOnyxSettingsFunctions:
             assert settings.onyx_temperature == 0.8
     
     @pytest.mark.unit
-    def test_get_onyx_settings_singleton(self):
+    def test_get_onyx_settings_singleton(self) -> Optional[Dict[str, Any]]:
         """Test get_onyx_settings singleton."""
         # Clear singleton
-        import onyx_ai_video.config.settings
         onyx_ai_video.config.settings._onyx_settings = None
         
         settings1 = get_onyx_settings()
@@ -554,7 +620,7 @@ class TestOnyxSettingsFunctions:
         assert settings1 is settings2
     
     @pytest.mark.unit
-    def test_update_onyx_settings(self):
+    def test_update_onyx_settings(self) -> Any:
         """Test update_onyx_settings function."""
         settings = OnyxSettings()
         
@@ -567,7 +633,7 @@ class TestOnyxSettingsFunctions:
         assert updated_settings.onyx_default_llm == "updated-model"
     
     @pytest.mark.unit
-    def test_validate_onyx_integration(self):
+    def test_validate_onyx_integration(self) -> bool:
         """Test validate_onyx_integration function."""
         # Test without Onyx modules
         with patch('builtins.__import__', side_effect=ImportError):
@@ -580,7 +646,7 @@ class TestOnyxSettingsFunctions:
             assert result["onyx_available"] is True
     
     @pytest.mark.unit
-    def test_get_onyx_environment_info(self):
+    def test_get_onyx_environment_info(self) -> Optional[Dict[str, Any]]:
         """Test get_onyx_environment_info function."""
         with patch.dict(os.environ, {
             "ONYX_ROOT": "/test/onyx",
@@ -595,7 +661,7 @@ class TestOnyxSettingsFunctions:
             assert "sys_path" in info
     
     @pytest.mark.unit
-    def test_setup_onyx_environment(self):
+    def test_setup_onyx_environment(self) -> Any:
         """Test setup_onyx_environment function."""
         # Clear environment
         for key in list(os.environ.keys()):
@@ -606,7 +672,7 @@ class TestOnyxSettingsFunctions:
         assert result is True
     
     @pytest.mark.unit
-    def test_create_onyx_env_file(self, temp_dir):
+    def test_create_onyx_env_file(self, temp_dir) -> Any:
         """Test create_onyx_env_file function."""
         env_file = temp_dir / ".env.onyx"
         
@@ -614,7 +680,15 @@ class TestOnyxSettingsFunctions:
         
         assert env_file.exists()
         with open(env_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             assert "ONYX_ROOT=" in content
             assert "ONYX_DEFAULT_LLM=" in content
             assert "ONYX_USE_LOGGING=" in content
@@ -624,7 +698,7 @@ class TestConfigUtilities:
     """Test configuration utility functions."""
     
     @pytest.mark.unit
-    def test_get_config_manager(self):
+    def test_get_config_manager(self) -> Optional[Dict[str, Any]]:
         """Test get_config_manager function."""
         manager1 = get_config_manager()
         manager2 = get_config_manager()
@@ -632,18 +706,22 @@ class TestConfigUtilities:
         assert manager1 is manager2
     
     @pytest.mark.unit
-    def test_get_config(self, temp_dir):
+    def test_get_config(self, temp_dir) -> Optional[Dict[str, Any]]:
         """Test get_config function."""
         config_data = {"system_name": "Test System"}
         config_file = temp_dir / "test_config.yaml"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         
         config = get_config(str(config_file))
         assert config.system_name == "Test System"
     
     @pytest.mark.unit
-    def test_save_config(self, temp_dir):
+    def test_save_config(self, temp_dir) -> Any:
         """Test save_config function."""
         config_file = temp_dir / "test_config.yaml"
         config = OnyxAIVideoConfig(system_name="Test System")
@@ -652,15 +730,23 @@ class TestConfigUtilities:
         
         assert config_file.exists()
         with open(config_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             saved_data = yaml.safe_load(f)
             assert saved_data["system_name"] == "Test System"
     
     @pytest.mark.unit
-    def test_reload_config(self, temp_dir):
+    def test_reload_config(self, temp_dir) -> Any:
         """Test reload_config function."""
         config_data = {"system_name": "Original"}
         config_file = temp_dir / "test_config.yaml"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         
         config1 = get_config(str(config_file))
@@ -668,6 +754,10 @@ class TestConfigUtilities:
         # Update file
         config_data["system_name"] = "Updated"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         
         config2 = reload_config(str(config_file))
@@ -676,10 +766,14 @@ class TestConfigUtilities:
         assert config2.system_name == "Updated"
     
     @pytest.mark.unit
-    def test_update_config(self, temp_dir):
+    def test_update_config(self, temp_dir) -> Any:
         """Test update_config function."""
         config_file = temp_dir / "test_config.yaml"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump({"system_name": "Original"}, f)
         
         updated_config = update_config({
@@ -691,7 +785,7 @@ class TestConfigUtilities:
         assert updated_config.logging.level == "ERROR"
     
     @pytest.mark.unit
-    def test_get_default_config(self):
+    def test_get_default_config(self) -> Optional[Dict[str, Any]]:
         """Test get_default_config function."""
         config = get_default_config()
         
@@ -706,7 +800,7 @@ class TestConfigUtilities:
         assert "onyx" in config
     
     @pytest.mark.unit
-    def test_create_config_file(self, temp_dir):
+    def test_create_config_file(self, temp_dir) -> Any:
         """Test create_config_file function."""
         config_file = temp_dir / "test_config.yaml"
         
@@ -714,6 +808,10 @@ class TestConfigUtilities:
         
         assert config_file.exists()
         with open(config_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             config = yaml.safe_load(f)
             assert config["system_name"] == "Onyx AI Video System"
             assert config["version"] == "1.0.0"
@@ -724,5 +822,9 @@ class TestConfigUtilities:
         
         assert json_config_file.exists()
         with open(json_config_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             config = json.load(f)
             assert config["test"] == "value" 

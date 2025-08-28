@@ -1,3 +1,7 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
 from uuid import UUID, uuid4
 from pydantic import BaseModel, Field, validator, field_validator, ConfigDict, model_validator
 from typing import Dict, List, Optional, Any
@@ -12,6 +16,9 @@ from onyx.server.documents.models import CredentialSnapshot
 from onyx.core.models import OnyxBaseModel
 from agents.backend.onyx.server.features.utils.ml_data_pipeline import send_training_example_kafka
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = structlog.get_logger()
 
 class ORJSONModel(OnyxBaseModel):
@@ -68,7 +75,7 @@ class DocumentSet(ORJSONModel):
     is_deleted: bool = False
 
     @field_validator('name')
-    def name_not_empty(cls, v):
+    def name_not_empty(cls, v) -> Any:
         if not v or not v.strip():
             logger.error("DocumentSet name validation failed", value=v)
             raise ValueError("Name must not be empty")
@@ -76,23 +83,23 @@ class DocumentSet(ORJSONModel):
 
     @field_validator('documents', mode="before")
     @classmethod
-    def list_or_empty(cls, v):
+    def list_or_empty(cls, v) -> List[Any]:
         return v or []
 
     @field_validator('metadata', mode="before")
     @classmethod
-    def dict_or_empty(cls, v):
+    def dict_or_empty(cls, v) -> Any:
         return v or {}
 
     @model_validator(mode="after")
-    def check_documents_and_metadata(self):
+    def check_documents_and_metadata(self) -> Any:
         if self.documents and not isinstance(self.metadata, dict):
             logger.warning("Metadata should be a dict if documents exist", documents=self.documents)
         if self.created_at > self.updated_at:
             logger.warning("created_at is after updated_at", id=str(self.id))
         return self
 
-    def audit_log(self):
+    def audit_log(self) -> Any:
         return {
             "id": str(self.id),
             "created_at": self.created_at.isoformat(),
@@ -105,34 +112,36 @@ class DocumentSet(ORJSONModel):
             "is_deleted": self.is_deleted,
         }
 
-    def update(self, **kwargs):
+    def update(self, **kwargs) -> Any:
         for k, v in kwargs.items():
             setattr(self, k, v)
         self.updated_at = datetime.utcnow()
         self.version += 1
         logger.info("DocumentSet updated", id=str(self.id), version=self.version, trace_id=self.trace_id)
 
-    def soft_delete(self):
+    def soft_delete(self) -> Any:
         self.is_deleted = True
         self.update()
         logger.info("DocumentSet soft deleted", id=str(self.id), trace_id=self.trace_id)
 
-    def restore(self):
+    def restore(self) -> Any:
         self.is_deleted = False
         self.update()
         logger.info("DocumentSet restored", id=str(self.id), trace_id=self.trace_id)
 
-    def to_dict(self):
+    def to_dict(self) -> Any:
         return self.model_dump()
 
-    def to_json(self):
+    def to_json(self) -> Any:
         return self.model_dump_json()
 
     @classmethod
     def from_json(cls, data: str):
-        return cls.model_validate_json(data)
+        
+    """from_json function."""
+return cls.model_validate_json(data)
 
-    def to_training_example(self):
+    def to_training_example(self) -> Any:
         return {
             "input": self.name,
             "output": self.documents,
@@ -141,7 +150,9 @@ class DocumentSet(ORJSONModel):
 
     @classmethod
     def from_training_example(cls, example: dict):
-        return cls(name=example["input"], documents=example.get("output", []), metadata=example.get("metadata", {}))
+        
+    """from_training_example function."""
+return cls(name=example["input"], documents=example.get("output", []), metadata=example.get("metadata", {}))
 
     @classmethod
     def from_model(cls, document_set_model: DocumentSetDBModel) -> "DocumentSet":
@@ -169,7 +180,7 @@ class DocumentSet(ORJSONModel):
             groups=[group.id for group in document_set_model.groups],
         )
 
-    def send_to_kafka(self, topic="ml_training_examples", bootstrap_servers=None):
+    def send_to_kafka(self, topic="ml_training_examples", bootstrap_servers=None) -> Any:
         """
         Envía este ejemplo a un topic de Kafka para el pipeline ML/LLM automatizado.
         """
@@ -179,6 +190,7 @@ class DocumentSet(ORJSONModel):
     # ds = DocumentSet(name="Set 1", documents=["doc1", "doc2"])
     # ds.send_to_kafka(topic="ml_training_examples", bootstrap_servers=["localhost:9092"])
 
-    class Config:
+    @dataclass
+class Config:
         frozen = True
         validate_assignment = True

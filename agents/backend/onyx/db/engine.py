@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import contextlib
 import os
 import re
@@ -51,6 +53,9 @@ from shared_configs.configs import TENANT_ID_PREFIX
 from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
 from shared_configs.contextvars import get_current_tenant_id
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 SYNC_DB_API = "psycopg2"
@@ -134,13 +139,17 @@ if LOG_POSTGRES_LATENCY:
     def before_cursor_execute(  # type: ignore
         conn, cursor, statement, parameters, context, executemany
     ):
-        conn.info["query_start_time"] = time.time()
+        
+    """before_cursor_execute function."""
+conn.info["query_start_time"] = time.time()
 
     @event.listens_for(Engine, "after_cursor_execute")
     def after_cursor_execute(  # type: ignore
         conn, cursor, statement, parameters, context, executemany
     ):
-        total_time = time.time() - conn.info["query_start_time"]
+        
+    """after_cursor_execute function."""
+total_time = time.time() - conn.info["query_start_time"]
         if total_time > 0.1:
             logger.debug(
                 f"Query Complete: {statement}\n\nTotal Time: {total_time:.4f} seconds"
@@ -152,7 +161,7 @@ if LOG_POSTGRES_CONN_COUNTS:
     checkin_count = 0
 
     @event.listens_for(Engine, "checkout")
-    def log_checkout(dbapi_connection, connection_record, connection_proxy):  # type: ignore
+    def log_checkout(dbapi_connection, connection_record, connection_proxy) -> Any:  # type: ignore
         global checkout_count
         checkout_count += 1
 
@@ -168,7 +177,7 @@ if LOG_POSTGRES_CONN_COUNTS:
         )
 
     @event.listens_for(Engine, "checkin")
-    def log_checkin(dbapi_connection, connection_record):  # type: ignore
+    def log_checkin(dbapi_connection, connection_record) -> Any:  # type: ignore
         global checkin_count
         checkin_count += 1
         logger.debug(f"Total connection checkins: {checkin_count}")
@@ -307,7 +316,7 @@ def get_sqlalchemy_engine() -> Engine:
     return SqlEngine.get_engine()
 
 
-async def get_async_connection() -> Any:
+async def get_async_connection() -> Optional[Dict[str, Any]]:
     """
     Custom connection function for async engine when using IAM auth.
     """

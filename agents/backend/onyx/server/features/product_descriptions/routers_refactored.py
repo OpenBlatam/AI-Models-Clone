@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from typing import List
+import structlog
+from fastapi import APIRouter, Depends, HTTPException, Query, Path, status
+from fastapi.responses import JSONResponse
+from .config_refactored import config
+from .schemas_refactored import (
+from .services_refactored import services
+    import time
+    import asyncio
+from typing import Any, List, Dict, Optional
+import logging
 """
 Refactored Routers Module
 ========================
@@ -6,13 +25,7 @@ Clean, well-organized API routers with proper separation of concerns.
 Each router handles a specific domain with clear responsibilities.
 """
 
-from typing import List
-import structlog
-from fastapi import APIRouter, Depends, HTTPException, Query, Path, status
-from fastapi.responses import JSONResponse
 
-from .config_refactored import config
-from .schemas_refactored import (
     ProductCreateRequest,
     ProductUpdateRequest,
     ProductSearchRequest,
@@ -25,7 +38,6 @@ from .schemas_refactored import (
     AIDescriptionResponse,
     ErrorResponse
 )
-from .services_refactored import services
 
 logger = structlog.get_logger(__name__)
 
@@ -246,8 +258,6 @@ async def bulk_create_products(
     product_service = Depends(get_product_service)
 ) -> BulkOperationResponse:
     """Bulk create products."""
-    import time
-    import asyncio
     
     if len(requests) > config.security.max_bulk_operations:
         raise HTTPException(

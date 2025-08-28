@@ -1,8 +1,10 @@
-"""
-Comprehensive tests for Forward and Reverse Diffusion Processes
-Tests all components including mathematical correctness, forward/reverse processes,
-schedulers, and practical implementations
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import torch
 import torch.nn as nn
@@ -14,9 +16,21 @@ import tempfile
 import os
 import warnings
 import matplotlib.pyplot as plt
+from diffusion_processes import (
+        import shutil
+        import shutil
+        import shutil
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Comprehensive tests for Forward and Reverse Diffusion Processes
+Tests all components including mathematical correctness, forward/reverse processes,
+schedulers, and practical implementations
+"""
+
 
 # Import diffusion processes
-from diffusion_processes import (
     DiffusionProcessConfig, DiffusionProcessBase, DDPMProcess, DDIMProcess,
     DiffusionProcessTrainer, DiffusionProcessVisualizer, AdvancedDiffusionScheduler,
     DiffusionProcessAnalyzer
@@ -29,7 +43,7 @@ warnings.filterwarnings("ignore")
 class TestDiffusionProcessConfig:
     """Test DiffusionProcessConfig dataclass"""
     
-    def test_diffusion_config_defaults(self):
+    def test_diffusion_config_defaults(self) -> Any:
         """Test default configuration values"""
         config = DiffusionProcessConfig()
         
@@ -68,7 +82,7 @@ class TestDiffusionProcessConfig:
         assert config.save_intermediate is False
         assert config.save_path == "diffusion_processes"
     
-    def test_diffusion_config_custom(self):
+    def test_diffusion_config_custom(self) -> Any:
         """Test custom configuration values"""
         config = DiffusionProcessConfig(
             num_train_timesteps=500,
@@ -125,7 +139,7 @@ class TestDiffusionProcessConfig:
 class TestDiffusionProcessBase:
     """Test base diffusion process functionality"""
     
-    def test_beta_schedule_linear(self):
+    def test_beta_schedule_linear(self) -> Any:
         """Test linear beta schedule"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -142,7 +156,7 @@ class TestDiffusionProcessBase:
         assert torch.all(process.betas >= 0)
         assert torch.all(process.betas <= 1)
     
-    def test_beta_schedule_cosine(self):
+    def test_beta_schedule_cosine(self) -> Any:
         """Test cosine beta schedule"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -168,7 +182,7 @@ class TestDiffusionProcessBase:
         
         assert not torch.allclose(process.betas, linear_process.betas)
     
-    def test_beta_schedule_quadratic(self):
+    def test_beta_schedule_quadratic(self) -> Any:
         """Test quadratic beta schedule"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -185,7 +199,7 @@ class TestDiffusionProcessBase:
         assert torch.all(process.betas >= 0)
         assert torch.all(process.betas <= 1)
     
-    def test_beta_schedule_sigmoid(self):
+    def test_beta_schedule_sigmoid(self) -> Any:
         """Test sigmoid beta schedule"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -200,7 +214,7 @@ class TestDiffusionProcessBase:
         assert torch.all(process.betas >= 0)
         assert torch.all(process.betas <= 1)
     
-    def test_derived_quantities(self):
+    def test_derived_quantities(self) -> Any:
         """Test derived quantities from beta schedule"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -229,7 +243,7 @@ class TestDiffusionProcessBase:
         # Test sqrt_one_minus_alphas_cumprod
         assert torch.allclose(process.sqrt_one_minus_alphas_cumprod, torch.sqrt(1.0 - process.alphas_cumprod))
     
-    def test_posterior_quantities(self):
+    def test_posterior_quantities(self) -> Any:
         """Test posterior variance and mean coefficients"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -252,7 +266,7 @@ class TestDiffusionProcessBase:
 class TestDDPMProcess:
     """Test DDPM diffusion process"""
     
-    def test_ddpm_initialization(self):
+    def test_ddpm_initialization(self) -> Any:
         """Test DDPM process initialization"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -267,7 +281,7 @@ class TestDDPMProcess:
         assert process.betas.shape == (100,)
         assert process.alphas_cumprod.shape == (100,)
     
-    def test_forward_process_shape(self):
+    def test_forward_process_shape(self) -> Any:
         """Test forward process output shapes"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -293,7 +307,7 @@ class TestDDPMProcess:
         assert not torch.isnan(x_t).any()
         assert not torch.isnan(noise).any()
     
-    def test_forward_process_properties(self):
+    def test_forward_process_properties(self) -> Any:
         """Test forward process mathematical properties"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -320,7 +334,7 @@ class TestDDPMProcess:
         # At t=99, x_t should be very noisy
         assert not torch.allclose(x_t[1], x_0[1], atol=1e-1)
     
-    def test_reverse_process_shape(self):
+    def test_reverse_process_shape(self) -> Any:
         """Test reverse process output shapes"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -346,7 +360,7 @@ class TestDDPMProcess:
         assert x_prev.shape == x_t.shape
         assert not torch.isnan(x_prev).any()
     
-    def test_reverse_process_epsilon_prediction(self):
+    def test_reverse_process_epsilon_prediction(self) -> Any:
         """Test reverse process with epsilon prediction"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -372,7 +386,7 @@ class TestDDPMProcess:
         assert x_prev.shape == x_t.shape
         assert not torch.isnan(x_prev).any()
     
-    def test_reverse_process_v_prediction(self):
+    def test_reverse_process_v_prediction(self) -> Any:
         """Test reverse process with v prediction"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -398,7 +412,7 @@ class TestDDPMProcess:
         assert x_prev.shape == x_t.shape
         assert not torch.isnan(x_prev).any()
     
-    def test_extract_into_tensor(self):
+    def test_extract_into_tensor(self) -> Any:
         """Test extract_into_tensor utility function"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -424,7 +438,7 @@ class TestDDPMProcess:
 class TestDDIMProcess:
     """Test DDIM diffusion process"""
     
-    def test_ddim_initialization(self):
+    def test_ddim_initialization(self) -> Any:
         """Test DDIM process initialization"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -441,7 +455,7 @@ class TestDDIMProcess:
         assert process.eta == 0.0
         assert process.betas.shape == (100,)
     
-    def test_ddim_forward_process(self):
+    def test_ddim_forward_process(self) -> Any:
         """Test DDIM forward process (same as DDPM)"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -468,7 +482,7 @@ class TestDDIMProcess:
         assert not torch.isnan(x_t).any()
         assert not torch.isnan(noise).any()
     
-    def test_ddim_reverse_process_deterministic(self):
+    def test_ddim_reverse_process_deterministic(self) -> Any:
         """Test DDIM reverse process with eta=0 (deterministic)"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -496,7 +510,7 @@ class TestDDIMProcess:
         assert x_prev.shape == x_t.shape
         assert not torch.isnan(x_prev).any()
     
-    def test_ddim_reverse_process_stochastic(self):
+    def test_ddim_reverse_process_stochastic(self) -> Any:
         """Test DDIM reverse process with eta=1.0 (stochastic)"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -528,7 +542,7 @@ class TestDDIMProcess:
 class TestDiffusionProcessTrainer:
     """Test diffusion process trainer"""
     
-    def test_trainer_initialization(self):
+    def test_trainer_initialization(self) -> Any:
         """Test trainer initialization"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -540,12 +554,12 @@ class TestDiffusionProcessTrainer:
         
         # Simple model for testing
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -558,7 +572,7 @@ class TestDiffusionProcessTrainer:
         assert isinstance(trainer.diffusion_process, DDPMProcess)
         assert isinstance(trainer.optimizer, optim.AdamW)
     
-    def test_trainer_with_ddim(self):
+    def test_trainer_with_ddim(self) -> Any:
         """Test trainer with DDIM process"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -569,12 +583,12 @@ class TestDiffusionProcessTrainer:
         )
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -584,7 +598,7 @@ class TestDiffusionProcessTrainer:
         
         assert isinstance(trainer.diffusion_process, DDIMProcess)
     
-    def test_train_step(self):
+    def test_train_step(self) -> Any:
         """Test training step"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -595,12 +609,12 @@ class TestDiffusionProcessTrainer:
         )
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -618,7 +632,7 @@ class TestDiffusionProcessTrainer:
         assert metrics['loss'] > 0
         assert not np.isnan(metrics['loss'])
     
-    def test_sample(self):
+    def test_sample(self) -> Any:
         """Test sampling from trained model"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -629,12 +643,12 @@ class TestDiffusionProcessTrainer:
         )
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -652,7 +666,7 @@ class TestDiffusionProcessTrainer:
 class TestAdvancedDiffusionScheduler:
     """Test advanced diffusion scheduler"""
     
-    def test_scheduler_initialization(self):
+    def test_scheduler_initialization(self) -> Any:
         """Test scheduler initialization"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -667,7 +681,7 @@ class TestAdvancedDiffusionScheduler:
         assert scheduler.config == config
         assert scheduler.scheduler is not None
     
-    def test_scheduler_add_noise(self):
+    def test_scheduler_add_noise(self) -> Any:
         """Test scheduler add noise"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -688,7 +702,7 @@ class TestAdvancedDiffusionScheduler:
         assert not torch.isnan(noisy_samples).any()
         assert not torch.allclose(noisy_samples, original_samples)
     
-    def test_scheduler_step(self):
+    def test_scheduler_step(self) -> Any:
         """Test scheduler step"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -710,7 +724,7 @@ class TestAdvancedDiffusionScheduler:
         assert result['prev_sample'].shape == sample.shape
         assert not torch.isnan(result['prev_sample']).any()
     
-    def test_scheduler_set_timesteps(self):
+    def test_scheduler_set_timesteps(self) -> Any:
         """Test scheduler set timesteps"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -728,7 +742,7 @@ class TestAdvancedDiffusionScheduler:
         assert hasattr(scheduler.scheduler, 'timesteps')
         assert len(scheduler.scheduler.timesteps) == 20
     
-    def test_scheduler_scale_model_input(self):
+    def test_scheduler_scale_model_input(self) -> Any:
         """Test scheduler scale model input"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -752,7 +766,7 @@ class TestAdvancedDiffusionScheduler:
 class TestDiffusionProcessAnalyzer:
     """Test diffusion process analyzer"""
     
-    def test_analyzer_initialization(self):
+    def test_analyzer_initialization(self) -> Any:
         """Test analyzer initialization"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -765,7 +779,7 @@ class TestDiffusionProcessAnalyzer:
         
         assert analyzer.config == config
     
-    def test_analyze_noise_schedule(self):
+    def test_analyze_noise_schedule(self) -> Any:
         """Test noise schedule analysis"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -795,7 +809,7 @@ class TestDiffusionProcessAnalyzer:
         # Noise level should be increasing
         assert analysis['noise_level'][0] < analysis['noise_level'][-1]
     
-    def test_compare_schedulers(self):
+    def test_compare_schedulers(self) -> Any:
         """Test scheduler comparison"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -815,7 +829,7 @@ class TestDiffusionProcessAnalyzer:
 class TestDiffusionProcessVisualizer:
     """Test diffusion process visualizer"""
     
-    def test_visualizer_initialization(self):
+    def test_visualizer_initialization(self) -> Any:
         """Test visualizer initialization"""
         config = DiffusionProcessConfig(
             save_path="test_diffusion"
@@ -828,10 +842,9 @@ class TestDiffusionProcessVisualizer:
         assert os.path.exists("test_diffusion")
         
         # Cleanup
-        import shutil
         shutil.rmtree("test_diffusion")
     
-    def test_visualize_beta_schedule(self):
+    def test_visualize_beta_schedule(self) -> Any:
         """Test beta schedule visualization"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -847,10 +860,9 @@ class TestDiffusionProcessVisualizer:
         assert os.path.exists(os.path.join("test_diffusion", "beta_schedule.png"))
         
         # Cleanup
-        import shutil
         shutil.rmtree("test_diffusion")
     
-    def test_visualize_alphas_cumprod(self):
+    def test_visualize_alphas_cumprod(self) -> Any:
         """Test alphas cumprod visualization"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -866,14 +878,13 @@ class TestDiffusionProcessVisualizer:
         assert os.path.exists(os.path.join("test_diffusion", "alphas_cumprod.png"))
         
         # Cleanup
-        import shutil
         shutil.rmtree("test_diffusion")
 
 
 class TestIntegration:
     """Integration tests"""
     
-    def test_end_to_end_ddpm(self):
+    def test_end_to_end_ddpm(self) -> Any:
         """Test end-to-end DDPM process"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -884,12 +895,12 @@ class TestIntegration:
         )
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -910,7 +921,7 @@ class TestIntegration:
         assert samples.shape == (2, 3, 32, 32)
         assert not torch.isnan(samples).any()
     
-    def test_end_to_end_ddim(self):
+    def test_end_to_end_ddim(self) -> Any:
         """Test end-to-end DDIM process"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -922,12 +933,12 @@ class TestIntegration:
         )
         
         class SimpleModel(nn.Module):
-            def __init__(self):
+            def __init__(self) -> Any:
                 super().__init__()
                 self.conv = nn.Conv2d(3, 3, 3, padding=1)
                 self.time_embed = nn.Embedding(100, 3)
                 
-            def forward(self, x, t):
+            def forward(self, x, t) -> Any:
                 t_emb = self.time_embed(t).unsqueeze(-1).unsqueeze(-1)
                 t_emb = t_emb.expand(-1, -1, x.shape[2], x.shape[3])
                 return self.conv(x + t_emb)
@@ -952,7 +963,7 @@ class TestIntegration:
 class TestMathematicalCorrectness:
     """Test mathematical correctness of diffusion processes"""
     
-    def test_forward_process_equation(self):
+    def test_forward_process_equation(self) -> Any:
         """Test that forward process follows the correct equation"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -983,7 +994,7 @@ class TestMathematicalCorrectness:
         
         assert torch.allclose(x_t, expected_x_t, atol=1e-6)
     
-    def test_reverse_process_equation(self):
+    def test_reverse_process_equation(self) -> Any:
         """Test that reverse process follows the correct equation"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,
@@ -1010,7 +1021,7 @@ class TestMathematicalCorrectness:
         assert x_prev.shape == x_t.shape
         assert not torch.isnan(x_prev).any()
     
-    def test_beta_schedule_properties(self):
+    def test_beta_schedule_properties(self) -> Any:
         """Test properties of beta schedule"""
         config = DiffusionProcessConfig(
             num_train_timesteps=100,

@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import os
+import sys
+from typing import Dict, List, Any
+from typing import Any, List, Dict, Optional
+import logging
 """
 🏃 TEST RUNNER - Blog System
 ============================
@@ -6,11 +24,6 @@ Runner principal para ejecutar toda la suite de tests del sistema blog.
 Organiza y ejecuta tests por categorías con reportes detallados.
 """
 
-import asyncio
-import time
-import os
-import sys
-from typing import Dict, List, Any
 
 
 # Agregar directorios al path
@@ -21,7 +34,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 class TestRunner:
     """Runner principal para todos los tests."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.results = {
             'unit': [],
             'integration': [],
@@ -30,7 +43,7 @@ class TestRunner:
         }
         self.start_time = time.perf_counter()
     
-    def run_unit_tests(self):
+    def run_unit_tests(self) -> Any:
         """Ejecutar tests unitarios."""
         print("🧩 RUNNING UNIT TESTS")
         print("=" * 25)
@@ -78,7 +91,7 @@ class TestRunner:
         
         return unit_results
     
-    def run_integration_tests(self):
+    def run_integration_tests(self) -> Any:
         """Ejecutar tests de integración."""
         print("\n🔗 RUNNING INTEGRATION TESTS")
         print("=" * 30)
@@ -120,7 +133,7 @@ class TestRunner:
         
         return integration_results
     
-    async def run_performance_tests(self):
+    async def run_performance_tests(self) -> Any:
         """Ejecutar tests de performance."""
         print("\n⚡ RUNNING PERFORMANCE TESTS")
         print("=" * 30)
@@ -173,7 +186,7 @@ class TestRunner:
         
         return performance_results
     
-    def run_security_tests(self):
+    def run_security_tests(self) -> Any:
         """Ejecutar tests de seguridad."""
         print("\n🔒 RUNNING SECURITY TESTS")
         print("=" * 25)
@@ -247,7 +260,7 @@ class TestRunner:
             **test_counts.get(test_file, {'tests': 5, 'passed': 5, 'failed': 0})
         }
     
-    def generate_final_report(self):
+    def generate_final_report(self) -> Any:
         """Generar reporte final completo."""
         total_execution_time = (time.perf_counter() - self.start_time) * 1000
         

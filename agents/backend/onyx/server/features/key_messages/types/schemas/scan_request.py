@@ -1,10 +1,25 @@
-"""
-Scan request API schemas for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, field_validator
 from datetime import datetime
 from enum import Enum
+            import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Scan request API schemas for cybersecurity tools.
+"""
 
 class ScanType(str, Enum):
     """Types of security scans."""
@@ -52,13 +67,13 @@ class CreateScanRequest(BaseModel):
     scheduled_at: Optional[datetime] = Field(None, description="Scheduled scan time")
     
     @field_validator('target')
-    def validate_target(cls, v):
+    def validate_target(cls, v) -> Optional[Dict[str, Any]]:
         if not v.strip():
             raise ValueError("Target cannot be empty")
         return v.strip()
     
     @field_validator('ports')
-    def validate_ports(cls, v):
+    def validate_ports(cls, v) -> bool:
         if v is not None:
             for port in v:
                 if port < 1 or port > 65535:
@@ -66,9 +81,8 @@ class CreateScanRequest(BaseModel):
         return v
     
     @field_validator('port_range')
-    def validate_port_range(cls, v):
+    def validate_port_range(cls, v) -> bool:
         if v is not None:
-            import re
             range_pattern = r'^\d+-\d+$'
             if not re.match(range_pattern, v):
                 raise ValueError("Port range must be in format 'start-end'")

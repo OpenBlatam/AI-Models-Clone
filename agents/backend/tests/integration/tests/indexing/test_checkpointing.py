@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import uuid
 from datetime import datetime
 from datetime import timedelta
@@ -19,10 +24,13 @@ from tests.integration.common_utils.managers.document import DocumentManager
 from tests.integration.common_utils.managers.index_attempt import IndexAttemptManager
 from tests.integration.common_utils.test_document_utils import create_test_document
 from tests.integration.common_utils.test_document_utils import (
-    create_test_document_failure,
-)
 from tests.integration.common_utils.test_models import DATestUser
 from tests.integration.common_utils.vespa import vespa_fixture
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    create_test_document_failure,
+)
 
 
 def test_mock_connector_basic_flow(

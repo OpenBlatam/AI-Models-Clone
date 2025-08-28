@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from collections.abc import Iterator
 from datetime import datetime
@@ -19,6 +21,9 @@ from onyx.connectors.interfaces import SecondsSinceUnixEpoch
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 PERMISSION_FULL_DESCRIPTION = (

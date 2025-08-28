@@ -1,7 +1,5 @@
-"""
-Model Repository - Onyx Integration
-Repository for persisting models.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from dataclasses import dataclass, field
@@ -11,11 +9,23 @@ import os
 from .base_types import CACHE_TTL, VALIDATION_TIMEOUT
 from .model_field import ModelField, FieldConfig
 from .model_schema import ModelSchema, SchemaConfig
-# from .base_model import OnyxBaseModel  # REMOVED to break circular import
 from .model_factory import ModelFactory
 from .model_registry import ModelRegistry
 from .model_manager import ModelManager
 from .model_service import ModelService
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Model Repository - Onyx Integration
+Repository for persisting models.
+"""
+# from .base_model import OnyxBaseModel  # REMOVED to break circular import
 
 T = TypeVar('T')
 
@@ -46,6 +56,10 @@ class ModelRepository:
         
         try:
             with open(path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 return json.load(f)
         except Exception as e:
             print(f"Error loading models from {path}: {e}")
@@ -57,6 +71,10 @@ class ModelRepository:
         
         try:
             with open(path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(models, f, indent=2)
         except Exception as e:
             print(f"Error saving models to {path}: {e}")
@@ -66,7 +84,6 @@ class ModelRepository:
         self._service.register_schema(name, schema)
     
     def register_model(self, name: str, model_class: "OnyxBaseModel") -> None:
-        from .base_model import OnyxBaseModel
         self._service.register_model(name, model_class)
         # Load existing models
         models_data = self._load_models(name)
@@ -74,7 +91,6 @@ class ModelRepository:
             self._service.create_model(name, data, id)
     
     def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional["OnyxBaseModel"]:
-        from .base_model import OnyxBaseModel
         model = self._service.create_model(name, data, id)
         if model and model.id:
             # Save to file
@@ -84,15 +100,12 @@ class ModelRepository:
         return model
     
     def get_model(self, name: str, id: str) -> Optional["OnyxBaseModel"]:
-        from .base_model import OnyxBaseModel
         return self._service.get_model(name, id)
     
     def get_models(self, name: str) -> Dict[str, "OnyxBaseModel"]:
-        from .base_model import OnyxBaseModel
         return self._service.get_models(name)
     
     def update_model(self, name: str, id: str, data: Dict[str, Any]) -> Optional["OnyxBaseModel"]:
-        from .base_model import OnyxBaseModel
         model = self._service.update_model(name, id, data)
         if model:
             # Save to file

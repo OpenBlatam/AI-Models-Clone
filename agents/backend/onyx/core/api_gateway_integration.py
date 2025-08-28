@@ -1,3 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import time
+import hmac
+import hashlib
+import jwt
+from typing import Dict, Any, Optional, List
+from functools import wraps
+from fastapi import FastAPI, Request, HTTPException, Depends, Header, status
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+import structlog
+            import uuid
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🌐 API GATEWAY INTEGRATION
 =========================
@@ -9,18 +36,7 @@ Advanced API Gateway patterns:
 - Authentication/Authorization
 """
 
-import time
-import hmac
-import hashlib
-import jwt
-from typing import Dict, Any, Optional, List
-from functools import wraps
 
-from fastapi import FastAPI, Request, HTTPException, Depends, Header, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-import structlog
 
 logger = structlog.get_logger(__name__)
 
@@ -83,7 +99,9 @@ class APIGatewayAuth:
     """API Gateway authentication handler."""
     
     def __init__(self, config: APIGatewayConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.bearer = HTTPBearer(auto_error=False)
     
     async def verify_api_key(self, api_key: Optional[str] = Header(None, alias="X-API-Key")):
@@ -148,7 +166,9 @@ class APIGatewayRateLimit:
     """Advanced rate limiting for API Gateway."""
     
     def __init__(self, config: APIGatewayConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self._requests: Dict[str, List[float]] = {}
     
     async def check_rate_limit(self, client_id: str, endpoint: str) -> bool:
@@ -193,9 +213,11 @@ class RequestTransformer:
     """Transform requests for microservices."""
     
     def __init__(self, config: APIGatewayConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
     
-    async def transform_request(self, request: Request) -> GatewayRequest:
+    async async def transform_request(self, request: Request) -> GatewayRequest:
         """Transform incoming request."""
         
         # Extract client information
@@ -214,7 +236,6 @@ class RequestTransformer:
         
         # Add request ID if enabled
         if self.config.add_request_id:
-            import uuid
             gateway_request.gateway_id = str(uuid.uuid4())
         
         # Add body for POST/PUT requests
@@ -257,7 +278,9 @@ class APIGatewayMiddleware:
     """Comprehensive API Gateway middleware."""
     
     def __init__(self, config: APIGatewayConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.auth = APIGatewayAuth(config)
         self.rate_limiter = APIGatewayRateLimit(config)
         self.transformer = RequestTransformer(config)
@@ -320,7 +343,7 @@ class APIGatewayMiddleware:
 # API GATEWAY APPLICATION
 # =============================================================================
 
-def create_api_gateway_app() -> FastAPI:
+async def create_api_gateway_app() -> FastAPI:
     """Create API Gateway integrated application."""
     
     config = APIGatewayConfig()
@@ -360,7 +383,9 @@ def create_api_gateway_app() -> FastAPI:
     # Add gateway middleware
     @app.middleware("http")
     async def api_gateway_middleware(request: Request, call_next):
-        return await gateway_middleware.process_request(request, call_next)
+        
+    """api_gateway_middleware function."""
+return await gateway_middleware.process_request(request, call_next)
     
     return app
 
@@ -438,6 +463,6 @@ async def rate_limited_endpoint():
         "timestamp": time.time()
     }
 
-if __name__ == "__main__":
-    import uvicorn
+match __name__:
+    case "__main__":
     uvicorn.run(gateway_app, host="0.0.0.0", port=8000) 

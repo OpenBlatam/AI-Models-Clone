@@ -1,9 +1,13 @@
-"""
-Functional FastAPI Application
-=============================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-FastAPI application using functional programming principles.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,6 +21,15 @@ import uuid
 from datetime import datetime
 from functools import partial, reduce
 import json
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Functional FastAPI Application
+=============================
+
+FastAPI application using functional programming principles.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -38,7 +51,7 @@ class VideoResponse(BaseModel):
     message: str
 
 # Pure functions for request processing
-def validate_request(data: RequestData) -> bool:
+async def validate_request(data: RequestData) -> bool:
     """Validate request data."""
     if not data.get("prompt", "").strip():
         raise ValueError("Prompt cannot be empty")
@@ -324,7 +337,7 @@ def add_cors_middleware(app: FastAPI) -> FastAPI:
 def add_error_handling(app: FastAPI) -> FastAPI:
     """Add global error handling."""
     @app.exception_handler(Exception)
-    async def global_exception_handler(request, exc):
+    async def global_exception_handler(request, exc) -> Any:
         logger.error(f"Unhandled exception: {str(exc)}")
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -397,7 +410,6 @@ def example_usage():
         print(f"Error: {e}")
 
 if __name__ == "__main__":
-    import uvicorn
     
     app = create_app()
     

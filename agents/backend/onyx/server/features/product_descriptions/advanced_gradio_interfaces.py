@@ -1,16 +1,13 @@
-"""
-Advanced Gradio Interfaces for Cybersecurity Model Showcase
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module provides comprehensive, user-friendly interfaces that showcase:
-- Real-time model inference with confidence scores
-- Interactive data visualization and analysis
-- Model performance metrics and comparisons
-- Batch processing capabilities
-- Anomaly detection visualization
-- Threat classification with explanations
-- Model interpretability features
-- Real-time monitoring dashboards
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import gradio as gr
 import numpy as np
@@ -27,6 +24,25 @@ import time
 from datetime import datetime
 from typing import Dict, List, Tuple, Any, Optional
 import warnings
+            from sklearn.metrics import confusion_matrix
+            from sklearn.metrics import roc_curve, auc
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Advanced Gradio Interfaces for Cybersecurity Model Showcase
+
+This module provides comprehensive, user-friendly interfaces that showcase:
+- Real-time model inference with confidence scores
+- Interactive data visualization and analysis
+- Model performance metrics and comparisons
+- Batch processing capabilities
+- Anomaly detection visualization
+- Threat classification with explanations
+- Model interpretability features
+- Real-time monitoring dashboards
+"""
+
 warnings.filterwarnings('ignore')
 
 # Configure matplotlib for better plots
@@ -37,7 +53,7 @@ sns.set_palette("husl")
 class CybersecurityModelInterface:
     """Advanced interface for cybersecurity model showcase."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.model = self._create_demo_model()
         self.model.eval()
         self.prediction_history = []
@@ -46,7 +62,7 @@ class CybersecurityModelInterface:
     def _create_demo_model(self) -> nn.Module:
         """Create a demo model for showcase."""
         class DemoCybersecurityModel(nn.Module):
-            def __init__(self, input_dim=20, num_classes=4):
+            def __init__(self, input_dim=20, num_classes=4) -> Any:
                 super().__init__()
                 self.features = nn.Sequential(
                     nn.Linear(input_dim, 64),
@@ -60,7 +76,7 @@ class CybersecurityModelInterface:
                 )
                 self.classifier = nn.Linear(16, num_classes)
                 
-            def forward(self, x):
+            def forward(self, x) -> Any:
                 features = self.features(x)
                 return self.classifier(features)
         
@@ -198,7 +214,6 @@ class CybersecurityModelInterface:
             
             # Create visualizations
             # 1. Confusion Matrix
-            from sklearn.metrics import confusion_matrix
             cm = confusion_matrix(targets, predictions)
             
             fig1 = go.Figure(data=go.Heatmap(
@@ -219,7 +234,6 @@ class CybersecurityModelInterface:
             )
             
             # 2. ROC Curve
-            from sklearn.metrics import roc_curve, auc
             fig2 = go.Figure()
             
             for i in range(4):
@@ -617,7 +631,9 @@ def create_advanced_interfaces():
                 )
                 
                 def clear_history():
-                    model_interface.prediction_history = []
+                    
+    """clear_history function."""
+model_interface.prediction_history = []
                     return gr.update(), gr.update(), gr.update()
                 
                 clear_btn.click(

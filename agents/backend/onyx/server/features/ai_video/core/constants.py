@@ -1,12 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import os
+from pathlib import Path
+from typing import List, Dict, Any
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 AI Video System - Constants
 
 Production-ready constants and configuration defaults.
 """
 
-import os
-from pathlib import Path
-from typing import List, Dict, Any
 
 # System constants
 SYSTEM_NAME = "Onyx AI Video System"

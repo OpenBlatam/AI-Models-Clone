@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import yaml
 from sqlalchemy.orm import Session
 
@@ -19,11 +21,18 @@ from onyx.db.prompts import upsert_prompt
 from onyx.db.user_documents import upsert_user_folder
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def load_user_folders_from_yaml(
     db_session: Session,
     user_folders_yaml: str = USER_FOLDERS_YAML,
 ) -> None:
     with open(user_folders_yaml, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         data = yaml.safe_load(file)
 
     all_user_folders = data.get("user_folders", [])
@@ -45,6 +54,10 @@ def load_prompts_from_yaml(
     db_session: Session, prompts_yaml: str = PROMPTS_YAML
 ) -> None:
     with open(prompts_yaml, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         data = yaml.safe_load(file)
 
     all_prompts = data.get("prompts", [])
@@ -69,6 +82,10 @@ def load_input_prompts_from_yaml(
     db_session: Session, input_prompts_yaml: str = INPUT_PROMPT_YAML
 ) -> None:
     with open(input_prompts_yaml, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         data = yaml.safe_load(file)
 
     all_input_prompts = data.get("input_prompts", [])
@@ -94,6 +111,10 @@ def load_personas_from_yaml(
     default_chunks: float = MAX_CHUNKS_FED_TO_CHAT,
 ) -> None:
     with open(personas_yaml, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         data = yaml.safe_load(file)
 
     all_personas = data.get("personas", [])

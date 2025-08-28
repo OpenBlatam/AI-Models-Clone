@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import sys
+from pathlib import Path
+import tempfile
+import shutil
+    from project_init import ProblemDefinition, DatasetAnalyzer, ProjectInitializer
+        import pandas as pd
+        import numpy as np
+            import pandas as pd
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 Test Script for Project Initialization System
@@ -10,16 +23,11 @@ Usage:
     python test_project_init.py
 """
 
-import sys
-from pathlib import Path
-import tempfile
-import shutil
 
 # Add current directory to path for imports
 sys.path.append(str(Path(__file__).parent))
 
 try:
-    from project_init import ProblemDefinition, DatasetAnalyzer, ProjectInitializer
     print("✅ Successfully imported project initialization modules")
 except ImportError as e:
     print(f"❌ Failed to import modules: {e}")
@@ -67,8 +75,6 @@ def test_dataset_analyzer():
     
     try:
         # Create temporary test data
-        import pandas as pd
-        import numpy as np
         
         test_data = pd.DataFrame({
             'id': range(10),
@@ -118,7 +124,6 @@ def test_project_initializer():
             )
             
             # Create test data
-            import pandas as pd
             test_data = pd.DataFrame({'id': range(5), 'value': [1, 2, 3, 4, 5]})
             data_file = temp_path / "test_data.csv"
             test_data.to_csv(data_file, index=False)

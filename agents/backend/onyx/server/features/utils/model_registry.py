@@ -1,7 +1,5 @@
-"""
-Model Registry - Onyx Integration
-Registry for managing models and schemas.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from dataclasses import dataclass, field
@@ -10,13 +8,26 @@ from .base_types import CACHE_TTL, VALIDATION_TIMEOUT
 from .model_field import ModelField, FieldConfig
 from .model_schema import ModelSchema, SchemaConfig
 from .model_factory import ModelFactory
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Model Registry - Onyx Integration
+Registry for managing models and schemas.
+"""
 
 T = TypeVar('T')
 
 class ModelRegistry:
     """Registry for managing models and schemas."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize registry."""
         self._factory = ModelFactory()
         self._instances: Dict[str, Dict[str, 'OnyxBaseModel']] = {}
@@ -26,7 +37,6 @@ class ModelRegistry:
         self._factory.register_schema(name, schema)
     
     def register_model(self, name: str, model_class: 'OnyxBaseModel') -> None:
-        from .base_model import OnyxBaseModel
         self._factory.register_model(name, model_class)
         self._instances[name] = {}
     
@@ -35,11 +45,9 @@ class ModelRegistry:
         return self._factory.get_schema(name)
     
     def get_model_class(self, name: str) -> Optional[Type['OnyxBaseModel']]:
-        from .base_model import OnyxBaseModel
         return self._factory.get_model_class(name)
     
     def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional['OnyxBaseModel']:
-        from .base_model import OnyxBaseModel
         model = self._factory.create_model(name, data, id)
         
         if model and model.id:
@@ -48,15 +56,12 @@ class ModelRegistry:
         return model
     
     def get_model(self, name: str, id: str) -> Optional['OnyxBaseModel']:
-        from .base_model import OnyxBaseModel
         return self._instances.get(name, {}).get(id)
     
     def get_models(self, name: str) -> Dict[str, 'OnyxBaseModel']:
-        from .base_model import OnyxBaseModel
         return self._instances.get(name, {}).copy()
     
     def update_model(self, name: str, id: str, data: Dict[str, Any]) -> Optional['OnyxBaseModel']:
-        from .base_model import OnyxBaseModel
         model = self.get_model(name, id)
         
         if model:

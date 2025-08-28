@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+import logging
+from typing import Dict, List, Any, Optional
+from datetime import datetime
+from ..models.facebook_models import (
+from ..services.langchain_service import FacebookLangChainService
+from ..utils.facebook_utils import FacebookUtils
+        import hashlib
+from typing import Any, List, Dict, Optional
 """
 🎯 Facebook Post Engine
 =======================
@@ -6,19 +24,11 @@ Motor principal para generación y análisis de Facebook posts.
 Integrado con LangChain y optimizado para Onyx.
 """
 
-import asyncio
-import time
-import logging
-from typing import Dict, List, Any, Optional
-from datetime import datetime
 
 # Onyx imports
-from ..models.facebook_models import (
     FacebookPost, FacebookRequest, FacebookAnalysis, FacebookPostResponse,
     FacebookFingerprint, FacebookTone, FacebookPostType, EngagementLevel
 )
-from ..services.langchain_service import FacebookLangChainService
-from ..utils.facebook_utils import FacebookUtils
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +37,9 @@ class FacebookPostEngine:
     """Motor principal para Facebook posts con LangChain."""
     
     def __init__(self, langchain_service: FacebookLangChainService):
-        self.langchain_service = langchain_service
+        
+    """__init__ function."""
+self.langchain_service = langchain_service
         self.utils = FacebookUtils()
         self.cache = {}
         self.analytics = {
@@ -342,7 +354,6 @@ class FacebookPostEngine:
     
     def _get_cache_key(self, request: FacebookRequest) -> str:
         """Generar clave de cache para el request."""
-        import hashlib
         
         key_data = f"{request.content_topic}_{request.post_type}_{request.tone}_{request.target_audience}_{request.max_length}"
         return hashlib.md5(key_data.encode()).hexdigest()
@@ -360,7 +371,7 @@ class FacebookPostEngine:
             )
         }
     
-    def clear_cache(self):
+    def clear_cache(self) -> Any:
         """Limpiar cache del motor."""
         self.cache.clear()
         self.logger.info("Facebook post engine cache cleared") 

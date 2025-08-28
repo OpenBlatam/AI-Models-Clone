@@ -1,10 +1,13 @@
-"""
-API Performance Metrics System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module provides comprehensive performance monitoring for API endpoints,
-tracking response time, latency, throughput, and other key performance indicators
-with real-time monitoring, analytics, and alerting capabilities.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import json
@@ -16,10 +19,20 @@ from datetime import datetime, timedelta
 from enum import Enum
 from typing import Any, Dict, List, Optional, Tuple, Union
 from contextlib import asynccontextmanager
-
 from fastapi import Request, Response
 from pydantic import BaseModel, Field
 import psutil
+from typing import Any, List, Dict, Optional
+import logging
+"""
+API Performance Metrics System
+
+This module provides comprehensive performance monitoring for API endpoints,
+tracking response time, latency, throughput, and other key performance indicators
+with real-time monitoring, analytics, and alerting capabilities.
+"""
+
+
 
 
 class MetricType(Enum):
@@ -171,7 +184,7 @@ class APIPerformanceMetrics:
         
         self._start_background_tasks()
     
-    def _setup_default_thresholds(self):
+    def _setup_default_thresholds(self) -> Any:
         """Setup default performance thresholds."""
         default_thresholds = [
             PerformanceThreshold(
@@ -218,7 +231,7 @@ class APIPerformanceMetrics:
         
         self.thresholds.extend(default_thresholds)
     
-    def _start_background_tasks(self):
+    def _start_background_tasks(self) -> Any:
         """Start background tasks for metrics management."""
         if self._cleanup_task is None or self._cleanup_task.done():
             self._cleanup_task = asyncio.create_task(self._cleanup_old_metrics())
@@ -226,7 +239,7 @@ class APIPerformanceMetrics:
         if self._system_metrics_task is None or self._system_metrics_task.done():
             self._system_metrics_task = asyncio.create_task(self._collect_system_metrics())
     
-    async def _cleanup_old_metrics(self):
+    async def _cleanup_old_metrics(self) -> Any:
         """Cleanup old metrics outside the time window."""
         while True:
             try:
@@ -257,7 +270,7 @@ class APIPerformanceMetrics:
                 print(f"Error in metrics cleanup: {e}")
                 await asyncio.sleep(60)
     
-    async def _collect_system_metrics(self):
+    async def _collect_system_metrics(self) -> Any:
         """Collect system metrics periodically."""
         while True:
             try:
@@ -279,7 +292,7 @@ class APIPerformanceMetrics:
                 print(f"Error collecting system metrics: {e}")
                 await asyncio.sleep(10)
     
-    async def _check_thresholds(self):
+    async def _check_thresholds(self) -> Any:
         """Check performance thresholds and generate alerts."""
         current_time = time.time()
         
@@ -321,9 +334,11 @@ class APIPerformanceMetrics:
             if total_requests == 0:
                 return 0.0
             return self.error_counts.get(endpoint, 0) / total_requests
-        elif metric_type == MetricType.MEMORY_USAGE:
+        elmatch metric_type:
+    case MetricType.MEMORY_USAGE:
             return statistics.mean(self.memory_usage) if self.memory_usage else 0.0
-        elif metric_type == MetricType.CPU_USAGE:
+        elmatch metric_type:
+    case MetricType.CPU_USAGE:
             return statistics.mean(self.cpu_usage) if self.cpu_usage else 0.0
         elif metric_type == MetricType.THROUGHPUT:
             return self.get_throughput()
@@ -393,15 +408,15 @@ class APIPerformanceMetrics:
         self.concurrent_requests += 1
         self.max_concurrent_requests = max(self.max_concurrent_requests, self.concurrent_requests)
     
-    def record_request_end(self):
+    async def record_request_end(self) -> Any:
         """Record the end of a request (for concurrent request tracking)."""
         self.concurrent_requests = max(0, self.concurrent_requests - 1)
     
-    def record_cache_hit(self):
+    def record_cache_hit(self) -> Any:
         """Record a cache hit."""
         self.cache_hits += 1
     
-    def record_cache_miss(self):
+    def record_cache_miss(self) -> Any:
         """Record a cache miss."""
         self.cache_misses += 1
     
@@ -415,7 +430,7 @@ class APIPerformanceMetrics:
         self.external_api_calls += 1
         self.external_api_time += call_time
     
-    def _update_throughput(self):
+    def _update_throughput(self) -> Any:
         """Update throughput calculation."""
         current_time = time.time()
         time_diff = current_time - self.last_throughput_calc
@@ -489,7 +504,7 @@ class APIPerformanceMetrics:
             return 0.0
         return statistics.mean(self.cpu_usage)
     
-    def get_concurrent_requests(self) -> Dict[str, int]:
+    async def get_concurrent_requests(self) -> Dict[str, int]:
         """Get concurrent request statistics."""
         return {
             "current": self.concurrent_requests,
@@ -504,7 +519,7 @@ class APIPerformanceMetrics:
             "avg_query_time": self.db_query_time / max(1, self.db_query_count)
         }
     
-    def get_external_api_stats(self) -> Dict[str, Any]:
+    async def get_external_api_stats(self) -> Dict[str, Any]:
         """Get external API performance statistics."""
         return {
             "call_count": self.external_api_calls,
@@ -559,11 +574,11 @@ class APIPerformanceMetrics:
             return [alert for alert in self.alerts if alert.severity == severity]
         return self.alerts
     
-    def clear_alerts(self):
+    def clear_alerts(self) -> Any:
         """Clear all alerts."""
         self.alerts.clear()
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close the performance metrics system."""
         if self._cleanup_task and not self._cleanup_task.done():
             self._cleanup_task.cancel()
@@ -632,8 +647,8 @@ async def performance_tracking(request: Request, response: Response):
 # Performance decorators
 def track_performance(endpoint_name: Optional[str] = None):
     """Decorator to track function performance."""
-    def decorator(func):
-        async def wrapper(*args, **kwargs):
+    def decorator(func) -> Any:
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             try:
                 result = await func(*args, **kwargs)
@@ -655,9 +670,9 @@ def track_performance(endpoint_name: Optional[str] = None):
     return decorator
 
 
-def track_cache_performance(func):
+def track_cache_performance(func) -> Any:
     """Decorator to track cache performance."""
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         metrics = get_performance_metrics()
         
         # Check if result is in cache (simplified)
@@ -672,9 +687,9 @@ def track_cache_performance(func):
     return wrapper
 
 
-def track_database_performance(func):
+def track_database_performance(func) -> Any:
     """Decorator to track database performance."""
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         start_time = time.time()
         try:
             result = await func(*args, **kwargs)
@@ -689,9 +704,9 @@ def track_database_performance(func):
     return wrapper
 
 
-def track_external_api_performance(func):
+async def track_external_api_performance(func) -> Any:
     """Decorator to track external API performance."""
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         start_time = time.time()
         try:
             result = await func(*args, **kwargs)
@@ -710,7 +725,7 @@ def track_external_api_performance(func):
 class PerformanceMonitor:
     """Utility class for performance monitoring."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = get_performance_metrics()
     
     def get_response_time_percentiles(self, endpoint: str = "*") -> Dict[str, float]:

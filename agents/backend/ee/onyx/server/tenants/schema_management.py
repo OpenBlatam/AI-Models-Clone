@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import logging
 import os
 from types import SimpleNamespace
@@ -11,6 +13,10 @@ from alembic.config import Config
 from onyx.db.engine import build_connection_string
 from onyx.db.engine import get_sqlalchemy_engine
 
+    from alembic.runtime.migration import MigrationContext
+    from sqlalchemy import text
+from typing import Any, List, Dict, Optional
+import asyncio
 logger = logging.getLogger(__name__)
 
 
@@ -78,8 +84,6 @@ def drop_schema(tenant_id: str) -> None:
 
 def get_current_alembic_version(tenant_id: str) -> str:
     """Get the current Alembic version for a tenant."""
-    from alembic.runtime.migration import MigrationContext
-    from sqlalchemy import text
 
     engine = get_sqlalchemy_engine()
 

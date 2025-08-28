@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Final
 
 import pytest
@@ -8,6 +10,9 @@ from pywikibot.family import Family  # type: ignore[import-untyped]
 from onyx.connectors.mediawiki import family
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Disabling these tests as they are flaky and rely on external wikis that are maintained by just fan communities
 
 

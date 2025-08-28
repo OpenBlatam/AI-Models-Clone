@@ -1,21 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Any, Dict
+from datetime import datetime
+from onyx.utils.logger import setup_logger
+from onyx.utils.telemetry import TelemetryLogger
+from ...models import VideoRequest, VideoResponse
+from ...core.exceptions import AIVideoError, ValidationError
+from .core.workflow import OnyxVideoWorkflow
+from .core.models import GeneratorStatus
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Onyx Video Workflow - Video Generator
 
 Video generator with advanced features using Onyx's infrastructure.
 """
 
-from typing import Any, Dict
-from datetime import datetime
 
 # Onyx imports
-from onyx.utils.logger import setup_logger
-from onyx.utils.telemetry import TelemetryLogger
 
 # Local imports
-from ...models import VideoRequest, VideoResponse
-from ...core.exceptions import AIVideoError, ValidationError
-from .core.workflow import OnyxVideoWorkflow
-from .core.models import GeneratorStatus
 
 
 class OnyxVideoGenerator:
@@ -27,7 +35,9 @@ class OnyxVideoGenerator:
     """
     
     def __init__(self, workflow_type: str = "default"):
-        self.logger = setup_logger("onyx_video_generator")
+        
+    """__init__ function."""
+self.logger = setup_logger("onyx_video_generator")
         self.workflow = OnyxVideoWorkflow(workflow_type)
         self.telemetry = TelemetryLogger()
         self.workflow_type = workflow_type
@@ -107,7 +117,7 @@ class OnyxVideoGenerator:
             self.logger.error(f"Vision video generation failed: {e}")
             raise AIVideoError(f"Vision video generation failed: {e}")
     
-    async def _validate_request(self, request: VideoRequest) -> None:
+    async async def _validate_request(self, request: VideoRequest) -> None:
         """Validate video request."""
         if not request.input_text.strip():
             raise ValidationError("Input text cannot be empty")

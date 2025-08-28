@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add chat session sharing
 
 Revision ID: 38eda64af7fe
@@ -6,12 +13,10 @@ Create Date: 2024-03-27 19:41:29.073594
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "38eda64af7fe"
-down_revision = "776b3bbe9092"
+revision: str = "38eda64af7fe"
+down_revision: str = "776b3bbe9092"
 branch_labels: None = None
 depends_on: None = None
 
@@ -24,13 +29,13 @@ def upgrade() -> None:
             sa.Enum(
                 "PUBLIC",
                 "PRIVATE",
-                name="chatsessionsharedstatus",
+                name: str = "chatsessionsharedstatus",
                 native_enum=False,
             ),
             nullable=True,
         ),
     )
-    op.execute("UPDATE chat_session SET shared_status='PRIVATE'")
+    op.execute("UPDATE chat_session SET shared_status: str = 'PRIVATE'")
     op.alter_column(
         "chat_session",
         "shared_status",

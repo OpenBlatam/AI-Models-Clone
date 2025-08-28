@@ -1,9 +1,7 @@
-"""Custom client that works similarly to Dask, but simpler and more lightweight.
-Dask jobs behaved very strangely - they would die all the time, retries would
-not follow the expected behavior, etc.
-
-NOTE: cannot use Celery directly due to
-https://github.com/celery/celery/issues/7007#issuecomment-1740139367"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import multiprocessing as mp
 import sys
@@ -14,13 +12,23 @@ from multiprocessing.context import SpawnProcess
 from typing import Any
 from typing import Literal
 from typing import Optional
-
 from onyx.configs.constants import POSTGRES_CELERY_WORKER_INDEXING_CHILD_APP_NAME
 from onyx.db.engine import SqlEngine
 from onyx.utils.logger import setup_logger
 from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 from shared_configs.configs import TENANT_ID_PREFIX
 from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""Custom client that works similarly to Dask, but simpler and more lightweight.
+Dask jobs behaved very strangely - they would die all the time, retries would
+not follow the expected behavior, etc.
+
+NOTE: cannot use Celery directly due to
+https://github.com/celery/celery/issues/7007#issuecomment-1740139367"""
+
+
 
 logger = setup_logger()
 

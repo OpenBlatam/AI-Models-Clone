@@ -1,3 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+import signal
+import sys
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator, Dict, Any, Optional, List
+from datetime import datetime, timedelta
+from dataclasses import dataclass, field
+from enum import Enum
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
+import structlog
+import redis.asyncio as redis
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
+from sqlalchemy.pool import NullPool
+from .functional_fastapi_components import (
+    import psutil
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 🔄 FastAPI Lifespan Management with Context Managers
 ====================================================
@@ -15,26 +41,8 @@ Prefer lifespan context managers for:
 - Dependency injection setup
 """
 
-import asyncio
-import logging
-import signal
-import sys
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator, Dict, Any, Optional, List
-from datetime import datetime, timedelta
-from dataclasses import dataclass, field
-from enum import Enum
 
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
-import structlog
-import redis.asyncio as redis
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.pool import NullPool
 
-from .functional_fastapi_components import (
     TextAnalysisRequest, AnalysisResponse, AnalysisTypeEnum,
     OptimizationTierEnum, AnalysisStatusEnum
 )
@@ -352,7 +360,9 @@ class CacheManager:
     """Cache manager for application caching."""
     
     def __init__(self, redis_client: redis.Redis):
-        self.redis = redis_client
+        
+    """__init__ function."""
+self.redis = redis_client
         self.logger = structlog.get_logger("cache")
     
     async def get(self, key: str) -> Optional[Any]:
@@ -623,7 +633,6 @@ async def perform_health_check(app_state: AppState):
 
 async def collect_system_metrics() -> Dict[str, Any]:
     """Collect system metrics."""
-    import psutil
     
     return {
         "timestamp": datetime.now().isoformat(),
@@ -646,7 +655,7 @@ def setup_signal_handlers(shutdown_event: asyncio.Event):
     """
     logger = structlog.get_logger("signal_handler")
     
-    def signal_handler(signum, frame):
+    def signal_handler(signum, frame) -> Any:
         logger.info(f"Received signal {signum}, initiating graceful shutdown")
         shutdown_event.set()
     
@@ -799,7 +808,7 @@ def setup_exception_handlers(app: FastAPI):
     """Setup exception handlers."""
     
     @app.exception_handler(Exception)
-    async def global_exception_handler(request, exc):
+    async def global_exception_handler(request, exc) -> Any:
         """Global exception handler."""
         logger = structlog.get_logger("exception_handler")
         logger.error("Unhandled exception", 
@@ -851,7 +860,6 @@ app = create_app()
 # ============================================================================
 
 if __name__ == "__main__":
-    import uvicorn
     
     config = load_config()
     

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import re
 from typing import Any
@@ -19,6 +21,9 @@ from onyx.file_processing.html_utils import web_html_cleanup
 from onyx.file_store.file_store import get_default_file_store
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -58,7 +63,9 @@ class GoogleSitesConnector(LoadConnector):
         base_url: str,
         batch_size: int = INDEX_BATCH_SIZE,
     ):
-        self.zip_path = zip_path
+        
+    """__init__ function."""
+self.zip_path = zip_path
         self.base_url = base_url
         self.batch_size = batch_size
 

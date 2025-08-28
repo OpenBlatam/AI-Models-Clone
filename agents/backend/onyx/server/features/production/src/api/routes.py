@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, Query, Path
+from fastapi.responses import JSONResponse
+import structlog
+from src.application.use_cases import (
+from src.domain.entities import (
+from src.core.container import get_container
+from src.core.exceptions import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 Ultra-Optimized API Routes
 ============================
@@ -10,12 +29,7 @@ Production-grade API endpoints with:
 - Performance monitoring
 """
 
-from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, Query, Path
-from fastapi.responses import JSONResponse
-import structlog
 
-from src.application.use_cases import (
     GenerateContentUseCase,
     GetUserContentUseCase,
     SearchContentUseCase,
@@ -23,12 +37,9 @@ from src.application.use_cases import (
     GetUserMetricsUseCase,
     UpdateUserCreditsUseCase
 )
-from src.domain.entities import (
     ContentRequest, GeneratedContent, ContentTemplate, UsageMetrics,
     ContentType, Language, Tone
 )
-from src.core.container import get_container
-from src.core.exceptions import (
     BusinessException, ValidationException, NotFoundException,
     UnauthorizedException, InsufficientCreditsException
 )
@@ -40,7 +51,9 @@ api_router = APIRouter()
 
 # Dependency to get container
 def get_di_container():
-    return get_container()
+    
+    """get_di_container function."""
+return get_container()
 
 # Content Generation Endpoints
 @api_router.post("/content/generate", response_model=GeneratedContent)
@@ -424,7 +437,7 @@ async def get_tones():
 
 # Error handling middleware
 @api_router.exception_handler(BusinessException)
-async def business_exception_handler(request, exc):
+async def business_exception_handler(request, exc) -> Any:
     logger.warning("Business exception", error=str(exc), path=request.url.path)
     return JSONResponse(
         status_code=400,
@@ -432,7 +445,7 @@ async def business_exception_handler(request, exc):
     )
 
 @api_router.exception_handler(ValidationException)
-async def validation_exception_handler(request, exc):
+async def validation_exception_handler(request, exc) -> Any:
     logger.warning("Validation exception", error=str(exc), path=request.url.path)
     return JSONResponse(
         status_code=422,
@@ -440,7 +453,7 @@ async def validation_exception_handler(request, exc):
     )
 
 @api_router.exception_handler(NotFoundException)
-async def not_found_exception_handler(request, exc):
+async def not_found_exception_handler(request, exc) -> Any:
     logger.warning("Not found exception", error=str(exc), path=request.url.path)
     return JSONResponse(
         status_code=404,
@@ -448,7 +461,7 @@ async def not_found_exception_handler(request, exc):
     )
 
 @api_router.exception_handler(UnauthorizedException)
-async def unauthorized_exception_handler(request, exc):
+async def unauthorized_exception_handler(request, exc) -> Any:
     logger.warning("Unauthorized exception", error=str(exc), path=request.url.path)
     return JSONResponse(
         status_code=401,

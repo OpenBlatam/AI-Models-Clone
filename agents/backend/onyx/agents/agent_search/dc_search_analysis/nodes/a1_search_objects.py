@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import cast
 
 from langchain_core.messages import HumanMessage
@@ -8,12 +10,8 @@ from onyx.agents.agent_search.dc_search_analysis.ops import extract_section
 from onyx.agents.agent_search.dc_search_analysis.ops import research
 from onyx.agents.agent_search.dc_search_analysis.states import MainState
 from onyx.agents.agent_search.dc_search_analysis.states import (
-    SearchSourcesObjectsUpdate,
-)
 from onyx.agents.agent_search.models import GraphConfig
 from onyx.agents.agent_search.shared_graph_utils.agent_prompt_ops import (
-    trim_prompt_piece,
-)
 from onyx.agents.agent_search.shared_graph_utils.utils import write_custom_event
 from onyx.chat.models import AgentAnswerPiece
 from onyx.configs.constants import DocumentSource
@@ -22,6 +20,13 @@ from onyx.prompts.agents.dc_prompts import DC_OBJECT_SEPARATOR
 from onyx.prompts.agents.dc_prompts import DC_OBJECT_WITH_BASE_DATA_EXTRACTION_PROMPT
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    SearchSourcesObjectsUpdate,
+)
+    trim_prompt_piece,
+)
 
 logger = setup_logger()
 
@@ -91,7 +96,7 @@ def search_objects(
             chunk_text = "Document " + str(doc_num) + ":\n" + doc.content
             document_texts_list.append(chunk_text)
 
-        document_texts = "\n\n".join(document_texts_list)
+        document_texts = "\n\n"f".join(document_texts_list)
 
         dc_object_extraction_prompt = DC_OBJECT_NO_BASE_DATA_EXTRACTION_PROMPT.format(
             question=question,
@@ -100,12 +105,7 @@ def search_objects(
             objects_of_interest=agent_1_output_objective,
         )
     else:
-        dc_object_extraction_prompt = DC_OBJECT_WITH_BASE_DATA_EXTRACTION_PROMPT.format(
-            question=question,
-            task=agent_1_task,
-            base_data=agent_1_base_data,
-            objects_of_interest=agent_1_output_objective,
-        )
+        dc_object_extraction_prompt = DC_OBJECT_WITH_BASE_DATA_EXTRACTION_PROMPT"
 
     msg = [
         HumanMessage(

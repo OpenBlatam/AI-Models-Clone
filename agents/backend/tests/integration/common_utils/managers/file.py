@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import io
 import mimetypes
 from typing import cast
@@ -13,9 +15,12 @@ from tests.integration.common_utils.constants import GENERAL_HEADERS
 from tests.integration.common_utils.test_models import DATestUser
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class FileManager:
     @staticmethod
-    def upload_files(
+    async def upload_files(
         files: List[Tuple[str, IO]],
         user_performing_action: DATestUser | None = None,
     ) -> Tuple[List[FileDescriptor], str]:
@@ -49,7 +54,7 @@ class FileManager:
         return response_json.get("files", cast(List[FileDescriptor], [])), ""
 
     @staticmethod
-    def fetch_uploaded_file(
+    async def fetch_uploaded_file(
         file_id: str,
         user_performing_action: DATestUser | None = None,
     ) -> bytes:
@@ -65,7 +70,7 @@ class FileManager:
         return response.content
 
     @staticmethod
-    def upload_file_for_connector(
+    async def upload_file_for_connector(
         file_path: str,
         file_name: str,
         user_performing_action: DATestUser,
@@ -73,7 +78,15 @@ class FileManager:
     ) -> dict:
         # Read the file content
         with open(file_path, "rb") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             file_content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
         # Create a file-like object
         file_obj = io.BytesIO(file_content)

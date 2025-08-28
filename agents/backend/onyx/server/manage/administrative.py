@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from datetime import timedelta
 from datetime import timezone
@@ -18,8 +20,6 @@ from onyx.configs.constants import OnyxCeleryPriority
 from onyx.configs.constants import OnyxCeleryTask
 from onyx.db.connector_credential_pair import get_connector_credential_pair_for_user
 from onyx.db.connector_credential_pair import (
-    update_connector_credential_pair_from_id,
-)
 from onyx.db.engine import get_session
 from onyx.db.enums import ConnectorCredentialPairStatus
 from onyx.db.feedback import fetch_docs_ranked_by_boost_for_user
@@ -39,6 +39,11 @@ from onyx.server.manage.models import HiddenUpdateRequest
 from onyx.server.models import StatusResponse
 from onyx.utils.logger import setup_logger
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    update_connector_credential_pair_from_id,
+)
 
 router = APIRouter(prefix="/manage")
 logger = setup_logger()

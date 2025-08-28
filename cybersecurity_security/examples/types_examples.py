@@ -1,16 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+from datetime import datetime
+from typing import Dict, Any, List
+from ..types import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Types Examples
 
 Demonstrates how to use the Pydantic models and schemas.
 """
 
-import asyncio
-import json
-from datetime import datetime
-from typing import Dict, Any, List
 
 # Import types modules
-from ..types import (
     # Models
     BaseRequest, BaseResult, BaseConfig,
     ScanRequest, ScanResult, ScanConfig, ScanStatus, ScanType,
@@ -1129,5 +1142,6 @@ def main():
         print(f"❌ Error running types examples: {e}")
         raise
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

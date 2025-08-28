@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add index for retrieving latest index_attempt
 
 Revision ID: e6a4bbc13fe4
@@ -6,7 +12,6 @@ Create Date: 2023-08-10 12:37:23.335471
 
 """
 
-from alembic import op
 
 
 # revision identifiers, used by Alembic.

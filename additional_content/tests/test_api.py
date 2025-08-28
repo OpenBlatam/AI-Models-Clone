@@ -1,18 +1,70 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 from fastapi.testclient import TestClient
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ..api import router
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ..models import AdditionalContentRequest
 
+from fastapi import FastAPI
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
-def client():
-    from fastapi import FastAPI
+def client() -> Any:
+    
+    """client function."""
     app = FastAPI()
     app.include_router(router)
     return TestClient(app)
 
-def test_generate_additional_content(client: TestClient):
+def test_generate_additional_content(client: TestClient) -> Any:
     """Test generating additional content."""
-    request_data = {
+    request_data: Dict[str, Any] = {
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
         "text": "This is a test post about AI and machine learning",
         "platform": "twitter",
         "content_type": "tweet",
@@ -22,6 +74,21 @@ def test_generate_additional_content(client: TestClient):
     }
     
     response = client.post("/additional-content/generate", json=request_data)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
     assert response.status_code == 200
     
     data = response.json()
@@ -31,7 +98,7 @@ def test_generate_additional_content(client: TestClient):
     assert "full_text" in data
     assert "metadata" in data
 
-def test_get_platforms(client: TestClient):
+async async async def test_get_platforms(client: TestClient) -> Optional[Dict[str, Any]]:
     """Test getting supported platforms."""
     response = client.get("/additional-content/platforms")
     assert response.status_code == 200
@@ -40,7 +107,7 @@ def test_get_platforms(client: TestClient):
     assert isinstance(data["platforms"], list)
     assert len(data["platforms"]) > 0
 
-def test_get_content_types(client: TestClient):
+async async async def test_get_content_types(client: TestClient) -> Optional[Dict[str, Any]]:
     """Test getting supported content types."""
     response = client.get("/additional-content/content-types")
     assert response.status_code == 200
@@ -49,7 +116,7 @@ def test_get_content_types(client: TestClient):
     assert isinstance(data["content_types"], list)
     assert len(data["content_types"]) > 0
 
-def test_get_cta_types(client: TestClient):
+async async async def test_get_cta_types(client: TestClient) -> Optional[Dict[str, Any]]:
     """Test getting supported CTA types."""
     response = client.get("/additional-content/cta-types")
     assert response.status_code == 200
@@ -58,7 +125,7 @@ def test_get_cta_types(client: TestClient):
     assert isinstance(data["cta_types"], list)
     assert len(data["cta_types"]) > 0
 
-def test_clear_cache(client: TestClient):
+def test_clear_cache(client: TestClient) -> Any:
     """Test clearing the cache."""
     response = client.delete("/additional-content/cache")
     assert response.status_code == 200

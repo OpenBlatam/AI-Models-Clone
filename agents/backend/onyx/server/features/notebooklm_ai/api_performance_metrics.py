@@ -1,11 +1,13 @@
-"""
-API Performance Metrics System for notebooklm_ai
-- Response time monitoring
-- Latency tracking
-- Throughput measurement
-- Real-time performance analytics
-- Performance alerts and thresholds
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -18,17 +20,28 @@ import json
 import logging
 from contextlib import asynccontextmanager
 from functools import wraps
-
-# Performance monitoring libraries
 from prometheus_client import (
-    Counter, Histogram, Gauge, Summary, 
-    generate_latest, CONTENT_TYPE_LATEST
-)
 import psutil
 import aiohttp
 from fastapi import FastAPI, Request, Response, HTTPException
 from fastapi.responses import JSONResponse
 import redis.asyncio as redis
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+API Performance Metrics System for notebooklm_ai
+- Response time monitoring
+- Latency tracking
+- Throughput measurement
+- Real-time performance analytics
+- Performance alerts and thresholds
+"""
+
+
+# Performance monitoring libraries
+    Counter, Histogram, Gauge, Summary, 
+    generate_latest, CONTENT_TYPE_LATEST
+)
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -52,7 +65,7 @@ class RequestMetrics:
     cache_hit: bool = False
     error: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.end_time and self.start_time:
             self.duration = self.end_time - self.start_time
 
@@ -103,7 +116,9 @@ class APIPerformanceMonitor:
     """Comprehensive API performance monitoring system."""
     
     def __init__(self, window_size: int = 1000, alert_thresholds: Optional[Dict] = None):
-        self.window_size = window_size
+        
+    """__init__ function."""
+self.window_size = window_size
         self.alert_thresholds = alert_thresholds or {
             'response_time_p95': 2.0,  # 2 seconds
             'error_rate': 0.05,        # 5%
@@ -128,7 +143,7 @@ class APIPerformanceMonitor:
         self.request_timestamps: deque = deque(maxlen=10000)
         self.throughput_window = 60  # 60 seconds
         
-    def _setup_prometheus_metrics(self):
+    def _setup_prometheus_metrics(self) -> Any:
         """Setup Prometheus metrics."""
         # Request metrics
         self.request_counter = Counter(
@@ -196,7 +211,7 @@ class APIPerformanceMonitor:
             'Disk usage percentage'
         )
 
-    def start_request(self, request_id: str, endpoint: str, method: str) -> RequestMetrics:
+    async def start_request(self, request_id: str, endpoint: str, method: str) -> RequestMetrics:
         """Start tracking a new request."""
         metrics = RequestMetrics(
             request_id=request_id,
@@ -509,7 +524,9 @@ class PerformanceMiddleware:
     """FastAPI middleware for performance monitoring."""
     
     def __init__(self, monitor: APIPerformanceMonitor):
-        self.monitor = monitor
+        
+    """__init__ function."""
+self.monitor = monitor
     
     async def __call__(self, request: Request, call_next):
         """Middleware implementation."""
@@ -563,9 +580,9 @@ class PerformanceMiddleware:
 
 def monitor_performance(monitor: APIPerformanceMonitor):
     """Decorator for monitoring specific functions."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             request_id = f"{func.__name__}_{int(time.time() * 1000000)}"
             
@@ -608,7 +625,9 @@ class PerformanceAnalytics:
     """Advanced performance analytics and insights."""
     
     def __init__(self, monitor: APIPerformanceMonitor):
-        self.monitor = monitor
+        
+    """__init__ function."""
+self.monitor = monitor
     
     def get_trend_analysis(self, hours: int = 24) -> Dict[str, Any]:
         """Analyze performance trends over time."""
@@ -821,7 +840,6 @@ async def background_performance_monitoring(monitor: APIPerformanceMonitor):
 # ============================================================================
 
 if __name__ == "__main__":
-    import uvicorn
     
     # Create performance monitoring app
     app = create_performance_app()

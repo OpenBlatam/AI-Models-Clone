@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from fastapi import APIRouter, Response
+from ...core.interfaces.metrics_interface import IMetricsService
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Metrics Endpoints
 ================
@@ -5,19 +18,19 @@ Metrics Endpoints
 Metrics and monitoring API endpoints.
 """
 
-from fastapi import APIRouter, Response
-from ...core.interfaces.metrics_interface import IMetricsService
 
 
 class MetricsEndpoints:
     """Metrics endpoints."""
     
     def __init__(self, metrics_service: IMetricsService):
-        self.metrics_service = metrics_service
+        
+    """__init__ function."""
+self.metrics_service = metrics_service
         self.router = APIRouter()
         self._setup_routes()
     
-    def _setup_routes(self):
+    def _setup_routes(self) -> Any:
         """Setup metrics routes."""
         
         @self.router.get("/metrics")

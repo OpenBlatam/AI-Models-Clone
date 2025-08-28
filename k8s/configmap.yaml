@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: seo-config
+  namespace: seo-system
+data:
+  LOG_LEVEL: "INFO"
+  CACHE_TTL: "3600"
+  BATCH_SIZE: "8"
+  MAX_CONCURRENT: "10"
+  REDIS_URL: "redis://redis:6379"
+  PROMETHEUS_ENABLED: "true"
+  GRAFANA_ENABLED: "true"
+  SECURITY_LEVEL: "production"
+  RATE_LIMIT: "1000"

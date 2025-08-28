@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Prompts that aren't part of a particular configurable feature
 
 LANGUAGE_REPHRASE_PROMPT = """
@@ -25,5 +30,6 @@ Query:
 
 
 # Use the following for easy viewing of prompts
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     print(LANGUAGE_REPHRASE_PROMPT)

@@ -1,3 +1,13 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES: int = 100
+
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add type to credentials
 
 Revision ID: 4ea2c93919c1
@@ -6,12 +16,10 @@ Create Date: 2024-07-18 13:07:13.655895
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "4ea2c93919c1"
-down_revision = "473a1a7ca408"
+revision: str = "4ea2c93919c1"
+down_revision: str = "473a1a7ca408"
 branch_labels: None = None
 depends_on: None = None
 

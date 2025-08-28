@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import json
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """chosen_assistants changed to jsonb
 
 Revision ID: da4c21c69164
@@ -6,10 +15,6 @@ Create Date: 2024-08-18 19:06:47.291491
 
 """
 
-import json
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
 revision = "da4c21c69164"

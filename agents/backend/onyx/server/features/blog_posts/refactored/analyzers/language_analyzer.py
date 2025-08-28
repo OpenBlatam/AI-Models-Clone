@@ -1,33 +1,43 @@
-"""
-Analizador de detección de idioma ultra-optimizado.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import logging
 import re
 from typing import Dict, Any, Optional, List, Tuple
 from concurrent.futures import ThreadPoolExecutor
-
 from .base import BaseAnalyzer, CachedAnalyzerMixin
 from ..models import NLPAnalysisResult, LanguageMetrics
 from ..config import NLPConfig
+    from langdetect import detect_langs, detect
+    from textblob import TextBlob
+    import spacy
+    from spacy.lang.en import English
+    from spacy.lang.es import Spanish
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Analizador de detección de idioma ultra-optimizado.
+"""
+
+
 
 # Importaciones condicionales
 try:
-    from langdetect import detect_langs, detect
     LANGDETECT_AVAILABLE = True
 except ImportError:
     LANGDETECT_AVAILABLE = False
 
 try:
-    from textblob import TextBlob
     TEXTBLOB_AVAILABLE = True
 except ImportError:
     TEXTBLOB_AVAILABLE = False
 
 try:
-    import spacy
-    from spacy.lang.en import English
-    from spacy.lang.es import Spanish
     SPACY_AVAILABLE = True
 except ImportError:
     SPACY_AVAILABLE = False
@@ -38,11 +48,13 @@ class LanguageAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
     """Analizador de detección de idioma con múltiples técnicas."""
     
     def __init__(self, config: NLPConfig, executor: Optional[ThreadPoolExecutor] = None):
-        super().__init__(config, executor)
+        
+    """__init__ function."""
+super().__init__(config, executor)
         self.language_patterns = self._load_language_patterns()
         self._initialize()
     
-    def _initialize(self):
+    def _initialize(self) -> Any:
         """Inicializar analizador."""
         available_methods = []
         if LANGDETECT_AVAILABLE:
@@ -109,7 +121,9 @@ class LanguageAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
         """Detección con langdetect."""
         try:
             def detect_lang():
-                # Detectar todos los idiomas posibles
+                
+    """detect_lang function."""
+# Detectar todos los idiomas posibles
                 langs = detect_langs(text)
                 
                 # Idioma principal
@@ -135,7 +149,9 @@ class LanguageAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
         """Detección con TextBlob."""
         try:
             def detect_lang():
-                blob = TextBlob(text)
+                
+    """detect_lang function."""
+blob = TextBlob(text)
                 detected_lang = blob.detect_language()
                 
                 # TextBlob no proporciona confidence, estimamos basado en longitud
@@ -155,7 +171,9 @@ class LanguageAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
     async def _detect_with_patterns(self, text: str) -> Optional[LanguageMetrics]:
         """Detección básica usando patrones de idioma."""
         def detect_lang():
-            text_lower = text.lower()
+            
+    """detect_lang function."""
+text_lower = text.lower()
             language_scores = {}
             
             # Analizar patrones para cada idioma

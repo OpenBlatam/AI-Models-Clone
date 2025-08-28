@@ -1,14 +1,21 @@
-"""
-Tests for Configuration Manager
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 import yaml
 import tempfile
 import os
 from pathlib import Path
 from unittest.mock import patch, mock_open
-
 from ..config_manager import (
+        import shutil
+        import shutil
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Tests for Configuration Manager
+"""
+
     ConfigManager,
     ConfigValidationError,
     load_config,
@@ -21,22 +28,25 @@ from ..config_manager import (
 class TestConfigManager:
     """Test ConfigManager class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         self.temp_dir = tempfile.mkdtemp()
         self.config_dir = Path(self.temp_dir) / "config"
         self.config_dir.mkdir()
         (self.config_dir / "environments").mkdir()
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Clean up test fixtures."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
     def create_test_config(self, config_data: dict, filename: str = "config.yaml"):
         """Create a test configuration file."""
         config_path = self.config_dir / filename
         with open(config_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         return config_path
     
@@ -44,10 +54,14 @@ class TestConfigManager:
         """Create an environment-specific configuration file."""
         env_path = self.config_dir / "environments" / f"{env_name}.yaml"
         with open(env_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         return env_path
     
-    def test_config_manager_initialization(self):
+    def test_config_manager_initialization(self) -> Any:
         """Test ConfigManager initialization."""
         config_manager = ConfigManager(config_dir=str(self.config_dir))
         
@@ -55,7 +69,7 @@ class TestConfigManager:
         assert config_manager.environment == "development"  # Default
         assert config_manager.config_cache == {}
     
-    def test_config_manager_initialization_with_environment(self):
+    def test_config_manager_initialization_with_environment(self) -> Any:
         """Test ConfigManager initialization with specific environment."""
         config_manager = ConfigManager(
             config_dir=str(self.config_dir),
@@ -64,18 +78,18 @@ class TestConfigManager:
         
         assert config_manager.environment == "production"
     
-    def test_config_manager_initialization_with_env_var(self):
+    def test_config_manager_initialization_with_env_var(self) -> Any:
         """Test ConfigManager initialization with environment variable."""
         with patch.dict(os.environ, {"ML_ENVIRONMENT": "staging"}):
             config_manager = ConfigManager(config_dir=str(self.config_dir))
             assert config_manager.environment == "staging"
     
-    def test_config_manager_invalid_config_dir(self):
+    def test_config_manager_invalid_config_dir(self) -> Any:
         """Test ConfigManager initialization with invalid config directory."""
         with pytest.raises(FileNotFoundError):
             ConfigManager(config_dir="nonexistent_dir")
     
-    def test_load_config_basic(self):
+    def test_load_config_basic(self) -> Any:
         """Test basic configuration loading."""
         # Create test configuration
         test_config = {
@@ -135,7 +149,7 @@ class TestConfigManager:
         assert config["data"]["default"]["batch_size"] == 32
         assert config["evaluation"]["default"]["batch_size"] == 32
     
-    def test_load_config_with_environment_overrides(self):
+    def test_load_config_with_environment_overrides(self) -> Any:
         """Test configuration loading with environment overrides."""
         # Create main configuration
         main_config = {
@@ -221,7 +235,7 @@ class TestConfigManager:
         assert config["training"]["default"]["learning_rate"] == 1.0e-4
         assert config["models"]["gpt2"]["model_name"] == "gpt2"
     
-    def test_load_config_with_main_env_overrides(self):
+    def test_load_config_with_main_env_overrides(self) -> Any:
         """Test configuration loading with environment overrides in main config."""
         # Create main configuration with environment overrides
         main_config = {
@@ -295,7 +309,7 @@ class TestConfigManager:
         # Check that non-overridden values remain
         assert config["training"]["default"]["learning_rate"] == 1.0e-4
     
-    def test_validation_missing_required_sections(self):
+    def test_validation_missing_required_sections(self) -> Any:
         """Test validation with missing required sections."""
         # Create incomplete configuration
         incomplete_config = {
@@ -314,7 +328,7 @@ class TestConfigManager:
         with pytest.raises(ConfigValidationError, match="Required configuration section"):
             config_manager.load_config()
     
-    def test_validation_missing_app_fields(self):
+    def test_validation_missing_app_fields(self) -> Any:
         """Test validation with missing app fields."""
         # Create configuration with missing app fields
         config = {
@@ -369,7 +383,7 @@ class TestConfigManager:
         with pytest.raises(ConfigValidationError, match="Required app field"):
             config_manager.load_config()
     
-    def test_validation_invalid_environment(self):
+    def test_validation_invalid_environment(self) -> Any:
         """Test validation with invalid environment."""
         config = {
             "app": {
@@ -424,7 +438,7 @@ class TestConfigManager:
         with pytest.raises(ConfigValidationError, match="Invalid environment"):
             config_manager.load_config()
     
-    def test_validation_invalid_model_config(self):
+    def test_validation_invalid_model_config(self) -> Any:
         """Test validation with invalid model configuration."""
         config = {
             "app": {
@@ -479,7 +493,7 @@ class TestConfigManager:
         with pytest.raises(ConfigValidationError, match="must be numeric"):
             config_manager.load_config()
     
-    def test_get_model_config(self):
+    def test_get_model_config(self) -> Optional[Dict[str, Any]]:
         """Test getting specific model configuration."""
         config = {
             "app": {
@@ -550,7 +564,7 @@ class TestConfigManager:
         with pytest.raises(ConfigValidationError, match="not found"):
             config_manager.get_model_config("nonexistent", full_config)
     
-    def test_get_training_config(self):
+    def test_get_training_config(self) -> Optional[Dict[str, Any]]:
         """Test getting specific training configuration."""
         config = {
             "app": {
@@ -625,7 +639,7 @@ class TestConfigManager:
         with pytest.raises(ConfigValidationError, match="not found"):
             config_manager.get_training_config("nonexistent", full_config)
     
-    def test_resolve_device(self):
+    def test_resolve_device(self) -> Any:
         """Test device resolution."""
         config_manager = ConfigManager(config_dir=str(self.config_dir))
         
@@ -637,7 +651,7 @@ class TestConfigManager:
         assert config_manager.resolve_device("cuda") == "cuda"
         assert config_manager.resolve_device("cpu") == "cpu"
     
-    def test_resolve_torch_dtype(self):
+    def test_resolve_torch_dtype(self) -> Any:
         """Test torch dtype resolution."""
         config_manager = ConfigManager(config_dir=str(self.config_dir))
         
@@ -653,7 +667,7 @@ class TestConfigManager:
         with pytest.raises(ConfigValidationError, match="Invalid torch_dtype"):
             config_manager.resolve_torch_dtype("invalid")
     
-    def test_update_config(self):
+    def test_update_config(self) -> Any:
         """Test configuration updates."""
         config = {
             "app": {
@@ -726,7 +740,7 @@ class TestConfigManager:
         assert updated_config["training"]["default"]["num_epochs"] == 5
         assert updated_config["models"]["gpt2"]["model_name"] == "gpt2"
     
-    def test_save_config(self):
+    def test_save_config(self) -> Any:
         """Test configuration saving."""
         config = {
             "app": {
@@ -789,12 +803,16 @@ class TestConfigManager:
         
         # Load and verify saved configuration
         with open(output_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             saved_config = yaml.safe_load(f)
         
         assert saved_config["app"]["name"] == "test_pipeline"
         assert saved_config["models"]["gpt2"]["model_name"] == "gpt2"
     
-    def test_get_config_summary(self):
+    def test_get_config_summary(self) -> Optional[Dict[str, Any]]:
         """Test configuration summary generation."""
         config = {
             "app": {
@@ -906,27 +924,30 @@ class TestConfigManager:
 class TestConvenienceFunctions:
     """Test convenience functions."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         self.temp_dir = tempfile.mkdtemp()
         self.config_dir = Path(self.temp_dir) / "config"
         self.config_dir.mkdir()
         (self.config_dir / "environments").mkdir()
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Clean up test fixtures."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
     def create_test_config(self, config_data: dict, filename: str = "config.yaml"):
         """Create a test configuration file."""
         config_path = self.config_dir / filename
         with open(config_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(config_data, f)
         return config_path
     
     @patch('ml.config.config_manager.ConfigManager')
-    def test_load_config_function(self, mock_config_manager_class):
+    def test_load_config_function(self, mock_config_manager_class) -> Any:
         """Test load_config convenience function."""
         # Mock config manager
         mock_config_manager = mock_config_manager_class.return_value
@@ -943,7 +964,7 @@ class TestConvenienceFunctions:
         mock_config_manager_class.assert_called_with(environment="production")
     
     @patch('ml.config.config_manager.ConfigManager')
-    def test_get_model_config_function(self, mock_config_manager_class):
+    def test_get_model_config_function(self, mock_config_manager_class) -> Optional[Dict[str, Any]]:
         """Test get_model_config convenience function."""
         # Mock config manager
         mock_config_manager = mock_config_manager_class.return_value
@@ -958,7 +979,7 @@ class TestConvenienceFunctions:
         mock_config_manager.get_model_config.assert_called_once_with("gpt2", {"models": {"gpt2": {"test": "config"}}})
     
     @patch('ml.config.config_manager.ConfigManager')
-    def test_get_training_config_function(self, mock_config_manager_class):
+    def test_get_training_config_function(self, mock_config_manager_class) -> Optional[Dict[str, Any]]:
         """Test get_training_config convenience function."""
         # Mock config manager
         mock_config_manager = mock_config_manager_class.return_value
@@ -973,7 +994,7 @@ class TestConvenienceFunctions:
         mock_config_manager.get_training_config.assert_called_once_with("default", {"training": {"default": {"test": "config"}}})
     
     @patch('ml.config.config_manager.ConfigManager')
-    def test_get_data_config_function(self, mock_config_manager_class):
+    def test_get_data_config_function(self, mock_config_manager_class) -> Optional[Dict[str, Any]]:
         """Test get_data_config convenience function."""
         # Mock config manager
         mock_config_manager = mock_config_manager_class.return_value
@@ -988,7 +1009,7 @@ class TestConvenienceFunctions:
         mock_config_manager.get_data_config.assert_called_once_with("default", {"data": {"default": {"test": "config"}}})
     
     @patch('ml.config.config_manager.ConfigManager')
-    def test_get_evaluation_config_function(self, mock_config_manager_class):
+    def test_get_evaluation_config_function(self, mock_config_manager_class) -> Optional[Dict[str, Any]]:
         """Test get_evaluation_config convenience function."""
         # Mock config manager
         mock_config_manager = mock_config_manager_class.return_value
@@ -1002,5 +1023,6 @@ class TestConvenienceFunctions:
         mock_config_manager.load_config.assert_called_once()
         mock_config_manager.get_evaluation_config.assert_called_once_with("default", {"evaluation": {"default": {"test": "config"}}})
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__]) 

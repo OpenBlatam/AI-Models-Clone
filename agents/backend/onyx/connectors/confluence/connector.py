@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import copy
 from datetime import datetime
 from datetime import timedelta
@@ -22,8 +30,6 @@ from onyx.connectors.confluence.utils import process_attachment
 from onyx.connectors.confluence.utils import update_param_in_path
 from onyx.connectors.confluence.utils import validate_attachment_filetype
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import (
-    is_atlassian_date_error,
-)
 from onyx.connectors.exceptions import ConnectorValidationError
 from onyx.connectors.exceptions import CredentialExpiredError
 from onyx.connectors.exceptions import InsufficientPermissionsError
@@ -46,6 +52,11 @@ from onyx.connectors.models import SlimDocument
 from onyx.connectors.models import TextSection
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    is_atlassian_date_error,
+)
 
 logger = setup_logger()
 # Potential Improvements
@@ -377,7 +388,7 @@ class ConfluenceConnector(
                 exception=e,
             )
 
-    def _fetch_page_attachments(
+    async def _fetch_page_attachments(
         self, page: dict[str, Any], doc: Document
     ) -> Document | ConnectorFailure:
         attachment_query = self._construct_attachment_query(page["id"])
@@ -459,7 +470,7 @@ class ConfluenceConnector(
                 )
         return doc
 
-    def _fetch_document_batches(
+    async def _fetch_document_batches(
         self,
         checkpoint: ConfluenceCheckpoint,
         start: SecondsSinceUnixEpoch | None = None,

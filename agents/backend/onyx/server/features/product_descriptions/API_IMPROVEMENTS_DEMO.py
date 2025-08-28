@@ -1,3 +1,42 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+from contextlib import asynccontextmanager
+from typing import Annotated, Optional, List, Dict, Any, Callable
+from functools import wraps
+from datetime import datetime, timedelta
+import time
+import asyncio
+import logging
+import hashlib
+import json
+from decimal import Decimal
+from fastapi import FastAPI, HTTPException, Depends, Query, Path, status, Request, Response
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from pydantic import BaseModel, Field, validator, root_validator
+from pydantic.config import ConfigDict
+from dependency_injector import containers, providers
+from dependency_injector.wiring import Provide, inject
+import structlog
+from prometheus_client import Counter, Histogram, Gauge
+from slowapi import Limiter
+from slowapi.util import get_remote_address
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 Modular Enhanced Product API - Enterprise Architecture
 =====================================================
@@ -37,24 +76,7 @@ Modern, scalable API with advanced modular architecture:
 ✅ Advanced validation pipeline
 """
 
-from contextlib import asynccontextmanager
-from typing import Annotated, Optional, List, Dict, Any, Callable
-from functools import wraps
-from datetime import datetime, timedelta
-import time
-import asyncio
-import logging
-import hashlib
-import json
-from decimal import Decimal
 
-from fastapi import FastAPI, HTTPException, Depends, Query, Path, status, Request, Response
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
-from pydantic import BaseModel, Field, validator, root_validator
-from pydantic.config import ConfigDict
 
 # Configure structured logging
 logging.basicConfig(
@@ -267,12 +289,6 @@ class ErrorResponse(BaseModel):
 # ============================================================================
 
 # Dependency Injection Container
-from dependency_injector import containers, providers
-from dependency_injector.wiring import Provide, inject
-import structlog
-from prometheus_client import Counter, Histogram, Gauge
-from slowapi import Limiter
-from slowapi.util import get_remote_address
 
 # Metrics
 REQUEST_COUNT = Counter('http_requests_total', 'Total HTTP requests', ['method', 'endpoint', 'status'])
@@ -341,7 +357,7 @@ limiter = Limiter(
 class CacheService:
     """High-performance Redis cache service."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.redis_client = None
         self.default_ttl = 3600  # 1 hour
         self.is_connected = False
@@ -429,7 +445,9 @@ class ProductService:
     """Enhanced product service with optimizations."""
     
     def __init__(self, cache_service: CacheService):
-        self.cache = cache_service
+        
+    """__init__ function."""
+self.cache = cache_service
         self.products: Dict[str, Dict[str, Any]] = {}  # In-memory for demo
         self.sku_index: Dict[str, str] = {}  # SKU -> product_id mapping
     
@@ -653,10 +671,12 @@ async def rate_limit_check(request: Request) -> None:
         app_state["request_count"] = 0
 
 
-def validate_request_size() -> Callable:
+async def validate_request_size() -> Callable:
     """Validate request payload size."""
     def dependency(request: Request):
-        content_length = request.headers.get('content-length')
+        
+    """dependency function."""
+content_length = request.headers.get('content-length')
         if content_length and int(content_length) > 10 * 1024 * 1024:  # 10MB limit
             raise HTTPException(
                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
@@ -750,7 +770,7 @@ async def lifespan(app: FastAPI):
 # ROUTE HANDLERS - Functional Approach
 # ============================================================================
 
-async def get_api_info() -> Dict[str, Any]:
+async async def get_api_info() -> Dict[str, Any]:
     """Get API information and status."""
     uptime = time.time() - app_state["startup_time"] if app_state["startup_time"] else 0
     
@@ -920,7 +940,9 @@ def create_enhanced_app() -> FastAPI:
     # Exception handlers
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
-        return JSONResponse(
+        
+    """validation_exception_handler function."""
+return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content=ErrorResponse(
                 error="validation_error",
@@ -1053,7 +1075,6 @@ if __name__ == "__main__":
     asyncio.run(demo_enhanced_api())
     
     # Start server
-    import uvicorn
     uvicorn.run(
         "API_IMPROVEMENTS_DEMO:app",
         host="0.0.0.0",

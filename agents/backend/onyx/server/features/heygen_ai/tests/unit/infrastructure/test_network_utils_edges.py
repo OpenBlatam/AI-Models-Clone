@@ -2,13 +2,13 @@ import asyncio
 import types
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
 async def test_resolve_hostname_to_ip_unresolved(monkeypatch):
     import socket as std_socket
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
 
     def raise_gaierror(host: str):
         raise std_socket.gaierror()
@@ -28,7 +28,7 @@ async def test_check_host_connectivity_timeout(monkeypatch):
 
     monkeypatch.setattr(asyncio, "open_connection", fake_open_connection)
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod, "socket", types.SimpleNamespace(gethostbyname=lambda h: "0.0.0.0"))
 
     utils = NetworkUtils(default_timeout=0.01)

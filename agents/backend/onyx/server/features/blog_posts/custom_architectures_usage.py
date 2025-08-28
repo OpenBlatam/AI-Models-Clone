@@ -1,7 +1,16 @@
-"""
-Usage Examples for Custom PyTorch Model Architectures
-Practical examples demonstrating how to use each custom model
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import torch
 import torch.nn as nn
@@ -11,9 +20,16 @@ import numpy as np
 from typing import Dict, Any, List, Tuple
 import json
 import logging
+from custom_model_architectures import (
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Usage Examples for Custom PyTorch Model Architectures
+Practical examples demonstrating how to use each custom model
+"""
+
 
 # Import custom architectures
-from custom_model_architectures import (
     CustomTransformer, CNNLSTMHybrid, TransformerCNN, MultiTaskModel,
     HierarchicalAttentionNetwork, DeepResidualCNN, ModelFactory,
     MODEL_CONFIGS
@@ -119,12 +135,12 @@ class ModelUsageExamples:
         
         # Focal loss for imbalanced classes
         class FocalLoss(nn.Module):
-            def __init__(self, alpha=1, gamma=2):
+            def __init__(self, alpha=1, gamma=2) -> Any:
                 super().__init__()
                 self.alpha = alpha
                 self.gamma = gamma
             
-            def forward(self, inputs, targets):
+            def forward(self, inputs, targets) -> Any:
                 ce_loss = nn.functional.cross_entropy(inputs, targets, reduction='none')
                 pt = torch.exp(-ce_loss)
                 focal_loss = self.alpha * (1-pt)**self.gamma * ce_loss
@@ -482,5 +498,6 @@ def main():
     logger.info("All custom architecture examples completed!")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

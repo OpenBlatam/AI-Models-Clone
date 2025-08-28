@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 
 from pydantic import BaseModel
@@ -5,6 +7,9 @@ from pydantic import BaseModel
 from onyx.db.models import IndexAttemptError
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class IndexAttemptErrorPydantic(BaseModel):
     id: int
     connector_credential_pair_id: int

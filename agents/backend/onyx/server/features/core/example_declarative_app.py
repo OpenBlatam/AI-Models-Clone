@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import uuid
+from datetime import datetime
+from typing import List, Optional, Dict, Any
+from dataclasses import dataclass
+from fastapi import FastAPI, Query, Path, Body, Depends, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import structlog
+from .declarative_routes import (
+from ..utils.optimized_base_model import OptimizedBaseModel
+from pydantic import BaseModel, Field, computed_field, field_validator
+    from .declarative_routes import get_route_metrics
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
 """
 Example FastAPI Application with Declarative Routes
 ==================================================
@@ -10,24 +31,12 @@ This example demonstrates how to use the declarative route system with:
 - OpenAPI documentation
 """
 
-import asyncio
-import uuid
-from datetime import datetime
-from typing import List, Optional, Dict, Any
-from dataclasses import dataclass
 
-from fastapi import FastAPI, Query, Path, Body, Depends, BackgroundTasks
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-import structlog
 
-from .declarative_routes import (
     get_route, post_route, put_route, delete_route, patch_route,
     BaseResponseModel, SuccessResponse, ErrorResponse, PaginatedResponse,
     DeclarativeRouter, RouteMetadata
 )
-from ..utils.optimized_base_model import OptimizedBaseModel
-from pydantic import BaseModel, Field, computed_field, field_validator
 
 logger = structlog.get_logger(__name__)
 
@@ -174,12 +183,12 @@ class MockBlogPost:
 class MockDataStore:
     """Mock data store for demonstration."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.users: Dict[str, MockUser] = {}
         self.blog_posts: Dict[str, MockBlogPost] = {}
         self._initialize_mock_data()
     
-    def _initialize_mock_data(self):
+    def _initialize_mock_data(self) -> Any:
         """Initialize with some mock data."""
         # Create mock users
         for i in range(1, 6):
@@ -742,7 +751,6 @@ async def get_metrics() -> Dict[str, Any]:
     Returns:
         Dict[str, Any]: Route metrics
     """
-    from .declarative_routes import get_route_metrics
     
     return {
         "route_metrics": get_route_metrics(),
@@ -809,6 +817,6 @@ def create_example_app() -> FastAPI:
 # Create app instance
 app = create_example_app()
 
-if __name__ == "__main__":
-    import uvicorn
+match __name__:
+    case "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 

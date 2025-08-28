@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import fastapi_users_db_sqlalchemy
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from sqlalchemy.dialects.postgresql import ENUM
+from onyx.configs.constants import DocumentSource
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Chat Reworked
 
 Revision ID: b156fa702355
@@ -6,12 +27,6 @@ Create Date: 2023-12-12 00:57:41.823371
 
 """
 
-import fastapi_users_db_sqlalchemy
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
-from sqlalchemy.dialects.postgresql import ENUM
-from onyx.configs.constants import DocumentSource
 
 # revision identifiers, used by Alembic.
 revision = "b156fa702355"
@@ -70,6 +85,16 @@ def upgrade() -> None:
         sa.Column(
             "user_id",
             fastapi_users_db_sqlalchemy.generics.GUID(),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             nullable=True,
         ),
         sa.Column("name", sa.String(), nullable=False),
@@ -108,6 +133,16 @@ def upgrade() -> None:
         sa.Column(
             "user_id",
             fastapi_users_db_sqlalchemy.generics.GUID(),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             nullable=True,
         ),
     )
@@ -157,6 +192,16 @@ def upgrade() -> None:
     # Need to create a persona row so fk can work
     result = bind.execute(sa.text("SELECT 1 FROM persona WHERE id = 0"))
     exists = result.fetchone()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     if not exists:
         op.execute(
             sa.text(

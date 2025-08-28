@@ -1,3 +1,34 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+import logging
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Optional, Union, List
+from dataclasses import dataclass
+from enum import Enum
+            import orjson
+            import ujson
+            import rapidjson
+            import orjson
+            import ujson
+            import rapidjson
+            import json
+            import orjson
+            import ujson
+            import rapidjson
+            import json
+            import msgpack
+            import google.protobuf
+        import json
+        import json
+from typing import Any, List, Dict, Optional
 """
 Ultra-Fast Serialization
 ========================
@@ -10,13 +41,6 @@ Ultra-high performance serialization with multiple backends:
 - Fast response encoding
 """
 
-import asyncio
-import time
-import logging
-from abc import ABC, abstractmethod
-from typing import Any, Dict, Optional, Union, List
-from dataclasses import dataclass
-from enum import Enum
 
 logger = logging.getLogger(__name__)
 
@@ -39,7 +63,7 @@ class SerializationStats:
     bytes_processed: int = 0
     format_usage: Dict[str, int] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.format_usage is None:
             self.format_usage = {}
 
@@ -66,7 +90,7 @@ class ISerializer(ABC):
 class FastJSONSerializer(ISerializer):
     """Ultra-fast JSON serializer using orjson."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.available_backends = self._detect_backends()
         self.backend = self._select_best_backend()
         logger.info(f"FastJSONSerializer using backend: {self.backend}")
@@ -77,21 +101,18 @@ class FastJSONSerializer(ISerializer):
         
         # Test orjson (fastest)
         try:
-            import orjson
             backends['orjson'] = True
         except ImportError:
             backends['orjson'] = False
         
         # Test ujson (fast)
         try:
-            import ujson
             backends['ujson'] = True
         except ImportError:
             backends['ujson'] = False
         
         # Test rapidjson
         try:
-            import rapidjson
             backends['rapidjson'] = True
         except ImportError:
             backends['rapidjson'] = False
@@ -115,31 +136,23 @@ class FastJSONSerializer(ISerializer):
     def serialize(self, data: Any) -> bytes:
         """Serialize data using fastest available backend."""
         if self.backend == 'orjson':
-            import orjson
             return orjson.dumps(data)
         elif self.backend == 'ujson':
-            import ujson
             return ujson.dumps(data).encode('utf-8')
         elif self.backend == 'rapidjson':
-            import rapidjson
             return rapidjson.dumps(data).encode('utf-8')
         else:
-            import json
             return json.dumps(data).encode('utf-8')
     
     def deserialize(self, data: bytes) -> Any:
         """Deserialize data using fastest available backend."""
         if self.backend == 'orjson':
-            import orjson
             return orjson.loads(data)
         elif self.backend == 'ujson':
-            import ujson
             return ujson.loads(data.decode('utf-8'))
         elif self.backend == 'rapidjson':
-            import rapidjson
             return rapidjson.loads(data.decode('utf-8'))
         else:
-            import json
             return json.loads(data.decode('utf-8'))
     
     def get_content_type(self) -> str:
@@ -150,9 +163,8 @@ class FastJSONSerializer(ISerializer):
 class MsgPackSerializer(ISerializer):
     """MessagePack binary serializer (faster and smaller than JSON)."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         try:
-            import msgpack
             self.msgpack = msgpack
             self.available = True
         except ImportError:
@@ -181,9 +193,8 @@ class MsgPackSerializer(ISerializer):
 class ProtobufSerializer(ISerializer):
     """Protocol Buffers serializer (Google's efficient binary format)."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         try:
-            import google.protobuf
             self.available = True
         except ImportError:
             logger.warning("protobuf not available, install with: pip install protobuf")
@@ -196,7 +207,6 @@ class ProtobufSerializer(ISerializer):
         
         # For this example, we'll use JSON as intermediate format
         # In production, you'd define proper .proto schemas
-        import json
         json_data = json.dumps(data)
         return json_data.encode('utf-8')
     
@@ -206,7 +216,6 @@ class ProtobufSerializer(ISerializer):
             raise ImportError("protobuf not available")
         
         # Simplified implementation
-        import json
         return json.loads(data.decode('utf-8'))
     
     def get_content_type(self) -> str:
@@ -217,7 +226,7 @@ class ProtobufSerializer(ISerializer):
 class UltraSerializer:
     """Ultra-high performance serializer with automatic format selection."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.serializers: Dict[SerializationFormat, ISerializer] = {}
         self.stats = SerializationStats()
         self.performance_cache = {}
@@ -228,7 +237,7 @@ class UltraSerializer:
         # Benchmark and select best defaults
         self._benchmark_serializers()
     
-    def _initialize_serializers(self):
+    def _initialize_serializers(self) -> Any:
         """Initialize all available serializers."""
         # JSON serializers
         try:
@@ -254,7 +263,7 @@ class UltraSerializer:
         
         logger.info(f"Initialized {len(self.serializers)} serializers")
     
-    def _benchmark_serializers(self):
+    def _benchmark_serializers(self) -> Any:
         """Benchmark all serializers to determine performance."""
         test_data = {
             "users": [

@@ -1,23 +1,42 @@
-"""
-Unit tests for core modules of Onyx AI Video System.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import pytest
 import asyncio
 from datetime import datetime
 from unittest.mock import Mock, AsyncMock, patch
-
 from ...core.integration import (
+from ...core.exceptions import (
+from ...core.models import (
+        from ...core.models import create_video_request
+        from ...core.models import create_video_response
+        from ...core.models import create_plugin_config
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Unit tests for core modules of Onyx AI Video System.
+"""
+
+
     OnyxIntegrationManager, OnyxIntegrationConfig, OnyxLogger,
     OnyxLLMManager, OnyxTaskManager, OnyxSecurityManager,
     OnyxPerformanceManager, OnyxRetryManager, OnyxFileManager
 )
-from ...core.exceptions import (
     AIVideoError, PluginError, ValidationError, ConfigurationError,
     WorkflowError, LLMError, ResourceError, TimeoutError, SecurityError,
     PerformanceError, handle_ai_video_error, create_error_response
 )
-from ...core.models import (
     VideoRequest, VideoResponse, PluginConfig, PluginInfo,
     WorkflowStep, SystemStatus, PerformanceMetrics,
     VideoQuality, VideoFormat, VideoStatus, PluginCategory, PluginStatus
@@ -28,7 +47,7 @@ class TestOnyxIntegrationManager:
     """Test Onyx Integration Manager."""
     
     @pytest.mark.unit
-    async def test_initialization(self):
+    async def test_initialization(self) -> Any:
         """Test integration manager initialization."""
         config = OnyxIntegrationConfig()
         manager = OnyxIntegrationManager(config)
@@ -43,7 +62,7 @@ class TestOnyxIntegrationManager:
         assert manager.file_manager is not None
     
     @pytest.mark.unit
-    async def test_initialize_success(self, mock_onyx_utils):
+    async def test_initialize_success(self, mock_onyx_utils) -> Any:
         """Test successful initialization."""
         manager = OnyxIntegrationManager()
         
@@ -54,7 +73,7 @@ class TestOnyxIntegrationManager:
         assert True  # Should not raise exception
     
     @pytest.mark.unit
-    async def test_initialize_failure(self):
+    async def test_initialize_failure(self) -> Any:
         """Test initialization failure."""
         manager = OnyxIntegrationManager()
         
@@ -65,7 +84,7 @@ class TestOnyxIntegrationManager:
                 await manager.initialize()
     
     @pytest.mark.unit
-    async def test_process_video_request(self, sample_video_request):
+    async async def test_process_video_request(self, sample_video_request) -> Any:
         """Test video request processing."""
         manager = OnyxIntegrationManager()
         
@@ -81,7 +100,7 @@ class TestOnyxIntegrationManager:
                         assert "script" in response.metadata
     
     @pytest.mark.unit
-    async def test_get_system_status(self):
+    async def test_get_system_status(self) -> Optional[Dict[str, Any]]:
         """Test system status retrieval."""
         manager = OnyxIntegrationManager()
         
@@ -95,7 +114,7 @@ class TestOnyxLogger:
     """Test Onyx Logger."""
     
     @pytest.mark.unit
-    def test_logger_creation(self):
+    def test_logger_creation(self) -> Any:
         """Test logger creation."""
         logger = OnyxLogger("test_logger")
         
@@ -103,7 +122,7 @@ class TestOnyxLogger:
         assert logger.telemetry is None  # No telemetry in test mode
     
     @pytest.mark.unit
-    def test_logging_methods(self):
+    def test_logging_methods(self) -> Any:
         """Test logging methods."""
         logger = OnyxLogger("test_logger")
         
@@ -117,7 +136,7 @@ class TestOnyxLogger:
         assert True  # Should not raise exception
     
     @pytest.mark.unit
-    def test_request_context(self):
+    async def test_request_context(self) -> Any:
         """Test request context setting."""
         logger = OnyxLogger("test_logger")
         
@@ -128,7 +147,7 @@ class TestOnyxLogger:
         assert logger._session_id == "session789"
     
     @pytest.mark.unit
-    def test_clear_request_context(self):
+    async def test_clear_request_context(self) -> Any:
         """Test request context clearing."""
         logger = OnyxLogger("test_logger")
         
@@ -144,7 +163,7 @@ class TestOnyxLLMManager:
     """Test Onyx LLM Manager."""
     
     @pytest.mark.unit
-    async def test_get_default_llm(self, mock_onyx_utils):
+    async def test_get_default_llm(self, mock_onyx_utils) -> Optional[Dict[str, Any]]:
         """Test getting default LLM."""
         manager = OnyxLLMManager()
         
@@ -153,7 +172,7 @@ class TestOnyxLLMManager:
         assert llm is not None
     
     @pytest.mark.unit
-    async def test_get_vision_llm(self, mock_onyx_utils):
+    async def test_get_vision_llm(self, mock_onyx_utils) -> Optional[Dict[str, Any]]:
         """Test getting vision LLM."""
         manager = OnyxLLMManager()
         
@@ -163,7 +182,7 @@ class TestOnyxLLMManager:
         assert llm is None or llm is not None
     
     @pytest.mark.unit
-    async def test_generate_text(self, mock_llm):
+    async def test_generate_text(self, mock_llm) -> Any:
         """Test text generation."""
         manager = OnyxLLMManager()
         
@@ -173,7 +192,7 @@ class TestOnyxLLMManager:
             assert result == "Generated text"
     
     @pytest.mark.unit
-    async def test_generate_with_vision(self, mock_llm):
+    async def test_generate_with_vision(self, mock_llm) -> Any:
         """Test vision generation."""
         manager = OnyxLLMManager()
         
@@ -188,7 +207,7 @@ class TestExceptions:
     """Test custom exceptions."""
     
     @pytest.mark.unit
-    def test_ai_video_error(self):
+    def test_ai_video_error(self) -> Any:
         """Test AIVideoError."""
         error = AIVideoError("Test error", "TEST_ERROR", {"key": "value"})
         
@@ -198,7 +217,7 @@ class TestExceptions:
         assert error.timestamp is not None
     
     @pytest.mark.unit
-    def test_plugin_error(self):
+    def test_plugin_error(self) -> Any:
         """Test PluginError."""
         error = PluginError("Plugin failed", "test_plugin", {"param": "value"})
         
@@ -207,7 +226,7 @@ class TestExceptions:
         assert error.context["plugin_name"] == "test_plugin"
     
     @pytest.mark.unit
-    def test_validation_error(self):
+    def test_validation_error(self) -> Any:
         """Test ValidationError."""
         error = ValidationError("Invalid input", "input_text", "bad_value")
         
@@ -216,7 +235,7 @@ class TestExceptions:
         assert error.value == "bad_value"
     
     @pytest.mark.unit
-    def test_error_to_dict(self):
+    def test_error_to_dict(self) -> Any:
         """Test error serialization."""
         error = AIVideoError("Test error", "TEST_ERROR", {"key": "value"})
         error_dict = error.to_dict()
@@ -228,7 +247,7 @@ class TestExceptions:
         assert "timestamp" in error_dict
     
     @pytest.mark.unit
-    def test_handle_ai_video_error(self):
+    def test_handle_ai_video_error(self) -> Any:
         """Test error handling utility."""
         error = AIVideoError("Test error")
         result = handle_ai_video_error(error, {"extra": "context"})
@@ -237,7 +256,7 @@ class TestExceptions:
         assert result["context"]["extra"] == "context"
     
     @pytest.mark.unit
-    def test_handle_unknown_error(self):
+    def test_handle_unknown_error(self) -> Any:
         """Test handling of unknown errors."""
         error = ValueError("Unknown error")
         result = handle_ai_video_error(error)
@@ -246,7 +265,7 @@ class TestExceptions:
         assert result["error_code"] == "UNKNOWN_ERROR"
     
     @pytest.mark.unit
-    def test_create_error_response(self):
+    def test_create_error_response(self) -> Any:
         """Test error response creation."""
         error = AIVideoError("Test error")
         response = create_error_response(error, {"request_id": "123"})
@@ -260,7 +279,7 @@ class TestModels:
     """Test data models."""
     
     @pytest.mark.unit
-    def test_video_request_creation(self):
+    async def test_video_request_creation(self) -> Any:
         """Test VideoRequest creation."""
         request = VideoRequest(
             input_text="Test video",
@@ -279,7 +298,7 @@ class TestModels:
         assert request.created_at is not None
     
     @pytest.mark.unit
-    def test_video_request_validation(self):
+    async def test_video_request_validation(self) -> Any:
         """Test VideoRequest validation."""
         # Test empty input text
         with pytest.raises(ValueError, match="Input text cannot be empty"):
@@ -297,7 +316,7 @@ class TestModels:
             VideoRequest(input_text="Test", user_id="user", duration=1000)  # Too long
     
     @pytest.mark.unit
-    def test_video_response_creation(self):
+    def test_video_response_creation(self) -> Any:
         """Test VideoResponse creation."""
         response = VideoResponse(
             request_id="req123",
@@ -315,7 +334,7 @@ class TestModels:
         assert response.created_at is not None
     
     @pytest.mark.unit
-    def test_plugin_config_creation(self):
+    def test_plugin_config_creation(self) -> Any:
         """Test PluginConfig creation."""
         config = PluginConfig(
             name="test_plugin",
@@ -334,7 +353,7 @@ class TestModels:
         assert config.max_workers == 2
     
     @pytest.mark.unit
-    def test_plugin_info_creation(self):
+    def test_plugin_info_creation(self) -> Any:
         """Test PluginInfo creation."""
         info = PluginInfo(
             name="test_plugin",
@@ -353,7 +372,7 @@ class TestModels:
         assert info.author == "Test Author"
     
     @pytest.mark.unit
-    def test_workflow_step_creation(self):
+    def test_workflow_step_creation(self) -> Any:
         """Test WorkflowStep creation."""
         step = WorkflowStep(
             name="test_step",
@@ -373,7 +392,7 @@ class TestModels:
         assert step.status == VideoStatus.PENDING
     
     @pytest.mark.unit
-    def test_system_status_creation(self):
+    def test_system_status_creation(self) -> Any:
         """Test SystemStatus creation."""
         status = SystemStatus(
             status="running",
@@ -393,7 +412,7 @@ class TestModels:
         assert status.error_rate == 5.0
     
     @pytest.mark.unit
-    def test_performance_metrics_creation(self):
+    def test_performance_metrics_creation(self) -> Any:
         """Test PerformanceMetrics creation."""
         metrics = PerformanceMetrics(
             total_requests=100,
@@ -416,9 +435,8 @@ class TestModelUtilities:
     """Test model utility functions."""
     
     @pytest.mark.unit
-    def test_create_video_request(self):
+    async def test_create_video_request(self) -> Any:
         """Test create_video_request utility."""
-        from ...core.models import create_video_request
         
         request = create_video_request(
             input_text="Test video",
@@ -435,9 +453,8 @@ class TestModelUtilities:
         assert request.plugins == ["plugin1", "plugin2"]
     
     @pytest.mark.unit
-    def test_create_video_response(self):
+    def test_create_video_response(self) -> Any:
         """Test create_video_response utility."""
-        from ...core.models import create_video_response
         
         response = create_video_response(
             request_id="req123",
@@ -450,9 +467,8 @@ class TestModelUtilities:
         assert response.output_url == "http://example.com/video.mp4"
     
     @pytest.mark.unit
-    def test_create_plugin_config(self):
+    def test_create_plugin_config(self) -> Any:
         """Test create_plugin_config utility."""
-        from ...core.models import create_plugin_config
         
         config = create_plugin_config(
             name="test_plugin",

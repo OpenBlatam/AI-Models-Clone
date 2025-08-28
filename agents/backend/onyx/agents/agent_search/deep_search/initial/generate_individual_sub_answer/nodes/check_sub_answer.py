@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from typing import cast
 
@@ -6,30 +8,16 @@ from langchain_core.messages import HumanMessage
 from langchain_core.runnables.config import RunnableConfig
 
 from onyx.agents.agent_search.deep_search.initial.generate_individual_sub_answer.states import (
-    AnswerQuestionState,
-)
 from onyx.agents.agent_search.deep_search.initial.generate_individual_sub_answer.states import (
-    SubQuestionAnswerCheckUpdate,
-)
 from onyx.agents.agent_search.models import GraphConfig
 from onyx.agents.agent_search.shared_graph_utils.agent_prompt_ops import (
-    binary_string_test,
-)
 from onyx.agents.agent_search.shared_graph_utils.constants import (
-    AGENT_LLM_RATELIMIT_MESSAGE,
-)
 from onyx.agents.agent_search.shared_graph_utils.constants import (
-    AGENT_LLM_TIMEOUT_MESSAGE,
-)
 from onyx.agents.agent_search.shared_graph_utils.constants import (
-    AGENT_POSITIVE_VALUE_STR,
-)
 from onyx.agents.agent_search.shared_graph_utils.constants import AgentLLMErrorType
 from onyx.agents.agent_search.shared_graph_utils.models import AgentErrorLog
 from onyx.agents.agent_search.shared_graph_utils.models import LLMNodeErrorStrings
 from onyx.agents.agent_search.shared_graph_utils.utils import (
-    get_langgraph_node_log_string,
-)
 from onyx.agents.agent_search.shared_graph_utils.utils import parse_question_id
 from onyx.configs.agent_configs import AGENT_MAX_TOKENS_VALIDATION
 from onyx.configs.agent_configs import AGENT_TIMEOUT_CONNECT_LLM_SUBANSWER_CHECK
@@ -41,6 +29,23 @@ from onyx.prompts.agent_search import UNKNOWN_ANSWER
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
 from onyx.utils.timing import log_function_time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    AnswerQuestionState,
+)
+    SubQuestionAnswerCheckUpdate,
+)
+    binary_string_test,
+)
+    AGENT_LLM_RATELIMIT_MESSAGE,
+)
+    AGENT_LLM_TIMEOUT_MESSAGE,
+)
+    AGENT_POSITIVE_VALUE_STR,
+)
+    get_langgraph_node_log_string,
+)
 
 logger = setup_logger()
 
@@ -70,16 +75,13 @@ def check_sub_answer(
                     graph_component="initial  - generate individual sub answer",
                     node_name="check sub answer",
                     node_start_time=node_start_time,
-                    result="unknown answer",
+                    result="unknown answer"f",
                 )
             ],
         )
     msg = [
         HumanMessage(
-            content=SUB_ANSWER_CHECK_PROMPT.format(
-                question=state.question,
-                base_answer=state.answer,
-            )
+            content=SUB_ANSWER_CHECK_PROMPT"
         )
     ]
 

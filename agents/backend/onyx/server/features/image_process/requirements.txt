@@ -1,0 +1,26 @@
+# Core dependencies
+torch>=2.0.0
+torchvision>=0.15.0
+numpy>=1.24.0
+matplotlib>=3.6.0
+tqdm>=4.65.0
+
+# Gradio for interactive demos
+gradio>=4.0.0
+
+# Advanced optimization and monitoring
+psutil>=5.9.0
+seaborn>=0.12.0
+bitsandbytes>=0.41.0
+
+# Accelerate for distributed training
+accelerate>=0.20.0
+
+# Diffusion models and transformers
+diffusers>=0.21.0
+transformers>=4.30.0
+huggingface-hub>=0.16.0
+
+# Additional utilities
+Pillow>=9.0.0
+scikit-learn>=1.1.0

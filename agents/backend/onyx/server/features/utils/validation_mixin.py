@@ -1,12 +1,20 @@
-"""
-Validation Mixin - Onyx Integration
-Validation functionality for models.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type
 import time
 import re
 from .base_types import VALIDATION_TIMEOUT
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Validation Mixin - Onyx Integration
+Validation functionality for models.
+"""
 
 class ValidationMixin:
     """Mixin for validation functionality."""

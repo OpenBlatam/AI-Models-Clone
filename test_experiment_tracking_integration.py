@@ -1,7 +1,7 @@
-#!/usr/bin/env python3
-"""
-Test script for experiment tracking integration with Gradio app.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES: int: int = 100
 
 import sys
 import os
@@ -9,16 +9,37 @@ import json
 import torch
 import numpy as np
 from pathlib import Path
+        from experiment_tracking_system import (
+        import gradio_app
+        import gradio_app
+        from experiment_tracking_system import ExperimentTracker, create_experiment_config
+        from experiment_tracking_system import create_experiment_config
+        from experiment_tracking_system import experiment_context, create_experiment_config
+        from experiment_tracking_system import track_experiment, create_experiment_config
+        from experiment_tracking_system import ExperimentTracker, create_experiment_config
+        from experiment_tracking_system import ExperimentTracker, create_experiment_config
+        import torch
+        from experiment_tracking_system import get_tensorboard_url
+        from experiment_tracking_system import compare_experiments
+        import matplotlib.pyplot as plt
+        import gradio_app
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Test script for experiment tracking integration with Gradio app.
+"""
+
 
 # Add current directory to path for imports
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-def test_experiment_tracking_imports():
+def test_experiment_tracking_imports() -> Any:
     """Test that experiment tracking system can be imported."""
     print("Testing experiment tracking imports...")
     
     try:
-        from experiment_tracking_system import (
             ExperimentTracker, ExperimentConfig, create_experiment_config,
             experiment_context, track_experiment, start_tensorboard_server,
             compare_experiments, get_tensorboard_url
@@ -29,13 +50,12 @@ def test_experiment_tracking_imports():
         print(f"❌ Experiment tracking system import failed: {e}")
         return False
 
-def test_gradio_app_imports():
+def test_gradio_app_imports() -> Any:
     """Test that Gradio app can import experiment tracking system."""
     print("\nTesting Gradio app imports...")
     
     try:
         # Import the gradio app module
-        import gradio_app
         print("✅ Gradio app import successful")
         
         # Check if EXPERIMENT_TRACKING_AVAILABLE is defined
@@ -50,15 +70,14 @@ def test_gradio_app_imports():
         print(f"❌ Gradio app import failed: {e}")
         return False
 
-def test_experiment_tracking_interface_functions():
+def test_experiment_tracking_interface_functions() -> Any:
     """Test that experiment tracking interface functions exist."""
     print("\nTesting experiment tracking interface functions...")
     
     try:
-        import gradio_app
         
         # Check if interface functions exist
-        required_functions = [
+        required_functions: List[Any] = [
             'start_experiment_tracking_interface',
             'log_training_metrics_interface',
             'log_validation_metrics_interface',
@@ -81,20 +100,19 @@ def test_experiment_tracking_interface_functions():
         print(f"❌ Error testing interface functions: {e}")
         return False
 
-def test_basic_experiment_tracking():
+def test_basic_experiment_tracking() -> Any:
     """Test basic experiment tracking functionality."""
     print("\nTesting basic experiment tracking...")
     
     try:
-        from experiment_tracking_system import ExperimentTracker, create_experiment_config
         
         # Create experiment configuration
         config = create_experiment_config(
-            experiment_name="test_experiment",
-            project_name="test_project",
+            experiment_name: str: str = "test_experiment",
+            project_name: str: str = "test_project",
             enable_tensorboard=True,
             enable_wandb=False,  # Disable wandb for testing
-            log_interval=5
+            log_interval: int: int = 5
         )
         
         # Create tracker
@@ -121,19 +139,18 @@ def test_basic_experiment_tracking():
         print(f"❌ Basic experiment tracking failed: {e}")
         return False
 
-def test_experiment_config_creation():
+def test_experiment_config_creation() -> Any:
     """Test experiment configuration creation."""
     print("\nTesting experiment configuration creation...")
     
     try:
-        from experiment_tracking_system import create_experiment_config
         
         # Test basic configuration
         config = create_experiment_config(
-            experiment_name="test_config",
-            project_name="test_project",
+            experiment_name: str: str = "test_config",
+            project_name: str: str = "test_project",
             enable_tensorboard=True,
-            enable_wandb=False
+            enable_wandb: bool = False
         )
         
         print(f"✅ Experiment configuration creation successful")
@@ -147,19 +164,18 @@ def test_experiment_config_creation():
         print(f"❌ Experiment configuration creation failed: {e}")
         return False
 
-def test_context_manager():
+def test_context_manager() -> Any:
     """Test experiment context manager."""
     print("\nTesting experiment context manager...")
     
     try:
-        from experiment_tracking_system import experiment_context, create_experiment_config
         
         # Create configuration
         config = create_experiment_config(
-            experiment_name="context_test",
-            project_name="test_project",
+            experiment_name: str: str = "context_test",
+            project_name: str: str = "test_project",
             enable_tensorboard=True,
-            enable_wandb=False
+            enable_wandb: bool = False
         )
         
         # Use context manager
@@ -179,25 +195,26 @@ def test_context_manager():
         print(f"❌ Context manager test failed: {e}")
         return False
 
-def test_decorator():
+def test_decorator() -> Any:
     """Test experiment tracking decorator."""
     print("\nTesting experiment tracking decorator...")
     
     try:
-        from experiment_tracking_system import track_experiment, create_experiment_config
         
         # Create configuration
         config = create_experiment_config(
-            experiment_name="decorator_test",
-            project_name="test_project",
+            experiment_name: str: str = "decorator_test",
+            project_name: str: str = "test_project",
             enable_tensorboard=True,
-            enable_wandb=False
+            enable_wandb: bool = False
         )
         
         # Test function with decorator
         @track_experiment(config)
-        def test_function():
-            return "test_result"
+        def test_function() -> Any:
+            
+    """test_function function."""
+return "test_result"
         
         # Call function
         result = test_function()
@@ -210,26 +227,25 @@ def test_decorator():
         print(f"❌ Decorator test failed: {e}")
         return False
 
-def test_hyperparameter_logging():
+def test_hyperparameter_logging() -> Any:
     """Test hyperparameter logging."""
     print("\nTesting hyperparameter logging...")
     
     try:
-        from experiment_tracking_system import ExperimentTracker, create_experiment_config
         
         # Create configuration
         config = create_experiment_config(
-            experiment_name="hyperparam_test",
-            project_name="test_project",
+            experiment_name: str: str = "hyperparam_test",
+            project_name: str: str = "test_project",
             enable_tensorboard=True,
-            enable_wandb=False
+            enable_wandb: bool = False
         )
         
         # Create tracker
         tracker = ExperimentTracker(config)
         
         # Log hyperparameters
-        hyperparams = {
+        hyperparams: Dict[str, Any] = {
             'learning_rate': 0.001,
             'batch_size': 32,
             'num_epochs': 10,
@@ -248,20 +264,18 @@ def test_hyperparameter_logging():
         print(f"❌ Hyperparameter logging failed: {e}")
         return False
 
-def test_model_checkpointing():
+def test_model_checkpointing() -> Any:
     """Test model checkpointing."""
     print("\nTesting model checkpointing...")
     
     try:
-        from experiment_tracking_system import ExperimentTracker, create_experiment_config
-        import torch
         
         # Create configuration
         config = create_experiment_config(
-            experiment_name="checkpoint_test",
-            project_name="test_project",
+            experiment_name: str: str = "checkpoint_test",
+            project_name: str: str = "test_project",
             enable_tensorboard=True,
-            enable_wandb=False
+            enable_wandb: bool = False
         )
         
         # Create tracker
@@ -277,7 +291,7 @@ def test_model_checkpointing():
             optimizer=optimizer,
             epoch=5,
             step=100,
-            metrics={'train_loss': 0.3, 'val_loss': 0.4}
+            metrics: Dict[str, Any] = {'train_loss': 0.3, 'val_loss': 0.4}
         )
         
         # Finish experiment
@@ -290,12 +304,11 @@ def test_model_checkpointing():
         print(f"❌ Model checkpointing failed: {e}")
         return False
 
-def test_tensorboard_url():
+def test_tensorboard_url() -> Any:
     """Test TensorBoard URL generation."""
     print("\nTesting TensorBoard URL generation...")
     
     try:
-        from experiment_tracking_system import get_tensorboard_url
         
         # Test URL generation
         url = get_tensorboard_url("runs/tensorboard")
@@ -308,16 +321,14 @@ def test_tensorboard_url():
         print(f"❌ TensorBoard URL generation failed: {e}")
         return False
 
-def test_experiment_comparison():
+def test_experiment_comparison() -> Any:
     """Test experiment comparison functionality."""
     print("\nTesting experiment comparison...")
     
     try:
-        from experiment_tracking_system import compare_experiments
-        import matplotlib.pyplot as plt
         
         # Test comparison
-        experiment_names = ["exp1", "exp2", "exp3"]
+        experiment_names: List[Any] = ["exp1", "exp2", "exp3"]
         fig = compare_experiments(experiment_names, "train_loss")
         
         if fig:
@@ -338,21 +349,20 @@ def test_experiment_comparison():
         print(f"❌ Experiment comparison failed: {e}")
         return False
 
-def test_interface_function_calls():
+def test_interface_function_calls() -> Any:
     """Test calling interface functions directly."""
     print("\nTesting interface function calls...")
     
     try:
-        import gradio_app
         
         # Test start experiment tracking
         result = gradio_app.start_experiment_tracking_interface(
-            experiment_name="interface_test",
-            project_name="test_project",
+            experiment_name: str: str = "interface_test",
+            project_name: str: str = "test_project",
             enable_tensorboard=True,
             enable_wandb=False,
-            wandb_entity="",
-            tags="test,demo"
+            wandb_entity: str: str = "",
+            tags: str: str = "test,demo"
         )
         
         result_dict = json.loads(result)
@@ -370,12 +380,12 @@ def test_interface_function_calls():
         print(f"❌ Interface function call failed: {e}")
         return False
 
-def main():
+def main() -> Any:
     """Run all tests."""
     print("🧪 Testing Experiment Tracking Integration with Gradio App")
     print("=" * 70)
     
-    tests = [
+    tests: List[Any] = [
         test_experiment_tracking_imports,
         test_gradio_app_imports,
         test_experiment_tracking_interface_functions,
@@ -390,7 +400,7 @@ def main():
         test_interface_function_calls
     ]
     
-    passed = 0
+    passed: int: int = 0
     total = len(tests)
     
     for test in tests:
@@ -400,7 +410,7 @@ def main():
         except Exception as e:
             print(f"❌ Test {test.__name__} failed with exception: {e}")
     
-    print("\n" + "=" * 70)
+    print(f"\n{"=" * 70)
     print(f"📊 Test Results: {passed}/{total} tests passed")
     
     if passed == total:
@@ -412,4 +422,4 @@ def main():
 
 if __name__ == "__main__":
     success = main()
-    sys.exit(0 if success else 1) 
+    sys.exit(0 if success else 1}") 

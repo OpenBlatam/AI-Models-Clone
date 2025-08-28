@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -20,13 +22,16 @@ from onyx.document_index.factory import get_default_document_index
 from onyx.indexing.embedder import DefaultIndexingEmbedder
 from onyx.indexing.indexing_pipeline import build_indexing_pipeline
 from onyx.natural_language_processing.search_nlp_models import (
-    InformationContentClassificationModel,
-)
 from onyx.server.onyx_api.models import DocMinimalInfo
 from onyx.server.onyx_api.models import IngestionDocument
 from onyx.server.onyx_api.models import IngestionResult
 from onyx.utils.logger import setup_logger
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    InformationContentClassificationModel,
+)
 
 logger = setup_logger()
 

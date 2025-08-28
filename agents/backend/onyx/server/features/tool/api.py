@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any
 
 from fastapi import APIRouter
@@ -20,15 +22,18 @@ from onyx.server.features.tool.models import CustomToolUpdate
 from onyx.server.features.tool.models import ToolSnapshot
 from onyx.tools.tool_implementations.custom.openapi_parsing import MethodSpec
 from onyx.tools.tool_implementations.custom.openapi_parsing import (
+from onyx.tools.tool_implementations.custom.openapi_parsing import (
+from onyx.tools.tool_implementations.images.image_generation_tool import (
+from onyx.tools.utils import is_image_generation_available
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     openapi_to_method_specs,
 )
-from onyx.tools.tool_implementations.custom.openapi_parsing import (
     validate_openapi_schema,
 )
-from onyx.tools.tool_implementations.images.image_generation_tool import (
     ImageGenerationTool,
 )
-from onyx.tools.utils import is_image_generation_available
 
 router = APIRouter(prefix="/tool")
 admin_router = APIRouter(prefix="/admin/tool")

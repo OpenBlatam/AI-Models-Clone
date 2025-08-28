@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 from collections.abc import Generator
 
@@ -9,6 +11,9 @@ from onyx.configs.chat_configs import STOP_STREAM_PAT
 from onyx.prompts.constants import TRIPLE_BACKTICK
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -25,7 +30,9 @@ class CitationProcessor:
         display_doc_id_to_rank_map: DocumentIdOrderMapping,
         stop_stream: str | None = STOP_STREAM_PAT,
     ):
-        self.context_docs = context_docs
+        
+    """__init__ function."""
+self.context_docs = context_docs
         self.final_doc_id_to_rank_map = final_doc_id_to_rank_map
         self.display_doc_id_to_rank_map = display_doc_id_to_rank_map
         self.stop_stream = stop_stream

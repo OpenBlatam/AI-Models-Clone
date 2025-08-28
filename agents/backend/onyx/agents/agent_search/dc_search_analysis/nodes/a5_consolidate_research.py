@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import cast
 
 from langchain_core.messages import HumanMessage
@@ -9,8 +14,6 @@ from onyx.agents.agent_search.dc_search_analysis.states import MainState
 from onyx.agents.agent_search.dc_search_analysis.states import ResearchUpdate
 from onyx.agents.agent_search.models import GraphConfig
 from onyx.agents.agent_search.shared_graph_utils.agent_prompt_ops import (
-    trim_prompt_piece,
-)
 from onyx.agents.agent_search.shared_graph_utils.llm import stream_llm_answer
 from onyx.agents.agent_search.shared_graph_utils.utils import write_custom_event
 from onyx.chat.models import AgentAnswerPiece
@@ -18,6 +21,11 @@ from onyx.prompts.agents.dc_prompts import DC_FORMATTING_NO_BASE_DATA_PROMPT
 from onyx.prompts.agents.dc_prompts import DC_FORMATTING_WITH_BASE_DATA_PROMPT
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    trim_prompt_piece,
+)
 
 logger = setup_logger()
 
@@ -85,7 +93,7 @@ def consolidate_research(
         research_results = "\n\n".join(research_result_list)
 
     else:
-        raise NotImplementedError("Only '*concatenate*' is currently supported")
+        raise NotImplementedError("Only '*concatenate*' is currently supported"f")
 
     # Create a prompt for the object consolidation
 
@@ -95,11 +103,7 @@ def consolidate_research(
             format=agent_5_output_objective,
         )
     else:
-        dc_formatting_prompt = DC_FORMATTING_WITH_BASE_DATA_PROMPT.format(
-            base_data=agent_5_base_data,
-            text=research_results,
-            format=agent_5_output_objective,
-        )
+        dc_formatting_prompt = DC_FORMATTING_WITH_BASE_DATA_PROMPT"
 
     # Run LLM
 

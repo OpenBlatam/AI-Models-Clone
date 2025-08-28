@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections import defaultdict
 from collections.abc import Callable
 from collections.abc import Iterator
@@ -27,8 +29,6 @@ from onyx.context.search.postprocessing.postprocessing import cleanup_chunks
 from onyx.context.search.postprocessing.postprocessing import search_postprocessing
 from onyx.context.search.preprocessing.preprocessing import retrieval_preprocessing
 from onyx.context.search.retrieval.search_runner import (
-    retrieve_chunks,
-)
 from onyx.context.search.utils import inference_section_from_chunks
 from onyx.context.search.utils import relevant_sections_to_indices
 from onyx.db.models import User
@@ -42,6 +42,11 @@ from onyx.utils.threadpool_concurrency import FunctionCall
 from onyx.utils.threadpool_concurrency import run_functions_in_parallel
 from onyx.utils.timing import log_function_time
 from onyx.utils.variable_functionality import fetch_ee_implementation_or_noop
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    retrieve_chunks,
+)
 
 logger = setup_logger()
 

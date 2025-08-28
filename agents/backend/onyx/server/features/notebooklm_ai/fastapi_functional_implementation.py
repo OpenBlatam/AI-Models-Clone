@@ -1,10 +1,16 @@
-"""
-FastAPI Functional Implementation for notebooklm_ai
-- Uses functional components (plain functions)
-- Pydantic models for input validation and response schemas
-- Declarative route definitions with clear return type annotations
-- def for synchronous operations and async def for asynchronous ones
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 from fastapi import FastAPI, HTTPException, Depends, BackgroundTasks, UploadFile, File, Query, Path
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,6 +27,19 @@ import uuid
 from pathlib import Path as PathLib
 from datetime import datetime
 import json
+    import re
+    from html import escape
+    import psutil
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+FastAPI Functional Implementation for notebooklm_ai
+- Uses functional components (plain functions)
+- Pydantic models for input validation and response schemas
+- Declarative route definitions with clear return type annotations
+- def for synchronous operations and async def for asynchronous ones
+"""
+
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -297,8 +316,6 @@ def validate_image_file(file: UploadFile) -> bool:
 
 def sanitize_prompt(prompt: str) -> str:
     """Sanitize user input prompt - synchronous function."""
-    import re
-    from html import escape
     
     # Remove potentially dangerous characters
     sanitized = re.sub(r'[<>"\']', '', prompt)
@@ -514,7 +531,6 @@ async def get_available_models() -> List[ModelInfoResponse]:
 
 async def get_health_status() -> HealthResponse:
     """Get service health status - asynchronous function."""
-    import psutil
     
     # Simulate model loading status
     models_loaded = {
@@ -646,10 +662,10 @@ async def load_essential_models(app: FastAPI) -> None:
 class LoggingMiddleware:
     """Middleware for comprehensive request/response logging."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         self.app = app
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
@@ -696,10 +712,10 @@ class LoggingMiddleware:
 class PerformanceMiddleware:
     """Middleware for performance monitoring and optimization."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         self.app = app
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
@@ -707,7 +723,7 @@ class PerformanceMiddleware:
         start_time = time.time()
         
         # Add performance headers
-        async def send_with_headers(message):
+        async def send_with_headers(message) -> Any:
             if message["type"] == "http.response.start":
                 message["headers"].extend([
                     (b"X-Process-Time", str(time.time() - start_time).encode()),
@@ -721,10 +737,10 @@ class PerformanceMiddleware:
 class CachingMiddleware:
     """Middleware for response caching."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         self.app = app
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         if scope["type"] != "http":
             await self.app(scope, receive, send)
             return
@@ -743,7 +759,7 @@ class CachingMiddleware:
             if cached_response:
                 scope['app'].state.cache_hits += 1
                 
-                async def send_cached(message):
+                async def send_cached(message) -> Any:
                     if message["type"] == "http.response.start":
                         message["headers"].extend([
                             (b"X-Cache-Hit", b"true"),
@@ -1142,7 +1158,6 @@ async def global_exception_handler(request, exc: Exception) -> JSONResponse:
 # ============================================================================
 
 if __name__ == "__main__":
-    import uvicorn
     
     uvicorn.run(
         "fastapi_functional_implementation:app",

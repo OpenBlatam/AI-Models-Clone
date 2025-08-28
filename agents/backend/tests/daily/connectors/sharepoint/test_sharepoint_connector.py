@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from dataclasses import dataclass
 from datetime import datetime
@@ -11,6 +13,9 @@ from onyx.connectors.models import Document
 from onyx.connectors.sharepoint.connector import SharepointConnector
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @dataclass
 class ExpectedDocument:
     semantic_identifier: str

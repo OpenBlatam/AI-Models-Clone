@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import logging
+import traceback
+from typing import Any, Dict, Union
+from datetime import datetime
+from fastapi import Request, Response
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from pydantic import ValidationError as PydanticValidationError
+from .http_exception_system import (
+from .error_system import (
+    import functools
+    import asyncio
+    from fastapi import FastAPI, APIRouter
+from typing import Any, List, Dict, Optional
 """
 🔧 HTTPException Handlers for FastAPI
 ====================================
@@ -6,21 +22,11 @@ FastAPI exception handlers that integrate with the HTTPException system
 and provide consistent error responses across the application.
 """
 
-import logging
-import traceback
-from typing import Any, Dict, Union
-from datetime import datetime
 
-from fastapi import Request, Response
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import JSONResponse
-from pydantic import ValidationError as PydanticValidationError
 
-from .http_exception_system import (
     OnyxHTTPException, HTTPExceptionFactory, HTTPExceptionMapper,
     HTTPExceptionHandler, http_exception_handler
 )
-from .error_system import (
     OnyxBaseError, ValidationError, AuthenticationError, AuthorizationError,
     DatabaseError, CacheError, NetworkError, ExternalServiceError,
     ResourceNotFoundError, RateLimitError, TimeoutError,
@@ -30,7 +36,7 @@ from .error_system import (
 logger = logging.getLogger(__name__)
 
 
-async def onyx_http_exception_handler(request: Request, exc: OnyxHTTPException) -> JSONResponse:
+async async def onyx_http_exception_handler(request: Request, exc: OnyxHTTPException) -> JSONResponse:
     """
     Handler for OnyxHTTPException with detailed error information.
     """
@@ -74,7 +80,7 @@ async def onyx_base_error_handler(request: Request, exc: OnyxBaseError) -> JSONR
     )
 
 
-async def request_validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
+async async def request_validation_error_handler(request: Request, exc: RequestValidationError) -> JSONResponse:
     """
     Handler for FastAPI request validation errors.
     """
@@ -173,7 +179,7 @@ class ExceptionHandlerRegistry:
     Registry for managing exception handlers across the application.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.handlers: Dict[type, Any] = {}
         self.logger = logging.getLogger(__name__)
     
@@ -182,11 +188,11 @@ class ExceptionHandlerRegistry:
         self.handlers[exception_type] = handler
         self.logger.info(f"Registered handler for {exception_type.__name__}")
     
-    def get_handler(self, exception_type: type) -> Any:
+    def get_handler(self, exception_type: type) -> Optional[Dict[str, Any]]:
         """Get handler for exception type"""
         return self.handlers.get(exception_type)
     
-    def register_default_handlers(self, app):
+    def register_default_handlers(self, app) -> Any:
         """Register default exception handlers for FastAPI app"""
         
         # Register OnyxHTTPException handler
@@ -204,7 +210,7 @@ class ExceptionHandlerRegistry:
         
         self.logger.info("Registered default exception handlers")
     
-    def register_custom_handlers(self, app):
+    def register_custom_handlers(self, app) -> Any:
         """Register custom exception handlers for specific error types"""
         
         # Register handlers for specific Onyx error types
@@ -229,7 +235,7 @@ class ExceptionHandlerRegistry:
 exception_handler_registry = ExceptionHandlerRegistry()
 
 
-def setup_exception_handlers(app):
+def setup_exception_handlers(app) -> Any:
     """
     Setup all exception handlers for a FastAPI application.
     
@@ -246,15 +252,13 @@ def setup_exception_handlers(app):
 
 
 # Decorator for automatic error handling
-def handle_http_exceptions(func):
+async def handle_http_exceptions(func) -> Any:
     """
     Decorator that automatically handles exceptions and converts them to HTTP exceptions.
     """
-    import functools
-    import asyncio
     
     @functools.wraps(func)
-    async def async_wrapper(*args, **kwargs):
+    async def async_wrapper(*args, **kwargs) -> Any:
         try:
             if asyncio.iscoroutinefunction(func):
                 return await func(*args, **kwargs)
@@ -270,7 +274,7 @@ def handle_http_exceptions(func):
             raise http_exception
     
     @functools.wraps(func)
-    def sync_wrapper(*args, **kwargs):
+    def sync_wrapper(*args, **kwargs) -> Any:
         try:
             return func(*args, **kwargs)
         except OnyxBaseError as e:
@@ -294,7 +298,6 @@ def create_app_with_exception_handlers():
     """
     Example of creating a FastAPI app with exception handlers.
     """
-    from fastapi import FastAPI, APIRouter
     
     app = FastAPI(title="Example App with Exception Handlers")
     
@@ -370,5 +373,6 @@ def example_usage():
         # In a real scenario, you would make HTTP requests to test these endpoints
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     example_usage() 

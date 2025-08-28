@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import time
 from datetime import datetime
 from typing import cast
@@ -19,6 +24,9 @@ from onyx.db.connector_credential_pair import get_connector_credential_pair_from
 from onyx.db.document import construct_document_id_select_for_connector_credential_pair
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class RedisConnectorDeletePayload(BaseModel):
     num_tasks: int | None
     submitted: datetime

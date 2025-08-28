@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from pydantic import BaseModel, Field, validator
+from datetime import datetime
+from typing import Dict, List, Any, Optional, Union
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 LANDING PAGE MODELS - REFACTORED VERSION
 ==========================================
@@ -6,10 +23,6 @@ Modelos Pydantic refactorizados para el sistema ultra-avanzado de landing pages.
 Diseñados para máxima performance y flexibilidad.
 """
 
-from pydantic import BaseModel, Field, validator
-from datetime import datetime
-from typing import Dict, List, Any, Optional, Union
-from enum import Enum
 
 
 class PageStatus(str, Enum):
@@ -44,7 +57,7 @@ class SEOModel(BaseModel):
     readability_score: float = Field(default=0.0, ge=0, le=100, description="Score de legibilidad")
     
     @validator('title')
-    def validate_title_optimization(cls, v):
+    def validate_title_optimization(cls, v) -> bool:
         """Valida que el título esté optimizado para conversiones."""
         power_words = ['ultimate', 'proven', 'revolutionary', 'exclusive', 'guaranteed']
         if not any(word in v.lower() for word in power_words):
@@ -86,7 +99,7 @@ class ContentModel(BaseModel):
     engagement_score: float = Field(default=0.0, ge=0, le=100, description="Score de engagement")
     
     @validator('primary_cta')
-    def validate_cta_effectiveness(cls, v):
+    def validate_cta_effectiveness(cls, v) -> bool:
         """Valida que el CTA sea efectivo."""
         action_words = ['get', 'start', 'try', 'claim', 'download', 'access', 'join']
         if not any(word in v.lower() for word in action_words):
@@ -168,13 +181,13 @@ class LandingPageModel(BaseModel):
         }
     
     @validator('conversion_rate')
-    def validate_conversion_rate(cls, v):
+    def validate_conversion_rate(cls, v) -> bool:
         """Valida que la tasa de conversión sea realista."""
         if v > 50:
             raise ValueError('Conversion rate above 50% is unrealistic')
         return v
     
-    def update_last_modified(self):
+    def update_last_modified(self) -> Any:
         """Actualiza timestamp de última modificación."""
         self.last_modified = datetime.utcnow()
     
@@ -209,7 +222,8 @@ class OptimizationResult(BaseModel):
     ab_test_results: Optional[Dict[str, Any]] = Field(None, description="Resultados de A/B testing")
     statistical_significance: Optional[float] = Field(None, description="Significancia estadística")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -247,7 +261,8 @@ class PageAnalytics(BaseModel):
     # Timestamps
     last_updated: datetime = Field(default_factory=datetime.utcnow, description="Última actualización")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         } 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import List, Optional
 from pydantic import BaseModel
 from onyx.llm.factory import get_default_llms
@@ -5,6 +7,9 @@ from onyx.llm.exceptions import GenAIDisabledException
 from onyx.llm.utils import dict_based_prompt_to_langchain_prompt, message_to_string
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 class CopywritingRequest(BaseModel):

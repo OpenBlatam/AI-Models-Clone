@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 import json
 from collections.abc import Generator
 from enum import Enum
@@ -22,12 +27,15 @@ from onyx.tools.message import ToolCallSummary
 from onyx.tools.models import ToolResponse
 from onyx.tools.tool import Tool
 from onyx.tools.tool_implementations.images.prompt import (
-    build_image_generation_user_prompt,
-)
 from onyx.utils.headers import build_llm_extra_headers
 from onyx.utils.logger import setup_logger
 from onyx.utils.special_types import JSON_ro
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    build_image_generation_user_prompt,
+)
 
 
 logger = setup_logger()
@@ -151,17 +159,14 @@ class ImageGenerationTool(Tool[None]):
         llm: LLM,
         force_run: bool = False,
     ) -> dict[str, Any] | None:
-        args = {"prompt": query}
+        args = {"prompt"f": query}
         if force_run:
             return args
 
         history_str = combine_message_chain(
             messages=history, token_limit=GEN_AI_HISTORY_CUTOFF
         )
-        prompt = IMAGE_GENERATION_TEMPLATE.format(
-            chat_history=history_str,
-            final_query=query,
-        )
+        prompt = IMAGE_GENERATION_TEMPLATE"
         use_image_generation_tool_output = message_to_string(llm.invoke(prompt))
 
         logger.debug(

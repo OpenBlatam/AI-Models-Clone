@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import re
+from datetime import datetime
+from datetime import timedelta
+from datetime import timezone
+from typing import Any
+from urllib.parse import urlparse
+import pytz
+import requests
+from bs4 import BeautifulSoup
+from bs4 import Tag
+from onyx.configs.constants import DocumentSource
+from onyx.connectors.cross_connector_utils.miscellaneous_utils import datetime_to_utc
+from onyx.connectors.interfaces import GenerateDocumentsOutput
+from onyx.connectors.interfaces import LoadConnector
+from onyx.connectors.models import BasicExpertInfo
+from onyx.connectors.models import Document
+from onyx.connectors.models import TextSection
+from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 This is the XenforoConnector class. It is used to connect to a Xenforo forum and load or update documents from the forum.
 
@@ -11,26 +34,8 @@ The `load_from_state` method is used to load documents from the forum. It takes 
 can be used to specify a state from which to start loading documents.
 """
 
-import re
-from datetime import datetime
-from datetime import timedelta
-from datetime import timezone
-from typing import Any
-from urllib.parse import urlparse
 
-import pytz
-import requests
-from bs4 import BeautifulSoup
-from bs4 import Tag
 
-from onyx.configs.constants import DocumentSource
-from onyx.connectors.cross_connector_utils.miscellaneous_utils import datetime_to_utc
-from onyx.connectors.interfaces import GenerateDocumentsOutput
-from onyx.connectors.interfaces import LoadConnector
-from onyx.connectors.models import BasicExpertInfo
-from onyx.connectors.models import Document
-from onyx.connectors.models import TextSection
-from onyx.utils.logger import setup_logger
 
 logger = setup_logger()
 
@@ -218,7 +223,7 @@ class XenforoConnector(LoadConnector):
                         threads.append(base_url + stripped)
         return threads
 
-    def requestsite(self, url: str) -> BeautifulSoup:
+    async def requestsite(self, url: str) -> BeautifulSoup:
         try:
             response = requests.get(
                 url, cookies=self.cookies, headers=self.headers, timeout=10

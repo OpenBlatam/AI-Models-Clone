@@ -1,11 +1,10 @@
-"""
-🎯 Facebook Posts - Refactored Models for Onyx Features
-======================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Modelos refactorizados siguiendo la arquitectura de features de Onyx.
-Integración completa con Clean Architecture, LangChain y patrones enterprise.
-Migración completa a la nueva arquitectura modular.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 from typing import List, Optional, Dict, Any, Union, Protocol
 from datetime import datetime
@@ -16,6 +15,18 @@ import uuid
 import hashlib
 import re
 from pydantic import BaseModel, Field, validator, root_validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+🎯 Facebook Posts - Refactored Models for Onyx Features
+======================================================
+
+Modelos refactorizados siguiendo la arquitectura de features de Onyx.
+Integración completa con Clean Architecture, LangChain y patrones enterprise.
+Migración completa a la nueva arquitectura modular.
+"""
+
 
 
 # ===== REFINED DOMAIN ENUMS =====
@@ -141,7 +152,7 @@ class ContentSpecification:
     campaign_id: Optional[str] = None
     competitor_context: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not self.topic or len(self.topic.strip()) < 3:
             raise ValueError("Topic must be at least 3 characters")
         
@@ -163,7 +174,7 @@ class GenerationConfig:
     brand_consistency: float = 0.8  # 0.0 - 1.0
     trending_topics_weight: float = 0.3  # 0.0 - 1.0
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not 50 <= self.max_length <= 2000:
             raise ValueError("max_length must be between 50 and 2000")
         
@@ -297,7 +308,7 @@ class FacebookPostContent(BaseModel):
     location_tag: Optional[str] = None
     
     @validator('text')
-    def validate_text_content(cls, v):
+    def validate_text_content(cls, v) -> bool:
         if not v.strip():
             raise ValueError('Text content cannot be empty')
         
@@ -315,7 +326,7 @@ class FacebookPostContent(BaseModel):
         return v.strip()
     
     @validator('hashtags')
-    def validate_hashtags(cls, v):
+    def validate_hashtags(cls, v) -> bool:
         validated = []
         for tag in v:
             clean_tag = tag.strip().replace('#', '').lower()
@@ -517,7 +528,8 @@ class FacebookPostEntity(BaseModel):
     actual_metrics: Optional[Dict[str, Any]] = None
     ab_test_group: Optional[str] = None
     
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
         json_encoders = {
             datetime: lambda v: v.isoformat()

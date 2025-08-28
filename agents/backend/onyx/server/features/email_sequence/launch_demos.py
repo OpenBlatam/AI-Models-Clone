@@ -1,3 +1,23 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import argparse
+import logging
+import sys
+import os
+from pathlib import Path
+        from gradio_app import main
+        import gradio as gr
+        from demos.interactive_demos import main
+        import gradio as gr
+        from demos.performance_monitoring_demo import main
+        import gradio as gr
+        from demos.demo_launcher import main
+        import gradio as gr
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Interactive Demos Launcher
@@ -6,11 +26,6 @@ Simple launcher script for all interactive demos of the email sequence system.
 Provides easy access to different demo types and configurations.
 """
 
-import argparse
-import logging
-import sys
-import os
-from pathlib import Path
 
 # Add the current directory to the path
 sys.path.append(str(Path(__file__).parent))
@@ -26,12 +41,10 @@ def launch_main_demo(port: int = 7860, share: bool = False, debug: bool = False)
     logger.info("Launching main Gradio application...")
     
     try:
-        from gradio_app import main
         # Override launch parameters
-        import gradio as gr
         original_launch = gr.Blocks.launch
         
-        def custom_launch(self, **kwargs):
+        def custom_launch(self, **kwargs) -> Any:
             kwargs.update({
                 'server_name': '0.0.0.0',
                 'server_port': port,
@@ -56,12 +69,10 @@ def launch_interactive_demos(port: int = 7861, share: bool = False, debug: bool 
     logger.info("Launching interactive demos...")
     
     try:
-        from demos.interactive_demos import main
         # Override launch parameters
-        import gradio as gr
         original_launch = gr.Blocks.launch
         
-        def custom_launch(self, **kwargs):
+        def custom_launch(self, **kwargs) -> Any:
             kwargs.update({
                 'server_name': '0.0.0.0',
                 'server_port': port,
@@ -86,12 +97,10 @@ def launch_performance_demos(port: int = 7862, share: bool = False, debug: bool 
     logger.info("Launching performance monitoring demos...")
     
     try:
-        from demos.performance_monitoring_demo import main
         # Override launch parameters
-        import gradio as gr
         original_launch = gr.Blocks.launch
         
-        def custom_launch(self, **kwargs):
+        def custom_launch(self, **kwargs) -> Any:
             kwargs.update({
                 'server_name': '0.0.0.0',
                 'server_port': port,
@@ -116,12 +125,10 @@ def launch_comprehensive_demos(port: int = 7863, share: bool = False, debug: boo
     logger.info("Launching comprehensive demo launcher...")
     
     try:
-        from demos.demo_launcher import main
         # Override launch parameters
-        import gradio as gr
         original_launch = gr.Blocks.launch
         
-        def custom_launch(self, **kwargs):
+        def custom_launch(self, **kwargs) -> Any:
             kwargs.update({
                 'server_name': '0.0.0.0',
                 'server_port': port,
@@ -290,5 +297,6 @@ Examples:
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

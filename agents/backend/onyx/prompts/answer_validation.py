@@ -1,8 +1,13 @@
-# The following prompts are used for verifying the LLM answer after it is already produced.
-# Reflexion flow essentially. This feature can be toggled on/off
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.configs.app_configs import CUSTOM_ANSWER_VALIDITY_CONDITIONS
 from onyx.prompts.constants import ANSWER_PAT
 from onyx.prompts.constants import QUESTION_PAT
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# The following prompts are used for verifying the LLM answer after it is already produced.
+# Reflexion flow essentially. This feature can be toggled on/off
 
 ANSWER_VALIDITY_CONDITIONS = (
     """
@@ -57,5 +62,6 @@ Hint: Remember, if ANY of the conditions are True, it is Invalid.
 
 
 # Use the following for easy viewing of prompts
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     print(ANSWER_VALIDITY_PROMPT)

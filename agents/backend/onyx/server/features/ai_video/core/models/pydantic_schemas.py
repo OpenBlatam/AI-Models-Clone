@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+from pydantic import (
+from typing import Optional, List, Dict, Any, Union, Literal
+from datetime import datetime, timedelta
+from enum import Enum
+import re
+import uuid
+from pathlib import Path
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Pydantic Schemas for AI Video System
 ===================================
@@ -14,16 +38,9 @@ Features:
 - Type safety and documentation
 """
 
-from pydantic import (
     BaseModel, Field, ConfigDict, validator, root_validator,
     ValidationError, computed_field, field_validator, model_validator
 )
-from typing import Optional, List, Dict, Any, Union, Literal
-from datetime import datetime, timedelta
-from enum import Enum
-import re
-import uuid
-from pathlib import Path
 
 # =============================================================================
 # ENUMERATIONS
@@ -407,7 +424,7 @@ class VideoGenerationResponse(BaseModel, BaseConfig):
     
     @computed_field
     @property
-    def can_download(self) -> bool:
+    async def can_download(self) -> bool:
         """Check if video can be downloaded."""
         return self.is_completed and self.video_url is not None
 

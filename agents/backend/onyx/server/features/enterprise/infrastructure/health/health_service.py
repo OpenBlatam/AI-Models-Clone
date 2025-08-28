@@ -1,10 +1,5 @@
-"""
-Health Check Service Implementation
-==================================
-
-Concrete implementation of health check service.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 import asyncio
 from typing import Callable, Dict
@@ -12,6 +7,16 @@ from ...core.interfaces.health_interface import IHealthService
 from ...core.entities.health import HealthStatus, ComponentHealth, HealthState
 from ...shared.config import EnterpriseConfig
 import logging
+                import psutil
+                import psutil
+from typing import Any, List, Dict, Optional
+"""
+Health Check Service Implementation
+==================================
+
+Concrete implementation of health check service.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +25,9 @@ class HealthCheckService(IHealthService):
     """Health check service implementation."""
     
     def __init__(self, config: EnterpriseConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.checks: Dict[str, Callable] = {}
         self.last_check_time: Dict[str, float] = {}
         self.check_cache_ttl = 30  # seconds
@@ -120,7 +127,7 @@ class HealthCheckService(IHealthService):
         """Get current health status."""
         return await self.run_checks()
     
-    def register_default_checks(self):
+    def register_default_checks(self) -> Any:
         """Register default health checks."""
         
         def basic_check():
@@ -130,7 +137,6 @@ class HealthCheckService(IHealthService):
         def memory_check():
             """Check memory usage."""
             try:
-                import psutil
                 memory_percent = psutil.virtual_memory().percent
                 return {
                     "healthy": memory_percent < 90,
@@ -143,7 +149,6 @@ class HealthCheckService(IHealthService):
         def disk_check():
             """Check disk usage."""
             try:
-                import psutil
                 disk_percent = psutil.disk_usage('/').percent
                 return {
                     "healthy": disk_percent < 85,

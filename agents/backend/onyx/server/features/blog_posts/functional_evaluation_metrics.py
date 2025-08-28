@@ -1,3 +1,30 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import numpy as np
+import pandas as pd
+from typing import Dict, Any, Optional, List, Tuple, Union, Callable
+from dataclasses import dataclass, field
+from enum import Enum
+from functools import partial, reduce
+from operator import itemgetter
+import logging
+import time
+from pathlib import Path
+import json
+import warnings
+from sklearn.metrics import (
+from sklearn.preprocessing import label_binarize
+import matplotlib.pyplot as plt
+import seaborn as sns
+        from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🚀 Functional Evaluation Metrics System
 ======================================
@@ -13,20 +40,7 @@ Key Principles:
 - Declarative configuration
 """
 
-import numpy as np
-import pandas as pd
-from typing import Dict, Any, Optional, List, Tuple, Union, Callable
-from dataclasses import dataclass, field
-from enum import Enum
-from functools import partial, reduce
-from operator import itemgetter
-import logging
-import time
-from pathlib import Path
-import json
-import warnings
 
-from sklearn.metrics import (
     accuracy_score, precision_recall_fscore_support, 
     confusion_matrix, classification_report, roc_auc_score,
     mean_squared_error, mean_absolute_error, r2_score,
@@ -34,9 +48,6 @@ from sklearn.metrics import (
     hamming_loss, jaccard_score, f1_score,
     precision_score, recall_score, roc_curve, precision_recall_curve
 )
-from sklearn.preprocessing import label_binarize
-import matplotlib.pyplot as plt
-import seaborn as sns
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -209,7 +220,6 @@ def calculate_generation_metrics(
     
     # BLEU score (simplified)
     try:
-        from nltk.translate.bleu_score import sentence_bleu, SmoothingFunction
         smoothie = SmoothingFunction().method1
         
         bleu_scores = []
@@ -482,6 +492,10 @@ def export_evaluation_results(
     # Export metrics to JSON
     metrics_path = output_dir / "metrics.json"
     with open(metrics_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         json.dump({
             'task_type': results.task_type.value,
             'metrics': results.metrics,
@@ -505,7 +519,15 @@ def export_evaluation_results(
     if results.classification_report is not None:
         report_path = output_dir / "classification_report.txt"
         with open(report_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(results.classification_report)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         exported_files['classification_report'] = str(report_path)
     
     # Export ROC curve data
@@ -535,6 +557,10 @@ def export_model_comparison(
     # Export comparison data to JSON
     comparison_path = output_dir / "model_comparison.json"
     with open(comparison_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         json.dump({
             'model_names': comparison.model_names,
             'comparison_metrics': comparison.comparison_metrics,
@@ -638,5 +664,6 @@ def demo_evaluation_metrics():
     quick_metrics = quick_evaluate_classification(y_true, y_pred, y_prob)
     print(f"Quick F1 score: {quick_metrics['f1']:.4f}")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     demo_evaluation_metrics() 

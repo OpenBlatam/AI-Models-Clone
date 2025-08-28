@@ -1,13 +1,23 @@
-"""
-Tool Service - Onyx Integration
-Service layer for Tool business logic and persistence with enhanced error handling.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import logging
 from typing import List, Optional
 from uuid import UUID
 from .models import Tool
 from .schemas import ToolCreate
 from ..utils.error_system import (
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Tool Service - Onyx Integration
+Service layer for Tool business logic and persistence with enhanced error handling.
+"""
     error_factory,
     ErrorContext,
     ValidationError,

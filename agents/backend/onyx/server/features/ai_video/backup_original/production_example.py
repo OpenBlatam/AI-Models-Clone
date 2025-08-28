@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import logging
+from pathlib import Path
+from typing import List, Dict, Any
+import json
+from video_ai_refactored import (
+        import traceback
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 🚀 VIDEO AI REFACTORED - CÓDIGO DE PRODUCCIÓN
@@ -7,15 +21,8 @@ Ejemplo completo de uso en producción del sistema de video IA refactorizado.
 Incluye manejo de errores, logging, monitoreo y optimizaciones de rendimiento.
 """
 
-import asyncio
-import time
-import logging
-from pathlib import Path
-from typing import List, Dict, Any
-import json
 
 # Import del sistema refactorizado
-from video_ai_refactored import (
     RefactoredVideoAI,
     VideoAIConfig,
     RefactoredVideoProcessor,
@@ -170,7 +177,7 @@ class ProductionVideoAIService:
         
         semaphore = asyncio.Semaphore(max_concurrent)
         
-        async def process_with_semaphore(video_info):
+        async def process_with_semaphore(video_info) -> Any:
             async with semaphore:
                 return await self.process_single_video(**video_info)
         
@@ -443,7 +450,6 @@ async def main():
         
     except Exception as e:
         print(f"\n❌ Error en ejemplos de producción: {e}")
-        import traceback
         traceback.print_exc()
 
 if __name__ == "__main__":

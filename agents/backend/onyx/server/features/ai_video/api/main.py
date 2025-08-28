@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+from contextlib import asynccontextmanager
+from typing import AsyncGenerator
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from .dependencies import create_app, lifespan, app_state
+from .routes import video_router, system_router
+from ..core.error_handler import error_handler, ErrorContext
+from ..core.exceptions import AIVideoError
+        import uuid
+    import uvicorn
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 🚀 FASTAPI MAIN - AI VIDEO SYSTEM
@@ -6,25 +25,11 @@
 Main FastAPI application for the AI Video system.
 """
 
-import asyncio
-import logging
-from contextlib import asynccontextmanager
-from typing import AsyncGenerator
 
-from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
-from fastapi.exceptions import RequestValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
 
 # Import dependencies and routes
-from .dependencies import create_app, lifespan, app_state
-from .routes import video_router, system_router
 
 # Import core components
-from ..core.error_handler import error_handler, ErrorContext
-from ..core.exceptions import AIVideoError
 
 # Setup logging
 logging.basicConfig(level=logging.INFO)
@@ -119,7 +124,6 @@ async def request_middleware(request: Request, call_next):
     
     # Add request ID to headers if not present
     if "X-Request-ID" not in request.headers:
-        import uuid
         request.headers.__dict__["_list"].append(
             (b"x-request-id", str(uuid.uuid4()).encode())
         )
@@ -319,7 +323,6 @@ app.openapi = custom_openapi
 # ============================================================================
 
 if __name__ == "__main__":
-    import uvicorn
     
     # Run the application
     uvicorn.run(

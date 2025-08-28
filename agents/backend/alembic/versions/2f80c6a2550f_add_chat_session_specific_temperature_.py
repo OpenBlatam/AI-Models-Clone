@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add chat session specific temperature override
 
 Revision ID: 2f80c6a2550f
@@ -6,13 +13,11 @@ Create Date: 2025-01-31 10:30:27.289646
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "2f80c6a2550f"
-down_revision = "33ea50e88f24"
+revision: str = "2f80c6a2550f"
+down_revision: str = "33ea50e88f24"
 branch_labels = None
 depends_on = None
 

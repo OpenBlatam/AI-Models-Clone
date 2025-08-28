@@ -1,8 +1,5 @@
-"""
-Core middleware for centralized logging, metrics, and exception handling.
-Uses functional programming patterns and RORO (Receive Object, Return Object) pattern.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import functools
 import inspect
@@ -15,12 +12,18 @@ from datetime import datetime
 from typing import Any, Callable, Dict, List, Optional, Type, Union
 from dataclasses import dataclass, field
 from enum import Enum
-
 import structlog
 from prometheus_client import Counter, Histogram, Gauge, generate_latest
 from fastapi import Request, Response, HTTPException
 from fastapi.responses import JSONResponse
 import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+Core middleware for centralized logging, metrics, and exception handling.
+Uses functional programming patterns and RORO (Receive Object, Return Object) pattern.
+"""
+
+
 
 
 class LogLevel(Enum):
@@ -188,7 +191,7 @@ def log_operation(
 class MetricsRegistry:
     """Registry for Prometheus metrics."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.counters: Dict[str, Counter] = {}
         self.histograms: Dict[str, Histogram] = {}
         self.gauges: Dict[str, Gauge] = {}
@@ -455,7 +458,7 @@ def with_logging(
     """
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             logger = structlog.get_logger()
             request_id = kwargs.get("request_id", "unknown")
             
@@ -487,7 +490,7 @@ def with_logging(
                 raise
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             logger = structlog.get_logger()
             request_id = kwargs.get("request_id", "unknown")
             
@@ -538,7 +541,7 @@ def with_metrics(
     """
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             context = create_metric_context(operation, component)
             
             try:
@@ -552,7 +555,7 @@ def with_metrics(
                 raise
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             context = create_metric_context(operation, component)
             
             try:
@@ -583,7 +586,7 @@ def with_exception_handling(
     """
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             log_instance = logger or structlog.get_logger()
             request_id = kwargs.get("request_id", "unknown")
             
@@ -599,7 +602,7 @@ def with_exception_handling(
                 return error_response
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             log_instance = logger or structlog.get_logger()
             request_id = kwargs.get("request_id", "unknown")
             

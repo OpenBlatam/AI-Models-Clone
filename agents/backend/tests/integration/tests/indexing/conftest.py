@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import httpx
 import pytest
 
@@ -5,6 +7,9 @@ from tests.integration.common_utils.constants import MOCK_CONNECTOR_SERVER_HOST
 from tests.integration.common_utils.constants import MOCK_CONNECTOR_SERVER_PORT
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def mock_server_client() -> httpx.Client:
     print(

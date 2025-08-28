@@ -1,9 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 from datetime import datetime
 from typing import Dict, Any, List, Optional
 
 from ..base_model import OnyxBaseModel
 from ..model_helpers import (
+from ..model_types import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     validate_email,
     validate_url,
     validate_phone,
@@ -25,7 +31,6 @@ from ..model_helpers import (
     update_model_version,
     update_model_metadata
 )
-from ..model_types import (
     ModelSchema,
     ModelValidation,
     ModelIndex,
@@ -64,7 +69,7 @@ def test_model_data():
     }
 
 @pytest.fixture
-def test_model(test_model_data):
+def test_model(test_model_data) -> Any:
     """Create a test model instance."""
     return TestModel(**test_model_data)
 
@@ -180,7 +185,7 @@ def test_validate_field_value():
     errors = validate_field_value("test", {"type": "string", "enum": ["value1", "value2"]})
     assert len(errors) > 0
 
-def test_validate_model_fields(test_model, test_schema):
+def test_validate_model_fields(test_model, test_schema) -> bool:
     """Test model fields validation."""
     validation = validate_model_fields(test_model, test_schema)
     assert validation.is_valid is True
@@ -192,7 +197,7 @@ def test_validate_model_fields(test_model, test_schema):
     assert any("email" in error for error in validation.errors)
 
 # Test model operations
-def test_create_model_index(test_model):
+def test_create_model_index(test_model) -> Any:
     """Test model index creation."""
     index = create_model_index(test_model, "name", "Test User")
     assert isinstance(index, ModelIndex)
@@ -200,14 +205,14 @@ def test_create_model_index(test_model):
     assert index.value == "Test User"
     assert index.model_id == test_model.id
 
-def test_create_model_cache(test_model):
+def test_create_model_cache(test_model) -> Any:
     """Test model cache creation."""
     cache = create_model_cache(test_model, "id", test_model.id)
     assert isinstance(cache, ModelCache)
     assert cache.key == "id"
     assert cache.value == test_model.id
 
-def test_create_model_event(test_model):
+def test_create_model_event(test_model) -> Any:
     """Test model event creation."""
     event = create_model_event(test_model, "created", {"action": "create"})
     assert isinstance(event, ModelEvent)
@@ -215,21 +220,21 @@ def test_create_model_event(test_model):
     assert event.data["action"] == "create"
     assert event.model_id == test_model.id
 
-def test_serialize_model(test_model):
+def test_serialize_model(test_model) -> Any:
     """Test model serialization."""
     data = serialize_model(test_model)
     assert data["name"] == test_model.name
     assert data["email"] == test_model.email
     assert data["age"] == test_model.age
 
-def test_deserialize_model(test_model_data):
+def test_deserialize_model(test_model_data) -> Any:
     """Test model deserialization."""
     model = deserialize_model(TestModel, test_model_data)
     assert model.name == test_model_data["name"]
     assert model.email == test_model_data["email"]
     assert model.age == test_model_data["age"]
 
-def test_get_model_indexes(test_model, test_schema):
+def test_get_model_indexes(test_model, test_schema) -> Optional[Dict[str, Any]]:
     """Test getting model indexes."""
     indexes = get_model_indexes(test_model, test_schema)
     assert len(indexes) > 0
@@ -237,36 +242,36 @@ def test_get_model_indexes(test_model, test_schema):
     assert any(index.field == "name" for index in indexes)
     assert any(index.field == "email" for index in indexes)
 
-def test_get_model_cache(test_model, test_schema):
+def test_get_model_cache(test_model, test_schema) -> Optional[Dict[str, Any]]:
     """Test getting model cache."""
     cache = get_model_cache(test_model, test_schema)
     assert len(cache) > 0
     assert any(c.key == "id" for c in cache)
     assert any(c.key == "email" for c in cache)
 
-def test_get_model_events(test_model, test_schema):
+def test_get_model_events(test_model, test_schema) -> Optional[Dict[str, Any]]:
     """Test getting model events."""
     events = get_model_events(test_model, test_schema, "created")
     assert isinstance(events, list)
 
 # Test model updates
-def test_update_model_timestamps(test_model):
+def test_update_model_timestamps(test_model) -> Any:
     """Test model timestamp updates."""
     old_updated_at = test_model.updated_at
     update_model_timestamps(test_model)
     assert test_model.updated_at > old_updated_at
 
-def test_update_model_status(test_model):
+def test_update_model_status(test_model) -> Any:
     """Test model status update."""
     update_model_status(test_model, ModelStatus.INACTIVE)
     assert test_model.status == ModelStatus.INACTIVE
 
-def test_update_model_version(test_model):
+def test_update_model_version(test_model) -> Any:
     """Test model version update."""
     update_model_version(test_model, "2.0")
     assert test_model.version == "2.0"
 
-def test_update_model_metadata(test_model):
+def test_update_model_metadata(test_model) -> Any:
     """Test model metadata update."""
     metadata = {"key": "value"}
     update_model_metadata(test_model, metadata)

@@ -1,10 +1,13 @@
-"""
-🧪 Data Splitting & Cross-Validation Test Suite
-===============================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive test suite for data splitting and cross-validation systems with
-unit tests, integration tests, and performance benchmarks.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -17,22 +20,33 @@ from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch, MagicMock
 import warnings
-
 import torch
 import torch.nn as nn
 import numpy as np
 import pandas as pd
 from sklearn.datasets import make_classification, make_regression
 from sklearn.model_selection import train_test_split
-
-# Import our systems
 from .production_transformers import DeviceManager
 from .data_splitting_cv import (
+from .efficient_data_loader import (
+        from torch.utils.data import Subset
+    import asyncio
+from typing import Any, List, Dict, Optional
+"""
+🧪 Data Splitting & Cross-Validation Test Suite
+===============================================
+
+Comprehensive test suite for data splitting and cross-validation systems with
+unit tests, integration tests, and performance benchmarks.
+"""
+
+
+
+# Import our systems
     DataSplitter, CrossValidator, DataSplittingManager,
     SplitConfig, SplitStrategy, CrossValidationConfig, CrossValidationStrategy,
     SplitResult, CrossValidationResult
 )
-from .efficient_data_loader import (
     DataLoaderManager, DataLoaderConfig, DataFormat, CacheStrategy,
     OptimizedTextDataset
 )
@@ -42,7 +56,7 @@ logger = logging.getLogger(__name__)
 class TestSplitConfig(unittest.TestCase):
     """Test split configuration."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration."""
         config = SplitConfig()
         
@@ -53,7 +67,7 @@ class TestSplitConfig(unittest.TestCase):
         self.assertEqual(config.random_state, 42)
         self.assertTrue(config.shuffle)
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration."""
         config = SplitConfig(
             strategy=SplitStrategy.RANDOM,
@@ -71,7 +85,7 @@ class TestSplitConfig(unittest.TestCase):
         self.assertEqual(config.random_state, 123)
         self.assertFalse(config.shuffle)
     
-    def test_invalid_ratios(self):
+    def test_invalid_ratios(self) -> Any:
         """Test validation of split ratios."""
         with self.assertRaises(ValueError):
             SplitConfig(
@@ -83,7 +97,7 @@ class TestSplitConfig(unittest.TestCase):
 class TestCrossValidationConfig(unittest.TestCase):
     """Test cross-validation configuration."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration."""
         config = CrossValidationConfig()
         
@@ -93,7 +107,7 @@ class TestCrossValidationConfig(unittest.TestCase):
         self.assertEqual(config.random_state, 42)
         self.assertTrue(config.shuffle)
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration."""
         config = CrossValidationConfig(
             strategy=CrossValidationStrategy.K_FOLD,
@@ -112,7 +126,7 @@ class TestCrossValidationConfig(unittest.TestCase):
 class TestDataSplitter(unittest.TestCase):
     """Test data splitter."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.splitter = DataSplitter(self.device_manager)
@@ -122,11 +136,11 @@ class TestDataSplitter(unittest.TestCase):
         # Create test dataset
         self.create_test_dataset()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def create_test_dataset(self):
+    def create_test_dataset(self) -> Any:
         """Create synthetic test dataset."""
         # Generate synthetic data
         X, y = make_classification(
@@ -148,7 +162,7 @@ class TestDataSplitter(unittest.TestCase):
         })
         df.to_csv(self.test_data_path, index=False)
     
-    def test_random_split(self):
+    def test_random_split(self) -> Any:
         """Test random split strategy."""
         # Create dataset
         df = pd.read_csv(self.test_data_path)
@@ -176,7 +190,7 @@ class TestDataSplitter(unittest.TestCase):
         self.assertEqual(len(result.test_indices), 150)
         self.assertEqual(result.split_info['strategy'], 'random')
     
-    def test_stratified_split(self):
+    def test_stratified_split(self) -> Any:
         """Test stratified split strategy."""
         # Create dataset
         df = pd.read_csv(self.test_data_path)
@@ -207,7 +221,7 @@ class TestDataSplitter(unittest.TestCase):
         # Check class distribution
         self.assertIn('class_distribution', result.split_info)
     
-    def test_time_series_split(self):
+    def test_time_series_split(self) -> Any:
         """Test time series split strategy."""
         # Create dataset with time information
         df = pd.read_csv(self.test_data_path)
@@ -239,7 +253,7 @@ class TestDataSplitter(unittest.TestCase):
         self.assertIsInstance(result, SplitResult)
         self.assertEqual(result.split_info['strategy'], 'time_series')
     
-    def test_group_split(self):
+    def test_group_split(self) -> Any:
         """Test group split strategy."""
         # Create dataset with group information
         df = pd.read_csv(self.test_data_path)
@@ -271,7 +285,7 @@ class TestDataSplitter(unittest.TestCase):
         self.assertIsInstance(result, SplitResult)
         self.assertEqual(result.split_info['strategy'], 'group')
     
-    def test_split_result_methods(self):
+    def test_split_result_methods(self) -> Any:
         """Test SplitResult methods."""
         # Create mock split result
         result = SplitResult(
@@ -299,17 +313,17 @@ class TestDataSplitter(unittest.TestCase):
 class TestCrossValidator(unittest.TestCase):
     """Test cross-validator."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.cross_validator = CrossValidator(self.device_manager)
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_cv_splits_creation(self):
+    def test_cv_splits_creation(self) -> Any:
         """Test CV splits creation."""
         # Create test dataset
         texts = [f"Sample {i}" for i in range(100)]
@@ -330,7 +344,7 @@ class TestCrossValidator(unittest.TestCase):
         splits = self.cross_validator._create_cv_splits(dataset, config)
         self.assertEqual(len(splits), 5)
     
-    def test_cv_statistics_calculation(self):
+    def test_cv_statistics_calculation(self) -> Any:
         """Test CV statistics calculation."""
         # Mock fold results
         fold_results = [
@@ -352,7 +366,7 @@ class TestCrossValidator(unittest.TestCase):
 class TestDataSplittingManager(unittest.TestCase):
     """Test data splitting manager."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
@@ -361,11 +375,11 @@ class TestDataSplittingManager(unittest.TestCase):
         # Create test dataset
         self.create_test_dataset()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def create_test_dataset(self):
+    def create_test_dataset(self) -> Any:
         """Create synthetic test dataset."""
         # Generate synthetic data
         X, y = make_classification(
@@ -387,7 +401,7 @@ class TestDataSplittingManager(unittest.TestCase):
         })
         df.to_csv(self.test_data_path, index=False)
     
-    async def test_manager_initialization(self):
+    async def test_manager_initialization(self) -> Any:
         """Test manager initialization."""
         manager = DataSplittingManager(self.device_manager)
         
@@ -396,7 +410,7 @@ class TestDataSplittingManager(unittest.TestCase):
         self.assertIsNotNone(manager.cross_validator)
         self.assertIsNotNone(manager.logger)
     
-    async def test_split_and_validate(self):
+    async def test_split_and_validate(self) -> bool:
         """Test split and validate functionality."""
         manager = DataSplittingManager(self.device_manager)
         
@@ -436,7 +450,7 @@ class TestDataSplittingManager(unittest.TestCase):
         self.assertIn('cv_result', result)
         self.assertIn('cv_summary', result)
     
-    async def test_create_dataloaders_from_split(self):
+    async def test_create_dataloaders_from_split(self) -> Any:
         """Test creating DataLoaders from split."""
         manager = DataSplittingManager(self.device_manager)
         
@@ -471,12 +485,11 @@ class TestDataSplittingManager(unittest.TestCase):
         self.assertIsInstance(val_loader, torch.utils.data.DataLoader)
         self.assertIsInstance(test_loader, torch.utils.data.DataLoader)
     
-    def test_analyze_split_quality(self):
+    def test_analyze_split_quality(self) -> Any:
         """Test split quality analysis."""
         manager = DataSplittingManager(self.device_manager)
         
         # Create mock split result with labels
-        from torch.utils.data import Subset
         
         # Create dataset with known labels
         texts = ["text1", "text2", "text3", "text4", "text5"]
@@ -513,7 +526,7 @@ class TestDataSplittingManager(unittest.TestCase):
 class TestIntegration(unittest.TestCase):
     """Integration tests."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
@@ -522,11 +535,11 @@ class TestIntegration(unittest.TestCase):
         # Create test dataset
         self.create_test_dataset()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def create_test_dataset(self):
+    def create_test_dataset(self) -> Any:
         """Create synthetic test dataset."""
         # Generate synthetic data
         X, y = make_classification(
@@ -548,7 +561,7 @@ class TestIntegration(unittest.TestCase):
         })
         df.to_csv(self.test_data_path, index=False)
     
-    async def test_end_to_end_workflow(self):
+    async def test_end_to_end_workflow(self) -> Any:
         """Test end-to-end workflow."""
         # Create manager
         manager = DataSplittingManager(self.device_manager)
@@ -597,7 +610,7 @@ class TestIntegration(unittest.TestCase):
         self.assertEqual(sizes['val'], 45)     # 15% of 300
         self.assertEqual(sizes['test'], 45)    # 15% of 300
     
-    async def test_cross_validation_workflow(self):
+    async def test_cross_validation_workflow(self) -> Any:
         """Test cross-validation workflow."""
         # Create manager
         manager = DataSplittingManager(self.device_manager)
@@ -639,16 +652,16 @@ class TestIntegration(unittest.TestCase):
 class TestPerformanceBenchmarks(unittest.TestCase):
     """Performance benchmarks."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up benchmark environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up benchmark environment."""
         shutil.rmtree(self.temp_dir)
     
-    def benchmark_splitting_performance(self):
+    def benchmark_splitting_performance(self) -> Any:
         """Benchmark splitting performance."""
         splitter = DataSplitter(self.device_manager)
         
@@ -671,7 +684,7 @@ class TestPerformanceBenchmarks(unittest.TestCase):
         self.assertLess(splitting_time, 1.0)  # Should complete within 1 second
         logger.info(f"Splitting time: {splitting_time:.4f} seconds")
     
-    def benchmark_cv_splits_creation(self):
+    def benchmark_cv_splits_creation(self) -> Any:
         """Benchmark CV splits creation."""
         cross_validator = CrossValidator(self.device_manager)
         
@@ -696,16 +709,16 @@ class TestPerformanceBenchmarks(unittest.TestCase):
 class TestErrorHandling(unittest.TestCase):
     """Test error handling."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    def test_invalid_split_ratios(self):
+    def test_invalid_split_ratios(self) -> Any:
         """Test handling of invalid split ratios."""
         with self.assertRaises(ValueError):
             SplitConfig(
@@ -714,7 +727,7 @@ class TestErrorHandling(unittest.TestCase):
                 test_ratio=0.3  # Sum > 1.0
             )
     
-    def test_missing_time_column(self):
+    def test_missing_time_column(self) -> Any:
         """Test handling of missing time column."""
         splitter = DataSplitter(self.device_manager)
         
@@ -731,7 +744,7 @@ class TestErrorHandling(unittest.TestCase):
         with self.assertRaises(ValueError):
             splitter.split_dataset(dataset, config)
     
-    def test_missing_group_column(self):
+    def test_missing_group_column(self) -> Any:
         """Test handling of missing group column."""
         splitter = DataSplitter(self.device_manager)
         
@@ -869,10 +882,11 @@ async def quick_cv_test():
 
 # Example usage
 if __name__ == "__main__":
-    import asyncio
     
     async def main():
-        print("🚀 Data Splitting & Cross-Validation Test Suite")
+        
+    """main function."""
+print("🚀 Data Splitting & Cross-Validation Test Suite")
         print("=" * 60)
         
         # Run quick tests

@@ -1,10 +1,8 @@
-"""
-Entrenamiento/Fine-tuning automático de LLM desde MinIO/Ceph/HDFS
-- Descarga el dataset generado por los modelos (JSONL)
-- Tokeniza y entrena/fine-tunea un modelo HuggingFace (por defecto GPT-2)
-- Guarda el modelo y tokenizer resultantes
-- Configurable por CLI/env
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import argparse
 import os
 import logging
@@ -12,16 +10,25 @@ import json
 from datetime import datetime
 from transformers import AutoTokenizer, AutoModelForCausalLM, Trainer, TrainingArguments, DataCollatorForLanguageModeling
 from torch.utils.data import Dataset
+import boto3
+from hdfs import InsecureClient
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Entrenamiento/Fine-tuning automático de LLM desde MinIO/Ceph/HDFS
+- Descarga el dataset generado por los modelos (JSONL)
+- Tokeniza y entrena/fine-tunea un modelo HuggingFace (por defecto GPT-2)
+- Guarda el modelo y tokenizer resultantes
+- Configurable por CLI/env
+"""
 
 # MinIO/Ceph (S3 compatible)
-import boto3
 # HDFS
-from hdfs import InsecureClient
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
 # --- Dataset utils ---
-def load_dataset_from_s3(bucket, key, endpoint_url, access_key, secret_key):
+def load_dataset_from_s3(bucket, key, endpoint_url, access_key, secret_key) -> Any:
     s3 = boto3.client(
         's3',
         endpoint_url=endpoint_url,
@@ -31,25 +38,33 @@ def load_dataset_from_s3(bucket, key, endpoint_url, access_key, secret_key):
     )
     obj = s3.get_object(Bucket=bucket, Key=key)
     lines = obj['Body'].read().decode('utf-8').splitlines()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     return [json.loads(line) for line in lines]
 
-def load_dataset_from_hdfs(hdfs_url, hdfs_path):
+def load_dataset_from_hdfs(hdfs_url, hdfs_path) -> Any:
     client = InsecureClient(hdfs_url)
     with client.read(hdfs_path, encoding='utf-8') as reader:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         return [json.loads(line) for line in reader]
 
 class PromptDataset(Dataset):
-    def __init__(self, samples, tokenizer, max_length=128, input_key='input', output_key=None):
+    def __init__(self, samples, tokenizer, max_length=128, input_key='input', output_key=None) -> Any:
         self.samples = samples
         self.tokenizer = tokenizer
         self.max_length = max_length
         self.input_key = input_key
         self.output_key = output_key
 
-    def __len__(self):
+    def __len__(self) -> Any:
         return len(self.samples)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         sample = self.samples[idx]
         if self.output_key and self.output_key in sample:
             text = sample[self.input_key] + "\n" + sample[self.output_key]
@@ -69,7 +84,9 @@ class PromptDataset(Dataset):
 
 # --- Main training script ---
 def main():
-    parser = argparse.ArgumentParser(description="Fine-tuning LLM desde MinIO/Ceph/HDFS")
+    
+    """main function."""
+parser = argparse.ArgumentParser(description="Fine-tuning LLM desde MinIO/Ceph/HDFS")
     parser.add_argument('--backend', choices=['s3', 'hdfs'], required=True)
     parser.add_argument('--dataset_key', type=str, required=True, help='Archivo JSONL en S3/HDFS')
     parser.add_argument('--input_key', type=str, default='input', help='Campo de entrada (prompt)')

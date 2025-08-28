@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import uuid
+from typing import Dict, List, Optional, Any
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Depends, HTTPException, Request, Query, BackgroundTasks
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+from fastapi_dependency_injection import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 FastAPI Dependency Injection Demo for Lazy Loading System
 
@@ -11,17 +33,8 @@ This demo showcases:
 - Testing with dependency injection
 """
 
-import asyncio
-import time
-import uuid
-from typing import Dict, List, Optional, Any
-from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Depends, HTTPException, Request, Query, BackgroundTasks
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
 
-from fastapi_dependency_injection import (
     DependencyConfig, DependencyManager, create_app,
     get_lazy_manager_dependency, get_loader_dependency,
     get_config, get_stats_dependency, get_request_id,
@@ -384,7 +397,7 @@ async def reload_configuration(
 
 # Utility functions
 
-async def cleanup_old_cache(lazy_manager):
+async def cleanup_old_cache(lazy_manager) -> Any:
     """Background task to cleanup old cache entries."""
     try:
         # Simulate cleanup
@@ -529,7 +542,7 @@ async def demonstrate_request_scoped_dependencies():
     
     # Simulate request context
     class MockRequest:
-        def __init__(self):
+        def __init__(self) -> Any:
             self.state = type('State', (), {})()
             self.state.request_id = str(uuid.uuid4())
             self.state.user_id = "user_123"

@@ -1,9 +1,10 @@
-"""
-Comprehensive tests for Advanced PyTorch Autograd Models
-Tests all components including weight initialization, loss functions,
-optimization algorithms, attention mechanisms, positional encodings,
-LoRA/P-tuning fine-tuning, and proper tokenization
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import torch
 import torch.nn as nn
@@ -14,9 +15,19 @@ from typing import Dict, Any, List, Tuple
 import tempfile
 import os
 import warnings
+from advanced_autograd_models import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Comprehensive tests for Advanced PyTorch Autograd Models
+Tests all components including weight initialization, loss functions,
+optimization algorithms, attention mechanisms, positional encodings,
+LoRA/P-tuning fine-tuning, and proper tokenization
+"""
+
 
 # Import advanced autograd models
-from advanced_autograd_models import (
     ModelConfig, AdvancedPositionalEncoding, AdvancedMultiHeadAttention,
     LoRALayer, LoRALinear, P_TuningLayer, AdvancedLossFunctions,
     AdvancedOptimizers, AdvancedTokenizer, AdvancedTransformerModel,
@@ -30,7 +41,7 @@ warnings.filterwarnings("ignore")
 class TestModelConfig:
     """Test ModelConfig dataclass"""
     
-    def test_model_config_defaults(self):
+    def test_model_config_defaults(self) -> Any:
         """Test default configuration values"""
         config = ModelConfig()
         
@@ -59,7 +70,7 @@ class TestModelConfig:
         assert config.focal_loss_alpha == 1.0
         assert config.focal_loss_gamma == 2.0
     
-    def test_model_config_custom(self):
+    def test_model_config_custom(self) -> Any:
         """Test custom configuration values"""
         config = ModelConfig(
             vocab_size=10000,
@@ -89,7 +100,7 @@ class TestModelConfig:
 class TestAdvancedPositionalEncoding:
     """Test AdvancedPositionalEncoding module"""
     
-    def test_sinusoidal_encoding_shape(self):
+    def test_sinusoidal_encoding_shape(self) -> Any:
         """Test sinusoidal positional encoding shape"""
         d_model = 512
         max_len = 1000
@@ -101,7 +112,7 @@ class TestAdvancedPositionalEncoding:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_learnable_encoding_shape(self):
+    def test_learnable_encoding_shape(self) -> Any:
         """Test learnable positional encoding shape"""
         d_model = 256
         max_len = 500
@@ -113,7 +124,7 @@ class TestAdvancedPositionalEncoding:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_rope_encoding_shape(self):
+    def test_rope_encoding_shape(self) -> Any:
         """Test RoPE positional encoding shape"""
         d_model = 128
         max_len = 200
@@ -125,7 +136,7 @@ class TestAdvancedPositionalEncoding:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_positional_encoding_gradients(self):
+    def test_positional_encoding_gradients(self) -> Any:
         """Test positional encoding gradients"""
         d_model = 64
         pe = AdvancedPositionalEncoding(d_model, encoding_type="sinusoidal", use_learnable=True)
@@ -144,7 +155,7 @@ class TestAdvancedPositionalEncoding:
             assert pe.learnable_pe.grad is not None
             assert not torch.isnan(pe.learnable_pe.grad).any()
     
-    def test_positional_encoding_device(self):
+    def test_positional_encoding_device(self) -> Any:
         """Test positional encoding device transfer"""
         if torch.cuda.is_available():
             device = torch.device('cuda')
@@ -157,7 +168,7 @@ class TestAdvancedPositionalEncoding:
             assert output.device == device
             assert not torch.isnan(output).any()
     
-    def test_invalid_encoding_type(self):
+    def test_invalid_encoding_type(self) -> Any:
         """Test invalid encoding type raises error"""
         with pytest.raises(ValueError):
             AdvancedPositionalEncoding(64, encoding_type="invalid")
@@ -166,7 +177,7 @@ class TestAdvancedPositionalEncoding:
 class TestAdvancedMultiHeadAttention:
     """Test AdvancedMultiHeadAttention module"""
     
-    def test_standard_attention_shape(self):
+    def test_standard_attention_shape(self) -> Any:
         """Test standard attention shape"""
         d_model = 512
         n_heads = 8
@@ -181,7 +192,7 @@ class TestAdvancedMultiHeadAttention:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_relative_attention_shape(self):
+    def test_relative_attention_shape(self) -> Any:
         """Test relative attention shape"""
         d_model = 256
         n_heads = 4
@@ -196,7 +207,7 @@ class TestAdvancedMultiHeadAttention:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_local_attention_shape(self):
+    def test_local_attention_shape(self) -> Any:
         """Test local attention shape"""
         d_model = 128
         n_heads = 2
@@ -211,7 +222,7 @@ class TestAdvancedMultiHeadAttention:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_sparse_attention_shape(self):
+    def test_sparse_attention_shape(self) -> Any:
         """Test sparse attention shape"""
         d_model = 64
         n_heads = 1
@@ -226,7 +237,7 @@ class TestAdvancedMultiHeadAttention:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_attention_with_mask(self):
+    def test_attention_with_mask(self) -> Any:
         """Test attention with mask"""
         d_model = 256
         n_heads = 4
@@ -243,7 +254,7 @@ class TestAdvancedMultiHeadAttention:
         assert output.shape == x.shape
         assert not torch.isnan(output).any()
     
-    def test_attention_gradients(self):
+    def test_attention_gradients(self) -> Any:
         """Test attention gradients"""
         d_model = 128
         n_heads = 2
@@ -258,7 +269,7 @@ class TestAdvancedMultiHeadAttention:
         assert x.grad is not None
         assert not torch.isnan(x.grad).any()
     
-    def test_attention_device(self):
+    def test_attention_device(self) -> Any:
         """Test attention device transfer"""
         if torch.cuda.is_available():
             device = torch.device('cuda')
@@ -275,7 +286,7 @@ class TestAdvancedMultiHeadAttention:
 class TestLoRALayer:
     """Test LoRA layer"""
     
-    def test_lora_layer_shape(self):
+    def test_lora_layer_shape(self) -> Any:
         """Test LoRA layer shape"""
         in_features = 256
         out_features = 128
@@ -288,7 +299,7 @@ class TestLoRALayer:
         assert output.shape == (4, out_features)
         assert not torch.isnan(output).any()
     
-    def test_lora_layer_gradients(self):
+    def test_lora_layer_gradients(self) -> Any:
         """Test LoRA layer gradients"""
         in_features = 128
         out_features = 64
@@ -310,7 +321,7 @@ class TestLoRALayer:
         assert not torch.isnan(lora.lora_A.weight.grad).any()
         assert not torch.isnan(lora.lora_B.weight.grad).any()
     
-    def test_lora_scaling(self):
+    def test_lora_scaling(self) -> Any:
         """Test LoRA scaling factor"""
         in_features = 64
         out_features = 32
@@ -329,7 +340,7 @@ class TestLoRALayer:
 class TestLoRALinear:
     """Test LoRA linear layer"""
     
-    def test_lora_linear_shape(self):
+    def test_lora_linear_shape(self) -> Any:
         """Test LoRA linear layer shape"""
         in_features = 128
         out_features = 64
@@ -342,7 +353,7 @@ class TestLoRALinear:
         assert output.shape == (3, out_features)
         assert not torch.isnan(output).any()
     
-    def test_lora_linear_gradients(self):
+    def test_lora_linear_gradients(self) -> Any:
         """Test LoRA linear layer gradients"""
         in_features = 64
         out_features = 32
@@ -369,7 +380,7 @@ class TestLoRALinear:
 class TestP_TuningLayer:
     """Test P-tuning layer"""
     
-    def test_p_tuning_shape(self):
+    def test_p_tuning_shape(self) -> Any:
         """Test P-tuning layer shape"""
         d_model = 256
         prompt_length = 10
@@ -384,7 +395,7 @@ class TestP_TuningLayer:
         assert output.shape == (batch_size, expected_seq_len, d_model)
         assert not torch.isnan(output).any()
     
-    def test_p_tuning_gradients(self):
+    def test_p_tuning_gradients(self) -> Any:
         """Test P-tuning layer gradients"""
         d_model = 128
         prompt_length = 5
@@ -407,7 +418,7 @@ class TestP_TuningLayer:
 class TestAdvancedLossFunctions:
     """Test advanced loss functions"""
     
-    def test_focal_loss(self):
+    def test_focal_loss(self) -> Any:
         """Test focal loss"""
         batch_size = 4
         num_classes = 3
@@ -420,7 +431,7 @@ class TestAdvancedLossFunctions:
         assert loss.item() > 0
         assert not torch.isnan(loss).any()
     
-    def test_label_smoothing_loss(self):
+    def test_label_smoothing_loss(self) -> Any:
         """Test label smoothing loss"""
         batch_size = 3
         num_classes = 5
@@ -433,7 +444,7 @@ class TestAdvancedLossFunctions:
         assert loss.item() > 0
         assert not torch.isnan(loss).any()
     
-    def test_contrastive_loss(self):
+    def test_contrastive_loss(self) -> Any:
         """Test contrastive loss"""
         batch_size = 4
         embedding_dim = 64
@@ -446,7 +457,7 @@ class TestAdvancedLossFunctions:
         assert loss.item() > 0
         assert not torch.isnan(loss).any()
     
-    def test_triplet_loss(self):
+    def test_triplet_loss(self) -> Any:
         """Test triplet loss"""
         batch_size = 3
         embedding_dim = 32
@@ -464,7 +475,7 @@ class TestAdvancedLossFunctions:
 class TestAdvancedOptimizers:
     """Test advanced optimizers"""
     
-    def test_create_optimizer(self):
+    def test_create_optimizer(self) -> Any:
         """Test optimizer creation"""
         config = ModelConfig()
         model = nn.Linear(64, 32)
@@ -474,7 +485,7 @@ class TestAdvancedOptimizers:
         assert isinstance(optimizer, optim.AdamW)
         assert len(optimizer.param_groups) == 2  # With and without weight decay
     
-    def test_create_scheduler(self):
+    def test_create_scheduler(self) -> Any:
         """Test scheduler creation"""
         config = ModelConfig()
         model = nn.Linear(32, 16)
@@ -488,7 +499,7 @@ class TestAdvancedOptimizers:
 class TestAdvancedTokenizer:
     """Test advanced tokenizer"""
     
-    def test_tokenizer_initialization(self):
+    def test_tokenizer_initialization(self) -> Any:
         """Test tokenizer initialization"""
         tokenizer = AdvancedTokenizer("gpt2", max_length=256)
         
@@ -497,7 +508,7 @@ class TestAdvancedTokenizer:
         assert tokenizer.truncation is True
         assert tokenizer.tokenizer.pad_token is not None
     
-    def test_tokenize_text_single(self):
+    def test_tokenize_text_single(self) -> Any:
         """Test tokenizing single text"""
         tokenizer = AdvancedTokenizer("gpt2", max_length=128)
         text = "Hello world, this is a test."
@@ -509,7 +520,7 @@ class TestAdvancedTokenizer:
         assert tokenized['input_ids'].shape[1] <= 128
         assert not torch.isnan(tokenized['input_ids']).any()
     
-    def test_tokenize_text_batch(self):
+    def test_tokenize_text_batch(self) -> Any:
         """Test tokenizing batch of texts"""
         tokenizer = AdvancedTokenizer("gpt2", max_length=64)
         texts = [
@@ -525,7 +536,7 @@ class TestAdvancedTokenizer:
         assert tokenized['input_ids'].shape[0] == 3
         assert tokenized['input_ids'].shape[1] <= 64
     
-    def test_create_attention_mask(self):
+    def test_create_attention_mask(self) -> Any:
         """Test attention mask creation"""
         tokenizer = AdvancedTokenizer("gpt2")
         input_ids = torch.randint(0, 1000, (2, 10))
@@ -536,7 +547,7 @@ class TestAdvancedTokenizer:
         assert attention_mask.dtype == torch.long
         assert not torch.isnan(attention_mask).any()
     
-    def test_decode_tokens(self):
+    def test_decode_tokens(self) -> Any:
         """Test token decoding"""
         tokenizer = AdvancedTokenizer("gpt2")
         token_ids = torch.randint(0, 1000, (2, 5))
@@ -551,7 +562,7 @@ class TestAdvancedTokenizer:
 class TestAdvancedTransformerModel:
     """Test advanced transformer model"""
     
-    def test_model_initialization(self):
+    def test_model_initialization(self) -> Any:
         """Test model initialization"""
         config = ModelConfig(
             vocab_size=1000,
@@ -570,7 +581,7 @@ class TestAdvancedTransformerModel:
         assert len(model.transformer_layers) == config.n_layers
         assert isinstance(model.output_layer, nn.Linear)
     
-    def test_model_forward_shape(self):
+    def test_model_forward_shape(self) -> Any:
         """Test model forward pass shape"""
         config = ModelConfig(
             vocab_size=500,
@@ -595,7 +606,7 @@ class TestAdvancedTransformerModel:
         assert outputs['hidden_states'].shape == (batch_size, seq_len, config.d_model)
         assert outputs['loss'] is None  # No labels provided
     
-    def test_model_forward_with_labels(self):
+    def test_model_forward_with_labels(self) -> Any:
         """Test model forward pass with labels"""
         config = ModelConfig(
             vocab_size=300,
@@ -618,7 +629,7 @@ class TestAdvancedTransformerModel:
         assert outputs['loss'].item() > 0
         assert not torch.isnan(outputs['loss']).any()
     
-    def test_model_gradients(self):
+    def test_model_gradients(self) -> Any:
         """Test model gradients"""
         config = ModelConfig(
             vocab_size=200,
@@ -646,7 +657,7 @@ class TestAdvancedTransformerModel:
                 assert param.grad is not None, f"No gradient for {name}"
                 assert not torch.isnan(param.grad).any(), f"NaN gradient for {name}"
     
-    def test_model_device(self):
+    def test_model_device(self) -> Any:
         """Test model device transfer"""
         if torch.cuda.is_available():
             device = torch.device('cuda')
@@ -672,7 +683,7 @@ class TestAdvancedTransformerModel:
 class TestAdvancedTrainingPipeline:
     """Test advanced training pipeline"""
     
-    def test_pipeline_initialization(self):
+    def test_pipeline_initialization(self) -> Any:
         """Test training pipeline initialization"""
         config = ModelConfig(
             vocab_size=100,
@@ -694,7 +705,7 @@ class TestAdvancedTrainingPipeline:
         assert isinstance(pipeline.optimizer, optim.AdamW)
         assert isinstance(pipeline.scheduler, optim.lr_scheduler._LRScheduler)
     
-    def test_train_step(self):
+    def test_train_step(self) -> Any:
         """Test training step"""
         config = ModelConfig(
             vocab_size=50,
@@ -724,7 +735,7 @@ class TestAdvancedTrainingPipeline:
         assert metrics['learning_rate'] > 0
         assert not np.isnan(metrics['loss'])
     
-    def test_evaluate_step(self):
+    def test_evaluate_step(self) -> Any:
         """Test evaluation step"""
         config = ModelConfig(
             vocab_size=30,
@@ -754,7 +765,7 @@ class TestAdvancedTrainingPipeline:
         assert not np.isnan(metrics['loss'])
         assert not np.isnan(metrics['perplexity'])
     
-    def test_generate_text(self):
+    def test_generate_text(self) -> Any:
         """Test text generation"""
         config = ModelConfig(
             vocab_size=100,
@@ -780,7 +791,7 @@ class TestAdvancedTrainingPipeline:
 class TestIntegration:
     """Integration tests"""
     
-    def test_end_to_end_training(self):
+    def test_end_to_end_training(self) -> Any:
         """Test end-to-end training pipeline"""
         config = ModelConfig(
             vocab_size=50,
@@ -816,7 +827,7 @@ class TestIntegration:
             assert not np.isnan(train_metrics['loss'])
             assert not np.isnan(eval_metrics['loss'])
     
-    def test_model_serialization(self):
+    def test_model_serialization(self) -> Any:
         """Test model saving and loading"""
         config = ModelConfig(
             vocab_size=100,
@@ -849,7 +860,7 @@ class TestIntegration:
         finally:
             os.unlink(temp_path)
     
-    def test_mixed_precision_training(self):
+    def test_mixed_precision_training(self) -> Any:
         """Test mixed precision training"""
         if not torch.cuda.is_available():
             pytest.skip("CUDA not available for mixed precision testing")

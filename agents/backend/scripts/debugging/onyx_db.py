@@ -1,31 +1,39 @@
-"""Onyx Database tool"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import os
-
-# hack to work around excessive use of globals in other functions
-os.environ["MULTI_TENANT"] = "True"
-
-if True:  # noqa: E402
     import csv
     import argparse
-
     from pydantic import BaseModel
     from sqlalchemy import func
-
     from onyx.db.engine import (
-        SYNC_DB_API,
-        USE_IAM_AUTH,
-        build_connection_string,
-        get_all_tenant_ids,
-    )
     from onyx.db.engine import get_session_with_tenant
     from onyx.db.engine import SqlEngine
     from onyx.db.models import Document
     from onyx.db.models import User
     from onyx.utils.logger import setup_logger
     from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
-
     import heapq
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""Onyx Database tool"""
+
+
+# hack to work around excessive use of globals in other functions
+os.environ["MULTI_TENANT"] = "True"
+
+if True:  # noqa: E402
+
+
+        SYNC_DB_API,
+        USE_IAM_AUTH,
+        build_connection_string,
+        get_all_tenant_ids,
+    )
+
 
     logger = setup_logger()
 
@@ -108,6 +116,10 @@ class SQLAlchemyDebugging:
         )
 
         with open(filename, "w") as csvfile:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             writer = csv.writer(csvfile)
             writer.writerow(
                 ["tenant_id", "first_user_email", "num_user", "num_docs", "num_chunks"]
@@ -178,5 +190,6 @@ def main() -> None:
         logger.info("No action.")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main()

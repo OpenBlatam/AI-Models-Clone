@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Optimized Main Entry Point for NotebookLM AI System
-Integrates all modules with lazy loading and performance optimization
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import logging
@@ -12,6 +14,21 @@ from typing import Dict, Any, Optional
 import time
 import psutil
 import gc
+                from performance_optimization_examples import PerformanceOptimizer
+                from security_guidelines_examples import SecurityManager
+                from high_throughput_scanning_examples import HighThroughputScanner
+                from batch_chunk_processing_examples import BatchProcessor
+                from lazy_loading_caching_examples import CacheManager
+                from middleware_decorators_examples import MiddlewareManager
+                from environment_variables_examples import ConfigManager
+                from production_api import ProductionAPI
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Optimized Main Entry Point for NotebookLM AI System
+Integrates all modules with lazy loading and performance optimization
+"""
+
 
 # Configure logging
 logging.basicConfig(
@@ -27,7 +44,7 @@ logger = logging.getLogger(__name__)
 class OptimizedNotebookLMAI:
     """Main optimized orchestrator for NotebookLM AI system"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.modules: Dict[str, Any] = {}
         self.cache: Dict[str, Any] = {}
         self.performance_metrics = {}
@@ -40,28 +57,20 @@ class OptimizedNotebookLMAI:
             
         try:
             if module_name == "performance":
-                from performance_optimization_examples import PerformanceOptimizer
                 self.modules[module_name] = PerformanceOptimizer()
             elif module_name == "security":
-                from security_guidelines_examples import SecurityManager
                 self.modules[module_name] = SecurityManager()
             elif module_name == "scanning":
-                from high_throughput_scanning_examples import HighThroughputScanner
                 self.modules[module_name] = HighThroughputScanner()
             elif module_name == "processing":
-                from batch_chunk_processing_examples import BatchProcessor
                 self.modules[module_name] = BatchProcessor()
             elif module_name == "caching":
-                from lazy_loading_caching_examples import CacheManager
                 self.modules[module_name] = CacheManager()
             elif module_name == "middleware":
-                from middleware_decorators_examples import MiddlewareManager
                 self.modules[module_name] = MiddlewareManager()
             elif module_name == "config":
-                from environment_variables_examples import ConfigManager
                 self.modules[module_name] = ConfigManager()
             elif module_name == "api":
-                from production_api import ProductionAPI
                 self.modules[module_name] = ProductionAPI()
             else:
                 raise ImportError(f"Unknown module: {module_name}")
@@ -143,7 +152,7 @@ class OptimizedNotebookLMAI:
         config = await config_manager.load_environment_config()
         return {"config_loaded": True, "config": config}
     
-    async def start_api_server(self) -> Dict[str, Any]:
+    async async def start_api_server(self) -> Dict[str, Any]:
         """Start the production API server"""
         logger.info("Starting API server")
         
@@ -168,7 +177,7 @@ class OptimizedNotebookLMAI:
             "cache_size": len(self.cache)
         }
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup resources"""
         logger.info("Cleaning up resources")
         
@@ -224,5 +233,6 @@ async def main():
     finally:
         await ai_system.cleanup()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Error Handling Middleware
-Product Descriptions Feature - Comprehensive Error Handling, Logging, and Monitoring
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -16,15 +21,22 @@ from collections import defaultdict, deque
 from contextvars import ContextVar
 from dataclasses import dataclass, asdict
 from enum import Enum
-
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 import uvicorn
+from http_exceptions import (
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Error Handling Middleware
+Product Descriptions Feature - Comprehensive Error Handling, Logging, and Monitoring
+"""
+
+
 
 # Import HTTP exceptions
-from http_exceptions import (
     ProductDescriptionsHTTPException,
     InternalServerHTTPException,
     create_error_response,
@@ -101,7 +113,9 @@ class ErrorMonitor:
     """Error monitoring and alerting system"""
     
     def __init__(self, max_errors: int = 1000, alert_threshold: int = 10):
-        self.max_errors = max_errors
+        
+    """__init__ function."""
+self.max_errors = max_errors
         self.alert_threshold = alert_threshold
         self.errors: deque = deque(maxlen=max_errors)
         self.error_counts: Dict[str, int] = defaultdict(int)
@@ -286,7 +300,9 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         include_traceback: bool = False,
         max_error_details_length: int = 1000
     ):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.monitor = monitor or ErrorMonitor()
         self.enable_logging = enable_logging
         self.enable_monitoring = enable_monitoring
@@ -584,7 +600,7 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         else:
             logger.info(f"LOW SEVERITY ERROR: {json.dumps(log_data, indent=2)}")
     
-    def _log_slow_request(self, request: Request, duration: float, status_code: int) -> None:
+    async def _log_slow_request(self, request: Request, duration: float, status_code: int) -> None:
         """Log slow requests"""
         log_data = {
             "duration_ms": duration,
@@ -613,11 +629,11 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
         return self.monitor.clear_old_errors(max_age_hours)
 
 # Utility functions
-def get_request_id() -> Optional[str]:
+async def get_request_id() -> Optional[str]:
     """Get current request ID from context"""
     return request_id_var.get()
 
-def get_request_duration() -> Optional[float]:
+async def get_request_duration() -> Optional[float]:
     """Get current request duration"""
     start_time = request_start_time_var.get()
     if start_time:

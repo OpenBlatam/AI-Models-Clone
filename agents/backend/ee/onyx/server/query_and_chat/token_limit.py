@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections import defaultdict
 from collections.abc import Sequence
 from datetime import datetime
@@ -28,6 +30,9 @@ from onyx.server.query_and_chat.token_limit import _user_is_rate_limited_by_glob
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _check_token_rate_limits(user: User | None) -> None:
     if user is None:
         # Unauthenticated users are only rate limited by global settings
@@ -69,7 +74,7 @@ def _user_is_rate_limited(user_id: UUID) -> None:
                 )
 
 
-def _fetch_user_usage(
+async def _fetch_user_usage(
     user_id: UUID, cutoff_time: datetime, db_session: Session
 ) -> Sequence[tuple[datetime, int]]:
     """
@@ -125,7 +130,7 @@ def _user_is_rate_limited_by_group(user_id: UUID) -> None:
                 )
 
 
-def _fetch_all_user_group_rate_limits(
+async def _fetch_all_user_group_rate_limits(
     user_id: UUID, db_session: Session
 ) -> Dict[int, List[TokenRateLimit]]:
     group_limits = (
@@ -157,7 +162,7 @@ def _fetch_all_user_group_rate_limits(
     return group_rate_limits
 
 
-def _fetch_user_group_usage(
+async def _fetch_user_group_usage(
     user_group_ids: list[int], cutoff_time: datetime, db_session: Session
 ) -> dict[int, list[Tuple[datetime, int]]]:
     """

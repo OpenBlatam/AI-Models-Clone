@@ -1,19 +1,36 @@
-"""
-Brand Kit Voice Component - Onyx Integration
-Component for managing brand voice.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, Literal
 from dataclasses import dataclass, field
 from datetime import datetime
 from ..base_types import (
+from ..model_field import ModelField, FieldConfig
+from ..base import ValidationMixin, CacheMixin, EventMixin, IndexMixin, PermissionMixin, StatusMixin
+        from prometheus_client import Counter
+        import structlog
+        from prometheus_client import Counter
+        import structlog
+        import numpy as np
+        import pandas as pd
+        from prometheus_client import Counter
+        import structlog
+        import orjson
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Brand Kit Voice Component - Onyx Integration
+Component for managing brand voice.
+"""
     CACHE_TTL, VALIDATION_TIMEOUT,
     ModelId, ModelKey, ModelValue,
     ValidationType, CacheType, EventType,
     StatusType, CategoryType, PermissionType
 )
-from ..model_field import ModelField, FieldConfig
-from ..base import ValidationMixin, CacheMixin, EventMixin, IndexMixin, PermissionMixin, StatusMixin
 
 T = TypeVar('T')
 
@@ -38,7 +55,7 @@ class BrandKitVoice:
     version: str = '1.0.0'
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize voice field with validation and caching"""
         self.voice_field = ModelField(
             name=self.name,
@@ -188,8 +205,6 @@ class BrandKitVoice:
     @classmethod
     def batch_to_dicts(cls, objs: List["BrandKitVoice"]) -> List[dict]:
         """Convierte una lista de BrandKitVoice a lista de dicts, con métricas y logging."""
-        from prometheus_client import Counter
-        import structlog
         logger = structlog.get_logger()
         metric = Counter('brandkitvoice_batch_to_dicts_total', 'Total batch_to_dicts calls')
         metric.inc()
@@ -203,8 +218,6 @@ class BrandKitVoice:
     @classmethod
     def batch_from_dicts(cls, dicts: List[dict]) -> List["BrandKitVoice"]:
         """Convierte una lista de dicts a BrandKitVoice, con métricas y logging."""
-        from prometheus_client import Counter
-        import structlog
         logger = structlog.get_logger()
         metric = Counter('brandkitvoice_batch_from_dicts_total', 'Total batch_from_dicts calls')
         metric.inc()
@@ -217,22 +230,18 @@ class BrandKitVoice:
     @classmethod
     def batch_to_numpy(cls, objs: List["BrandKitVoice"]):
         """Convierte una lista de BrandKitVoice a un array numpy."""
-        import numpy as np
         dicts = cls.batch_to_dicts(objs)
         return np.array(dicts)
 
     @classmethod
     def batch_to_pandas(cls, objs: List["BrandKitVoice"]):
         """Convierte una lista de BrandKitVoice a un DataFrame pandas."""
-        import pandas as pd
         dicts = cls.batch_to_dicts(objs)
         return pd.DataFrame(dicts)
 
     @classmethod
     def batch_deduplicate(cls, objs: List["BrandKitVoice"], key="name") -> List["BrandKitVoice"]:
         """Elimina duplicados por key, validando unicidad y tipos."""
-        from prometheus_client import Counter
-        import structlog
         logger = structlog.get_logger()
         metric = Counter('brandkitvoice_batch_deduplicate_total', 'Total batch_deduplicate calls')
         metric.inc()
@@ -251,7 +260,6 @@ class BrandKitVoice:
     @classmethod
     def to_training_example(cls, obj: "BrandKitVoice") -> dict:
         """Convierte un BrandKitVoice a ejemplo de entrenamiento ML/LLM."""
-        import orjson
         return orjson.loads(orjson.dumps(obj.get_data()))
 
     @classmethod

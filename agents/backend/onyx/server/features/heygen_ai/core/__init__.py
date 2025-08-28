@@ -1,30 +1,56 @@
-from typing_extensions import Literal, TypedDict
-from typing import Any, List, Dict, Optional, Union, Tuple
-from .heygen_ai import HeyGenAI
-from .avatar_manager import AvatarManager
-from .voice_engine import VoiceEngine
-from .video_renderer import VideoRenderer
-from .script_generator import ScriptGenerator
-from .langchain_manager import LangChainManager
-from .advanced_ai_workflows import AdvancedAIWorkflows
-from typing import Any, List, Dict, Optional
-import logging
-import asyncio
 """
 HeyGen AI Core Module
 Main entry point for the HeyGen AI equivalent system.
 """
 
+import logging
+import asyncio
 
 __version__ = "1.0.0"
 __author__ = "Blatam Academy"
 
+# Only import modules that don't have relative import issues
+try:
+    from .external_api_integration import (
+        ExternalAPIManager, ServiceConfig, ServiceType, 
+        ElevenLabsService, SocialMediaService, CloudStorageService, AnalyticsService
+    )
+    EXTERNAL_API_AVAILABLE = True
+except ImportError:
+    EXTERNAL_API_AVAILABLE = False
+    logging.warning("External API integration not available")
+
+try:
+    from .performance_optimizer import (
+        PerformanceOptimizer, MultiLevelCache, MemoryCache, RedisCache,
+        LoadBalancer, PerformanceMonitor, BackgroundTaskProcessor
+    )
+    PERFORMANCE_OPTIMIZER_AVAILABLE = True
+except ImportError:
+    PERFORMANCE_OPTIMIZER_AVAILABLE = False
+    logging.warning("Performance optimizer not available")
+
+try:
+    from .langchain_manager import LangChainManager
+    LANGCHAIN_AVAILABLE = True
+except ImportError:
+    LANGCHAIN_AVAILABLE = False
+    logging.warning("LangChain manager not available")
+
 __all__ = [
-    "HeyGenAI",
-    "AvatarManager", 
-    "VoiceEngine",
-    "VideoRenderer",
-    "ScriptGenerator",
-    "LangChainManager",
-    "AdvancedAIWorkflows"
+    "ExternalAPIManager",
+    "ServiceConfig", 
+    "ServiceType",
+    "ElevenLabsService",
+    "SocialMediaService",
+    "CloudStorageService",
+    "AnalyticsService",
+    "PerformanceOptimizer",
+    "MultiLevelCache",
+    "MemoryCache",
+    "RedisCache",
+    "LoadBalancer",
+    "PerformanceMonitor",
+    "BackgroundTaskProcessor",
+    "LangChainManager"
 ] 

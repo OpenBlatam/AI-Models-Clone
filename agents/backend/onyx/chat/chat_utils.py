@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 from typing import cast
 from uuid import UUID
@@ -30,14 +32,17 @@ from onyx.llm.models import PreviousMessage
 from onyx.natural_language_processing.utils import BaseTokenizer
 from onyx.server.query_and_chat.models import CreateChatMessageRequest
 from onyx.tools.tool_implementations.custom.custom_tool import (
+from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     build_custom_tools_from_openapi_schema_and_headers,
 )
-from onyx.utils.logger import setup_logger
 
 logger = setup_logger()
 
 
-def prepare_chat_message_request(
+async def prepare_chat_message_request(
     message_text: str,
     user: User | None,
     persona_id: int | None,
@@ -101,6 +106,10 @@ def llm_doc_from_inference_section(inference_section: InferenceSection) -> LlmDo
 
 
 def combine_message_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     messages: list[ThreadMessage],
     max_tokens: int | None,
     llm_tokenizer: BaseTokenizer,

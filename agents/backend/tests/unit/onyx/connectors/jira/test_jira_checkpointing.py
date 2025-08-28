@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import time
 from collections.abc import Callable
 from collections.abc import Generator
@@ -24,6 +29,9 @@ from onyx.connectors.onyx_jira.connector import JiraConnector
 from onyx.connectors.onyx_jira.connector import JiraConnectorCheckpoint
 from tests.unit.onyx.connectors.utils import load_everything_from_checkpoint_connector
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 PAGE_SIZE = 2
 
 

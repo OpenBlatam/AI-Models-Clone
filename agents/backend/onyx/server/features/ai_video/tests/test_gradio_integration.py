@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import pytest
+import asyncio
+import logging
+from unittest.mock import Mock, patch, AsyncMock
+from pathlib import Path
+from typing import Dict, Any, List
+import sys
+from gradio_interface import GradioAIVideoApp
+from models.video import VideoRequest
+from models.style import StylePreset, StyleParameters
+from core.error_handler import ValidationError
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Tests for Gradio Integration
@@ -6,21 +29,10 @@ Comprehensive test suite for the Gradio AI Video interface
 including unit tests, integration tests, and performance tests.
 """
 
-import pytest
-import asyncio
-import logging
-from unittest.mock import Mock, patch, AsyncMock
-from pathlib import Path
-from typing import Dict, Any, List
 
 # Add the parent directory to the path
-import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
-from gradio_interface import GradioAIVideoApp
-from models.video import VideoRequest
-from models.style import StylePreset, StyleParameters
-from core.error_handler import ValidationError
 
 # Configure logging for tests
 logging.basicConfig(level=logging.WARNING)
@@ -31,12 +43,12 @@ class TestGradioAIVideoApp:
     """Test suite for GradioAIVideoApp"""
     
     @pytest.fixture
-    def app(self):
+    def app(self) -> Any:
         """Create a test app instance"""
         return GradioAIVideoApp()
     
     @pytest.fixture
-    def sample_video_request(self):
+    async def sample_video_request(self) -> Any:
         """Create a sample video request"""
         return {
             "model_type": "Stable Diffusion",
@@ -49,7 +61,7 @@ class TestGradioAIVideoApp:
         }
     
     @pytest.fixture
-    def sample_style_request(self):
+    async def sample_style_request(self) -> Any:
         """Create a sample style transfer request"""
         return {
             "input_video": "test_input.mp4",
@@ -61,7 +73,7 @@ class TestGradioAIVideoApp:
             "film_grain": 0.1
         }
     
-    def test_app_initialization(self, app):
+    def test_app_initialization(self, app) -> Any:
         """Test app initialization"""
         assert app is not None
         assert app.video_generator is None
@@ -71,7 +83,7 @@ class TestGradioAIVideoApp:
         assert len(app.sample_styles) > 0
         assert len(app.sample_prompts) > 0
     
-    def test_sample_styles_creation(self, app):
+    def test_sample_styles_creation(self, app) -> Any:
         """Test sample styles creation"""
         styles = app.sample_styles
         
@@ -107,7 +119,7 @@ class TestGradioAIVideoApp:
         assert modern.parameters.color_temperature == 5500
         assert modern.parameters.film_grain == 0.0
     
-    def test_sample_prompts_creation(self, app):
+    def test_sample_prompts_creation(self, app) -> Any:
         """Test sample prompts creation"""
         prompts = app.sample_prompts
         
@@ -129,11 +141,11 @@ class TestVideoGeneration:
     """Test video generation functionality"""
     
     @pytest.fixture
-    def app(self):
+    def app(self) -> Any:
         return GradioAIVideoApp()
     
     @pytest.mark.asyncio
-    async def test_generate_video_success(self, app, sample_video_request):
+    async def test_generate_video_success(self, app, sample_video_request) -> Any:
         """Test successful video generation"""
         
         result = await app.generate_video(
@@ -161,7 +173,7 @@ class TestVideoGeneration:
         assert "Video generation completed successfully" in logs
     
     @pytest.mark.asyncio
-    async def test_generate_video_empty_prompt(self, app):
+    async def test_generate_video_empty_prompt(self, app) -> Any:
         """Test video generation with empty prompt"""
         
         result = await app.generate_video(
@@ -181,7 +193,7 @@ class TestVideoGeneration:
         assert "Prompt cannot be empty" in generation_info["message"]
     
     @pytest.mark.asyncio
-    async def test_generate_video_invalid_duration(self, app):
+    async def test_generate_video_invalid_duration(self, app) -> Any:
         """Test video generation with invalid duration"""
         
         result = await app.generate_video(
@@ -201,7 +213,7 @@ class TestVideoGeneration:
         assert "Duration must be positive" in generation_info["message"]
     
     @pytest.mark.asyncio
-    async def test_generate_video_different_models(self, app):
+    async def test_generate_video_different_models(self, app) -> Any:
         """Test video generation with different models"""
         
         models = ["Stable Diffusion", "Midjourney", "DALL-E", "Custom"]
@@ -223,7 +235,7 @@ class TestVideoGeneration:
             assert generation_info["status"] == "completed"
     
     @pytest.mark.asyncio
-    async def test_generate_video_different_resolutions(self, app):
+    async def test_generate_video_different_resolutions(self, app) -> Any:
         """Test video generation with different resolutions"""
         
         resolutions = ["512x512", "768x768", "1024x1024", "1920x1080"]
@@ -249,11 +261,11 @@ class TestStyleTransfer:
     """Test style transfer functionality"""
     
     @pytest.fixture
-    def app(self):
+    def app(self) -> Any:
         return GradioAIVideoApp()
     
     @pytest.mark.asyncio
-    async def test_apply_style_transfer_success(self, app, sample_style_request):
+    async def test_apply_style_transfer_success(self, app, sample_style_request) -> Any:
         """Test successful style transfer"""
         
         result = await app.apply_style_transfer(
@@ -285,7 +297,7 @@ class TestStyleTransfer:
         assert params["film_grain"] == 0.1
     
     @pytest.mark.asyncio
-    async def test_apply_style_transfer_no_input(self, app):
+    async def test_apply_style_transfer_no_input(self, app) -> Any:
         """Test style transfer with no input video"""
         
         result = await app.apply_style_transfer(
@@ -305,7 +317,7 @@ class TestStyleTransfer:
         assert "Input video is required" in style_info["message"]
     
     @pytest.mark.asyncio
-    async def test_apply_style_transfer_different_styles(self, app):
+    async def test_apply_style_transfer_different_styles(self, app) -> Any:
         """Test style transfer with different styles"""
         
         styles = ["Cinematic", "Vintage", "Modern"]
@@ -327,7 +339,7 @@ class TestStyleTransfer:
             assert style_info["status"] == "completed"
     
     @pytest.mark.asyncio
-    async def test_apply_style_transfer_parameter_ranges(self, app):
+    async def test_apply_style_transfer_parameter_ranges(self, app) -> Any:
         """Test style transfer with different parameter ranges"""
         
         # Test extreme values
@@ -363,11 +375,11 @@ class TestPerformanceOptimization:
     """Test performance optimization functionality"""
     
     @pytest.fixture
-    def app(self):
+    def app(self) -> Any:
         return GradioAIVideoApp()
     
     @pytest.mark.asyncio
-    async def test_apply_optimization_success(self, app):
+    async def test_apply_optimization_success(self, app) -> Any:
         """Test successful performance optimization"""
         
         result = await app.apply_optimization(
@@ -415,7 +427,7 @@ class TestPerformanceOptimization:
         assert "Optimization applied successfully" in logs
     
     @pytest.mark.asyncio
-    async def test_apply_optimization_different_configs(self, app):
+    async def test_apply_optimization_different_configs(self, app) -> Any:
         """Test optimization with different configurations"""
         
         configs = [
@@ -467,11 +479,11 @@ class TestSystemMonitoring:
     """Test system monitoring functionality"""
     
     @pytest.fixture
-    def app(self):
+    def app(self) -> Any:
         return GradioAIVideoApp()
     
     @pytest.mark.asyncio
-    async def test_refresh_metrics_success(self, app):
+    async def test_refresh_metrics_success(self, app) -> Any:
         """Test successful metrics refresh"""
         
         result = await app.refresh_metrics(
@@ -511,7 +523,7 @@ class TestSystemMonitoring:
         assert alert_log is not None
     
     @pytest.mark.asyncio
-    async def test_refresh_metrics_different_configs(self, app):
+    async def test_refresh_metrics_different_configs(self, app) -> Any:
         """Test metrics refresh with different configurations"""
         
         configs = [
@@ -553,11 +565,11 @@ class TestErrorHandling:
     """Test error handling functionality"""
     
     @pytest.fixture
-    def app(self):
+    def app(self) -> Any:
         return GradioAIVideoApp()
     
     @pytest.mark.asyncio
-    async def test_validation_error_handling(self, app):
+    async def test_validation_error_handling(self, app) -> Any:
         """Test validation error handling"""
         
         # Test empty prompt
@@ -606,7 +618,7 @@ class TestErrorHandling:
         assert "Input video is required" in style_info["message"]
     
     @pytest.mark.asyncio
-    async def test_exception_handling(self, app):
+    async def test_exception_handling(self, app) -> Any:
         """Test general exception handling"""
         
         # Mock a function to raise an exception
@@ -630,11 +642,11 @@ class TestIntegration:
     """Integration tests"""
     
     @pytest.fixture
-    def app(self):
+    def app(self) -> Any:
         return GradioAIVideoApp()
     
     @pytest.mark.asyncio
-    async def test_full_workflow(self, app):
+    async def test_full_workflow(self, app) -> Any:
         """Test complete workflow from generation to optimization"""
         
         # 1. Generate video
@@ -693,7 +705,7 @@ class TestIntegration:
         assert "gpu_usage" in metrics
     
     @pytest.mark.asyncio
-    async def test_batch_processing(self, app):
+    async def test_batch_processing(self, app) -> Any:
         """Test batch processing of multiple videos"""
         
         batch_requests = [
@@ -738,5 +750,6 @@ class TestIntegration:
             assert generation_info["status"] == "completed"
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

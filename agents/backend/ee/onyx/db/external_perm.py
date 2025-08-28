@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 from uuid import UUID
 
@@ -15,6 +17,9 @@ from onyx.db.users import batch_add_ext_perm_user_if_not_exists
 from onyx.db.users import get_user_by_email
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -29,7 +34,7 @@ class ExternalUserGroup(BaseModel):
     gives_anyone_access: bool = False
 
 
-def delete_user__ext_group_for_user__no_commit(
+async def delete_user__ext_group_for_user__no_commit(
     db_session: Session,
     user_id: UUID,
 ) -> None:
@@ -40,7 +45,7 @@ def delete_user__ext_group_for_user__no_commit(
     )
 
 
-def delete_user__ext_group_for_cc_pair__no_commit(
+async def delete_user__ext_group_for_cc_pair__no_commit(
     db_session: Session,
     cc_pair_id: int,
 ) -> None:
@@ -51,7 +56,7 @@ def delete_user__ext_group_for_cc_pair__no_commit(
     )
 
 
-def delete_public_external_group_for_cc_pair__no_commit(
+async def delete_public_external_group_for_cc_pair__no_commit(
     db_session: Session,
     cc_pair_id: int,
 ) -> None:
@@ -135,7 +140,12 @@ def replace_user__ext_group_for_cc_pair(
     db_session.commit()
 
 
-def fetch_external_groups_for_user(
+async async def fetch_external_groups_for_user(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
     user_id: UUID,
 ) -> Sequence[User__ExternalUserGroupId]:
@@ -146,7 +156,12 @@ def fetch_external_groups_for_user(
     ).all()
 
 
-def fetch_external_groups_for_user_email_and_group_ids(
+async async def fetch_external_groups_for_user_email_and_group_ids(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
     user_email: str,
     group_ids: list[str],
@@ -164,7 +179,12 @@ def fetch_external_groups_for_user_email_and_group_ids(
     return list(user_ext_groups)
 
 
-def fetch_public_external_group_ids(
+async async def fetch_public_external_group_ids(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     db_session: Session,
 ) -> list[str]:
     return list(

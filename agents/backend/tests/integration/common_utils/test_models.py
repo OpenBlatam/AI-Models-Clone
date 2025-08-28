@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
@@ -17,6 +19,9 @@ from onyx.server.documents.models import IndexAttemptSnapshot
 from onyx.server.documents.models import IndexingStatus
 from onyx.server.documents.models import InputType
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 These data models are used to represent the data on the testing side of things.
 This means the flow is:

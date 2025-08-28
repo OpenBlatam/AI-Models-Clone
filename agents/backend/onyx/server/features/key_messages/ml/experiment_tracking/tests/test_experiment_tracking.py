@@ -1,6 +1,10 @@
-"""
-Tests for Experiment Tracking System
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import pytest
 import tempfile
@@ -9,8 +13,21 @@ import json
 import time
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
-
 from ..tracker import (
+from ..checkpointing import (
+from ..metrics import (
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Tests for Experiment Tracking System
+"""
+
+
     ExperimentTracker,
     NoOpTracker,
     TensorBoardTracker,
@@ -18,13 +35,11 @@ from ..tracker import (
     MLflowTracker,
     CompositeTracker
 )
-from ..checkpointing import (
     CheckpointManager,
     ModelCheckpoint,
     TrainingCheckpoint,
     CheckpointStrategy
 )
-from ..metrics import (
     MetricsTracker,
     MetricLogger,
     MetricAggregator,
@@ -34,7 +49,7 @@ from ..metrics import (
 class TestExperimentTracker:
     """Test base experiment tracker."""
     
-    def test_experiment_tracker_initialization(self):
+    def test_experiment_tracker_initialization(self) -> Any:
         """Test experiment tracker initialization."""
         tracker = NoOpTracker()
         
@@ -43,7 +58,7 @@ class TestExperimentTracker:
         assert tracker.config is None
         assert tracker.is_initialized is False
     
-    def test_noop_tracker_initialization(self):
+    def test_noop_tracker_initialization(self) -> Any:
         """Test NoOpTracker initialization."""
         tracker = NoOpTracker()
         
@@ -54,7 +69,7 @@ class TestExperimentTracker:
         assert tracker.is_initialized is True
         assert run_id.startswith("noop_")
     
-    def test_noop_tracker_logging(self):
+    def test_noop_tracker_logging(self) -> Any:
         """Test NoOpTracker logging methods."""
         tracker = NoOpTracker()
         tracker.init_experiment("test_experiment")
@@ -70,17 +85,16 @@ class TestExperimentTracker:
 class TestTensorBoardTracker:
     """Test TensorBoard tracker."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         self.temp_dir = tempfile.mkdtemp()
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Clean up test fixtures."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
     @patch('torch.utils.tensorboard.SummaryWriter')
-    def test_tensorboard_tracker_initialization(self, mock_writer_class):
+    def test_tensorboard_tracker_initialization(self, mock_writer_class) -> Any:
         """Test TensorBoard tracker initialization."""
         mock_writer = Mock()
         mock_writer_class.return_value = mock_writer
@@ -95,7 +109,7 @@ class TestTensorBoardTracker:
         assert mock_writer_class.called
     
     @patch('torch.utils.tensorboard.SummaryWriter')
-    def test_tensorboard_tracker_logging(self, mock_writer_class):
+    def test_tensorboard_tracker_logging(self, mock_writer_class) -> Any:
         """Test TensorBoard tracker logging."""
         mock_writer = Mock()
         mock_writer_class.return_value = mock_writer
@@ -115,7 +129,7 @@ class TestTensorBoardTracker:
         assert mock_writer.flush.called
         assert mock_writer.close.called
     
-    def test_tensorboard_tracker_fallback(self):
+    def test_tensorboard_tracker_fallback(self) -> Any:
         """Test TensorBoard tracker fallback when not available."""
         with patch('torch.utils.tensorboard.SummaryWriter', side_effect=ImportError):
             tracker = TensorBoardTracker(log_dir=self.temp_dir)
@@ -128,7 +142,7 @@ class TestWandbTracker:
     """Test Weights & Biases tracker."""
     
     @patch('wandb.init')
-    def test_wandb_tracker_initialization(self, mock_wandb_init):
+    def test_wandb_tracker_initialization(self, mock_wandb_init) -> Any:
         """Test W&B tracker initialization."""
         mock_run = Mock()
         mock_run.id = "test_run_id"
@@ -144,7 +158,7 @@ class TestWandbTracker:
         assert mock_wandb_init.called
     
     @patch('wandb.init')
-    def test_wandb_tracker_logging(self, mock_wandb_init):
+    def test_wandb_tracker_logging(self, mock_wandb_init) -> Any:
         """Test W&B tracker logging."""
         mock_run = Mock()
         mock_run.id = "test_run_id"
@@ -164,7 +178,7 @@ class TestWandbTracker:
         assert mock_run.config.update.called
         assert mock_run.finish.called
     
-    def test_wandb_tracker_fallback(self):
+    def test_wandb_tracker_fallback(self) -> Any:
         """Test W&B tracker fallback when not available."""
         with patch('wandb.init', side_effect=ImportError):
             tracker = WandbTracker(project="test_project")
@@ -179,7 +193,7 @@ class TestMLflowTracker:
     @patch('mlflow.start_run')
     @patch('mlflow.set_experiment')
     @patch('mlflow.set_tracking_uri')
-    def test_mlflow_tracker_initialization(self, mock_set_uri, mock_set_exp, mock_start_run):
+    def test_mlflow_tracker_initialization(self, mock_set_uri, mock_set_exp, mock_start_run) -> Any:
         """Test MLflow tracker initialization."""
         mock_run = Mock()
         mock_run.info.run_id = "test_run_id"
@@ -203,7 +217,7 @@ class TestMLflowTracker:
     @patch('mlflow.log_param')
     @patch('mlflow.end_run')
     def test_mlflow_tracker_logging(self, mock_end_run, mock_log_param, mock_log_metric, 
-                                   mock_set_uri, mock_set_exp, mock_start_run):
+                                   mock_set_uri, mock_set_exp, mock_start_run) -> Any:
         """Test MLflow tracker logging."""
         mock_run = Mock()
         mock_run.info.run_id = "test_run_id"
@@ -223,7 +237,7 @@ class TestMLflowTracker:
         assert mock_log_param.called
         assert mock_end_run.called
     
-    def test_mlflow_tracker_fallback(self):
+    def test_mlflow_tracker_fallback(self) -> Any:
         """Test MLflow tracker fallback when not available."""
         with patch('mlflow.start_run', side_effect=ImportError):
             tracker = MLflowTracker()
@@ -235,7 +249,7 @@ class TestMLflowTracker:
 class TestCompositeTracker:
     """Test composite tracker."""
     
-    def test_composite_tracker_initialization(self):
+    def test_composite_tracker_initialization(self) -> Any:
         """Test composite tracker initialization."""
         trackers = [NoOpTracker(), NoOpTracker()]
         composite = CompositeTracker(trackers)
@@ -247,7 +261,7 @@ class TestCompositeTracker:
         assert composite.is_initialized is True
         assert run_id.startswith("noop_")
     
-    def test_composite_tracker_logging(self):
+    def test_composite_tracker_logging(self) -> Any:
         """Test composite tracker logging."""
         trackers = [NoOpTracker(), NoOpTracker()]
         composite = CompositeTracker(trackers)
@@ -266,7 +280,7 @@ class TestCompositeTracker:
 class TestCheckpointStrategy:
     """Test checkpoint strategy."""
     
-    def test_checkpoint_strategy_initialization(self):
+    def test_checkpoint_strategy_initialization(self) -> Any:
         """Test checkpoint strategy initialization."""
         strategy = CheckpointStrategy(
             save_steps=1000,
@@ -282,7 +296,7 @@ class TestCheckpointStrategy:
         assert strategy.monitor == "val_loss"
         assert strategy.mode == "min"
     
-    def test_checkpoint_strategy_validation(self):
+    def test_checkpoint_strategy_validation(self) -> Any:
         """Test checkpoint strategy validation."""
         # Test invalid mode
         with pytest.raises(ValueError, match="mode must be 'min' or 'max'"):
@@ -299,16 +313,15 @@ class TestCheckpointStrategy:
 class TestModelCheckpoint:
     """Test model checkpoint."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         self.temp_dir = tempfile.mkdtemp()
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Clean up test fixtures."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_model_checkpoint_creation(self):
+    def test_model_checkpoint_creation(self) -> Any:
         """Test model checkpoint creation."""
         model_state = {"layer1.weight": torch.randn(10, 10)}
         model_config = {"model_name": "test_model"}
@@ -330,7 +343,7 @@ class TestModelCheckpoint:
         assert checkpoint.epoch == 5
         assert checkpoint.metrics == metrics
     
-    def test_model_checkpoint_save_load(self):
+    def test_model_checkpoint_save_load(self) -> Any:
         """Test model checkpoint save and load."""
         model_state = {"layer1.weight": torch.randn(10, 10)}
         model_config = {"model_name": "test_model"}
@@ -366,16 +379,15 @@ class TestModelCheckpoint:
 class TestTrainingCheckpoint:
     """Test training checkpoint."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         self.temp_dir = tempfile.mkdtemp()
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Clean up test fixtures."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_training_checkpoint_creation(self):
+    def test_training_checkpoint_creation(self) -> Any:
         """Test training checkpoint creation."""
         model_state = {"layer1.weight": torch.randn(10, 10)}
         optimizer_state = {"param_groups": [{"lr": 0.001}]}
@@ -410,7 +422,7 @@ class TestTrainingCheckpoint:
         assert checkpoint.best_metric == 0.5
         assert checkpoint.best_metric_name == "loss"
     
-    def test_training_checkpoint_save_load(self):
+    def test_training_checkpoint_save_load(self) -> Any:
         """Test training checkpoint save and load."""
         model_state = {"layer1.weight": torch.randn(10, 10)}
         optimizer_state = {"param_groups": [{"lr": 0.001}]}
@@ -455,16 +467,15 @@ class TestTrainingCheckpoint:
 class TestCheckpointManager:
     """Test checkpoint manager."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Set up test fixtures."""
         self.temp_dir = tempfile.mkdtemp()
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Clean up test fixtures."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_checkpoint_manager_initialization(self):
+    def test_checkpoint_manager_initialization(self) -> Any:
         """Test checkpoint manager initialization."""
         strategy = CheckpointStrategy(save_steps=1000, save_total_limit=3)
         manager = CheckpointManager(checkpoint_dir=self.temp_dir, strategy=strategy)
@@ -475,7 +486,7 @@ class TestCheckpointManager:
         assert manager.best_metric is None
         assert manager.best_checkpoint_path is None
     
-    def test_should_save_checkpoint(self):
+    def test_should_save_checkpoint(self) -> Any:
         """Test checkpoint saving decision logic."""
         strategy = CheckpointStrategy(save_steps=1000, save_best_only=False)
         manager = CheckpointManager(checkpoint_dir=self.temp_dir, strategy=strategy)
@@ -485,7 +496,7 @@ class TestCheckpointManager:
         assert manager.should_save_checkpoint(2000) is True
         assert manager.should_save_checkpoint(500) is False
     
-    def test_should_save_checkpoint_best_only(self):
+    def test_should_save_checkpoint_best_only(self) -> Any:
         """Test checkpoint saving with best_only strategy."""
         strategy = CheckpointStrategy(save_steps=1000, save_best_only=True, monitor="loss", mode="min")
         manager = CheckpointManager(checkpoint_dir=self.temp_dir, strategy=strategy)
@@ -499,7 +510,7 @@ class TestCheckpointManager:
         # Worse metric should not save
         assert manager.should_save_checkpoint(3000, 0.7) is False
     
-    def test_save_and_load_checkpoint(self):
+    def test_save_and_load_checkpoint(self) -> Any:
         """Test saving and loading checkpoints."""
         strategy = CheckpointStrategy(save_steps=1000, save_total_limit=3)
         manager = CheckpointManager(checkpoint_dir=self.temp_dir, strategy=strategy)
@@ -530,7 +541,7 @@ class TestCheckpointManager:
         assert loaded_checkpoint.epoch == 1
         assert loaded_checkpoint.metrics["loss"] == 0.5
     
-    def test_cleanup_old_checkpoints(self):
+    def test_cleanup_old_checkpoints(self) -> Any:
         """Test cleanup of old checkpoints."""
         strategy = CheckpointStrategy(save_steps=1000, save_total_limit=2)
         manager = CheckpointManager(checkpoint_dir=self.temp_dir, strategy=strategy)
@@ -559,14 +570,14 @@ class TestCheckpointManager:
 class TestMetricAggregator:
     """Test metric aggregator."""
     
-    def test_metric_aggregator_initialization(self):
+    def test_metric_aggregator_initialization(self) -> Any:
         """Test metric aggregator initialization."""
         aggregator = MetricAggregator(window_size=100)
         
         assert aggregator.window_size == 100
         assert len(aggregator.values) == 0
     
-    def test_metric_aggregator_add_value(self):
+    def test_metric_aggregator_add_value(self) -> Any:
         """Test adding values to aggregator."""
         aggregator = MetricAggregator(window_size=3)
         
@@ -579,7 +590,7 @@ class TestMetricAggregator:
         assert aggregator.values[1].value == 2.0
         assert aggregator.values[2].value == 3.0
     
-    def test_metric_aggregator_window_limit(self):
+    def test_metric_aggregator_window_limit(self) -> Any:
         """Test window size limit."""
         aggregator = MetricAggregator(window_size=2)
         
@@ -592,7 +603,7 @@ class TestMetricAggregator:
         assert aggregator.values[0].value == 2.0
         assert aggregator.values[1].value == 3.0
     
-    def test_metric_aggregator_statistics(self):
+    def test_metric_aggregator_statistics(self) -> Any:
         """Test metric aggregator statistics."""
         aggregator = MetricAggregator(window_size=5)
         
@@ -607,7 +618,7 @@ class TestMetricAggregator:
         assert aggregator.get_max() == 5.0
         assert aggregator.get_latest() == 5.0
     
-    def test_metric_aggregator_summary(self):
+    def test_metric_aggregator_summary(self) -> Any:
         """Test metric aggregator summary."""
         aggregator = MetricAggregator(window_size=3)
         
@@ -627,7 +638,7 @@ class TestMetricAggregator:
 class TestMetricsTracker:
     """Test metrics tracker."""
     
-    def test_metrics_tracker_initialization(self):
+    def test_metrics_tracker_initialization(self) -> Any:
         """Test metrics tracker initialization."""
         tracker = MetricsTracker(log_frequency=10, window_size=100)
         
@@ -635,7 +646,7 @@ class TestMetricsTracker:
         assert tracker.window_size == 100
         assert tracker.step == 0
     
-    def test_metrics_tracker_log_scalar(self):
+    def test_metrics_tracker_log_scalar(self) -> Any:
         """Test logging scalar metrics."""
         tracker = MetricsTracker(log_frequency=1)
         
@@ -647,7 +658,7 @@ class TestMetricsTracker:
         assert tracker.get_average("loss") == 0.5
         assert tracker.get_average("accuracy") == 0.9
     
-    def test_metrics_tracker_log_scalars(self):
+    def test_metrics_tracker_log_scalars(self) -> Any:
         """Test logging multiple scalar metrics."""
         tracker = MetricsTracker(log_frequency=1)
         
@@ -656,7 +667,7 @@ class TestMetricsTracker:
         assert tracker.get_latest("loss") == 0.5
         assert tracker.get_latest("accuracy") == 0.9
     
-    def test_metrics_tracker_log_histogram(self):
+    def test_metrics_tracker_log_histogram(self) -> Any:
         """Test logging histogram data."""
         tracker = MetricsTracker(log_frequency=1)
         
@@ -667,7 +678,7 @@ class TestMetricsTracker:
         assert len(histogram_data) == 5
         assert histogram_data == values
     
-    def test_metrics_tracker_log_text(self):
+    def test_metrics_tracker_log_text(self) -> Any:
         """Test logging text data."""
         tracker = MetricsTracker(log_frequency=1)
         
@@ -677,7 +688,7 @@ class TestMetricsTracker:
         assert len(text_logs) == 1
         assert "Sample text" in text_logs[0]
     
-    def test_metrics_tracker_get_summary(self):
+    def test_metrics_tracker_get_summary(self) -> Optional[Dict[str, Any]]:
         """Test getting metric summaries."""
         tracker = MetricsTracker(log_frequency=1)
         
@@ -690,7 +701,7 @@ class TestMetricsTracker:
         assert summary['max'] == 0.5
         assert summary['count'] == 2
     
-    def test_metrics_tracker_export_import(self):
+    def test_metrics_tracker_export_import(self) -> Any:
         """Test exporting and importing metrics."""
         tracker = MetricsTracker(log_frequency=1)
         
@@ -715,14 +726,14 @@ class TestMetricsTracker:
 class TestTrainingMetricsTracker:
     """Test training metrics tracker."""
     
-    def test_training_metrics_tracker_initialization(self):
+    def test_training_metrics_tracker_initialization(self) -> Any:
         """Test training metrics tracker initialization."""
         tracker = TrainingMetricsTracker(log_frequency=1, window_size=100)
         
         assert tracker.epoch == 0
         assert tracker.best_metrics == {}
     
-    def test_training_metrics_tracker_log_training_step(self):
+    def test_training_metrics_tracker_log_training_step(self) -> Any:
         """Test logging training step metrics."""
         tracker = TrainingMetricsTracker(log_frequency=1)
         
@@ -740,7 +751,7 @@ class TestTrainingMetricsTracker:
         assert tracker.get_latest("train/learning_rate") == 0.001
         assert tracker.step == 1
     
-    def test_training_metrics_tracker_log_validation_step(self):
+    def test_training_metrics_tracker_log_validation_step(self) -> Any:
         """Test logging validation step metrics."""
         tracker = TrainingMetricsTracker(log_frequency=1)
         
@@ -749,7 +760,7 @@ class TestTrainingMetricsTracker:
         assert tracker.get_latest("val/loss") == 0.3
         assert tracker.get_latest("val/accuracy") == 0.9
     
-    def test_training_metrics_tracker_log_epoch(self):
+    def test_training_metrics_tracker_log_epoch(self) -> Any:
         """Test logging epoch metrics."""
         tracker = TrainingMetricsTracker(log_frequency=1)
         
@@ -769,5 +780,6 @@ class TestTrainingMetricsTracker:
         assert best_metrics["loss"] == 0.3
         assert best_metrics["accuracy"] == 0.9
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__]) 

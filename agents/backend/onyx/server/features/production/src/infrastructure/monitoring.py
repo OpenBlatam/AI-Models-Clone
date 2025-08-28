@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+import time
+import psutil
+import gc
+from typing import Dict, Any, List, Optional
+from datetime import datetime, timedelta
+from contextlib import asynccontextmanager
+import structlog
+from prometheus_client import (
+from prometheus_client.openmetrics.exposition import generate_latest as generate_latest_openmetrics
+from src.core.config import MonitoringSettings
+from src.core.exceptions import BusinessException
+from typing import Any, List, Dict, Optional
 """
 📊 Ultra-Optimized Monitoring Service
 =====================================
@@ -10,24 +35,11 @@ Production-grade monitoring with:
 - System health monitoring
 """
 
-import asyncio
-import logging
-import time
-import psutil
-import gc
-from typing import Dict, Any, List, Optional
-from datetime import datetime, timedelta
-from contextlib import asynccontextmanager
 
-import structlog
-from prometheus_client import (
     Counter, Histogram, Gauge, Summary, Info,
     generate_latest, CONTENT_TYPE_LATEST
 )
-from prometheus_client.openmetrics.exposition import generate_latest as generate_latest_openmetrics
 
-from src.core.config import MonitoringSettings
-from src.core.exceptions import BusinessException
 
 
 class MonitoringService:
@@ -37,7 +49,9 @@ class MonitoringService:
     """
     
     def __init__(self, config: MonitoringSettings):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.logger = structlog.get_logger(__name__)
         
         # Performance tracking
@@ -78,7 +92,7 @@ class MonitoringService:
         
         self.logger.info("Monitoring Service initialized")
     
-    def _initialize_prometheus_metrics(self):
+    def _initialize_prometheus_metrics(self) -> Any:
         """Initialize Prometheus metrics"""
         
         # HTTP metrics
@@ -264,7 +278,7 @@ class MonitoringService:
             }
         }
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize monitoring service"""
         
         self.logger.info("Initializing Monitoring Service...")
@@ -285,7 +299,7 @@ class MonitoringService:
             self.logger.error(f"Failed to initialize Monitoring Service: {e}")
             raise BusinessException(f"Monitoring Service initialization failed: {e}")
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup monitoring service"""
         
         self.logger.info("Cleaning up Monitoring Service...")
@@ -466,7 +480,7 @@ class MonitoringService:
         except Exception as e:
             self.logger.error(f"Failed to set custom metric: {e}")
     
-    async def _metrics_collector(self):
+    async def _metrics_collector(self) -> Any:
         """Background task for collecting metrics"""
         
         while True:
@@ -486,7 +500,7 @@ class MonitoringService:
                 self.logger.error(f"Metrics collector error: {e}")
                 await asyncio.sleep(60)  # Wait 1 minute on error
     
-    async def _collect_system_metrics(self):
+    async def _collect_system_metrics(self) -> Any:
         """Collect system metrics"""
         
         try:
@@ -532,7 +546,7 @@ class MonitoringService:
         except Exception as e:
             self.logger.error(f"Failed to collect system metrics: {e}")
     
-    def _update_error_rate(self):
+    def _update_error_rate(self) -> Any:
         """Update error rate metric"""
         
         try:
@@ -543,7 +557,7 @@ class MonitoringService:
         except Exception as e:
             self.logger.error(f"Failed to update error rate: {e}")
     
-    async def _alert_checker(self):
+    async def _alert_checker(self) -> Any:
         """Background task for checking alerts"""
         
         while True:
@@ -602,7 +616,7 @@ class MonitoringService:
         except Exception as e:
             self.logger.error(f"Failed to check alert rules: {e}")
     
-    def _cleanup_old_alerts(self):
+    def _cleanup_old_alerts(self) -> Any:
         """Clean up old alerts"""
         
         try:
@@ -616,7 +630,7 @@ class MonitoringService:
         except Exception as e:
             self.logger.error(f"Failed to cleanup old alerts: {e}")
     
-    async def _system_monitor(self):
+    async def _system_monitor(self) -> Any:
         """Background task for system monitoring"""
         
         while True:
@@ -636,7 +650,7 @@ class MonitoringService:
                 self.logger.error(f"System monitor error: {e}")
                 await asyncio.sleep(600)  # Wait 10 minutes on error
     
-    async def _monitor_application_health(self):
+    async def _monitor_application_health(self) -> Any:
         """Monitor application health"""
         
         try:
@@ -662,7 +676,7 @@ class MonitoringService:
         except Exception as e:
             self.logger.error(f"Failed to monitor application health: {e}")
     
-    async def _monitor_resource_usage(self):
+    async def _monitor_resource_usage(self) -> Any:
         """Monitor resource usage"""
         
         try:

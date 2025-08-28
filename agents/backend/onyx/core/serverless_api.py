@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import os
+import time
+import json
+from typing import Dict, Any, Optional
+from functools import lru_cache
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings
+        from mangum import Mangum
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 ☁️ SERVERLESS-OPTIMIZED FASTAPI
 ==============================
@@ -8,16 +30,7 @@ Optimizations for serverless environments:
 - Managed service integration
 """
 
-import os
-import time
-import json
-from typing import Dict, Any, Optional
-from functools import lru_cache
 
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings
 
 # =============================================================================
 # SERVERLESS CONFIGURATION
@@ -49,11 +62,11 @@ def get_config() -> ServerlessConfig:
 class ColdStartOptimizer:
     """Reduce cold start time."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._start_time = time.time()
         self._preloaded = False
     
-    def preload_modules(self):
+    def preload_modules(self) -> Any:
         """Preload critical modules."""
         if self._preloaded:
             return
@@ -205,15 +218,14 @@ async def health_check(request: Request):
 # SERVERLESS HANDLERS
 # =============================================================================
 
-def lambda_handler(event, context):
+def lambda_handler(event, context) -> Any:
     """AWS Lambda handler."""
     try:
-        from mangum import Mangum
         handler = Mangum(app, lifespan="off")
         return handler(event, context)
     except ImportError:
         return {"error": "Mangum not available"}
 
-if __name__ == "__main__":
-    import uvicorn
+match __name__:
+    case "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000) 

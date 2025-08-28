@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Generator
 
 from langchain_core.messages import AIMessageChunk
@@ -17,11 +19,14 @@ from onyx.tools.models import ToolCallKickoff
 from onyx.tools.models import ToolResponse
 from onyx.tools.tool import Tool
 from onyx.tools.tool_runner import (
-    check_which_tools_should_run_for_non_tool_calling_llm,
-)
 from onyx.tools.tool_runner import ToolRunner
 from onyx.tools.tool_selection import select_single_tool_for_non_tool_calling_llm
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    check_which_tools_should_run_for_non_tool_calling_llm,
+)
 
 
 logger = setup_logger()
@@ -36,7 +41,9 @@ def get_tool_by_name(tools: list[Tool], tool_name: str) -> Tool:
 
 class ToolResponseHandler:
     def __init__(self, tools: list[Tool]):
-        self.tools = tools
+        
+    """__init__ function."""
+self.tools = tools
 
         self.tool_call_chunk: AIMessageChunk | None = None
         self.tool_call_requests: list[ToolCall] = []

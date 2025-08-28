@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import uuid
+import pytest
+from unittest.mock import Mock, patch, AsyncMock, MagicMock
+from typing import Dict, List, Any, Optional
+from non_blocking_routes import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test Suite for Non-Blocking Routes System
 
@@ -12,14 +29,7 @@ This test suite validates:
 - Resource management and cleanup
 """
 
-import asyncio
-import time
-import uuid
-import pytest
-from unittest.mock import Mock, patch, AsyncMock, MagicMock
-from typing import Dict, List, Any, Optional
 
-from non_blocking_routes import (
     NonBlockingRouteManager, DatabaseConnectionPool, RedisConnectionPool,
     HTTPConnectionPool, BackgroundTaskManager, CircuitBreaker,
     non_blocking_route, async_database_operation, async_external_api,
@@ -31,22 +41,24 @@ class TestNonBlockingRouteManager:
     """Test cases for NonBlockingRouteManager class."""
     
     @pytest.fixture
-    def route_manager(self):
+    def route_manager(self) -> Any:
         """Create a fresh route manager for each test."""
         return NonBlockingRouteManager()
     
     @pytest.fixture
-    def initialized_manager(self, route_manager):
+    def initialized_manager(self, route_manager) -> Any:
         """Create an initialized route manager."""
         async def init():
-            await route_manager.initialize_pools(
+            
+    """init function."""
+await route_manager.initialize_pools(
                 database_url="postgresql://test:test@localhost/test",
                 redis_url="redis://localhost:6379"
             )
         asyncio.run(init())
         return route_manager
     
-    def test_initialization(self, route_manager):
+    def test_initialization(self, route_manager) -> Any:
         """Test route manager initialization."""
         assert route_manager.db_pool is None
         assert route_manager.redis_pool is None
@@ -55,7 +67,7 @@ class TestNonBlockingRouteManager:
         assert route_manager.circuit_breakers == {}
     
     @pytest.mark.asyncio
-    async def test_pool_initialization(self, route_manager):
+    async def test_pool_initialization(self, route_manager) -> Any:
         """Test connection pool initialization."""
         # Mock the pool initialization
         with patch.object(DatabaseConnectionPool, 'initialize') as mock_db_init, \
@@ -75,7 +87,7 @@ class TestNonBlockingRouteManager:
             mock_redis_init.assert_called_once()
             mock_http_init.assert_called_once()
     
-    def test_get_circuit_breaker(self, route_manager):
+    def test_get_circuit_breaker(self, route_manager) -> Optional[Dict[str, Any]]:
         """Test circuit breaker creation and retrieval."""
         # Get circuit breaker for a service
         circuit_breaker = route_manager.get_circuit_breaker("test_service")
@@ -88,10 +100,12 @@ class TestNonBlockingRouteManager:
         assert circuit_breaker is same_circuit_breaker
     
     @pytest.mark.asyncio
-    async def test_execute_with_timeout_success(self, route_manager):
+    async def test_execute_with_timeout_success(self, route_manager) -> Any:
         """Test successful execution with timeout."""
         async def fast_operation():
-            await asyncio.sleep(0.1)
+            
+    """fast_operation function."""
+await asyncio.sleep(0.1)
             return "success"
         
         result = await route_manager.execute_with_timeout(
@@ -103,10 +117,12 @@ class TestNonBlockingRouteManager:
         assert result == "success"
     
     @pytest.mark.asyncio
-    async def test_execute_with_timeout_failure(self, route_manager):
+    async def test_execute_with_timeout_failure(self, route_manager) -> Any:
         """Test timeout execution failure."""
         async def slow_operation():
-            await asyncio.sleep(2.0)
+            
+    """slow_operation function."""
+await asyncio.sleep(2.0)
             return "success"
         
         with pytest.raises(BlockingOperationError, match="database operation timed out"):
@@ -117,12 +133,14 @@ class TestNonBlockingRouteManager:
             )
     
     @pytest.mark.asyncio
-    async def test_execute_with_retry_success(self, route_manager):
+    async def test_execute_with_retry_success(self, route_manager) -> Any:
         """Test successful execution with retry."""
         call_count = 0
         
         async def operation_with_retry():
-            nonlocal call_count
+            
+    """operation_with_retry function."""
+nonlocal call_count
             call_count += 1
             if call_count < 3:
                 raise Exception("Temporary failure")
@@ -138,10 +156,12 @@ class TestNonBlockingRouteManager:
         assert call_count == 3
     
     @pytest.mark.asyncio
-    async def test_execute_with_retry_failure(self, route_manager):
+    async def test_execute_with_retry_failure(self, route_manager) -> Any:
         """Test retry execution failure."""
         async def always_failing_operation():
-            raise Exception("Permanent failure")
+            
+    """always_failing_operation function."""
+raise Exception("Permanent failure")
         
         with pytest.raises(Exception, match="Permanent failure"):
             await route_manager.execute_with_retry(
@@ -151,10 +171,12 @@ class TestNonBlockingRouteManager:
             )
     
     @pytest.mark.asyncio
-    async def test_execute_in_background(self, route_manager):
+    async def test_execute_in_background(self, route_manager) -> Any:
         """Test background task execution."""
         async def background_function(param: str):
-            await asyncio.sleep(0.1)
+            
+    """background_function function."""
+await asyncio.sleep(0.1)
             return f"Processed: {param}"
         
         task_id = await route_manager.execute_in_background(
@@ -170,7 +192,7 @@ class TestNonBlockingRouteManager:
         assert result == "Processed: test_param"
     
     @pytest.mark.asyncio
-    async def test_shutdown(self, route_manager):
+    async def test_shutdown(self, route_manager) -> Any:
         """Test route manager shutdown."""
         # Initialize pools first
         with patch.object(DatabaseConnectionPool, 'initialize'), \
@@ -198,7 +220,7 @@ class TestConnectionPool:
     """Test cases for ConnectionPool base class."""
     
     @pytest.fixture
-    def connection_pool(self):
+    def connection_pool(self) -> Any:
         """Create a connection pool instance."""
         return ConnectionPool(
             pool_size=5,
@@ -207,7 +229,7 @@ class TestConnectionPool:
             retry_attempts=3
         )
     
-    def test_initialization(self, connection_pool):
+    def test_initialization(self, connection_pool) -> Any:
         """Test connection pool initialization."""
         assert connection_pool.pool_size == 5
         assert connection_pool.max_overflow == 10
@@ -217,7 +239,7 @@ class TestConnectionPool:
         assert connection_pool.connection_pool == {}
     
     @pytest.mark.asyncio
-    async def test_get_connection_pool_exhausted(self, connection_pool):
+    async def test_get_connection_pool_exhausted(self, connection_pool) -> Optional[Dict[str, Any]]:
         """Test connection pool exhaustion."""
         # Mock the pool to be exhausted
         connection_pool.active_connections = 15  # pool_size + max_overflow
@@ -226,7 +248,7 @@ class TestConnectionPool:
             await connection_pool.get_connection("test_service")
     
     @pytest.mark.asyncio
-    async def test_return_connection(self, connection_pool):
+    async def test_return_connection(self, connection_pool) -> Any:
         """Test connection return to pool."""
         # Mock connection
         mock_connection = Mock()
@@ -246,7 +268,7 @@ class TestDatabaseConnectionPool:
     """Test cases for DatabaseConnectionPool class."""
     
     @pytest.fixture
-    def db_pool(self):
+    def db_pool(self) -> Any:
         """Create a database connection pool."""
         return DatabaseConnectionPool(
             database_url="postgresql://test:test@localhost/test",
@@ -257,7 +279,7 @@ class TestDatabaseConnectionPool:
         )
     
     @pytest.mark.asyncio
-    async def test_initialization(self, db_pool):
+    async def test_initialization(self, db_pool) -> Any:
         """Test database pool initialization."""
         with patch('asyncpg.create_pool') as mock_create_pool:
             mock_pool = AsyncMock()
@@ -269,7 +291,7 @@ class TestDatabaseConnectionPool:
             mock_create_pool.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_get_connection(self, db_pool):
+    async def test_get_connection(self, db_pool) -> Optional[Dict[str, Any]]:
         """Test getting database connection."""
         with patch('asyncpg.create_pool') as mock_create_pool:
             mock_pool = AsyncMock()
@@ -284,7 +306,7 @@ class TestDatabaseConnectionPool:
             mock_pool.acquire.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_return_connection(self, db_pool):
+    async def test_return_connection(self, db_pool) -> Any:
         """Test returning database connection."""
         with patch('asyncpg.create_pool') as mock_create_pool:
             mock_pool = AsyncMock()
@@ -297,7 +319,7 @@ class TestDatabaseConnectionPool:
             mock_pool.release.assert_called_once_with(mock_connection)
     
     @pytest.mark.asyncio
-    async def test_execute_query(self, db_pool):
+    async def test_execute_query(self, db_pool) -> Any:
         """Test database query execution."""
         with patch('asyncpg.create_pool') as mock_create_pool:
             mock_pool = AsyncMock()
@@ -315,7 +337,7 @@ class TestDatabaseConnectionPool:
             mock_pool.release.assert_called_once_with(mock_connection)
     
     @pytest.mark.asyncio
-    async def test_execute_transaction_success(self, db_pool):
+    async def test_execute_transaction_success(self, db_pool) -> Any:
         """Test successful transaction execution."""
         with patch('asyncpg.create_pool') as mock_create_pool:
             mock_pool = AsyncMock()
@@ -335,7 +357,7 @@ class TestDatabaseConnectionPool:
             mock_pool.release.assert_called_once_with(mock_connection)
     
     @pytest.mark.asyncio
-    async def test_execute_transaction_failure(self, db_pool):
+    async def test_execute_transaction_failure(self, db_pool) -> Any:
         """Test failed transaction execution."""
         with patch('asyncpg.create_pool') as mock_create_pool:
             mock_pool = AsyncMock()
@@ -357,7 +379,7 @@ class TestRedisConnectionPool:
     """Test cases for RedisConnectionPool class."""
     
     @pytest.fixture
-    def redis_pool(self):
+    def redis_pool(self) -> Any:
         """Create a Redis connection pool."""
         return RedisConnectionPool(
             redis_url="redis://localhost:6379",
@@ -368,7 +390,7 @@ class TestRedisConnectionPool:
         )
     
     @pytest.mark.asyncio
-    async def test_initialization(self, redis_pool):
+    async def test_initialization(self, redis_pool) -> Any:
         """Test Redis pool initialization."""
         with patch('aioredis.from_url') as mock_from_url:
             mock_redis = AsyncMock()
@@ -380,7 +402,7 @@ class TestRedisConnectionPool:
             mock_from_url.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_get_connection(self, redis_pool):
+    async def test_get_connection(self, redis_pool) -> Optional[Dict[str, Any]]:
         """Test getting Redis connection."""
         with patch('aioredis.from_url') as mock_from_url:
             mock_redis = AsyncMock()
@@ -392,7 +414,7 @@ class TestRedisConnectionPool:
             assert connection == mock_redis
     
     @pytest.mark.asyncio
-    async def test_get_set_delete(self, redis_pool):
+    async def test_get_set_delete(self, redis_pool) -> Optional[Dict[str, Any]]:
         """Test Redis get, set, and delete operations."""
         with patch('aioredis.from_url') as mock_from_url:
             mock_redis = AsyncMock()
@@ -423,7 +445,7 @@ class TestHTTPConnectionPool:
     """Test cases for HTTPConnectionPool class."""
     
     @pytest.fixture
-    def http_pool(self):
+    async def http_pool(self) -> Any:
         """Create an HTTP connection pool."""
         return HTTPConnectionPool(
             pool_size=5,
@@ -433,7 +455,7 @@ class TestHTTPConnectionPool:
         )
     
     @pytest.mark.asyncio
-    async def test_initialization(self, http_pool):
+    async def test_initialization(self, http_pool) -> Any:
         """Test HTTP pool initialization."""
         with patch('aiohttp.ClientSession') as mock_session_class:
             mock_session = AsyncMock()
@@ -445,7 +467,7 @@ class TestHTTPConnectionPool:
             mock_session_class.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_get_request(self, http_pool):
+    async async def test_get_request(self, http_pool) -> Optional[Dict[str, Any]]:
         """Test HTTP GET request."""
         with patch('aiohttp.ClientSession') as mock_session_class:
             mock_session = AsyncMock()
@@ -466,7 +488,7 @@ class TestHTTPConnectionPool:
             assert result["headers"]["content-type"] == "application/json"
     
     @pytest.mark.asyncio
-    async def test_post_request(self, http_pool):
+    async async def test_post_request(self, http_pool) -> Any:
         """Test HTTP POST request."""
         with patch('aiohttp.ClientSession') as mock_session_class:
             mock_session = AsyncMock()
@@ -491,12 +513,12 @@ class TestBackgroundTaskManager:
     """Test cases for BackgroundTaskManager class."""
     
     @pytest.fixture
-    def task_manager(self):
+    def task_manager(self) -> Any:
         """Create a background task manager."""
         return BackgroundTaskManager(max_workers=5)
     
     @pytest.mark.asyncio
-    async def test_initialization(self, task_manager):
+    async def test_initialization(self, task_manager) -> Any:
         """Test task manager initialization."""
         assert task_manager.max_workers == 5
         assert task_manager.thread_pool is not None
@@ -504,16 +526,24 @@ class TestBackgroundTaskManager:
         assert task_manager.tasks == {}
     
     @pytest.mark.asyncio
-    async def test_run_in_thread(self, task_manager):
+    async def test_run_in_thread(self, task_manager) -> Any:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         """Test running function in thread pool."""
         def thread_function(value: int) -> int:
             return value * 2
         
         result = await task_manager.run_in_thread(thread_function, 5)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         assert result == 10
     
     @pytest.mark.asyncio
-    async def test_run_in_process(self, task_manager):
+    async def test_run_in_process(self, task_manager) -> Any:
         """Test running function in process pool."""
         def process_function(value: int) -> int:
             return value * 3
@@ -522,10 +552,12 @@ class TestBackgroundTaskManager:
         assert result == 12
     
     @pytest.mark.asyncio
-    async def test_add_background_task(self, task_manager):
+    async def test_add_background_task(self, task_manager) -> Any:
         """Test adding background task."""
         async def background_function():
-            await asyncio.sleep(0.1)
+            
+    """background_function function."""
+await asyncio.sleep(0.1)
             return "completed"
         
         task_id = str(uuid.uuid4())
@@ -535,10 +567,12 @@ class TestBackgroundTaskManager:
         assert not task_manager.tasks[task_id].done()
     
     @pytest.mark.asyncio
-    async def test_wait_for_task_success(self, task_manager):
+    async def test_wait_for_task_success(self, task_manager) -> Any:
         """Test waiting for task completion."""
         async def background_function():
-            await asyncio.sleep(0.1)
+            
+    """background_function function."""
+await asyncio.sleep(0.1)
             return "completed"
         
         task_id = str(uuid.uuid4())
@@ -548,10 +582,12 @@ class TestBackgroundTaskManager:
         assert result == "completed"
     
     @pytest.mark.asyncio
-    async def test_wait_for_task_timeout(self, task_manager):
+    async def test_wait_for_task_timeout(self, task_manager) -> Any:
         """Test task timeout."""
         async def slow_function():
-            await asyncio.sleep(2.0)
+            
+    """slow_function function."""
+await asyncio.sleep(2.0)
             return "completed"
         
         task_id = str(uuid.uuid4())
@@ -561,10 +597,12 @@ class TestBackgroundTaskManager:
             await task_manager.wait_for_task(task_id, timeout=0.5)
     
     @pytest.mark.asyncio
-    async def test_cancel_task(self, task_manager):
+    async def test_cancel_task(self, task_manager) -> Any:
         """Test task cancellation."""
         async def background_function():
-            await asyncio.sleep(1.0)
+            
+    """background_function function."""
+await asyncio.sleep(1.0)
             return "completed"
         
         task_id = str(uuid.uuid4())
@@ -577,11 +615,13 @@ class TestBackgroundTaskManager:
         assert task_id not in task_manager.tasks
     
     @pytest.mark.asyncio
-    async def test_shutdown(self, task_manager):
+    async def test_shutdown(self, task_manager) -> Any:
         """Test task manager shutdown."""
         # Add some tasks
         async def background_function():
-            await asyncio.sleep(0.1)
+            
+    """background_function function."""
+await asyncio.sleep(0.1)
             return "completed"
         
         task_ids = []
@@ -602,7 +642,7 @@ class TestCircuitBreaker:
     """Test cases for CircuitBreaker class."""
     
     @pytest.fixture
-    def circuit_breaker(self):
+    def circuit_breaker(self) -> Any:
         """Create a circuit breaker."""
         return CircuitBreaker(
             failure_threshold=3,
@@ -610,7 +650,7 @@ class TestCircuitBreaker:
             expected_exception=Exception
         )
     
-    def test_initialization(self, circuit_breaker):
+    def test_initialization(self, circuit_breaker) -> Any:
         """Test circuit breaker initialization."""
         assert circuit_breaker.failure_threshold == 3
         assert circuit_breaker.recovery_timeout == 5.0
@@ -619,10 +659,12 @@ class TestCircuitBreaker:
         assert circuit_breaker.state == "CLOSED"
     
     @pytest.mark.asyncio
-    async def test_successful_call(self, circuit_breaker):
+    async def test_successful_call(self, circuit_breaker) -> Any:
         """Test successful circuit breaker call."""
         async def successful_function():
-            return "success"
+            
+    """successful_function function."""
+return "success"
         
         result = await circuit_breaker.call(successful_function)
         
@@ -631,10 +673,12 @@ class TestCircuitBreaker:
         assert circuit_breaker.failure_count == 0
     
     @pytest.mark.asyncio
-    async def test_failed_call_below_threshold(self, circuit_breaker):
+    async def test_failed_call_below_threshold(self, circuit_breaker) -> Any:
         """Test failed call below threshold."""
         async def failing_function():
-            raise Exception("Test error")
+            
+    """failing_function function."""
+raise Exception("Test error")
         
         with pytest.raises(Exception, match="Test error"):
             await circuit_breaker.call(failing_function)
@@ -643,10 +687,12 @@ class TestCircuitBreaker:
         assert circuit_breaker.failure_count == 1
     
     @pytest.mark.asyncio
-    async def test_circuit_opens_after_threshold(self, circuit_breaker):
+    async def test_circuit_opens_after_threshold(self, circuit_breaker) -> Any:
         """Test circuit opens after reaching failure threshold."""
         async def failing_function():
-            raise Exception("Test error")
+            
+    """failing_function function."""
+raise Exception("Test error")
         
         # Make calls up to threshold
         for i in range(3):
@@ -657,20 +703,26 @@ class TestCircuitBreaker:
         assert circuit_breaker.failure_count == 3
     
     @pytest.mark.asyncio
-    async def test_circuit_blocks_when_open(self, circuit_breaker):
+    async def test_circuit_blocks_when_open(self, circuit_breaker) -> Any:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         """Test circuit blocks calls when open."""
         # Open the circuit
         circuit_breaker.state = "OPEN"
         circuit_breaker.failure_count = 3
         
         async def successful_function():
-            return "success"
+            
+    """successful_function function."""
+return "success"
         
         with pytest.raises(BlockingOperationError, match="Circuit breaker is OPEN"):
             await circuit_breaker.call(successful_function)
     
     @pytest.mark.asyncio
-    async def test_circuit_recovery(self, circuit_breaker):
+    async def test_circuit_recovery(self, circuit_breaker) -> Any:
         """Test circuit recovery after timeout."""
         # Open the circuit
         circuit_breaker.state = "OPEN"
@@ -678,7 +730,9 @@ class TestCircuitBreaker:
         circuit_breaker.last_failure_time = time.time() - 6.0  # Past recovery timeout
         
         async def successful_function():
-            return "success"
+            
+    """successful_function function."""
+return "success"
         
         result = await circuit_breaker.call(successful_function)
         
@@ -691,16 +745,18 @@ class TestDecorators:
     """Test cases for route decorators."""
     
     @pytest.fixture
-    def route_manager(self):
+    def route_manager(self) -> Any:
         """Create a route manager for decorator tests."""
         return NonBlockingRouteManager()
     
     @pytest.mark.asyncio
-    async def test_non_blocking_route_decorator_success(self, route_manager):
+    async def test_non_blocking_route_decorator_success(self, route_manager) -> Any:
         """Test successful non-blocking route decorator."""
         @non_blocking_route(timeout=1.0)
         async def test_function():
-            await asyncio.sleep(0.1)
+            
+    """test_function function."""
+await asyncio.sleep(0.1)
             return "success"
         
         # Mock the global route manager
@@ -709,11 +765,13 @@ class TestDecorators:
             assert result == "success"
     
     @pytest.mark.asyncio
-    async def test_non_blocking_route_decorator_timeout(self, route_manager):
+    async def test_non_blocking_route_decorator_timeout(self, route_manager) -> Any:
         """Test non-blocking route decorator timeout."""
         @non_blocking_route(timeout=0.1)
         async def slow_function():
-            await asyncio.sleep(1.0)
+            
+    """slow_function function."""
+await asyncio.sleep(1.0)
             return "success"
         
         # Mock the global route manager
@@ -722,11 +780,13 @@ class TestDecorators:
                 await slow_function()
     
     @pytest.mark.asyncio
-    async def test_async_database_operation_decorator(self, route_manager):
+    async def test_async_database_operation_decorator(self, route_manager) -> Any:
         """Test async database operation decorator."""
         @async_database_operation(timeout=1.0)
         async def db_function():
-            await asyncio.sleep(0.1)
+            
+    """db_function function."""
+await asyncio.sleep(0.1)
             return "db_result"
         
         # Mock the global route manager with database pool
@@ -736,11 +796,13 @@ class TestDecorators:
             assert result == "db_result"
     
     @pytest.mark.asyncio
-    async def test_async_external_api_decorator(self, route_manager):
+    async async def test_async_external_api_decorator(self, route_manager) -> Any:
         """Test async external API decorator."""
         @async_external_api(timeout=1.0, max_retries=2)
         async def api_function():
-            await asyncio.sleep(0.1)
+            
+    """api_function function."""
+await asyncio.sleep(0.1)
             return "api_result"
         
         # Mock the global route manager with HTTP pool
@@ -750,11 +812,13 @@ class TestDecorators:
             assert result == "api_result"
     
     @pytest.mark.asyncio
-    async def test_background_task_decorator(self, route_manager):
+    async def test_background_task_decorator(self, route_manager) -> Any:
         """Test background task decorator."""
         @background_task()
         async def background_function():
-            await asyncio.sleep(0.1)
+            
+    """background_function function."""
+await asyncio.sleep(0.1)
             return "background_result"
         
         # Mock the global route manager
@@ -768,7 +832,7 @@ class TestIntegration:
     """Integration tests for the non-blocking routes system."""
     
     @pytest.mark.asyncio
-    async def test_full_workflow(self):
+    async def test_full_workflow(self) -> Any:
         """Test complete non-blocking workflow."""
         # Initialize route manager
         route_manager = NonBlockingRouteManager()
@@ -826,7 +890,9 @@ class TestIntegration:
             circuit_breaker = route_manager.get_circuit_breaker("test_service")
             
             async def test_function():
-                return "success"
+                
+    """test_function function."""
+return "success"
             
             result = await circuit_breaker.call(test_function)
             assert result == "success"
@@ -838,15 +904,19 @@ class TestIntegration:
             await route_manager.shutdown()
     
     @pytest.mark.asyncio
-    async def test_performance_comparison(self):
+    async def test_performance_comparison(self) -> Any:
         """Test performance comparison between blocking and non-blocking operations."""
         # Simulate blocking operations
         def blocking_operation():
-            time.sleep(0.1)
+            
+    """blocking_operation function."""
+time.sleep(0.1)
             return "blocking_result"
         
         async def non_blocking_operation():
-            await asyncio.sleep(0.1)
+            
+    """non_blocking_operation function."""
+await asyncio.sleep(0.1)
             return "non_blocking_result"
         
         # Test blocking operations (sequential)

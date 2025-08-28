@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
@@ -7,8 +9,11 @@ from onyx.llm.utils import get_max_input_tokens
 from onyx.llm.utils import model_supports_image_input
 
 
-if TYPE_CHECKING:
     from onyx.db.models import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+if TYPE_CHECKING:
         LLMProvider as LLMProviderModel,
         ModelConfiguration as ModelConfigurationModel,
     )

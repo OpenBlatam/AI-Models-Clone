@@ -1,20 +1,30 @@
-"""
-Usage Examples
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Demonstrates how to use the cybersecurity toolkit with proper async/await patterns.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
 from typing import Dict, Any
-
-# Import from the main package
 from ..validators import ValidationRequest, ValidationRules, validate_and_sanitize_input
 from ..crypto import KeyGenerationRequest, EncryptionRequest, generate_secure_key, encrypt_data
 from ..network import PortRangeScanRequest, scan_port_range_async
 from ..logging import SecurityEvent, LoggerConfig, create_security_logger, log_security_event_async
 from ..intelligence import IPReputationRequest, check_ip_reputation_async
 from ..testing import SecurityTestRequest, run_security_tests_async
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Usage Examples
+
+Demonstrates how to use the cybersecurity toolkit with proper async/await patterns.
+"""
+
+
+# Import from the main package
 
 async def run_basic_examples() -> Dict[str, Any]:
     """Run basic security examples."""
@@ -178,5 +188,6 @@ async def main():
         print(f"❌ Error running examples: {e}")
         raise
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

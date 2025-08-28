@@ -1,9 +1,16 @@
-"""
-Onyx AI Video System - Security Manager
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Security utilities for the Onyx AI Video system with integration
-with Onyx's security patterns and access control.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import hashlib
 import hmac
@@ -15,12 +22,23 @@ from typing import Any, Dict, List, Optional, Union, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 import logging
-
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
-
 from ..core.exceptions import SecurityError, ValidationError
+            import os
+                    from onyx.core.functions import validate_user_access
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Onyx AI Video System - Security Manager
+
+Security utilities for the Onyx AI Video system with integration
+with Onyx's security patterns and access control.
+"""
+
+
+
 
 
 @dataclass
@@ -58,7 +76,9 @@ class SecurityManager:
     """
     
     def __init__(self, config: Optional[SecurityConfig] = None):
-        self.config = config or SecurityConfig()
+        
+    """__init__ function."""
+self.config = config or SecurityConfig()
         self.logger = logging.getLogger(__name__)
         
         # Encryption
@@ -81,7 +101,7 @@ class SecurityManager:
             'request_id': r'^[a-zA-Z0-9_-]+$'
         }
     
-    def _setup_encryption(self):
+    def _setup_encryption(self) -> Any:
         """Setup encryption with Fernet."""
         if not self.config.encryption_enabled:
             return
@@ -272,7 +292,6 @@ class SecurityManager:
             Tuple of (is_valid, error_message)
         """
         try:
-            import os
             
             # Check if file exists
             if not os.path.exists(file_path):
@@ -404,7 +423,6 @@ class SecurityManager:
             # Check if Onyx security is available
             if self.config.use_onyx_security:
                 try:
-                    from onyx.core.functions import validate_user_access
                     return validate_user_access(user_id, resource_id)
                 except ImportError:
                     self.logger.warning("Onyx security not available, using local validation")
@@ -451,7 +469,7 @@ class SecurityManager:
             self.logger.error(f"Access revocation failed: {e}")
             return False
     
-    def cleanup_expired_access(self):
+    def cleanup_expired_access(self) -> Any:
         """Clean up expired access controls."""
         try:
             current_time = datetime.now()
@@ -593,8 +611,8 @@ def get_security_status() -> Dict[str, Any]:
 # Security decorators
 def require_access(required_permissions: Optional[List[str]] = None):
     """Decorator to require access validation."""
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func) -> Any:
+        def wrapper(*args, **kwargs) -> Any:
             # Extract user_id and resource_id from function arguments
             # This is a simplified implementation
             user_id = kwargs.get('user_id') or args[0] if args else None
@@ -613,8 +631,8 @@ def require_access(required_permissions: Optional[List[str]] = None):
 
 def rate_limited(max_requests: int = 100, window_seconds: int = 60):
     """Decorator to apply rate limiting."""
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func) -> Any:
+        def wrapper(*args, **kwargs) -> Any:
             user_id = kwargs.get('user_id') or args[0] if args else 'anonymous'
             
             allowed, rate_info = check_rate_limit(user_id)
@@ -628,8 +646,8 @@ def rate_limited(max_requests: int = 100, window_seconds: int = 60):
 
 def validate_input_decorator(max_length: Optional[int] = None):
     """Decorator to validate input."""
-    def decorator(func):
-        def wrapper(*args, **kwargs):
+    def decorator(func) -> Any:
+        def wrapper(*args, **kwargs) -> Any:
             # Validate input_text parameter
             input_text = kwargs.get('input_text') or args[0] if args else None
             

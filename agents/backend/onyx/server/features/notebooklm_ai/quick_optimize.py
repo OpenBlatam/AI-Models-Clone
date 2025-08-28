@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import sys
+import os
+from pathlib import Path
+        from optimize_system import SystemOptimizer
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Quick Optimize - NotebookLM AI
@@ -10,10 +22,6 @@ Usage:
     python quick_optimize.py
 """
 
-import asyncio
-import sys
-import os
-from pathlib import Path
 
 # Add current directory to path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -25,7 +33,6 @@ async def quick_optimize():
     
     try:
         # Import and run the main optimizer
-        from optimize_system import SystemOptimizer
         
         optimizer = SystemOptimizer()
         await optimizer.run_full_optimization()
@@ -66,5 +73,6 @@ def main():
     
     return success
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

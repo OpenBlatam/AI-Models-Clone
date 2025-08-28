@@ -1,8 +1,10 @@
-"""
-DNS Enumerator
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Provides comprehensive DNS enumeration capabilities including record lookup, subdomain enumeration, and zone transfers.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import aiohttp
@@ -14,6 +16,14 @@ from typing import Dict, Any, List, Optional, Union
 from pydantic import BaseModel, Field, validator
 from enum import Enum
 import time
+from typing import Any, List, Dict, Optional
+import logging
+"""
+DNS Enumerator
+
+Provides comprehensive DNS enumeration capabilities including record lookup, subdomain enumeration, and zone transfers.
+"""
+
 
 class DNSRecordType(str, Enum):
     """Enumeration of DNS record types."""
@@ -37,7 +47,7 @@ class DNSEnumerationRequest(BaseModel):
     max_concurrent_queries: int = Field(default=10, ge=1, le=50, description="Maximum concurrent DNS queries")
     
     @validator('target_domain')
-    def validate_domain(cls, v):
+    def validate_domain(cls, v) -> bool:
         if not v or '.' not in v:
             raise ValueError("Invalid domain format")
         return v.lower()
@@ -70,7 +80,7 @@ class SubdomainEnumerationRequest(BaseModel):
     timeout: float = Field(default=5.0, ge=1.0, le=30.0, description="Request timeout in seconds")
     
     @validator('target_domain')
-    def validate_domain(cls, v):
+    def validate_domain(cls, v) -> bool:
         if not v or '.' not in v:
             raise ValueError("Invalid domain format")
         return v.lower()

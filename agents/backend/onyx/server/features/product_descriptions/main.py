@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import argparse
+import logging
+import sys
+from pathlib import Path
+from core.generator import ProductDescriptionGenerator
+from core.config import ProductDescriptionConfig, ECOMMERCE_CONFIG, LUXURY_CONFIG, TECHNICAL_CONFIG
+from api.service import ProductDescriptionService
+from api.gradio_interface import create_gradio_app
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Product Description Generator - Main Entry Point
@@ -10,19 +28,10 @@ Run the product description generator in different modes:
 - Demo mode
 """
 
-import asyncio
-import argparse
-import logging
-import sys
-from pathlib import Path
 
 # Add current directory to Python path
 sys.path.append(str(Path(__file__).parent))
 
-from core.generator import ProductDescriptionGenerator
-from core.config import ProductDescriptionConfig, ECOMMERCE_CONFIG, LUXURY_CONFIG, TECHNICAL_CONFIG
-from api.service import ProductDescriptionService
-from api.gradio_interface import create_gradio_app
 
 # Setup logging
 logging.basicConfig(
@@ -139,7 +148,9 @@ def run_cli():
         return
     
     async def generate():
-        # Initialize generator
+        
+    """generate function."""
+# Initialize generator
         config = ProductDescriptionConfig()
         generator = ProductDescriptionGenerator(config)
         
@@ -174,7 +185,7 @@ def run_cli():
     asyncio.run(generate())
 
 
-def run_api(host="0.0.0.0", port=8000):
+async def run_api(host="0.0.0.0", port=8000) -> Any:
     """Run API service with guard clauses."""
     # Guard clause: Validate host
     if not host or not host.strip():
@@ -192,7 +203,7 @@ def run_api(host="0.0.0.0", port=8000):
     service.run(host=host, port=port)
 
 
-def run_gradio(share=False, port=7860):
+def run_gradio(share=False, port=7860) -> Any:
     """Run Gradio interface with guard clauses."""
     # Guard clause: Validate port range
     if port < 1 or port > 65535:
@@ -287,5 +298,6 @@ Examples:
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

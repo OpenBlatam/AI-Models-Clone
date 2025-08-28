@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
-"""
-NotebookLM AI - Production API v8.0
-🚀 Enterprise-grade FastAPI application with ultra-advanced optimizations
-⚡ Maximum performance, reliability, and scalability
-🎯 Production-ready with advanced monitoring, security, and fault tolerance
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -15,7 +15,6 @@ from dataclasses import dataclass
 from functools import wraps
 import secrets
 from datetime import datetime
-
 from fastapi import FastAPI, HTTPException, Depends, Request, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -24,8 +23,19 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import uvicorn
 from pydantic import BaseModel, Field
 import structlog
-
 from production_engine_v8 import get_production_engine, ProductionConfig, production_monitor, production_cache
+        from prometheus_client import generate_latest
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+NotebookLM AI - Production API v8.0
+🚀 Enterprise-grade FastAPI application with ultra-advanced optimizations
+⚡ Maximum performance, reliability, and scalability
+🎯 Production-ready with advanced monitoring, security, and fault tolerance
+"""
+
+
+
 
 # Configure structured logging
 structlog.configure(
@@ -192,7 +202,6 @@ async def health_check():
 async def metrics():
     """Prometheus metrics endpoint."""
     try:
-        from prometheus_client import generate_latest
         return Response(generate_latest(), media_type="text/plain")
     except ImportError:
         return {"error": "Prometheus client not available"}
@@ -366,7 +375,9 @@ async def stream_process(
         engine_instance = await get_engine()
         
         async def generate():
-            request_data = {
+            
+    """generate function."""
+request_data = {
                 "type": "text",
                 "text": request.text,
                 "operations": request.operations,

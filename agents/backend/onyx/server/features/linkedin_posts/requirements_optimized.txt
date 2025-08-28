@@ -1,171 +1,60 @@
-# Optimized Requirements - LinkedIn Posts API
-# Latest libraries for maximum performance
+# 🚀 Optimized LinkedIn Posts Optimization - Requirements
+# ======================================================
+# 
+# This file contains all necessary dependencies for the optimized LinkedIn optimizer
+# with fallback support for when ML libraries aren't available.
 
-# ===== CORE FRAMEWORK =====
-fastapi==0.104.1                    # Ultra-fast web framework
-uvicorn[standard]==0.24.0           # ASGI server with optimizations
-uvloop==0.19.0                      # Ultra-fast event loop
-httptools==0.6.1                    # Optimized HTTP parser
-orjson==3.9.10                      # 2-3x faster JSON serialization
+# Core Python packages
+asyncio
+dataclasses
+typing
+pathlib
+json
+pickle
+functools
+hashlib
+logging
+time
+datetime
+abc
+enum
 
-# ===== ASYNC DATABASE =====
-sqlalchemy[asyncio]==2.0.23         # Async ORM
-asyncpg==0.29.0                     # Ultra-fast PostgreSQL driver
-alembic==1.12.1                     # Database migrations
-psycopg2-binary==2.9.9              # PostgreSQL adapter
+# ML and AI packages (optional - system will fallback if not available)
+torch>=1.9.0
+transformers>=4.20.0
+numpy>=1.21.0
+pandas>=1.3.0
+scikit-learn>=1.0.0
 
-# ===== REDIS & CACHING =====
-redis[hiredis]==5.0.1               # Optimized Redis client
-aioredis==2.0.1                     # Async Redis client
-aiocache==0.12.2                    # Multi-level caching
-cachetools==5.3.2                   # Cache utilities
+# Performance and monitoring
+psutil>=5.8.0
+memory-profiler>=0.60.0
 
-# ===== AI & MACHINE LEARNING =====
-openai==1.3.7                       # OpenAI client
-langchain==0.0.340                  # LLM framework
-langchain-openai==0.0.2             # OpenAI integration
-transformers==4.36.0                # Transformer models
-torch==2.1.1                        # PyTorch optimized
-spacy==3.7.2                        # Ultra-fast NLP
-textstat==0.7.3                     # Text analysis
-vaderSentiment==3.3.2               # Sentiment analysis
-keybert==0.8.3                      # Keyword extraction
-nltk==3.8.1                         # NLP toolkit
-language-tool-python==2.7.1         # Grammar checking
+# Testing and development
+pytest>=6.2.0
+pytest-asyncio>=0.15.0
+pytest-cov>=2.12.0
 
-# ===== HTTP CLIENTS =====
-httpx==0.25.2                       # Async HTTP client
-aiohttp==3.9.1                      # Alternative HTTP client
-requests==2.31.0                    # Sync HTTP client (fallback)
+# Code quality
+black>=21.7b0
+flake8>=3.9.0
+mypy>=0.910
 
-# ===== DATA VALIDATION =====
-pydantic==2.5.0                     # Ultra-fast validation
-pydantic-settings==2.1.0            # Settings management
-email-validator==2.1.0              # Email validation
+# Documentation
+sphinx>=4.0.0
+sphinx-rtd-theme>=0.5.0
 
-# ===== SECURITY & AUTH =====
-python-jose[cryptography]==3.3.0    # JWT handling
-passlib[bcrypt]==1.7.4              # Password hashing
-python-multipart==0.0.6             # Form handling
-cryptography==41.0.7                # Cryptographic recipes
+# Optional: GPU acceleration
+# cuda-python>=11.0.0  # Uncomment if using NVIDIA GPU
 
-# ===== MONITORING & OBSERVABILITY =====
-prometheus-client==0.19.0                    # Prometheus metrics
-prometheus-fastapi-instrumentator==6.1.0     # FastAPI instrumentation
-structlog==23.2.0                            # Structured logging
-sentry-sdk[fastapi]==1.38.0                  # Error monitoring
+# Optional: Advanced features
+# redis>=4.0.0  # For distributed caching
+# celery>=5.2.0  # For background task processing
+# fastapi>=0.68.0  # For API endpoints
+# uvicorn>=0.15.0  # For API server
 
-# ===== ASYNC UTILITIES =====
-asyncio-throttle==1.0.2             # Async throttling
-aiofiles==23.2.1                    # Async file operations
-websockets==12.0                    # WebSocket support
-asyncio-mqtt==0.16.1                # MQTT async client
-
-# ===== PERFORMANCE OPTIMIZATION =====
-brotli==1.1.0                       # Compression
-lz4==4.3.2                          # Fast compression
-xxhash==3.4.1                       # Fast hashing
-cython==3.0.6                       # Performance optimization
-
-# ===== DATA PROCESSING =====
-pandas==2.1.3                       # Data manipulation
-numpy==1.25.2                       # Numerical computing
-arrow==1.3.0                        # Date/time handling
-python-dateutil==2.8.2              # Date utilities
-pytz==2023.3                        # Timezone handling
-
-# ===== BACKGROUND TASKS =====
-celery==5.3.4                       # Distributed task queue
-flower==2.0.1                       # Celery monitoring
-kombu==5.3.4                        # Message queue
-
-# ===== FILE HANDLING =====
-python-magic==0.4.27                # File type detection
-pillow==10.1.0                      # Image processing
-aiofiles==23.2.1                    # Async file operations
-
-# ===== UTILITIES =====
-click==8.1.7                        # CLI framework
-rich==13.7.0                        # Rich text output
-typer==0.9.0                        # CLI with type hints
-python-dotenv==1.0.0                # Environment variables
-
-# ===== TESTING =====
-pytest==7.4.3                       # Testing framework
-pytest-asyncio==0.21.1              # Async testing
-pytest-cov==4.1.0                   # Coverage testing
-pytest-benchmark==4.0.0             # Performance testing
-factory-boy==3.3.0                  # Test data generation
-faker==20.1.0                       # Fake data generation
-httpx==0.25.2                       # Test HTTP client
-
-# ===== DEVELOPMENT TOOLS =====
-black==23.11.0                      # Code formatting
-isort==5.12.0                       # Import sorting
-flake8==6.1.0                       # Linting
-mypy==1.7.1                         # Type checking
-pre-commit==3.6.0                   # Git hooks
-
-# ===== PRODUCTION SERVER =====
-gunicorn==21.2.0                    # WSGI server
-supervisor==4.2.5                   # Process management
-
-# ===== COMPRESSION & ENCODING =====
-msgpack==1.0.7                      # Binary serialization
-zstandard==0.22.0                   # Fast compression
-lz4==4.3.2                          # Ultra-fast compression
-
-# ===== MEMORY OPTIMIZATION =====
-memory-profiler==0.61.0             # Memory profiling
-pympler==0.9                        # Memory analysis
-objgraph==3.6.0                     # Object reference tracking
-
-# ===== NETWORKING =====
-dnspython==2.4.2                    # DNS toolkit
-netaddr==0.9.0                      # Network address manipulation
-ipaddress==1.0.23                   # IP address handling
-
-# ===== CONFIGURATION =====
-pyyaml==6.0.1                       # YAML parsing
-toml==0.10.2                        # TOML parsing
-configparser==6.0.0                 # Config file parsing
-
-# ===== TIMEZONE & LOCALIZATION =====
-babel==2.13.1                       # Internationalization
-tzdata==2023.3                      # Timezone data
-
-# ===== ADVANCED FEATURES =====
-dramatiq==1.15.0                    # Alternative task queue
-rq==1.15.1                          # Simple job queue
-schedule==1.2.0                     # Job scheduling
-apscheduler==3.10.4                 # Advanced scheduling
-
-# ===== GRAPH & VISUALIZATION =====
-matplotlib==3.8.2                   # Plotting
-seaborn==0.13.0                     # Statistical visualization
-plotly==5.17.0                      # Interactive plots
-
-# ===== SCIENTIFIC COMPUTING =====
-scipy==1.11.4                       # Scientific library
-scikit-learn==1.3.2                 # Machine learning
-joblib==1.3.2                       # Parallel computing
-
-# ===== WEB SCRAPING =====
-beautifulsoup4==4.12.2              # HTML parsing
-lxml==4.9.3                         # XML/HTML parser
-selenium==4.15.2                    # Web automation
-
-# ===== API CLIENTS =====
-tweepy==4.14.0                      # Twitter API
-facebook-sdk==3.1.0                 # Facebook API
-linkedin-api==2.0.0                 # LinkedIn API (unofficial)
-
-# ===== OPTIMIZATION LIBRARIES =====
-line-profiler==4.1.1                # Line-by-line profiling
-py-spy==0.3.14                      # Sampling profiler
-scalene==1.5.26                     # CPU/memory profiler
-
-# ===== ADDITIONAL OPTIMIZATIONS =====
-ujson==5.8.0                        # Ultra-fast JSON (alternative)
-rapidjson==1.14                     # Fast JSON parser
-python-rapidjson==1.14              # Python bindings for RapidJSON 
+# Development tools
+jupyter>=1.0.0
+ipython>=7.25.0
+matplotlib>=3.4.0
+seaborn>=0.11.0 

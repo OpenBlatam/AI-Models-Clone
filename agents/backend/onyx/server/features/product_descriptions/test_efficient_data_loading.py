@@ -1,3 +1,43 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import json
+import os
+import tempfile
+import time
+from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, patch
+from typing import Dict, List, Any
+import numpy as np
+import pandas as pd
+import pytest
+import torch
+from sklearn.datasets import make_classification, make_regression
+from efficient_data_loading import (
+            from efficient_data_loading import BaseCybersecurityDataset
+        import shutil
+        from transformers import AutoTokenizer
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+        import psutil
+            import shutil
+            import shutil
+            import shutil
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Tests for Efficient Data Loading System
 
@@ -10,22 +50,8 @@ This test suite covers:
 - Edge case handling and error scenarios
 """
 
-import asyncio
-import json
-import os
-import tempfile
-import time
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
-from typing import Dict, List, Any
 
-import numpy as np
-import pandas as pd
-import pytest
-import torch
-from sklearn.datasets import make_classification, make_regression
 
-from efficient_data_loading import (
     DataLoaderConfig, ThreatDetectionDataset, AnomalyDetectionDataset,
     NetworkTrafficDataset, MalwareDataset, CachedDataset, DataAugmentation,
     DataLoaderFactory, DataLoaderMonitor, MemoryOptimizedDataLoader,
@@ -38,7 +64,7 @@ from efficient_data_loading import (
 class TestDataLoaderConfig:
     """Test DataLoaderConfig dataclass."""
     
-    def test_data_loader_config_creation(self):
+    def test_data_loader_config_creation(self) -> Any:
         """Test creating DataLoaderConfig with default values."""
         config = DataLoaderConfig()
         
@@ -50,7 +76,7 @@ class TestDataLoaderConfig:
         assert config.shuffle is True
         assert config.enable_caching is True
     
-    def test_data_loader_config_custom_values(self):
+    def test_data_loader_config_custom_values(self) -> Any:
         """Test creating DataLoaderConfig with custom values."""
         config = DataLoaderConfig(
             batch_size=64,
@@ -70,17 +96,16 @@ class TestDataLoaderConfig:
 class TestBaseCybersecurityDataset:
     """Test BaseCybersecurityDataset abstract class."""
     
-    def test_base_dataset_abstract_methods(self):
+    def test_base_dataset_abstract_methods(self) -> Any:
         """Test that BaseCybersecurityDataset cannot be instantiated directly."""
         with pytest.raises(TypeError):
-            from efficient_data_loading import BaseCybersecurityDataset
             BaseCybersecurityDataset("test.csv", DataLoaderConfig())
 
 
 class TestThreatDetectionDataset:
     """Test ThreatDetectionDataset."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test data."""
         self.temp_dir = tempfile.mkdtemp()
         self.dataset_path = os.path.join(self.temp_dir, "threat_data.csv")
@@ -98,12 +123,11 @@ class TestThreatDetectionDataset:
         df = pd.DataFrame(data)
         df.to_csv(self.dataset_path, index=False)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test data."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_threat_detection_dataset_creation(self):
+    def test_threat_detection_dataset_creation(self) -> Any:
         """Test creating ThreatDetectionDataset."""
         config = DataLoaderConfig()
         dataset = ThreatDetectionDataset(self.dataset_path, config)
@@ -113,9 +137,8 @@ class TestThreatDetectionDataset:
         assert len(dataset.labels) == 4
         assert dataset.labels == [0, 1, 1, 0]
     
-    def test_threat_detection_dataset_with_tokenizer(self):
+    def test_threat_detection_dataset_with_tokenizer(self) -> Any:
         """Test ThreatDetectionDataset with tokenizer."""
-        from transformers import AutoTokenizer
         
         tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
         config = DataLoaderConfig()
@@ -126,7 +149,7 @@ class TestThreatDetectionDataset:
         assert 'input_ids' in dataset.data[0]
         assert 'attention_mask' in dataset.data[0]
     
-    def test_threat_detection_dataset_getitem(self):
+    def test_threat_detection_dataset_getitem(self) -> Optional[Dict[str, Any]]:
         """Test ThreatDetectionDataset __getitem__ method."""
         config = DataLoaderConfig()
         dataset = ThreatDetectionDataset(self.dataset_path, config)
@@ -136,7 +159,7 @@ class TestThreatDetectionDataset:
         assert len(item) == 2
         assert item[1] == 0  # label
     
-    def test_threat_detection_dataset_validation(self):
+    def test_threat_detection_dataset_validation(self) -> Any:
         """Test data validation in ThreatDetectionDataset."""
         config = DataLoaderConfig(validate_data=True, sanitize_inputs=True)
         
@@ -157,7 +180,7 @@ class TestThreatDetectionDataset:
         # Should filter out malicious content
         assert len(dataset) == 2  # Only 2 valid items
     
-    def test_threat_detection_dataset_invalid_path(self):
+    def test_threat_detection_dataset_invalid_path(self) -> Any:
         """Test ThreatDetectionDataset with invalid path."""
         config = DataLoaderConfig()
         
@@ -168,7 +191,7 @@ class TestThreatDetectionDataset:
 class TestAnomalyDetectionDataset:
     """Test AnomalyDetectionDataset."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test data."""
         self.temp_dir = tempfile.mkdtemp()
         self.dataset_path = os.path.join(self.temp_dir, "anomaly_data.csv")
@@ -188,12 +211,11 @@ class TestAnomalyDetectionDataset:
         df = pd.DataFrame(data)
         df.to_csv(self.dataset_path, index=False)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test data."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_anomaly_detection_dataset_creation(self):
+    def test_anomaly_detection_dataset_creation(self) -> Any:
         """Test creating AnomalyDetectionDataset."""
         config = DataLoaderConfig()
         dataset = AnomalyDetectionDataset(self.dataset_path, config)
@@ -204,7 +226,7 @@ class TestAnomalyDetectionDataset:
         assert dataset.data.shape[1] == 5  # 5 features
         assert dataset.labels.shape[0] == 4
     
-    def test_anomaly_detection_dataset_getitem(self):
+    def test_anomaly_detection_dataset_getitem(self) -> Optional[Dict[str, Any]]:
         """Test AnomalyDetectionDataset __getitem__ method."""
         config = DataLoaderConfig()
         dataset = AnomalyDetectionDataset(self.dataset_path, config)
@@ -215,7 +237,7 @@ class TestAnomalyDetectionDataset:
         assert isinstance(item[0], torch.Tensor)
         assert isinstance(item[1], torch.Tensor)
     
-    def test_anomaly_detection_dataset_metadata(self):
+    def test_anomaly_detection_dataset_metadata(self) -> Any:
         """Test metadata extraction."""
         config = DataLoaderConfig()
         dataset = AnomalyDetectionDataset(self.dataset_path, config)
@@ -231,7 +253,7 @@ class TestAnomalyDetectionDataset:
 class TestNetworkTrafficDataset:
     """Test NetworkTrafficDataset."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test data."""
         self.temp_dir = tempfile.mkdtemp()
         self.dataset_path = os.path.join(self.temp_dir, "network_data.csv")
@@ -249,12 +271,11 @@ class TestNetworkTrafficDataset:
         df = pd.DataFrame(data)
         df.to_csv(self.dataset_path, index=False)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test data."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_network_traffic_dataset_creation(self):
+    def test_network_traffic_dataset_creation(self) -> Any:
         """Test creating NetworkTrafficDataset."""
         config = DataLoaderConfig()
         dataset = NetworkTrafficDataset(self.dataset_path, config)
@@ -265,7 +286,7 @@ class TestNetworkTrafficDataset:
         assert dataset.data.shape[1] == 5  # 5 features
         assert dataset.labels.shape[0] == 10
     
-    def test_network_traffic_dataset_scaler(self):
+    def test_network_traffic_dataset_scaler(self) -> Any:
         """Test that scaler is stored in metadata."""
         config = DataLoaderConfig()
         dataset = NetworkTrafficDataset(self.dataset_path, config)
@@ -278,7 +299,7 @@ class TestNetworkTrafficDataset:
 class TestMalwareDataset:
     """Test MalwareDataset."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test data."""
         self.temp_dir = tempfile.mkdtemp()
         self.dataset_path = os.path.join(self.temp_dir, "malware_data.csv")
@@ -304,12 +325,11 @@ class TestMalwareDataset:
         df = pd.DataFrame(data)
         df.to_csv(self.dataset_path, index=False)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test data."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_malware_dataset_creation(self):
+    def test_malware_dataset_creation(self) -> Any:
         """Test creating MalwareDataset."""
         config = DataLoaderConfig()
         dataset = MalwareDataset(self.dataset_path, config)
@@ -320,7 +340,7 @@ class TestMalwareDataset:
         assert 'api_sequences' in dataset.data
         assert isinstance(dataset.labels, torch.Tensor)
     
-    def test_malware_dataset_getitem(self):
+    def test_malware_dataset_getitem(self) -> Optional[Dict[str, Any]]:
         """Test MalwareDataset __getitem__ method."""
         config = DataLoaderConfig()
         dataset = MalwareDataset(self.dataset_path, config)
@@ -335,17 +355,16 @@ class TestMalwareDataset:
 class TestCachedDataset:
     """Test CachedDataset."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.cache_dir = os.path.join(self.temp_dir, "cache")
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test environment."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_cached_dataset_creation(self):
+    def test_cached_dataset_creation(self) -> Any:
         """Test creating CachedDataset."""
         # Create mock dataset
         mock_dataset = MagicMock()
@@ -357,7 +376,7 @@ class TestCachedDataset:
         assert len(cached_dataset) == 10
         assert cached_dataset.cache_size == 5
     
-    def test_cached_dataset_getitem(self):
+    def test_cached_dataset_getitem(self) -> Optional[Dict[str, Any]]:
         """Test CachedDataset __getitem__ method."""
         # Create mock dataset
         mock_dataset = MagicMock()
@@ -377,7 +396,7 @@ class TestCachedDataset:
         assert item == ("data", "label")
         assert cached_dataset.cache_hits == 1
     
-    def test_cached_dataset_cache_stats(self):
+    def test_cached_dataset_cache_stats(self) -> Any:
         """Test cache statistics."""
         # Create mock dataset
         mock_dataset = MagicMock()
@@ -403,7 +422,7 @@ class TestCachedDataset:
 class TestDataAugmentation:
     """Test DataAugmentation."""
     
-    def test_text_augmentation(self):
+    def test_text_augmentation(self) -> Any:
         """Test text augmentation."""
         original_text = "Suspicious network activity detected"
         
@@ -416,7 +435,7 @@ class TestDataAugmentation:
         assert isinstance(augmented, str)
         assert len(augmented) > 0
     
-    def test_feature_augmentation(self):
+    def test_feature_augmentation(self) -> Any:
         """Test feature augmentation."""
         original_features = np.array([0.1, 0.2, 0.3, 0.4, 0.5])
         
@@ -433,7 +452,7 @@ class TestDataAugmentation:
 class TestCustomCollateFn:
     """Test CustomCollateFn."""
     
-    def test_threat_detection_collate(self):
+    def test_threat_detection_collate(self) -> Any:
         """Test threat detection collate function."""
         # Test with tokenized data
         batch = [
@@ -449,7 +468,7 @@ class TestCustomCollateFn:
         assert result['input_ids'].shape[0] == 2
         assert result['labels'].shape[0] == 2
     
-    def test_anomaly_detection_collate(self):
+    def test_anomaly_detection_collate(self) -> Any:
         """Test anomaly detection collate function."""
         batch = [
             (torch.tensor([0.1, 0.2, 0.3]), 0),
@@ -463,7 +482,7 @@ class TestCustomCollateFn:
         assert features.shape[0] == 2
         assert labels.shape[0] == 2
     
-    def test_malware_collate(self):
+    def test_malware_collate(self) -> Any:
         """Test malware collate function."""
         batch = [
             ({'binary_features': torch.tensor([0.1, 0.2]), 'api_sequences': ['a', 'b']}, 0),
@@ -482,7 +501,7 @@ class TestCustomCollateFn:
 class TestDataLoaderFactory:
     """Test DataLoaderFactory."""
     
-    def test_create_dataloader(self):
+    def test_create_dataloader(self) -> Any:
         """Test creating DataLoader with factory."""
         # Create mock dataset
         mock_dataset = MagicMock()
@@ -497,7 +516,7 @@ class TestDataLoaderFactory:
         assert dataloader.batch_size == 32
         assert dataloader.num_workers == 2
     
-    def test_create_dataloader_with_caching(self):
+    def test_create_dataloader_with_caching(self) -> Any:
         """Test creating DataLoader with caching."""
         # Create mock dataset
         mock_dataset = MagicMock()
@@ -519,7 +538,7 @@ class TestDataLoaderFactory:
 class TestDataLoaderMonitor:
     """Test DataLoaderMonitor."""
     
-    def test_data_loader_monitor_creation(self):
+    def test_data_loader_monitor_creation(self) -> Any:
         """Test creating DataLoaderMonitor."""
         # Create mock DataLoader
         mock_dataloader = MagicMock()
@@ -531,7 +550,7 @@ class TestDataLoaderMonitor:
         assert monitor.config == config
         assert monitor.metrics["load_times"] == []
     
-    def test_record_batch_load(self):
+    def test_record_batch_load(self) -> Any:
         """Test recording batch load metrics."""
         mock_dataloader = MagicMock()
         config = DataLoaderConfig()
@@ -545,7 +564,7 @@ class TestDataLoaderMonitor:
         assert monitor.metrics["batch_sizes"][0] == 32
         assert monitor.metrics["memory_usage"][0] == 0.5
     
-    def test_record_error(self):
+    def test_record_error(self) -> Any:
         """Test recording errors."""
         mock_dataloader = MagicMock()
         config = DataLoaderConfig()
@@ -558,7 +577,7 @@ class TestDataLoaderMonitor:
         assert len(monitor.metrics["errors"]) == 1
         assert monitor.metrics["errors"][0]["error"] == "Test error"
     
-    def test_get_performance_report(self):
+    def test_get_performance_report(self) -> Optional[Dict[str, Any]]:
         """Test getting performance report."""
         mock_dataloader = MagicMock()
         config = DataLoaderConfig()
@@ -580,7 +599,7 @@ class TestDataLoaderMonitor:
 class TestMemoryOptimizedDataLoader:
     """Test MemoryOptimizedDataLoader."""
     
-    def test_memory_optimized_dataloader_creation(self):
+    def test_memory_optimized_dataloader_creation(self) -> Any:
         """Test creating MemoryOptimizedDataLoader."""
         # Create mock DataLoader
         mock_dataloader = MagicMock()
@@ -592,7 +611,7 @@ class TestMemoryOptimizedDataLoader:
         assert memory_dataloader.dataloader == mock_dataloader
         assert memory_dataloader.max_memory_usage == 0.8
     
-    def test_memory_optimized_dataloader_iteration(self):
+    def test_memory_optimized_dataloader_iteration(self) -> Any:
         """Test MemoryOptimizedDataLoader iteration."""
         # Create mock DataLoader
         mock_dataloader = MagicMock()
@@ -611,7 +630,7 @@ class TestAsyncDataLoader:
     """Test AsyncDataLoader."""
     
     @pytest.mark.asyncio
-    async def test_async_dataloader_creation(self):
+    async def test_async_dataloader_creation(self) -> Any:
         """Test creating AsyncDataLoader."""
         # Create mock DataLoader
         mock_dataloader = MagicMock()
@@ -623,7 +642,7 @@ class TestAsyncDataLoader:
         assert async_dataloader.max_queue_size == 5
     
     @pytest.mark.asyncio
-    async def test_async_dataloader_iteration(self):
+    async def test_async_dataloader_iteration(self) -> Any:
         """Test AsyncDataLoader iteration."""
         # Create mock DataLoader
         mock_dataloader = MagicMock()
@@ -643,7 +662,7 @@ class TestAsyncDataLoader:
 class TestDataLoaderBenchmark:
     """Test DataLoaderBenchmark."""
     
-    def test_benchmark_dataloader(self):
+    def test_benchmark_dataloader(self) -> Any:
         """Test DataLoaderBenchmark.benchmark_dataloader."""
         # Create mock DataLoader
         mock_dataloader = MagicMock()
@@ -662,7 +681,7 @@ class TestDataLoaderBenchmark:
 class TestUtilityFunctions:
     """Test utility functions."""
     
-    def test_create_balanced_sampler(self):
+    def test_create_balanced_sampler(self) -> Any:
         """Test create_balanced_sampler."""
         labels = [0, 0, 0, 1, 1, 2, 2, 2, 2]  # Imbalanced labels
         
@@ -671,7 +690,7 @@ class TestUtilityFunctions:
         assert isinstance(sampler, torch.utils.data.WeightedRandomSampler)
         assert sampler.num_samples == len(labels)
     
-    def test_split_dataset(self):
+    def test_split_dataset(self) -> Any:
         """Test split_dataset."""
         # Create mock dataset
         mock_dataset = MagicMock()
@@ -690,11 +709,15 @@ class TestUtilityFunctions:
         assert len(val_dataset) == 15
         assert len(test_dataset) == 15
     
-    def test_get_dataset_info(self):
+    def test_get_dataset_info(self) -> Optional[Dict[str, Any]]:
         """Test get_dataset_info."""
         # Create temporary CSV file
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
             f.write("col1,col2\n1,2\n3,4\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             temp_path = f.name
         
         try:
@@ -710,7 +733,7 @@ class TestUtilityFunctions:
         finally:
             os.unlink(temp_path)
     
-    def test_optimize_dataloader_config(self):
+    def test_optimize_dataloader_config(self) -> Any:
         """Test optimize_dataloader_config."""
         config = optimize_dataloader_config(
             dataset_size=10000,
@@ -727,7 +750,7 @@ class TestUtilityFunctions:
 class TestIntegrationTests:
     """Integration tests for complete workflows."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment."""
         self.temp_dir = tempfile.mkdtemp()
         
@@ -742,12 +765,11 @@ class TestIntegrationTests:
         df = pd.DataFrame({'text': texts, 'label': y})
         df.to_csv(self.dataset_path, index=False)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test environment."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_complete_data_loading_workflow(self):
+    def test_complete_data_loading_workflow(self) -> Any:
         """Test complete data loading workflow."""
         # Create configuration
         config = DataLoaderConfig(
@@ -777,7 +799,7 @@ class TestIntegrationTests:
         assert len(dataset) == 100
     
     @pytest.mark.asyncio
-    async def test_async_data_loading_workflow(self):
+    async def test_async_data_loading_workflow(self) -> Any:
         """Test async data loading workflow."""
         # Create configuration
         config = DataLoaderConfig(batch_size=16, num_workers=2)
@@ -802,7 +824,7 @@ class TestIntegrationTests:
         
         assert batch_count > 0
     
-    def test_memory_optimized_workflow(self):
+    def test_memory_optimized_workflow(self) -> Any:
         """Test memory-optimized workflow."""
         # Create configuration
         config = DataLoaderConfig(batch_size=16, num_workers=2)
@@ -835,7 +857,7 @@ class TestIntegrationTests:
 class TestPerformanceTests:
     """Performance tests."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment."""
         self.temp_dir = tempfile.mkdtemp()
         
@@ -850,12 +872,11 @@ class TestPerformanceTests:
         df = pd.DataFrame({'text': texts, 'label': y})
         df.to_csv(self.dataset_path, index=False)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test environment."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_large_dataset_performance(self):
+    def test_large_dataset_performance(self) -> Any:
         """Test performance with large dataset."""
         config = DataLoaderConfig(
             batch_size=64,
@@ -886,9 +907,8 @@ class TestPerformanceTests:
         throughput = batch_count / total_time
         assert throughput > 0.5  # At least 0.5 batches per second
     
-    def test_memory_usage_performance(self):
+    def test_memory_usage_performance(self) -> Any:
         """Test memory usage performance."""
-        import psutil
         
         config = DataLoaderConfig(
             batch_size=32,
@@ -922,14 +942,14 @@ class TestPerformanceTests:
 class TestErrorHandling:
     """Test error handling and edge cases."""
     
-    def test_invalid_dataset_path(self):
+    def test_invalid_dataset_path(self) -> Any:
         """Test handling of invalid dataset paths."""
         config = DataLoaderConfig()
         
         with pytest.raises(Exception):
             ThreatDetectionDataset("nonexistent.csv", config)
     
-    def test_empty_dataset(self):
+    def test_empty_dataset(self) -> Any:
         """Test handling of empty datasets."""
         temp_dir = tempfile.mkdtemp()
         try:
@@ -944,10 +964,9 @@ class TestErrorHandling:
             with pytest.raises(ValueError, match="Dataset is empty"):
                 ThreatDetectionDataset(empty_dataset_path, config)
         finally:
-            import shutil
             shutil.rmtree(temp_dir)
     
-    def test_malformed_dataset(self):
+    def test_malformed_dataset(self) -> Any:
         """Test handling of malformed datasets."""
         temp_dir = tempfile.mkdtemp()
         try:
@@ -955,23 +974,34 @@ class TestErrorHandling:
             
             # Create malformed dataset
             with open(malformed_dataset_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write("invalid,csv,format\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write("no,proper,columns\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             config = DataLoaderConfig()
             
             with pytest.raises(Exception):
                 ThreatDetectionDataset(malformed_dataset_path, config)
         finally:
-            import shutil
             shutil.rmtree(temp_dir)
     
-    def test_invalid_config(self):
+    def test_invalid_config(self) -> Any:
         """Test handling of invalid configurations."""
         with pytest.raises(Exception):
             DataLoaderConfig(batch_size=-1)  # Invalid batch size
     
-    def test_cache_directory_creation(self):
+    def test_cache_directory_creation(self) -> Any:
         """Test cache directory creation."""
         temp_dir = tempfile.mkdtemp()
         try:
@@ -987,9 +1017,9 @@ class TestErrorHandling:
             # Check that cache directory was created
             assert os.path.exists(cache_dir)
         finally:
-            import shutil
             shutil.rmtree(temp_dir)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """single tool call per message
 
 Revision ID: 33cb72ea4d80
@@ -6,13 +13,11 @@ Create Date: 2024-11-01 12:51:01.535003
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = "33cb72ea4d80"
-down_revision = "5b29123cd710"
+revision: str = "33cb72ea4d80"
+down_revision: str = "5b29123cd710"
 branch_labels = None
 depends_on = None
 
@@ -36,16 +41,16 @@ def upgrade() -> None:
 
     # Step 2: Add a unique constraint on message_id
     op.create_unique_constraint(
-        constraint_name="uq_tool_call_message_id",
-        table_name="tool_call",
-        columns=["message_id"],
+        constraint_name: str = "uq_tool_call_message_id",
+        table_name: str = "tool_call",
+        columns: List[Any] = ["message_id"],
     )
 
 
 def downgrade() -> None:
     # Step 1: Drop the unique constraint on message_id
     op.drop_constraint(
-        constraint_name="uq_tool_call_message_id",
-        table_name="tool_call",
-        type_="unique",
+        constraint_name: str = "uq_tool_call_message_id",
+        table_name: str = "tool_call",
+        type_: str = "unique",
     )

@@ -1,14 +1,24 @@
-"""
-Subscriber Models
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
 
-This module contains models for email subscribers and subscriber segments.
-"""
+# Constants
+MAX_RETRIES = 100
 
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field, validator, EmailStr
 from uuid import UUID, uuid4
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Subscriber Models
+
+This module contains models for email subscribers and subscriber segments.
+"""
+
 
 
 class SubscriberStatus(str, Enum):
@@ -57,7 +67,7 @@ class SubscriberSegment(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
     @validator('name')
-    def validate_name(cls, v):
+    def validate_name(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Segment name cannot be empty")
         return v.strip()
@@ -83,7 +93,8 @@ class SubscriberSegment(BaseModel):
         self.subscriber_count = count
         self.last_updated = datetime.utcnow()
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)
@@ -144,13 +155,13 @@ class Subscriber(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
     @validator('first_name', 'last_name')
-    def validate_names(cls, v):
+    def validate_names(cls, v) -> bool:
         if v is not None and not v.strip():
             return None
         return v.strip() if v else None
     
     @validator('interests')
-    def validate_interests(cls, v):
+    def validate_interests(cls, v) -> bool:
         return [interest.strip() for interest in v if interest.strip()]
     
     @property
@@ -299,7 +310,8 @@ class Subscriber(BaseModel):
             "total_emails_clicked": self.total_emails_clicked
         }
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)

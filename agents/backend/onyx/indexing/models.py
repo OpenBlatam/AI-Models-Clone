@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
@@ -10,8 +12,11 @@ from onyx.utils.logger import setup_logger
 from shared_configs.enums import EmbeddingProvider
 from shared_configs.model_server_models import Embedding
 
-if TYPE_CHECKING:
     from onyx.db.models import SearchSettings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+if TYPE_CHECKING:
 
 
 logger = setup_logger()

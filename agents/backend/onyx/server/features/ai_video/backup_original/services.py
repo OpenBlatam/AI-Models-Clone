@@ -1,8 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from typing import List, Dict, Any, Optional, Callable, Union, Mapping
 from pydantic import BaseModel, ValidationError
 import uuid
 from starlette.datastructures import Headers
 
+                from .onyx_ai_video.core.models import VideoRequest
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class ServiceError(Exception):
     """Excepción base para errores de servicios."""
     pass
@@ -72,7 +81,9 @@ class VideoService:
         - El trace_id se propaga en logs y respuestas si se pasa en headers.
     """
     def __init__(self, get_system: Callable, video_status: Dict[str, Any], video_logs: Dict[str, Any], envelope: Callable[[bool, Any], dict], logger: Optional[Any] = None, on_job_created: Optional[Callable[[str, dict], None]] = None):
-        self.get_system = get_system
+        
+    """__init__ function."""
+self.get_system = get_system
         self.video_status = video_status
         self.video_logs = video_logs
         self.envelope = envelope
@@ -97,7 +108,6 @@ class VideoService:
             if self.logger:
                 self.logger.info({"action": "create_video", "use_onyx": use_onyx, "user": user.get("sub"), "trace_id": trace_id})
             if use_onyx:
-                from .onyx_ai_video.core.models import VideoRequest
                 req = body if isinstance(body, VideoRequest) else VideoRequest(**body)
                 system = await self.get_system()
                 response = await system.generate_video(req)
@@ -228,7 +238,9 @@ class BatchService:
         - El trace_id se propaga en logs y respuestas si se pasa.
     """
     def __init__(self, batch_helpers: Dict[str, Callable], get_system: Callable, video_status: Dict[str, Any], video_logs: Dict[str, Any], cache_status: Any, cache_logs: Any, envelope: Callable[[bool, Any], dict], logger: Optional[Any] = None, on_batch_completed: Optional[Callable[[List[str], dict], None]] = None):
-        self.batch_get_status = batch_helpers["get_status"]
+        
+    """__init__ function."""
+self.batch_get_status = batch_helpers["get_status"]
         self.batch_fetch_status = batch_helpers["fetch_status"]
         self.batch_serialize_status = batch_helpers["serialize_status"]
         self.batch_get_logs = batch_helpers["get_logs"]

@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import time
 from collections.abc import Callable
 from collections.abc import Generator
@@ -20,6 +25,9 @@ from onyx.connectors.zendesk.connector import ZendeskConnector
 from tests.unit.onyx.connectors.utils import load_everything_from_checkpoint_connector
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def mock_zendesk_client() -> MagicMock:
     """Create a mock Zendesk client"""

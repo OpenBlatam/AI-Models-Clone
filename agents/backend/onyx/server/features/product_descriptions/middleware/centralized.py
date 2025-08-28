@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 import logging
 from fastapi import Request, Response
@@ -6,13 +8,19 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.types import ASGIApp
 from typing import Callable
 
+from typing import Any, List, Dict, Optional
+import asyncio
 class CentralizedMiddleware(BaseHTTPMiddleware):
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.logger = logging.getLogger("centralized.middleware")
 
     async def dispatch(self, request: Request, call_next: Callable):
-        start_time = time.time()
+        
+    """dispatch function."""
+start_time = time.time()
         try:
             response = await call_next(request)
             process_time = time.time() - start_time

@@ -1,3 +1,38 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+import sys
+import time
+import uuid
+import weakref
+from contextlib import asynccontextmanager
+from datetime import datetime
+from typing import Any, Dict, List, Optional
+from fastapi import FastAPI, Request, Response, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import JSONResponse
+from starlette.middleware.base import BaseHTTPMiddleware
+from onyx import __version__
+from onyx.configs.app_configs import (
+from onyx.utils.logger import setup_logger
+    import redis.asyncio as redis
+    from prometheus_client import Counter, Histogram, Gauge, generate_latest
+    import orjson as json
+    import json
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 🚀 IMPROVED ENTERPRISE MAIN
 ==========================
@@ -13,49 +48,27 @@ Enhanced version of main.py with advanced microservices patterns:
 - Security best practices
 """
 
-import asyncio
-import logging
-import sys
-import time
-import uuid
-import weakref
-from contextlib import asynccontextmanager
-from datetime import datetime
-from typing import Any, Dict, List, Optional
 
 # FastAPI & core dependencies
-from fastapi import FastAPI, Request, Response, Depends, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from fastapi.responses import JSONResponse
-from starlette.middleware.base import BaseHTTPMiddleware
 
 # Import existing onyx components
-from onyx import __version__
-from onyx.configs.app_configs import (
     APP_API_PREFIX, APP_HOST, APP_PORT, CORS_ALLOWED_ORIGIN
 )
-from onyx.utils.logger import setup_logger
 
 # Optional advanced dependencies
 try:
-    import redis.asyncio as redis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
 
 try:
-    from prometheus_client import Counter, Histogram, Gauge, generate_latest
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
 try:
-    import orjson as json
     JSON_AVAILABLE = True
 except ImportError:
-    import json
     JSON_AVAILABLE = False
 
 # Setup logger
@@ -67,7 +80,9 @@ class EnterpriseCache:
     """Multi-tier cache with Redis and memory layers"""
     
     def __init__(self, redis_url: str = "redis://localhost:6379"):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.redis_client = None
         self.memory_cache = weakref.WeakValueDictionary()
         self.access_times = {}
@@ -79,7 +94,7 @@ class EnterpriseCache:
         self.redis_hits = 0
         self.memory_hits = 0
     
-    async def init_redis(self):
+    async def init_redis(self) -> Any:
         """Initialize Redis connection with retry logic"""
         if not REDIS_AVAILABLE:
             logger.warning("Redis not available - using memory cache only")
@@ -191,13 +206,15 @@ class CircuitBreaker:
     """Simple but effective circuit breaker"""
     
     def __init__(self, failure_threshold: int = 5, timeout: int = 60):
-        self.failure_threshold = failure_threshold
+        
+    """__init__ function."""
+self.failure_threshold = failure_threshold
         self.timeout = timeout
         self.failure_count = 0
         self.last_failure_time = None
         self.state = "CLOSED"  # CLOSED, OPEN, HALF_OPEN
     
-    async def call(self, func, *args, **kwargs):
+    async def call(self, func, *args, **kwargs) -> Any:
         """Execute function with circuit breaker protection"""
         if self.state == "OPEN":
             if time.time() - self.last_failure_time > self.timeout:
@@ -234,7 +251,9 @@ class RateLimiter:
     """Redis-based distributed rate limiter"""
     
     def __init__(self, redis_client, requests_per_minute: int = 1000):
-        self.redis_client = redis_client
+        
+    """__init__ function."""
+self.redis_client = redis_client
         self.requests_per_minute = requests_per_minute
     
     async def is_allowed(self, identifier: str) -> tuple[bool, Dict[str, Any]]:
@@ -275,7 +294,7 @@ class RateLimiter:
 class EnterpriseMiddleware(BaseHTTPMiddleware):
     """Comprehensive enterprise middleware"""
     
-    def __init__(self, app, cache_manager, rate_limiter, circuit_breaker):
+    def __init__(self, app, cache_manager, rate_limiter, circuit_breaker) -> Any:
         super().__init__(app)
         self.cache_manager = cache_manager
         self.rate_limiter = rate_limiter
@@ -597,7 +616,6 @@ def create_enhanced_application() -> FastAPI:
 enhanced_app = create_enhanced_application()
 
 if __name__ == "__main__":
-    import uvicorn
     
     logger.info(f"🚀 Starting Enhanced Onyx Backend v{__version__}")
     logger.info(f"🌐 Server will run on http://{APP_HOST}:{APP_PORT}")

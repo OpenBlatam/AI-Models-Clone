@@ -1,13 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import logging
+from typing import Dict, List, Any, Optional
+from concurrent.futures import ThreadPoolExecutor
+from .config import NLPConfig
+from .analyzers import (
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Factory pattern para crear y gestionar analizadores NLP.
 """
 
-import logging
-from typing import Dict, List, Any, Optional
-from concurrent.futures import ThreadPoolExecutor
 
-from .config import NLPConfig
-from .analyzers import (
     AnalyzerInterface,
     SentimentAnalyzer,
     ReadabilityAnalyzer,
@@ -21,7 +25,9 @@ class AnalyzerFactory:
     """Factory para crear y gestionar analizadores NLP."""
     
     def __init__(self, config: NLPConfig, executor: ThreadPoolExecutor):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.executor = executor
         self.analyzers: Dict[str, AnalyzerInterface] = {}
         self.logger = logging.getLogger(f"{__name__}.AnalyzerFactory")
@@ -36,7 +42,7 @@ class AnalyzerFactory:
             'language': LanguageAnalyzer
         }
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Inicializar factory y crear analizadores."""
         self.logger.info("Initializing AnalyzerFactory...")
         

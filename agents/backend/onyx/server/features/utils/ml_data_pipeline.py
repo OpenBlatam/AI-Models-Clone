@@ -1,24 +1,32 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import json
+from datetime import datetime
+from typing import List
+from kafka import KafkaProducer, KafkaConsumer
+import boto3
+from hdfs import InsecureClient
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 ML/LLM Data Pipeline Utilities
 - Kafka ingestion
 - MinIO/Ceph (S3 compatible) and HDFS storage
 - Ready for training/fine-tuning workflows
 """
-import json
-from datetime import datetime
-from typing import List
 
 # Kafka
-from kafka import KafkaProducer, KafkaConsumer
 
 # MinIO/Ceph (S3 compatible)
-import boto3
 
 # HDFS
-from hdfs import InsecureClient
 
 # --- Kafka Producer ---
-def send_training_example_kafka(instance, topic="ml_training_examples", bootstrap_servers=None):
+def send_training_example_kafka(instance, topic="ml_training_examples", bootstrap_servers=None) -> Any:
     """Send a training example to a Kafka topic."""
     producer = KafkaProducer(
         bootstrap_servers=bootstrap_servers or ['localhost:9092'],
@@ -84,12 +92,20 @@ def save_batch_to_hdfs(batch: List[dict], hdfs_url, hdfs_path):
     """Save a batch of examples to HDFS as JSONL."""
     client = InsecureClient(hdfs_url)
     with client.write(hdfs_path, encoding='utf-8', append=True) as writer:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         for example in batch:
             writer.write(json.dumps(example, ensure_ascii=False) + '\n')
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     print(f"Saved batch to HDFS: {hdfs_path}")
 
 # --- Read dataset from S3 ---
-def load_dataset_from_s3(bucket, key, endpoint_url, access_key, secret_key):
+def load_dataset_from_s3(bucket, key, endpoint_url, access_key, secret_key) -> Any:
     s3 = boto3.client(
         's3',
         endpoint_url=endpoint_url,
@@ -99,12 +115,20 @@ def load_dataset_from_s3(bucket, key, endpoint_url, access_key, secret_key):
     )
     obj = s3.get_object(Bucket=bucket, Key=key)
     lines = obj['Body'].read().decode('utf-8').splitlines()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     return [json.loads(line) for line in lines]
 
 # --- Read dataset from HDFS ---
-def load_dataset_from_hdfs(hdfs_url, hdfs_path):
+def load_dataset_from_hdfs(hdfs_url, hdfs_path) -> Any:
     client = InsecureClient(hdfs_url)
     with client.read(hdfs_path, encoding='utf-8') as reader:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         return [json.loads(line) for line in reader]
 
 # --- Ejemplo de uso con InputPrompt ---

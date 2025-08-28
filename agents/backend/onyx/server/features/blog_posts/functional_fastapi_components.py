@@ -1,3 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+from typing import List, Optional, Dict, Any, Callable, Awaitable, TypeVar, Generic
+from functools import wraps, partial
+from datetime import datetime, timedelta
+from dataclasses import dataclass, field
+from enum import Enum
+from fastapi import (
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field, ConfigDict, validator, root_validator
+from pydantic.types import conint, constr
+import structlog
+from .sqlalchemy_2_implementation import (
+    import hashlib
+from typing import Any, List, Dict, Optional
 """
 🚀 Functional FastAPI Components with Pydantic Models
 ====================================================
@@ -11,24 +37,11 @@ Functional approach to FastAPI using:
 - Type-safe operations
 """
 
-import asyncio
-import logging
-from typing import List, Optional, Dict, Any, Callable, Awaitable, TypeVar, Generic
-from functools import wraps, partial
-from datetime import datetime, timedelta
-from dataclasses import dataclass, field
-from enum import Enum
 
-from fastapi import (
     FastAPI, Depends, HTTPException, status, Request, Response,
     BackgroundTasks, Query, Path, Body, Header
 )
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field, ConfigDict, validator, root_validator
-from pydantic.types import conint, constr
-import structlog
 
-from .sqlalchemy_2_implementation import (
     DatabaseConfig, SQLAlchemy2Manager,
     TextAnalysisCreate, TextAnalysisUpdate, BatchAnalysisCreate,
     TextAnalysisResponse, BatchAnalysisResponse,
@@ -389,7 +402,8 @@ class AnalysisResponse(BaseModel):
     processed_at: Optional[datetime] = Field(description="Processing completion timestamp")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    class Config:
+    @dataclass
+class Config:
         from_attributes = True
         json_schema_extra = {
             "example": {
@@ -427,7 +441,8 @@ class BatchAnalysisResponse(BaseModel):
     completed_at: Optional[datetime] = Field(description="Completion timestamp")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    class Config:
+    @dataclass
+class Config:
         from_attributes = True
     
     @property
@@ -637,7 +652,6 @@ def generate_cache_key(
     optimization_tier: OptimizationTierEnum
 ) -> str:
     """Pure function to generate cache key."""
-    import hashlib
     
     # Create a deterministic string for hashing
     content = f"{text_content}:{analysis_type}:{optimization_tier}"
@@ -1148,5 +1162,6 @@ async def example_functional_usage():
     )
     print(f"Cache key: {cache_key}")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(example_functional_usage()) 

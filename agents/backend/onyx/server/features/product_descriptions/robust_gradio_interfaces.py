@@ -1,14 +1,16 @@
-"""
-Robust Gradio Interfaces with Comprehensive Error Handling and Input Validation
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module provides production-ready Gradio interfaces with:
-- Comprehensive input validation and sanitization
-- Robust error handling with user-friendly messages
-- Detailed logging for debugging and monitoring
-- Graceful degradation for edge cases
-- Security-focused input validation
-- Performance monitoring and optimization
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import gradio as gr
 import numpy as np
@@ -32,6 +34,23 @@ import re
 import hashlib
 from dataclasses import dataclass
 from enum import Enum
+            from sklearn.metrics import confusion_matrix
+            from sklearn.metrics import roc_curve, auc
+            import psutil
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Robust Gradio Interfaces with Comprehensive Error Handling and Input Validation
+
+This module provides production-ready Gradio interfaces with:
+- Comprehensive input validation and sanitization
+- Robust error handling with user-friendly messages
+- Detailed logging for debugging and monitoring
+- Graceful degradation for edge cases
+- Security-focused input validation
+- Performance monitoring and optimization
+"""
+
 
 # Configure logging
 logging.basicConfig(
@@ -79,7 +98,7 @@ class ValidationResult:
 class InputValidator:
     """Comprehensive input validation system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.max_file_size = 50 * 1024 * 1024  # 50MB
         self.max_features = 100
         self.max_samples = 10000
@@ -228,7 +247,7 @@ class InputValidator:
 class ErrorHandler:
     """Comprehensive error handling system."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_counts = {}
         self.performance_metrics = {}
     
@@ -284,7 +303,7 @@ class ErrorHandler:
 class RobustCybersecurityModelInterface:
     """Robust interface for cybersecurity model showcase with comprehensive error handling."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.model = self._create_demo_model()
         self.model.eval()
         self.validator = InputValidator()
@@ -298,7 +317,7 @@ class RobustCybersecurityModelInterface:
         """Create a demo model for showcase."""
         try:
             class DemoCybersecurityModel(nn.Module):
-                def __init__(self, input_dim=20, num_classes=4):
+                def __init__(self, input_dim=20, num_classes=4) -> Any:
                     super().__init__()
                     self.features = nn.Sequential(
                         nn.Linear(input_dim, 64),
@@ -312,7 +331,7 @@ class RobustCybersecurityModelInterface:
                     )
                     self.classifier = nn.Linear(16, num_classes)
                     
-                def forward(self, x):
+                def forward(self, x) -> Any:
                     features = self.features(x)
                     return self.classifier(features)
             
@@ -503,7 +522,6 @@ class RobustCybersecurityModelInterface:
     def _create_confusion_matrix(self, targets: np.ndarray, predictions: np.ndarray) -> go.Figure:
         """Create confusion matrix visualization."""
         try:
-            from sklearn.metrics import confusion_matrix
             cm = confusion_matrix(targets, predictions)
             
             fig = go.Figure(data=go.Heatmap(
@@ -530,7 +548,6 @@ class RobustCybersecurityModelInterface:
     def _create_roc_curves(self, targets: np.ndarray, probabilities: np.ndarray) -> go.Figure:
         """Create ROC curves visualization."""
         try:
-            from sklearn.metrics import roc_curve, auc
             fig = go.Figure()
             
             for i in range(4):
@@ -637,7 +654,6 @@ class RobustCybersecurityModelInterface:
     def _get_memory_usage(self) -> Dict[str, float]:
         """Get memory usage information."""
         try:
-            import psutil
             process = psutil.Process()
             memory_info = process.memory_info()
             return {
@@ -749,7 +765,7 @@ def create_robust_interfaces():
                         # Warnings display
                         warnings_output = gr.HTML(label="Warnings")
                 
-                def analyze_with_error_handling(*features):
+                def analyze_with_error_handling(*features) -> Any:
                     result = model_interface.real_time_inference(*features)
                     
                     if result.get('error', False):
@@ -825,7 +841,7 @@ def create_robust_interfaces():
                 
                 confidence_dist_plot = gr.Plot(label="Confidence Distribution")
                 
-                def analyze_batch_with_validation(file):
+                def analyze_batch_with_validation(file) -> Any:
                     if file is None:
                         return (
                             "<div class='error-message'><strong>Error:</strong> No file uploaded</div>",
@@ -929,7 +945,9 @@ def create_robust_interfaces():
                 status_output = gr.JSON(label="System Status")
                 
                 def get_system_status():
-                    return model_interface.get_system_status()
+                    
+    """get_system_status function."""
+return model_interface.get_system_status()
                 
                 refresh_status_btn.click(
                     fn=get_system_status,

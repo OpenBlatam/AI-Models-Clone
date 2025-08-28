@@ -1,10 +1,10 @@
-#!/usr/bin/env python3
-"""
-Comprehensive test runner for Onyx AI Video System.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-This script runs all tests (unit, integration, system) and generates
-detailed reports with coverage analysis.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import sys
@@ -18,6 +18,20 @@ from datetime import datetime
 from typing import Dict, List, Any, Optional
 import pytest
 import coverage
+                from onyx_ai_video.core.models import VideoRequest, VideoResponse
+                from onyx_ai_video.config.config_manager import OnyxConfigManager
+                from onyx_ai_video.api.main import OnyxAIVideoSystem
+                        import shutil
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Comprehensive test runner for Onyx AI Video System.
+
+This script runs all tests (unit, integration, system) and generates
+detailed reports with coverage analysis.
+"""
+
 
 
 class TestRunner:
@@ -120,9 +134,6 @@ class TestRunner:
             sys.path.insert(0, str(self.project_root))
             
             try:
-                from onyx_ai_video.core.models import VideoRequest, VideoResponse
-                from onyx_ai_video.config.config_manager import OnyxConfigManager
-                from onyx_ai_video.api.main import OnyxAIVideoSystem
                 print("✅ Core modules import check passed")
             except ImportError as e:
                 print(f"❌ Core modules import failed: {e}")
@@ -134,7 +145,7 @@ class TestRunner:
             print(f"❌ Dependencies check failed: {e}")
             return False
     
-    def _setup_test_config(self):
+    def _setup_test_config(self) -> Any:
         """Setup test configuration."""
         test_config = {
             "test_outputs_dir": str(self.project_root / "test_outputs"),
@@ -147,6 +158,10 @@ class TestRunner:
         
         config_file = self.project_root / "test_config.json"
         with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(test_config, f, indent=2)
     
     def run_tests(self, categories: List[str] = None, coverage: bool = True) -> Dict[str, Any]:
@@ -235,6 +250,10 @@ class TestRunner:
                 coverage_file = self.project_root / "test_reports" / f"coverage_{category}.json"
                 if coverage_file.exists():
                     with open(coverage_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         test_result["coverage"] = json.load(f)
             
             return test_result
@@ -324,13 +343,25 @@ class TestRunner:
             output_file = self.project_root / "test_reports" / f"test_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
         
         with open(output_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(report, f, indent=2)
         
         # Generate HTML report
         html_report = self._generate_html_report(report)
         html_file = Path(output_file).with_suffix('.html')
         with open(html_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(html_report)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         print(f"✅ Test report generated: {output_file}")
         print(f"✅ HTML report generated: {html_file}")
@@ -464,21 +495,11 @@ class TestRunner:
         # Generate recommendations HTML
         recommendations_html = ""
         for rec in report.get("recommendations", []):
-            recommendations_html += f"<li>{rec}</li>"
+            recommendations_html += f"<li>{rec}</li>"f"
         
-        return html_template.format(
-            timestamp=report["test_run"]["timestamp"],
-            duration=report["test_run"]["duration"],
-            total_tests=report["summary"]["total_tests"],
-            total_passed=report["summary"]["total_passed"],
-            total_failed=report["summary"]["total_failed"],
-            success_rate=report["summary"]["success_rate"],
-            categories_html=categories_html,
-            coverage=report["coverage_summary"]["overall_coverage"],
-            recommendations_html=recommendations_html
-        )
+        return html_template"
     
-    def cleanup(self):
+    def cleanup(self) -> Any:
         """Cleanup test artifacts."""
         print("\n🧹 Cleaning up test artifacts...")
         
@@ -490,7 +511,6 @@ class TestRunner:
                     if file_path.is_file():
                         file_path.unlink()
                     elif file_path.is_dir():
-                        import shutil
                         shutil.rmtree(file_path)
             
             print("✅ Cleanup completed")
@@ -558,5 +578,6 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

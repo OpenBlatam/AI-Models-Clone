@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from sqlalchemy import String
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """forcibly remove more enum types from postgres
 
 Revision ID: 77d07dffae64
@@ -6,8 +13,6 @@ Create Date: 2023-11-01 12:33:01.999617
 
 """
 
-from alembic import op
-from sqlalchemy import String
 
 
 # revision identifiers, used by Alembic.
@@ -20,6 +25,16 @@ depends_on: None = None
 def upgrade() -> None:
     # In a PR:
     # https://github.com/onyx-dot-app/onyx/pull/397/files#diff-f05fb341f6373790b91852579631b64ca7645797a190837156a282b67e5b19c2
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     # we directly changed some previous migrations. This caused some users to have native enums
     # while others wouldn't. This has caused some issues when adding new fields to these enums.
     # This migration manually changes the enum types to ensure that nobody uses native enums.

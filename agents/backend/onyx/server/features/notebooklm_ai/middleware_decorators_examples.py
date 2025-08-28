@@ -1,3 +1,40 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import functools
+import inspect
+import json
+import logging
+import time
+import traceback
+from dataclasses import dataclass, field, asdict
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Union, Callable, Set, Tuple, Type, TypeVar, Awaitable
+from enum import Enum
+import threading
+from contextlib import contextmanager, asynccontextmanager
+from collections import defaultdict, deque
+import uuid
+import hashlib
+import base64
+from datetime import datetime, timedelta
+import statistics
+import weakref
+    import fastapi
+    from fastapi import FastAPI, Request, Response, HTTPException
+    from fastapi.middleware.base import BaseHTTPMiddleware
+    from starlette.middleware.base import RequestResponseEndpoint
+    from starlette.types import ASGIApp
+    import prometheus_client
+    from prometheus_client import Counter, Histogram, Gauge, Summary
+    import redis
+from typing import Any, List, Dict, Optional
 """
 Middleware and Decorators for Centralized Logging, Metrics, and Exception Handling
 =================================================================================
@@ -21,46 +58,18 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import functools
-import inspect
-import json
-import logging
-import time
-import traceback
-from dataclasses import dataclass, field, asdict
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, Callable, Set, Tuple, Type, TypeVar, Awaitable
-from enum import Enum
-import threading
-from contextlib import contextmanager, asynccontextmanager
-from collections import defaultdict, deque
-import uuid
-import hashlib
-import base64
-from datetime import datetime, timedelta
-import statistics
-import weakref
 
 try:
-    import fastapi
-    from fastapi import FastAPI, Request, Response, HTTPException
-    from fastapi.middleware.base import BaseHTTPMiddleware
-    from starlette.middleware.base import RequestResponseEndpoint
-    from starlette.types import ASGIApp
     FASTAPI_AVAILABLE = True
 except ImportError:
     FASTAPI_AVAILABLE = False
 
 try:
-    import prometheus_client
-    from prometheus_client import Counter, Histogram, Gauge, Summary
     PROMETHEUS_AVAILABLE = True
 except ImportError:
     PROMETHEUS_AVAILABLE = False
 
 try:
-    import redis
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
@@ -189,10 +198,10 @@ class LoggingMiddleware:
         else:
             self._setup_standard_logging()
     
-    def _setup_json_logging(self):
+    def _setup_json_logging(self) -> Any:
         """Setup JSON logging format."""
         class JSONFormatter(logging.Formatter):
-            def format(self, record):
+            def format(self, record) -> Any:
                 log_entry = {
                     'timestamp': datetime.fromtimestamp(record.created).isoformat(),
                     'level': record.levelname,
@@ -214,7 +223,7 @@ class LoggingMiddleware:
         self.logger.addHandler(handler)
         self.logger.setLevel(getattr(logging, self.config.log_level.value.upper()))
     
-    def _setup_standard_logging(self):
+    def _setup_standard_logging(self) -> Any:
         """Setup standard logging format."""
         formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
@@ -348,7 +357,7 @@ class MetricsMiddleware:
         else:
             self._setup_memory_metrics()
     
-    def _setup_prometheus_metrics(self):
+    def _setup_prometheus_metrics(self) -> Any:
         """Setup Prometheus metrics."""
         self.request_counter = Counter(
             'http_requests_total',
@@ -380,7 +389,7 @@ class MetricsMiddleware:
             ['exception_type', 'function_name']
         )
     
-    def _setup_memory_metrics(self):
+    def _setup_memory_metrics(self) -> Any:
         """Setup in-memory metrics."""
         self.request_counter = None
         self.request_duration = None
@@ -535,7 +544,7 @@ class ExceptionHandlingMiddleware:
         # Register default handlers
         self._register_default_handlers()
     
-    def _register_default_handlers(self):
+    def _register_default_handlers(self) -> Any:
         """Register default exception handlers."""
         self.register_handler(ValueError, self._handle_value_error)
         self.register_handler(TypeError, self._handle_type_error)
@@ -801,7 +810,7 @@ def log_function_call(middleware_manager: MiddlewareManager):
     """Decorator to log function calls."""
     def decorator(func: F) -> F:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # Get function info
             function_name = func.__name__
             module_name = func.__module__
@@ -842,7 +851,7 @@ def async_log_function_call(middleware_manager: MiddlewareManager):
     """Decorator to log async function calls."""
     def decorator(func: F) -> F:
         @functools.wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Get function info
             function_name = func.__name__
             module_name = func.__module__
@@ -883,7 +892,7 @@ def monitor_performance(threshold: float = 1.0):
     """Decorator to monitor function performance."""
     def decorator(func: F) -> F:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             start_time = time.time()
             
             try:
@@ -909,7 +918,7 @@ def handle_exceptions(exception_handlers: Dict[Type[Exception], Callable] = None
     """Decorator to handle exceptions."""
     def decorator(func: F) -> F:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             try:
                 return func(*args, **kwargs)
             except Exception as e:
@@ -931,7 +940,9 @@ if FASTAPI_AVAILABLE:
         """FastAPI middleware for logging, metrics, and exception handling."""
         
         def __init__(self, app: ASGIApp, middleware_manager: MiddlewareManager):
-            super().__init__(app)
+            
+    """__init__ function."""
+super().__init__(app)
             self.middleware_manager = middleware_manager
         
         async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -1047,7 +1058,9 @@ def demonstrate_middleware_usage():
     
     # Test async function
     async def test_async():
-        result = await example_async_function(4, 6)
+        
+    """test_async function."""
+result = await example_async_function(4, 6)
         print(f"Async result: {result}")
     
     asyncio.run(test_async())
@@ -1077,16 +1090,22 @@ def demonstrate_fastapi_middleware():
     # Example endpoints
     @app.get("/")
     async def root():
-        return {"message": "Hello World"}
+        
+    """root function."""
+return {"message": "Hello World"}
     
     @app.get("/slow")
     async def slow_endpoint():
-        await asyncio.sleep(2)  # Simulate slow operation
+        
+    """slow_endpoint function."""
+await asyncio.sleep(2)  # Simulate slow operation
         return {"message": "Slow response"}
     
     @app.get("/error")
     async def error_endpoint():
-        raise ValueError("Example error")
+        
+    """error_endpoint function."""
+raise ValueError("Example error")
     
     print("FastAPI middleware demonstration")
     print("Start the server with: uvicorn main:app --reload")
@@ -1108,7 +1127,9 @@ def demonstrate_context_managers():
     
     # Async performance context manager
     async def async_operation():
-        async with async_performance_context("async_operation", middleware_manager):
+        
+    """async_operation function."""
+async with async_performance_context("async_operation", middleware_manager):
             await asyncio.sleep(0.1)  # Simulate async work
             print("Async operation completed")
     
@@ -1145,5 +1166,6 @@ def main():
     logger.info("Middleware and decorators examples completed")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

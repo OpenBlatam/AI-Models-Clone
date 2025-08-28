@@ -1,0 +1,126 @@
+# Quantum-Optimized HeyGen AI Dockerfile
+# Advanced GPU utilization and mixed precision training
+
+# Use NVIDIA CUDA base image for GPU support
+FROM nvidia/cuda:11.8-devel-ubuntu20.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV CUDA_VISIBLE_DEVICES=0
+ENV PYTORCH_CUDA_ALLOC_CONF=max_split_size_mb:128
+ENV TOKENIZERS_PARALLELISM=false
+ENV TORCH_CUDNN_V8_API_ENABLED=1
+ENV TORCH_CUDNN_V8_API_DISABLED=0
+ENV PYTORCH_NO_CUDA_MEMORY_CACHING=1
+ENV QUANTUM_OPTIMIZATION_ENABLED=1
+ENV MIXED_PRECISION_TRAINING=1
+ENV GPU_OPTIMIZATION_LEVEL=quantum
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    python3.11 \
+    python3.11-dev \
+    python3-pip \
+    python3.11-venv \
+    git \
+    curl \
+    wget \
+    build-essential \
+    cmake \
+    pkg-config \
+    libssl-dev \
+    libffi-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libtiff-dev \
+    libavcodec-dev \
+    libavformat-dev \
+    libswscale-dev \
+    libv4l-dev \
+    libxvidcore-dev \
+    libx264-dev \
+    libgtk-3-dev \
+    libatlas-base-dev \
+    gfortran \
+    libhdf5-dev \
+    libhdf5-serial-dev \
+    libhdf5-103 \
+    libqtgui4 \
+    libqtwebkit4 \
+    libqt4-test \
+    python3-pyqt5 \
+    libgstreamer1.0-0 \
+    libgstreamer-plugins-base1.0-0 \
+    libgtk2.0-dev \
+    libtbb2 \
+    libtbb-dev \
+    libdc1394-22-dev \
+    libopenexr-dev \
+    libgstreamer1.0-dev \
+    libgstreamer-plugins-base1.0-dev \
+    libgstreamer-plugins-bad1.0-dev \
+    gstreamer1.0-plugins-base \
+    gstreamer1.0-plugins-good \
+    gstreamer1.0-plugins-bad \
+    gstreamer1.0-plugins-ugly \
+    gstreamer1.0-libav \
+    gstreamer1.0-tools \
+    gstreamer1.0-x \
+    gstreamer1.0-alsa \
+    gstreamer1.0-gl \
+    gstreamer1.0-gtk3 \
+    gstreamer1.0-qt5 \
+    gstreamer1.0-pulseaudio \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create symbolic link for python
+RUN ln -s /usr/bin/python3.11 /usr/bin/python
+
+# Upgrade pip
+RUN python -m pip install --upgrade pip
+
+# Install PyTorch with CUDA support
+RUN pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+# Copy requirements and install Python dependencies
+COPY requirements-quantum.txt .
+RUN pip install -r requirements-quantum.txt
+
+# Install additional optimization libraries
+RUN pip install \
+    transformers \
+    diffusers \
+    accelerate \
+    bitsandbytes \
+    optimum \
+    onnx \
+    onnxruntime \
+    onnxruntime-gpu \
+    torch-quantization \
+    pytorch-quantization \
+    psutil \
+    GPUtil
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/models /app/cache /app/temp
+
+# Set permissions
+RUN chmod +x run_quantum_optimized.sh
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Default command
+CMD ["python", "main_quantum_optimized.py"] 

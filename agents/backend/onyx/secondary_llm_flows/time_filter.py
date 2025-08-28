@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from datetime import datetime
 from datetime import timedelta
@@ -12,6 +14,10 @@ from onyx.prompts.filter_extration import TIME_FILTER_PROMPT
 from onyx.prompts.prompt_utils import get_current_llm_day_time
 from onyx.utils.logger import setup_logger
 
+    from onyx.llm.factory import get_default_llms, get_main_llm_from_tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -49,8 +55,7 @@ def extract_time_filter(query: str, llm: LLM) -> tuple[datetime | None, bool]:
         messages = [
             {
                 "role": "system",
-                "content": TIME_FILTER_PROMPT.format(
-                    current_day_time_str=get_current_llm_day_time()
+                "content"f": TIME_FILTER_PROMPT"
                 ),
             },
             {
@@ -156,7 +161,6 @@ def extract_time_filter(query: str, llm: LLM) -> tuple[datetime | None, bool]:
 
 if __name__ == "__main__":
     # Just for testing purposes, too tedious to unit test as it relies on an LLM
-    from onyx.llm.factory import get_default_llms, get_main_llm_from_tuple
 
     while True:
         user_input = input("Query to Extract Time: ")

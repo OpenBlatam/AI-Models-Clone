@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import datetime
 import json
 import os
@@ -40,6 +42,9 @@ from onyx.utils.variable_functionality import fetch_versioned_implementation
 from shared_configs.configs import MULTI_TENANT
 from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -120,6 +125,10 @@ def load_processed_docs(cohere_enabled: bool) -> list[dict]:
         "initial_docs.json",
     )
     processed_docs = json.load(open(initial_docs_path))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     return processed_docs
 
 

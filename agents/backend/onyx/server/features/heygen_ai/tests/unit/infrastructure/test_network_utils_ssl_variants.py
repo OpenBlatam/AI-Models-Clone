@@ -1,7 +1,7 @@
 import pytest
 import ssl as _ssl
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
@@ -29,7 +29,7 @@ async def test_check_ssl_certificate_no_cert(monkeypatch):
         def wrap_socket(self, sock, server_hostname=None):
             return FakeSSock()
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod.socket, "create_connection", lambda *_args, **_kw: FakeSocket())
     monkeypatch.setattr(mod.ssl, "create_default_context", lambda: FakeContext())
 
@@ -67,7 +67,7 @@ async def test_check_ssl_certificate_weak_cipher(monkeypatch):
         def wrap_socket(self, sock, server_hostname=None):
             return FakeSSock()
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod.socket, "create_connection", lambda *_args, **_kw: FakeSocket())
     monkeypatch.setattr(mod.ssl, "create_default_context", lambda: FakeContext())
 
@@ -75,6 +75,7 @@ async def test_check_ssl_certificate_weak_cipher(monkeypatch):
     info = await utils.check_ssl_certificate("example.com", 443)
     assert info["is_certificate_valid"] is True
     assert info["has_strong_cipher"] is False
+
 
 
 

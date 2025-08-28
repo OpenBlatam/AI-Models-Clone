@@ -1,6 +1,6 @@
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
@@ -25,7 +25,7 @@ async def test_check_http_status_missing_headers(monkeypatch):
         def get(self, url):
             return FakeResponse()
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod, "aiohttp", type("x", (), {"ClientSession": lambda timeout=None: FakeSession(), "ClientTimeout": lambda total: total}))
 
     u = NetworkUtils()
@@ -34,6 +34,7 @@ async def test_check_http_status_missing_headers(monkeypatch):
     assert info["status_code"] == 204
     assert info["content_type"] is None
     assert info["server_header"] is None
+
 
 
 

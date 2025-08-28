@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import itertools
 import os
 
@@ -7,6 +9,9 @@ from onyx.configs.constants import DocumentSource
 from onyx.connectors.gitlab.connector import GitlabConnector
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def gitlab_connector() -> GitlabConnector:
     connector = GitlabConnector(

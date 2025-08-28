@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy import delete
 from sqlalchemy.orm import Session
 
@@ -10,6 +12,9 @@ from onyx.db.models import ConnectorCredentialPair
 from onyx.db.models import UserGroup__ConnectorCredentialPair
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 

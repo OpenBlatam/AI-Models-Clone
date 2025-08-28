@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import abc
 from collections.abc import Generator
 
@@ -11,6 +13,9 @@ from onyx.chat.stream_processing.citation_processing import CitationProcessor
 from onyx.chat.stream_processing.utils import DocumentIdOrderMapping
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -52,7 +57,9 @@ class CitationResponseHandler(AnswerResponseHandler):
         final_doc_id_to_rank_map: DocumentIdOrderMapping,
         display_doc_id_to_rank_map: DocumentIdOrderMapping,
     ):
-        self.context_docs = context_docs
+        
+    """__init__ function."""
+self.context_docs = context_docs
         self.final_doc_id_to_rank_map = final_doc_id_to_rank_map
         self.display_doc_id_to_rank_map = display_doc_id_to_rank_map
         self.citation_processor = CitationProcessor(

@@ -1,4 +1,4 @@
-from agents.backend.onyx.server.features.heygen_ai.security_config import SecurityConfigManager
+from security_config import SecurityConfigManager
 
 
 def test_generate_security_report_shape(tmp_path):
@@ -18,6 +18,7 @@ def test_generate_security_report_shape(tmp_path):
     }
     assert isinstance(report['feature_status'], dict)
     assert isinstance(report['current_settings'], dict)
+
 
 
 

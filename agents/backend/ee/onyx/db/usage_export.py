@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import uuid
 from collections.abc import Generator
 from datetime import datetime
@@ -5,11 +7,21 @@ from typing import IO
 from typing import Optional
 
 from fastapi_users_db_sqlalchemy import UUID_ID
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from sqlalchemy import cast
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Session
 
 from ee.onyx.db.query_history import fetch_chat_sessions_eagerly_by_time
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.reporting.usage_export_models import ChatMessageSkeleton
 from ee.onyx.server.reporting.usage_export_models import FlowType
 from ee.onyx.server.reporting.usage_export_models import UsageReportMetadata
@@ -19,8 +31,11 @@ from onyx.db.models import User
 from onyx.file_store.file_store import get_default_file_store
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Gets skeletons of all messages in the given range
-def get_empty_chat_messages_entries__paginated(
+async def get_empty_chat_messages_entries__paginated(
     db_session: Session,
     period: tuple[datetime, datetime],
     limit: int | None = 500,
@@ -34,6 +49,11 @@ def get_empty_chat_messages_entries__paginated(
     Only messages of type USER are returned
     """
     chat_sessions = fetch_chat_sessions_eagerly_by_time(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         start=period[0],
         end=period[1],
         db_session=db_session,
@@ -65,11 +85,16 @@ def get_empty_chat_messages_entries__paginated(
     return chat_sessions[-1].time_created, message_skeletons
 
 
-def get_all_empty_chat_message_entries(
+async def get_all_empty_chat_message_entries(
     db_session: Session,
     period: tuple[datetime, datetime],
 ) -> Generator[list[ChatMessageSkeleton], None, None]:
     """period is the range of time over which to fetch messages."""
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     initial_time: Optional[datetime] = period[0]
     while True:
         # iterate from oldest to newest
@@ -88,10 +113,15 @@ def get_all_empty_chat_message_entries(
         initial_time = time_created
 
 
-def get_all_usage_reports(db_session: Session) -> list[UsageReportMetadata]:
+async def get_all_usage_reports(db_session: Session) -> list[UsageReportMetadata]:
     # Get the user emails
     usage_reports = db_session.query(UsageReport).all()
     user_ids = {r.requestor_user_id for r in usage_reports if r.requestor_user_id}
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     user_emails = {
         user.id: user.email
         for user in db_session.query(User)
@@ -103,7 +133,17 @@ def get_all_usage_reports(db_session: Session) -> list[UsageReportMetadata]:
         UsageReportMetadata(
             report_name=r.report_name,
             requestor=(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
                 user_emails.get(r.requestor_user_id) if r.requestor_user_id else None
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             ),
             time_created=r.time_created,
             period_from=r.period_from,
@@ -113,7 +153,7 @@ def get_all_usage_reports(db_session: Session) -> list[UsageReportMetadata]:
     ]
 
 
-def get_usage_report_data(
+async def get_usage_report_data(
     db_session: Session,
     report_name: str,
 ) -> IO:
@@ -131,6 +171,11 @@ def write_usage_report(
     new_report = UsageReport(
         report_name=report_name,
         requestor_user_id=user_id,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         period_from=period[0] if period else None,
         period_to=period[1] if period else None,
     )

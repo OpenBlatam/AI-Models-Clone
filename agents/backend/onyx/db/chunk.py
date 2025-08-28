@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from datetime import timezone
 
@@ -8,6 +10,9 @@ from onyx.db.models import ChunkStats
 from onyx.indexing.models import UpdatableChunkData
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def update_chunk_boost_components__no_commit(
     chunk_data: list[UpdatableChunkData],
     db_session: Session,

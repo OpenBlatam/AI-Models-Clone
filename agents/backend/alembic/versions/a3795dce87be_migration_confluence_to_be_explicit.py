@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from sqlalchemy.sql import table, column
+    from urllib.parse import urlparse
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """migration confluence to be explicit
 
 Revision ID: a3795dce87be
@@ -6,10 +19,6 @@ Create Date: 2024-09-01 13:52:12.006740
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
-from sqlalchemy.sql import table, column
 
 revision = "a3795dce87be"
 down_revision = "1f60f60c3401"
@@ -18,7 +27,6 @@ depends_on: None = None
 
 
 def extract_confluence_keys_from_url(wiki_url: str) -> tuple[str, str, str, bool]:
-    from urllib.parse import urlparse
 
     def _extract_confluence_keys_from_cloud_url(wiki_url: str) -> tuple[str, str, str]:
         parsed_url = urlparse(wiki_url)
@@ -88,6 +96,16 @@ def upgrade() -> None:
             )
         )
     ).fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     for row in confluence_connectors:
         config = row.connector_specific_config
@@ -131,6 +149,16 @@ def downgrade() -> None:
             )
         )
         .fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     )
 
     for row in confluence_connectors:

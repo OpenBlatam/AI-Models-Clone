@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import time
 import traceback
 from collections import defaultdict
@@ -54,8 +59,6 @@ from onyx.indexing.embedder import DefaultIndexingEmbedder
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.indexing.indexing_pipeline import build_indexing_pipeline
 from onyx.natural_language_processing.search_nlp_models import (
-    InformationContentClassificationModel,
-)
 from onyx.utils.logger import setup_logger
 from onyx.utils.logger import TaskAttemptSingleton
 from onyx.utils.middleware import make_randomized_onyx_request_id
@@ -64,6 +67,11 @@ from onyx.utils.telemetry import optional_telemetry
 from onyx.utils.telemetry import RecordType
 from onyx.utils.variable_functionality import global_version
 from shared_configs.configs import MULTI_TENANT
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    InformationContentClassificationModel,
+)
 
 logger = setup_logger()
 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from types import SimpleNamespace
 
@@ -9,10 +11,17 @@ from tests.regression.answer_quality.cli_utils import start_docker_compose
 from tests.regression.answer_quality.cli_utils import switch_to_commit
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def load_config(config_filename: str) -> SimpleNamespace:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(current_dir, config_filename)
     with open(config_path, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         return SimpleNamespace(**yaml.safe_load(file))
 
 
@@ -44,5 +53,6 @@ def main() -> None:
     )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main()

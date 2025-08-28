@@ -1,13 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import pytest
+import asyncio
+from unittest.mock import patch, MagicMock
+from cybersecurity_security.network import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Tests for Network Module
 
 Tests network scanning and security assessment functionality.
 """
 
-import pytest
-import asyncio
-from unittest.mock import patch, MagicMock
-from cybersecurity_security.network import (
     PortScanRequest, PortScanResult, PortRangeScanRequest,
     PortRangeScanResult, scan_port, scan_port_async,
     scan_port_range_async, get_service_name
@@ -16,7 +23,7 @@ from cybersecurity_security.network import (
 class TestNetwork:
     """Test suite for network module."""
     
-    def test_port_scan_request_creation(self):
+    async def test_port_scan_request_creation(self) -> Any:
         """Test PortScanRequest creation with valid data."""
         request = PortScanRequest(
             target_host="localhost",
@@ -27,7 +34,7 @@ class TestNetwork:
         assert request.port == 80
         assert request.timeout == 1.0
     
-    def test_port_scan_request_invalid_port(self):
+    async def test_port_scan_request_invalid_port(self) -> Any:
         """Test PortScanRequest with invalid port."""
         with pytest.raises(ValueError):
             PortScanRequest(
@@ -35,7 +42,7 @@ class TestNetwork:
                 port=70000  # Should be <= 65535
             )
     
-    def test_port_scan_request_invalid_host(self):
+    async def test_port_scan_request_invalid_host(self) -> Any:
         """Test PortScanRequest with invalid host."""
         with pytest.raises(ValueError, match="Target host cannot be empty"):
             PortScanRequest(
@@ -43,7 +50,7 @@ class TestNetwork:
                 port=80
             )
     
-    def test_port_range_scan_request_creation(self):
+    async def test_port_range_scan_request_creation(self) -> Any:
         """Test PortRangeScanRequest creation."""
         request = PortRangeScanRequest(
             target_host="localhost",
@@ -57,7 +64,7 @@ class TestNetwork:
         assert request.end_port == 1024
         assert request.max_workers == 10
     
-    def test_port_range_scan_request_invalid_range(self):
+    async def test_port_range_scan_request_invalid_range(self) -> Any:
         """Test PortRangeScanRequest with invalid port range."""
         with pytest.raises(ValueError, match="End port must be greater than start port"):
             PortRangeScanRequest(
@@ -66,7 +73,7 @@ class TestNetwork:
                 end_port=1
             )
     
-    def test_get_service_name(self):
+    def test_get_service_name(self) -> Optional[Dict[str, Any]]:
         """Test service name resolution."""
         assert get_service_name(80) == "HTTP"
         assert get_service_name(443) == "HTTPS"
@@ -74,7 +81,11 @@ class TestNetwork:
         assert get_service_name(9999) == "Unknown"
     
     @patch('socket.socket')
-    def test_scan_port_open(self, mock_socket):
+    def test_scan_port_open(self, mock_socket) -> Any:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         """Test scanning an open port."""
         # Mock socket to simulate open port
         mock_sock = MagicMock()
@@ -95,7 +106,7 @@ class TestNetwork:
         assert result.error is None
     
     @patch('socket.socket')
-    def test_scan_port_closed(self, mock_socket):
+    def test_scan_port_closed(self, mock_socket) -> Any:
         """Test scanning a closed port."""
         # Mock socket to simulate closed port
         mock_sock = MagicMock()
@@ -116,7 +127,7 @@ class TestNetwork:
         assert result.error is None
     
     @patch('socket.socket')
-    def test_scan_port_error(self, mock_socket):
+    def test_scan_port_error(self, mock_socket) -> Any:
         """Test scanning port with error."""
         # Mock socket to raise exception
         mock_socket.side_effect = Exception("Connection error")
@@ -134,7 +145,7 @@ class TestNetwork:
         assert result.error == "Connection error"
     
     @pytest.mark.asyncio
-    async def test_scan_port_async(self):
+    async def test_scan_port_async(self) -> Any:
         """Test async port scanning."""
         with patch('cybersecurity_security.network.port_scanner.scan_port') as mock_scan:
             mock_scan.return_value = PortScanResult(
@@ -158,7 +169,7 @@ class TestNetwork:
             assert result.service == "HTTP"
     
     @pytest.mark.asyncio
-    async def test_scan_port_range_async(self):
+    async def test_scan_port_range_async(self) -> Any:
         """Test async port range scanning."""
         # Mock individual port scans
         mock_results = [
@@ -205,7 +216,7 @@ class TestNetwork:
             assert len(result.scan_results) == 3
     
     @pytest.mark.asyncio
-    async def test_scan_port_range_async_with_exceptions(self):
+    async def test_scan_port_range_async_with_exceptions(self) -> Any:
         """Test async port range scanning with exceptions."""
         # Mock some successful scans and some exceptions
         mock_results = [
@@ -243,7 +254,7 @@ class TestNetwork:
             assert result.open_port_count == 1
             assert len(result.scan_results) == 2
     
-    def test_port_scan_result_creation(self):
+    def test_port_scan_result_creation(self) -> Any:
         """Test PortScanResult creation."""
         result = PortScanResult(
             host="localhost",
@@ -259,7 +270,7 @@ class TestNetwork:
         assert result.scan_time == 1234567890.0
         assert result.error is None
     
-    def test_port_range_scan_result_creation(self):
+    def test_port_range_scan_result_creation(self) -> Any:
         """Test PortRangeScanResult creation."""
         open_ports = [
             PortScanResult(host="localhost", port=80, is_open=True, service="HTTP", scan_time=1234567890.0)

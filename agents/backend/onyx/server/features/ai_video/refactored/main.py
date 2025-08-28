@@ -1,19 +1,12 @@
-"""
-AI Video System - Refactored Main Application
-============================================
-
-Main entry point for the refactored AI Video system with clean architecture.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 from contextlib import asynccontextmanager
 from typing import Any, Dict
-
 import uvicorn
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import ORJSONResponse
-
 from .shared.config import get_settings
 from .shared.logging import setup_logging
 from .shared.metrics import setup_metrics
@@ -22,6 +15,17 @@ from .infrastructure.caching import setup_cache, cleanup_cache
 from .infrastructure.messaging import setup_event_bus, cleanup_event_bus
 from .presentation.api.routes import create_api_routes
 from .presentation.middleware import create_middleware_stack
+from typing import Any, List, Dict, Optional
+import logging
+"""
+AI Video System - Refactored Main Application
+============================================
+
+Main entry point for the refactored AI Video system with clean architecture.
+"""
+
+
+
 
 
 @asynccontextmanager

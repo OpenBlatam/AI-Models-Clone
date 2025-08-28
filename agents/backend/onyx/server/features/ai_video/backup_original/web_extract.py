@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import typing as t
 import logging
 import time
@@ -11,6 +16,11 @@ from .extractor_stats import ExtractorStats
 from dataclasses import dataclass, field
 from typing import Optional, List
 
+        import requests
+            from bs4 import BeautifulSoup
+    import sys
+from typing import Any, List, Dict, Optional
+import asyncio
 # --- Logging Setup ---
 logger = logging.getLogger("web_extract")
 if not logger.hasHandlers():
@@ -32,9 +42,9 @@ class ExtractionError(Exception):
 
 # --- Retry Decorator ---
 def retry(max_attempts: int = 3, backoff: float = 1.5, exceptions: t.Any = (Exception,)):
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             attempts = 0
             delay = 1.0
             while attempts < max_attempts:
@@ -86,12 +96,14 @@ class ExtractorPlugin:
 
 # --- Thread-safe plugin registry ---
 class PluginRegistry:
-    def __init__(self):
+    def __init__(self) -> Any:
         self._plugins: t.List[ExtractorPlugin] = []
         self._lock = threading.Lock()
 
     def register(self, plugin: ExtractorPlugin):
-        with self._lock:
+        
+    """register function."""
+with self._lock:
             self._plugins.append(plugin)
             self._plugins.sort(key=lambda p: p.priority)
 
@@ -102,10 +114,9 @@ class PluginRegistry:
 EXTRACTOR_REGISTRY = PluginRegistry()
 
 # --- Utility: Prefetch HTML ---
-def _prefetch_html(url: str, headers: t.Optional[dict] = None, proxies: t.Optional[dict] = None, timeout: int = 10) -> t.Optional[str]:
+async def _prefetch_html(url: str, headers: t.Optional[dict] = None, proxies: t.Optional[dict] = None, timeout: int = 10) -> t.Optional[str]:
     """Download HTML once for fast extractors."""
     try:
-        import requests
         resp = requests.get(url, timeout=timeout, headers=headers, proxies=proxies)
         return resp.text
     except Exception as e:
@@ -181,7 +192,7 @@ def extract_web_content_ext(
     futures = {}
     with ThreadPoolExecutor(max_workers=len(plugins)) as executor:
         for plugin in plugins:
-            def run_plugin(plugin=plugin):
+            def run_plugin(plugin=plugin) -> Any:
                 t0 = time.time()
                 try:
                     if hasattr(plugin, 'extract_with_html') and html:
@@ -223,7 +234,6 @@ def extract_web_content_ext(
         soup = result.pop("_soup")
     elif "raw" in result and result["raw"] and isinstance(result["raw"], dict) and "html" in result["raw"]:
         try:
-            from bs4 import BeautifulSoup
             soup = BeautifulSoup(result["raw"]["html"], "html.parser")
         except ImportError:
             soup = None
@@ -240,8 +250,8 @@ def extract_web_content_ext(
     return result
 
 # --- Minimal Test Entrypoint ---
-if __name__ == "__main__":
-    import sys
+match __name__:
+    case "__main__":
     url = sys.argv[1] if len(sys.argv) > 1 else "https://en.wikipedia.org/wiki/Artificial_intelligence"
     try:
         res = extract_web_content_ext(url, debug=True)
@@ -278,7 +288,7 @@ def _absolutize_urls(urls: t.List[str], base_url: str) -> t.List[str]:
 # (Example for Selectolax, repeat for others as needed)
 # SelectolaxExtractor._old_extract_with_html = SelectolaxExtractor.extract_with_html
 
-# def selectolax_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10):
+# def selectolax_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10) -> Any:
 #     meta_used = {}
 #     if not _is_valid_html(html):
 #         meta_used['html_valid'] = False
@@ -305,7 +315,7 @@ def _absolutize_urls(urls: t.List[str], base_url: str) -> t.List[str]:
 # --- Patch ParselExtractor to use normalization ---
 # ParselExtractor._old_extract_with_html = ParselExtractor.extract_with_html
 
-# def parsel_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10):
+# def parsel_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10) -> Any:
 #     meta_used = {}
 #     if not _is_valid_html(html):
 #         meta_used['html_valid'] = False
@@ -332,7 +342,7 @@ def _absolutize_urls(urls: t.List[str], base_url: str) -> t.List[str]:
 # --- Patch BS4Extractor to use normalization ---
 # BS4Extractor._old_extract_with_html = BS4Extractor.extract_with_html
 
-# def bs4_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10):
+# def bs4_extract_with_html_patched(self, url, html, debug=False, headers=None, proxies=None, timeout=10) -> Any:
 #     meta_used = {}
 #     if not _is_valid_html(html):
 #         meta_used['html_valid'] = False
@@ -417,7 +427,7 @@ def extract_web_content_ext_learn(
     futures = {}
     with ThreadPoolExecutor(max_workers=len(plugins)) as executor:
         for plugin in plugins:
-            def run_plugin(plugin=plugin):
+            def run_plugin(plugin=plugin) -> Any:
                 t0 = time.time()
                 try:
                     if hasattr(plugin, 'extract_with_html') and html:
@@ -477,7 +487,9 @@ class WebContentExtractor:
     """Main web content extraction class."""
     
     def __init__(self, config: Optional[dict] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self.extractors = EXTRACTOR_REGISTRY.get_plugins()
     
     def extract(self, url: str, **kwargs) -> ExtractedContent:

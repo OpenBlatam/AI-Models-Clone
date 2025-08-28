@@ -1,7 +1,7 @@
-"""
-Tests for Lazy Loading System
-Comprehensive test suite for lazy loading of heavy modules
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import pytest
 import asyncio
@@ -11,9 +11,17 @@ import json
 from pathlib import Path
 from unittest.mock import patch, MagicMock, AsyncMock
 from typing import Dict, Any, List
+from lazy_loading_exploit_modules import (
+        import yaml
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Tests for Lazy Loading System
+Comprehensive test suite for lazy loading of heavy modules
+"""
+
 
 # Import lazy loading components
-from lazy_loading_exploit_modules import (
     LazyModuleManager, ModuleConfig, ModuleType, LoadingStrategy,
     ExploitDatabaseModule, VulnerabilityDatabaseModule, MachineLearningModelModule,
     LazyModule, ModuleMetrics
@@ -22,7 +30,7 @@ from lazy_loading_exploit_modules import (
 class TestLazyModule:
     """Test cases for base LazyModule class"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.config = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -32,7 +40,7 @@ class TestLazyModule:
             cache_ttl=3600
         )
     
-    def test_lazy_module_initialization(self):
+    def test_lazy_module_initialization(self) -> Any:
         """Test LazyModule initialization"""
         module = LazyModule(self.config)
         
@@ -44,7 +52,7 @@ class TestLazyModule:
         assert len(module._cache) == 0
         assert len(module._cache_timestamps) == 0
     
-    def test_lazy_module_metrics_initialization(self):
+    def test_lazy_module_metrics_initialization(self) -> Any:
         """Test ModuleMetrics initialization"""
         module = LazyModule(self.config)
         metrics = module.get_metrics()
@@ -60,7 +68,7 @@ class TestLazyModule:
         assert metrics.last_loaded is None
     
     @pytest.mark.asyncio
-    async def test_lazy_module_load_module_not_implemented(self):
+    async def test_lazy_module_load_module_not_implemented(self) -> Any:
         """Test that _load_module raises NotImplementedError"""
         module = LazyModule(self.config)
         
@@ -68,7 +76,7 @@ class TestLazyModule:
             await module._load_module()
     
     @pytest.mark.asyncio
-    async def test_lazy_module_unload_module(self):
+    async def test_lazy_module_unload_module(self) -> Any:
         """Test module unloading"""
         module = LazyModule(self.config)
         
@@ -90,7 +98,7 @@ class TestLazyModule:
 class TestExploitDatabaseModule:
     """Test cases for ExploitDatabaseModule"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.config = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -102,7 +110,7 @@ class TestExploitDatabaseModule:
         self.module = ExploitDatabaseModule(self.config)
     
     @pytest.mark.asyncio
-    async def test_load_from_file_json(self):
+    async def test_load_from_file_json(self) -> Any:
         """Test loading exploit database from JSON file"""
         # Create temporary JSON file
         with tempfile.NamedTemporaryFile(mode='w', suffix='.json', delete=False) as f:
@@ -135,9 +143,8 @@ class TestExploitDatabaseModule:
             Path(file_path).unlink()
     
     @pytest.mark.asyncio
-    async def test_load_from_file_yaml(self):
+    async def test_load_from_file_yaml(self) -> Any:
         """Test loading exploit database from YAML file"""
-        import yaml
         
         # Create temporary YAML file
         with tempfile.NamedTemporaryFile(mode='w', suffix='.yaml', delete=False) as f:
@@ -170,7 +177,7 @@ class TestExploitDatabaseModule:
             Path(file_path).unlink()
     
     @pytest.mark.asyncio
-    async def test_load_from_file_not_found(self):
+    async def test_load_from_file_not_found(self) -> Any:
         """Test loading from non-existent file"""
         self.module.config.module_path = "nonexistent_file.json"
         
@@ -178,11 +185,15 @@ class TestExploitDatabaseModule:
             await self.module._load_from_file()
     
     @pytest.mark.asyncio
-    async def test_load_from_file_unsupported_format(self):
+    async def test_load_from_file_unsupported_format(self) -> Any:
         """Test loading from unsupported file format"""
         # Create temporary file with unsupported extension
         with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
             f.write("test data")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             file_path = f.name
         
         try:
@@ -195,7 +206,7 @@ class TestExploitDatabaseModule:
             Path(file_path).unlink()
     
     @pytest.mark.asyncio
-    async def test_search_exploits(self):
+    async def test_search_exploits(self) -> Any:
         """Test exploit search functionality"""
         # Mock module data
         self.module._module = {
@@ -225,7 +236,7 @@ class TestExploitDatabaseModule:
         assert len(results) == 0
     
     @pytest.mark.asyncio
-    async def test_get_exploit_by_id(self):
+    async def test_get_exploit_by_id(self) -> Optional[Dict[str, Any]]:
         """Test getting exploit by ID"""
         # Mock module data
         self.module._module = {
@@ -251,7 +262,7 @@ class TestExploitDatabaseModule:
 class TestVulnerabilityDatabaseModule:
     """Test cases for VulnerabilityDatabaseModule"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.config = ModuleConfig(
             module_type=ModuleType.VULNERABILITY_DATABASE,
@@ -263,7 +274,7 @@ class TestVulnerabilityDatabaseModule:
         self.module = VulnerabilityDatabaseModule(self.config)
     
     @pytest.mark.asyncio
-    async def test_get_vulnerability(self):
+    async def test_get_vulnerability(self) -> Optional[Dict[str, Any]]:
         """Test getting vulnerability by CVE ID"""
         # Mock module data
         self.module._module = {
@@ -288,7 +299,7 @@ class TestVulnerabilityDatabaseModule:
         assert vuln is None
     
     @pytest.mark.asyncio
-    async def test_search_vulnerabilities(self):
+    async def test_search_vulnerabilities(self) -> Any:
         """Test vulnerability search functionality"""
         # Mock module data
         self.module._module = {
@@ -324,7 +335,7 @@ class TestVulnerabilityDatabaseModule:
 class TestMachineLearningModelModule:
     """Test cases for MachineLearningModelModule"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.config = ModuleConfig(
             module_type=ModuleType.MACHINE_LEARNING_MODEL,
@@ -336,7 +347,7 @@ class TestMachineLearningModelModule:
         self.module = MachineLearningModelModule(self.config)
     
     @pytest.mark.asyncio
-    async def test_load_module(self):
+    async def test_load_module(self) -> Any:
         """Test ML model loading"""
         result = await self.module._load_module()
         
@@ -346,7 +357,7 @@ class TestMachineLearningModelModule:
         assert result["loaded"] is True
     
     @pytest.mark.asyncio
-    async def test_predict(self):
+    async def test_predict(self) -> Any:
         """Test ML model prediction"""
         # Mock module data
         self.module._module = {
@@ -368,12 +379,12 @@ class TestMachineLearningModelModule:
 class TestLazyModuleManager:
     """Test cases for LazyModuleManager"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.manager = LazyModuleManager()
     
     @pytest.mark.asyncio
-    async def test_register_module(self):
+    async def test_register_module(self) -> Any:
         """Test module registration"""
         config = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -387,7 +398,7 @@ class TestLazyModuleManager:
         assert isinstance(self.manager.modules["test_module"], ExploitDatabaseModule)
     
     @pytest.mark.asyncio
-    async def test_register_duplicate_module(self):
+    async def test_register_duplicate_module(self) -> Any:
         """Test registering duplicate module"""
         config = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -401,7 +412,7 @@ class TestLazyModuleManager:
             await self.manager.register_module("test_module", config)
     
     @pytest.mark.asyncio
-    async def test_get_module(self):
+    async def test_get_module(self) -> Optional[Dict[str, Any]]:
         """Test getting registered module"""
         config = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -416,13 +427,13 @@ class TestLazyModuleManager:
         assert module.config == config
     
     @pytest.mark.asyncio
-    async def test_get_nonexistent_module(self):
+    async def test_get_nonexistent_module(self) -> Optional[Dict[str, Any]]:
         """Test getting non-existent module"""
         with pytest.raises(ValueError):
             await self.manager.get_module("nonexistent_module")
     
     @pytest.mark.asyncio
-    async def test_unload_module(self):
+    async def test_unload_module(self) -> Any:
         """Test module unloading"""
         config = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -444,7 +455,7 @@ class TestLazyModuleManager:
         assert module._module is None
     
     @pytest.mark.asyncio
-    async def test_get_all_metrics(self):
+    async def test_get_all_metrics(self) -> Optional[Dict[str, Any]]:
         """Test getting metrics for all modules"""
         config = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -459,7 +470,7 @@ class TestLazyModuleManager:
         assert isinstance(metrics["test_module"], ModuleMetrics)
     
     @pytest.mark.asyncio
-    async def test_cleanup_all(self):
+    async def test_cleanup_all(self) -> Any:
         """Test cleaning up all modules"""
         config1 = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -490,7 +501,7 @@ class TestLazyModuleManager:
 class TestCaching:
     """Test cases for caching functionality"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.config = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -502,7 +513,7 @@ class TestCaching:
         self.module = ExploitDatabaseModule(self.config)
     
     @pytest.mark.asyncio
-    async def test_get_cached_cache_hit(self):
+    async def test_get_cached_cache_hit(self) -> Optional[Dict[str, Any]]:
         """Test cache hit behavior"""
         # Add item to cache
         self.module._cache["test_key"] = "test_value"
@@ -520,7 +531,7 @@ class TestCaching:
         fetch_func.assert_not_called()
     
     @pytest.mark.asyncio
-    async def test_get_cached_cache_miss(self):
+    async def test_get_cached_cache_miss(self) -> Optional[Dict[str, Any]]:
         """Test cache miss behavior"""
         # Mock fetch function
         fetch_func = AsyncMock(return_value="new_value")
@@ -535,7 +546,7 @@ class TestCaching:
         fetch_func.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_get_cached_expired(self):
+    async def test_get_cached_expired(self) -> Optional[Dict[str, Any]]:
         """Test cache expiration behavior"""
         # Add expired item to cache
         self.module._cache["test_key"] = "old_value"
@@ -553,7 +564,7 @@ class TestCaching:
         fetch_func.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_cache_eviction(self):
+    async def test_cache_eviction(self) -> Any:
         """Test cache eviction when cache is full"""
         # Fill cache
         for i in range(6):  # More than cache_size (5)
@@ -574,7 +585,7 @@ class TestLoadingStrategies:
     """Test cases for different loading strategies"""
     
     @pytest.mark.asyncio
-    async def test_on_demand_strategy(self):
+    async def test_on_demand_strategy(self) -> Any:
         """Test on-demand loading strategy"""
         config = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -593,7 +604,7 @@ class TestLoadingStrategies:
         assert module._loaded
     
     @pytest.mark.asyncio
-    async def test_preload_strategy(self):
+    async def test_preload_strategy(self) -> Any:
         """Test preload loading strategy"""
         config = ModuleConfig(
             module_type=ModuleType.EXPLOIT_DATABASE,
@@ -610,5 +621,6 @@ class TestLoadingStrategies:
         module = await manager.get_module("test_module")
         assert module._loaded
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

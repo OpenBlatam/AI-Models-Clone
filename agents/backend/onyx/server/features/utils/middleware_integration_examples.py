@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import logging
+from typing import Dict, List, Optional, Any
+from datetime import datetime, timedelta
+from fastapi import FastAPI, APIRouter, Request, Response, Depends, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from pydantic import BaseModel, Field
+from .enhanced_middleware_system import (
+from .middleware_monitoring import (
+from .http_exception_system import (
+from .http_exception_handlers import handle_http_exceptions
+from .error_system import (
+        import redis.asyncio as redis
+        import random
+        import random
+        import redis.asyncio as redis
+        import random
+from typing import Any, List, Dict, Optional
 """
 🔗 Middleware Integration Examples
 ==================================
@@ -6,34 +31,20 @@ Comprehensive examples showing how to integrate the enhanced middleware system
 with FastAPI applications for error handling, logging, and monitoring.
 """
 
-import asyncio
-import time
-import logging
-from typing import Dict, List, Optional, Any
-from datetime import datetime, timedelta
 
-from fastapi import FastAPI, APIRouter, Request, Response, Depends, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from pydantic import BaseModel, Field
 
 # Import our middleware systems
-from .enhanced_middleware_system import (
     EnhancedMiddlewareManager, EnhancedMiddlewareConfig,
     create_enhanced_middleware_config, create_production_enhanced_config,
     create_development_enhanced_config, setup_enhanced_middleware
 )
-from .middleware_monitoring import (
     MonitoringManager, MonitoringConfig,
     create_monitoring_config, create_production_monitoring_config,
     create_development_monitoring_config, setup_monitoring
 )
-from .http_exception_system import (
     HTTPExceptionFactory, raise_bad_request, raise_not_found,
     raise_unauthorized, raise_forbidden, raise_internal_server_error
 )
-from .http_exception_handlers import handle_http_exceptions
-from .error_system import (
     ValidationError, AuthenticationError, AuthorizationError,
     ResourceNotFoundError, BusinessLogicError, DatabaseError,
     ErrorFactory
@@ -182,7 +193,6 @@ async def create_production_middleware_app() -> FastAPI:
     # Setup Redis (optional)
     redis_client = None
     try:
-        import redis.asyncio as redis
         redis_client = redis.from_url("redis://localhost:6379", decode_responses=True)
         await redis_client.ping()
         logger.info("Redis connected successfully")
@@ -330,7 +340,6 @@ async def create_production_middleware_app() -> FastAPI:
     @router.get("/api/test/errors")
     async def test_errors():
         """Test endpoint for error monitoring."""
-        import random
         
         error_types = [
             ValueError("Random validation error"),
@@ -536,7 +545,6 @@ def create_development_middleware_app() -> FastAPI:
     @router.get("/debug/test/errors")
     async def test_errors_debug():
         """Test various error types for debugging."""
-        import random
         
         error_scenarios = [
             ("validation", lambda: raise_bad_request("Test validation error", field="test")),
@@ -835,7 +843,6 @@ async def create_complete_integration_app() -> FastAPI:
     # Setup Redis
     redis_client = None
     try:
-        import redis.asyncio as redis
         redis_client = redis.from_url("redis://localhost:6379", decode_responses=True)
         await redis_client.ping()
         logger.info("Redis connected for complete integration")
@@ -982,7 +989,6 @@ async def create_complete_integration_app() -> FastAPI:
     @router.get("/api/v1/test/errors")
     async def test_errors_v1():
         """Test error monitoring."""
-        import random
         
         error_scenarios = [
             ("validation", lambda: raise_bad_request("Test validation error")),
@@ -1087,5 +1093,6 @@ async def run_examples():
     print("2. Call it to create the FastAPI app")
     print("3. Run with uvicorn: uvicorn app:app --reload")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(run_examples()) 

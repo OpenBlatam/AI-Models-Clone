@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import uuid
+from typing import Dict, List, Any, Optional
+from contextlib import asynccontextmanager
+from fastapi import FastAPI, Request, Response, HTTPException, Depends, BackgroundTasks
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+from performance_metrics import (
+            import random
+from typing import Any, List, Dict, Optional
+import logging
 """
 API Performance Metrics Demo
 
@@ -11,17 +34,8 @@ This demo showcases:
 - Performance optimization insights
 """
 
-import asyncio
-import time
-import uuid
-from typing import Dict, List, Any, Optional
-from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request, Response, HTTPException, Depends, BackgroundTasks
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
 
-from performance_metrics import (
     APIPerformanceMetrics, PerformanceMonitor, PerformanceThreshold,
     get_performance_metrics, set_performance_metrics, performance_tracking,
     track_performance, track_cache_performance, track_database_performance,
@@ -88,7 +102,7 @@ async def performance_middleware(request: Request, call_next):
 class ProductService:
     """Product service with performance tracking."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.cache = {}
     
     @track_performance("get_product")
@@ -433,9 +447,10 @@ async def simulate_load(num_requests: int, concurrent: int):
     semaphore = asyncio.Semaphore(concurrent)
     
     async def make_request():
-        async with semaphore:
+        
+    """make_request function."""
+async with semaphore:
             # Simulate different types of requests
-            import random
             request_type = random.choice(["product", "user", "batch"])
             
             if request_type == "product":
@@ -604,14 +619,18 @@ async def demonstrate_fastapi_integration():
     # Add performance middleware
     @test_app.middleware("http")
     async def test_performance_middleware(request: Request, call_next):
-        async with performance_tracking(request, Response()):
+        
+    """test_performance_middleware function."""
+async with performance_tracking(request, Response()):
             response = await call_next(request)
             return response
     
     # Add test endpoint
     @test_app.get("/test")
     async def test_endpoint():
-        await asyncio.sleep(0.1)  # Simulate processing
+        
+    """test_endpoint function."""
+await asyncio.sleep(0.1)  # Simulate processing
         return {"message": "Test completed"}
     
     print("1. Testing FastAPI middleware integration...")

@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .contracts import (
+from abc import ABC, abstractmethod
+from typing import List, Dict, Any, Optional, AsyncGenerator
+from ..entities import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🔌 INTERFACES - Contracts
 =========================
@@ -5,7 +14,6 @@
 Interfaces y contratos del sistema.
 """
 
-from .contracts import (
     IOptimizer,
     ICache,
     INLPAnalyzer
@@ -17,9 +25,6 @@ __all__ = [
     'INLPAnalyzer'
 ]
 
-from abc import ABC, abstractmethod
-from typing import List, Dict, Any, Optional, AsyncGenerator
-from ..entities import (
     TextInput, AnalysisResult, BatchResult, PerformanceMetrics, 
     SystemStatus, AnalysisType, OptimizationTier
 )
@@ -48,7 +53,7 @@ class IMonitor(ABC):
     """Interface para monitoreo."""
     
     @abstractmethod
-    async def record_request(self, processing_time_ms: float, success: bool) -> None:
+    async async def record_request(self, processing_time_ms: float, success: bool) -> None:
         """Registrar request."""
         pass
     

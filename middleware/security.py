@@ -1,7 +1,13 @@
-"""
-Security middleware for authentication, authorization, rate limiting, and security headers.
-Uses functional programming patterns and RORO pattern.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import hashlib
@@ -11,13 +17,21 @@ import time
 from typing import Any, Callable, Dict, List, Optional, Set
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
-
 import jwt
 from fastapi import Request, Response, HTTPException, status
 from fastapi.responses import JSONResponse
 import structlog
-
 from .core import (
+    import re
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Security middleware for authentication, authorization, rate limiting, and security headers.
+Uses functional programming patterns and RORO pattern.
+"""
+
+
+
     LogContext, create_log_context, log_operation, LogLevel,
     MetricContext, create_metric_context, record_metric, MetricType,
     ExceptionContext, create_exception_context, handle_exception,
@@ -50,7 +64,7 @@ class RateLimitContext:
 class RateLimiter:
     """In-memory rate limiter with sliding window."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.requests: Dict[str, List[float]] = {}
         self.locks: Dict[str, asyncio.Lock] = {}
     
@@ -94,7 +108,7 @@ class RateLimiter:
             self.requests[key].append(current_time)
             return True
     
-    def get_remaining_requests(self, key: str, limit: int, window: int) -> int:
+    async def get_remaining_requests(self, key: str, limit: int, window: int) -> int:
         """Get remaining requests for a key."""
         current_time = time.time()
         
@@ -262,7 +276,7 @@ def require_authentication():
     """Decorator to require authentication."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             request = kwargs.get("request")
             if not request:
                 raise HTTPException(
@@ -291,7 +305,7 @@ def require_authentication():
                 )
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             request = kwargs.get("request")
             if not request:
                 raise HTTPException(
@@ -327,7 +341,7 @@ def require_permission(permission: str):
     """Decorator to require specific permission."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             user_permissions = kwargs.get("user_permissions", set())
             if not check_permission(permission, user_permissions):
                 raise HTTPException(
@@ -337,7 +351,7 @@ def require_permission(permission: str):
             return await func(*args, **kwargs)
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             user_permissions = kwargs.get("user_permissions", set())
             if not check_permission(permission, user_permissions):
                 raise HTTPException(
@@ -355,7 +369,7 @@ def require_role(roles: List[str]):
     """Decorator to require specific role."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             user_roles = kwargs.get("user_roles", [])
             if not check_role(roles, user_roles):
                 raise HTTPException(
@@ -365,7 +379,7 @@ def require_role(roles: List[str]):
             return await func(*args, **kwargs)
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             user_roles = kwargs.get("user_roles", [])
             if not check_role(roles, user_roles):
                 raise HTTPException(
@@ -394,7 +408,7 @@ def rate_limit(
     """
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             request = kwargs.get("request")
             if not request:
                 return await func(*args, **kwargs)
@@ -422,7 +436,7 @@ def rate_limit(
             return await func(*args, **kwargs)
         
         @functools.wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             request = kwargs.get("request")
             if not request:
                 return func(*args, **kwargs)
@@ -672,7 +686,6 @@ def validate_email(email: str) -> bool:
     Returns:
         True if email is valid, False otherwise
     """
-    import re
     pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
     return re.match(pattern, email) is not None
 

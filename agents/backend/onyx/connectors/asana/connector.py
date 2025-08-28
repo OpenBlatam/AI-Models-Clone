@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import datetime
 from typing import Any
 
@@ -13,6 +18,11 @@ from onyx.connectors.models import Document
 from onyx.connectors.models import TextSection
 from onyx.utils.logger import setup_logger
 
+    import time
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -94,8 +104,6 @@ class AsanaConnector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import time
-    import os
 
     logger.notice("Starting Asana connector test")
     connector = AsanaConnector(

@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from typing import Dict, Any, List, Optional
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+import logging
+from datetime import datetime
+import asyncio
+from ..dependencies.auth import get_admin_user, require_permission
+from ..routes.base import get_request_context, log_route_access
+from ..schemas.base import BaseResponse, ErrorResponse
+from ..pydantic_schemas import (
+from ..async_database_api_operations import AsyncDatabaseManager
+from ..caching_manager import CachingManager
+from ..performance_metrics import PerformanceMonitor
+from ..error_handling_middleware import ErrorMonitor
+from typing import Any, List, Dict, Optional
 """
 Admin Router
 
@@ -6,19 +25,10 @@ and privileged endpoints. Requires admin authentication and provides
 comprehensive system control capabilities.
 """
 
-from typing import Dict, Any, List, Optional
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-import logging
-from datetime import datetime
-import asyncio
 
 # Import dependencies
-from ..dependencies.auth import get_admin_user, require_permission
-from ..routes.base import get_request_context, log_route_access
 
 # Import schemas
-from ..schemas.base import BaseResponse, ErrorResponse
-from ..pydantic_schemas import (
     AdminConfigResponse,
     SystemStatsResponse,
     UserManagementResponse,
@@ -26,10 +36,6 @@ from ..pydantic_schemas import (
 )
 
 # Import services
-from ..async_database_api_operations import AsyncDatabaseManager
-from ..caching_manager import CachingManager
-from ..performance_metrics import PerformanceMonitor
-from ..error_handling_middleware import ErrorMonitor
 
 # Initialize router
 router = APIRouter(prefix="/admin", tags=["admin"])

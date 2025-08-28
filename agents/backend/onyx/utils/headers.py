@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import TypedDict
 
 from fastapi.datastructures import Headers
@@ -7,6 +9,9 @@ from onyx.configs.model_configs import LITELLM_PASS_THROUGH_HEADERS
 from onyx.configs.tool_configs import CUSTOM_TOOL_PASS_THROUGH_HEADERS
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -56,7 +61,7 @@ def get_relevant_headers(
     return pass_through_headers
 
 
-def get_litellm_additional_request_headers(
+async def get_litellm_additional_request_headers(
     headers: dict[str, str] | Headers,
 ) -> dict[str, str]:
     return get_relevant_headers(headers, LITELLM_PASS_THROUGH_HEADERS)
@@ -73,7 +78,7 @@ def build_llm_extra_headers(
     return extra_headers
 
 
-def get_custom_tool_additional_request_headers(
+async def get_custom_tool_additional_request_headers(
     headers: dict[str, str] | Headers,
 ) -> dict[str, str]:
     return get_relevant_headers(headers, CUSTOM_TOOL_PASS_THROUGH_HEADERS)

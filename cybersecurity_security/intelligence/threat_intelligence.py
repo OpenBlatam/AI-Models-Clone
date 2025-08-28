@@ -1,14 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import ipaddress
+from typing import Dict, Any, List, Optional
+from pydantic import BaseModel, Field, validator
+import asyncio
+import aiohttp
+            import socket
+from typing import Any, List, Dict, Optional
+import logging
 """
 Threat Intelligence
 
 Provides threat intelligence and reputation checking capabilities.
 """
 
-import ipaddress
-from typing import Dict, Any, List, Optional
-from pydantic import BaseModel, Field, validator
-import asyncio
-import aiohttp
 
 class IPReputationRequest(BaseModel):
     """Pydantic model for IP reputation request."""
@@ -16,7 +21,7 @@ class IPReputationRequest(BaseModel):
     api_key: Optional[str] = Field(None, description="API key for external services")
     
     @validator('ip_address')
-    def validate_ip_address(cls, v):
+    def validate_ip_address(cls, v) -> bool:
         try:
             ipaddress.ip_address(v)
             return v
@@ -37,7 +42,7 @@ class DomainReputationRequest(BaseModel):
     domain: str = Field(..., description="Domain to check")
     
     @validator('domain')
-    def validate_domain(cls, v):
+    def validate_domain(cls, v) -> bool:
         if not v or '.' not in v:
             raise ValueError("Invalid domain format")
         return v.lower()
@@ -111,7 +116,6 @@ async def check_domain_reputation_async(data: DomainReputationRequest) -> Domain
     async with aiohttp.ClientSession() as session:
         # DNS resolution check
         try:
-            import socket
             # Run DNS resolution in thread pool to avoid blocking
             loop = asyncio.get_event_loop()
             ip_address = await loop.run_in_executor(None, socket.gethostbyname, domain)

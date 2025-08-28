@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add default slack channel config
 
 Revision ID: eaa3b5593925
@@ -6,8 +13,6 @@ Create Date: 2025-02-03 18:07:56.552526
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
@@ -35,6 +40,11 @@ def upgrade() -> None:
     # Create default channel configs for existing slack bots without one
     conn = op.get_bind()
     slack_bots = conn.execute(sa.text("SELECT id FROM slack_bot")).fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     for slack_bot in slack_bots:
         slack_bot_id = slack_bot[0]
@@ -44,6 +54,11 @@ def upgrade() -> None:
             ),
             {"bot_id": slack_bot_id},
         ).fetchone()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
         if not existing_default:
             conn.execute(

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import shutil
 import tempfile
@@ -15,6 +17,9 @@ from onyx.auth.users import current_admin_user
 from onyx.db.models import User
 from onyx.utils.long_term_log import LongTermLogger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 router = APIRouter(prefix="/admin/long-term-logs")
 
 
@@ -65,12 +70,20 @@ def download_long_term_logs_zip(
         # Create JSON file
         json_path = temp_dir_path / f"{category}-logs.json"
         with open(json_path, "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(logs, f, indent=2, default=str)
 
         # Create ZIP file
         zip_path = temp_dir_path / f"{category}-logs.zip"
         with zipfile.ZipFile(zip_path, "w") as zip_file:
             zip_file.write(json_path, json_path.name)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
         # Let FastAPI handle cleanup by setting background tasks
         return FileResponse(

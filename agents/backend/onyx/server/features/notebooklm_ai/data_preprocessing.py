@@ -1,10 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import torch
+import torch.nn as nn
+import torch.optim as optim
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 import numpy as np
 from typing import List, Tuple, Optional, Callable
 import logging
 
+from typing import Any, List, Dict, Optional
+import asyncio
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -13,7 +19,9 @@ class TextPreprocessor:
     """Efficient text preprocessing for NLP tasks."""
     
     def __init__(self, max_length: int = 512, truncation: bool = True, padding: bool = True):
-        self.max_length = max_length
+        
+    """__init__ function."""
+self.max_length = max_length
         self.truncation = truncation
         self.padding = padding
     
@@ -44,23 +52,23 @@ class ImagePreprocessor:
                                std=[0.229, 0.224, 0.225]) if normalize else transforms.Lambda(lambda x: x)
         ])
     
-    def preprocess_image(self, image):
+    def preprocess_image(self, image) -> Any:
         """Preprocess a single image."""
         return self.transforms(image)
 
 class CustomDataset(Dataset):
     """Generic dataset with efficient data loading and preprocessing."""
     
-    def __init__(self, data, labels, preprocessor=None, transform=None):
+    def __init__(self, data, labels, preprocessor=None, transform=None) -> Any:
         self.data = data
         self.labels = labels
         self.preprocessor = preprocessor
         self.transform = transform
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return len(self.data)
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         item = self.data[idx]
         label = self.labels[idx]
         

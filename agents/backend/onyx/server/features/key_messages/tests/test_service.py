@@ -1,28 +1,35 @@
-"""
-Tests for Key Messages service.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 import asyncio
 from unittest.mock import AsyncMock, patch
 from onyx.server.features.key_messages.service import KeyMessageService
 from onyx.server.features.key_messages.models import (
+from onyx.core.exceptions import ValidationException, ServiceException
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Tests for Key Messages service.
+"""
     KeyMessageRequest,
     MessageType,
     MessageTone,
     BatchKeyMessageRequest
 )
-from onyx.core.exceptions import ValidationException, ServiceException
 
 class TestKeyMessageService:
     """Test KeyMessageService."""
     
     @pytest.fixture
-    def service(self):
+    def service(self) -> Any:
         """Create a service instance for testing."""
         return KeyMessageService()
     
     @pytest.fixture
-    def valid_request(self):
+    async def valid_request(self) -> Any:
         """Create a valid request for testing."""
         return KeyMessageRequest(
             message="Test message",
@@ -33,7 +40,7 @@ class TestKeyMessageService:
         )
     
     @pytest.mark.asyncio
-    async def test_generate_response_success(self, service, valid_request):
+    async def test_generate_response_success(self, service, valid_request) -> Any:
         """Test successful response generation."""
         with patch.object(service, '_generate_with_llm', new_callable=AsyncMock) as mock_llm:
             mock_llm.return_value = "Generated response"
@@ -50,7 +57,7 @@ class TestKeyMessageService:
             assert response.processing_time > 0
     
     @pytest.mark.asyncio
-    async def test_generate_response_empty_message(self, service):
+    async def test_generate_response_empty_message(self, service) -> Any:
         """Test response generation with empty message."""
         request = KeyMessageRequest(message="")
         
@@ -60,7 +67,7 @@ class TestKeyMessageService:
         assert "Message cannot be empty" in response.error
     
     @pytest.mark.asyncio
-    async def test_generate_response_common_response(self, service):
+    async def test_generate_response_common_response(self, service) -> Any:
         """Test response generation with common response."""
         request = KeyMessageRequest(
             message="test_message",
@@ -76,7 +83,7 @@ class TestKeyMessageService:
         assert response.data.metadata.get("from_cache") is True
     
     @pytest.mark.asyncio
-    async def test_generate_response_cache(self, service, valid_request):
+    async def test_generate_response_cache(self, service, valid_request) -> Any:
         """Test response generation with caching."""
         # First call
         with patch.object(service, '_generate_with_llm', new_callable=AsyncMock) as mock_llm:
@@ -92,7 +99,7 @@ class TestKeyMessageService:
         assert response2.data.metadata.get("from_cache") is True
     
     @pytest.mark.asyncio
-    async def test_analyze_message_success(self, service, valid_request):
+    async def test_analyze_message_success(self, service, valid_request) -> Any:
         """Test successful message analysis."""
         with patch.object(service, '_analyze_with_llm', new_callable=AsyncMock) as mock_llm:
             mock_llm.return_value = "Analysis result"
@@ -107,7 +114,7 @@ class TestKeyMessageService:
             assert response.processing_time > 0
     
     @pytest.mark.asyncio
-    async def test_analyze_message_empty_message(self, service):
+    async def test_analyze_message_empty_message(self, service) -> Any:
         """Test message analysis with empty message."""
         request = KeyMessageRequest(message="")
         
@@ -117,7 +124,7 @@ class TestKeyMessageService:
         assert "Message cannot be empty" in response.error
     
     @pytest.mark.asyncio
-    async def test_analyze_message_cache(self, service, valid_request):
+    async def test_analyze_message_cache(self, service, valid_request) -> Any:
         """Test message analysis with caching."""
         # First call
         with patch.object(service, '_analyze_with_llm', new_callable=AsyncMock) as mock_llm:
@@ -133,7 +140,7 @@ class TestKeyMessageService:
         assert response2.data.metadata.get("from_cache") is True
     
     @pytest.mark.asyncio
-    async def test_generate_batch_success(self, service):
+    async def test_generate_batch_success(self, service) -> Any:
         """Test successful batch generation."""
         messages = [
             KeyMessageRequest(message="Message 1"),
@@ -154,7 +161,7 @@ class TestKeyMessageService:
             assert response.processing_time > 0
     
     @pytest.mark.asyncio
-    async def test_generate_batch_with_failures(self, service):
+    async def test_generate_batch_with_failures(self, service) -> Any:
         """Test batch generation with some failures."""
         messages = [
             KeyMessageRequest(message="Message 1"),
@@ -175,7 +182,7 @@ class TestKeyMessageService:
             assert response.results[1].success is False
     
     @pytest.mark.asyncio
-    async def test_generate_batch_size_limit(self, service):
+    async def test_generate_batch_size_limit(self, service) -> Any:
         """Test batch generation with size limit."""
         messages = [KeyMessageRequest(message=f"Message {i}") for i in range(100)]
         request = BatchKeyMessageRequest(messages=messages, batch_size=50)
@@ -189,7 +196,7 @@ class TestKeyMessageService:
             assert len(response.results) == 50
     
     @pytest.mark.asyncio
-    async def test_generate_with_llm_success(self, service, valid_request):
+    async def test_generate_with_llm_success(self, service, valid_request) -> Any:
         """Test successful LLM generation."""
         with patch.object(service, '_call_llm_api', new_callable=AsyncMock) as mock_api:
             mock_api.return_value = "LLM generated response"
@@ -200,7 +207,7 @@ class TestKeyMessageService:
             mock_api.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_generate_with_llm_failure(self, service, valid_request):
+    async def test_generate_with_llm_failure(self, service, valid_request) -> Any:
         """Test LLM generation failure."""
         with patch.object(service, '_call_llm_api', new_callable=AsyncMock) as mock_api:
             mock_api.side_effect = Exception("LLM error")
@@ -209,7 +216,7 @@ class TestKeyMessageService:
                 await service._generate_with_llm(valid_request)
     
     @pytest.mark.asyncio
-    async def test_analyze_with_llm_success(self, service, valid_request):
+    async def test_analyze_with_llm_success(self, service, valid_request) -> Any:
         """Test successful LLM analysis."""
         with patch.object(service, '_call_llm_api', new_callable=AsyncMock) as mock_api:
             mock_api.return_value = "LLM analysis result"
@@ -220,7 +227,7 @@ class TestKeyMessageService:
             mock_api.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_analyze_with_llm_failure(self, service, valid_request):
+    async def test_analyze_with_llm_failure(self, service, valid_request) -> Any:
         """Test LLM analysis failure."""
         with patch.object(service, '_call_llm_api', new_callable=AsyncMock) as mock_api:
             mock_api.side_effect = Exception("LLM error")
@@ -229,14 +236,14 @@ class TestKeyMessageService:
                 await service._analyze_with_llm(valid_request)
     
     @pytest.mark.asyncio
-    async def test_call_llm_api(self, service):
+    async async def test_call_llm_api(self, service) -> Any:
         """Test LLM API call."""
         result = await service._call_llm_api("Test prompt")
         
         assert isinstance(result, str)
         assert "Generated response for:" in result
     
-    def test_generate_cache_key(self, service):
+    def test_generate_cache_key(self, service) -> Any:
         """Test cache key generation."""
         data1 = {"message": "test", "type": "marketing"}
         data2 = {"message": "test", "type": "marketing"}
@@ -251,7 +258,7 @@ class TestKeyMessageService:
         assert isinstance(key1, str)
         assert len(key1) == 32  # MD5 hash length
     
-    def test_cache_operations(self, service):
+    def test_cache_operations(self, service) -> Any:
         """Test cache operations."""
         # Test setting and getting cache
         service._cache_response("test_key", "test_response")
@@ -264,7 +271,7 @@ class TestKeyMessageService:
         assert cached is None
     
     @pytest.mark.asyncio
-    async def test_clear_cache(self, service):
+    async def test_clear_cache(self, service) -> Any:
         """Test cache clearing."""
         # Add some data to cache
         service._cache_response("test_key", "test_response")
@@ -275,7 +282,7 @@ class TestKeyMessageService:
         assert len(service.cache) == 0
     
     @pytest.mark.asyncio
-    async def test_get_cache_stats(self, service):
+    async def test_get_cache_stats(self, service) -> Optional[Dict[str, Any]]:
         """Test cache statistics."""
         # Add some data to cache
         service._cache_response("test_key", "test_response")
@@ -290,7 +297,7 @@ class TestKeyMessageService:
         assert "test_key" in stats["cache_keys"]
     
     @pytest.mark.asyncio
-    async def test_create_response(self, service, valid_request):
+    async def test_create_response(self, service, valid_request) -> Any:
         """Test response creation."""
         start_time = 0.0
         response_text = "Test response"
@@ -307,7 +314,7 @@ class TestKeyMessageService:
         assert response.processing_time >= 0
     
     @pytest.mark.asyncio
-    async def test_create_analysis_response(self, service, valid_request):
+    async def test_create_analysis_response(self, service, valid_request) -> Any:
         """Test analysis response creation."""
         start_time = 0.0
         analysis_text = "Analysis result"

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from abc import ABC
 from abc import abstractmethod
 from typing import cast
@@ -18,6 +20,9 @@ from onyx.db.pg_file_store import upsert_pgfilestore
 from onyx.utils.file import FileWithMimeType
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class FileStore(ABC):
     """
     An abstraction for storing files and large binary objects.
@@ -103,7 +108,9 @@ class FileStore(ABC):
 
 class PostgresBackedFileStore(FileStore):
     def __init__(self, db_session: Session):
-        self.db_session = db_session
+        
+    """__init__ function."""
+self.db_session = db_session
 
     def has_file(
         self,
@@ -189,6 +196,10 @@ class PostgresBackedFileStore(FileStore):
         try:
             file_io = self.read_file(filename, mode="b")
             file_content = file_io.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             matches = puremagic.magic_string(file_content)
             if matches:
                 mime_type = cast(str, matches[0].mime_type)

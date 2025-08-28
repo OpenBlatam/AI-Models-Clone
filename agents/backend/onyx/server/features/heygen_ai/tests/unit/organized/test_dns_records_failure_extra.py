@@ -1,7 +1,7 @@
 import types
 import pytest
 
-import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+import network_utils as mod
 from network_utils import NetworkUtils
 
 

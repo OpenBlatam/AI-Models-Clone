@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from dataclasses import dataclass
 
 from onyx.access.utils import prefix_external_group
@@ -6,6 +11,9 @@ from onyx.access.utils import prefix_user_group
 from onyx.configs.constants import PUBLIC_DOC_PAT
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @dataclass(frozen=True)
 class ExternalAccess:
 

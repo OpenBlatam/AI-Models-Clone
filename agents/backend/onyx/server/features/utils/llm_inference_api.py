@@ -1,8 +1,11 @@
-"""
-API de inferencia LLM enterprise, modular, instrumentada y lista para producción.
-- FastAPI + Transformers + structlog + Sentry + Prometheus + orjson
-- Seguridad, observabilidad, recarga automática, middlewares y mejores prácticas
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from fastapi import FastAPI, Request, Depends, HTTPException
 from fastapi.openapi.docs import get_swagger_ui_html
 from fastapi.responses import Response, ORJSONResponse
@@ -19,6 +22,18 @@ from .model_loader import maybe_reload_model, load_model, device, model, tokeniz
 from .logging_utils import logger
 from .metrics import REQUESTS, ERRORS, LATENCY, instrumentator
 from .schemas import GenerationRequest, BatchGenerationRequest, GenerationResponse, BatchGenerationResponse, TokenResponse, RefreshTokenRequest
+from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+    import time, uuid
+        import torch
+    import time, uuid, torch
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+API de inferencia LLM enterprise, modular, instrumentada y lista para producción.
+- FastAPI + Transformers + structlog + Sentry + Prometheus + orjson
+- Seguridad, observabilidad, recarga automática, middlewares y mejores prácticas
+"""
 
 app = FastAPI(
     docs_url=None,
@@ -41,19 +56,25 @@ if os.getenv("FORCE_HTTPS") == "1":
 # --- Instrumentación Prometheus ---
 @app.on_event("startup")
 def on_startup():
-    startup_event()
+    
+    """on_startup function."""
+startup_event()
     instrumentator.instrument(app).expose(app, include_in_schema=False, should_gzip=True)
 
 # --- Error handling global ---
 @app.exception_handler(Exception)
 def global_exception_handler(request: Request, exc: Exception):
-    logger.error({"event": "unhandled_exception", "error": str(exc)})
+    
+    """global_exception_handler function."""
+logger.error({"event": "unhandled_exception", "error": str(exc)})
     sentry_sdk.capture_exception(exc)
     return ORJSONResponse(status_code=500, content={"detail": "Internal server error"})
 
 @app.exception_handler(StarletteHTTPException)
 def http_exception_handler(request: Request, exc: StarletteHTTPException):
-    logger.warning({"event": "http_exception", "status_code": exc.status_code, "detail": exc.detail})
+    
+    """http_exception_handler function."""
+logger.warning({"event": "http_exception", "status_code": exc.status_code, "detail": exc.detail})
     return ORJSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
 
 # --- Endpoints auth ---
@@ -63,24 +84,31 @@ app.post("/token/refresh", response_model=TokenResponse)(refresh_token_endpoint)
 # --- Endpoints health/readiness para K8s ---
 @app.get("/health", tags=["infra"])
 def health():
-    REQUESTS.labels(endpoint="health").inc()
+    
+    """health function."""
+REQUESTS.labels(endpoint="health").inc()
     return {"status": "ok"}
 
 @app.get("/readiness", tags=["infra"])
 def readiness():
-    # Puedes agregar lógica para readiness real (ej: modelo cargado, DB, etc)
+    
+    """readiness function."""
+# Puedes agregar lógica para readiness real (ej: modelo cargado, DB, etc)
     if model is None or tokenizer is None:
         raise HTTPException(status_code=HTTP_503_SERVICE_UNAVAILABLE, detail="Model not loaded")
     return {"ready": True}
 
 @app.get("/version", tags=["infra"])
 def version():
-    REQUESTS.labels(endpoint="version").inc()
+    
+    """version function."""
+REQUESTS.labels(endpoint="version").inc()
     return {"model_path": getattr(model, 'model_path', None), "last_loaded": last_loaded}
 
 @app.get("/metrics", include_in_schema=False)
 def metrics():
-    from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
+    
+    """metrics function."""
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 @app.get("/docs")
@@ -100,14 +128,12 @@ async def predict(
 ):
     endpoint = "predict"
     REQUESTS.labels(endpoint=endpoint).inc()
-    import time, uuid
     start = time.time()
     request_id = str(uuid.uuid4())
     user = auth.get("user")
     try:
         maybe_reload_model()
         inputs = tokenizer(req.prompt, return_tensors="pt").to(device)
-        import torch
         with torch.no_grad():
             outputs = model.generate(
                 **inputs,
@@ -135,7 +161,6 @@ async def batch_predict(
 ):
     endpoint = "batch_predict"
     REQUESTS.labels(endpoint=endpoint).inc()
-    import time, uuid, torch
     start = time.time()
     request_id = str(uuid.uuid4())
     user = auth.get("user")

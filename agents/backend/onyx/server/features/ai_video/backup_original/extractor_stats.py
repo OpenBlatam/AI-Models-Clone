@@ -1,9 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import json
 import typing as t
 from threading import Lock
 import logging
 
+    import argparse
+    import sys
+from typing import Any, List, Dict, Optional
+import asyncio
 logger = logging.getLogger("extractor_stats")
 
 class ExtractorStats:
@@ -20,7 +26,9 @@ class ExtractorStats:
         get_global_summary(): summary across all domains
     """
     def __init__(self, stats_file: str):
-        self.stats_file = stats_file
+        
+    """__init__ function."""
+self.stats_file = stats_file
         self.stats = self._load()
         self._lock = Lock()
 
@@ -28,6 +36,10 @@ class ExtractorStats:
         if os.path.exists(self.stats_file):
             try:
                 with open(self.stats_file, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     data = json.load(f)
                     if isinstance(data, dict):
                         return data
@@ -39,6 +51,10 @@ class ExtractorStats:
         with self._lock:
             try:
                 with open(self.stats_file, 'w', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     json.dump(self.stats, f, indent=2)
                 logger.info(f"[ExtractorStats] Stats saved to {self.stats_file}")
             except Exception as e:
@@ -59,7 +75,7 @@ class ExtractorStats:
     def get_ordered_extractors(self, domain: str, extractors: t.List) -> t.List:
         """Order extractors by historical score for this domain."""
         stats = self.stats.get(domain, {})
-        def score(extractor):
+        def score(extractor) -> Any:
             d = stats.get(extractor.name, None)
             if not d or d['runs'] == 0:
                 return 0  # unknown extractors go last
@@ -124,8 +140,6 @@ class ExtractorStats:
         return summary
 
 if __name__ == "__main__":
-    import argparse
-    import sys
     parser = argparse.ArgumentParser(description="ExtractorStats CLI")
     parser.add_argument('--file', type=str, default='extractor_stats.json', help='Stats file path')
     parser.add_argument('--reset', action='store_true', help='Reset all stats')
@@ -143,7 +157,15 @@ if __name__ == "__main__":
     if args.import_json:
         if os.path.isfile(args.import_json):
             with open(args.import_json, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 data = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         else:
             data = args.import_json
         stats.import_json(data)

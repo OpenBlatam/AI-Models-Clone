@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import sys
+import argparse
+from pathlib import Path
+from examples.gradient_accumulation_demo import GradientAccumulationDemo, main
+            from pathlib import Path
+            import json
+            import traceback
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Gradient Accumulation Demo Launcher
@@ -5,15 +17,10 @@ Gradient Accumulation Demo Launcher
 Launcher script for the comprehensive gradient accumulation demonstration.
 """
 
-import asyncio
-import sys
-import argparse
-from pathlib import Path
 
 # Add the current directory to Python path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from examples.gradient_accumulation_demo import GradientAccumulationDemo, main
 
 
 def parse_arguments():
@@ -158,7 +165,7 @@ async def run_specific_demo(demo_name: str, args):
         raise ValueError(f"Unknown demo: {demo_name}")
 
 
-async def run_comprehensive_demo(args):
+async def run_comprehensive_demo(args) -> Any:
     """Run comprehensive demo with custom parameters"""
     
     demo = GradientAccumulationDemo("comprehensive_gradient_accumulation_demo")
@@ -206,14 +213,16 @@ def main_launcher():
         
         # Save results if requested
         if args.save_results:
-            from pathlib import Path
-            import json
             
             results_dir = Path(args.log_dir)
             results_dir.mkdir(parents=True, exist_ok=True)
             
             results_file = results_dir / f"{args.demo}_results.json"
             with open(results_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(results, f, indent=2)
             
             print(f"📁 Results saved to: {results_file}")
@@ -227,7 +236,6 @@ def main_launcher():
     except Exception as e:
         print(f"❌ Demo failed with error: {e}")
         if args.debug:
-            import traceback
             traceback.print_exc()
         return 1
 

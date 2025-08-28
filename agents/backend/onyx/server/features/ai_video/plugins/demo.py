@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import logging
+import sys
+import time
+from pathlib import Path
+from typing import Dict, Any
+from plugins import (
+from plugins.examples import WebExtractorPlugin
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Plugin System Demo
@@ -14,24 +28,16 @@ Usage:
     python demo.py
 """
 
-import asyncio
-import logging
-import sys
-import time
-from pathlib import Path
-from typing import Dict, Any
 
 # Add the parent directory to the path so we can import our modules
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from plugins import (
     PluginManager, 
     ManagerConfig, 
     ValidationLevel,
     quick_start,
     create_plugin_manager
 )
-from plugins.examples import WebExtractorPlugin
 
 # Configure logging
 logging.basicConfig(
@@ -49,11 +55,11 @@ logger = logging.getLogger(__name__)
 class DemoPluginManager:
     """Demo class that showcases the plugin system capabilities."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.manager = None
         self.demo_plugins = []
     
-    async def run_demo(self):
+    async def run_demo(self) -> Any:
         """Run the complete plugin system demo."""
         print("🎯 AI Video Plugin System Demo")
         print("=" * 50)
@@ -96,7 +102,7 @@ class DemoPluginManager:
             # Cleanup
             await self._cleanup()
     
-    async def _demo_manager_creation(self):
+    async def _demo_manager_creation(self) -> Any:
         """Demonstrate plugin manager creation."""
         print("\n1️⃣ Plugin Manager Creation")
         print("-" * 30)
@@ -115,7 +121,7 @@ class DemoPluginManager:
         print(f"  - Validation level: {config.validation_level.value}")
         print(f"  - Plugin directories: {config.plugin_dirs}")
     
-    async def _demo_plugin_discovery(self):
+    async def _demo_plugin_discovery(self) -> Any:
         """Demonstrate plugin discovery."""
         print("\n2️⃣ Plugin Discovery")
         print("-" * 30)
@@ -132,7 +138,7 @@ class DemoPluginManager:
             print(f"     Author: {plugin_info.author}")
             print()
     
-    async def _demo_plugin_loading(self):
+    async def _demo_plugin_loading(self) -> Any:
         """Demonstrate plugin loading and configuration."""
         print("\n3️⃣ Plugin Loading and Configuration")
         print("-" * 40)
@@ -169,7 +175,7 @@ class DemoPluginManager:
         config = self.manager.get_plugin_config("web_extractor")
         print(f"Plugin configuration: {config}")
     
-    async def _demo_lifecycle_management(self):
+    async def _demo_lifecycle_management(self) -> Any:
         """Demonstrate plugin lifecycle management."""
         print("\n4️⃣ Plugin Lifecycle Management")
         print("-" * 35)
@@ -193,7 +199,7 @@ class DemoPluginManager:
         await self.manager.stop_plugin("web_extractor")
         print("✅ Plugin stopped")
     
-    async def _demo_error_handling(self):
+    async def _demo_error_handling(self) -> Any:
         """Demonstrate error handling and recovery."""
         print("\n5️⃣ Error Handling and Recovery")
         print("-" * 35)
@@ -226,7 +232,7 @@ class DemoPluginManager:
             })
             print(f"Configuration update successful: {success}")
     
-    async def _demo_performance_monitoring(self):
+    async def _demo_performance_monitoring(self) -> Any:
         """Demonstrate performance monitoring."""
         print("\n6️⃣ Performance Monitoring")
         print("-" * 30)
@@ -248,16 +254,16 @@ class DemoPluginManager:
             for key, value in plugin_stats.items():
                 print(f"  - {key}: {value}")
     
-    async def _demo_event_handling(self):
+    async def _demo_event_handling(self) -> Any:
         """Demonstrate event handling."""
         print("\n7️⃣ Event Handling")
         print("-" * 20)
         
         # Add custom event handlers
-        def on_plugin_loaded(plugin_name, plugin):
+        def on_plugin_loaded(plugin_name, plugin) -> Any:
             print(f"🎉 Custom event: Plugin '{plugin_name}' loaded!")
         
-        def on_plugin_started(plugin_name, plugin):
+        def on_plugin_started(plugin_name, plugin) -> Any:
             print(f"🚀 Custom event: Plugin '{plugin_name}' started!")
         
         self.manager.add_event_handler("plugin_loaded", on_plugin_loaded)
@@ -268,7 +274,7 @@ class DemoPluginManager:
         await self.manager.reload_plugin("web_extractor")
         await self.manager.start_plugin("web_extractor")
     
-    async def _demo_health_reporting(self):
+    async def _demo_health_reporting(self) -> Any:
         """Demonstrate health reporting."""
         print("\n8️⃣ Health Reporting")
         print("-" * 20)
@@ -300,7 +306,7 @@ class DemoPluginManager:
             if details['last_error']:
                 print(f"    - Last error: {details['last_error']}")
     
-    async def _demo_advanced_features(self):
+    async def _demo_advanced_features(self) -> Any:
         """Demonstrate advanced features."""
         print("\n9️⃣ Advanced Features")
         print("-" * 20)
@@ -329,7 +335,7 @@ class DemoPluginManager:
         await self.manager.restart_plugin("web_extractor")
         print("  - Plugin restarted successfully")
     
-    async def _cleanup(self):
+    async def _cleanup(self) -> Any:
         """Cleanup resources."""
         print("\n🧹 Cleanup")
         print("-" * 10)
@@ -429,5 +435,6 @@ def main():
         asyncio.run(demo.run_demo())
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

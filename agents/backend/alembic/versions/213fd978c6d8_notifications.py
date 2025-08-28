@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """notifications
 
 Revision ID: 213fd978c6d8
@@ -6,12 +13,10 @@ Create Date: 2024-08-10 11:13:36.070790
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "213fd978c6d8"
-down_revision = "5fc1f54cc252"
+revision: str = "213fd978c6d8"
+down_revision: str = "5fc1f54cc252"
 branch_labels: None = None
 depends_on: None = None
 

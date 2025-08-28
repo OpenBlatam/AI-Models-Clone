@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+    from ai_video.plugins import PluginManager, ManagerConfig
+from .base import BasePlugin, PluginMetadata
+from .loader import PluginLoader, LoadResult
+from .validator import PluginValidator, ValidationLevel, ValidationStatus, ValidationReport
+from .registry import PluginRegistry, PluginState, RegistryEntry
+from .manager import PluginManager, ManagerConfig
+        import asyncio
+        import asyncio
+   from ai_video.plugins import PluginManager, ManagerConfig
+   from ai_video.plugins import quick_start
+   from ai_video.plugins import get_plugin_info, list_available_plugins
+   from ai_video.plugins import PluginManager, ValidationLevel
+from ai_video.plugins import BasePlugin, PluginMetadata
+from typing import Any, List, Dict, Optional
+import logging
 """
 AI Video Plugin System
 
@@ -12,7 +29,6 @@ This module provides:
 - Performance monitoring
 
 Quick Start:
-    from ai_video.plugins import PluginManager, ManagerConfig
     
     # Create and start the plugin manager
     config = ManagerConfig(auto_discover=True, auto_load=True)
@@ -35,11 +51,6 @@ Quick Start:
     print(f"Plugin stats: {stats}")
 """
 
-from .base import BasePlugin, PluginMetadata
-from .loader import PluginLoader, LoadResult
-from .validator import PluginValidator, ValidationLevel, ValidationStatus, ValidationReport
-from .registry import PluginRegistry, PluginState, RegistryEntry
-from .manager import PluginManager, ManagerConfig
 
 __all__ = [
     # Core classes
@@ -146,7 +157,6 @@ def get_plugin_info(plugin_name: str, manager: PluginManager = None) -> dict:
     """
     if manager is None:
         # Create a temporary manager for discovery
-        import asyncio
         loop = asyncio.get_event_loop()
         if loop.is_running():
             # We're in an async context, create manager
@@ -156,7 +166,9 @@ def get_plugin_info(plugin_name: str, manager: PluginManager = None) -> dict:
         else:
             # We're in a sync context, use asyncio.run
             async def _get_info():
-                m = await create_plugin_manager(auto_load=False)
+                
+    """_get_info function."""
+m = await create_plugin_manager(auto_load=False)
                 await m.discover_plugins()
                 return m.get_plugin_info(plugin_name)
             
@@ -179,7 +191,6 @@ def list_available_plugins(manager: PluginManager = None) -> list:
     """
     if manager is None:
         # Create a temporary manager for discovery
-        import asyncio
         loop = asyncio.get_event_loop()
         if loop.is_running():
             # We're in an async context, create manager
@@ -189,7 +200,9 @@ def list_available_plugins(manager: PluginManager = None) -> list:
         else:
             # We're in a sync context, use asyncio.run
             async def _list_plugins():
-                m = await create_plugin_manager(auto_load=False)
+                
+    """_list_plugins function."""
+m = await create_plugin_manager(auto_load=False)
                 await m.discover_plugins()
                 return list(m.registry.discovered_plugins.keys())
             
@@ -221,7 +234,6 @@ Quick Examples:
 
 1. Basic Usage:
    ```python
-   from ai_video.plugins import PluginManager, ManagerConfig
    
    # Create manager
    config = ManagerConfig(auto_discover=True, auto_load=True)
@@ -234,7 +246,6 @@ Quick Examples:
 
 2. Quick Start:
    ```python
-   from ai_video.plugins import quick_start
    
    # Start with recommended settings
    manager = await quick_start()
@@ -246,7 +257,6 @@ Quick Examples:
 
 3. Plugin Information:
    ```python
-   from ai_video.plugins import get_plugin_info, list_available_plugins
    
    # List all available plugins
    available = list_available_plugins()
@@ -259,7 +269,6 @@ Quick Examples:
 
 4. Advanced Usage:
    ```python
-   from ai_video.plugins import PluginManager, ValidationLevel
    
    # Create manager with strict validation
    config = ManagerConfig(
@@ -274,7 +283,7 @@ Quick Examples:
    await manager.start()
    
    # Add event handlers
-   def on_plugin_loaded(plugin_name, plugin):
+   def on_plugin_loaded(plugin_name, plugin) -> Any:
        print(f"Plugin loaded: {plugin_name}")
    
    manager.add_event_handler("plugin_loaded", on_plugin_loaded)
@@ -290,10 +299,9 @@ Plugin Development:
 To create a plugin, inherit from BasePlugin:
 
 ```python
-from ai_video.plugins import BasePlugin, PluginMetadata
 
 class MyPlugin(BasePlugin):
-    def __init__(self, config=None):
+    def __init__(self, config=None) -> Any:
         super().__init__(config)
         self.name = "my_plugin"
         self.version = "1.0.0"
@@ -308,11 +316,11 @@ class MyPlugin(BasePlugin):
             category="extractor"
         )
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         # Initialize your plugin
         pass
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         # Cleanup your plugin
         pass
 ```

@@ -2,7 +2,7 @@ import types
 import pytest
 
 from network_utils import NetworkUtils
-import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+import network_utils as mod
 
 
 @pytest.mark.asyncio

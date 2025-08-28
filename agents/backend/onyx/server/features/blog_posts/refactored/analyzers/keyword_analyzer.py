@@ -1,6 +1,7 @@
-"""
-Analizador de palabras clave ultra-optimizado.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import logging
 import re
@@ -8,26 +9,32 @@ from typing import Dict, Any, Optional, List, Tuple
 from concurrent.futures import ThreadPoolExecutor
 from collections import Counter
 import string
-
 from .base import BaseAnalyzer, CachedAnalyzerMixin
 from ..models import NLPAnalysisResult, KeywordMetrics
 from ..config import NLPConfig
+    import yake
+    from sklearn.feature_extraction.text import TfidfVectorizer
+    import spacy
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Analizador de palabras clave ultra-optimizado.
+"""
+
+
 
 # Importaciones condicionales
 try:
-    import yake
     YAKE_AVAILABLE = True
 except ImportError:
     YAKE_AVAILABLE = False
 
 try:
-    from sklearn.feature_extraction.text import TfidfVectorizer
     SKLEARN_AVAILABLE = True
 except ImportError:
     SKLEARN_AVAILABLE = False
 
 try:
-    import spacy
     SPACY_AVAILABLE = True
 except ImportError:
     SPACY_AVAILABLE = False
@@ -38,14 +45,16 @@ class KeywordAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
     """Analizador de palabras clave con múltiples técnicas."""
     
     def __init__(self, config: NLPConfig, executor: Optional[ThreadPoolExecutor] = None):
-        super().__init__(config, executor)
+        
+    """__init__ function."""
+super().__init__(config, executor)
         self.max_keywords = config.analysis.keyword_max_count
         self.max_ngram = config.analysis.keyword_max_ngram
         self.yake_extractor = None
         self.spacy_model = None
         self._initialize_models()
     
-    def _initialize_models(self):
+    def _initialize_models(self) -> Any:
         """Inicializar modelos de extracción de palabras clave."""
         # Inicializar YAKE si está disponible
         if YAKE_AVAILABLE and self.config.analysis.enable_keywords:
@@ -131,7 +140,9 @@ class KeywordAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
         """Extracción con YAKE."""
         try:
             def extract():
-                keywords = self.yake_extractor.extract_keywords(text)
+                
+    """extract function."""
+keywords = self.yake_extractor.extract_keywords(text)
                 # YAKE devuelve (score, keyword) - score más bajo = mejor
                 # Convertir a (keyword, confidence) donde confidence más alto = mejor
                 normalized_keywords = []
@@ -150,7 +161,9 @@ class KeywordAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
         """Extracción con spaCy usando NER y POS."""
         try:
             def extract():
-                doc = self.spacy_model(text)
+                
+    """extract function."""
+doc = self.spacy_model(text)
                 keywords = []
                 
                 # Entidades nombradas
@@ -187,7 +200,9 @@ class KeywordAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
         """Extracción con TF-IDF."""
         try:
             def extract():
-                # Preparar texto para TF-IDF
+                
+    """extract function."""
+# Preparar texto para TF-IDF
                 sentences = re.split(r'[.!?]+', text)
                 sentences = [s.strip() for s in sentences if s.strip()]
                 
@@ -223,7 +238,9 @@ class KeywordAnalyzer(BaseAnalyzer, CachedAnalyzerMixin):
     async def _basic_keyword_extraction(self, text: str) -> List[Tuple[str, float]]:
         """Extracción básica de palabras clave."""
         def extract():
-            # Limpiar texto
+            
+    """extract function."""
+# Limpiar texto
             text_clean = re.sub(r'[^\w\s]', ' ', text.lower())
             words = text_clean.split()
             

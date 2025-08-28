@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import os
 from typing import cast
@@ -7,6 +9,9 @@ from cohere import Client
 
 from ee.onyx.configs.app_configs import COHERE_DEFAULT_API_KEY
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 Embedding = List[float]
 
 
@@ -16,6 +21,10 @@ def load_processed_docs(cohere_enabled: bool) -> list[dict]:
     if cohere_enabled and COHERE_DEFAULT_API_KEY:
         initial_docs_path = os.path.join(base_path, "initial_docs_cohere.json")
         processed_docs = json.load(open(initial_docs_path))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
         cohere_client = Client(api_key=COHERE_DEFAULT_API_KEY)
         embed_model = "embed-english-v3.0"
@@ -41,5 +50,9 @@ def load_processed_docs(cohere_enabled: bool) -> list[dict]:
     else:
         initial_docs_path = os.path.join(base_path, "initial_docs.json")
         processed_docs = json.load(open(initial_docs_path))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
     return processed_docs

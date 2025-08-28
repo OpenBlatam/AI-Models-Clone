@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-"""
-AI Video System - Cleanup Script
-
-Production-ready cleanup script for maintaining system health and performance.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import sys
 import shutil
@@ -13,12 +8,21 @@ import argparse
 from pathlib import Path
 from datetime import datetime, timedelta
 from typing import List, Dict, Any
+from core.utils import cleanup_old_files, get_memory_usage, get_cpu_usage
+from core.exceptions import AIVideoError
+from typing import Any, List, Dict, Optional
+import asyncio
+#!/usr/bin/env python3
+"""
+AI Video System - Cleanup Script
+
+Production-ready cleanup script for maintaining system health and performance.
+"""
+
 
 # Add current directory to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from core.utils import cleanup_old_files, get_memory_usage, get_cpu_usage
-from core.exceptions import AIVideoError
 
 logger = logging.getLogger(__name__)
 
@@ -492,5 +496,6 @@ def main():
         sys.exit(1)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

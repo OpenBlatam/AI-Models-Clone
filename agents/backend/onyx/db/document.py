@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import contextlib
 import time
 from collections.abc import Generator
@@ -41,6 +52,9 @@ from onyx.document_index.interfaces import DocumentMetadata
 from onyx.server.documents.models import ConnectorCredentialPairIdentifier
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 ONE_HOUR_IN_SECONDS = 60 * 60
@@ -831,7 +845,7 @@ def get_document_sources(
     return {doc_id: source for doc_id, source in results}
 
 
-def fetch_chunk_counts_for_documents(
+async def fetch_chunk_counts_for_documents(
     document_ids: list[str],
     db_session: Session,
 ) -> list[tuple[str, int]]:
@@ -852,7 +866,7 @@ def fetch_chunk_counts_for_documents(
     return [(doc_id, chunk_counts.get(doc_id, 0)) for doc_id in document_ids]
 
 
-def fetch_chunk_count_for_document(
+async def fetch_chunk_count_for_document(
     document_id: str,
     db_session: Session,
 ) -> int | None:

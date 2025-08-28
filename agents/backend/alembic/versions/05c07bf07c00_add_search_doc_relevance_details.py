@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """add search doc relevance details
 
 Revision ID: 05c07bf07c00
@@ -6,12 +13,10 @@ Create Date: 2024-07-10 17:48:15.886653
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "05c07bf07c00"
-down_revision = "b896bbd0d5a7"
+revision: str = "05c07bf07c00"
+down_revision: str = "b896bbd0d5a7"
 branch_labels: None = None
 depends_on: None = None
 

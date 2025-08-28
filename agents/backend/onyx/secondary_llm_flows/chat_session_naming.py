@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.chat.chat_utils import combine_message_chain
 from onyx.configs.chat_configs import LANGUAGE_CHAT_NAMING_HINT
 from onyx.configs.model_configs import GEN_AI_HISTORY_CUTOFF
@@ -9,6 +11,9 @@ from onyx.llm.utils import message_to_string
 from onyx.prompts.chat_prompts import CHAT_NAMING
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -29,9 +34,7 @@ def get_renamed_conversation_name(
     prompt_msgs = [
         {
             "role": "user",
-            "content": CHAT_NAMING.format(
-                language_hint_or_empty=language_hint, chat_history=history_str
-            ),
+            "content"f": CHAT_NAMING",
         },
     ]
 

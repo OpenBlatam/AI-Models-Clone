@@ -1,8 +1,5 @@
-"""
-Input Sanitization System for Cybersecurity Tools
-Prevents shell command injection and other input-based attacks
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 import shlex
 import subprocess
@@ -17,6 +14,14 @@ import html
 import json
 from fastapi import HTTPException, status
 from pydantic import BaseModel, Field, field_validator
+from fastapi import APIRouter
+    import asyncio
+from typing import Any, List, Dict, Optional
+"""
+Input Sanitization System for Cybersecurity Tools
+Prevents shell command injection and other input-based attacks
+"""
+
 
 class SanitizationLevel(Enum):
     """Sanitization levels for different security requirements"""
@@ -51,7 +56,9 @@ class InputSanitizer:
     """Comprehensive input sanitization system"""
     
     def __init__(self, sanitization_level: SanitizationLevel = SanitizationLevel.HIGH):
-        self.sanitization_level = sanitization_level
+        
+    """__init__ function."""
+self.sanitization_level = sanitization_level
         self.logger = logging.getLogger(__name__)
         
         # Dangerous patterns for different input types
@@ -390,7 +397,9 @@ class SecureCommandExecutor:
     """Secure command execution with input sanitization"""
     
     def __init__(self, sanitizer: InputSanitizer):
-        self.sanitizer = sanitizer
+        
+    """__init__ function."""
+self.sanitizer = sanitizer
         self.logger = logging.getLogger(__name__)
         self.allowed_commands = {
             'ping': ['ping', '-c', '4'],
@@ -523,7 +532,6 @@ class CommandExecutionResponse(BaseModel):
     sanitized: bool
 
 # FastAPI router
-from fastapi import APIRouter
 
 router = APIRouter(prefix="/sanitization", tags=["Input Sanitization"])
 
@@ -645,6 +653,6 @@ async def demo_input_sanitization():
     
     print("\n=== Input Sanitization Demo Completed! ===")
 
-if __name__ == "__main__":
-    import asyncio
+match __name__:
+    case "__main__":
     asyncio.run(demo_input_sanitization()) 

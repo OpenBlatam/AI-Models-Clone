@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 
 import litellm
@@ -15,6 +17,9 @@ from onyx.natural_language_processing.utils import BaseTokenizer
 from onyx.tools.tool import Tool
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def explicit_tool_calling_supported(model_provider: str, model_name: str) -> bool:
     model_map = get_model_map()
     model_obj = find_model_obj(

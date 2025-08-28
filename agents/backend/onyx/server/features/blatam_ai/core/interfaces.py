@@ -1,504 +1,582 @@
-from typing_extensions import Literal, TypedDict
-from typing import Any, List, Dict, Optional, Union, Tuple
-# Constants
-TIMEOUT_SECONDS = 60
+"""
+🎯 BLATAM AI CORE INTERFACES v6.0.0
+====================================
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Union, Protocol, TypeVar, Generic
-from dataclasses import dataclass
-from enum import Enum
+Core interfaces and abstractions for the Blatam AI system:
+- 🎯 Clean interface definitions
+- 🔧 Protocol-based abstractions
+- ⚡ Async-first design patterns
+- 🏗️ Builder and factory patterns
+- 📊 Observable patterns
+- 🚀 Performance optimization interfaces
+"""
+
+from __future__ import annotations
+
 import asyncio
-from typing import Any, List, Dict, Optional
 import logging
-"""
-🔧 BLATAM AI CORE INTERFACES v5.0.0
-===================================
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Dict, List, Optional, Union, Callable, TypeVar, Generic, Protocol, runtime_checkable
+from typing_extensions import Self
+import time
+import uuid
 
-Interfaces base modulares para arquitectura limpia:
-- 🏗️ Base component interfaces
-- 🎯 Specialized behavior contracts
-- 📊 Metrics and monitoring interfaces
-- 🔄 Event handling interfaces
-- ⚙️ Configuration interfaces
-"""
-
+# Configure logging
+logger = logging.getLogger(__name__)
 
 # =============================================================================
-# 🎯 CORE ENUMS
+# 🎯 TYPE VARIABLES AND GENERICS
 # =============================================================================
 
-class ComponentStatus(Enum):
-    """Estados de componentes."""
-    INITIALIZING = "initializing"
-    READY = "ready"
-    RUNNING = "running"
-    OPTIMIZING = "optimizing"
-    ERROR = "error"
-    STOPPED = "stopped"
-    DEGRADED = "degraded"
-
-class ProcessingType(Enum):
-    """Tipos de procesamiento."""
-    ENTERPRISE = "enterprise"
-    NLP_ANALYSIS = "nlp_analysis"
-    NLP_GENERATION = "nlp_generation"
-    PRODUCT_DESCRIPTION = "product_description"
-    AGENT_INTERACTION = "agent_interaction"
-    BATCH_PROCESSING = "batch_processing"
-    AUTO_DETECT = "auto_detect"
-
-class OptimizationStrategy(Enum):
-    """Estrategias de optimización."""
-    PERFORMANCE = "performance"
-    MEMORY = "memory"
-    BALANCED = "balanced"
-    ACCURACY = "accuracy"
-    SPEED = "speed"
+T = TypeVar('T')
+TConfig = TypeVar('TConfig', bound='BaseConfig')
+TResult = TypeVar('TResult')
+TInput = TypeVar('TInput')
+TOutput = TypeVar('TOutput')
 
 # =============================================================================
-# 🏗️ BASE COMPONENT INTERFACES
+# 🎯 BASE INTERFACES
 # =============================================================================
 
-class BlatamComponent(ABC):
-    """Interface base para todos los componentes del sistema."""
+class Initializable(Protocol):
+    """Protocol for components that can be initialized."""
     
-    @property
-    @abstractmethod
-    def component_name(self) -> str:
-        """Nombre del componente."""
-        pass
+    async def initialize(self) -> bool:
+        """Initialize the component."""
+        ...
     
-    @property
-    @abstractmethod
-    def status(self) -> ComponentStatus:
-        """Estado actual del componente."""
-        pass
-    
-    @abstractmethod
-    async def initialize(self, **kwargs) -> bool:
-        """Inicializa el componente."""
-        pass
-    
-    @abstractmethod
     async def shutdown(self) -> bool:
-        """Apaga el componente limpiamente."""
-        pass
+        """Shutdown the component."""
+        ...
+
+class HealthCheckable(Protocol):
+    """Protocol for components that support health checks."""
     
-    @abstractmethod
     async def health_check(self) -> Dict[str, Any]:
-        """Verifica la salud del componente."""
-        pass
-    
-    @abstractmethod
-    def get_stats(self) -> Dict[str, Any]:
-        """Obtiene estadísticas del componente."""
-        pass
-    
-    @abstractmethod
-    async def process(self, data: Any, **kwargs) -> Any:
-        """Procesa datos según la especialidad del componente."""
-        pass
+        """Check component health."""
+        ...
 
-class ProcessingComponent(BlatamComponent):
-    """Interface para componentes de procesamiento."""
+class Configurable(Protocol):
+    """Protocol for components that can be configured."""
     
-    @abstractmethod
-    def get_supported_types(self) -> List[ProcessingType]:
-        """Obtiene tipos de procesamiento soportados."""
-        pass
+    def get_config(self) -> Dict[str, Any]:
+        """Get current configuration."""
+        ...
     
-    @abstractmethod
-    async def can_handle(self, data: Any, processing_type: ProcessingType) -> bool:
-        """Determina si puede manejar el tipo de datos/procesamiento."""
-        pass
-    
-    @abstractmethod
-    async def estimate_processing_time(self, data: Any) -> float:
-        """Estima tiempo de procesamiento en ms."""
-        pass
+    def update_config(self, config: Dict[str, Any]) -> bool:
+        """Update configuration."""
+        ...
 
-class OptimizableComponent(BlatamComponent):
-    """Interface para componentes optimizables."""
+class Observable(Protocol):
+    """Protocol for components that can be observed."""
     
-    @abstractmethod
-    async def optimize(self, strategy: OptimizationStrategy, metrics: Dict[str, Any]) -> Dict[str, Any]:
-        """Optimiza el componente basado en estrategia y métricas."""
-        pass
+    def add_observer(self, observer: 'Observer') -> None:
+        """Add an observer."""
+        ...
     
-    @abstractmethod
-    async def record_performance(self, operation: str, duration_ms: float, success: bool, metadata: Optional[Dict] = None):
-        """Registra métricas de rendimiento."""
-        pass
-    
-    @abstractmethod
-    def get_optimization_targets(self) -> Dict[str, float]:
-        """Obtiene targets de optimización."""
-        pass
-    
-    @abstractmethod
-    async def rollback_optimization(self, optimization_id: str) -> bool:
-        """Revierte una optimización específica."""
-        pass
+    def remove_observer(self, observer: 'Observer') -> None:
+        """Remove an observer."""
+        ...
 
-class LearningComponent(BlatamComponent):
-    """Interface para componentes que aprenden."""
+class Observer(Protocol):
+    """Protocol for observers."""
     
-    @abstractmethod
-    async def learn_from_interaction(self, interaction_data: Dict[str, Any]):
-        """Aprende de una interacción."""
-        pass
-    
-    @abstractmethod
-    async def adapt_behavior(self, feedback: Dict[str, Any]):
-        """Adapta comportamiento basado en feedback."""
-        pass
-    
-    @abstractmethod
-    async def save_learned_patterns(self) -> bool:
-        """Guarda patrones aprendidos."""
-        pass
-    
-    @abstractmethod
-    async def load_learned_patterns(self) -> bool:
-        """Carga patrones aprendidos."""
-        pass
-
-class CacheableComponent(BlatamComponent):
-    """Interface para componentes con capacidades de cache."""
-    
-    @abstractmethod
-    async def cache_get(self, key: str) -> Optional[Any]:
-        """Obtiene valor del cache."""
-        pass
-    
-    @abstractmethod
-    async def cache_set(self, key: str, value: Any, ttl: Optional[int] = None):
-        """Establece valor en cache."""
-        pass
-    
-    @abstractmethod
-    async def cache_invalidate(self, pattern: Optional[str] = None):
-        """Invalida cache."""
-        pass
-    
-    @abstractmethod
-    def get_cache_stats(self) -> Dict[str, Any]:
-        """Obtiene estadísticas de cache."""
-        pass
+    async def on_event(self, event: 'Event') -> None:
+        """Handle an event."""
+        ...
 
 # =============================================================================
-# 🤖 ENGINE INTERFACES
+# 🎯 EVENT SYSTEM
 # =============================================================================
 
-class AIEngine(BlatamComponent):
-    """Interface base para motores AI."""
-    
-    @property
-    @abstractmethod
-    def engine_type(self) -> str:
-        """Tipo de motor (speed, nlp, langchain, evolution)."""
-        pass
-    
-    @abstractmethod
-    async def warm_up(self) -> bool:
-        """Precalienta el motor."""
-        pass
-    
-    @abstractmethod
-    async def scale_up(self, factor: float) -> bool:
-        """Escala el motor hacia arriba."""
-        pass
-    
-    @abstractmethod
-    async def scale_down(self, factor: float) -> bool:
-        """Escala el motor hacia abajo."""
-        pass
+class EventType(Enum):
+    """System event types."""
+    COMPONENT_INITIALIZED = "component_initialized"
+    COMPONENT_SHUTDOWN = "component_shutdown"
+    PERFORMANCE_UPDATE = "performance_update"
+    ERROR_OCCURRED = "error_occurred"
+    CONFIGURATION_CHANGED = "configuration_changed"
+    HEALTH_CHECK = "health_check"
+    METRICS_UPDATE = "metrics_update"
+    OPTIMIZATION_TRIGGERED = "optimization_triggered"
+    LEARNING_COMPLETED = "learning_completed"
+    SELF_HEALING_TRIGGERED = "self_healing_triggered"
 
-class SpeedEngine(AIEngine, OptimizableComponent, CacheableComponent):
-    """Interface para motor de velocidad."""
+@dataclass
+class Event:
+    """System event with metadata."""
+    event_type: EventType
+    source: str
+    timestamp: float = field(default_factory=time.time)
+    data: Dict[str, Any] = field(default_factory=dict)
+    event_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     
-    @abstractmethod
-    async def ultra_fast_call(self, func, *args, **kwargs) -> Any:
-        """Ejecuta función con optimizaciones ultra-rápidas."""
-        pass
-    
-    @abstractmethod
-    async def parallel_process(self, tasks: List[Any]) -> List[Any]:
-        """Procesa tareas en paralelo."""
-        pass
-    
-    @abstractmethod
-    async def batch_optimize(self, operations: List[Dict[str, Any]]) -> List[Any]:
-        """Optimiza operaciones en lote."""
-        pass
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert event to dictionary."""
+        return {
+            'event_type': self.event_type.value,
+            'source': self.source,
+            'timestamp': self.timestamp,
+            'data': self.data,
+            'event_id': self.event_id
+        }
 
-class NLPEngine(AIEngine, LearningComponent):
-    """Interface para motor de NLP."""
+class EventBus:
+    """Centralized event bus for system-wide communication."""
     
-    @abstractmethod
-    async def analyze_text(self, text: str, **kwargs) -> Dict[str, Any]:
-        """Analiza texto."""
-        pass
+    def __init__(self):
+        self._observers: Dict[EventType, List[Observer]] = {}
+        self._event_history: List[Event] = []
+        self._max_history_size = 10000
+        self._enabled = True
     
-    @abstractmethod
-    async def generate_text(self, prompt: str, **kwargs) -> str:
-        """Genera texto."""
-        pass
+    def enable(self) -> None:
+        """Enable event bus."""
+        self._enabled = True
+        logger.info("📡 Event bus enabled")
     
-    @abstractmethod
-    async def get_embeddings(self, texts: List[str]) -> List[List[float]]:
-        """Obtiene embeddings."""
-        pass
+    def disable(self) -> None:
+        """Disable event bus."""
+        self._enabled = False
+        logger.info("📡 Event bus disabled")
     
-    @abstractmethod
-    async def semantic_search(self, query: str, documents: List[str], top_k: int = 5) -> List[Dict[str, Any]]:
-        """Búsqueda semántica."""
-        pass
-
-class LangChainEngine(AIEngine, LearningComponent):
-    """Interface para motor de LangChain."""
+    def subscribe(self, event_type: EventType, observer: Observer) -> None:
+        """Subscribe an observer to an event type."""
+        if event_type not in self._observers:
+            self._observers[event_type] = []
+        self._observers[event_type].append(observer)
+        logger.debug(f"📡 Observer subscribed to {event_type.value}")
     
-    @abstractmethod
-    async def create_agent(self, agent_type: str, name: str, **config) -> str:
-        """Crea un agente."""
-        pass
+    def unsubscribe(self, event_type: EventType, observer: Observer) -> None:
+        """Unsubscribe an observer from an event type."""
+        if event_type in self._observers:
+            try:
+                self._observers[event_type].remove(observer)
+                logger.debug(f"📡 Observer unsubscribed from {event_type.value}")
+            except ValueError:
+                pass
     
-    @abstractmethod
-    async def run_agent(self, agent_name: str, input_text: str, **kwargs) -> Dict[str, Any]:
-        """Ejecuta un agente."""
-        pass
+    async def publish(self, event: Event) -> None:
+        """Publish an event to all subscribers."""
+        if not self._enabled:
+            return
+        
+        # Store event in history
+        self._event_history.append(event)
+        if len(self._event_history) > self._max_history_size:
+            self._event_history = self._event_history[-self._max_history_size:]
+        
+        # Notify observers
+        if event.event_type in self._observers:
+            tasks = []
+            for observer in self._observers[event.event_type]:
+                task = asyncio.create_task(self._notify_observer(observer, event))
+                tasks.append(task)
+            
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
+        
+        logger.debug(f"📡 Event published: {event.event_type.value} from {event.source}")
     
-    @abstractmethod
-    async def create_chain(self, chain_type: str, **config) -> str:
-        """Crea una cadena."""
-        pass
+    async def _notify_observer(self, observer: Observer, event: Event) -> None:
+        """Notify a single observer of an event."""
+        try:
+            await observer.on_event(event)
+        except Exception as e:
+            logger.error(f"❌ Error in event observer: {e}")
     
-    @abstractmethod
-    async def run_chain(self, chain_name: str, inputs: Dict[str, Any]) -> Dict[str, Any]:
-        """Ejecuta una cadena."""
-        pass
-
-class EvolutionEngine(AIEngine, OptimizableComponent, LearningComponent):
-    """Interface para motor de evolución."""
+    def get_event_history(self, event_type: Optional[EventType] = None, limit: int = 100) -> List[Event]:
+        """Get event history, optionally filtered by type."""
+        if event_type:
+            filtered = [e for e in self._event_history if e.event_type == event_type]
+            return filtered[-limit:]
+        return self._event_history[-limit:]
     
-    @abstractmethod
-    async def auto_optimize_system(self) -> Dict[str, Any]:
-        """Optimiza automáticamente el sistema."""
-        pass
-    
-    @abstractmethod
-    async def self_heal_system(self) -> Dict[str, Any]:
-        """Auto-cura del sistema."""
-        pass
-    
-    @abstractmethod
-    async def predict_system_load(self, horizon_minutes: int = 60) -> Dict[str, Any]:
-        """Predice carga del sistema."""
-        pass
-    
-    @abstractmethod
-    async def evolve_parameters(self, component_name: str) -> Dict[str, Any]:
-        """Evoluciona parámetros de un componente."""
-        pass
+    def get_subscriber_count(self, event_type: EventType) -> int:
+        """Get number of subscribers for an event type."""
+        return len(self._observers.get(event_type, []))
 
 # =============================================================================
-# 🔧 SERVICE INTERFACES
+# 🎯 CONFIGURATION INTERFACES
 # =============================================================================
 
-class BlatamService(BlatamComponent):
-    """Interface base para servicios."""
+class BaseConfig(ABC):
+    """Base configuration class with validation and serialization."""
     
-    @property
-    @abstractmethod
-    def service_type(self) -> str:
-        """Tipo de servicio."""
-        pass
+    def validate(self) -> bool:
+        """Validate configuration values."""
+        return True
     
-    @abstractmethod
-    async def start_service(self) -> bool:
-        """Inicia el servicio."""
-        pass
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert configuration to dictionary."""
+        raise NotImplementedError
     
-    @abstractmethod
-    async def stop_service(self) -> bool:
-        """Detiene el servicio."""
-        pass
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> Self:
+        """Create configuration from dictionary."""
+        raise NotImplementedError
+    
+    def merge(self, other: 'BaseConfig') -> Self:
+        """Merge with another configuration."""
+        raise NotImplementedError
 
-class ProcessingService(BlatamService):
-    """Interface para servicios de procesamiento."""
+@dataclass
+class CacheConfig(BaseConfig):
+    """Cache configuration."""
+    enabled: bool = True
+    max_size: int = 10000
+    ttl_seconds: int = 3600
+    eviction_policy: str = "lru"
+    compression_enabled: bool = False
     
-    @abstractmethod
-    async def process_enterprise_data(self, data: Any, user_id: Optional[str] = None) -> Dict[str, Any]:
-        """Procesa datos empresariales."""
-        pass
+    def validate(self) -> bool:
+        """Validate cache configuration."""
+        if self.max_size <= 0:
+            logger.error("❌ Cache max_size must be positive")
+            return False
+        if self.ttl_seconds < 0:
+            logger.error("❌ Cache TTL must be non-negative")
+            return False
+        return True
     
-    @abstractmethod
-    async def process_batch(self, items: List[Any], batch_size: int = 10) -> List[Dict[str, Any]]:
-        """Procesa lote de datos."""
-        pass
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            'enabled': self.enabled,
+            'max_size': self.max_size,
+            'ttl_seconds': self.ttl_seconds,
+            'eviction_policy': self.eviction_policy,
+            'compression_enabled': self.compression_enabled
+        }
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> Self:
+        """Create from dictionary."""
+        return cls(**data)
+    
+    def merge(self, other: 'CacheConfig') -> Self:
+        """Merge with another cache config."""
+        return CacheConfig(
+            enabled=other.enabled if other.enabled is not None else self.enabled,
+            max_size=other.max_size if other.max_size is not None else self.max_size,
+            ttl_seconds=other.ttl_seconds if other.ttl_seconds is not None else self.ttl_seconds,
+            eviction_policy=other.eviction_policy if other.eviction_policy else self.eviction_policy,
+            compression_enabled=other.compression_enabled if other.compression_enabled is not None else self.compression_enabled
+        )
 
-class OptimizationService(BlatamService):
-    """Interface para servicios de optimización."""
+@dataclass
+class PerformanceConfig(BaseConfig):
+    """Performance configuration."""
+    enable_profiling: bool = False
+    enable_metrics: bool = True
+    sampling_rate: float = 0.1
+    max_metrics_history: int = 10000
+    performance_threshold: float = 1000.0  # milliseconds
     
-    @abstractmethod
-    async def optimize_component(self, component: OptimizableComponent, strategy: OptimizationStrategy) -> Dict[str, Any]:
-        """Optimiza un componente."""
-        pass
+    def validate(self) -> bool:
+        """Validate performance configuration."""
+        if not 0.0 <= self.sampling_rate <= 1.0:
+            logger.error("❌ Sampling rate must be between 0.0 and 1.0")
+            return False
+        if self.max_metrics_history <= 0:
+            logger.error("❌ Max metrics history must be positive")
+            return False
+        if self.performance_threshold <= 0:
+            logger.error("❌ Performance threshold must be positive")
+            return False
+        return True
     
-    @abstractmethod
-    async def analyze_performance(self, metrics_history: List[Dict[str, Any]]) -> Dict[str, Any]:
-        """Analiza rendimiento."""
-        pass
-
-class MonitoringService(BlatamService):
-    """Interface para servicios de monitoreo."""
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            'enable_profiling': self.enable_profiling,
+            'enable_metrics': self.enable_metrics,
+            'sampling_rate': self.sampling_rate,
+            'max_metrics_history': self.max_metrics_history,
+            'performance_threshold': self.performance_threshold
+        }
     
-    @abstractmethod
-    async def collect_metrics(self, component: BlatamComponent) -> Dict[str, Any]:
-        """Recolecta métricas."""
-        pass
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> Self:
+        """Create from dictionary."""
+        return cls(**data)
     
-    @abstractmethod
-    async def detect_anomalies(self, metrics: Dict[str, Any]) -> List[Dict[str, Any]]:
-        """Detecta anomalías."""
-        pass
-    
-    @abstractmethod
-    async def generate_alerts(self, anomalies: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-        """Genera alertas."""
-        pass
-
-# =============================================================================
-# 🏭 FACTORY INTERFACES
-# =============================================================================
-
-T = TypeVar('T', bound=BlatamComponent)
-
-class ComponentFactory(Generic[T], ABC):
-    """Interface base para factories de componentes."""
-    
-    @abstractmethod
-    async def create(self, config: Dict[str, Any], **kwargs) -> T:
-        """Crea un componente."""
-        pass
-    
-    @abstractmethod
-    def validate_config(self, config: Dict[str, Any]) -> bool:
-        """Valida configuración."""
-        pass
-    
-    @abstractmethod
-    def get_default_config(self) -> Dict[str, Any]:
-        """Obtiene configuración por defecto."""
-        pass
-
-class EngineFactory(ComponentFactory[AIEngine]):
-    """Interface para factories de motores."""
-    
-    @abstractmethod
-    def get_engine_type(self) -> str:
-        """Obtiene tipo de motor que crea."""
-        pass
-    
-    @abstractmethod
-    def get_dependencies(self) -> List[str]:
-        """Obtiene dependencias del motor."""
-        pass
-
-class ServiceFactory(ComponentFactory[BlatamService]):
-    """Interface para factories de servicios."""
-    
-    @abstractmethod
-    def get_service_type(self) -> str:
-        """Obtiene tipo de servicio que crea."""
-        pass
-
-# =============================================================================
-# 📊 EVENT INTERFACES
-# =============================================================================
-
-class EventHandler(ABC):
-    """Interface para manejadores de eventos."""
-    
-    @abstractmethod
-    async def handle(self, event_type: str, event_data: Dict[str, Any]) -> bool:
-        """Maneja un evento."""
-        pass
-    
-    @abstractmethod
-    def get_supported_events(self) -> List[str]:
-        """Obtiene eventos soportados."""
-        pass
-
-class EventPublisher(ABC):
-    """Interface para publicadores de eventos."""
-    
-    @abstractmethod
-    async def publish(self, event_type: str, event_data: Dict[str, Any]) -> bool:
-        """Publica un evento."""
-        pass
-    
-    @abstractmethod
-    async def subscribe(self, event_type: str, handler: EventHandler) -> bool:
-        """Suscribe un manejador."""
-        pass
-    
-    @abstractmethod
-    async def unsubscribe(self, event_type: str, handler: EventHandler) -> bool:
-        """Desuscribe un manejador."""
-        pass
+    def merge(self, other: 'PerformanceConfig') -> Self:
+        """Merge with another performance config."""
+        return PerformanceConfig(
+            enable_profiling=other.enable_profiling if other.enable_profiling is not None else self.enable_profiling,
+            enable_metrics=other.enable_metrics if other.enable_metrics is not None else self.enable_metrics,
+            sampling_rate=other.sampling_rate if other.sampling_rate is not None else self.sampling_rate,
+            max_metrics_history=other.max_metrics_history if other.max_metrics_history is not None else self.max_metrics_history,
+            performance_threshold=other.performance_threshold if other.performance_threshold is not None else self.performance_threshold
+        )
 
 # =============================================================================
-# ⚙️ CONFIGURATION INTERFACES
+# 🎯 BUILDER PATTERNS
 # =============================================================================
 
-class ConfigurationProvider(ABC):
-    """Interface para proveedores de configuración."""
+class Builder(Generic[T], ABC):
+    """Generic builder interface."""
     
     @abstractmethod
-    async def get_config(self, key: str) -> Optional[Any]:
-        """Obtiene configuración."""
+    def build(self) -> T:
+        """Build and return the final object."""
+        pass
+    
+    def reset(self) -> Self:
+        """Reset the builder to initial state."""
+        return self
+
+class ComponentBuilder(Builder[T], ABC):
+    """Builder for components."""
+    
+    def __init__(self):
+        self._config: Optional[BaseConfig] = None
+        self._dependencies: List[str] = []
+        self._metadata: Dict[str, Any] = {}
+    
+    def with_config(self, config: BaseConfig) -> Self:
+        """Set component configuration."""
+        self._config = config
+        return self
+    
+    def with_dependencies(self, dependencies: List[str]) -> Self:
+        """Set component dependencies."""
+        self._dependencies = dependencies
+        return self
+    
+    def with_metadata(self, metadata: Dict[str, Any]) -> Self:
+        """Set component metadata."""
+        self._metadata = metadata
+        return self
+    
+    def reset(self) -> Self:
+        """Reset builder state."""
+        self._config = None
+        self._dependencies = []
+        self._metadata = {}
+        return self
+
+# =============================================================================
+# 🎯 FACTORY PATTERNS
+# =============================================================================
+
+class AbstractFactory(ABC, Generic[T]):
+    """Abstract factory interface."""
+    
+    @abstractmethod
+    def create(self, config: BaseConfig, **kwargs) -> T:
+        """Create an instance."""
         pass
     
     @abstractmethod
-    async def set_config(self, key: str, value: Any) -> bool:
-        """Establece configuración."""
+    def get_supported_types(self) -> List[str]:
+        """Get supported instance types."""
         pass
+
+class FactoryRegistry:
+    """Registry for factories."""
     
-    @abstractmethod
-    async def reload_config(self) -> bool:
-        """Recarga configuración."""
-        pass
+    def __init__(self):
+        self._factories: Dict[str, AbstractFactory] = {}
+        self._factory_metadata: Dict[str, Dict[str, Any]] = {}
     
-    @abstractmethod
-    def watch_config(self, key: str, callback) -> bool:
-        """Observa cambios en configuración."""
-        pass
+    def register_factory(self, name: str, factory: AbstractFactory, metadata: Optional[Dict[str, Any]] = None) -> None:
+        """Register a factory."""
+        self._factories[name] = factory
+        self._factory_metadata[name] = metadata or {}
+        logger.info(f"🏭 Registered factory: {name}")
+    
+    def get_factory(self, name: str) -> AbstractFactory:
+        """Get a factory by name."""
+        if name not in self._factories:
+            raise KeyError(f"Factory '{name}' not found")
+        return self._factories[name]
+    
+    def get_factory_metadata(self, name: str) -> Dict[str, Any]:
+        """Get metadata for a factory."""
+        return self._factory_metadata.get(name, {})
+    
+    def list_factories(self) -> List[str]:
+        """List all registered factories."""
+        return list(self._factories.keys())
+    
+    def unregister_factory(self, name: str) -> None:
+        """Unregister a factory."""
+        if name in self._factories:
+            del self._factories[name]
+        if name in self._factory_metadata:
+            del self._factory_metadata[name]
+        logger.info(f"🗑️ Unregistered factory: {name}")
+
+# =============================================================================
+# 🎯 OBSERVABLE PATTERNS
+# =============================================================================
+
+class Subject:
+    """Subject in observer pattern."""
+    
+    def __init__(self):
+        self._observers: List[Observer] = []
+        self._observer_lock = asyncio.Lock()
+    
+    async def add_observer(self, observer: Observer) -> None:
+        """Add an observer."""
+        async with self._observer_lock:
+            if observer not in self._observers:
+                self._observers.append(observer)
+                logger.debug(f"👁️ Observer added to {self.__class__.__name__}")
+    
+    async def remove_observer(self, observer: Observer) -> None:
+        """Remove an observer."""
+        async with self._observer_lock:
+            try:
+                self._observers.remove(observer)
+                logger.debug(f"👁️ Observer removed from {self.__class__.__name__}")
+            except ValueError:
+                pass
+    
+    async def notify_observers(self, event: Event) -> None:
+        """Notify all observers of an event."""
+        async with self._observer_lock:
+            if not self._observers:
+                return
+            
+            tasks = []
+            for observer in self._observers:
+                task = asyncio.create_task(observer.on_event(event))
+                tasks.append(task)
+            
+            if tasks:
+                await asyncio.gather(*tasks, return_exceptions=True)
+
+# =============================================================================
+# 🎯 PERFORMANCE INTERFACES
+# =============================================================================
+
+class Profilable(Protocol):
+    """Protocol for components that support profiling."""
+    
+    def start_profiling(self) -> None:
+        """Start profiling."""
+        ...
+    
+    def stop_profiling(self) -> Dict[str, Any]:
+        """Stop profiling and return results."""
+        ...
+    
+    def is_profiling(self) -> bool:
+        """Check if profiling is active."""
+        ...
+
+class Optimizable(Protocol):
+    """Protocol for components that can be optimized."""
+    
+    async def optimize(self, metrics: Dict[str, Any]) -> Dict[str, Any]:
+        """Optimize based on metrics."""
+        ...
+    
+    def get_optimization_suggestions(self) -> List[str]:
+        """Get optimization suggestions."""
+        ...
+    
+    def can_optimize(self) -> bool:
+        """Check if optimization is possible."""
+        ...
+
+class SelfHealing(Protocol):
+    """Protocol for components that support self-healing."""
+    
+    async def detect_issues(self) -> List[Dict[str, Any]]:
+        """Detect potential issues."""
+        ...
+    
+    async def self_heal(self) -> bool:
+        """Attempt self-healing."""
+        ...
+    
+    def get_healing_strategies(self) -> List[str]:
+        """Get available healing strategies."""
+        ...
+
+# =============================================================================
+# 🎯 LEARNING INTERFACES
+# =============================================================================
+
+class Learnable(Protocol):
+    """Protocol for components that can learn."""
+    
+    async def learn(self, data: Any) -> bool:
+        """Learn from data."""
+        ...
+    
+    def get_learning_progress(self) -> Dict[str, Any]:
+        """Get learning progress."""
+        ...
+    
+    def can_learn(self) -> bool:
+        """Check if learning is possible."""
+        ...
+
+class Adaptive(Protocol):
+    """Protocol for components that can adapt."""
+    
+    async def adapt(self, feedback: Dict[str, Any]) -> bool:
+        """Adapt based on feedback."""
+        ...
+    
+    def get_adaptation_history(self) -> List[Dict[str, Any]]:
+        """Get adaptation history."""
+        ...
+    
+    def is_adaptive(self) -> bool:
+        """Check if adaptation is enabled."""
+        ...
 
 # =============================================================================
 # 🌟 EXPORTS
 # =============================================================================
 
 __all__ = [
-    # Enums
-    "ComponentStatus", "ProcessingType", "OptimizationStrategy",
+    # Protocols
+    "Initializable",
+    "HealthCheckable", 
+    "Configurable",
+    "Observable",
+    "Observer",
+    "Profilable",
+    "Optimizable",
+    "SelfHealing",
+    "Learnable",
+    "Adaptive",
     
-    # Base interfaces
-    "BlatamComponent", "ProcessingComponent", "OptimizableComponent", 
-    "LearningComponent", "CacheableComponent",
+    # Event system
+    "EventType",
+    "Event",
+    "EventBus",
     
-    # Engine interfaces
-    "AIEngine", "SpeedEngine", "NLPEngine", "LangChainEngine", "EvolutionEngine",
+    # Configuration
+    "BaseConfig",
+    "CacheConfig",
+    "PerformanceConfig",
     
-    # Service interfaces
-    "BlatamService", "ProcessingService", "OptimizationService", "MonitoringService",
+    # Builders
+    "Builder",
+    "ComponentBuilder",
     
-    # Factory interfaces
-    "ComponentFactory", "EngineFactory", "ServiceFactory",
+    # Factories
+    "AbstractFactory",
+    "FactoryRegistry",
     
-    # Event interfaces
-    "EventHandler", "EventPublisher",
+    # Observable patterns
+    "Subject",
     
-    # Configuration interfaces
-    "ConfigurationProvider"
+    # Type variables
+    "T",
+    "TConfig",
+    "TResult",
+    "TInput",
+    "TOutput"
 ] 

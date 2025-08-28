@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import sys
+import argparse
+from pathlib import Path
+    from src.api.main import create_app, run_server
+    from src.config.settings import settings
+    from REFACTORED_DEMO import run_refactored_demo
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 🚀 ULTRA LANDING PAGE SYSTEM - MAIN ENTRY POINT
@@ -13,18 +27,11 @@ Uso:
     python main.py --health       # Check de salud del sistema
 """
 
-import asyncio
-import sys
-import argparse
-from pathlib import Path
 
 # Agregar src al path para imports
 sys.path.insert(0, str(Path(__file__).parent / "src"))
 
 try:
-    from src.api.main import create_app, run_server
-    from src.config.settings import settings
-    from REFACTORED_DEMO import run_refactored_demo
     REFACTORED_IMPORTS_AVAILABLE = True
 except ImportError:
     REFACTORED_IMPORTS_AVAILABLE = False

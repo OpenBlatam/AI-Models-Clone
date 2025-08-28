@@ -1,4 +1,4 @@
-from agents.backend.onyx.server.features.heygen_ai.security_config import SecurityConfigManager
+from security_config import SecurityConfigManager
 
 
 def test_feature_flags_mapping_and_defaults(tmp_path):
@@ -22,6 +22,7 @@ def test_save_and_reload_preserves_updates(tmp_path):
     mgr2 = SecurityConfigManager(str(cfg_path))
     assert mgr2.get_authentication_settings()['is_multi_factor_enabled'] is True
     assert mgr2.get_encryption_settings()['is_encryption_in_transit_enabled'] is False
+
 
 
 

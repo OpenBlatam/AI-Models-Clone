@@ -1,7 +1,7 @@
-# NOTE No longer used. This needs to be revisited later.
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 from collections.abc import Iterator
-
 from onyx.chat.models import OnyxAnswerPiece
 from onyx.chat.models import StreamingError
 from onyx.llm.exceptions import GenAIDisabledException
@@ -15,6 +15,11 @@ from onyx.prompts.query_validation import ANSWERABLE_PROMPT
 from onyx.server.query_and_chat.models import QueryValidationResponse
 from onyx.server.utils import get_json_line
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# NOTE No longer used. This needs to be revisited later.
+
 
 logger = setup_logger()
 
@@ -23,7 +28,7 @@ def get_query_validation_messages(user_query: str) -> list[dict[str, str]]:
     messages = [
         {
             "role": "user",
-            "content": ANSWERABLE_PROMPT.format(user_query=user_query),
+            "content"f": ANSWERABLE_PROMPT",
         },
     ]
 

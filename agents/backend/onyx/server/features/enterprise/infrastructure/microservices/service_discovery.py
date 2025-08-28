@@ -1,10 +1,5 @@
-"""
-Service Discovery Implementation
-===============================
-
-Advanced service discovery with multiple backend support.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import json
 import logging
@@ -13,6 +8,14 @@ from dataclasses import dataclass
 from typing import Dict, List, Optional, Any
 from datetime import datetime
 import aiohttp
+from typing import Any, List, Dict, Optional
+"""
+Service Discovery Implementation
+===============================
+
+Advanced service discovery with multiple backend support.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -65,7 +68,9 @@ class ConsulServiceDiscovery(IServiceDiscovery):
     """Consul-based service discovery."""
     
     def __init__(self, consul_url: str = "http://localhost:8500"):
-        self.consul_url = consul_url.rstrip('/')
+        
+    """__init__ function."""
+self.consul_url = consul_url.rstrip('/')
         self.session: Optional[aiohttp.ClientSession] = None
         
     async def _get_session(self) -> aiohttp.ClientSession:
@@ -161,7 +166,7 @@ class ConsulServiceDiscovery(IServiceDiscovery):
 class ServiceDiscoveryManager:
     """Manager for multiple service discovery backends."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.discoveries: Dict[str, IServiceDiscovery] = {}
         self.primary_discovery: Optional[str] = None
         

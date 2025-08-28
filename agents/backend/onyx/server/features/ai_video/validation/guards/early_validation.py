@@ -1,19 +1,18 @@
-"""
-⚡ EARLY VALIDATION - FAIL FAST PRINCIPLE
-========================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Sistema de validación temprana que verifica todos los inputs y parámetros
-al inicio de las funciones antes de comenzar cualquier procesamiento.
-Implementa el principio "fail fast" para detectar errores lo antes posible.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import logging
 import time
 import asyncio
 from typing import (
-    Any, Optional, Union, Dict, List, Tuple, Callable, 
-    TypeVar, Generic, Protocol, runtime_checkable, get_type_hints
-)
 from dataclasses import dataclass, field
 from enum import Enum, auto
 from pathlib import Path
@@ -23,8 +22,21 @@ import functools
 from collections import defaultdict
 import json
 import re
-
 from .error_handling import (
+from typing import Any, List, Dict, Optional
+"""
+⚡ EARLY VALIDATION - FAIL FAST PRINCIPLE
+========================================
+
+Sistema de validación temprana que verifica todos los inputs y parámetros
+al inicio de las funciones antes de comenzar cualquier procesamiento.
+Implementa el principio "fail fast" para detectar errores lo antes posible.
+"""
+
+    Any, Optional, Union, Dict, List, Tuple, Callable, 
+    TypeVar, Generic, Protocol, runtime_checkable, get_type_hints
+)
+
     AIVideoError, ErrorCategory, ErrorSeverity, ErrorContext,
     ValidationError, ConfigurationError, DataValidationError
 )
@@ -417,7 +429,7 @@ def early_validate(
     """Decorador para validación temprana."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # Obtener nombres de parámetros
             sig = inspect.signature(func)
             bound_args = sig.bind(*args, **kwargs)
@@ -445,7 +457,7 @@ def early_validate(
             return func(*args, **kwargs)
         
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Obtener nombres de parámetros
             sig = inspect.signature(func)
             bound_args = sig.bind(*args, **kwargs)
@@ -496,7 +508,7 @@ def _apply_validation_rule(field_name: str, value: Any, rule: ValidationRule) ->
         if rule.validator(value):
             return ValidationResult(
                 valid=True,
-                message=f"Validación exitosa para '{field_name}'",
+                message=f"Validación exitosa para '{field_name}'"f",
                 field_name=field_name,
                 value=value,
                 rule=rule
@@ -504,7 +516,7 @@ def _apply_validation_rule(field_name: str, value: Any, rule: ValidationRule) ->
         else:
             return ValidationResult(
                 valid=False,
-                message=rule.error_message.format(field=field_name, value=value),
+                message=rule.error_message",
                 field_name=field_name,
                 value=value,
                 rule=rule
@@ -528,7 +540,9 @@ class ValidationSchema:
     """Esquema de validación para funciones."""
     
     def __init__(self, name: str):
-        self.name = name
+        
+    """__init__ function."""
+self.name = name
         self.rules: Dict[str, ValidationRule] = {}
         self.level = ValidationLevel.NORMAL
     

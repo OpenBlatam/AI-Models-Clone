@@ -1,7 +1,5 @@
-"""
-Model Schema - Onyx Integration
-Schema definition and validation for models.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from dataclasses import dataclass, field
@@ -11,6 +9,13 @@ import time
 from .base_types import CACHE_TTL, VALIDATION_TIMEOUT
 from .validation_mixin import ValidationMixin
 from .model_field import ModelField, FieldConfig
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Model Schema - Onyx Integration
+Schema definition and validation for models.
+"""
 
 T = TypeVar('T')
 

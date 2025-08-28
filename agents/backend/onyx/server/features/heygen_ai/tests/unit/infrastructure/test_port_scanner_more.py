@@ -1,7 +1,7 @@
 import asyncio
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.port_scanner import AsyncPortScanner
+from port_scanner import AsyncPortScanner
 
 
 @pytest.mark.asyncio
@@ -27,6 +27,7 @@ async def test_scan_port_range_collects_all(monkeypatch):
     # Expect 3 open ports: 80, 82, 84
     open_ports = [r.target_port for r in results if r.is_port_open]
     assert open_ports == [80, 82, 84]
+
 
 
 

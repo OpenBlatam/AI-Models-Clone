@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from __future__ import annotations
 import msgspec
 from uuid import uuid4
@@ -6,7 +17,6 @@ from typing import List, Any, Optional
 import zstandard as zstd
 import numpy as np
 from agents.backend.onyx.server.features.utils.model_types import ModelStatus, ModelId, JsonDict
-# Campos para integración LangChain
 from agents.backend.onyx.server.features.video.processors.langchain_processor import LangChainConfig
 from .collaboration import CollaborationInfo
 from .compliance import ComplianceInfo
@@ -15,9 +25,28 @@ from .multimedia import MultimediaInfo
 from .review import ReviewInfo
 from .langchain_models import LangChainAnalysis, ContentOptimization, ShortVideoOptimization
 from .suggestions import suggest_music, suggest_visual_styles, suggest_sound_effects, suggest_transitions
+    import pandas as pd
+        import re
+        import json
+        from datetime import datetime
+        from datetime import datetime
+        from datetime import datetime
+        from datetime import datetime
+        from .web_extract import extract_web_content
+        from .multimedia import MultimediaInfo
+        import os
+        import logging
+                from transformers import pipeline
+                    from gtts import gTTS
+                    import pyttsx3
+                    from google.cloud import texttospeech
+                    import azure.cognitiveservices.speech as speechsdk
+                    import requests
+from typing import Any, List, Dict, Optional
+import asyncio
+# Campos para integración LangChain
 
 try:
-    import pandas as pd
 except ImportError:
     pd = None
 
@@ -289,7 +318,6 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
     
     def _extract_seo_keywords(self) -> list:
         """Extrae keywords SEO del título y descripción."""
-        import re
         
         text = f"{self.title} {self.description}".lower()
         
@@ -603,19 +631,16 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
 
     def log_structured(self) -> None:
         """Imprime un log estructurado del video y su análisis/optimización."""
-        import json
         print(json.dumps(self.to_dict(), indent=2, default=str))
 
     def add_comment(self, user_id: str, text: str, timestamp: Optional[str] = None) -> 'AIVideo':
         """Devuelve una nueva instancia con un comentario agregado."""
-        from datetime import datetime
         ts = timestamp or datetime.utcnow().isoformat()
         new_comment = {"user": user_id, "text": text, "timestamp": ts}
         return self.update(collaboration=self.collaboration.update(comments=self.collaboration.comments + [new_comment]))
 
     def add_history(self, user_id: str, diff: dict, timestamp: Optional[str] = None) -> 'AIVideo':
         """Devuelve una nueva instancia con un registro de historial agregado."""
-        from datetime import datetime
         ts = timestamp or datetime.utcnow().isoformat()
         new_entry = {"user": user_id, "diff": diff, "timestamp": ts}
         return self.update(collaboration=self.collaboration.update(history=self.collaboration.history + [new_entry]))
@@ -642,7 +667,6 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
 
     def add_approval_history(self, user_id: str, status: str, comment: Optional[str] = None, timestamp: Optional[str] = None) -> 'AIVideo':
         """Devuelve una nueva instancia con un registro de aprobación/revisión agregado."""
-        from datetime import datetime
         ts = timestamp or datetime.utcnow().isoformat()
         entry = {"user": user_id, "status": status, "timestamp": ts, "comment": comment}
         return self.update(review=self.review.update(approval_history=self.review.approval_history + [entry]))
@@ -653,7 +677,6 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
 
     def soft_delete(self, user_id: str, timestamp: Optional[str] = None) -> 'AIVideo':
         """Devuelve una nueva instancia marcada como eliminada (soft delete)."""
-        from datetime import datetime
         ts = timestamp or datetime.utcnow().isoformat()
         return self.update(is_deleted=True, compliance=self.compliance.update(deleted_at=ts, deleted_by=user_id))
 
@@ -684,8 +707,6 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
         - Si hay images, se agregan a multimedia.thumbnails.
         Los campos pueden ser editados posteriormente por el usuario.
         """
-        from .web_extract import extract_web_content
-        from .multimedia import MultimediaInfo
         content = extract_web_content(url)
         title = content.get("title") or f"Video Ad from {url}"
         description = content.get("description") or content.get("text") or ""
@@ -771,14 +792,12 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
             Si tienes transformers instalado, se usará un modelo de clasificación de emociones (ej: "j-hartmann/emotion-english-distilroberta-base" o "mrm8488/t5-base-finetuned-emotion-spanish") para inferir la emoción del texto.
             Instala con: pip install transformers torch
             Puedes pasar funciones selectoras para música, visual, efectos y transiciones:
-                def my_selector(options, meta):
+                def my_selector(options, meta) -> Any:
                     return options[0]
                 video.generate_voiceover(music_selector=my_selector, sound_selector=my_selector)
         Ejemplo:
             video.generate_voiceover(lang="es", api_key="...", log=True)
         """
-        import os
-        import logging
         logger = logging.getLogger("AIVideo.TTS")
         if log:
             logging.basicConfig(level=logging.DEBUG)
@@ -797,7 +816,6 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
         # Inferir emoción/tono si no se pasa
         if not detected_emotion:
             try:
-                from transformers import pipeline
                 # Selección de modelo según idioma
                 if lang.startswith("es"):
                     model_name = "mrm8488/t5-base-finetuned-emotion-spanish"
@@ -879,26 +897,30 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
                 if log:
                     logger.info(f"Intentando TTS engine: {engine}")
                 if engine == "gtts":
-                    from gtts import gTTS
                     tts = gTTS(text=script, lang=lang)
                     tts.save(audio_path)
                 elif engine == "pyttsx3":
-                    import pyttsx3
                     engine_obj = pyttsx3.init()
                     engine_obj.setProperty('rate', 150)
                     engine_obj.save_to_file(script, audio_path)
                     engine_obj.runAndWait()
                 elif engine == "google":
-                    from google.cloud import texttospeech
                     client = texttospeech.TextToSpeechClient.from_service_account_json(kwargs["google_credentials_json"])
                     synthesis_input = texttospeech.SynthesisInput(text=script)
                     voice = texttospeech.VoiceSelectionParams(language_code=lang, ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL)
                     audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
                     response = client.synthesize_speech(input=synthesis_input, voice=voice, audio_config=audio_config)
                     with open(audio_path, "wb") as out:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                         out.write(response.audio_content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 elif engine == "azure":
-                    import azure.cognitiveservices.speech as speechsdk
                     speech_key = kwargs["azure_key"]
                     service_region = kwargs["azure_region"]
                     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region)
@@ -907,7 +929,6 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
                     synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_config)
                     synthesizer.speak_text_async(script).get()
                 elif engine == "elevenlabs":
-                    import requests
                     api_key = kwargs["api_key"]
                     voice_id = kwargs.get("voice_id")
                     # Autoselección de voz si no se pasa voice_id
@@ -978,7 +999,15 @@ class AIVideo(msgspec.Struct, frozen=True, slots=True):
                     r = requests.post(url, headers=headers, json=payload)
                     if r.status_code == 200:
                         with open(audio_path, "wb") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                             f.write(r.content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     else:
                         error_msg = f"ElevenLabs API error: {r.status_code} {r.text}"
                         errors.append(error_msg)

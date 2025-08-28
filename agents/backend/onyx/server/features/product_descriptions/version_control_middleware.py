@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Version Control Middleware
-Product Descriptions Feature - FastAPI Middleware for Logging, Monitoring, and Performance
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import logging
@@ -14,13 +19,20 @@ from pathlib import Path
 import asyncio
 from contextvars import ContextVar
 import uuid
-
 from fastapi import Request, Response
 from fastapi.middleware.base import BaseHTTPMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.types import ASGIApp
 import uvicorn
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Version Control Middleware
+Product Descriptions Feature - FastAPI Middleware for Logging, Monitoring, and Performance
+"""
+
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -34,7 +46,9 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """Middleware for comprehensive request logging"""
     
     def __init__(self, app: ASGIApp, log_requests: bool = True, log_responses: bool = True):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.log_requests = log_requests
         self.log_responses = log_responses
     
@@ -66,7 +80,7 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
             await self._log_error(request, e, request_id)
             raise
     
-    async def _log_request(self, request: Request, request_id: str) -> None:
+    async async def _log_request(self, request: Request, request_id: str) -> None:
         """Log incoming request details"""
         try:
             # Get request body if available
@@ -145,7 +159,9 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
     """Middleware for performance monitoring and optimization"""
     
     def __init__(self, app: ASGIApp, slow_request_threshold: float = 1.0):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.slow_request_threshold = slow_request_threshold
         self.request_times: Dict[str, list] = {}
     
@@ -200,7 +216,7 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             logger.error(f"Error tracking performance: {e}")
     
-    async def _log_slow_request(self, request: Request, duration: float) -> None:
+    async async def _log_slow_request(self, request: Request, duration: float) -> None:
         """Log slow request details"""
         try:
             log_data = {
@@ -248,7 +264,9 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
     """Middleware for centralized error handling and monitoring"""
     
     def __init__(self, app: ASGIApp, log_errors: bool = True, notify_errors: bool = False):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.log_errors = log_errors
         self.notify_errors = notify_errors
         self.error_counts: Dict[str, int] = {}
@@ -384,7 +402,9 @@ class SecurityMiddleware(BaseHTTPMiddleware):
     """Middleware for security headers and basic protection"""
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         response = await call_next(request)
@@ -402,7 +422,9 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
     """Basic rate limiting middleware"""
     
     def __init__(self, app: ASGIApp, requests_per_minute: int = 60):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.requests_per_minute = requests_per_minute
         self.request_counts: Dict[str, list] = {}
     
@@ -460,11 +482,11 @@ def create_middleware_stack(app: ASGIApp) -> ASGIApp:
     return app
 
 # Utility functions for accessing middleware data
-def get_request_id() -> Optional[str]:
+async def get_request_id() -> Optional[str]:
     """Get current request ID from context"""
     return request_id_var.get()
 
-def get_request_duration() -> Optional[float]:
+async def get_request_duration() -> Optional[float]:
     """Get current request duration"""
     start_time = start_time_var.get()
     if start_time:

@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from enum import Enum
+from functools import lru_cache
+from typing import List, Optional
+from pydantic import Field
+from pydantic_settings import BaseSettings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Refactored Configuration Module
 ==============================
@@ -5,11 +21,6 @@ Refactored Configuration Module
 Clean, centralized configuration with environment variables support.
 """
 
-from enum import Enum
-from functools import lru_cache
-from typing import List, Optional
-from pydantic import Field
-from pydantic_settings import BaseSettings
 
 
 class Environment(str, Enum):

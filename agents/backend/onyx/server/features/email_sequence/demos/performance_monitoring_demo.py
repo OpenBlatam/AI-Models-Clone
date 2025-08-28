@@ -1,9 +1,10 @@
-"""
-Real-time Performance Monitoring Demo
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Interactive demo showcasing real-time model performance monitoring,
-system health tracking, and predictive analytics for the email sequence system.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import gradio as gr
 import asyncio
@@ -21,9 +22,17 @@ import random
 import time
 import threading
 from collections import deque
+import sys
+from typing import Any, List, Dict, Optional
+"""
+Real-time Performance Monitoring Demo
+
+Interactive demo showcasing real-time model performance monitoring,
+system health tracking, and predictive analytics for the email sequence system.
+"""
+
 
 # Add the parent directory to the path
-import sys
 sys.path.append(str(Path(__file__).parent.parent))
 
 # Configure logging
@@ -34,7 +43,7 @@ logger = logging.getLogger(__name__)
 class PerformanceMonitoringDemo:
     """Real-time performance monitoring demo"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.monitoring_data = {
             "timestamps": deque(maxlen=1000),
             "model_performance": deque(maxlen=1000),
@@ -220,6 +229,10 @@ class PerformanceMonitoringDemo:
         if not self.is_monitoring:
             self.is_monitoring = True
             self.monitoring_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 target=self._monitoring_loop,
                 args=(interval,),
                 daemon=True
@@ -227,7 +240,7 @@ class PerformanceMonitoringDemo:
             self.monitoring_thread.start()
             logger.info(f"Started monitoring with {interval}s interval")
     
-    def stop_monitoring(self):
+    def stop_monitoring(self) -> Any:
         """Stop real-time monitoring"""
         
         self.is_monitoring = False
@@ -247,7 +260,7 @@ class PerformanceMonitoringDemo:
                 logger.error(f"Error in monitoring loop: {e}")
                 time.sleep(interval)
     
-    def _generate_monitoring_data(self):
+    def _generate_monitoring_data(self) -> Any:
         """Generate new monitoring data points"""
         
         timestamp = datetime.now()
@@ -749,5 +762,6 @@ def main():
     )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

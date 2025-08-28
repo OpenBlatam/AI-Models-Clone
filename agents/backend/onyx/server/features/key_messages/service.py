@@ -1,6 +1,11 @@
-"""
-Production-ready functional service for Key Messages feature with guard clauses and early validation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import asyncio
 import time
 from typing import Dict, List, Optional, Any, Callable, Union, Tuple
@@ -9,14 +14,20 @@ import structlog
 from contextlib import asynccontextmanager
 from functools import partial, reduce
 import uuid
-
 from .models import (
-    KeyMessageRequest, KeyMessageResponse, BatchKeyMessageRequest, 
-    BatchKeyMessageResponse, GeneratedResponse, MessageAnalysis
-)
 from .ml.models import create_model, ModelEnsemble
 from .ml.data_loader import DataManager
 from .ml.evaluation import ModelEvaluator
+    import hashlib
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Production-ready functional service for Key Messages feature with guard clauses and early validation.
+"""
+
+    KeyMessageRequest, KeyMessageResponse, BatchKeyMessageRequest, 
+    BatchKeyMessageResponse, GeneratedResponse, MessageAnalysis
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -131,7 +142,7 @@ SERVICE_HEALTH_VALIDATIONS = {
     )
 }
 
-def validate_request(request: KeyMessageRequest) -> None:
+async def validate_request(request: KeyMessageRequest) -> None:
     """Validate message request using modular validations."""
     # Guard clause: Check if request is None
     if request is None:
@@ -143,7 +154,7 @@ def validate_request(request: KeyMessageRequest) -> None:
     
     run_validations(REQUEST_VALIDATIONS, request)
 
-def validate_batch_request(batch_request: BatchKeyMessageRequest) -> None:
+async def validate_batch_request(batch_request: BatchKeyMessageRequest) -> None:
     """Validate batch request using modular validations."""
     # Guard clause: Check if batch_request is None
     if batch_request is None:
@@ -236,7 +247,6 @@ def generate_cache_key(request: KeyMessageRequest) -> str:
     if not hasattr(request, 'message') or not hasattr(request, 'message_type') or not hasattr(request, 'tone'):
         raise ValueError("Request missing required attributes")
     
-    import hashlib
     key_data = CACHE_OPERATIONS["generate_key"](request)
     return hashlib.md5(key_data.encode()).hexdigest()
 

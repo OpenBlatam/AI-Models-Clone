@@ -1,18 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import argparse
+import json
+from fastapi import FastAPI
+from fastapi.openapi.utils import get_openapi
+from onyx.main import app as app_fn
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # export openapi schema without having to start the actual web server
 
 # helpful tips: https://github.com/fastapi/fastapi/issues/1173
 
-import argparse
-import json
 
-from fastapi import FastAPI
-from fastapi.openapi.utils import get_openapi
 
-from onyx.main import app as app_fn
 
 
 def go(filename: str) -> None:
     with open(filename, "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         app: FastAPI = app_fn()
         json.dump(
             get_openapi(
@@ -40,5 +49,6 @@ def main() -> None:
     go(args.filename)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main()

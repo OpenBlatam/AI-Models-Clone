@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from enum import Enum
 
 import litellm  # type: ignore
@@ -7,6 +9,9 @@ from onyx.llm.utils import model_supports_image_input
 from onyx.server.manage.llm.models import ModelConfigurationView
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class CustomConfigKeyType(Enum):
     # used for configuration values that require manual input
     # i.e., textual API keys (e.g., "abcd1234")
@@ -154,7 +159,7 @@ _PROVIDER_TO_VISIBLE_MODELS_MAP = {
 CREDENTIALS_FILE_CUSTOM_CONFIG_KEY = "CREDENTIALS_FILE"
 
 
-def fetch_available_well_known_llms() -> list[WellKnownLLMProviderDescriptor]:
+async def fetch_available_well_known_llms() -> list[WellKnownLLMProviderDescriptor]:
     return [
         WellKnownLLMProviderDescriptor(
             name=OPENAI_PROVIDER_NAME,
@@ -251,16 +256,16 @@ def fetch_available_well_known_llms() -> list[WellKnownLLMProviderDescriptor]:
     ]
 
 
-def fetch_models_for_provider(provider_name: str) -> list[str]:
+async def fetch_models_for_provider(provider_name: str) -> list[str]:
     return _PROVIDER_TO_MODELS_MAP.get(provider_name, [])
 
 
-def fetch_model_names_for_provider_as_set(provider_name: str) -> set[str] | None:
+async def fetch_model_names_for_provider_as_set(provider_name: str) -> set[str] | None:
     model_names = fetch_models_for_provider(provider_name)
     return set(model_names) if model_names else None
 
 
-def fetch_visible_model_names_for_provider_as_set(
+async def fetch_visible_model_names_for_provider_as_set(
     provider_name: str,
 ) -> set[str] | None:
     visible_model_names: list[str] | None = _PROVIDER_TO_VISIBLE_MODELS_MAP.get(
@@ -269,7 +274,7 @@ def fetch_visible_model_names_for_provider_as_set(
     return set(visible_model_names) if visible_model_names else None
 
 
-def fetch_model_configurations_for_provider(
+async def fetch_model_configurations_for_provider(
     provider_name: str,
 ) -> list[ModelConfigurationView]:
     # if there are no explicitly listed visible model names,

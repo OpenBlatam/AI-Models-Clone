@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+import fastapi_users_db_sqlalchemy
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Chat Folders
 
 Revision ID: 7547d982db8f
@@ -6,9 +24,6 @@ Create Date: 2024-05-02 15:18:56.573347
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-import fastapi_users_db_sqlalchemy
 
 # revision identifiers, used by Alembic.
 revision = "7547d982db8f"
@@ -24,6 +39,16 @@ def upgrade() -> None:
         sa.Column(
             "user_id",
             fastapi_users_db_sqlalchemy.generics.GUID(),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             nullable=True,
         ),
         sa.Column("name", sa.String(), nullable=True),

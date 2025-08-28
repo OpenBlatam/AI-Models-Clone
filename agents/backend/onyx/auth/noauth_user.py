@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Mapping
 from typing import Any
 from typing import cast
@@ -12,6 +14,9 @@ from onyx.server.manage.models import UserInfo
 from onyx.server.manage.models import UserPreferences
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def set_no_auth_user_preferences(
     store: KeyValueStore, preferences: UserPreferences
 ) -> None:
@@ -30,7 +35,7 @@ def load_no_auth_user_preferences(store: KeyValueStore) -> UserPreferences:
         )
 
 
-def fetch_no_auth_user(
+async def fetch_no_auth_user(
     store: KeyValueStore, *, anonymous_user_enabled: bool | None = None
 ) -> UserInfo:
     return UserInfo(

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import functools
 from collections.abc import Callable
 from typing import Any
@@ -39,6 +41,9 @@ from onyx.onyxbot.slack.utils import update_emote_react
 from onyx.server.query_and_chat.models import CreateChatMessageRequest
 from onyx.utils.logger import OnyxLoggingAdapter
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 srl = SlackRateLimiter()
 
 RT = TypeVar("RT")  # return type
@@ -149,6 +154,10 @@ def handle_regular_answer(
     # )
     # max_history_tokens = int(input_tokens * thread_context_percent)
     # combined_message = combine_message_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     #     messages, max_tokens=max_history_tokens, llm_tokenizer=llm_tokenizer
     # )
 
@@ -158,6 +167,10 @@ def handle_regular_answer(
     user_message = messages[-1]
     history_messages = messages[:-1]
     single_message_history = slackify_message_thread(history_messages) or None
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
     # Always check for ACL permissions, also for documnt sets that were explicitly added
     # to the Bot by the Administrator. (Change relative to earlier behavior where all documents

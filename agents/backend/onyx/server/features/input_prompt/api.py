@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -20,6 +22,9 @@ from onyx.server.features.input_prompt.models import InputPromptSnapshot
 from onyx.server.features.input_prompt.models import UpdateInputPromptRequest
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 basic_router = APIRouter(prefix="/input_prompt")

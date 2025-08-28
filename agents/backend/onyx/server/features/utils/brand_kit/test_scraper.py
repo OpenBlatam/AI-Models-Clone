@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import time
 from playwright.async_api import async_playwright
@@ -13,6 +15,7 @@ import logging
 import sys
 import traceback
 
+from typing import Any, List, Dict, Optional
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -21,7 +24,7 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class BrandKitScraper:
-    def __init__(self):
+    def __init__(self) -> Any:
         self.executor = ThreadPoolExecutor(max_workers=8)
         self.session = requests.Session()
         self.session.headers.update({
@@ -30,11 +33,11 @@ class BrandKitScraper:
         self.start_time = None
         self.timeout = 5.0  # seconds
 
-    def _check_timeout(self):
+    def _check_timeout(self) -> Any:
         if time.time() - self.start_time > self.timeout:
             raise TimeoutError("Scraping exceeded 5 seconds")
 
-    async def fetch_html(self, url):
+    async async def fetch_html(self, url) -> Any:
         self._check_timeout()
         async with async_playwright() as p:
             browser = await p.chromium.launch(headless=True, args=['--disable-gpu', '--no-sandbox', '--disable-dev-shm-usage'])
@@ -55,7 +58,7 @@ class BrandKitScraper:
             self._check_timeout()
             return html
 
-    async def extract_css_colors(self, html):
+    async def extract_css_colors(self, html) -> Any:
         self._check_timeout()
         soup = bs4.BeautifulSoup(html, 'html.parser')
         colors = set()
@@ -86,7 +89,7 @@ class BrandKitScraper:
         self._check_timeout()
         return list(colors)
 
-    async def extract_image_colors(self, html, base_url):
+    async def extract_image_colors(self, html, base_url) -> Any:
         self._check_timeout()
         soup = bs4.BeautifulSoup(html, 'html.parser')
         images = [img.get('src', '') for img in soup.find_all('img') if img.get('src')]
@@ -110,12 +113,16 @@ class BrandKitScraper:
             logger.warning("Image color extraction timed out.")
         return list(colors)
 
-    def _fast_image_sample(self, url):
+    def _fast_image_sample(self, url) -> Any:
         try:
             response = self.session.get(url, timeout=1)
             if response.status_code != 200 or int(response.headers.get('content-length', 0)) > 2_000_000:
                 return []
             img = Image.open(BytesIO(response.content)).convert('RGB')
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             img = img.resize((16, 16))  # Downsample for speed
             arr = np.array(img).reshape(-1, 3)
             unique = np.unique(arr, axis=0)
@@ -125,7 +132,7 @@ class BrandKitScraper:
             logger.warning(f"Image processing error for {url}: {e}")
             return []
 
-    async def scrape(self, url):
+    async def scrape(self, url) -> Any:
         self.start_time = time.time()
         try:
             html = await self.fetch_html(url)
@@ -146,7 +153,9 @@ class BrandKitScraper:
             return []
 
 async def main():
-    scraper = BrandKitScraper()
+    
+    """main function."""
+scraper = BrandKitScraper()
     url = "https://www.apple.com"
     print(f"\nScraping {url}...")
     colors = await scraper.scrape(url)
@@ -154,5 +163,6 @@ async def main():
     for color in colors:
         print(f"- {color}")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

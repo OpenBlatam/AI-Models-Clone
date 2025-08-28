@@ -1,13 +1,20 @@
-"""
-Model Mixins - Onyx Integration
-Mixins for model operations and validations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from datetime import datetime
 import json
 import logging
 from pydantic import BaseModel, ValidationError
 from .model_types import OnyxBaseModel, ModelCache, ModelIndex
+from datetime import datetime
+from typing import List, Optional
+import logging
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Model Mixins - Onyx Integration
+Mixins for model operations and validations.
+"""
 
 T = TypeVar('T', bound=OnyxBaseModel)
 
@@ -141,7 +148,7 @@ class IndexingMixin:
 
 class LoggingMixin:
     """Mixin for logging methods."""
-    def __init__(self, **data):
+    def __init__(self, **data) -> Any:
         super().__init__(**data)
         self._logger = logging.getLogger(self.__class__.__name__)
     
@@ -168,9 +175,6 @@ class LoggingMixin:
 
 # Example usage:
 """
-from datetime import datetime
-from typing import List, Optional
-import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -193,7 +197,7 @@ class UserModel(
     age: Optional[int] = None
     index_fields = ["email"]
     
-    def __init__(self, **data):
+    def __init__(self, **data) -> Any:
         super().__init__(**data)
         self.created_at = datetime.utcnow()
         self.updated_at = datetime.utcnow()

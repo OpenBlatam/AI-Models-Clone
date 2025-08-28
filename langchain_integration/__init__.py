@@ -1,3 +1,32 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+from typing import Dict, List, Optional, Any, Union
+from dataclasses import dataclass, field
+from datetime import datetime
+    from langchain.schema import BaseMessage, HumanMessage, SystemMessage, AIMessage
+    from langchain.prompts import PromptTemplate, ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+    from langchain.chains import LLMChain, SequentialChain
+    from langchain.memory import ConversationBufferMemory
+    from langchain.callbacks import AsyncCallbackHandler
+    from langchain.schema.runnable import Runnable
+from ..models import BlogPostRequest, BlogPostType, BlogPostTone, BlogPostLength, LangChainPrompt
+from ..openrouter_client import OpenRouterClient, OpenRouterModelManager
+        from ..models import OpenRouterRequest
+        from ..models import OpenRouterRequest
+        from ..models import OpenRouterRequest
+                import json
+from typing import Any, List, Dict, Optional
 """
 ONYX BLOG POST - LangChain Integration Module
 ============================================
@@ -6,20 +35,9 @@ Integración con LangChain para manejo avanzado de prompts y chains.
 Incluye templates, chains personalizadas y prompt engineering.
 """
 
-import asyncio
-import logging
-from typing import Dict, List, Optional, Any, Union
-from dataclasses import dataclass, field
-from datetime import datetime
 
 # LangChain imports
 try:
-    from langchain.schema import BaseMessage, HumanMessage, SystemMessage, AIMessage
-    from langchain.prompts import PromptTemplate, ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
-    from langchain.chains import LLMChain, SequentialChain
-    from langchain.memory import ConversationBufferMemory
-    from langchain.callbacks import AsyncCallbackHandler
-    from langchain.schema.runnable import Runnable
     LANGCHAIN_AVAILABLE = True
 except ImportError:
     LANGCHAIN_AVAILABLE = False
@@ -33,43 +51,41 @@ except ImportError:
     class LLMChain:
         pass
 
-from ..models import BlogPostRequest, BlogPostType, BlogPostTone, BlogPostLength, LangChainPrompt
-from ..openrouter_client import OpenRouterClient, OpenRouterModelManager
 
 logger = logging.getLogger(__name__)
 
 class OnyxCallbackHandler:
     """Callback handler personalizado para Onyx"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.start_time = None
         self.tokens_used = 0
         self.cost = 0.0
         self.steps = []
     
-    async def on_llm_start(self, serialized, prompts, **kwargs):
+    async def on_llm_start(self, serialized, prompts, **kwargs) -> Any:
         """Cuando inicia el LLM"""
         self.start_time = datetime.now()
         logger.debug("LLM chain started")
     
-    async def on_llm_end(self, response, **kwargs):
+    async def on_llm_end(self, response, **kwargs) -> Any:
         """Cuando termina el LLM"""
         if self.start_time:
             duration = (datetime.now() - self.start_time).total_seconds()
             logger.debug(f"LLM chain completed in {duration:.2f}s")
     
-    async def on_chain_start(self, serialized, inputs, **kwargs):
+    async def on_chain_start(self, serialized, inputs, **kwargs) -> Any:
         """Cuando inicia una chain"""
         logger.debug(f"Chain started: {serialized.get('name', 'unknown')}")
     
-    async def on_chain_end(self, outputs, **kwargs):
+    async def on_chain_end(self, outputs, **kwargs) -> Any:
         """Cuando termina una chain"""
         logger.debug("Chain completed successfully")
 
 class BlogPostPromptTemplates:
     """Templates de prompts para blog posts"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.system_prompts = {
             "base": """Eres un experto escritor de blog posts profesional especializado en crear contenido de alta calidad, SEO-optimizado y engaging para diferentes audiencias.
 
@@ -180,7 +196,7 @@ Devuelve el contenido mejorado manteniendo la estructura JSON original."""
         if LANGCHAIN_AVAILABLE:
             self._create_langchain_templates()
     
-    def _create_langchain_templates(self):
+    def _create_langchain_templates(self) -> Any:
         """Crear templates de LangChain"""
         # Template principal para generación
         self.main_template = ChatPromptTemplate.from_messages([
@@ -254,7 +270,9 @@ class OnyxLLMWrapper:
     """Wrapper para usar OpenRouter con LangChain"""
     
     def __init__(self, openrouter_client: OpenRouterClient, model: str):
-        self.client = openrouter_client
+        
+    """__init__ function."""
+self.client = openrouter_client
         self.model = model
         self.callback_handler = OnyxCallbackHandler()
     
@@ -271,7 +289,6 @@ class OnyxLLMWrapper:
                 or_messages.append({"role": "assistant", "content": msg.content})
         
         # Crear request para OpenRouter
-        from ..models import OpenRouterRequest
         or_request = OpenRouterRequest(
             model=self.model,
             messages=or_messages,
@@ -291,7 +308,9 @@ class BlogPostChain:
         model_manager: OpenRouterModelManager,
         prompt_templates: BlogPostPromptTemplates
     ):
-        self.client = openrouter_client
+        
+    """__init__ function."""
+self.client = openrouter_client
         self.model_manager = model_manager
         self.templates = prompt_templates
         self.memory = ConversationBufferMemory() if LANGCHAIN_AVAILABLE else None
@@ -368,10 +387,7 @@ class BlogPostChain:
         target_audience: str
     ) -> Dict[str, Any]:
         """Generar metadata SEO"""
-        seo_prompt = self.templates.get_user_prompt("seo_optimization").format(
-            title=title,
-            content=content[:1000],  # Truncar para el prompt
-            keywords=", ".join(keywords),
+        seo_prompt = self.templates.get_user_prompt("seo_optimization"f")",
             target_audience=target_audience
         )
         
@@ -380,7 +396,6 @@ class BlogPostChain:
             {"role": "user", "content": seo_prompt}
         ]
         
-        from ..models import OpenRouterRequest
         or_request = OpenRouterRequest(
             model="openai/gpt-4-turbo",
             messages=messages,
@@ -395,16 +410,13 @@ class BlogPostChain:
     
     async def improve_content(self, content: str) -> Dict[str, Any]:
         """Mejorar contenido existente"""
-        improvement_prompt = self.templates.get_user_prompt("content_improvement").format(
-            content=content
-        )
+        improvement_prompt = self.templates.get_user_prompt("content_improvement"f")"
         
         messages = [
             {"role": "system", "content": self.templates.get_system_prompt("base")},
             {"role": "user", "content": improvement_prompt}
         ]
         
-        from ..models import OpenRouterRequest
         or_request = OpenRouterRequest(
             model="openai/gpt-4-turbo",
             messages=messages,
@@ -421,7 +433,9 @@ class LangChainOrchestrator:
     """Orquestador principal para LangChain integration"""
     
     def __init__(self, openrouter_client: OpenRouterClient):
-        self.client = openrouter_client
+        
+    """__init__ function."""
+self.client = openrouter_client
         self.model_manager = OpenRouterModelManager(openrouter_client)
         self.prompt_templates = BlogPostPromptTemplates()
         self.blog_chain = BlogPostChain(
@@ -454,7 +468,6 @@ class LangChainOrchestrator:
         if include_seo and request.include_seo:
             try:
                 # Extraer título del contenido para SEO
-                import json
                 content_json = json.loads(main_result["content"])
                 title = content_json.get("title", request.topic)
                 

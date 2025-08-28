@@ -1,6 +1,16 @@
-"""
-Unit tests for utility modules.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import pytest
 import asyncio
@@ -10,14 +20,21 @@ import json
 from pathlib import Path
 from unittest.mock import Mock, AsyncMock, patch, MagicMock
 from datetime import datetime, timedelta
-
 from ...utils.logger import (
+from ...utils.performance import (
+from ...utils.security import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Unit tests for utility modules.
+"""
+
+
     OnyxLogger, setup_logger, get_logger, log_function_call,
     log_performance, log_error, log_security_event, log_plugin_event,
     create_logger_context, format_log_message, get_log_level,
     set_log_level, create_rotating_logger, create_json_logger
 )
-from ...utils.performance import (
     PerformanceMonitor, PerformanceMetrics, CacheManager,
     start_performance_monitoring, stop_performance_monitoring,
     get_performance_metrics, measure_function_performance,
@@ -25,7 +42,6 @@ from ...utils.performance import (
     create_performance_report, analyze_performance_trends,
     get_system_resources, monitor_request_performance
 )
-from ...utils.security import (
     SecurityManager, SecurityConfig, SecurityEvent,
     validate_access, validate_input, check_rate_limit,
     encrypt_data, decrypt_data, hash_password, verify_password,
@@ -39,7 +55,7 @@ class TestOnyxLogger:
     """Test Onyx Logger."""
     
     @pytest.mark.unit
-    def test_logger_initialization(self, temp_dir):
+    def test_logger_initialization(self, temp_dir) -> Any:
         """Test logger initialization."""
         log_file = temp_dir / "test.log"
         
@@ -57,7 +73,7 @@ class TestOnyxLogger:
         assert logger.logger is not None
     
     @pytest.mark.unit
-    def test_logger_with_onyx(self):
+    def test_logger_with_onyx(self) -> Any:
         """Test logger with Onyx integration."""
         with patch('onyx.utils.logger.setup_logger') as mock_onyx_logger:
             mock_onyx_logger.return_value = Mock()
@@ -71,7 +87,7 @@ class TestOnyxLogger:
             mock_onyx_logger.assert_called_once()
     
     @pytest.mark.unit
-    def test_logging_methods(self, temp_dir):
+    def test_logging_methods(self, temp_dir) -> Any:
         """Test all logging methods."""
         log_file = temp_dir / "test.log"
         logger = OnyxLogger(
@@ -91,7 +107,15 @@ class TestOnyxLogger:
         # Check that log file was created and contains messages
         assert log_file.exists()
         with open(log_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             assert "Debug message" in content
             assert "Info message" in content
             assert "Warning message" in content
@@ -100,7 +124,7 @@ class TestOnyxLogger:
             assert "Notice message" in content
     
     @pytest.mark.unit
-    def test_request_context(self, temp_dir):
+    async def test_request_context(self, temp_dir) -> Any:
         """Test request context logging."""
         log_file = temp_dir / "test.log"
         logger = OnyxLogger(
@@ -113,13 +137,21 @@ class TestOnyxLogger:
         logger.info("Request message")
         
         with open(log_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             assert "req123" in content
             assert "user456" in content
             assert "session789" in content
     
     @pytest.mark.unit
-    def test_clear_request_context(self, temp_dir):
+    async def test_clear_request_context(self, temp_dir) -> Any:
         """Test clearing request context."""
         log_file = temp_dir / "test.log"
         logger = OnyxLogger(
@@ -133,7 +165,15 @@ class TestOnyxLogger:
         logger.info("No context message")
         
         with open(log_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             # Should not contain context in the last message
             lines = content.strip().split('\n')
             last_line = lines[-1]
@@ -142,7 +182,7 @@ class TestOnyxLogger:
             assert "session789" not in last_line
     
     @pytest.mark.unit
-    def test_log_level_validation(self):
+    def test_log_level_validation(self) -> Any:
         """Test log level validation."""
         valid_levels = ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
         
@@ -155,7 +195,7 @@ class TestOnyxLogger:
             OnyxLogger(name="test", level="INVALID")
     
     @pytest.mark.unit
-    def test_log_file_rotation(self, temp_dir):
+    def test_log_file_rotation(self, temp_dir) -> Any:
         """Test log file rotation."""
         log_file = temp_dir / "test.log"
         logger = OnyxLogger(
@@ -176,7 +216,7 @@ class TestOnyxLogger:
         assert len(backup_files) > 0
     
     @pytest.mark.unit
-    def test_json_logging(self, temp_dir):
+    def test_json_logging(self, temp_dir) -> Any:
         """Test JSON logging format."""
         log_file = temp_dir / "test.json"
         logger = OnyxLogger(
@@ -189,6 +229,10 @@ class TestOnyxLogger:
         logger.info("Test message", extra={"key": "value"})
         
         with open(log_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             line = f.readline().strip()
             log_entry = json.loads(line)
             
@@ -202,7 +246,7 @@ class TestLoggerUtilities:
     """Test logger utility functions."""
     
     @pytest.mark.unit
-    def test_setup_logger(self, temp_dir):
+    def test_setup_logger(self, temp_dir) -> Any:
         """Test setup_logger function."""
         log_file = temp_dir / "test.log"
         
@@ -216,7 +260,7 @@ class TestLoggerUtilities:
         assert logger.name == "test_logger"
     
     @pytest.mark.unit
-    def test_get_logger(self):
+    def test_get_logger(self) -> Optional[Dict[str, Any]]:
         """Test get_logger function."""
         logger1 = get_logger("test_logger")
         logger2 = get_logger("test_logger")
@@ -224,7 +268,7 @@ class TestLoggerUtilities:
         assert logger1 is logger2
     
     @pytest.mark.unit
-    def test_log_function_call(self, temp_dir):
+    def test_log_function_call(self, temp_dir) -> Any:
         """Test log_function_call decorator."""
         log_file = temp_dir / "test.log"
         logger = OnyxLogger(
@@ -234,20 +278,28 @@ class TestLoggerUtilities:
         )
         
         @log_function_call(logger)
-        def test_function(arg1, arg2):
+        def test_function(arg1, arg2) -> Any:
             return arg1 + arg2
         
         result = test_function(1, 2)
         
         assert result == 3
         with open(log_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             assert "test_function" in content
             assert "arg1=1" in content
             assert "arg2=2" in content
     
     @pytest.mark.unit
-    def test_log_performance(self, temp_dir):
+    def test_log_performance(self, temp_dir) -> Any:
         """Test log_performance function."""
         log_file = temp_dir / "test.log"
         logger = OnyxLogger(
@@ -259,13 +311,21 @@ class TestLoggerUtilities:
         log_performance(logger, "test_operation", 1.5, {"key": "value"})
         
         with open(log_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             assert "test_operation" in content
             assert "1.5" in content
             assert "key" in content
     
     @pytest.mark.unit
-    def test_log_error(self, temp_dir):
+    def test_log_error(self, temp_dir) -> Any:
         """Test log_error function."""
         log_file = temp_dir / "test.log"
         logger = OnyxLogger(
@@ -278,14 +338,22 @@ class TestLoggerUtilities:
         log_error(logger, error, "test_context", {"extra": "data"})
         
         with open(log_file, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             content = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             assert "ValueError" in content
             assert "Test error" in content
             assert "test_context" in content
             assert "extra" in content
     
     @pytest.mark.unit
-    def test_create_logger_context(self):
+    def test_create_logger_context(self) -> Any:
         """Test create_logger_context function."""
         context = create_logger_context(
             request_id="req123",
@@ -305,7 +373,7 @@ class TestPerformanceMonitor:
     """Test Performance Monitor."""
     
     @pytest.mark.unit
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test performance monitor initialization."""
         monitor = PerformanceMonitor(
             enable_monitoring=True,
@@ -322,7 +390,7 @@ class TestPerformanceMonitor:
         assert monitor.cache is not None
     
     @pytest.mark.unit
-    def test_start_stop_operation(self):
+    def test_start_stop_operation(self) -> Any:
         """Test operation timing."""
         monitor = PerformanceMonitor()
         
@@ -336,7 +404,7 @@ class TestPerformanceMonitor:
         assert metrics["duration"] > 0
     
     @pytest.mark.unit
-    def test_get_system_metrics(self):
+    def test_get_system_metrics(self) -> Optional[Dict[str, Any]]:
         """Test system metrics collection."""
         monitor = PerformanceMonitor()
         
@@ -348,7 +416,7 @@ class TestPerformanceMonitor:
         assert "timestamp" in metrics
     
     @pytest.mark.unit
-    def test_get_performance_summary(self):
+    def test_get_performance_summary(self) -> Optional[Dict[str, Any]]:
         """Test performance summary generation."""
         monitor = PerformanceMonitor()
         
@@ -368,7 +436,7 @@ class TestPerformanceMonitor:
         assert "operations" in summary
     
     @pytest.mark.unit
-    def test_cache_operations(self):
+    def test_cache_operations(self) -> Any:
         """Test cache operations."""
         monitor = PerformanceMonitor(cache_enabled=True, cache_size=5)
         
@@ -385,7 +453,7 @@ class TestPerformanceMonitor:
         assert len(monitor.cache) <= 5
     
     @pytest.mark.unit
-    def test_cache_ttl(self):
+    def test_cache_ttl(self) -> Any:
         """Test cache TTL functionality."""
         monitor = PerformanceMonitor(cache_enabled=True)
         
@@ -396,7 +464,7 @@ class TestPerformanceMonitor:
         assert value is None
     
     @pytest.mark.unit
-    def test_memory_tracking(self):
+    def test_memory_tracking(self) -> Any:
         """Test memory usage tracking."""
         monitor = PerformanceMonitor()
         
@@ -409,7 +477,7 @@ class TestPerformanceMonitor:
         assert memory_info["total_memory"] > 0
     
     @pytest.mark.unit
-    def test_cpu_tracking(self):
+    def test_cpu_tracking(self) -> Any:
         """Test CPU usage tracking."""
         monitor = PerformanceMonitor()
         
@@ -421,7 +489,7 @@ class TestPerformanceMonitor:
         assert cpu_info["cpu_count"] > 0
     
     @pytest.mark.unit
-    def test_gpu_tracking(self):
+    def test_gpu_tracking(self) -> Any:
         """Test GPU usage tracking."""
         monitor = PerformanceMonitor()
         
@@ -434,7 +502,7 @@ class TestPerformanceMonitor:
             assert "gpu_memory" in gpu_info
     
     @pytest.mark.unit
-    def test_create_performance_report(self):
+    def test_create_performance_report(self) -> Any:
         """Test performance report creation."""
         monitor = PerformanceMonitor()
         
@@ -451,7 +519,7 @@ class TestPerformanceMonitor:
         assert "recommendations" in report
     
     @pytest.mark.unit
-    def test_analyze_performance_trends(self):
+    def test_analyze_performance_trends(self) -> Any:
         """Test performance trend analysis."""
         monitor = PerformanceMonitor()
         
@@ -472,7 +540,7 @@ class TestPerformanceUtilities:
     """Test performance utility functions."""
     
     @pytest.mark.unit
-    def test_start_stop_performance_monitoring(self):
+    def test_start_stop_performance_monitoring(self) -> Any:
         """Test performance monitoring start/stop."""
         monitor = PerformanceMonitor()
         
@@ -483,7 +551,7 @@ class TestPerformanceUtilities:
         assert monitor.monitoring_active is False
     
     @pytest.mark.unit
-    def test_get_performance_metrics(self):
+    def test_get_performance_metrics(self) -> Optional[Dict[str, Any]]:
         """Test get_performance_metrics function."""
         monitor = PerformanceMonitor()
         
@@ -494,13 +562,15 @@ class TestPerformanceUtilities:
         assert "cache_metrics" in metrics
     
     @pytest.mark.unit
-    def test_measure_function_performance(self):
+    def test_measure_function_performance(self) -> Any:
         """Test measure_function_performance decorator."""
         monitor = PerformanceMonitor()
         
         @measure_function_performance(monitor)
         def test_function():
-            time.sleep(0.1)
+            
+    """test_function function."""
+time.sleep(0.1)
             return "result"
         
         result = test_function()
@@ -510,7 +580,7 @@ class TestPerformanceUtilities:
         assert summary["total_operations"] >= 1
     
     @pytest.mark.unit
-    def test_track_memory_usage(self):
+    def test_track_memory_usage(self) -> Any:
         """Test track_memory_usage function."""
         memory_info = track_memory_usage()
         
@@ -519,7 +589,7 @@ class TestPerformanceUtilities:
         assert "memory_percentage" in memory_info
     
     @pytest.mark.unit
-    def test_track_cpu_usage(self):
+    def test_track_cpu_usage(self) -> Any:
         """Test track_cpu_usage function."""
         cpu_info = track_cpu_usage()
         
@@ -527,7 +597,7 @@ class TestPerformanceUtilities:
         assert "cpu_count" in cpu_info
     
     @pytest.mark.unit
-    def test_track_gpu_usage(self):
+    def test_track_gpu_usage(self) -> Any:
         """Test track_gpu_usage function."""
         gpu_info = track_gpu_usage()
         
@@ -536,7 +606,7 @@ class TestPerformanceUtilities:
             assert "gpu_usage" in gpu_info
     
     @pytest.mark.unit
-    def test_get_system_resources(self):
+    def test_get_system_resources(self) -> Optional[Dict[str, Any]]:
         """Test get_system_resources function."""
         resources = get_system_resources()
         
@@ -546,12 +616,14 @@ class TestPerformanceUtilities:
         assert "network" in resources
     
     @pytest.mark.unit
-    def test_monitor_request_performance(self):
+    async def test_monitor_request_performance(self) -> Any:
         """Test monitor_request_performance function."""
         monitor = PerformanceMonitor()
         
         def request_handler():
-            time.sleep(0.1)
+            
+    """request_handler function."""
+time.sleep(0.1)
             return {"status": "success"}
         
         result = monitor_request_performance(monitor, request_handler)
@@ -564,7 +636,7 @@ class TestSecurityManager:
     """Test Security Manager."""
     
     @pytest.mark.unit
-    def test_initialization(self):
+    def test_initialization(self) -> Any:
         """Test security manager initialization."""
         config = SecurityConfig(
             enable_encryption=True,
@@ -583,7 +655,7 @@ class TestSecurityManager:
         assert manager.security_events is not None
     
     @pytest.mark.unit
-    async def test_validate_access(self):
+    async def test_validate_access(self) -> bool:
         """Test access validation."""
         manager = SecurityManager()
         
@@ -597,7 +669,7 @@ class TestSecurityManager:
             assert result is False
     
     @pytest.mark.unit
-    def test_validate_input(self):
+    def test_validate_input(self) -> bool:
         """Test input validation."""
         manager = SecurityManager()
         
@@ -612,7 +684,7 @@ class TestSecurityManager:
         assert is_valid is False
     
     @pytest.mark.unit
-    def test_check_rate_limit(self):
+    def test_check_rate_limit(self) -> Any:
         """Test rate limiting."""
         config = SecurityConfig(
             rate_limit_enabled=True,
@@ -637,7 +709,7 @@ class TestSecurityManager:
         assert info["remaining"] == 0
     
     @pytest.mark.unit
-    def test_encrypt_decrypt_data(self):
+    def test_encrypt_decrypt_data(self) -> Any:
         """Test data encryption and decryption."""
         config = SecurityConfig(
             enable_encryption=True,
@@ -653,7 +725,7 @@ class TestSecurityManager:
         assert decrypted == original_data
     
     @pytest.mark.unit
-    def test_hash_password(self):
+    def test_hash_password(self) -> Any:
         """Test password hashing."""
         manager = SecurityManager()
         
@@ -664,7 +736,7 @@ class TestSecurityManager:
         assert len(hashed) > len(password)
     
     @pytest.mark.unit
-    def test_verify_password(self):
+    def test_verify_password(self) -> Any:
         """Test password verification."""
         manager = SecurityManager()
         
@@ -675,7 +747,7 @@ class TestSecurityManager:
         assert manager.verify_password("wrong_password", hashed) is False
     
     @pytest.mark.unit
-    def test_generate_api_key(self):
+    async def test_generate_api_key(self) -> Any:
         """Test API key generation."""
         manager = SecurityManager()
         
@@ -685,7 +757,7 @@ class TestSecurityManager:
         assert api_key.isalnum()
     
     @pytest.mark.unit
-    def test_validate_api_key(self):
+    async def test_validate_api_key(self) -> bool:
         """Test API key validation."""
         manager = SecurityManager()
         
@@ -695,7 +767,7 @@ class TestSecurityManager:
         assert manager.validate_api_key("invalid_key") is False
     
     @pytest.mark.unit
-    def test_sanitize_input(self):
+    def test_sanitize_input(self) -> Any:
         """Test input sanitization."""
         manager = SecurityManager()
         
@@ -714,7 +786,7 @@ class TestSecurityManager:
         assert ";" not in sanitized
     
     @pytest.mark.unit
-    def test_log_security_event(self):
+    def test_log_security_event(self) -> Any:
         """Test security event logging."""
         manager = SecurityManager()
         
@@ -731,7 +803,7 @@ class TestSecurityManager:
         assert manager.security_events[0].event_type == "access_denied"
     
     @pytest.mark.unit
-    def test_create_security_audit_log(self):
+    def test_create_security_audit_log(self) -> Any:
         """Test security audit log creation."""
         manager = SecurityManager()
         
@@ -753,7 +825,7 @@ class TestSecurityManager:
         assert audit_log["total_events"] == 5
     
     @pytest.mark.unit
-    async def test_check_permissions(self):
+    async def test_check_permissions(self) -> Any:
         """Test permission checking."""
         manager = SecurityManager()
         
@@ -766,7 +838,7 @@ class TestSecurityManager:
             assert has_permission is False
     
     @pytest.mark.unit
-    def test_validate_file_upload(self):
+    async def test_validate_file_upload(self) -> bool:
         """Test file upload validation."""
         manager = SecurityManager()
         
@@ -791,7 +863,7 @@ class TestSecurityManager:
         assert "executable" in error.lower()
     
     @pytest.mark.unit
-    def test_scan_for_malware(self):
+    def test_scan_for_malware(self) -> Any:
         """Test malware scanning."""
         manager = SecurityManager()
         
@@ -809,7 +881,7 @@ class TestSecurityUtilities:
     """Test security utility functions."""
     
     @pytest.mark.unit
-    async def test_validate_access_function(self):
+    async def test_validate_access_function(self) -> bool:
         """Test validate_access function."""
         config = SecurityConfig()
         manager = SecurityManager(config)
@@ -818,7 +890,7 @@ class TestSecurityUtilities:
         assert result is True
     
     @pytest.mark.unit
-    def test_validate_input_function(self):
+    def test_validate_input_function(self) -> bool:
         """Test validate_input function."""
         config = SecurityConfig()
         manager = SecurityManager(config)
@@ -828,7 +900,7 @@ class TestSecurityUtilities:
         assert cleaned == "Valid input"
     
     @pytest.mark.unit
-    def test_check_rate_limit_function(self):
+    def test_check_rate_limit_function(self) -> Any:
         """Test check_rate_limit function."""
         config = SecurityConfig(rate_limit_enabled=True, rate_limit_requests=1)
         manager = SecurityManager(config)
@@ -840,7 +912,7 @@ class TestSecurityUtilities:
         assert allowed is False
     
     @pytest.mark.unit
-    def test_encrypt_decrypt_functions(self):
+    def test_encrypt_decrypt_functions(self) -> Any:
         """Test encrypt/decrypt functions."""
         config = SecurityConfig(enable_encryption=True, encryption_key="test-key-32-chars-long-key")
         manager = SecurityManager(config)
@@ -852,7 +924,7 @@ class TestSecurityUtilities:
         assert decrypted == data
     
     @pytest.mark.unit
-    def test_hash_verify_password_functions(self):
+    def test_hash_verify_password_functions(self) -> Any:
         """Test password hash/verify functions."""
         manager = SecurityManager()
         
@@ -863,7 +935,7 @@ class TestSecurityUtilities:
         assert verify_password(manager, "wrong", hashed) is False
     
     @pytest.mark.unit
-    def test_generate_validate_api_key_functions(self):
+    async def test_generate_validate_api_key_functions(self) -> bool:
         """Test API key generation/validation functions."""
         manager = SecurityManager()
         
@@ -872,7 +944,7 @@ class TestSecurityUtilities:
         assert validate_api_key(manager, "invalid") is False
     
     @pytest.mark.unit
-    def test_sanitize_input_function(self):
+    def test_sanitize_input_function(self) -> Any:
         """Test sanitize_input function."""
         manager = SecurityManager()
         
@@ -883,7 +955,7 @@ class TestSecurityUtilities:
         assert "alert" not in sanitized
     
     @pytest.mark.unit
-    def test_log_security_event_function(self):
+    def test_log_security_event_function(self) -> Any:
         """Test log_security_event function."""
         manager = SecurityManager()
         
@@ -897,7 +969,7 @@ class TestSecurityUtilities:
         assert len(manager.security_events) == 1
     
     @pytest.mark.unit
-    def test_create_security_audit_log_function(self):
+    def test_create_security_audit_log_function(self) -> Any:
         """Test create_security_audit_log function."""
         manager = SecurityManager()
         
@@ -908,7 +980,7 @@ class TestSecurityUtilities:
         assert "events_by_user" in audit_log
     
     @pytest.mark.unit
-    async def test_check_permissions_function(self):
+    async def test_check_permissions_function(self) -> Any:
         """Test check_permissions function."""
         manager = SecurityManager()
         
@@ -917,7 +989,7 @@ class TestSecurityUtilities:
             assert has_permission is True
     
     @pytest.mark.unit
-    def test_validate_file_upload_function(self):
+    async def test_validate_file_upload_function(self) -> bool:
         """Test validate_file_upload function."""
         manager = SecurityManager()
         
@@ -931,7 +1003,7 @@ class TestSecurityUtilities:
         assert error is None
     
     @pytest.mark.unit
-    def test_scan_for_malware_function(self):
+    def test_scan_for_malware_function(self) -> Any:
         """Test scan_for_malware function."""
         manager = SecurityManager()
         

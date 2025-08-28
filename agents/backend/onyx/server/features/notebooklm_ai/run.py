@@ -1,13 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import uvicorn
+import os
+import sys
+from pathlib import Path
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 #!/usr/bin/env python3
 """
 FastAPI Application Runner
 Production-ready runner with proper configuration and error handling.
 """
 
-import uvicorn
-import os
-import sys
-from pathlib import Path
 
 # Add the current directory to Python path
 sys.path.insert(0, str(Path(__file__).parent))
@@ -41,5 +46,6 @@ def main():
         use_colors=True
     )
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

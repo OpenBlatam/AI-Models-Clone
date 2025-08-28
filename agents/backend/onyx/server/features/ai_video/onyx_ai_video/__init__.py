@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .core.integration import OnyxIntegrationManager, onyx_integration
+from .core.exceptions import AIVideoError, PluginError, ValidationError
+from .core.models import VideoRequest, VideoResponse, PluginConfig
+from .workflows.video_workflow import OnyxVideoWorkflow, onyx_video_generator
+from .workflows.workflow_manager import WorkflowManager
+from .plugins.plugin_manager import OnyxPluginManager, onyx_plugin_manager
+from .plugins.plugin_base import OnyxPluginBase, OnyxPluginContext
+from .config.config_manager import OnyxConfigManager, get_config, save_config
+from .config.settings import OnyxAIVideoConfig
+from .utils.logger import OnyxLogger
+from .utils.performance import PerformanceMonitor
+from .utils.security import SecurityManager
+from .api.main import OnyxAIVideoSystem, get_system, shutdown_system
+from .api.endpoints import create_api_router
+from .cli.main import OnyxAIVideoCLI, main as cli_main
+    import asyncio
+    import asyncio
+from typing import Any, List, Dict, Optional
+import logging
 """
 Onyx AI Video System - Modular Package
 
@@ -10,33 +31,18 @@ __author__ = "Onyx Team"
 __description__ = "Modular AI Video Generation System for Onyx"
 
 # Core imports
-from .core.integration import OnyxIntegrationManager, onyx_integration
-from .core.exceptions import AIVideoError, PluginError, ValidationError
-from .core.models import VideoRequest, VideoResponse, PluginConfig
 
 # Workflow imports
-from .workflows.video_workflow import OnyxVideoWorkflow, onyx_video_generator
-from .workflows.workflow_manager import WorkflowManager
 
 # Plugin imports
-from .plugins.plugin_manager import OnyxPluginManager, onyx_plugin_manager
-from .plugins.plugin_base import OnyxPluginBase, OnyxPluginContext
 
 # Configuration imports
-from .config.config_manager import OnyxConfigManager, get_config, save_config
-from .config.settings import OnyxAIVideoConfig
 
 # Utility imports
-from .utils.logger import OnyxLogger
-from .utils.performance import PerformanceMonitor
-from .utils.security import SecurityManager
 
 # API imports
-from .api.main import OnyxAIVideoSystem, get_system, shutdown_system
-from .api.endpoints import create_api_router
 
 # CLI imports
-from .cli.main import OnyxAIVideoCLI, main as cli_main
 
 # Main system
 __all__ = [
@@ -106,12 +112,10 @@ async def generate_video_with_vision(request: VideoRequest, image_data: bytes) -
 
 def get_system_status() -> dict:
     """Get system status."""
-    import asyncio
     return asyncio.run(get_system().get_system_status())
 
 def get_system_metrics() -> dict:
     """Get system metrics."""
-    import asyncio
     return asyncio.run(get_system().get_metrics())
 
 # Quick start function

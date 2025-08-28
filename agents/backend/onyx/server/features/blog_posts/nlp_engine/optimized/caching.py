@@ -1,9 +1,10 @@
-"""
-🚀 ULTRA-FAST CACHING - Multi-Level Performance
-===============================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Sistema de cache ultra-optimizado con múltiples niveles.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import time
 import asyncio
@@ -12,16 +13,27 @@ import threading
 from typing import Any, Dict, Optional
 from dataclasses import dataclass
 from enum import Enum
+    import aioredis
+    import cachetools
+            import json
+            import json
+from typing import Any, List, Dict, Optional
+import logging
+"""
+🚀 ULTRA-FAST CACHING - Multi-Level Performance
+===============================================
+
+Sistema de cache ultra-optimizado con múltiples niveles.
+"""
+
 
 # Cache libraries
 try:
-    import aioredis
     AIOREDIS_AVAILABLE = True
 except ImportError:
     AIOREDIS_AVAILABLE = False
 
 try:
-    import cachetools
     CACHETOOLS_AVAILABLE = True
 except ImportError:
     CACHETOOLS_AVAILABLE = False
@@ -61,7 +73,9 @@ class UltraFastCache:
         redis_url: str = "redis://localhost:6379",
         enable_metrics: bool = True
     ):
-        self.l1_size = l1_size
+        
+    """__init__ function."""
+self.l1_size = l1_size
         self.l1_ttl = l1_ttl
         self.redis_url = redis_url
         self.enable_metrics = enable_metrics
@@ -82,7 +96,7 @@ class UltraFastCache:
         # Inicializar
         self._initialize_l1()
     
-    def _initialize_l1(self):
+    def _initialize_l1(self) -> Any:
         """Inicializar L1 cache."""
         if CACHETOOLS_AVAILABLE:
             self.l1_cache = cachetools.TTLCache(
@@ -92,7 +106,7 @@ class UltraFastCache:
         else:
             self.l1_cache = {}
     
-    async def initialize_l2(self):
+    async def initialize_l2(self) -> Any:
         """Inicializar L2 cache (Redis)."""
         if AIOREDIS_AVAILABLE:
             try:
@@ -168,7 +182,6 @@ class UltraFastCache:
     async def _get_l2(self, key: str) -> Optional[Any]:
         """Get de L2 cache (Redis)."""
         try:
-            import json
             data = await self.l2_cache.get(key)
             if data:
                 return json.loads(data)
@@ -179,7 +192,6 @@ class UltraFastCache:
     async def _set_l2(self, key: str, value: Any, ttl: Optional[int] = None) -> bool:
         """Set en L2 cache (Redis)."""
         try:
-            import json
             data = json.dumps(value, ensure_ascii=False)
             
             if ttl:

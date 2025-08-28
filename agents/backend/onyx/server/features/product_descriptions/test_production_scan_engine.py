@@ -1,7 +1,13 @@
-"""
-Comprehensive Test Suite for Production-Grade Cybersecurity Scan Engine
-Tests all functionality, edge cases, and integration scenarios
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import json
@@ -9,7 +15,6 @@ import time
 import uuid
 from unittest.mock import AsyncMock, MagicMock, patch
 from typing import Dict, List, Optional
-
 import aiohttp
 import numpy as np
 import pytest
@@ -17,8 +22,17 @@ import structlog
 from fastapi.testclient import TestClient
 from prometheus_client import REGISTRY
 from pydantic import ValidationError
-
 from production_scan_engine import (
+        from fastapi import FastAPI
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Comprehensive Test Suite for Production-Grade Cybersecurity Scan Engine
+Tests all functionality, edge cases, and integration scenarios
+"""
+
+
+
     ProductionScanEngine,
     ProductionScanConfiguration,
     ScanTarget,
@@ -44,7 +58,7 @@ from production_scan_engine import (
 class TestProductionScanConfiguration:
     """Test production scan configuration validation"""
     
-    def test_valid_configuration(self):
+    def test_valid_configuration(self) -> Any:
         """Test valid configuration creation"""
         config = ProductionScanConfiguration(
             scan_type=ScanType.VULNERABILITY,
@@ -60,7 +74,7 @@ class TestProductionScanConfiguration:
         assert config.enable_ml_detection is True
         assert config.ml_confidence_threshold == 0.9
     
-    def test_invalid_ml_threshold(self):
+    def test_invalid_ml_threshold(self) -> Any:
         """Test invalid ML confidence threshold"""
         with pytest.raises(ValidationError):
             ProductionScanConfiguration(ml_confidence_threshold=1.5)
@@ -68,7 +82,7 @@ class TestProductionScanConfiguration:
         with pytest.raises(ValidationError):
             ProductionScanConfiguration(ml_confidence_threshold=0.0)
     
-    def test_invalid_concurrent_scans(self):
+    def test_invalid_concurrent_scans(self) -> Any:
         """Test invalid concurrent scans limit"""
         with pytest.raises(ValidationError):
             ProductionScanConfiguration(max_concurrent_scans=0)
@@ -76,7 +90,7 @@ class TestProductionScanConfiguration:
         with pytest.raises(ValidationError):
             ProductionScanConfiguration(max_concurrent_scans=300)
     
-    def test_default_values(self):
+    def test_default_values(self) -> Any:
         """Test default configuration values"""
         config = ProductionScanConfiguration()
         
@@ -90,7 +104,7 @@ class TestProductionScanConfiguration:
 class TestScanTarget:
     """Test scan target validation and functionality"""
     
-    def test_valid_target(self):
+    def test_valid_target(self) -> Optional[Dict[str, Any]]:
         """Test valid target creation"""
         target = ScanTarget(
             url="example.com",
@@ -106,12 +120,12 @@ class TestScanTarget:
         assert target.timeout == 30
         assert target.retries == 3
     
-    def test_invalid_url(self):
+    def test_invalid_url(self) -> Any:
         """Test invalid URL validation"""
         with pytest.raises(ValueError, match="URL cannot be empty"):
             ScanTarget(url="")
     
-    def test_invalid_timeout(self):
+    def test_invalid_timeout(self) -> Any:
         """Test invalid timeout validation"""
         with pytest.raises(ValueError, match="Timeout must be positive"):
             ScanTarget(url="example.com", timeout=0)
@@ -119,12 +133,12 @@ class TestScanTarget:
         with pytest.raises(ValueError, match="Timeout must be positive"):
             ScanTarget(url="example.com", timeout=-1)
     
-    def test_invalid_retries(self):
+    def test_invalid_retries(self) -> Any:
         """Test invalid retries validation"""
         with pytest.raises(ValueError, match="Retries cannot be negative"):
             ScanTarget(url="example.com", retries=-1)
     
-    def test_invalid_port(self):
+    def test_invalid_port(self) -> Any:
         """Test invalid port validation"""
         with pytest.raises(ValueError, match="Port must be between 1 and 65535"):
             ScanTarget(url="example.com", port=0)
@@ -136,7 +150,7 @@ class TestScanTarget:
 class TestSecurityFinding:
     """Test security finding functionality"""
     
-    def test_finding_creation(self):
+    def test_finding_creation(self) -> Any:
         """Test security finding creation"""
         finding = SecurityFinding(
             title="Test Vulnerability",
@@ -154,7 +168,7 @@ class TestSecurityFinding:
         assert finding.confidence == 1.0
         assert finding.false_positive is False
     
-    def test_finding_with_optional_fields(self):
+    def test_finding_with_optional_fields(self) -> Any:
         """Test finding with optional fields"""
         finding = SecurityFinding(
             title="Test Finding",
@@ -174,7 +188,7 @@ class TestSecurityFinding:
 class TestSecurityMetrics:
     """Test security metrics functionality"""
     
-    def test_metrics_creation(self):
+    def test_metrics_creation(self) -> Any:
         """Test metrics creation"""
         metrics = SecurityMetrics(
             scan_id="test-scan-123",
@@ -189,7 +203,7 @@ class TestSecurityMetrics:
         assert metrics.completed_targets == 8
         assert metrics.failed_targets == 2
     
-    def test_metrics_calculation(self):
+    def test_metrics_calculation(self) -> Any:
         """Test metrics calculation"""
         start_time = time.time()
         metrics = SecurityMetrics(
@@ -218,12 +232,12 @@ class TestDatabaseManager:
     """Test database manager functionality"""
     
     @pytest.fixture
-    def db_manager(self):
+    def db_manager(self) -> Any:
         """Create database manager instance"""
         return DatabaseManager("postgresql+asyncpg://test:test@localhost/test")
     
     @pytest.mark.asyncio
-    async def test_initialization(self, db_manager):
+    async def test_initialization(self, db_manager) -> Any:
         """Test database initialization"""
         with patch('production_scan_engine.create_async_engine') as mock_engine:
             mock_engine.return_value = MagicMock()
@@ -235,7 +249,7 @@ class TestDatabaseManager:
             assert db_manager.session_factory is not None
     
     @pytest.mark.asyncio
-    async def test_store_scan_result(self, db_manager):
+    async def test_store_scan_result(self, db_manager) -> Any:
         """Test storing scan result"""
         db_manager.session_factory = MagicMock()
         mock_session = AsyncMock()
@@ -252,7 +266,7 @@ class TestDatabaseManager:
         mock_session.assert_called()
     
     @pytest.mark.asyncio
-    async def test_close(self, db_manager):
+    async def test_close(self, db_manager) -> Any:
         """Test database close"""
         db_manager.engine = AsyncMock()
         
@@ -265,12 +279,12 @@ class TestRedisCache:
     """Test Redis cache functionality"""
     
     @pytest.fixture
-    def redis_cache(self):
+    def redis_cache(self) -> Any:
         """Create Redis cache instance"""
         return RedisCache("redis://localhost:6379")
     
     @pytest.mark.asyncio
-    async def test_initialization(self, redis_cache):
+    async def test_initialization(self, redis_cache) -> Any:
         """Test Redis initialization"""
         with patch('production_scan_engine.aioredis.from_url') as mock_redis:
             mock_redis.return_value = AsyncMock()
@@ -282,7 +296,7 @@ class TestRedisCache:
             assert redis_cache.redis is not None
     
     @pytest.mark.asyncio
-    async def test_cache_scan_result(self, redis_cache):
+    async def test_cache_scan_result(self, redis_cache) -> Any:
         """Test caching scan result"""
         redis_cache.redis = AsyncMock()
         
@@ -297,7 +311,7 @@ class TestRedisCache:
         )
     
     @pytest.mark.asyncio
-    async def test_get_cached_result(self, redis_cache):
+    async def test_get_cached_result(self, redis_cache) -> Optional[Dict[str, Any]]:
         """Test getting cached result"""
         redis_cache.redis = AsyncMock()
         cached_data = {"scan_id": "test-123", "status": "completed"}
@@ -309,7 +323,7 @@ class TestRedisCache:
         redis_cache.redis.get.assert_called_once_with("scan_result:test-123")
     
     @pytest.mark.asyncio
-    async def test_get_cached_result_not_found(self, redis_cache):
+    async def test_get_cached_result_not_found(self, redis_cache) -> Optional[Dict[str, Any]]:
         """Test getting non-existent cached result"""
         redis_cache.redis = AsyncMock()
         redis_cache.redis.get.return_value = None
@@ -319,7 +333,7 @@ class TestRedisCache:
         assert result is None
     
     @pytest.mark.asyncio
-    async def test_close(self, redis_cache):
+    async def test_close(self, redis_cache) -> Any:
         """Test Redis close"""
         redis_cache.redis = AsyncMock()
         
@@ -332,11 +346,11 @@ class TestSystemMonitor:
     """Test system monitor functionality"""
     
     @pytest.fixture
-    def system_monitor(self):
+    def system_monitor(self) -> Any:
         """Create system monitor instance"""
         return SystemMonitor()
     
-    def test_get_system_metrics(self, system_monitor):
+    def test_get_system_metrics(self, system_monitor) -> Optional[Dict[str, Any]]:
         """Test getting system metrics"""
         with patch('production_scan_engine.psutil.cpu_percent') as mock_cpu, \
              patch('production_scan_engine.psutil.virtual_memory') as mock_memory, \
@@ -366,7 +380,7 @@ class TestProductionScanEngine:
     """Test production scan engine functionality"""
     
     @pytest.fixture
-    def config(self):
+    def config(self) -> Any:
         """Create test configuration"""
         return ProductionScanConfiguration(
             max_concurrent_scans=5,
@@ -378,12 +392,12 @@ class TestProductionScanEngine:
         )
     
     @pytest.fixture
-    def engine(self, config):
+    def engine(self, config) -> Any:
         """Create test engine instance"""
         return ProductionScanEngine(config)
     
     @pytest.mark.asyncio
-    async def test_initialization(self, engine):
+    async def test_initialization(self, engine) -> Any:
         """Test engine initialization"""
         await engine.initialize()
         
@@ -391,7 +405,7 @@ class TestProductionScanEngine:
         assert engine._rate_limiter._value == 100
     
     @pytest.mark.asyncio
-    async def test_deduplicate_targets(self, engine):
+    async def test_deduplicate_targets(self, engine) -> Optional[Dict[str, Any]]:
         """Test target deduplication"""
         targets = [
             ScanTarget(url="example.com", port=443),
@@ -408,7 +422,7 @@ class TestProductionScanEngine:
         assert unique_targets[2].url == "test.com"
     
     @pytest.mark.asyncio
-    async def test_scan_single_target_success(self, engine):
+    async def test_scan_single_target_success(self, engine) -> Optional[Dict[str, Any]]:
         """Test successful single target scan"""
         target = ScanTarget(url="example.com", port=443)
         scan_id = "test-scan-123"
@@ -431,7 +445,7 @@ class TestProductionScanEngine:
             assert result.metrics['findings_count'] == 1
     
     @pytest.mark.asyncio
-    async def test_scan_single_target_timeout(self, engine):
+    async def test_scan_single_target_timeout(self, engine) -> Optional[Dict[str, Any]]:
         """Test single target scan timeout"""
         target = ScanTarget(url="example.com", port=443, timeout=1)
         scan_id = "test-scan-123"
@@ -445,7 +459,7 @@ class TestProductionScanEngine:
             assert "timeout" in result.error_message.lower()
     
     @pytest.mark.asyncio
-    async def test_scan_single_target_exception(self, engine):
+    async def test_scan_single_target_exception(self, engine) -> Optional[Dict[str, Any]]:
         """Test single target scan exception"""
         target = ScanTarget(url="example.com", port=443)
         scan_id = "test-scan-123"
@@ -459,7 +473,7 @@ class TestProductionScanEngine:
             assert "Test error" in result.error_message
     
     @pytest.mark.asyncio
-    async def test_perform_comprehensive_scan(self, engine):
+    async def test_perform_comprehensive_scan(self, engine) -> Any:
         """Test comprehensive scan execution"""
         target = ScanTarget(url="example.com", port=443)
         
@@ -482,7 +496,7 @@ class TestProductionScanEngine:
             assert findings[1].title == "Header Issue"
     
     @pytest.mark.asyncio
-    async def test_ssl_tls_security_check(self, engine):
+    async def test_ssl_tls_security_check(self, engine) -> Any:
         """Test SSL/TLS security check"""
         target = ScanTarget(url="example.com", port=443)
         
@@ -502,7 +516,7 @@ class TestProductionScanEngine:
             assert any("Weak SSL/TLS Version" in f.title for f in findings)
     
     @pytest.mark.asyncio
-    async def test_security_headers_check(self, engine):
+    async def test_security_headers_check(self, engine) -> Any:
         """Test security headers check"""
         target = ScanTarget(url="example.com", port=443)
         
@@ -518,7 +532,7 @@ class TestProductionScanEngine:
             assert any("Missing Security Header" in f.title for f in findings)
     
     @pytest.mark.asyncio
-    async def test_open_ports_check(self, engine):
+    async def test_open_ports_check(self, engine) -> Any:
         """Test open ports check"""
         target = ScanTarget(url="example.com", port=22)  # SSH port
         
@@ -534,7 +548,7 @@ class TestProductionScanEngine:
             mock_writer.close.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_web_vulnerabilities_check(self, engine):
+    async def test_web_vulnerabilities_check(self, engine) -> Any:
         """Test web vulnerabilities check"""
         target = ScanTarget(url="example.com", port=443)
         
@@ -551,7 +565,7 @@ class TestProductionScanEngine:
             assert any("Directory Traversal" in f.title for f in findings)
     
     @pytest.mark.asyncio
-    async def test_scan_targets_success(self, engine):
+    async def test_scan_targets_success(self, engine) -> Optional[Dict[str, Any]]:
         """Test successful multi-target scan"""
         targets = [
             ScanTarget(url="example.com", port=443),
@@ -573,7 +587,7 @@ class TestProductionScanEngine:
             assert engine.scan_metrics[scan_id].completed_targets == 2
     
     @pytest.mark.asyncio
-    async def test_scan_targets_with_failures(self, engine):
+    async def test_scan_targets_with_failures(self, engine) -> Optional[Dict[str, Any]]:
         """Test multi-target scan with failures"""
         targets = [
             ScanTarget(url="example.com", port=443),
@@ -595,7 +609,7 @@ class TestProductionScanEngine:
             assert engine.scan_metrics[scan_id].failed_targets == 1
     
     @pytest.mark.asyncio
-    async def test_cancel_scan(self, engine):
+    async def test_cancel_scan(self, engine) -> Any:
         """Test scan cancellation"""
         scan_id = "test-scan-123"
         mock_task = AsyncMock()
@@ -608,14 +622,14 @@ class TestProductionScanEngine:
         mock_task.cancel.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_cancel_nonexistent_scan(self, engine):
+    async def test_cancel_nonexistent_scan(self, engine) -> Any:
         """Test cancelling non-existent scan"""
         success = await engine.cancel_scan("nonexistent")
         
         assert success is False
     
     @pytest.mark.asyncio
-    async def test_get_scan_metrics(self, engine):
+    async def test_get_scan_metrics(self, engine) -> Optional[Dict[str, Any]]:
         """Test getting scan metrics"""
         scan_id = "test-scan-123"
         metrics = SecurityMetrics(scan_id=scan_id, start_time=time.time())
@@ -626,14 +640,14 @@ class TestProductionScanEngine:
         assert result == metrics
     
     @pytest.mark.asyncio
-    async def test_get_scan_metrics_not_found(self, engine):
+    async def test_get_scan_metrics_not_found(self, engine) -> Optional[Dict[str, Any]]:
         """Test getting non-existent scan metrics"""
         result = engine.get_scan_metrics("nonexistent")
         
         assert result is None
     
     @pytest.mark.asyncio
-    async def test_shutdown(self, engine):
+    async def test_shutdown(self, engine) -> Any:
         """Test engine shutdown"""
         # Add some active scans
         engine.active_scans["scan-1"] = AsyncMock()
@@ -650,9 +664,8 @@ class TestFastAPIIntegration:
     """Test FastAPI integration"""
     
     @pytest.fixture
-    def client(self):
+    def client(self) -> Any:
         """Create test client"""
-        from fastapi import FastAPI
         app = FastAPI()
         
         # Add routes
@@ -664,7 +677,7 @@ class TestFastAPIIntegration:
         return TestClient(app)
     
     @pytest.mark.asyncio
-    async def test_start_production_scan(self, client):
+    async def test_start_production_scan(self, client) -> Any:
         """Test starting production scan"""
         with patch('production_scan_engine.get_production_scan_engine') as mock_get_engine:
             mock_engine = AsyncMock()
@@ -692,7 +705,7 @@ class TestFastAPIIntegration:
             assert data["status"] == "pending"
     
     @pytest.mark.asyncio
-    async def test_get_production_scan_status(self, client):
+    async def test_get_production_scan_status(self, client) -> Optional[Dict[str, Any]]:
         """Test getting scan status"""
         with patch('production_scan_engine.get_production_scan_engine') as mock_get_engine:
             mock_engine = AsyncMock()
@@ -710,7 +723,7 @@ class TestFastAPIIntegration:
             assert data["scan_id"] == "test-123"
     
     @pytest.mark.asyncio
-    async def test_get_production_scan_status_not_found(self, client):
+    async def test_get_production_scan_status_not_found(self, client) -> Optional[Dict[str, Any]]:
         """Test getting non-existent scan status"""
         with patch('production_scan_engine.get_production_scan_engine') as mock_get_engine:
             mock_engine = AsyncMock()
@@ -723,7 +736,7 @@ class TestFastAPIIntegration:
             assert response.status_code == 404
     
     @pytest.mark.asyncio
-    async def test_cancel_production_scan(self, client):
+    async def test_cancel_production_scan(self, client) -> Any:
         """Test cancelling production scan"""
         with patch('production_scan_engine.get_production_scan_engine') as mock_get_engine:
             mock_engine = AsyncMock()
@@ -737,7 +750,7 @@ class TestFastAPIIntegration:
             assert "cancelled successfully" in data["message"]
     
     @pytest.mark.asyncio
-    async def test_cancel_production_scan_not_found(self, client):
+    async def test_cancel_production_scan_not_found(self, client) -> Any:
         """Test cancelling non-existent scan"""
         with patch('production_scan_engine.get_production_scan_engine') as mock_get_engine:
             mock_engine = AsyncMock()
@@ -749,7 +762,7 @@ class TestFastAPIIntegration:
             assert response.status_code == 404
     
     @pytest.mark.asyncio
-    async def test_production_health_check(self, client):
+    async def test_production_health_check(self, client) -> Any:
         """Test production health check"""
         with patch('production_scan_engine.get_production_scan_engine') as mock_get_engine:
             mock_engine = AsyncMock()
@@ -773,7 +786,7 @@ class TestFastAPIIntegration:
 class TestProductionScanRequest:
     """Test production scan request validation"""
     
-    def test_valid_request(self):
+    async def test_valid_request(self) -> Any:
         """Test valid request creation"""
         request = ProductionScanRequest(
             targets=[
@@ -789,12 +802,12 @@ class TestProductionScanRequest:
         assert len(request.targets) == 2
         assert request.configuration.scan_type == ScanType.VULNERABILITY
     
-    def test_empty_targets(self):
+    def test_empty_targets(self) -> Optional[Dict[str, Any]]:
         """Test request with empty targets"""
         with pytest.raises(ValidationError, match="At least one target is required"):
             ProductionScanRequest(targets=[])
     
-    def test_request_without_configuration(self):
+    async def test_request_without_configuration(self) -> Any:
         """Test request without configuration"""
         request = ProductionScanRequest(
             targets=[ScanTarget(url="example.com")]
@@ -806,7 +819,7 @@ class TestProductionScanRequest:
 class TestProductionScanResponse:
     """Test production scan response"""
     
-    def test_response_creation(self):
+    def test_response_creation(self) -> Any:
         """Test response creation"""
         response = ProductionScanResponse(
             scan_id="test-123",
@@ -827,7 +840,7 @@ class TestIntegrationScenarios:
     """Test integration scenarios"""
     
     @pytest.mark.asyncio
-    async def test_full_scan_workflow(self):
+    async def test_full_scan_workflow(self) -> Any:
         """Test complete scan workflow"""
         config = ProductionScanConfiguration(
             max_concurrent_scans=2,
@@ -868,7 +881,7 @@ class TestIntegrationScenarios:
             await engine.shutdown()
     
     @pytest.mark.asyncio
-    async def test_error_handling_scenarios(self):
+    async def test_error_handling_scenarios(self) -> Any:
         """Test various error handling scenarios"""
         config = ProductionScanConfiguration(
             max_concurrent_scans=1,
@@ -901,7 +914,7 @@ class TestPerformanceMetrics:
     """Test performance metrics and monitoring"""
     
     @pytest.mark.asyncio
-    async def test_scan_performance_tracking(self):
+    async def test_scan_performance_tracking(self) -> Any:
         """Test scan performance tracking"""
         config = ProductionScanConfiguration(
             max_concurrent_scans=5,
@@ -938,7 +951,7 @@ class TestPerformanceMetrics:
             await engine.shutdown()
     
     @pytest.mark.asyncio
-    async def test_concurrent_scan_limits(self):
+    async def test_concurrent_scan_limits(self) -> Any:
         """Test concurrent scan limits"""
         config = ProductionScanConfiguration(
             max_concurrent_scans=2,

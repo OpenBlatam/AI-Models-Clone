@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import logging
+from typing import Optional, List, Dict
+from .models import (
+from typing import Any, List, Dict, Optional
 """
 🚀 VIDEO SERVICE - AI VIDEO SYSTEM
 ==================================
@@ -5,11 +19,6 @@
 Business logic and service layer for video processing operations.
 """
 
-import asyncio
-import time
-import logging
-from typing import Optional, List, Dict
-from .models import (
     VideoData, VideoResponse, BatchVideoRequest, BatchVideoResponse,
     VideoListResponse, VideoQuality, VideoStatus
 )
@@ -28,7 +37,7 @@ class VideoService:
     Handles video processing, batch operations, and data management.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the video service with storage containers."""
         self.processing_queue: Dict[str, VideoData] = {}
         self.results_cache: Dict[str, VideoResponse] = {}

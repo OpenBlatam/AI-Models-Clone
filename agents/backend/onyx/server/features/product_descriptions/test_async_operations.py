@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+import uuid
+import pytest
+from typing import Dict, List, Any, Optional
+from unittest.mock import AsyncMock, MagicMock, patch
+from async_database_api_operations import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test Suite for Async Database and API Operations
 
@@ -10,14 +24,7 @@ This test suite covers:
 - Context managers and async patterns
 """
 
-import asyncio
-import time
-import uuid
-import pytest
-from typing import Dict, List, Any, Optional
-from unittest.mock import AsyncMock, MagicMock, patch
 
-from async_database_api_operations import (
     AsyncOperationOrchestrator, AsyncPostgreSQLManager, AsyncSQLiteManager,
     AsyncRedisManager, AsyncAPIManager, OperationContext, OperationResult,
     OperationType, DatabaseType, execute_with_retry, get_database_connection,
@@ -77,7 +84,7 @@ class TestAsyncPostgreSQLManager:
     """Test cases for AsyncPostgreSQLManager."""
     
     @pytest.mark.asyncio
-    async def test_manager_creation(self):
+    async def test_manager_creation(self) -> Any:
         """Test AsyncPostgreSQLManager creation."""
         manager = AsyncPostgreSQLManager("postgresql://test:test@localhost:5432/testdb")
         assert manager.connection_string == "postgresql://test:test@localhost:5432/testdb"
@@ -86,7 +93,7 @@ class TestAsyncPostgreSQLManager:
         assert manager.stats["connections_created"] == 0
     
     @pytest.mark.asyncio
-    async def test_pool_initialization(self):
+    async def test_pool_initialization(self) -> Any:
         """Test pool initialization."""
         with patch('asyncpg.create_pool') as mock_create_pool:
             mock_pool = AsyncMock()
@@ -99,7 +106,7 @@ class TestAsyncPostgreSQLManager:
             assert manager.pool == mock_pool
     
     @pytest.mark.asyncio
-    async def test_pool_closure(self):
+    async def test_pool_closure(self) -> Any:
         """Test pool closure."""
         manager = AsyncPostgreSQLManager("postgresql://test:test@localhost:5432/testdb")
         manager.pool = AsyncMock()
@@ -108,7 +115,7 @@ class TestAsyncPostgreSQLManager:
         manager.pool.close.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_query_execution_success(self):
+    async def test_query_execution_success(self) -> Any:
         """Test successful query execution."""
         with patch('asyncpg.create_pool') as mock_create_pool:
             mock_pool = AsyncMock()
@@ -128,7 +135,7 @@ class TestAsyncPostgreSQLManager:
             assert manager.stats["operations_performed"] == 1
     
     @pytest.mark.asyncio
-    async def test_query_execution_failure(self):
+    async def test_query_execution_failure(self) -> Any:
         """Test failed query execution."""
         with patch('asyncpg.create_pool') as mock_create_pool:
             mock_pool = AsyncMock()
@@ -151,7 +158,7 @@ class TestAsyncSQLiteManager:
     """Test cases for AsyncSQLiteManager."""
     
     @pytest.mark.asyncio
-    async def test_manager_creation(self):
+    async def test_manager_creation(self) -> Any:
         """Test AsyncSQLiteManager creation."""
         manager = AsyncSQLiteManager("test.db")
         assert manager.connection_string == "test.db"
@@ -159,14 +166,14 @@ class TestAsyncSQLiteManager:
         assert manager.pool == "test.db"
     
     @pytest.mark.asyncio
-    async def test_pool_initialization(self):
+    async def test_pool_initialization(self) -> Any:
         """Test pool initialization."""
         manager = AsyncSQLiteManager("test.db")
         await manager.initialize_pool()
         assert manager.pool == "test.db"
     
     @pytest.mark.asyncio
-    async def test_query_execution_success(self):
+    async def test_query_execution_success(self) -> Any:
         """Test successful query execution."""
         with patch('aiosqlite.connect') as mock_connect:
             mock_db = AsyncMock()
@@ -185,7 +192,7 @@ class TestAsyncSQLiteManager:
             assert manager.stats["operations_performed"] == 1
     
     @pytest.mark.asyncio
-    async def test_query_execution_failure(self):
+    async def test_query_execution_failure(self) -> Any:
         """Test failed query execution."""
         with patch('aiosqlite.connect') as mock_connect:
             mock_db = AsyncMock()
@@ -205,7 +212,7 @@ class TestAsyncRedisManager:
     """Test cases for AsyncRedisManager."""
     
     @pytest.mark.asyncio
-    async def test_manager_creation(self):
+    async def test_manager_creation(self) -> Any:
         """Test AsyncRedisManager creation."""
         manager = AsyncRedisManager("redis://localhost:6379")
         assert manager.connection_string == "redis://localhost:6379"
@@ -213,7 +220,7 @@ class TestAsyncRedisManager:
         assert manager.pool is None
     
     @pytest.mark.asyncio
-    async def test_pool_initialization(self):
+    async def test_pool_initialization(self) -> Any:
         """Test pool initialization."""
         with patch('aioredis.from_url') as mock_from_url:
             mock_pool = AsyncMock()
@@ -226,7 +233,7 @@ class TestAsyncRedisManager:
             assert manager.pool == mock_pool
     
     @pytest.mark.asyncio
-    async def test_query_execution_success(self):
+    async def test_query_execution_success(self) -> Any:
         """Test successful query execution."""
         with patch('aioredis.from_url') as mock_from_url:
             mock_pool = AsyncMock()
@@ -244,7 +251,7 @@ class TestAsyncRedisManager:
             assert manager.stats["operations_performed"] == 1
     
     @pytest.mark.asyncio
-    async def test_query_execution_failure(self):
+    async def test_query_execution_failure(self) -> Any:
         """Test failed query execution."""
         with patch('aioredis.from_url') as mock_from_url:
             mock_pool = AsyncMock()
@@ -265,7 +272,7 @@ class TestAsyncAPIManager:
     """Test cases for AsyncAPIManager."""
     
     @pytest.mark.asyncio
-    async def test_manager_creation(self):
+    async def test_manager_creation(self) -> Any:
         """Test AsyncAPIManager creation."""
         manager = AsyncAPIManager("https://api.example.com")
         assert manager.base_url == "https://api.example.com"
@@ -274,7 +281,7 @@ class TestAsyncAPIManager:
         assert manager.session is None
     
     @pytest.mark.asyncio
-    async def test_session_initialization(self):
+    async def test_session_initialization(self) -> Any:
         """Test session initialization."""
         with patch('aiohttp.ClientSession') as mock_session_class:
             mock_session = AsyncMock()
@@ -287,7 +294,7 @@ class TestAsyncAPIManager:
             assert manager.session == mock_session
     
     @pytest.mark.asyncio
-    async def test_session_closure(self):
+    async def test_session_closure(self) -> Any:
         """Test session closure."""
         manager = AsyncAPIManager("https://api.example.com")
         manager.session = AsyncMock()
@@ -296,7 +303,7 @@ class TestAsyncAPIManager:
         manager.session.close.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_get_request_success(self):
+    async async def test_get_request_success(self) -> Optional[Dict[str, Any]]:
         """Test successful GET request."""
         with patch('aiohttp.ClientSession') as mock_session_class:
             mock_session = AsyncMock()
@@ -317,7 +324,7 @@ class TestAsyncAPIManager:
             assert manager.stats["successful_requests"] == 1
     
     @pytest.mark.asyncio
-    async def test_post_request_success(self):
+    async async def test_post_request_success(self) -> Any:
         """Test successful POST request."""
         with patch('aiohttp.ClientSession') as mock_session_class:
             mock_session = AsyncMock()
@@ -337,7 +344,7 @@ class TestAsyncAPIManager:
             assert result.execution_time > 0
     
     @pytest.mark.asyncio
-    async def test_request_failure(self):
+    async async def test_request_failure(self) -> Any:
         """Test failed request."""
         with patch('aiohttp.ClientSession') as mock_session_class:
             mock_session = AsyncMock()
@@ -354,7 +361,7 @@ class TestAsyncAPIManager:
             assert manager.stats["failed_requests"] == 1
     
     @pytest.mark.asyncio
-    async def test_http_error_response(self):
+    async async def test_http_error_response(self) -> Any:
         """Test HTTP error response."""
         with patch('aiohttp.ClientSession') as mock_session_class:
             mock_session = AsyncMock()
@@ -378,7 +385,7 @@ class TestAsyncOperationOrchestrator:
     """Test cases for AsyncOperationOrchestrator."""
     
     @pytest.mark.asyncio
-    async def test_orchestrator_creation(self):
+    async def test_orchestrator_creation(self) -> Any:
         """Test AsyncOperationOrchestrator creation."""
         orchestrator = AsyncOperationOrchestrator()
         assert len(orchestrator.database_managers) == 0
@@ -387,7 +394,7 @@ class TestAsyncOperationOrchestrator:
         assert orchestrator.performance_stats["total_operations"] == 0
     
     @pytest.mark.asyncio
-    async def test_add_database_manager(self):
+    async def test_add_database_manager(self) -> Any:
         """Test adding database manager."""
         with patch('async_database_api_operations.AsyncPostgreSQLManager') as mock_manager_class:
             mock_manager = AsyncMock()
@@ -404,7 +411,7 @@ class TestAsyncOperationOrchestrator:
             mock_manager.initialize_pool.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_add_api_manager(self):
+    async async def test_add_api_manager(self) -> Any:
         """Test adding API manager."""
         with patch('async_database_api_operations.AsyncAPIManager') as mock_manager_class:
             mock_manager = AsyncMock()
@@ -417,7 +424,7 @@ class TestAsyncOperationOrchestrator:
             mock_manager.initialize_session.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_execute_database_operation(self):
+    async def test_execute_database_operation(self) -> Any:
         """Test database operation execution."""
         mock_manager = AsyncMock()
         mock_result = OperationResult(
@@ -445,7 +452,7 @@ class TestAsyncOperationOrchestrator:
         assert orchestrator.performance_stats["total_operations"] == 1
     
     @pytest.mark.asyncio
-    async def test_execute_api_operation(self):
+    async async def test_execute_api_operation(self) -> Any:
         """Test API operation execution."""
         mock_manager = AsyncMock()
         mock_result = OperationResult(
@@ -473,7 +480,7 @@ class TestAsyncOperationOrchestrator:
         assert orchestrator.performance_stats["total_operations"] == 1
     
     @pytest.mark.asyncio
-    async def test_execute_batch_operations(self):
+    async def test_execute_batch_operations(self) -> Any:
         """Test batch operation execution."""
         mock_db_manager = AsyncMock()
         mock_api_manager = AsyncMock()
@@ -528,7 +535,7 @@ class TestAsyncOperationOrchestrator:
         assert orchestrator.performance_stats["total_operations"] == 2
     
     @pytest.mark.asyncio
-    async def test_get_performance_stats(self):
+    async def test_get_performance_stats(self) -> Optional[Dict[str, Any]]:
         """Test performance statistics retrieval."""
         orchestrator = AsyncOperationOrchestrator()
         
@@ -550,7 +557,7 @@ class TestAsyncOperationOrchestrator:
         assert "test_api" in stats["apis"]
     
     @pytest.mark.asyncio
-    async def test_close_all(self):
+    async def test_close_all(self) -> Any:
         """Test closing all managers."""
         mock_db_manager = AsyncMock()
         mock_api_manager = AsyncMock()
@@ -571,7 +578,7 @@ class TestIntegration:
     """Integration tests for async operations."""
     
     @pytest.mark.asyncio
-    async def test_database_api_integration(self):
+    async async def test_database_api_integration(self) -> Any:
         """Test integration between database and API operations."""
         orchestrator = AsyncOperationOrchestrator()
         
@@ -634,7 +641,7 @@ class TestPerformance:
     """Performance tests for async operations."""
     
     @pytest.mark.asyncio
-    async def test_database_performance(self):
+    async def test_database_performance(self) -> Any:
         """Test database operation performance."""
         orchestrator = AsyncOperationOrchestrator()
         
@@ -672,7 +679,7 @@ class TestPerformance:
         assert orchestrator.performance_stats["total_operations"] == 100
     
     @pytest.mark.asyncio
-    async def test_api_performance(self):
+    async async def test_api_performance(self) -> Any:
         """Test API operation performance."""
         orchestrator = AsyncOperationOrchestrator()
         
@@ -710,7 +717,7 @@ class TestPerformance:
         assert orchestrator.performance_stats["total_operations"] == 50
     
     @pytest.mark.asyncio
-    async def test_mixed_operations_performance(self):
+    async def test_mixed_operations_performance(self) -> Any:
         """Test mixed database and API operations performance."""
         orchestrator = AsyncOperationOrchestrator()
         
@@ -772,7 +779,7 @@ class TestErrorHandling:
     """Error handling tests for async operations."""
     
     @pytest.mark.asyncio
-    async def test_database_error_handling(self):
+    async def test_database_error_handling(self) -> Any:
         """Test database error handling."""
         orchestrator = AsyncOperationOrchestrator()
         
@@ -791,7 +798,7 @@ class TestErrorHandling:
         assert orchestrator.performance_stats["failed_operations"] == 1
     
     @pytest.mark.asyncio
-    async def test_api_error_handling(self):
+    async async def test_api_error_handling(self) -> Any:
         """Test API error handling."""
         orchestrator = AsyncOperationOrchestrator()
         
@@ -811,7 +818,7 @@ class TestErrorHandling:
         assert orchestrator.performance_stats["failed_operations"] == 1
     
     @pytest.mark.asyncio
-    async def test_batch_operations_with_errors(self):
+    async def test_batch_operations_with_errors(self) -> Any:
         """Test batch operations with some errors."""
         orchestrator = AsyncOperationOrchestrator()
         
@@ -890,12 +897,14 @@ class TestUtilityFunctions:
     """Tests for utility functions."""
     
     @pytest.mark.asyncio
-    async def test_execute_with_retry_success(self):
+    async def test_execute_with_retry_success(self) -> Any:
         """Test retry mechanism with eventual success."""
         call_count = 0
         
         async def failing_operation():
-            nonlocal call_count
+            
+    """failing_operation function."""
+nonlocal call_count
             call_count += 1
             if call_count < 3:
                 raise Exception("Temporary failure")
@@ -919,10 +928,12 @@ class TestUtilityFunctions:
         assert call_count == 3
     
     @pytest.mark.asyncio
-    async def test_execute_with_retry_failure(self):
+    async def test_execute_with_retry_failure(self) -> Any:
         """Test retry mechanism with eventual failure."""
         async def always_failing_operation():
-            raise Exception("Persistent failure")
+            
+    """always_failing_operation function."""
+raise Exception("Persistent failure")
         
         result = await execute_with_retry(
             always_failing_operation,
@@ -934,7 +945,7 @@ class TestUtilityFunctions:
         assert "Persistent failure" in result.error
     
     @pytest.mark.asyncio
-    async def test_get_database_connection(self):
+    async def test_get_database_connection(self) -> Optional[Dict[str, Any]]:
         """Test database connection context manager."""
         mock_manager = AsyncMock()
         
@@ -945,7 +956,7 @@ class TestUtilityFunctions:
                 assert manager == mock_manager
     
     @pytest.mark.asyncio
-    async def test_get_api_session(self):
+    async async def test_get_api_session(self) -> Optional[Dict[str, Any]]:
         """Test API session context manager."""
         mock_manager = AsyncMock()
         
@@ -962,7 +973,7 @@ class TestBenchmarks:
     """Benchmark tests for performance comparison."""
     
     @pytest.mark.asyncio
-    async def test_benchmark_database_vs_api(self):
+    async async def test_benchmark_database_vs_api(self) -> Any:
         """Benchmark database vs API operations."""
         orchestrator = AsyncOperationOrchestrator()
         

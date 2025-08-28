@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 
 from sqlalchemy.orm import Session
@@ -10,8 +12,6 @@ from onyx.db.document import delete_all_documents_for_connector_credential_pair
 from onyx.db.enums import IndexModelStatus
 from onyx.db.index_attempt import cancel_indexing_attempts_for_search_settings
 from onyx.db.index_attempt import (
-    count_unique_cc_pairs_with_successful_index_attempts,
-)
 from onyx.db.models import ConnectorCredentialPair
 from onyx.db.models import SearchSettings
 from onyx.db.search_settings import get_current_search_settings
@@ -20,6 +20,11 @@ from onyx.db.search_settings import update_search_settings_status
 from onyx.document_index.factory import get_default_document_index
 from onyx.key_value_store.factory import get_kv_store
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    count_unique_cc_pairs_with_successful_index_attempts,
+)
 
 
 logger = setup_logger()

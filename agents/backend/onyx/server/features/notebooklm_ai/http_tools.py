@@ -1,8 +1,5 @@
-"""
-HTTP Tools - Async HTTP operations for security testing
-Uses aiohttp and httpx with proper error handling and guard clauses
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import json
 import re
@@ -10,24 +7,30 @@ from typing import Dict, Any, List, Optional, Tuple, Union
 from dataclasses import dataclass, field
 from datetime import datetime
 import logging
+    import aiohttp
+    import httpx
+from error_handling_core import (
+from typing import Any, List, Dict, Optional
+"""
+HTTP Tools - Async HTTP operations for security testing
+Uses aiohttp and httpx with proper error handling and guard clauses
+"""
+
 
 # Import HTTP libraries with error handling
 try:
-    import aiohttp
     AIOHTTP_AVAILABLE = True
 except ImportError:
     AIOHTTP_AVAILABLE = False
     logging.warning("aiohttp not available")
 
 try:
-    import httpx
     HTTPX_AVAILABLE = True
 except ImportError:
     HTTPX_AVAILABLE = False
     logging.warning("httpx not available")
 
 # Import validation functions
-from error_handling_core import (
     ValidationError, ErrorContext, ValidationResult, OperationResult,
     create_error_context, log_error_with_context, validate_ip_address
 )
@@ -127,7 +130,7 @@ def validate_url(url: str) -> ValidationResult:
     # Happy path: All validations passed
     return ValidationResult(is_valid=True)
 
-def validate_http_method(method: str) -> ValidationResult:
+async def validate_http_method(method: str) -> ValidationResult:
     """Validate HTTP method - guard clauses with happy path last"""
     # Guard clause: Check if input is string
     if not isinstance(method, str):
@@ -210,7 +213,7 @@ def validate_scan_types(scan_types: List[str]) -> ValidationResult:
 # HTTP OPERATIONS (I/O-bound)
 # ============================================================================
 
-async def make_http_request_aiohttp(request: HttpRequest) -> HttpResponse:
+async async def make_http_request_aiohttp(request: HttpRequest) -> HttpResponse:
     """Make HTTP request using aiohttp - guard clauses with happy path last"""
     # Guard clause: Check if aiohttp is available
     if not AIOHTTP_AVAILABLE:
@@ -302,7 +305,7 @@ async def make_http_request_aiohttp(request: HttpRequest) -> HttpResponse:
             error_message=str(e)
         )
 
-async def make_http_request_httpx(request: HttpRequest) -> HttpResponse:
+async async def make_http_request_httpx(request: HttpRequest) -> HttpResponse:
     """Make HTTP request using httpx - guard clauses with happy path last"""
     # Guard clause: Check if httpx is available
     if not HTTPX_AVAILABLE:

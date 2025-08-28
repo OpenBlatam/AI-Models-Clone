@@ -1,7 +1,14 @@
-"""
-Model Types - Onyx Integration
-Type definitions for model operations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Set, Type, TypeVar, Union, ClassVar
 from datetime import datetime
@@ -11,6 +18,15 @@ import uuid
 import re
 import time
 from functools import lru_cache
+from datetime import datetime
+from typing import List, Optional
+import logging
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Model Types - Onyx Integration
+Type definitions for model operations.
+"""
 
 # Type variables
 T = TypeVar('T', bound='OnyxBaseModel')
@@ -346,7 +362,7 @@ class OnyxBaseModel(BaseModel):
         """Set a custom attribute on the model."""
         self.attributes[key] = value
 
-    def get_attribute(self, key: str, default: Any = None) -> Any:
+    def get_attribute(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Get a custom attribute from the model."""
         return self.attributes.get(key, default)
 
@@ -504,7 +520,7 @@ class ModelField(BaseModel):
         return errors
 
     @lru_cache(maxsize=CACHE_SIZE)
-    def get_default_value(self) -> Any:
+    def get_default_value(self) -> Optional[Dict[str, Any]]:
         """Get the default value for the field with caching."""
         if self.default is not None:
             return self.default
@@ -904,9 +920,6 @@ class ModelFactory(BaseModel):
 
 # Example usage:
 """
-from datetime import datetime
-from typing import List, Optional
-import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

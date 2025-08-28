@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import logging
+from abc import ABC, abstractmethod
+from typing import Dict, List, Optional, Any, Type, TypeVar
+from dataclasses import dataclass, field
+from datetime import datetime
+from ..core.interfaces import (
+from ..core.exceptions import PluginError, ValidationError
+from ..core.types import PluginInfo, ComponentConfig
+from typing import Any, List, Dict, Optional
 """
 Base Plugin Classes and Registry
 
@@ -5,14 +17,7 @@ This module provides the base classes and registry system for all plugins
 in the modular AI video workflow system.
 """
 
-import asyncio
-import logging
-from abc import ABC, abstractmethod
-from typing import Dict, List, Optional, Any, Type, TypeVar
-from dataclasses import dataclass, field
-from datetime import datetime
 
-from ..core.interfaces import (
     ExtractorInterface,
     SuggestionInterface,
     GeneratorInterface,
@@ -20,8 +25,6 @@ from ..core.interfaces import (
     MetricsInterface,
     PluginInterface
 )
-from ..core.exceptions import PluginError, ValidationError
-from ..core.types import PluginInfo, ComponentConfig
 
 logger = logging.getLogger(__name__)
 
@@ -66,7 +69,9 @@ class BasePlugin(ABC):
     tags: List[str] = field(default_factory=list)
     
     def __init__(self, config: Optional[Dict[str, Any]] = None):
-        self.config = config or {}
+        
+    """__init__ function."""
+self.config = config or {}
         self.is_initialized = False
         self.is_enabled = True
         self.logger = logging.getLogger(f"plugin.{self.name}")
@@ -271,7 +276,7 @@ class PluginRegistry:
     - Version management
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._plugins: Dict[str, Type[BasePlugin]] = {}
         self._metadata: Dict[str, PluginMetadata] = {}
         self._categories: Dict[str, List[str]] = {}

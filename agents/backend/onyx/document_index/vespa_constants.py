@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.configs.app_configs import VESPA_CLOUD_URL
 from onyx.configs.app_configs import VESPA_CONFIG_SERVER_HOST
 from onyx.configs.app_configs import VESPA_HOST
@@ -5,6 +7,9 @@ from onyx.configs.app_configs import VESPA_PORT
 from onyx.configs.app_configs import VESPA_TENANT_PORT
 from onyx.configs.constants import SOURCE_TYPE
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # config server
 
 

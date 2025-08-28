@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import yaml
+import json
+from pathlib import Path
+from typing import Dict, Any, Optional, Tuple, List
+from dataclasses import dataclass, asdict
+import subprocess
+from datetime import datetime
+from functools import partial, reduce
+from operator import itemgetter
+import hashlib
+from functional_training import TrainingConfig, ModelType, TrainingMode
+    import platform
+    import torch
+    import sys
+    import psutil
+    import torch
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 Functional Configuration Loader
 =================================
@@ -13,18 +37,7 @@ Key Principles:
 - Declarative configuration
 """
 
-import yaml
-import json
-from pathlib import Path
-from typing import Dict, Any, Optional, Tuple, List
-from dataclasses import dataclass, asdict
-import subprocess
-from datetime import datetime
-from functools import partial, reduce
-from operator import itemgetter
-import hashlib
 
-from functional_training import TrainingConfig, ModelType, TrainingMode
 
 # ============================================================================
 # Pure Data Structures
@@ -104,9 +117,6 @@ def get_git_branch() -> str:
 
 def get_environment_info() -> Dict[str, Any]:
     """Get environment information in a pure functional way."""
-    import platform
-    import torch
-    import sys
     
     return {
         'python_version': platform.python_version(),
@@ -123,8 +133,6 @@ def get_environment_info() -> Dict[str, Any]:
 
 def get_system_resources() -> Dict[str, Any]:
     """Get system resource information in a pure functional way."""
-    import psutil
-    import torch
     
     cpu_info = {
         'cpu_count': psutil.cpu_count(),
@@ -155,6 +163,10 @@ def load_yaml_file(yaml_path: str) -> Dict[str, Any]:
     """Load YAML file in a pure functional way."""
     try:
         with open(yaml_path, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             return yaml.safe_load(f)
     except FileNotFoundError:
         raise ValueError(f"Config file not found: {yaml_path}")
@@ -165,6 +177,10 @@ def save_yaml_file(data: Dict[str, Any], yaml_path: str) -> None:
     """Save data to YAML file in a pure functional way."""
     try:
         with open(yaml_path, 'w', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             yaml.dump(data, f, default_flow_style=False, indent=2, allow_unicode=True)
     except Exception as e:
         raise ValueError(f"Failed to save YAML file: {e}")
@@ -269,6 +285,10 @@ def save_experiment_config(exp_config: ExperimentConfig, output_dir: str) -> Dic
     
     try:
         with open(metadata_path, 'w', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(metadata_dict, f, indent=2, ensure_ascii=False)
     except Exception as e:
         raise ValueError(f"Failed to save metadata: {e}")
@@ -291,6 +311,10 @@ def load_experiment_config(experiment_id: str, config_dir: str) -> ExperimentCon
     if metadata_path.exists():
         try:
             with open(metadata_path, 'r', encoding='utf-8') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 metadata_dict = json.load(f)
         except Exception as e:
             raise ValueError(f"Failed to load metadata: {e}")
@@ -625,5 +649,6 @@ def demo_config_loader():
     env_info = get_environment_info()
     print(f"Environment: Python {env_info['python_version']}, PyTorch {env_info['pytorch_version']}")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     demo_config_loader() 

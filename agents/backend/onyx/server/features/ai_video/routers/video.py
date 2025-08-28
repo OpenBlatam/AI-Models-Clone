@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import APIRouter, Depends, Body, Query, Header, Request, status
 from typing import List, Optional
 from ..models import EnvelopeResponse, VideoRequestInput
@@ -5,6 +7,9 @@ from ..services import video_service, batch_service
 from ..auth import get_current_user
 from ..utils_api import endpoint_protected
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = logging.getLogger("video_router")
 
 video_router = APIRouter(prefix="/video", tags=["Video"])

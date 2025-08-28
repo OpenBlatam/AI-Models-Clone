@@ -1,17 +1,13 @@
-"""
-launch:
-- api server
-- postgres
-- vespa
-- model server (this is only needed so the api server can startup, no embedding is done)
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Run this script to seed the database with dummy documents.
-Then run test_query_times.py to test query times.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import random
 from datetime import datetime
-
 from onyx.access.models import DocumentAccess
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.models import Document
@@ -26,6 +22,21 @@ from onyx.indexing.models import IndexChunk
 from onyx.utils.timing import log_function_time
 from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 from shared_configs.model_server_models import Embedding
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+launch:
+- api server
+- postgres
+- vespa
+- model server (this is only needed so the api server can startup, no embedding is done)
+
+Run this script to seed the database with dummy documents.
+Then run test_query_times.py to test query times.
+"""
+
+
 
 TOTAL_DOC_SETS = 8
 TOTAL_ACL_ENTRIES_PER_CATEGORY = 80

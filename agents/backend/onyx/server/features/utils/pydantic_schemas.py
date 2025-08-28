@@ -1,7 +1,10 @@
-"""
-Pydantic Schema System - Comprehensive Input/Output Validation
-Production-ready Pydantic schema system with consistent validation, response models, and Onyx integration.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, Generic, Callable, ClassVar
@@ -11,17 +14,25 @@ import uuid
 import re
 from functools import wraps
 import time
-
 from pydantic import (
+import orjson
+import structlog
+from .optimized_base_model import OptimizedBaseModel
+from .http_response_models import SuccessResponse, ErrorResponse, ListResponse, PaginationInfo
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Pydantic Schema System - Comprehensive Input/Output Validation
+Production-ready Pydantic schema system with consistent validation, response models, and Onyx integration.
+"""
+
+
     BaseModel, ConfigDict, Field, computed_field, field_validator, 
     model_validator, ValidationError, EmailStr, HttpUrl, IPvAnyAddress,
     validator, root_validator
 )
-import orjson
-import structlog
 
-from .optimized_base_model import OptimizedBaseModel
-from .http_response_models import SuccessResponse, ErrorResponse, ListResponse, PaginationInfo
 
 logger = structlog.get_logger(__name__)
 
@@ -117,7 +128,7 @@ class BaseInputModel(OptimizedBaseModel):
     
     @model_validator(mode='before')
     @classmethod
-    def validate_input_data(cls, data: Any) -> Any:
+    def validate_input_data(cls, data: Any) -> bool:
         """Pre-validation hook for input sanitization."""
         if isinstance(data, dict):
             # Sanitize string fields
@@ -287,7 +298,7 @@ class SchemaRegistry:
     Registry for managing schemas and their validation rules.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._schemas: Dict[str, Type[BaseModel]] = {}
         self._validation_rules: Dict[str, List[ValidationSchema]] = {}
         self._custom_validators: Dict[str, Callable] = {}
@@ -386,7 +397,7 @@ class SchemaFactory:
 def validate_input(func: Callable) -> Callable:
     """Decorator for input validation."""
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         # Extract input model from function signature
         if args and isinstance(args[0], BaseInputModel):
             input_model = args[0]
@@ -413,7 +424,7 @@ def validate_input(func: Callable) -> Callable:
 def validate_output(func: Callable) -> Callable:
     """Decorator for output validation."""
     @wraps(func)
-    def wrapper(*args, **kwargs):
+    def wrapper(*args, **kwargs) -> Any:
         result = func(*args, **kwargs)
         
         # Validate output if it's a BaseOutputModel

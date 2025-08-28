@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import os
 from datetime import datetime
 from datetime import timezone
@@ -35,6 +40,9 @@ from onyx.file_processing.extract_file_text import OnyxExtensionType
 from onyx.file_processing.image_utils import store_image_and_create_section
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -141,11 +149,15 @@ class BlobStorageConnector(LoadConnector, PollConnector):
 
         return None
 
-    def _download_object(self, key: str) -> bytes:
+    async def _download_object(self, key: str) -> bytes:
         if self.s3_client is None:
             raise ConnectorMissingCredentialError("Blob storage")
         object = self.s3_client.get_object(Bucket=self.bucket_name, Key=key)
         return object["Body"].read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
 
     # NOTE: Left in as may be useful for one-off access to documents and sharing across orgs.
     # def _get_presigned_url(self, key: str) -> str:

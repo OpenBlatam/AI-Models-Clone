@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import requests
 
 from onyx.auth.schemas import UserRole
@@ -8,6 +10,9 @@ from tests.integration.common_utils.test_models import DATestAPIKey
 from tests.integration.common_utils.test_models import DATestUser
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def test_limited(reset: None) -> None:
     """Verify that with a limited role key, limited endpoints are accessible and
     others are not."""

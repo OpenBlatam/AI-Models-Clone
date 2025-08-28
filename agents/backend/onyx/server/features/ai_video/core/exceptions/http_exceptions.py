@@ -1,3 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from typing import Any, Dict, List, Optional, Union
+from dataclasses import dataclass, field
+from enum import Enum
+import logging
+import traceback
+import json
+import time
+from contextlib import contextmanager
+from fastapi import HTTPException, status
+from fastapi.responses import JSONResponse
+from fastapi.requests import Request
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
+    import asyncio
+from typing import Any, List, Dict, Optional
 """
 🚀 HTTP EXCEPTION SYSTEM - AI VIDEO SPECIFIC ERRORS
 ===================================================
@@ -10,20 +36,7 @@ Comprehensive HTTP exception system for AI Video applications:
 - Error logging and monitoring
 """
 
-from typing import Any, Dict, List, Optional, Union
-from dataclasses import dataclass, field
-from enum import Enum
-import logging
-import traceback
-import json
-import time
-from contextlib import contextmanager
 
-from fastapi import HTTPException, status
-from fastapi.responses import JSONResponse
-from fastapi.requests import Request
-from fastapi.exceptions import RequestValidationError
-from starlette.exceptions import HTTPException as StarletteHTTPException
 
 logger = logging.getLogger(__name__)
 
@@ -82,7 +95,9 @@ class AIVideoHTTPException(HTTPException):
         context: Optional[ErrorContext] = None,
         headers: Optional[Dict[str, str]] = None
     ):
-        super().__init__(status_code=status_code, detail=detail, headers=headers)
+        
+    """__init__ function."""
+super().__init__(status_code=status_code, detail=detail, headers=headers)
         self.category = category
         self.severity = severity
         self.context = context or ErrorContext()
@@ -124,7 +139,9 @@ class ValidationError(AIVideoHTTPException):
         value: Optional[Any] = None,
         context: Optional[ErrorContext] = None
     ):
-        if field:
+        
+    """__init__ function."""
+if field:
             detail = f"Validation error for field '{field}': {detail}"
             if value is not None:
                 detail += f" (value: {value})"
@@ -146,7 +163,9 @@ class InvalidVideoRequestError(ValidationError):
         video_id: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.video_id = video_id
         
@@ -164,7 +183,9 @@ class InvalidModelRequestError(ValidationError):
         model_name: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.model_name = model_name
         
@@ -182,7 +203,9 @@ class AuthenticationError(AIVideoHTTPException):
         detail: str = "Authentication required",
         context: Optional[ErrorContext] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=detail,
             category=ErrorCategory.AUTHENTICATION,
@@ -194,7 +217,9 @@ class InvalidTokenError(AuthenticationError):
     """Invalid authentication token."""
     
     def __init__(self, context: Optional[ErrorContext] = None):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             detail="Invalid or expired authentication token",
             context=context
         )
@@ -209,7 +234,9 @@ class AuthorizationError(AIVideoHTTPException):
         resource: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        if resource:
+        
+    """__init__ function."""
+if resource:
             detail = f"Access denied to resource: {resource}"
         
         super().__init__(
@@ -229,7 +256,9 @@ class InsufficientPermissionsError(AuthorizationError):
         required_permissions: List[str],
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.operation = operation
         
@@ -248,7 +277,9 @@ class ResourceNotFoundError(AIVideoHTTPException):
         resource_id: str,
         context: Optional[ErrorContext] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"{resource_type} with id '{resource_id}' not found",
             category=ErrorCategory.RESOURCE_NOT_FOUND,
@@ -264,7 +295,9 @@ class VideoNotFoundError(ResourceNotFoundError):
         video_id: str,
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.video_id = video_id
         
@@ -282,7 +315,9 @@ class ModelNotFoundError(ResourceNotFoundError):
         model_name: str,
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.model_name = model_name
         
@@ -303,7 +338,9 @@ class ResourceConflictError(AIVideoHTTPException):
         resource_id: str,
         context: Optional[ErrorContext] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             status_code=status.HTTP_409_CONFLICT,
             detail=detail,
             category=ErrorCategory.RESOURCE_CONFLICT,
@@ -319,7 +356,9 @@ class VideoAlreadyExistsError(ResourceConflictError):
         video_id: str,
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.video_id = video_id
         
@@ -340,7 +379,9 @@ class ProcessingError(AIVideoHTTPException):
         video_id: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.video_id = video_id
         
@@ -362,7 +403,9 @@ class VideoGenerationError(ProcessingError):
         model_name: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.video_id = video_id
         context.model_name = model_name
@@ -382,7 +425,9 @@ class VideoProcessingTimeoutError(ProcessingError):
         timeout_seconds: Optional[int] = None,
         context: Optional[ErrorContext] = None
     ):
-        detail = "Video processing timed out"
+        
+    """__init__ function."""
+detail = "Video processing timed out"
         if timeout_seconds:
             detail += f" after {timeout_seconds} seconds"
         
@@ -402,7 +447,9 @@ class ModelError(AIVideoHTTPException):
         model_name: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.model_name = model_name
         
@@ -423,7 +470,9 @@ class ModelLoadError(ModelError):
         detail: str,
         context: Optional[ErrorContext] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             detail=f"Failed to load model '{model_name}': {detail}",
             model_name=model_name,
             context=context
@@ -438,7 +487,9 @@ class ModelInferenceError(ModelError):
         detail: str,
         context: Optional[ErrorContext] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             detail=f"Model inference failed for '{model_name}': {detail}",
             model_name=model_name,
             context=context
@@ -454,7 +505,9 @@ class DatabaseError(AIVideoHTTPException):
         operation: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.operation = operation
         
@@ -470,7 +523,9 @@ class DatabaseConnectionError(DatabaseError):
     """Database connection error."""
     
     def __init__(self, detail: str, context: Optional[ErrorContext] = None):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             detail=f"Database connection failed: {detail}",
             operation="connection",
             context=context
@@ -485,7 +540,9 @@ class DatabaseQueryError(DatabaseError):
         query: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        if query:
+        
+    """__init__ function."""
+if query:
             detail = f"Database query failed: {detail} (query: {query})"
         
         super().__init__(
@@ -504,7 +561,9 @@ class CacheError(AIVideoHTTPException):
         operation: Optional[str] = None,
         context: Optional[ErrorContext] = None
     ):
-        if context is None:
+        
+    """__init__ function."""
+if context is None:
             context = ErrorContext()
         context.operation = operation
         
@@ -520,7 +579,9 @@ class CacheConnectionError(CacheError):
     """Cache connection error."""
     
     def __init__(self, detail: str, context: Optional[ErrorContext] = None):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             detail=f"Cache connection failed: {detail}",
             operation="connection",
             context=context
@@ -536,7 +597,9 @@ class ExternalServiceError(AIVideoHTTPException):
         detail: str,
         context: Optional[ErrorContext] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             status_code=status.HTTP_502_BAD_GATEWAY,
             detail=f"External service '{service_name}' error: {detail}",
             category=ErrorCategory.EXTERNAL_SERVICE_ERROR,
@@ -555,7 +618,9 @@ class RateLimitError(AIVideoHTTPException):
         retry_after: Optional[int] = None,
         context: Optional[ErrorContext] = None
     ):
-        detail = f"Rate limit exceeded: {limit} requests per {window_seconds} seconds"
+        
+    """__init__ function."""
+detail = f"Rate limit exceeded: {limit} requests per {window_seconds} seconds"
         if retry_after:
             detail += f". Retry after {retry_after} seconds"
         
@@ -581,7 +646,9 @@ class SystemError(AIVideoHTTPException):
         detail: str,
         context: Optional[ErrorContext] = None
     ):
-        super().__init__(
+        
+    """__init__ function."""
+super().__init__(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=detail,
             category=ErrorCategory.SYSTEM_ERROR,
@@ -599,7 +666,9 @@ class MemoryError(SystemError):
         required_memory: Optional[float] = None,
         context: Optional[ErrorContext] = None
     ):
-        if available_memory and required_memory:
+        
+    """__init__ function."""
+if available_memory and required_memory:
             detail = f"{detail} (available: {available_memory}MB, required: {required_memory}MB)"
         
         super().__init__(
@@ -617,7 +686,9 @@ class TimeoutError(AIVideoHTTPException):
         timeout_seconds: Optional[int] = None,
         context: Optional[ErrorContext] = None
     ):
-        if timeout_seconds:
+        
+    """__init__ function."""
+if timeout_seconds:
             detail = f"{detail} (timeout: {timeout_seconds}s)"
         
         super().__init__(
@@ -635,7 +706,7 @@ class TimeoutError(AIVideoHTTPException):
 class HTTPExceptionHandler:
     """Handler for HTTP exceptions with proper response formatting."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.logger = logging.getLogger(__name__)
     
     def handle_exception(self, exc: Exception, request: Optional[Request] = None) -> JSONResponse:
@@ -654,7 +725,7 @@ class HTTPExceptionHandler:
         else:
             return self._handle_unexpected_error(exc, context)
     
-    def _extract_request_context(self, request: Optional[Request]) -> ErrorContext:
+    async def _extract_request_context(self, request: Optional[Request]) -> ErrorContext:
         """Extract context from request."""
         context = ErrorContext()
         
@@ -694,7 +765,7 @@ class HTTPExceptionHandler:
             headers=exc.headers
         )
     
-    def _handle_fastapi_exception(self, exc: HTTPException, context: ErrorContext) -> JSONResponse:
+    async def _handle_fastapi_exception(self, exc: HTTPException, context: ErrorContext) -> JSONResponse:
         """Handle FastAPI exceptions."""
         # Convert to AI Video format
         ai_video_exc = AIVideoHTTPException(
@@ -792,7 +863,7 @@ class HTTPExceptionHandler:
 class ErrorMonitor:
     """Monitor and track errors for analytics."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_counts = {}
         self.error_timestamps = []
         self.logger = logging.getLogger(__name__)
@@ -871,9 +942,9 @@ def error_context(
             context=context
         )
 
-def handle_errors(func):
+def handle_errors(func) -> Any:
     """Decorator to handle errors in functions."""
-    async def wrapper(*args, **kwargs):
+    async def wrapper(*args, **kwargs) -> Any:
         try:
             return await func(*args, **kwargs)
         except AIVideoHTTPException:
@@ -961,45 +1032,61 @@ async def video_exists(video_id: str) -> bool:
     return False
 
 async def load_model(model_name: str):
-    raise Exception("Model not found")
+    
+    """load_model function."""
+raise Exception("Model not found")
 
 async def generate_video(model, video_id: str):
-    raise Exception("Generation failed")
+    
+    """generate_video function."""
+raise Exception("Generation failed")
 
 async def is_rate_limited(user_id: str) -> bool:
     return True
 
 async def process_request():
-    return {"status": "success"}
+    
+    """process_request function."""
+return {"status": "success"}
 
 # ============================================================================
 # 8. FASTAPI INTEGRATION
 # ============================================================================
 
-def setup_error_handlers(app):
+def setup_error_handlers(app) -> Any:
     """Setup error handlers for FastAPI app."""
     error_handler = HTTPExceptionHandler()
     
     @app.exception_handler(AIVideoHTTPException)
     async def ai_video_exception_handler(request: Request, exc: AIVideoHTTPException):
-        return error_handler.handle_exception(exc, request)
+        
+    """ai_video_exception_handler function."""
+return error_handler.handle_exception(exc, request)
     
     @app.exception_handler(HTTPException)
     async def http_exception_handler(request: Request, exc: HTTPException):
-        return error_handler.handle_exception(exc, request)
+        
+    """http_exception_handler function."""
+return error_handler.handle_exception(exc, request)
     
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
-        return error_handler.handle_exception(exc, request)
+        
+    """validation_exception_handler function."""
+return error_handler.handle_exception(exc, request)
     
     @app.exception_handler(Exception)
     async def general_exception_handler(request: Request, exc: Exception):
-        return error_handler.handle_exception(exc, request)
+        
+    """general_exception_handler function."""
+return error_handler.handle_exception(exc, request)
 
 if __name__ == "__main__":
     # Example usage
     async def main():
-        # Test error handling
+        
+    """main function."""
+# Test error handling
         try:
             await example_video_processing_with_errors()
         except Exception as e:
@@ -1008,5 +1095,4 @@ if __name__ == "__main__":
         # Test rate limiting
         await example_rate_limiting()
     
-    import asyncio
     asyncio.run(main()) 

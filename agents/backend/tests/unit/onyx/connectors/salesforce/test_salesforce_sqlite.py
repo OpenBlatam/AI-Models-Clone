@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import csv
 import os
 import shutil
@@ -5,6 +16,9 @@ import tempfile
 
 from onyx.connectors.salesforce.sqlite_functions import OnyxSalesforceSQLite
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 _VALID_SALESFORCE_IDS = [
     "001bm00000fd9Z3AAI",
     "001bm00000fdYTdAAM",
@@ -141,6 +155,10 @@ def _create_csv_file_and_update_db(
     with tempfile.TemporaryDirectory() as directory:
         csv_path = os.path.join(directory, filename)
         with open(csv_path, "w", newline="", encoding="utf-8") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             writer = csv.DictWriter(f, fieldnames=fields)
             writer.writeheader()
             for record in records:

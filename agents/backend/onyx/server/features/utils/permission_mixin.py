@@ -1,7 +1,5 @@
-"""
-Permission Mixin - Onyx Integration
-Permission handling functionality for models.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Set, Callable, TypeVar
 from dataclasses import dataclass, field
@@ -10,16 +8,23 @@ from .base_types import PermissionType, PermissionStatus
 import msgspec
 import numpy as np
 import time
-try:
     import pandas as pd
+    from datadog import api as dd_api
+    import sentry_sdk
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Permission Mixin - Onyx Integration
+Permission handling functionality for models.
+"""
+try:
 except ImportError:
     pd = None
 try:
-    from datadog import api as dd_api
 except ImportError:
     dd_api = None
 try:
-    import sentry_sdk
 except ImportError:
     sentry_sdk = None
 
@@ -103,18 +108,24 @@ class Permission(msgspec.Struct, frozen=True, slots=True):
 
     @staticmethod
     def batch_to_numpy(items: List["Permission"]):
-        arr = np.array([item.as_tuple() for item in items], dtype=object)
+        
+    """batch_to_numpy function."""
+arr = np.array([item.as_tuple() for item in items], dtype=object)
         return arr
 
     @staticmethod
     def batch_to_pandas(items: List["Permission"]):
-        if pd is None:
+        
+    """batch_to_pandas function."""
+if pd is None:
             raise ImportError("pandas is not installed")
         return pd.DataFrame(Permission.batch_to_dicts(items))
 
     @staticmethod
     def batch_to_parquet(items: List["Permission"], path: str):
-        if pd is None:
+        
+    """batch_to_parquet function."""
+if pd is None:
             raise ImportError("pandas is not installed")
         Permission.batch_to_pandas(items).to_parquet(path)
 
@@ -134,7 +145,9 @@ class Permission(msgspec.Struct, frozen=True, slots=True):
 
     @staticmethod
     def _log_metric(operation: str, count: int, duration: float):
-        if dd_api:
+        
+    """_log_metric function."""
+if dd_api:
             dd_api.Metric.send(
                 metric=f"permission.{operation}.duration",
                 points=duration,
@@ -143,7 +156,9 @@ class Permission(msgspec.Struct, frozen=True, slots=True):
 
     @staticmethod
     def _log_error(error_type: str, value: Any):
-        if sentry_sdk:
+        
+    """_log_error function."""
+if sentry_sdk:
             sentry_sdk.capture_message(f"Permission error: {error_type} - {value}")
 
 class PermissionMixin:

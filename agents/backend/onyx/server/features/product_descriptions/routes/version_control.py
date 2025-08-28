@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
+import logging
+from datetime import datetime
+from ..dependencies.auth import get_authenticated_user, require_permission
+from ..routes.base import get_request_context, log_route_access
+from ..schemas.base import BaseResponse, ErrorResponse
+from ..pydantic_schemas import (
+from ..version_control_roro import VersionControlService
+from ..git_workflow import GitWorkflowManager
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Version Control Router
 
@@ -6,18 +20,10 @@ git management, version tracking, and rollback functionality for
 product descriptions.
 """
 
-from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-import logging
-from datetime import datetime
 
 # Import dependencies
-from ..dependencies.auth import get_authenticated_user, require_permission
-from ..routes.base import get_request_context, log_route_access
 
 # Import schemas
-from ..schemas.base import BaseResponse, ErrorResponse
-from ..pydantic_schemas import (
     VersionControlRequest,
     VersionControlResponse,
     GitOperationRequest,
@@ -28,8 +34,6 @@ from ..pydantic_schemas import (
 )
 
 # Import services
-from ..version_control_roro import VersionControlService
-from ..git_workflow import GitWorkflowManager
 
 # Initialize router
 router = APIRouter(prefix="/version-control", tags=["version-control"])

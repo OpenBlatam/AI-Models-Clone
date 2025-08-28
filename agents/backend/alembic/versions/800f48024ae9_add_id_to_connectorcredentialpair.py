@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.schema import Sequence, CreateSequence
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add ID to ConnectorCredentialPair
 
 Revision ID: 800f48024ae9
@@ -6,9 +14,6 @@ Create Date: 2023-09-19 16:13:42.299715
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.schema import Sequence, CreateSequence
 
 # revision identifiers, used by Alembic.
 revision = "800f48024ae9"

@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add composite index to document_by_connector_credential_pair
 
 Revision ID: dab04867cd88
@@ -6,7 +12,6 @@ Create Date: 2024-12-13 22:43:20.119990
 
 """
 
-from alembic import op
 
 
 # revision identifiers, used by Alembic.

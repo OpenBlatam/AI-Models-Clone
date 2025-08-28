@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from datetime import datetime
 from datetime import timezone
 from datetime import UTC
@@ -25,6 +30,9 @@ from onyx.server.utils import mask_credential_dict
 from onyx.utils.variable_functionality import fetch_ee_implementation_or_noop
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class DocumentSyncStatus(BaseModel):
     doc_id: str
     last_synced: datetime | None

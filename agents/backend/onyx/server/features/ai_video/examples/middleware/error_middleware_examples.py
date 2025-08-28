@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import time
+import logging
+from typing import Dict, Any, Optional
+from dataclasses import dataclass
+from fastapi import FastAPI, Request, HTTPException
+from fastapi.responses import JSONResponse
+from fastapi.testclient import TestClient
+from .error_middleware import (
+from .http_exceptions import (
+from typing import Any, List, Dict, Optional
 """
 🚀 ERROR MIDDLEWARE EXAMPLES - REAL-WORLD AI VIDEO SCENARIOS
 ===========================================================
@@ -11,16 +24,7 @@ Practical examples of error middleware usage in AI Video applications:
 - Real-world error scenarios
 """
 
-import asyncio
-import time
-import logging
-from typing import Dict, Any, Optional
-from dataclasses import dataclass
-from fastapi import FastAPI, Request, HTTPException
-from fastapi.responses import JSONResponse
-from fastapi.testclient import TestClient
 
-from .error_middleware import (
     MiddlewareStack,
     ErrorTracker,
     StructuredLoggingMiddleware,
@@ -32,7 +36,6 @@ from .error_middleware import (
     ErrorSeverity
 )
 
-from .http_exceptions import (
     AIVideoHTTPException,
     SystemError,
     VideoGenerationError,
@@ -247,7 +250,7 @@ async def test_error_scenarios():
 class CircuitBreakerExample:
     """Example of circuit breaker patterns in video processing."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_tracker = ErrorTracker()
         self.request_count = 0
     
@@ -310,7 +313,7 @@ class CircuitBreakerExample:
 class PerformanceMonitoringExample:
     """Example of performance monitoring in video processing."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.performance_middleware = PerformanceMonitoringMiddleware(None)
         self.slow_operations = []
     
@@ -348,7 +351,7 @@ class PerformanceMonitoringExample:
             "cpu_usage": metrics.cpu_usage
         }
     
-    async def simulate_performance_issues(self):
+    async def simulate_performance_issues(self) -> Any:
         """Simulate various performance issues."""
         
         print("=== Simulating Performance Issues ===\n")
@@ -376,7 +379,7 @@ class PerformanceMonitoringExample:
 class ErrorRecoveryExample:
     """Example of error recovery strategies."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_tracker = ErrorTracker()
         self.retry_count = 0
         self.max_retries = 3
@@ -459,7 +462,7 @@ class ErrorRecoveryExample:
 class AlertingExample:
     """Example of alerting and monitoring."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_tracker = ErrorTracker()
         self.alert_history = []
     
@@ -477,7 +480,7 @@ class AlertingExample:
         
         return alert
     
-    async def monitor_error_rates(self):
+    async def monitor_error_rates(self) -> Any:
         """Monitor error rates and send alerts."""
         
         # Simulate error recording
@@ -531,13 +534,13 @@ class AlertingExample:
 class IntegratedErrorHandlingSystem:
     """Integrated error handling system for AI Video applications."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_tracker = ErrorTracker()
         self.performance_monitor = PerformanceMonitoringExample()
         self.error_recovery = ErrorRecoveryExample()
         self.alerting = AlertingExample()
     
-    async def process_video_request(self, video_id: str, prompt: str, model_name: str) -> Dict[str, Any]:
+    async async def process_video_request(self, video_id: str, prompt: str, model_name: str) -> Dict[str, Any]:
         """Process video request with comprehensive error handling."""
         
         start_time = time.time()

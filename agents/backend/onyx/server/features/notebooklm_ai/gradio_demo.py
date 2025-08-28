@@ -1,19 +1,13 @@
-#!/usr/bin/env python3
-"""
-Gradio Interactive Demo for Diffusion Models
-===========================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Comprehensive Gradio interface for diffusion model inference and visualization:
-- Multiple pipeline types (Stable Diffusion, SDXL, Img2Img, Inpaint, ControlNet)
-- Real-time image generation and editing
-- Advanced parameter controls
-- Batch processing and comparison
-- Training monitoring and visualization
-- Model performance analysis
+# Constants
+TIMEOUT_SECONDS = 60
 
-Features: Interactive UI, real-time generation, parameter tuning,
-batch processing, and comprehensive visualization tools.
-"""
+# Constants
+BUFFER_SIZE = 1024
 
 import gradio as gr
 import torch
@@ -32,18 +26,37 @@ import logging
 from typing import Dict, Any, List, Optional, Union, Tuple
 from dataclasses import dataclass
 import warnings
+from diffusion_pipelines import (
+from diffusion_training_evaluation import (
+from gradient_optimization import (
+from advanced_data_loading import (
+            import cv2
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Gradio Interactive Demo for Diffusion Models
+===========================================
+
+Comprehensive Gradio interface for diffusion model inference and visualization:
+- Multiple pipeline types (Stable Diffusion, SDXL, Img2Img, Inpaint, ControlNet)
+- Real-time image generation and editing
+- Advanced parameter controls
+- Batch processing and comparison
+- Training monitoring and visualization
+- Model performance analysis
+
+Features: Interactive UI, real-time generation, parameter tuning,
+batch processing, and comprehensive visualization tools.
+"""
+
 
 # Import our diffusion components
-from diffusion_pipelines import (
     DiffusionPipelineManager, PipelineConfig, GenerationRequest
 )
-from diffusion_training_evaluation import (
     DiffusionTrainer, TrainingConfig, DiffusionEvaluator, EvaluationConfig
 )
-from gradient_optimization import (
     TrainingStabilityManager, GradientConfig
 )
-from advanced_data_loading import (
     AdvancedDataLoader, DataConfig
 )
 
@@ -83,7 +96,9 @@ class DiffusionDemo:
     """Main demo class for diffusion model inference."""
     
     def __init__(self, config: DemoConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.pipeline_manager = None
         self.current_pipeline = None
         self.current_pipeline_key = None
@@ -95,7 +110,7 @@ class DiffusionDemo:
         self.generation_history = []
         self.training_stats = {}
         
-    def _initialize_pipelines(self):
+    def _initialize_pipelines(self) -> Any:
         """Initialize pipeline manager and load models."""
         try:
             pipeline_config = PipelineConfig(
@@ -301,7 +316,6 @@ class DiffusionDemo:
             img_array = np.array(image)
             
             # Apply Canny edge detection
-            import cv2
             gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
             edges = cv2.Canny(gray, 100, 200)
             
@@ -676,7 +690,9 @@ def create_gradio_interface():
         
         # Update history gallery
         def update_history():
-            if demo.generation_history:
+            
+    """update_history function."""
+if demo.generation_history:
                 # Return recent images (placeholder - would need to store actual images)
                 return [Image.new('RGB', (512, 512), (100, 100, 100)) for _ in range(min(5, len(demo.generation_history)))]
             return []
@@ -700,5 +716,6 @@ def main():
     )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

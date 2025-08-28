@@ -1,6 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import msgspec
 from typing import List, Optional, Dict
 
+        from datetime import datetime
+        from datetime import datetime
+        from datetime import datetime
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class CollaborationInfo(msgspec.Struct, frozen=True, slots=True):
     """
     Información colaborativa y de versionado para un video.
@@ -21,7 +29,6 @@ class CollaborationInfo(msgspec.Struct, frozen=True, slots=True):
     external_doc_links: List[str] = msgspec.field(default_factory=list)  # URLs a Google Docs, Notion, etc
 
     def add_comment(self, user_id: str, text: str, timestamp: Optional[str] = None, mentions: Optional[List[str]] = None) -> 'CollaborationInfo':
-        from datetime import datetime
         ts = timestamp or datetime.utcnow().isoformat()
         new_comment = {"user": user_id, "text": text, "timestamp": ts}
         if mentions:
@@ -29,7 +36,6 @@ class CollaborationInfo(msgspec.Struct, frozen=True, slots=True):
         return self.update(comments=self.comments + [new_comment])
 
     def add_history(self, user_id: str, diff: dict, timestamp: Optional[str] = None) -> 'CollaborationInfo':
-        from datetime import datetime
         ts = timestamp or datetime.utcnow().isoformat()
         new_entry = {"user": user_id, "diff": diff, "timestamp": ts}
         return self.update(history=self.history + [new_entry])
@@ -50,13 +56,16 @@ class CollaborationInfo(msgspec.Struct, frozen=True, slots=True):
         return self.update(roles=roles)
 
     def set_last_edit(self, user_id: str, timestamp: Optional[str] = None) -> 'CollaborationInfo':
-        from datetime import datetime
         ts = timestamp or datetime.utcnow().isoformat()
         last_edit = dict(self.last_edit)
         last_edit[user_id] = ts
         return self.update(last_edit=last_edit)
 
     def with_chat_thread(self, thread_id: str) -> 'CollaborationInfo':
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         return self.update(chat_thread_id=thread_id)
 
     def with_external_doc_links(self, links: List[str]) -> 'CollaborationInfo':

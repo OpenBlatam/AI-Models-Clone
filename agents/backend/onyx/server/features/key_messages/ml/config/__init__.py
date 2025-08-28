@@ -1,9 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .config_manager import (
+from ml.config import load_config, get_config
+from ml.config import (
+from ml.config import ConfigManager
+from ml.config import ConfigManager, ConfigValidationError
+from ml.config import get_config
+from ml.models import ModelFactory, ModelConfig
+from ml.training import TrainingManager, TrainingConfig
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Configuration Module for Key Messages ML Pipeline
 Provides YAML-based configuration management with environment-specific overrides
 """
 
-from .config_manager import (
     ConfigManager,
     ConfigValidationError,
     load_config,
@@ -51,7 +63,6 @@ def example_usage():
 
 ## 1. Basic Configuration Loading
 ```python
-from ml.config import load_config, get_config
 
 # Load configuration with default environment
 config = load_config()
@@ -65,7 +76,6 @@ config = get_config("development")
 
 ## 2. Accessing Specific Configurations
 ```python
-from ml.config import (
     get_model_config,
     get_training_config,
     get_data_config,
@@ -87,7 +97,6 @@ eval_config = get_evaluation_config("comprehensive", environment="production")
 
 ## 3. Using ConfigManager for Advanced Usage
 ```python
-from ml.config import ConfigManager
 
 # Initialize config manager
 config_manager = ConfigManager(
@@ -161,7 +170,6 @@ training:
 
 ## 6. Configuration Validation
 ```python
-from ml.config import ConfigManager, ConfigValidationError
 
 try:
     config_manager = ConfigManager()
@@ -175,9 +183,6 @@ except ConfigValidationError as e:
 
 ## 7. Integration with ML Pipeline
 ```python
-from ml.config import get_config
-from ml.models import ModelFactory, ModelConfig
-from ml.training import TrainingManager, TrainingConfig
 
 # Load configuration
 config = get_config("production")
@@ -194,5 +199,6 @@ training_manager = TrainingManager(training_config)
 ```
 """)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     example_usage() 

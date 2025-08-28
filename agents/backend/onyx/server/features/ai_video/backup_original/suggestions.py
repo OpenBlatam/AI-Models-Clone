@@ -1,7 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import List
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Funciones de sugerencias creativas para videos AI según emoción/tono.
 """
-from typing import List
 
 def suggest_music(emotion: str) -> List[str]:
     """Devuelve una lista de sugerencias de música según la emoción."""
@@ -54,7 +59,9 @@ class ContentSuggestions:
     """Container for content suggestions."""
     
     def __init__(self, emotion: str = "neutral"):
-        self.emotion = emotion
+        
+    """__init__ function."""
+self.emotion = emotion
         self.music = suggest_music(emotion)
         self.visual_styles = suggest_visual_styles(emotion)
         self.sound_effects = suggest_sound_effects(emotion)
@@ -74,7 +81,7 @@ class ContentSuggestions:
 class SuggestionEngine:
     """Engine for generating content suggestions."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.emotions = ["alegre", "serio", "juvenil", "neutral", "triste", "emocionante"]
     
     def get_suggestions(self, emotion: str) -> ContentSuggestions:

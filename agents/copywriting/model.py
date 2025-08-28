@@ -1,9 +1,14 @@
-# Very to onny just a propmpt dedicatefrom datetime import datetime
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any
-
 from pydantic import BaseModel
 from pydantic import ConfigDict
 from pydantic import Field
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# Very to onny just a propmpt dedicatefrom datetime import datetime
+
 class CopywritingRequest(BaseModel):
     message: str = Field(description="The original message or content to be transformed into ad copy")
     platform: str = Field(description="The target platform for the ad (e.g., 'facebook', 'youtube')")

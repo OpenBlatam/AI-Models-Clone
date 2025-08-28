@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import time
 from datetime import datetime
 from datetime import timedelta
@@ -20,6 +25,9 @@ from tests.integration.common_utils.test_models import DATestIndexAttempt
 from tests.integration.common_utils.test_models import DATestUser
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class IndexAttemptManager:
     @staticmethod
     def create_test_index_attempts(

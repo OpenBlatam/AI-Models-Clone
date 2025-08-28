@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Callable, Any
+from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Circuit Breaker Interface
 =========================
@@ -5,9 +13,6 @@ Circuit Breaker Interface
 Abstract interface for circuit breaker pattern implementation.
 """
 
-from abc import ABC, abstractmethod
-from typing import Callable, Any
-from enum import Enum
 
 
 class CircuitState(Enum):
@@ -36,7 +41,7 @@ class ICircuitBreaker(ABC):
         pass
     
     @abstractmethod
-    async def reset(self):
+    async def reset(self) -> Any:
         """Manually reset circuit breaker."""
         pass
     

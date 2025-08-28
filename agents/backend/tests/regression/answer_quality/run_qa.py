@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import json
 import multiprocessing
 import os
@@ -10,6 +15,9 @@ from tests.regression.answer_quality.api_utils import get_answer_from_query
 from tests.regression.answer_quality.cli_utils import get_current_commit_sha
 from tests.regression.answer_quality.cli_utils import get_docker_container_env_vars
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 RESULTS_FILENAME = "results.jsonl"
 METADATA_FILENAME = "metadata.yaml"
 
@@ -17,24 +25,44 @@ METADATA_FILENAME = "metadata.yaml"
 def _populate_results_file(output_folder_path: str, all_qa_output: list[dict]) -> None:
     output_file_path = os.path.join(output_folder_path, RESULTS_FILENAME)
     with open(output_file_path, "a", encoding="utf-8") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         for qa_output in all_qa_output:
             file.write(json.dumps(qa_output) + "\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             file.flush()
 
 
 def _update_metadata_file(test_output_folder: str, invalid_answer_count: int) -> None:
     metadata_path = os.path.join(test_output_folder, METADATA_FILENAME)
     with open(metadata_path, "r", encoding="utf-8") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         metadata = yaml.safe_load(file)
 
     metadata["number_of_failed_questions"] = invalid_answer_count
     with open(metadata_path, "w", encoding="utf-8") as yaml_file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         yaml.dump(metadata, yaml_file)
 
 
 def _read_questions_jsonl(questions_file_path: str) -> list[dict]:
     questions = []
     with open(questions_file_path, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         for line in file:
             json_obj = json.loads(line)
             questions.append(json_obj)
@@ -89,6 +117,10 @@ def _initialize_files(config: dict) -> tuple[str, list[dict]]:
     metadata_path = os.path.join(test_output_folder, METADATA_FILENAME)
     print("saving metadata to:", metadata_path)
     with open(metadata_path, "w", encoding="utf-8") as yaml_file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         yaml.dump(metadata, yaml_file)
 
     copied_questions_file_path = os.path.join(
@@ -178,6 +210,10 @@ def run_qa_test_and_save_results(env_name: str = "") -> None:
     current_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(current_dir, "search_test_config.yaml")
     with open(config_path, "r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         config = yaml.safe_load(file)
 
     if not isinstance(config, dict):

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from datetime import datetime
 from datetime import timezone
@@ -27,6 +29,9 @@ from onyx.file_processing.image_utils import store_image_and_create_section
 from onyx.file_store.file_store import get_default_file_store
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -178,6 +183,10 @@ def _process_file(
     if extension in LoadConnector.IMAGE_EXTENSIONS:
         # Read the image data
         image_data = file.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         if not image_data:
             logger.warning(f"Empty image file: {file_name}")
             return []

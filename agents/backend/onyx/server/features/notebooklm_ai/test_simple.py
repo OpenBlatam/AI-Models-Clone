@@ -1,44 +1,60 @@
-#!/usr/bin/env python3
-"""
-Simple Test Script for NotebookLM AI System
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import sys
 import os
 import time
 from datetime import datetime
+        import torch
+        import numpy as np
+        import transformers
+        import spacy
+        import fastapi
+    import sys
+        import torch
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python3
+"""
+Simple Test Script for NotebookLM AI System
+"""
+
 
 def test_basic_imports():
     """Test basic Python imports."""
     print("🔍 Testing basic imports...")
     
     try:
-        import torch
         print(f"✅ PyTorch: {torch.__version__}")
         print(f"   CUDA available: {torch.cuda.is_available()}")
     except ImportError:
         print("❌ PyTorch not available")
     
     try:
-        import numpy as np
         print(f"✅ NumPy: {np.__version__}")
     except ImportError:
         print("❌ NumPy not available")
     
     try:
-        import transformers
         print(f"✅ Transformers: {transformers.__version__}")
     except ImportError:
         print("❌ Transformers not available")
     
     try:
-        import spacy
         print(f"✅ spaCy: {spacy.__version__}")
     except ImportError:
         print("❌ spaCy not available")
     
     try:
-        import fastapi
         print(f"✅ FastAPI: {fastapi.__version__}")
     except ImportError:
         print("❌ FastAPI not available")
@@ -134,7 +150,6 @@ def test_performance():
     print(f"   Operations per second: {1000/processing_time:.0f}")
     
     # Test memory usage (basic)
-    import sys
     memory_usage = sys.getsizeof("test string") * 1000
     print(f"✅ Memory Usage: {memory_usage} bytes for 1000 strings")
 
@@ -148,7 +163,6 @@ def test_system_info():
     
     # Check for GPU
     try:
-        import torch
         if torch.cuda.is_available():
             print(f"GPU: {torch.cuda.get_device_name()}")
             print(f"GPU Memory: {torch.cuda.get_device_properties(0).total_memory / 1024**3:.1f} GB")
@@ -188,5 +202,6 @@ def main():
     print("3. Run full demo: python demo_notebooklm.py")
     print("4. Check documentation: README.md")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

@@ -1,19 +1,24 @@
-"""
-This file takes the happy path to adding a curator to a user group and then tests
-the permissions of the curator manipulating connectors.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
-
 import pytest
 from requests.exceptions import HTTPError
-
 from onyx.db.enums import AccessType
 from onyx.server.documents.models import DocumentSource
 from tests.integration.common_utils.managers.connector import ConnectorManager
 from tests.integration.common_utils.managers.user import DATestUser
 from tests.integration.common_utils.managers.user import UserManager
 from tests.integration.common_utils.managers.user_group import UserGroupManager
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+This file takes the happy path to adding a curator to a user group and then tests
+the permissions of the curator manipulating connectors.
+"""
+
+
+
 
 
 @pytest.mark.skipif(

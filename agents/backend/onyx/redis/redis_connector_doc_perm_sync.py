@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 from datetime import datetime
 from logging import Logger
@@ -16,6 +18,9 @@ from onyx.redis.redis_pool import SCAN_ITER_COUNT_DEFAULT
 from onyx.utils.variable_functionality import fetch_versioned_implementation
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class RedisConnectorPermissionSyncPayload(BaseModel):
     id: str
     submitted: datetime

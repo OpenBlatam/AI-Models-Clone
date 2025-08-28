@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Dict, List, Any, Optional, Union
+from ..core.enums import ProcessingTier, CacheStrategy, Environment, LogLevel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🔌 CONFIG INTERFACES - Contratos para Configuración
 ==================================================
@@ -5,9 +13,6 @@
 Interfaces para servicios de configuración y gestión de parámetros.
 """
 
-from abc import ABC, abstractmethod
-from typing import Dict, List, Any, Optional, Union
-from ..core.enums import ProcessingTier, CacheStrategy, Environment, LogLevel
 
 
 class IConfigurationService(ABC):
@@ -67,7 +72,7 @@ class IConfigurationService(ABC):
         pass
     
     @abstractmethod
-    def get_config_value(self, key: str, default: Any = None) -> Any:
+    def get_config_value(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """
         Obtener valor de configuración por clave.
         

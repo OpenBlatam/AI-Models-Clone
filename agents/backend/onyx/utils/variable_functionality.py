@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import functools
 import importlib
 import inspect
@@ -7,6 +9,9 @@ from typing import TypeVar
 from onyx.configs.app_configs import ENTERPRISE_EDITION_ENABLED
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -31,7 +36,7 @@ def set_is_ee_based_on_env_variable() -> None:
 
 
 @functools.lru_cache(maxsize=128)
-def fetch_versioned_implementation(module: str, attribute: str) -> Any:
+async def fetch_versioned_implementation(module: str, attribute: str) -> Any:
     """
     Fetches a versioned implementation of a specified attribute from a given module.
     This function first checks if the application is running in an Enterprise Edition (EE)
@@ -86,7 +91,7 @@ def fetch_versioned_implementation(module: str, attribute: str) -> Any:
 T = TypeVar("T")
 
 
-def fetch_versioned_implementation_with_fallback(
+async def fetch_versioned_implementation_with_fallback(
     module: str, attribute: str, fallback: T
 ) -> T:
     """
@@ -122,7 +127,7 @@ def noop_fallback(*args: Any, **kwargs: Any) -> None:
     """
 
 
-def fetch_ee_implementation_or_noop(
+async def fetch_ee_implementation_or_noop(
     module: str, attribute: str, noop_return_value: Any = None
 ) -> Any:
     """

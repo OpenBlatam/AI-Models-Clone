@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import logging
+import time
+from functools import wraps
+from typing import Any, Dict, List, Optional, Type, Union, Callable
+from contextlib import asynccontextmanager
+from fastapi import Request, Response, HTTPException, status
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, ValidationError, ConfigDict
+from pydantic.json import pydantic_encoder
+from .pydantic_schemas import (
+                import json
+        import hashlib
+from typing import Any, List, Dict, Optional
 """
 Pydantic Validation Middleware and Utilities
 ===========================================
@@ -14,19 +33,8 @@ Features:
 - Detailed validation error reporting
 """
 
-import asyncio
-import logging
-import time
-from functools import wraps
-from typing import Any, Dict, List, Optional, Type, Union, Callable
-from contextlib import asynccontextmanager
 
-from fastapi import Request, Response, HTTPException, status
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ValidationError, ConfigDict
-from pydantic.json import pydantic_encoder
 
-from .pydantic_schemas import (
     APIError, VideoGenerationInput, BatchGenerationInput,
     VideoEditInput, create_error_response
 )
@@ -50,7 +58,9 @@ class ValidationConfig:
         detailed_error_messages: bool = True,
         log_validation_errors: bool = True
     ):
-        self.enable_request_validation = enable_request_validation
+        
+    """__init__ function."""
+self.enable_request_validation = enable_request_validation
         self.enable_response_validation = enable_response_validation
         self.enable_performance_monitoring = enable_performance_monitoring
         self.enable_validation_caching = enable_validation_caching
@@ -66,7 +76,9 @@ class PydanticValidationMiddleware:
     """Middleware for Pydantic request/response validation."""
     
     def __init__(self, config: ValidationConfig = None):
-        self.config = config or ValidationConfig()
+        
+    """__init__ function."""
+self.config = config or ValidationConfig()
         self.validation_cache: Dict[str, Any] = {}
         self.validation_stats = {
             'total_validations': 0,
@@ -108,7 +120,7 @@ class PydanticValidationMiddleware:
             self._update_stats(time.time() - start_time, False)
             raise
     
-    async def _validate_request(self, request: Request) -> None:
+    async async def _validate_request(self, request: Request) -> None:
         """Validate incoming request data."""
         if request.method in ['POST', 'PUT', 'PATCH']:
             try:
@@ -148,7 +160,6 @@ class PydanticValidationMiddleware:
         if hasattr(response, 'body') and response.body:
             try:
                 # Parse response body
-                import json
                 body = json.loads(response.body.decode())
                 
                 # Validate response schema
@@ -188,7 +199,6 @@ class PydanticValidationMiddleware:
     
     def _get_cache_key(self, path: str, data: Any) -> str:
         """Generate cache key for validation result."""
-        import hashlib
         content = f"{path}:{str(data)}"
         return hashlib.md5(content.encode()).hexdigest()
     
@@ -253,7 +263,7 @@ def validate_request(schema: Type[BaseModel]):
     """Decorator to validate request data against Pydantic schema."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Extract request from args or kwargs
             request = None
             for arg in args:
@@ -306,7 +316,7 @@ def validate_response(schema: Type[BaseModel]):
     """Decorator to validate response data against Pydantic schema."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Execute function
             result = await func(*args, **kwargs)
             
@@ -335,7 +345,7 @@ def validate_input_output(input_schema: Type[BaseModel], output_schema: Type[Bas
     """Decorator to validate both input and output."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             # Input validation
             request = None
             for arg in args:
@@ -479,7 +489,7 @@ class ValidationUtils:
 class ValidationPerformanceMonitor:
     """Monitor validation performance metrics."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.metrics = {
             'validation_times': [],
             'cache_hits': 0,
@@ -504,11 +514,11 @@ class ValidationPerformanceMonitor:
             self.metrics['validation_errors'] += 1
             raise
     
-    def record_cache_hit(self):
+    def record_cache_hit(self) -> Any:
         """Record cache hit."""
         self.metrics['cache_hits'] += 1
     
-    def record_cache_miss(self):
+    def record_cache_miss(self) -> Any:
         """Record cache miss."""
         self.metrics['cache_misses'] += 1
     

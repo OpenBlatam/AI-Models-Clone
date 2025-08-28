@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-Motor Principal NLP - NotebookLM AI
-🧠 Coordina todos los componentes del sistema NLP
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -10,7 +15,6 @@ from typing import Dict, Any, List, Optional, Union
 from dataclasses import dataclass, field
 from collections import defaultdict
 import structlog
-
 from ..processors.text_processor import TextProcessor, TextProcessorConfig
 from ..processors.tokenizer import AdvancedTokenizer, TokenizerConfig
 from ..processors.embedder import EmbeddingEngine, EmbeddingConfig
@@ -21,6 +25,15 @@ from ..analyzers.entity_recognizer import EntityRecognizer, EntityConfig
 from ..analyzers.summarizer import TextSummarizer, SummaryConfig
 from ..analyzers.classifier import TextClassifier, ClassificationConfig
 from ..utils.nlp_utils import NLPUtils, TextMetrics, LanguageDetector
+from typing import Any, List, Dict, Optional
+import logging
+#!/usr/bin/env python3
+"""
+Motor Principal NLP - NotebookLM AI
+🧠 Coordina todos los componentes del sistema NLP
+"""
+
+
 
 logger = structlog.get_logger()
 
@@ -52,7 +65,9 @@ class NLPEngine:
     """Motor principal del sistema NLP."""
     
     def __init__(self, config: NLPConfig = None):
-        self.config = config or NLPConfig()
+        
+    """__init__ function."""
+self.config = config or NLPConfig()
         self.stats = defaultdict(int)
         
         # Inicializar componentes
@@ -290,7 +305,7 @@ class NLPEngine:
                 "timestamp": time.time()
             }
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Limpia recursos del motor."""
         # Limpiar componentes
         await self.embedding_engine.cleanup()

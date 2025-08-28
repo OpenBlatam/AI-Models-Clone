@@ -1,6 +1,16 @@
-"""
-Pytest configuration and fixtures for Onyx AI Video System tests.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
 
 import pytest
 import asyncio
@@ -9,8 +19,6 @@ import shutil
 from pathlib import Path
 from typing import Dict, Any, Optional
 from unittest.mock import Mock, AsyncMock, patch
-
-# Import system components
 from ..core.models import VideoRequest, VideoResponse, VideoQuality, VideoFormat
 from ..config.config_manager import OnyxConfigManager, OnyxAIVideoConfig
 from ..utils.logger import OnyxLogger
@@ -20,6 +28,16 @@ from ..core.integration import OnyxIntegrationManager, OnyxIntegrationConfig
 from ..workflows.video_workflow import OnyxVideoWorkflow
 from ..plugins.plugin_manager import OnyxPluginManager
 from ..api.main import OnyxAIVideoSystem
+    import yaml
+    import yaml
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Pytest configuration and fixtures for Onyx AI Video System tests.
+"""
+
+
+# Import system components
 
 
 @pytest.fixture(scope="session")
@@ -113,13 +131,16 @@ def sample_config(temp_dir) -> Dict[str, Any]:
 
 
 @pytest.fixture
-def config_manager(sample_config, temp_dir):
+def config_manager(sample_config, temp_dir) -> Any:
     """Create a test configuration manager."""
     config_file = temp_dir / "test_config.yaml"
     
     # Create config file
-    import yaml
     with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         yaml.dump(sample_config, f)
     
     return OnyxConfigManager(str(config_file))
@@ -198,7 +219,7 @@ def mock_plugin_manager():
 
 
 @pytest.fixture
-def sample_video_request() -> VideoRequest:
+async def sample_video_request() -> VideoRequest:
     """Create a sample video request for testing."""
     return VideoRequest(
         input_text="Create a test video about artificial intelligence",
@@ -233,7 +254,7 @@ def sample_video_response(sample_video_request) -> VideoResponse:
 @pytest.fixture
 def mock_system(test_config, mock_logger, mock_performance_monitor, 
                 mock_security_manager, mock_onyx_integration, 
-                mock_video_workflow, mock_plugin_manager):
+                mock_video_workflow, mock_plugin_manager) -> Any:
     """Create a mock system for testing."""
     system = Mock(spec=OnyxAIVideoSystem)
     system.config = test_config
@@ -260,7 +281,7 @@ def mock_system(test_config, mock_logger, mock_performance_monitor,
 
 
 @pytest.fixture
-def real_system(temp_dir, sample_config):
+def real_system(temp_dir, sample_config) -> Any:
     """Create a real system instance for integration tests."""
     # Create necessary directories
     (temp_dir / "output").mkdir(exist_ok=True)
@@ -270,8 +291,11 @@ def real_system(temp_dir, sample_config):
     
     # Create config file
     config_file = temp_dir / "test_config.yaml"
-    import yaml
     with open(config_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         yaml.dump(sample_config, f)
     
     return OnyxAIVideoSystem(str(config_file))
@@ -382,7 +406,7 @@ def mock_onyx_utils():
 
 
 # Test markers
-def pytest_configure(config):
+def pytest_configure(config) -> Any:
     """Configure pytest markers."""
     config.addinivalue_line(
         "markers", "unit: mark test as a unit test"
@@ -409,13 +433,13 @@ class AsyncTestCase:
     """Base class for async test cases."""
     
     @pytest.fixture(autouse=True)
-    def setup_async(self, event_loop):
+    def setup_async(self, event_loop) -> Any:
         """Setup async test environment."""
         self.loop = event_loop
         asyncio.set_event_loop(self.loop)
 
 
-def create_mock_video_request(**kwargs) -> VideoRequest:
+async def create_mock_video_request(**kwargs) -> VideoRequest:
     """Create a mock video request with default values."""
     defaults = {
         "input_text": "Test video request",

@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from dataclasses import dataclass, field
+from typing import Dict, List, Optional, Any, Union
+from ..core.enums import AnalysisType, ProcessingTier
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 APPLICATION DTOs - Data Transfer Objects
 ==========================================
@@ -5,9 +19,6 @@
 DTOs para transferencia de datos entre capas de la aplicación.
 """
 
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any, Union
-from ..core.enums import AnalysisType, ProcessingTier
 
 
 @dataclass
@@ -22,7 +33,7 @@ class AnalysisRequest:
     timeout_seconds: float = 30.0
     metadata: Dict[str, Any] = field(default_factory=dict)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validar request."""
         if not self.text or not isinstance(self.text, str):
             raise ValueError("Text must be a non-empty string")
@@ -105,7 +116,7 @@ class BatchAnalysisRequest:
     timeout_seconds: float = 300.0  # Más tiempo para lotes
     metadata: Dict[str, Any] = field(default_factory=dict)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validar request de lote."""
         if not self.texts or not isinstance(self.texts, list):
             raise ValueError("Texts must be a non-empty list")
@@ -147,7 +158,7 @@ class CacheRequest:
     ttl: Optional[int] = None
     pattern: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validar request de cache."""
         valid_operations = ['get', 'set', 'delete', 'clear', 'invalidate_pattern']
         if self.operation not in valid_operations:
@@ -212,7 +223,7 @@ class ConfigurationRequest:
     value: Optional[Any] = None
     section: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validar request de configuración."""
         valid_operations = ['get', 'set', 'reload', 'validate', 'get_all']
         if self.operation not in valid_operations:
@@ -251,7 +262,7 @@ class ValidationResult:
 
 
 # Utility functions para DTOs
-def create_analysis_request(
+async def create_analysis_request(
     text: str,
     analysis_types: Optional[List[str]] = None,
     tier: Optional[str] = None,

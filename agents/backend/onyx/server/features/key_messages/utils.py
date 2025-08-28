@@ -1,6 +1,11 @@
-"""
-Functional utility functions for Key Messages feature with descriptive naming.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import asyncio
 import time
 import hashlib
@@ -16,6 +21,17 @@ import aiohttp
 import aiofiles
 from pathlib import Path
 from pydantic import BaseModel, ValidationError, field_validator
+    import os
+        import ipaddress
+        import ipaddress
+        import ipaddress
+        import ipaddress
+        from urllib.parse import urlparse
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Functional utility functions for Key Messages feature with descriptive naming.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -447,7 +463,9 @@ class FunctionalCache:
     """Functional cache implementation."""
     
     def __init__(self, max_size: int = 1000, ttl_seconds: int = MIN_CACHE_TTL_SECONDS):
-        # Guard clause: Check if max_size is negative
+        
+    """__init__ function."""
+# Guard clause: Check if max_size is negative
         if max_size < 0:
             max_size = 0
         
@@ -594,7 +612,7 @@ def is_logged_operation(operation_name: str):
     
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             start_time = time.perf_counter()
             try:
                 result = await func(*args, **kwargs)
@@ -609,7 +627,7 @@ def is_logged_operation(operation_name: str):
                 raise
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             start_time = time.perf_counter()
             try:
                 result = func(*args, **kwargs)
@@ -637,7 +655,7 @@ def is_cached_operation(ttl_seconds: int = MIN_CACHE_TTL_SECONDS):
     
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             cache_key = transform_generate_cache_key(func.__name__, args, kwargs)
             
@@ -652,7 +670,7 @@ def is_cached_operation(ttl_seconds: int = MIN_CACHE_TTL_SECONDS):
             return result
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # Generate cache key
             cache_key = transform_generate_cache_key(func.__name__, args, kwargs)
             
@@ -682,11 +700,11 @@ def is_retryable_operation(max_retries: int = MAX_RETRY_ATTEMPTS, delay_seconds:
     
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             return await is_retry_operation_successful(func, max_retries, delay_seconds, *args, **kwargs)
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             for attempt in range(max_retries + 1):
                 try:
                     return func(*args, **kwargs)
@@ -766,7 +784,15 @@ async def is_file_readable(file_path: Union[str, Path]) -> bool:
             return False
         
         async with aiofiles.open(file_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             await f.read(1)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         return True
     except Exception:
         return False
@@ -786,7 +812,15 @@ async def is_file_writable(file_path: Union[str, Path]) -> bool:
         
         # Test write access
         async with aiofiles.open(file_path, 'a') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             await f.write('')
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         return True
     except Exception:
         return False
@@ -833,7 +867,7 @@ async def is_directory_empty(directory_path: Union[str, Path]) -> bool:
     except Exception:
         return True
 
-async def is_http_endpoint_available(url: str, timeout_seconds: int = MAX_REQUEST_TIMEOUT_SECONDS) -> bool:
+async async def is_http_endpoint_available(url: str, timeout_seconds: int = MAX_REQUEST_TIMEOUT_SECONDS) -> bool:
     """Check if HTTP endpoint is available."""
     # Guard clause: Check if url is None or empty
     if not url or not url.strip():
@@ -851,7 +885,7 @@ async def is_http_endpoint_available(url: str, timeout_seconds: int = MAX_REQUES
     except Exception:
         return False
 
-async def has_http_response_successful_status(response: aiohttp.ClientResponse) -> bool:
+async async def has_http_response_successful_status(response: aiohttp.ClientResponse) -> bool:
     """Check if HTTP response has successful status."""
     # Guard clause: Check if response is None
     if response is None:
@@ -859,7 +893,7 @@ async def has_http_response_successful_status(response: aiohttp.ClientResponse) 
     
     return 200 <= response.status < 300
 
-async def is_http_response_json(response: aiohttp.ClientResponse) -> bool:
+async async def is_http_response_json(response: aiohttp.ClientResponse) -> bool:
     """Check if HTTP response is JSON."""
     # Guard clause: Check if response is None
     if response is None:
@@ -987,7 +1021,6 @@ def has_cpu_usage_spiked(current_usage: float, baseline_usage: float, spike_thre
 
 def is_test_environment() -> bool:
     """Check if running in test environment."""
-    import os
     test_env_vars = ['TESTING', 'PYTEST_CURRENT_TEST', 'UNITTEST']
     return any(os.getenv(var) for var in test_env_vars)
 
@@ -1223,13 +1256,17 @@ class URLTargetInput(BaseModel):
 # Custom Exceptions
 class InvalidTargetError(Exception):
     def __init__(self, message: str, target: str = None, **kwargs):
-        super().__init__(message)
+        
+    """__init__ function."""
+super().__init__(message)
         self.target = target
         self.extra = kwargs
 
 class NetworkTimeoutError(TimeoutError):
     def __init__(self, message: str, target: str = None, timeout: int = None, **kwargs):
-        super().__init__(message)
+        
+    """__init__ function."""
+super().__init__(message)
         self.target = target
         self.timeout = timeout
         self.extra = kwargs
@@ -1331,7 +1368,6 @@ def is_private_ip_address(ip_address: str) -> bool:
         return False
     
     try:
-        import ipaddress
         ip = ipaddress.ip_address(ip_address.strip())
         return ip.is_private
     except ValueError:
@@ -1344,7 +1380,6 @@ def is_reserved_ip_address(ip_address: str) -> bool:
         return False
     
     try:
-        import ipaddress
         ip = ipaddress.ip_address(ip_address.strip())
         return ip.is_reserved
     except ValueError:
@@ -1357,7 +1392,6 @@ def is_loopback_ip_address(ip_address: str) -> bool:
         return False
     
     try:
-        import ipaddress
         ip = ipaddress.ip_address(ip_address.strip())
         return ip.is_loopback
     except ValueError:
@@ -1370,7 +1404,6 @@ def is_multicast_ip_address(ip_address: str) -> bool:
         return False
     
     try:
-        import ipaddress
         ip = ipaddress.ip_address(ip_address.strip())
         return ip.is_multicast
     except ValueError:
@@ -1434,7 +1467,6 @@ def is_target_url_safe(input: URLTargetInput) -> Dict[str, bool]:
     
     # Guard clause: Check for private IP addresses in URL
     try:
-        from urllib.parse import urlparse
         parsed = urlparse(url)
         if parsed.hostname:
             if is_private_ip_address(parsed.hostname) or is_loopback_ip_address(parsed.hostname):

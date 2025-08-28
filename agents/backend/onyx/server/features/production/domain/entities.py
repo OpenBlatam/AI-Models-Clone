@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import uuid
+from datetime import datetime
+from typing import List, Optional, Dict, Any
+from dataclasses import dataclass, field
+from enum import Enum
+from pydantic import BaseModel, Field, validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Domain Entities
 ===============
@@ -5,13 +22,7 @@ Domain Entities
 Core business entities for the copywriting system.
 """
 
-import uuid
-from datetime import datetime
-from typing import List, Optional, Dict, Any
-from dataclasses import dataclass, field
-from enum import Enum
 
-from pydantic import BaseModel, Field, validator
 
 
 class CopywritingStyle(Enum):
@@ -65,7 +76,7 @@ class CopywritingRequest:
     updated_at: datetime = field(default_factory=datetime.now)
     status: RequestStatus = RequestStatus.PENDING
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Post-initialization validation."""
         if not self.prompt.strip():
             raise ValueError("Prompt cannot be empty")
@@ -76,22 +87,22 @@ class CopywritingRequest:
         if self.creativity < 0.0 or self.creativity > 1.0:
             raise ValueError("Creativity must be between 0.0 and 1.0")
     
-    def mark_processing(self):
+    def mark_processing(self) -> Any:
         """Mark request as processing."""
         self.status = RequestStatus.PROCESSING
         self.updated_at = datetime.now()
     
-    def mark_completed(self):
+    def mark_completed(self) -> Any:
         """Mark request as completed."""
         self.status = RequestStatus.COMPLETED
         self.updated_at = datetime.now()
     
-    def mark_failed(self):
+    def mark_failed(self) -> Any:
         """Mark request as failed."""
         self.status = RequestStatus.FAILED
         self.updated_at = datetime.now()
     
-    def mark_cancelled(self):
+    def mark_cancelled(self) -> Any:
         """Mark request as cancelled."""
         self.status = RequestStatus.CANCELLED
         self.updated_at = datetime.now()
@@ -127,7 +138,7 @@ class CopywritingResponse:
     metadata: Dict[str, Any] = field(default_factory=dict)
     created_at: datetime = field(default_factory=datetime.now)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Post-initialization validation."""
         if not self.generated_text.strip():
             raise ValueError("Generated text cannot be empty")
@@ -169,7 +180,7 @@ class PerformanceMetrics:
     ai_metrics: Dict[str, Any] = field(default_factory=dict)
     timestamp: datetime = field(default_factory=datetime.now)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Post-initialization validation."""
         if self.request_count < 0:
             raise ValueError("Request count cannot be negative")
@@ -207,7 +218,7 @@ class User:
     updated_at: datetime = field(default_factory=datetime.now)
     metadata: Dict[str, Any] = field(default_factory=dict)
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Post-initialization validation."""
         if not self.email or "@" not in self.email:
             raise ValueError("Invalid email address")
@@ -215,12 +226,12 @@ class User:
         if not self.username or len(self.username) < 3:
             raise ValueError("Username must be at least 3 characters long")
     
-    def upgrade_to_premium(self):
+    def upgrade_to_premium(self) -> Any:
         """Upgrade user to premium."""
         self.is_premium = True
         self.updated_at = datetime.now()
     
-    def deactivate(self):
+    def deactivate(self) -> Any:
         """Deactivate user account."""
         self.is_active = False
         self.updated_at = datetime.now()
@@ -240,14 +251,14 @@ class CopywritingRequestModel(BaseModel):
     keywords: List[str] = Field(default_factory=list, max_items=20, description="Keywords to include")
     
     @validator("prompt")
-    def validate_prompt(cls, v):
+    def validate_prompt(cls, v) -> bool:
         """Validate prompt."""
         if not v.strip():
             raise ValueError("Prompt cannot be empty")
         return v.strip()
     
     @validator("keywords")
-    def validate_keywords(cls, v):
+    def validate_keywords(cls, v) -> bool:
         """Validate keywords."""
         if len(v) > 20:
             raise ValueError("Too many keywords (max 20)")

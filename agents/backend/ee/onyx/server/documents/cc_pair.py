@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from http import HTTPStatus
 
@@ -7,16 +9,10 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from ee.onyx.background.celery.tasks.doc_permission_syncing.tasks import (
-    try_creating_permissions_sync_task,
-)
 from ee.onyx.background.celery.tasks.external_group_syncing.tasks import (
-    try_creating_external_group_sync_task,
-)
 from onyx.auth.users import current_curator_or_admin_user
 from onyx.background.celery.versioned_apps.client import app as client_app
 from onyx.db.connector_credential_pair import (
-    get_connector_credential_pair_from_id_for_user,
-)
 from onyx.db.engine import get_session
 from onyx.db.models import User
 from onyx.redis.redis_connector import RedisConnector
@@ -24,6 +20,15 @@ from onyx.redis.redis_pool import get_redis_client
 from onyx.server.models import StatusResponse
 from onyx.utils.logger import setup_logger
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    try_creating_permissions_sync_task,
+)
+    try_creating_external_group_sync_task,
+)
+    get_connector_credential_pair_from_id_for_user,
+)
 
 logger = setup_logger()
 router = APIRouter(prefix="/manage")

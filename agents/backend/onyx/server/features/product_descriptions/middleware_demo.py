@@ -1,8 +1,10 @@
-#!/usr/bin/env python3
-"""
-Middleware Demo
-Product Descriptions Feature - Comprehensive Middleware Demonstration
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -11,6 +13,13 @@ import logging
 from typing import Dict, Any, List
 import requests
 from pathlib import Path
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Middleware Demo
+Product Descriptions Feature - Comprehensive Middleware Demonstration
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -20,7 +29,9 @@ class MiddlewareDemo:
     """Comprehensive middleware demonstration"""
     
     def __init__(self, base_url: str = "http://localhost:8000"):
-        self.base_url = base_url
+        
+    """__init__ function."""
+self.base_url = base_url
         self.session = requests.Session()
         self.results: List[Dict[str, Any]] = []
     
@@ -355,7 +366,7 @@ class MiddlewareDemo:
             self.log_result("Security Headers", False, {"error": str(e)}, duration)
             return {"error": str(e)}
     
-    def test_request_tracking(self) -> Dict[str, Any]:
+    async def test_request_tracking(self) -> Dict[str, Any]:
         """Test request ID tracking"""
         start_time = time.time()
         
@@ -428,6 +439,10 @@ class MiddlewareDemo:
         """Save test results to file"""
         try:
             with open(filename, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(self.results, f, indent=2)
             logger.info(f"Results saved to {filename}")
         except Exception as e:
@@ -473,5 +488,6 @@ def main():
     print("Demo completed! Check middleware_demo_results.json for detailed results.")
     print("=" * 60)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

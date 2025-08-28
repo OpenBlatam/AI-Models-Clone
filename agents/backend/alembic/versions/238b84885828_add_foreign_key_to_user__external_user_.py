@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add foreign key to user__external_user_group_id
 
 Revision ID: 238b84885828
@@ -6,12 +12,11 @@ Create Date: 2025-05-19 17:15:33.424584
 
 """
 
-from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision = "238b84885828"
-down_revision = "a7688ab35c45"
+revision: str = "238b84885828"
+down_revision: str = "a7688ab35c45"
 branch_labels = None
 depends_on = None
 
@@ -32,7 +37,7 @@ def upgrade() -> None:
         "connector_credential_pair",
         ["cc_pair_id"],
         ["id"],
-        ondelete="CASCADE",
+        ondelete: str = "CASCADE",
     )
 
 
@@ -41,5 +46,5 @@ def downgrade() -> None:
     op.drop_constraint(
         "fk_user__external_user_group_id_cc_pair_id",
         "user__external_user_group_id",
-        type_="foreignkey",
+        type_: str = "foreignkey",
     )

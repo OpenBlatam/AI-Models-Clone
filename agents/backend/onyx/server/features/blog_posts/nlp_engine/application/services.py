@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import time
+from typing import Dict, List, Any, Optional, Union
+import logging
+from ..core.entities import AnalysisResult
+from ..core.enums import ProcessingTier, CacheStrategy, Environment
+from ..interfaces.cache import ICacheRepository, ICacheKeyGenerator
+from ..interfaces.metrics import IMetricsCollector, IPerformanceMonitor, IHealthChecker
+from ..interfaces.config import IConfigurationService
+from .dto import (
+from typing import Any, List, Dict, Optional
 """
 🎯 APPLICATION SERVICES - Servicios de Aplicación
 ================================================
@@ -6,17 +19,7 @@ Servicios que coordinan la lógica de aplicación y proporcionan
 funcionalidades transversales.
 """
 
-import asyncio
-import time
-from typing import Dict, List, Any, Optional, Union
-import logging
 
-from ..core.entities import AnalysisResult
-from ..core.enums import ProcessingTier, CacheStrategy, Environment
-from ..interfaces.cache import ICacheRepository, ICacheKeyGenerator
-from ..interfaces.metrics import IMetricsCollector, IPerformanceMonitor, IHealthChecker
-from ..interfaces.config import IConfigurationService
-from .dto import (
     CacheRequest, HealthCheckRequest, HealthCheckResponse, 
     MetricsRequest, MetricsResponse, ConfigurationRequest, ConfigurationResponse
 )
@@ -33,7 +36,9 @@ class AnalysisService:
         performance_monitor: IPerformanceMonitor,
         health_checker: IHealthChecker
     ):
-        self._config_service = config_service
+        
+    """__init__ function."""
+self._config_service = config_service
         self._metrics_collector = metrics_collector
         self._cache_repository = cache_repository
         self._performance_monitor = performance_monitor
@@ -91,12 +96,12 @@ class AnalysisService:
         """Verificar si una optimización está habilitada."""
         return self._config_service.is_optimization_enabled(optimization)
     
-    async def record_request_start(self) -> None:
+    async async def record_request_start(self) -> None:
         """Registrar inicio de request."""
         self._active_requests += 1
         self._metrics_collector.record_gauge('active_requests', self._active_requests)
     
-    async def record_request_end(self) -> None:
+    async async def record_request_end(self) -> None:
         """Registrar fin de request."""
         self._active_requests = max(0, self._active_requests - 1)
         self._metrics_collector.record_gauge('active_requests', self._active_requests)
@@ -127,7 +132,9 @@ class CacheService:
         cache_key_generator: ICacheKeyGenerator,
         metrics_collector: IMetricsCollector
     ):
-        self._cache_repository = cache_repository
+        
+    """__init__ function."""
+self._cache_repository = cache_repository
         self._cache_key_generator = cache_key_generator
         self._metrics_collector = metrics_collector
         self._logger = logging.getLogger(self.__class__.__name__)
@@ -140,7 +147,7 @@ class CacheService:
             'evictions': 0
         }
     
-    async def handle_cache_request(self, request: CacheRequest) -> Dict[str, Any]:
+    async async def handle_cache_request(self, request: CacheRequest) -> Dict[str, Any]:
         """
         Manejar request de cache.
         
@@ -283,12 +290,14 @@ class MetricsService:
         performance_monitor: IPerformanceMonitor,
         health_checker: IHealthChecker
     ):
-        self._metrics_collector = metrics_collector
+        
+    """__init__ function."""
+self._metrics_collector = metrics_collector
         self._performance_monitor = performance_monitor
         self._health_checker = health_checker
         self._logger = logging.getLogger(self.__class__.__name__)
     
-    async def handle_metrics_request(self, request: MetricsRequest) -> MetricsResponse:
+    async async def handle_metrics_request(self, request: MetricsRequest) -> MetricsResponse:
         """
         Manejar request de métricas.
         
@@ -335,7 +344,7 @@ class MetricsService:
                 format_type=request.format_type
             )
     
-    async def handle_health_check_request(self, request: HealthCheckRequest) -> HealthCheckResponse:
+    async async def handle_health_check_request(self, request: HealthCheckRequest) -> HealthCheckResponse:
         """
         Manejar request de health check.
         
@@ -428,10 +437,12 @@ class ConfigurationService:
     """Servicio para gestión de configuración."""
     
     def __init__(self, config_service: IConfigurationService):
-        self._config_service = config_service
+        
+    """__init__ function."""
+self._config_service = config_service
         self._logger = logging.getLogger(self.__class__.__name__)
     
-    async def handle_configuration_request(self, request: ConfigurationRequest) -> ConfigurationResponse:
+    async async def handle_configuration_request(self, request: ConfigurationRequest) -> ConfigurationResponse:
         """
         Manejar request de configuración.
         

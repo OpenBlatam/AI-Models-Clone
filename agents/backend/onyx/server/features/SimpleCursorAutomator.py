@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pyautogui
 import time
 import keyboard
@@ -5,6 +7,11 @@ from typing import Optional, Tuple
 from dataclasses import dataclass
 from enum import Enum
 
+            import pyautogui
+            import keyboard
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class AutomationError(Exception):
     """Excepción personalizada para errores de automatización"""
     pass
@@ -35,7 +42,9 @@ class AutomationConfig:
 
 class SimpleCursorAutomator:
     def __init__(self, config: Optional[AutomationConfig] = None):
-        # Validar configuración
+        
+    """__init__ function."""
+# Validar configuración
         if config is None:
             config = AutomationConfig()
         
@@ -119,7 +128,9 @@ class SimpleCursorAutomator:
         setup_timeout = time.time() + self.config.timeout
         
         def capture_position():
-            nonlocal position_captured
+            
+    """capture_position function."""
+nonlocal position_captured
             try:
                 pos = pyautogui.position()
                 if self._validate_position(pos):
@@ -132,7 +143,9 @@ class SimpleCursorAutomator:
                 print(f"❌ Error capturando posición: {e}")
         
         def use_auto():
-            nonlocal position_captured
+            
+    """use_auto function."""
+nonlocal position_captured
             self.target_position = None
             position_captured = True
             print("🤖 Usando modo automático")
@@ -187,6 +200,10 @@ class SimpleCursorAutomator:
             
             # Escribir comando con intervalos seguros
             pyautogui.typewrite(command, interval=0.05)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             time.sleep(0.5)
             
             # Enviar
@@ -307,8 +324,6 @@ def main() -> None:
     try:
         # Validar dependencias
         try:
-            import pyautogui
-            import keyboard
         except ImportError as e:
             print(f"❌ Dependencia faltante: {e}")
             print("💡 Instala con: pip install pyautogui keyboard")
@@ -329,5 +344,6 @@ def main() -> None:
         print(f"❌ Error crítico: {e}")
         print("💡 Verifica la configuración y dependencias")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

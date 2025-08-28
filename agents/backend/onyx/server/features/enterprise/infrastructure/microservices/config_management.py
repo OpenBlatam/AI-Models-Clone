@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+import os
+import logging
+from abc import ABC, abstractmethod
+from typing import Dict, Any, Optional, Callable
+from dataclasses import dataclass
+import yaml
+            import aiohttp
+from typing import Any, List, Dict, Optional
 """
 Configuration Management
 ========================
@@ -10,14 +25,6 @@ Dynamic configuration management for microservices:
 - File-based configuration
 """
 
-import asyncio
-import json
-import os
-import logging
-from abc import ABC, abstractmethod
-from typing import Dict, Any, Optional, Callable
-from dataclasses import dataclass
-import yaml
 
 logger = logging.getLogger(__name__)
 
@@ -64,14 +71,15 @@ class ConsulConfigProvider(IConfigurationProvider):
     """Consul KV store configuration provider."""
     
     def __init__(self, consul_url: str = "http://localhost:8500"):
-        self.consul_url = consul_url.rstrip('/')
+        
+    """__init__ function."""
+self.consul_url = consul_url.rstrip('/')
         self.session = None
         self.watchers: Dict[str, asyncio.Task] = {}
         
-    async def _get_session(self):
+    async def _get_session(self) -> Optional[Dict[str, Any]]:
         """Get HTTP session."""
         if not self.session:
-            import aiohttp
             self.session = aiohttp.ClientSession()
         return self.session
     
@@ -135,7 +143,9 @@ class ConsulConfigProvider(IConfigurationProvider):
         watcher_id = f"consul_{key}_{id(callback)}"
         
         async def watch_loop():
-            last_index = 0
+            
+    """watch_loop function."""
+last_index = 0
             while True:
                 try:
                     session = await self._get_session()
@@ -209,7 +219,9 @@ class EnvironmentConfigProvider(IConfigurationProvider):
     """Environment variables configuration provider."""
     
     def __init__(self, prefix: str = ""):
-        self.prefix = prefix
+        
+    """__init__ function."""
+self.prefix = prefix
         
     async def get_config(self, key: str) -> Optional[ConfigurationItem]:
         """Get configuration from environment."""
@@ -276,7 +288,9 @@ class FileConfigProvider(IConfigurationProvider):
     """File-based configuration provider."""
     
     def __init__(self, file_path: str):
-        self.file_path = file_path
+        
+    """__init__ function."""
+self.file_path = file_path
         self.configs: Dict[str, Any] = {}
         self.file_watchers: Dict[str, asyncio.Task] = {}
         
@@ -284,6 +298,10 @@ class FileConfigProvider(IConfigurationProvider):
         """Load configuration from file."""
         try:
             with open(self.file_path, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 if self.file_path.endswith('.yaml') or self.file_path.endswith('.yml'):
                     return yaml.safe_load(f)
                 else:
@@ -327,7 +345,9 @@ class FileConfigProvider(IConfigurationProvider):
         watcher_id = f"file_{key}_{id(callback)}"
         
         async def watch_file():
-            last_mtime = 0
+            
+    """watch_file function."""
+last_mtime = 0
             while True:
                 try:
                     current_mtime = os.path.getmtime(self.file_path)
@@ -381,7 +401,7 @@ class FileConfigProvider(IConfigurationProvider):
 class ConfigurationManager:
     """Unified configuration manager with multiple providers."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.providers: Dict[str, IConfigurationProvider] = {}
         self.cache: Dict[str, ConfigurationItem] = {}
         self.cache_ttl = 60  # seconds
@@ -391,7 +411,7 @@ class ConfigurationManager:
         self.providers[name] = provider
         logger.info(f"Added configuration provider: {name}")
     
-    async def get_config(self, key: str, default: Any = None) -> Any:
+    async def get_config(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Get configuration value from providers (in priority order)."""
         # Check cache first
         if key in self.cache:
@@ -426,7 +446,7 @@ class ConfigurationManager:
         
         return all_configs
     
-    def clear_cache(self):
+    def clear_cache(self) -> Any:
         """Clear configuration cache."""
         self.cache.clear()
         logger.info("Configuration cache cleared") 

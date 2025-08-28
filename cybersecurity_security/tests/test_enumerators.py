@@ -1,13 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import pytest
+import asyncio
+from unittest.mock import patch, MagicMock
+from cybersecurity_security.enumerators import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Tests for Enumerators Module
 
 Tests DNS, SMB, and SSH enumeration functionality.
 """
 
-import pytest
-import asyncio
-from unittest.mock import patch, MagicMock
-from cybersecurity_security.enumerators import (
     # DNS Enumerator
     DNSEnumerationRequest, DNSEnumerationResult, DNSRecordType,
     enumerate_dns_records_async, enumerate_dns_subdomains_async,
@@ -27,7 +31,7 @@ from cybersecurity_security.enumerators import (
 class TestDNSEnumerator:
     """Test suite for DNS enumerator."""
     
-    def test_dns_enumeration_request_creation(self):
+    async def test_dns_enumeration_request_creation(self) -> Any:
         """Test DNSEnumerationRequest creation."""
         request = DNSEnumerationRequest(
             target_domain="example.com",
@@ -41,12 +45,12 @@ class TestDNSEnumerator:
         assert "8.8.8.8" in request.nameservers
         assert request.timeout == 10.0
     
-    def test_dns_enumeration_request_invalid_domain(self):
+    async def test_dns_enumeration_request_invalid_domain(self) -> Any:
         """Test DNSEnumerationRequest with invalid domain."""
         with pytest.raises(ValueError, match="Invalid domain format"):
             DNSEnumerationRequest(target_domain="invalid")
     
-    def test_dns_enumeration_request_invalid_timeout(self):
+    async def test_dns_enumeration_request_invalid_timeout(self) -> Any:
         """Test DNSEnumerationRequest with invalid timeout."""
         with pytest.raises(ValueError):
             DNSEnumerationRequest(
@@ -55,7 +59,7 @@ class TestDNSEnumerator:
             )
     
     @pytest.mark.asyncio
-    async def test_enumerate_dns_records_async(self):
+    async def test_enumerate_dns_records_async(self) -> Any:
         """Test DNS record enumeration."""
         with patch('dns.resolver.Resolver') as mock_resolver:
             mock_resolver_instance = MagicMock()
@@ -83,11 +87,11 @@ class TestDNSEnumerator:
             assert result.total_queries >= 1
     
     @pytest.mark.asyncio
-    async def test_enumerate_dns_subdomains_async(self):
+    async def test_enumerate_dns_subdomains_async(self) -> Any:
         """Test DNS subdomain enumeration."""
         with patch('socket.gethostbyname') as mock_gethostbyname:
             # Mock successful resolution for some subdomains
-            def mock_resolve(hostname):
+            def mock_resolve(hostname) -> Any:
                 if hostname in ["www.example.com", "mail.example.com"]:
                     return "192.168.1.1"
                 raise socket.gaierror("Name or service not known")
@@ -111,7 +115,7 @@ class TestDNSEnumerator:
 class TestSMBEnumerator:
     """Test suite for SMB enumerator."""
     
-    def test_smb_enumeration_request_creation(self):
+    async def test_smb_enumeration_request_creation(self) -> Any:
         """Test SMBEnumerationRequest creation."""
         request = SMBEnumerationRequest(
             target_host="192.168.1.1",
@@ -128,12 +132,12 @@ class TestSMBEnumerator:
         assert request.domain == "WORKGROUP"
         assert request.timeout == 10.0
     
-    def test_smb_enumeration_request_invalid_host(self):
+    async def test_smb_enumeration_request_invalid_host(self) -> Any:
         """Test SMBEnumerationRequest with invalid host."""
         with pytest.raises(ValueError, match="Target host cannot be empty"):
             SMBEnumerationRequest(target_host="")
     
-    def test_smb_enumeration_request_invalid_port(self):
+    async def test_smb_enumeration_request_invalid_port(self) -> Any:
         """Test SMBEnumerationRequest with invalid port."""
         with pytest.raises(ValueError):
             SMBEnumerationRequest(
@@ -142,7 +146,7 @@ class TestSMBEnumerator:
             )
     
     @pytest.mark.asyncio
-    async def test_enumerate_smb_shares_async(self):
+    async def test_enumerate_smb_shares_async(self) -> Any:
         """Test SMB share enumeration."""
         with patch('socket.create_connection') as mock_connection:
             mock_sock = MagicMock()
@@ -164,7 +168,7 @@ class TestSMBEnumerator:
             assert "IPC$" in share_names
     
     @pytest.mark.asyncio
-    async def test_check_smb_null_sessions_async(self):
+    async def test_check_smb_null_sessions_async(self) -> Any:
         """Test SMB null session checking."""
         with patch('socket.create_connection') as mock_connection:
             mock_sock = MagicMock()
@@ -184,7 +188,7 @@ class TestSMBEnumerator:
             assert result is True
     
     @pytest.mark.asyncio
-    async def test_enumerate_smb_async(self):
+    async def test_enumerate_smb_async(self) -> Any:
         """Test comprehensive SMB enumeration."""
         with patch('cybersecurity_security.enumerators.smb_enumerator.enumerate_smb_shares_async') as mock_shares:
             mock_shares.return_value = [
@@ -231,7 +235,7 @@ class TestSMBEnumerator:
 class TestSSHEnumerator:
     """Test suite for SSH enumerator."""
     
-    def test_ssh_enumeration_request_creation(self):
+    async def test_ssh_enumeration_request_creation(self) -> Any:
         """Test SSHEnumerationRequest creation."""
         request = SSHEnumerationRequest(
             target_host="192.168.1.1",
@@ -248,12 +252,12 @@ class TestSSHEnumerator:
         assert "root" in request.username_list
         assert "password" in request.password_list
     
-    def test_ssh_enumeration_request_invalid_host(self):
+    async def test_ssh_enumeration_request_invalid_host(self) -> Any:
         """Test SSHEnumerationRequest with invalid host."""
         with pytest.raises(ValueError, match="Target host cannot be empty"):
             SSHEnumerationRequest(target_host="")
     
-    def test_ssh_enumeration_request_invalid_port(self):
+    async def test_ssh_enumeration_request_invalid_port(self) -> Any:
         """Test SSHEnumerationRequest with invalid port."""
         with pytest.raises(ValueError):
             SSHEnumerationRequest(
@@ -262,7 +266,7 @@ class TestSSHEnumerator:
             )
     
     @pytest.mark.asyncio
-    async def test_enumerate_ssh_versions_async(self):
+    async def test_enumerate_ssh_versions_async(self) -> Any:
         """Test SSH version enumeration."""
         with patch('socket.create_connection') as mock_connection:
             mock_sock = MagicMock()
@@ -284,7 +288,7 @@ class TestSSHEnumerator:
             assert "SSH-2.0-OpenSSH" in server_info.banner
     
     @pytest.mark.asyncio
-    async def test_check_ssh_key_exchange_async(self):
+    async def test_check_ssh_key_exchange_async(self) -> Any:
         """Test SSH key exchange analysis."""
         with patch('cybersecurity_security.enumerators.ssh_enumerator.enumerate_ssh_versions_async') as mock_version:
             mock_version.return_value = SSHServerInfo(
@@ -308,7 +312,7 @@ class TestSSHEnumerator:
             assert "recommendations" in result
     
     @pytest.mark.asyncio
-    async def test_enumerate_ssh_algorithms_async(self):
+    async def test_enumerate_ssh_algorithms_async(self) -> Any:
         """Test SSH algorithm enumeration."""
         with patch('cybersecurity_security.enumerators.ssh_enumerator.enumerate_ssh_versions_async') as mock_version:
             mock_version.return_value = SSHServerInfo(
@@ -334,7 +338,7 @@ class TestSSHEnumerator:
             assert "compression" in result
     
     @pytest.mark.asyncio
-    async def test_perform_ssh_brute_force_async(self):
+    async def test_perform_ssh_brute_force_async(self) -> Any:
         """Test SSH brute force enumeration."""
         with patch('socket.create_connection') as mock_connection:
             mock_sock = MagicMock()
@@ -360,7 +364,7 @@ class TestSSHEnumerator:
             assert results[0].authentication_time >= 0
     
     @pytest.mark.asyncio
-    async def test_enumerate_ssh_async(self):
+    async def test_enumerate_ssh_async(self) -> Any:
         """Test comprehensive SSH enumeration."""
         with patch('cybersecurity_security.enumerators.ssh_enumerator.enumerate_ssh_versions_async') as mock_version:
             mock_version.return_value = SSHServerInfo(
@@ -404,7 +408,7 @@ class TestEnumeratorIntegration:
     """Integration tests for enumerator modules."""
     
     @pytest.mark.asyncio
-    async def test_multiple_enumerator_types(self):
+    async def test_multiple_enumerator_types(self) -> Any:
         """Test using multiple enumerator types together."""
         # Test DNS enumeration
         dns_request = DNSEnumerationRequest(

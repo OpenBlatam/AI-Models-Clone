@@ -1,10 +1,7 @@
-"""
-Enhanced Product Service - Enterprise API
-==========================================
-
-Servicio API empresarial mejorado para gestión completa de productos
-con funcionalidades avanzadas, validaciones y Clean Architecture.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, Query, Path
 from fastapi.middleware.cors import CORSMiddleware
@@ -17,9 +14,18 @@ import time
 from datetime import datetime
 from decimal import Decimal
 import uvicorn
+from ..core.model import (
+from typing import Any, List, Dict, Optional
+"""
+Enhanced Product Service - Enterprise API
+==========================================
+
+Servicio API empresarial mejorado para gestión completa de productos
+con funcionalidades avanzadas, validaciones y Clean Architecture.
+"""
+
 
 # Importar modelos mejorados
-from ..core.model import (
     EnhancedProductEntity, ProductStatus, ProductType, PriceType, 
     InventoryTracking, Money, Dimensions, SEOData
 )
@@ -88,27 +94,27 @@ class EnhancedProductRequest(BaseModel):
     auto_generate_description: bool = Field(False, description="Generar descripción con IA")
     
     @validator('sku')
-    def validate_sku(cls, v):
+    def validate_sku(cls, v) -> bool:
         if not v or not v.strip():
             raise ValueError('SKU no puede estar vacío')
         return v.strip().upper()
     
     @validator('base_price_currency')
-    def validate_currency(cls, v):
+    def validate_currency(cls, v) -> bool:
         if len(v) != 3 or not v.isupper():
             raise ValueError('Código de moneda debe tener 3 caracteres en mayúsculas')
         return v
     
     @validator('tags')
-    def validate_tags(cls, v):
+    def validate_tags(cls, v) -> bool:
         return [tag.strip().lower() for tag in v if tag.strip()]
     
     @validator('seo_keywords')
-    def validate_keywords(cls, v):
+    def validate_keywords(cls, v) -> bool:
         return [kw.strip().lower() for kw in v if kw.strip()]
     
     @root_validator
-    def validate_physical_product(cls, values):
+    def validate_physical_product(cls, values) -> bool:
         product_type = values.get('product_type')
         if product_type == ProductType.PHYSICAL:
             requires_shipping = values.get('requires_shipping', True)
@@ -122,7 +128,7 @@ class EnhancedProductRequest(BaseModel):
         return values
     
     @root_validator
-    def validate_digital_product(cls, values):
+    def validate_digital_product(cls, values) -> bool:
         product_type = values.get('product_type')
         if product_type == ProductType.DIGITAL:
             download_url = values.get('download_url')
@@ -132,7 +138,7 @@ class EnhancedProductRequest(BaseModel):
         return values
     
     @root_validator
-    def validate_prices(cls, values):
+    def validate_prices(cls, values) -> bool:
         base_price = values.get('base_price_amount')
         sale_price = values.get('sale_price_amount')
         cost_price = values.get('cost_price_amount')
@@ -218,7 +224,7 @@ class ProductSearchRequest(BaseModel):
     sort_order: str = Field("desc", description="Orden (asc/desc)")
     
     @validator('sort_by')
-    def validate_sort_by(cls, v):
+    def validate_sort_by(cls, v) -> bool:
         allowed = [
             "name", "sku", "created_at", "updated_at", "published_at",
             "base_price", "inventory_quantity", "status"
@@ -228,7 +234,7 @@ class ProductSearchRequest(BaseModel):
         return v
     
     @validator('sort_order')
-    def validate_sort_order(cls, v):
+    def validate_sort_order(cls, v) -> bool:
         if v not in ["asc", "desc"]:
             raise ValueError("sort_order debe ser 'asc' o 'desc'")
         return v
@@ -344,7 +350,7 @@ class EnhancedProductService:
     - Auditoría y logging
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.app = FastAPI(
             title="Enhanced Product Management API",
             description="API empresarial para gestión completa de productos",
@@ -367,7 +373,7 @@ class EnhancedProductService:
         # Configurar rutas
         self._setup_routes()
     
-    def _setup_middleware(self):
+    def _setup_middleware(self) -> Any:
         """Configurar middleware de FastAPI"""
         
         # CORS
@@ -381,7 +387,7 @@ class EnhancedProductService:
         
         # Logging personalizado
         @self.app.middleware("http")
-        async def log_requests(request, call_next):
+        async async def log_requests(request, call_next) -> Any:
             start_time = time.time()
             response = await call_next(request)
             process_time = time.time() - start_time
@@ -395,7 +401,7 @@ class EnhancedProductService:
             response.headers["X-Process-Time"] = str(process_time)
             return response
     
-    def _setup_routes(self):
+    def _setup_routes(self) -> Any:
         """Configurar rutas de la API"""
         
         @self.app.on_event("startup")
@@ -625,7 +631,7 @@ class EnhancedProductService:
                 timestamp=datetime.utcnow().isoformat()
             )
     
-    def _create_product_from_request(self, request: EnhancedProductRequest) -> EnhancedProductEntity:
+    async def _create_product_from_request(self, request: EnhancedProductRequest) -> EnhancedProductEntity:
         """Crear entidad de producto desde request"""
         
         product = EnhancedProductEntity(

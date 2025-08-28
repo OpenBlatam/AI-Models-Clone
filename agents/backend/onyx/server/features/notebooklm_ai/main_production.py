@@ -1,8 +1,13 @@
-#!/usr/bin/env python3
-"""
-NotebookLM AI - Production Main Application
-Advanced document intelligence system with production-ready features.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -28,26 +33,33 @@ import json
 import hashlib
 import jwt
 from functools import wraps
+    from core.entities import (
+    from infrastructure.ai_engines import (
+    from shared.config import NotebookLMConfig
+    from presentation.api import NotebookLMRouter
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+NotebookLM AI - Production Main Application
+Advanced document intelligence system with production-ready features.
+"""
+
 
 # Import our NotebookLM components
 try:
-    from core.entities import (
         Document, Notebook, Source, Citation, Query, Response as AIResponse, 
         Conversation, User, DocumentType, SourceType, QueryType
     )
-    from infrastructure.ai_engines import (
         AdvancedLLMEngine, DocumentProcessor, CitationGenerator, 
         ResponseOptimizer, MultiModalProcessor, AIEngineConfig
     )
-    from shared.config import NotebookLMConfig
-    from presentation.api import NotebookLMRouter
 except ImportError as e:
     print(f"Warning: Some components not available: {e}")
     # Create mock classes for production
     class MockEngine:
-        def __init__(self, *args, **kwargs):
+        def __init__(self, *args, **kwargs) -> Any:
             pass
-        async def generate_response(self, *args, **kwargs):
+        async def generate_response(self, *args, **kwargs) -> Any:
             return "Production mock response"
     
     AdvancedLLMEngine = MockEngine
@@ -107,7 +119,9 @@ class RateLimiter:
     """Rate limiter using Redis."""
     
     def __init__(self, redis_client: redis.Redis):
-        self.redis = redis_client
+        
+    """__init__ function."""
+self.redis = redis_client
         self.window = RATE_LIMIT_WINDOW
         self.max_requests = RATE_LIMIT_MAX_REQUESTS
     
@@ -136,7 +150,9 @@ class CacheManager:
     """Multi-level cache manager."""
     
     def __init__(self, redis_client: redis.Redis):
-        self.redis = redis_client
+        
+    """__init__ function."""
+self.redis = redis_client
         self.memory_cache = {}
         self.cache_ttl = 3600  # 1 hour
     
@@ -572,7 +588,9 @@ async def stream_query(
 ):
     """Stream AI response."""
     async def generate_response():
-        try:
+        
+    """generate_response function."""
+try:
             if hasattr(app.state, 'llm_engine'):
                 # Generate response in chunks
                 response = await app.state.llm_engine.generate_response(query, context)

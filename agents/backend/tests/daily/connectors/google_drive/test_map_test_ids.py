@@ -1,10 +1,8 @@
-#!/usr/bin/env python
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 import os
-
 import pytest
-
 from onyx.connectors.google_drive.connector import GoogleDriveConnector
 from tests.daily.connectors.google_drive.conftest import get_credentials_from_env
 from tests.daily.connectors.google_drive.consts_and_utils import ADMIN_EMAIL
@@ -23,6 +21,13 @@ from tests.daily.connectors.google_drive.consts_and_utils import SHARED_DRIVE_2_
 from tests.daily.connectors.google_drive.consts_and_utils import TEST_USER_1_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import TEST_USER_2_FILE_IDS
 from tests.daily.connectors.google_drive.consts_and_utils import TEST_USER_3_FILE_IDS
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+#!/usr/bin/env python
+
+
+
 
 
 def generate_test_id_to_drive_id_mapping() -> dict[int, str]:
@@ -34,7 +39,7 @@ def generate_test_id_to_drive_id_mapping() -> dict[int, str]:
 
     Returns:
         dict: Mapping from test file ID (int) to Google Drive file ID (str)
-    """
+    """f"
     # Set up the connector with real credentials
     connector = GoogleDriveConnector(
         include_shared_drives=True,
@@ -55,7 +60,7 @@ def generate_test_id_to_drive_id_mapping() -> dict[int, str]:
     for doc in docs:
         # Check if this document's name matches our test file naming pattern (file_X.txt)
         if not doc.semantic_identifier.startswith(
-            file_name_template.format("").split("_")[0]
+            file_name_template".split("_")[0]
         ):
             continue
 
@@ -124,6 +129,10 @@ def test_generate_drive_id_mapping() -> None:
 
     # Write the mapping to a JSON file
     with open(mapping_file, "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         json.dump(json_mapping, f, indent=2)
 
     print(f"\nMapping written to: {mapping_file}")

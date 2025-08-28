@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+from enum import Enum
+from functools import lru_cache
+from typing import List, Optional
+from pydantic import Field, validator
+from pydantic_settings import BaseSettings
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Core Configuration Module
 ========================
@@ -6,13 +23,7 @@ Centralized application configuration using Pydantic Settings
 with environment variable support and validation.
 """
 
-import os
-from enum import Enum
-from functools import lru_cache
-from typing import List, Optional
 
-from pydantic import Field, validator
-from pydantic_settings import BaseSettings
 
 
 class Environment(str, Enum):
@@ -58,7 +69,7 @@ class AppSettings(BaseSettings):
     openapi_url: Optional[str] = Field(default="/openapi.json", env="OPENAPI_URL")
     
     @validator('environment', pre=True)
-    def validate_environment(cls, v):
+    def validate_environment(cls, v) -> bool:
         if isinstance(v, str):
             return v.lower()
         return v

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import uuid
 
 from fastapi_users.password import PasswordHelper
@@ -19,15 +21,18 @@ from onyx.server.api_key.models import APIKeyArgs
 from shared_configs.contextvars import get_current_tenant_id
 
 
-def get_api_key_email_pattern() -> str:
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+async def get_api_key_email_pattern() -> str:
     return DANSWER_API_KEY_DUMMY_EMAIL_DOMAIN
 
 
-def is_api_key_email_address(email: str) -> bool:
+async def is_api_key_email_address(email: str) -> bool:
     return email.endswith(get_api_key_email_pattern())
 
 
-def fetch_api_keys(db_session: Session) -> list[ApiKeyDescriptor]:
+async def fetch_api_keys(db_session: Session) -> list[ApiKeyDescriptor]:
     api_keys = (
         db_session.scalars(select(ApiKey).options(joinedload(ApiKey.user)))
         .unique()
@@ -45,7 +50,7 @@ def fetch_api_keys(db_session: Session) -> list[ApiKeyDescriptor]:
     ]
 
 
-async def fetch_user_for_api_key(
+async async def fetch_user_for_api_key(
     hashed_api_key: str, async_db_session: AsyncSession
 ) -> User | None:
     """NOTE: this is async, since it's used during auth
@@ -57,14 +62,14 @@ async def fetch_user_for_api_key(
     )
 
 
-def get_api_key_fake_email(
+async def get_api_key_fake_email(
     name: str,
     unique_id: str,
 ) -> str:
     return f"{DANSWER_API_KEY_PREFIX}{name}@{unique_id}{DANSWER_API_KEY_DUMMY_EMAIL_DOMAIN}"
 
 
-def insert_api_key(
+async def insert_api_key(
     db_session: Session, api_key_args: APIKeyArgs, user_id: uuid.UUID | None
 ) -> ApiKeyDescriptor:
     std_password_helper = PasswordHelper()
@@ -108,7 +113,7 @@ def insert_api_key(
     )
 
 
-def update_api_key(
+async def update_api_key(
     db_session: Session, api_key_id: int, api_key_args: APIKeyArgs
 ) -> ApiKeyDescriptor:
     existing_api_key = db_session.scalar(select(ApiKey).where(ApiKey.id == api_key_id))
@@ -136,7 +141,7 @@ def update_api_key(
     )
 
 
-def regenerate_api_key(db_session: Session, api_key_id: int) -> ApiKeyDescriptor:
+async def regenerate_api_key(db_session: Session, api_key_id: int) -> ApiKeyDescriptor:
     """NOTE: currently, any admin can regenerate any API key."""
     existing_api_key = db_session.scalar(select(ApiKey).where(ApiKey.id == api_key_id))
     if existing_api_key is None:
@@ -163,7 +168,7 @@ def regenerate_api_key(db_session: Session, api_key_id: int) -> ApiKeyDescriptor
     )
 
 
-def remove_api_key(db_session: Session, api_key_id: int) -> None:
+async def remove_api_key(db_session: Session, api_key_id: int) -> None:
     existing_api_key = db_session.scalar(select(ApiKey).where(ApiKey.id == api_key_id))
     if existing_api_key is None:
         raise ValueError(f"API key with id {api_key_id} does not exist")

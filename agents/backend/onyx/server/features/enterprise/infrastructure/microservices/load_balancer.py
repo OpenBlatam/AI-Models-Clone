@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import random
+import logging
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import Dict, List, Optional, Any
+from datetime import datetime
+import aiohttp
+from .service_discovery import ServiceInstance
+from typing import Any, List, Dict, Optional
 """
 Load Balancer Implementation
 ===========================
@@ -10,16 +25,7 @@ Advanced load balancing strategies for microservices:
 - Geographic routing
 """
 
-import asyncio
-import random
-import logging
-from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Dict, List, Optional, Any
-from datetime import datetime
-import aiohttp
 
-from .service_discovery import ServiceInstance
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +38,7 @@ class LoadBalancerStats:
     average_response_time: float = 0.0
     backend_stats: Dict[str, Dict[str, Any]] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.backend_stats is None:
             self.backend_stats = {}
 
@@ -49,7 +55,7 @@ class LoadBalancingStrategy(ABC):
 class RoundRobinStrategy(LoadBalancingStrategy):
     """Round robin load balancing strategy."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.current_index = 0
     
     def select_instance(self, instances: List[ServiceInstance], request_context: Dict = None) -> Optional[ServiceInstance]:
@@ -65,7 +71,7 @@ class RoundRobinStrategy(LoadBalancingStrategy):
 class WeightedRoundRobinStrategy(LoadBalancingStrategy):
     """Weighted round robin load balancing strategy."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.current_weights: Dict[str, int] = {}
         self.total_weight = 0
     
@@ -91,7 +97,7 @@ class WeightedRoundRobinStrategy(LoadBalancingStrategy):
 class LeastConnectionsStrategy(LoadBalancingStrategy):
     """Least connections load balancing strategy."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.connection_counts: Dict[str, int] = {}
     
     def select_instance(self, instances: List[ServiceInstance], request_context: Dict = None) -> Optional[ServiceInstance]:
@@ -124,7 +130,9 @@ class HealthBasedStrategy(LoadBalancingStrategy):
     """Health-based load balancing strategy."""
     
     def __init__(self, fallback_strategy: LoadBalancingStrategy = None):
-        self.fallback_strategy = fallback_strategy or RoundRobinStrategy()
+        
+    """__init__ function."""
+self.fallback_strategy = fallback_strategy or RoundRobinStrategy()
         self.health_cache: Dict[str, bool] = {}
         
     async def check_instance_health(self, instance: ServiceInstance) -> bool:
@@ -162,7 +170,9 @@ class LoadBalancerManager:
     """Advanced load balancer with multiple strategies."""
     
     def __init__(self, strategy: LoadBalancingStrategy = None):
-        self.strategy = strategy or RoundRobinStrategy()
+        
+    """__init__ function."""
+self.strategy = strategy or RoundRobinStrategy()
         self.stats = LoadBalancerStats()
         self.session: Optional[aiohttp.ClientSession] = None
         
@@ -181,7 +191,7 @@ class LoadBalancerManager:
             )
         return self.session
     
-    async def route_request(self, 
+    async async def route_request(self, 
                           instances: List[ServiceInstance],
                           path: str = "/",
                           method: str = "GET",
@@ -223,6 +233,10 @@ class LoadBalancerManager:
                         response_data = await response.text()
                 except:
                     response_data = await response.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 
                 return {
                     "data": response_data,
@@ -321,7 +335,7 @@ class LoadBalancerManager:
                 results[instance.id] = await self.strategy.check_instance_health(instance)
             return results
     
-    async def close(self):
+    async def close(self) -> Any:
         """Close HTTP session."""
         if self.session:
             await self.session.close() 

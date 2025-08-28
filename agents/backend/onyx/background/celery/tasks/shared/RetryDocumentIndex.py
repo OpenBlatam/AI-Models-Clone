@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import httpx
 from tenacity import retry
 from tenacity import retry_if_exception_type
@@ -9,6 +11,9 @@ from onyx.document_index.interfaces import VespaDocumentFields
 from onyx.document_index.interfaces import VespaDocumentUserFields
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class RetryDocumentIndex:
     """A wrapper class to help with specific retries against Vespa involving
     read timeouts.
@@ -22,7 +27,9 @@ class RetryDocumentIndex:
     STOP_AFTER = 70
 
     def __init__(self, index: DocumentIndex):
-        self.index: DocumentIndex = index
+        
+    """__init__ function."""
+self.index: DocumentIndex = index
 
     @retry(
         retry=retry_if_exception_type(httpx.ReadTimeout),

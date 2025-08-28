@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import pytest
+import asyncio
+from datetime import datetime, timedelta
+from typing import List, Dict, Any
+from unittest.mock import AsyncMock, MagicMock, patch, Mock
+from fastapi.testclient import TestClient
+from fastapi import FastAPI, HTTPException, status
+from .declarative_routes import (
+from .functional_fastapi_components import (
+        from fastapi import APIRouter
+        from fastapi import APIRouter
+        from fastapi import APIRouter
+        import time
+        import time
+from typing import Any, List, Dict, Optional
+import logging
 """
 🧪 Test Suite for Declarative Route Definitions
 ==============================================
@@ -11,15 +35,7 @@ Comprehensive testing of:
 - OpenAPI documentation generation
 """
 
-import pytest
-import asyncio
-from datetime import datetime, timedelta
-from typing import List, Dict, Any
-from unittest.mock import AsyncMock, MagicMock, patch, Mock
-from fastapi.testclient import TestClient
-from fastapi import FastAPI, HTTPException, status
 
-from .declarative_routes import (
     # Route Classes
     AnalysisRoutes, BatchRoutes, HealthRoutes,
     
@@ -41,7 +57,6 @@ from .declarative_routes import (
     create_analysis_router, create_app
 )
 
-from .functional_fastapi_components import (
     # Pydantic Models
     TextAnalysisRequest, BatchAnalysisRequest, AnalysisUpdateRequest,
     PaginationRequest, AnalysisFilterRequest,
@@ -167,7 +182,7 @@ def fastapi_app():
     return create_app()
 
 @pytest.fixture
-def test_client(fastapi_app):
+def test_client(fastapi_app) -> Any:
     """Create test client."""
     return TestClient(fastapi_app)
 
@@ -178,7 +193,7 @@ def test_client(fastapi_app):
 class TestRouteResponse:
     """Test route response types."""
     
-    def test_route_response_creation(self):
+    def test_route_response_creation(self) -> Any:
         """Test basic route response creation."""
         response = RouteResponse(
             success=True,
@@ -193,7 +208,7 @@ class TestRouteResponse:
         assert response.request_id == "test-id"
         assert isinstance(response.timestamp, datetime)
     
-    def test_analysis_detail_response(self, sample_analysis_response):
+    def test_analysis_detail_response(self, sample_analysis_response) -> Any:
         """Test analysis detail response."""
         response = AnalysisDetailResponse(
             success=True,
@@ -206,7 +221,7 @@ class TestRouteResponse:
         assert response.data == sample_analysis_response
         assert response.message == "Analysis retrieved successfully"
     
-    def test_analysis_list_response(self, sample_analysis_response):
+    def test_analysis_list_response(self, sample_analysis_response) -> List[Any]:
         """Test analysis list response."""
         paginated_data = PaginatedResponse.create(
             items=[sample_analysis_response],
@@ -226,7 +241,7 @@ class TestRouteResponse:
         assert response.data == paginated_data
         assert len(response.data.items) == 1
     
-    def test_batch_detail_response(self, sample_batch_response):
+    def test_batch_detail_response(self, sample_batch_response) -> Any:
         """Test batch detail response."""
         response = BatchDetailResponse(
             success=True,
@@ -239,7 +254,7 @@ class TestRouteResponse:
         assert response.data == sample_batch_response
         assert response.message == "Batch retrieved successfully"
     
-    def test_health_check_response(self):
+    def test_health_check_response(self) -> Any:
         """Test health check response."""
         health_data = HealthResponse(
             status="healthy",
@@ -269,11 +284,13 @@ class TestWithResponseWrapper:
     """Test response wrapper decorator."""
     
     @pytest.mark.asyncio
-    async def test_successful_response_wrapping(self):
+    async def test_successful_response_wrapping(self) -> Any:
         """Test successful response wrapping."""
         @with_response_wrapper(AnalysisDetailResponse)
         async def test_func():
-            return {"id": 1, "text": "test"}
+            
+    """test_func function."""
+return {"id": 1, "text": "test"}
         
         result = await test_func()
         
@@ -283,11 +300,13 @@ class TestWithResponseWrapper:
         assert result.message == "Operation completed successfully"
     
     @pytest.mark.asyncio
-    async def test_already_wrapped_response(self):
+    async def test_already_wrapped_response(self) -> Any:
         """Test response that's already wrapped."""
         @with_response_wrapper(AnalysisDetailResponse)
         async def test_func():
-            return AnalysisDetailResponse(
+            
+    """test_func function."""
+return AnalysisDetailResponse(
                 success=True,
                 data={"id": 1},
                 message="Custom message"
@@ -301,11 +320,13 @@ class TestWithResponseWrapper:
         assert result.message == "Custom message"
     
     @pytest.mark.asyncio
-    async def test_http_exception_passthrough(self):
+    async async def test_http_exception_passthrough(self) -> Any:
         """Test HTTP exception passthrough."""
         @with_response_wrapper(AnalysisDetailResponse)
         async def test_func():
-            raise HTTPException(status_code=404, detail="Not found")
+            
+    """test_func function."""
+raise HTTPException(status_code=404, detail="Not found")
         
         with pytest.raises(HTTPException) as exc_info:
             await test_func()
@@ -314,11 +335,13 @@ class TestWithResponseWrapper:
         assert exc_info.value.detail == "Not found"
     
     @pytest.mark.asyncio
-    async def test_general_exception_wrapping(self):
+    async def test_general_exception_wrapping(self) -> Any:
         """Test general exception wrapping."""
         @with_response_wrapper(AnalysisDetailResponse)
         async def test_func():
-            raise ValueError("Test error")
+            
+    """test_func function."""
+raise ValueError("Test error")
         
         result = await test_func()
         
@@ -331,11 +354,13 @@ class TestWithRequestLogging:
     """Test request logging decorator."""
     
     @pytest.mark.asyncio
-    async def test_successful_request_logging(self, mock_request):
+    async async def test_successful_request_logging(self, mock_request) -> Any:
         """Test successful request logging."""
         @with_request_logging()
         async def test_func(request: Mock):
-            return "success"
+            
+    """test_func function."""
+return "success"
         
         with patch('structlog.get_logger') as mock_logger:
             mock_log = MagicMock()
@@ -347,11 +372,13 @@ class TestWithRequestLogging:
             assert mock_log.info.call_count == 2  # Start and success
     
     @pytest.mark.asyncio
-    async def test_failed_request_logging(self, mock_request):
+    async async def test_failed_request_logging(self, mock_request) -> Any:
         """Test failed request logging."""
         @with_request_logging()
         async def test_func(request: Mock):
-            raise ValueError("Test error")
+            
+    """test_func function."""
+raise ValueError("Test error")
         
         with patch('structlog.get_logger') as mock_logger:
             mock_log = MagicMock()
@@ -366,11 +393,13 @@ class TestWithPerformanceMonitoring:
     """Test performance monitoring decorator."""
     
     @pytest.mark.asyncio
-    async def test_successful_performance_monitoring(self):
+    async def test_successful_performance_monitoring(self) -> Any:
         """Test successful performance monitoring."""
         @with_performance_monitoring()
         async def test_func():
-            await asyncio.sleep(0.1)  # Simulate work
+            
+    """test_func function."""
+await asyncio.sleep(0.1)  # Simulate work
             return "success"
         
         with patch('structlog.get_logger') as mock_logger:
@@ -387,11 +416,13 @@ class TestWithPerformanceMonitoring:
             assert call_args["processing_time_seconds"] > 0
     
     @pytest.mark.asyncio
-    async def test_failed_performance_monitoring(self):
+    async def test_failed_performance_monitoring(self) -> Any:
         """Test failed performance monitoring."""
         @with_performance_monitoring()
         async def test_func():
-            await asyncio.sleep(0.1)  # Simulate work
+            
+    """test_func function."""
+await asyncio.sleep(0.1)  # Simulate work
             raise ValueError("Test error")
         
         with patch('structlog.get_logger') as mock_logger:
@@ -415,7 +446,7 @@ class TestDependencies:
     """Test dependency functions."""
     
     @pytest.mark.asyncio
-    async def test_get_db_manager(self):
+    async def test_get_db_manager(self) -> Optional[Dict[str, Any]]:
         """Test database manager dependency."""
         with patch('declarative_routes.SQLAlchemy2Manager') as mock_manager_class:
             mock_manager = MagicMock()
@@ -426,7 +457,7 @@ class TestDependencies:
             assert result == mock_manager
     
     @pytest.mark.asyncio
-    async def test_get_current_user(self, mock_auth_token):
+    async def test_get_current_user(self, mock_auth_token) -> Optional[Dict[str, Any]]:
         """Test current user dependency."""
         result = await get_current_user(mock_auth_token)
         
@@ -436,14 +467,14 @@ class TestDependencies:
         assert result["role"] == "user"
     
     @pytest.mark.asyncio
-    async def test_get_request_id_with_header(self, mock_request):
+    async async def test_get_request_id_with_header(self, mock_request) -> Optional[Dict[str, Any]]:
         """Test request ID dependency with header."""
         result = await get_request_id(mock_request)
         
         assert result == "test-request-id"
     
     @pytest.mark.asyncio
-    async def test_get_request_id_without_header(self, mock_request):
+    async async def test_get_request_id_without_header(self, mock_request) -> Optional[Dict[str, Any]]:
         """Test request ID dependency without header."""
         mock_request.headers = {}
         
@@ -461,15 +492,14 @@ class TestAnalysisRoutes:
     """Test analysis routes."""
     
     @pytest.fixture
-    def router(self):
+    def router(self) -> Any:
         """Create router for testing."""
-        from fastapi import APIRouter
         router = APIRouter()
         return AnalysisRoutes(router)
     
     @pytest.mark.asyncio
     async def test_create_analysis_success(self, router, sample_text_analysis_request, 
-                                         mock_db_manager, sample_analysis_response):
+                                         mock_db_manager, sample_analysis_response) -> Any:
         """Test successful analysis creation."""
         # Mock service response
         with patch('declarative_routes.create_analysis_service') as mock_service:
@@ -498,7 +528,7 @@ class TestAnalysisRoutes:
                             assert result.message == "Analysis created successfully"
     
     @pytest.mark.asyncio
-    async def test_create_analysis_validation_error(self, router, mock_db_manager):
+    async def test_create_analysis_validation_error(self, router, mock_db_manager) -> Any:
         """Test analysis creation with validation error."""
         invalid_request = TextAnalysisRequest(
             text_content="",  # Invalid empty content
@@ -524,7 +554,7 @@ class TestAnalysisRoutes:
                         assert "Validation failed" in str(exc_info.value.detail)
     
     @pytest.mark.asyncio
-    async def test_get_analysis_success(self, router, mock_db_manager, sample_analysis_response):
+    async def test_get_analysis_success(self, router, mock_db_manager, sample_analysis_response) -> Optional[Dict[str, Any]]:
         """Test successful analysis retrieval."""
         with patch('declarative_routes.get_analysis_service') as mock_service:
             mock_service.return_value.success = True
@@ -545,7 +575,7 @@ class TestAnalysisRoutes:
                         assert result.data == sample_analysis_response
     
     @pytest.mark.asyncio
-    async def test_get_analysis_not_found(self, router, mock_db_manager):
+    async def test_get_analysis_not_found(self, router, mock_db_manager) -> Optional[Dict[str, Any]]:
         """Test analysis retrieval with not found."""
         with patch('declarative_routes.get_analysis_service') as mock_service:
             mock_service.return_value.success = False
@@ -569,15 +599,14 @@ class TestBatchRoutes:
     """Test batch routes."""
     
     @pytest.fixture
-    def router(self):
+    def router(self) -> Any:
         """Create router for testing."""
-        from fastapi import APIRouter
         router = APIRouter()
         return BatchRoutes(router)
     
     @pytest.mark.asyncio
     async def test_create_batch_success(self, router, sample_batch_analysis_request,
-                                      mock_db_manager, sample_batch_response):
+                                      mock_db_manager, sample_batch_response) -> Any:
         """Test successful batch creation."""
         with patch('declarative_routes.create_batch_service') as mock_service:
             mock_service.return_value.success = True
@@ -605,14 +634,13 @@ class TestHealthRoutes:
     """Test health routes."""
     
     @pytest.fixture
-    def router(self):
+    def router(self) -> Any:
         """Create router for testing."""
-        from fastapi import APIRouter
         router = APIRouter()
         return HealthRoutes(router)
     
     @pytest.mark.asyncio
-    async def test_health_check_success(self, router, mock_db_manager):
+    async def test_health_check_success(self, router, mock_db_manager) -> Any:
         """Test successful health check."""
         with patch('declarative_routes.get_db_manager', return_value=mock_db_manager):
             with patch('declarative_routes.get_request_id', return_value="test-id"):
@@ -627,7 +655,7 @@ class TestHealthRoutes:
                 assert result.message == "Health check completed"
     
     @pytest.mark.asyncio
-    async def test_detailed_health_check(self, router, mock_db_manager):
+    async def test_detailed_health_check(self, router, mock_db_manager) -> Any:
         """Test detailed health check."""
         with patch('declarative_routes.get_db_manager', return_value=mock_db_manager):
             with patch('declarative_routes.get_request_id', return_value="test-id"):
@@ -652,7 +680,7 @@ class TestRouteIntegration:
     """Integration tests for routes."""
     
     @pytest.mark.asyncio
-    async def test_analysis_workflow(self, mock_db_manager, sample_analysis_response):
+    async def test_analysis_workflow(self, mock_db_manager, sample_analysis_response) -> Any:
         """Test complete analysis workflow."""
         # Mock all dependencies
         with patch('declarative_routes.get_db_manager', return_value=mock_db_manager):
@@ -689,7 +717,7 @@ class TestRouteIntegration:
                             mock_bg_tasks.return_value.add_task.assert_called_once()
     
     @pytest.mark.asyncio
-    async def test_batch_workflow(self, mock_db_manager, sample_batch_response):
+    async def test_batch_workflow(self, mock_db_manager, sample_batch_response) -> Any:
         """Test complete batch workflow."""
         with patch('declarative_routes.get_db_manager', return_value=mock_db_manager):
             with patch('declarative_routes.get_current_user', return_value={"id": 1}):
@@ -731,7 +759,7 @@ class TestRouteIntegration:
 class TestApplication:
     """Test FastAPI application."""
     
-    def test_create_analysis_router(self):
+    def test_create_analysis_router(self) -> Any:
         """Test analysis router creation."""
         router = create_analysis_router()
         
@@ -739,7 +767,7 @@ class TestApplication:
         assert router.prefix == "/api/v1"
         assert "Analysis" in router.tags
     
-    def test_create_app(self):
+    def test_create_app(self) -> Any:
         """Test application creation."""
         app = create_app()
         
@@ -749,11 +777,13 @@ class TestApplication:
         assert app.docs_url == "/docs"
         assert app.redoc_url == "/redoc"
     
-    def test_global_exception_handler(self, fastapi_app):
+    def test_global_exception_handler(self, fastapi_app) -> Any:
         """Test global exception handler."""
         @fastapi_app.get("/test-error")
         async def test_error():
-            raise ValueError("Test error")
+            
+    """test_error function."""
+raise ValueError("Test error")
         
         client = TestClient(fastapi_app)
         
@@ -778,7 +808,7 @@ class TestApplication:
 class TestOpenAPIDocumentation:
     """Test OpenAPI documentation generation."""
     
-    def test_openapi_schema_generation(self, fastapi_app):
+    async def test_openapi_schema_generation(self, fastapi_app) -> Any:
         """Test OpenAPI schema generation."""
         client = TestClient(fastapi_app)
         
@@ -802,7 +832,7 @@ class TestOpenAPIDocumentation:
         assert "/api/v1/batches" in paths
         assert "/api/v1/health" in paths
     
-    def test_route_documentation(self, fastapi_app):
+    def test_route_documentation(self, fastapi_app) -> Any:
         """Test route documentation."""
         client = TestClient(fastapi_app)
         
@@ -825,7 +855,7 @@ class TestOpenAPIDocumentation:
         assert get_operation["summary"] == "List Analyses"
         assert "Retrieve paginated list" in get_operation["description"]
     
-    def test_response_model_documentation(self, fastapi_app):
+    def test_response_model_documentation(self, fastapi_app) -> Any:
         """Test response model documentation."""
         client = TestClient(fastapi_app)
         
@@ -852,9 +882,8 @@ class TestPerformance:
     """Performance tests for routes."""
     
     @pytest.mark.asyncio
-    async def test_route_performance(self, mock_db_manager, sample_analysis_response):
+    async def test_route_performance(self, mock_db_manager, sample_analysis_response) -> Any:
         """Test route performance."""
-        import time
         
         with patch('declarative_routes.get_db_manager', return_value=mock_db_manager):
             with patch('declarative_routes.get_current_user', return_value={"id": 1}):
@@ -883,15 +912,16 @@ class TestPerformance:
                         # Should complete in reasonable time
                         assert total_time < 1.0  # Less than 1 second for 10 requests
     
-    def test_decorator_performance(self):
+    def test_decorator_performance(self) -> Any:
         """Test decorator performance."""
-        import time
         
         @with_response_wrapper(AnalysisDetailResponse)
         @with_request_logging()
         @with_performance_monitoring()
         async def test_func():
-            return {"test": "data"}
+            
+    """test_func function."""
+return {"test": "data"}
         
         start_time = time.time()
         
@@ -913,7 +943,7 @@ class TestErrorHandling:
     """Test error handling in routes."""
     
     @pytest.mark.asyncio
-    async def test_database_error_handling(self, mock_db_manager):
+    async def test_database_error_handling(self, mock_db_manager) -> Any:
         """Test database error handling."""
         with patch('declarative_routes.get_db_manager', return_value=mock_db_manager):
             with patch('declarative_routes.get_current_user', return_value={"id": 1}):
@@ -934,7 +964,7 @@ class TestErrorHandling:
                         assert exc_info.value.status_code == 500
     
     @pytest.mark.asyncio
-    async def test_validation_error_handling(self, mock_db_manager):
+    async def test_validation_error_handling(self, mock_db_manager) -> Any:
         """Test validation error handling."""
         with patch('declarative_routes.get_db_manager', return_value=mock_db_manager):
             with patch('declarative_routes.get_current_user', return_value={"id": 1}):
@@ -972,5 +1002,6 @@ def test_example_usage():
     # Implementation depends on the actual function content
     pass
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

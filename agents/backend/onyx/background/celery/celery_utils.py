@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from datetime import datetime
 from datetime import timezone
 from pathlib import Path
@@ -9,8 +14,6 @@ import httpx
 from onyx.configs.app_configs import MAX_PRUNING_DOCUMENT_RETRIEVAL_PER_MINUTE
 from onyx.configs.app_configs import VESPA_REQUEST_TIMEOUT
 from onyx.connectors.cross_connector_utils.rate_limit_wrapper import (
-    rate_limit_builder,
-)
 from onyx.connectors.interfaces import BaseConnector
 from onyx.connectors.interfaces import LoadConnector
 from onyx.connectors.interfaces import PollConnector
@@ -19,6 +22,11 @@ from onyx.connectors.models import Document
 from onyx.httpx.httpx_pool import HttpxPool
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    rate_limit_builder,
+)
 
 
 logger = setup_logger()
@@ -102,7 +110,7 @@ def celery_is_worker_primary(worker: Any) -> bool:
     return False
 
 
-def httpx_init_vespa_pool(
+async def httpx_init_vespa_pool(
     max_keepalive_connections: int,
     timeout: int = VESPA_REQUEST_TIMEOUT,
     ssl_cert: str | None = None,

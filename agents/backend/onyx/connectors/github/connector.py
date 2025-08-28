@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import copy
 import time
 from collections.abc import Callable
@@ -37,6 +42,11 @@ from onyx.connectors.models import DocumentFailure
 from onyx.connectors.models import TextSection
 from onyx.utils.logger import setup_logger
 
+    import os
+    from onyx.connectors.connector_runner import ConnectorRunner
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 ITEMS_PER_PAGE = 100
@@ -242,7 +252,7 @@ def _convert_pr_to_document(pull_request: PullRequest) -> Document:
     )
 
 
-def _fetch_issue_comments(issue: Issue) -> str:
+async def _fetch_issue_comments(issue: Issue) -> str:
     comments = issue.get_comments()
     return "\nComment: ".join(comment.body for comment in comments)
 
@@ -408,7 +418,7 @@ class GithubConnector(CheckpointedConnector[GithubConnectorCheckpoint]):
             _sleep_after_rate_limit_exception(github_client)
             return self._get_all_repos(github_client, attempt_num + 1)
 
-    def _pull_requests_func(
+    async def _pull_requests_func(
         self, repo: Repository.Repository
     ) -> Callable[[], PaginatedList[PullRequest]]:
         return lambda: repo.get_pulls(
@@ -422,7 +432,7 @@ class GithubConnector(CheckpointedConnector[GithubConnectorCheckpoint]):
             state=self.state_filter, sort="updated", direction="desc"
         )
 
-    def _fetch_from_github(
+    async def _fetch_from_github(
         self,
         checkpoint: GithubConnectorCheckpoint,
         start: datetime | None = None,
@@ -798,8 +808,6 @@ class GithubConnector(CheckpointedConnector[GithubConnectorCheckpoint]):
 
 
 if __name__ == "__main__":
-    import os
-    from onyx.connectors.connector_runner import ConnectorRunner
 
     # Initialize the connector
     connector = GithubConnector(

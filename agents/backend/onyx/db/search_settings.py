@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy import and_
 from sqlalchemy import delete
 from sqlalchemy import select
@@ -24,11 +26,14 @@ from onyx.indexing.models import IndexingSetting
 from onyx.natural_language_processing.search_nlp_models import clean_model_name
 from onyx.natural_language_processing.search_nlp_models import warm_up_cross_encoder
 from onyx.server.manage.embedding.models import (
-    CloudEmbeddingProvider as ServerCloudEmbeddingProvider,
-)
 from onyx.utils.logger import setup_logger
 from shared_configs.configs import PRESERVED_SEARCH_FIELDS
 from shared_configs.enums import EmbeddingProvider
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    CloudEmbeddingProvider as ServerCloudEmbeddingProvider,
+)
 
 
 logger = setup_logger()

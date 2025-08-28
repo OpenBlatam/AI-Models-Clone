@@ -1,3 +1,42 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import time
+import logging
+from typing import Dict, Any, Optional, List, Union, Tuple, Callable, TypeVar
+from dataclasses import dataclass, field
+from enum import Enum
+from functools import partial
+import numpy as np
+import pandas as pd
+from functional_utils import (
+        from sklearn.metrics import accuracy_score
+        from sklearn.metrics import precision_score
+        from sklearn.metrics import recall_score
+        from sklearn.metrics import f1_score
+        from sklearn.metrics import cohen_kappa_score
+        from sklearn.metrics import matthews_corrcoef
+        from sklearn.metrics import roc_auc_score
+        from sklearn.metrics import log_loss
+        from sklearn.metrics import mean_squared_error
+        from sklearn.metrics import mean_squared_error
+        from sklearn.metrics import mean_absolute_error
+        from sklearn.metrics import r2_score
+        from sklearn.metrics import hamming_loss
+        from sklearn.metrics import accuracy_score
+        from sklearn.metrics import precision_score
+        from sklearn.metrics import recall_score
+        from sklearn.metrics import f1_score
+        from sklearn.metrics import precision_score
+        from sklearn.metrics import recall_score
+        from sklearn.metrics import f1_score
+        from sklearn.metrics import jaccard_score
+        from sklearn.metrics import jaccard_score
+        from sklearn.metrics import confusion_matrix, classification_report, roc_curve, precision_recall_curve
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🔧 Modular Evaluation Framework
 ===============================
@@ -13,16 +52,7 @@ Key Principles:
 - Immutable data transformations
 """
 
-import time
-import logging
-from typing import Dict, Any, Optional, List, Union, Tuple, Callable, TypeVar
-from dataclasses import dataclass, field
-from enum import Enum
-from functools import partial
-import numpy as np
-import pandas as pd
 
-from functional_utils import (
     Result, ValidationResult, safe_execute, timer_context,
     transform_list, filter_list, group_by, sort_by,
     pipe, compose, log_function_call, log_data_info
@@ -209,37 +239,30 @@ class MetricCalculator:
     # Individual metric calculation methods
     @staticmethod
     def _calculate_accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import accuracy_score
         return accuracy_score(y_true, y_pred)
     
     @staticmethod
     def _calculate_precision(y_true: np.ndarray, y_pred: np.ndarray, config: MetricConfig) -> float:
-        from sklearn.metrics import precision_score
         return precision_score(y_true, y_pred, average=config.average, zero_division=config.zero_division)
     
     @staticmethod
     def _calculate_recall(y_true: np.ndarray, y_pred: np.ndarray, config: MetricConfig) -> float:
-        from sklearn.metrics import recall_score
         return recall_score(y_true, y_pred, average=config.average, zero_division=config.zero_division)
     
     @staticmethod
     def _calculate_f1(y_true: np.ndarray, y_pred: np.ndarray, config: MetricConfig) -> float:
-        from sklearn.metrics import f1_score
         return f1_score(y_true, y_pred, average=config.average, zero_division=config.zero_division)
     
     @staticmethod
     def _calculate_cohen_kappa(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import cohen_kappa_score
         return cohen_kappa_score(y_true, y_pred)
     
     @staticmethod
     def _calculate_matthews_corrcoef(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import matthews_corrcoef
         return matthews_corrcoef(y_true, y_pred)
     
     @staticmethod
     def _calculate_roc_auc(y_true: np.ndarray, y_prob: np.ndarray, config: MetricConfig) -> float:
-        from sklearn.metrics import roc_auc_score
         if len(np.unique(y_true)) == 2:
             return roc_auc_score(y_true, y_prob[:, 1])
         else:
@@ -247,27 +270,22 @@ class MetricCalculator:
     
     @staticmethod
     def _calculate_log_loss(y_true: np.ndarray, y_prob: np.ndarray) -> float:
-        from sklearn.metrics import log_loss
         return log_loss(y_true, y_prob)
     
     @staticmethod
     def _calculate_mse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import mean_squared_error
         return mean_squared_error(y_true, y_pred)
     
     @staticmethod
     def _calculate_rmse(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import mean_squared_error
         return np.sqrt(mean_squared_error(y_true, y_pred))
     
     @staticmethod
     def _calculate_mae(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import mean_absolute_error
         return mean_absolute_error(y_true, y_pred)
     
     @staticmethod
     def _calculate_r2(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import r2_score
         return r2_score(y_true, y_pred)
     
     @staticmethod
@@ -280,52 +298,42 @@ class MetricCalculator:
     
     @staticmethod
     def _calculate_hamming_loss(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import hamming_loss
         return hamming_loss(y_true, y_pred)
     
     @staticmethod
     def _calculate_exact_match(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import accuracy_score
         return accuracy_score(y_true, y_pred)
     
     @staticmethod
     def _calculate_micro_precision(y_true: np.ndarray, y_pred: np.ndarray, config: MetricConfig) -> float:
-        from sklearn.metrics import precision_score
         return precision_score(y_true, y_pred, average='micro', zero_division=config.zero_division)
     
     @staticmethod
     def _calculate_micro_recall(y_true: np.ndarray, y_pred: np.ndarray, config: MetricConfig) -> float:
-        from sklearn.metrics import recall_score
         return recall_score(y_true, y_pred, average='micro', zero_division=config.zero_division)
     
     @staticmethod
     def _calculate_micro_f1(y_true: np.ndarray, y_pred: np.ndarray, config: MetricConfig) -> float:
-        from sklearn.metrics import f1_score
         return f1_score(y_true, y_pred, average='micro', zero_division=config.zero_division)
     
     @staticmethod
     def _calculate_macro_precision(y_true: np.ndarray, y_pred: np.ndarray, config: MetricConfig) -> float:
-        from sklearn.metrics import precision_score
         return precision_score(y_true, y_pred, average='macro', zero_division=config.zero_division)
     
     @staticmethod
     def _calculate_macro_recall(y_true: np.ndarray, y_pred: np.ndarray, config: MetricConfig) -> float:
-        from sklearn.metrics import recall_score
         return recall_score(y_true, y_pred, average='macro', zero_division=config.zero_division)
     
     @staticmethod
     def _calculate_macro_f1(y_true: np.ndarray, y_pred: np.ndarray, config: MetricConfig) -> float:
-        from sklearn.metrics import f1_score
         return f1_score(y_true, y_pred, average='macro', zero_division=config.zero_division)
     
     @staticmethod
     def _calculate_jaccard_micro(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import jaccard_score
         return jaccard_score(y_true, y_pred, average='micro')
     
     @staticmethod
     def _calculate_jaccard_macro(y_true: np.ndarray, y_pred: np.ndarray) -> float:
-        from sklearn.metrics import jaccard_score
         return jaccard_score(y_true, y_pred, average='macro')
 
 # ============================================================================
@@ -412,7 +420,6 @@ class EvaluationPipeline:
         y_prob: Optional[np.ndarray]
     ) -> Dict[str, Any]:
         """Calculate classification-specific data."""
-        from sklearn.metrics import confusion_matrix, classification_report, roc_curve, precision_recall_curve
         
         data = {
             'confusion_matrix': confusion_matrix(y_true, y_pred),
@@ -679,5 +686,6 @@ def demo_modular_evaluation():
     
     print("\n🎉 All modular evaluation functions working correctly!")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     demo_modular_evaluation() 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import uuid
 from types import TracebackType
 from typing import Any
@@ -11,6 +13,9 @@ from onyx.db.models import Credential
 from onyx.redis.redis_pool import get_redis_client
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class OnyxDBCredentialsProvider(
     CredentialsProviderInterface["OnyxDBCredentialsProvider"]
 ):
@@ -21,7 +26,9 @@ class OnyxDBCredentialsProvider(
     LOCK_TTL = 900  # TTL of the lock
 
     def __init__(self, tenant_id: str, connector_name: str, credential_id: int):
-        self._tenant_id = tenant_id
+        
+    """__init__ function."""
+self._tenant_id = tenant_id
         self._connector_name = connector_name
         self._credential_id = credential_id
 
@@ -102,7 +109,9 @@ class OnyxStaticCredentialsProvider(
         connector_name: str,
         credential_json: dict[str, Any],
     ):
-        self._tenant_id = tenant_id
+        
+    """__init__ function."""
+self._tenant_id = tenant_id
         self._connector_name = connector_name
         self._credential_json = credential_json
 

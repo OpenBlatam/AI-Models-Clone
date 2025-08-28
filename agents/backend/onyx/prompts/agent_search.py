@@ -1,4 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from onyx.agents.agent_search.shared_graph_utils.constants import (
+from a document store.
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     AGENT_ANSWER_SEPARATOR,
 )
 
@@ -766,7 +772,6 @@ independently without the original question available
     - good sub-question: "What is the name of the river that flows through Paris?"
 
     - For each new sub-question, please also provide a search term that can be used to retrieve relevant documents \
-from a document store.
 
 - Consider specifically the sub-questions that were suggested but not answered. This is a sign that they are not answerable \
 with the available context, and you should not ask similar questions.

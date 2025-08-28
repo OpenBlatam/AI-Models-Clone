@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from pydantic import BaseModel, Field
+from typing import Optional, Dict, Any, List, Callable
+import asyncio
+import logging
+from pathlib import Path
+import json
+from datetime import datetime
+from functools import partial, reduce
+from operator import itemgetter
+import uuid
+from functional_training import (
+        import torch
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 🚀 Functional FastAPI Application
 ================================
@@ -13,21 +35,7 @@ Key Principles:
 - Declarative configuration
 """
 
-from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from pydantic import BaseModel, Field
-from typing import Optional, Dict, Any, List, Callable
-import asyncio
-import logging
-from pathlib import Path
-import json
-from datetime import datetime
-from functools import partial, reduce
-from operator import itemgetter
-import uuid
 
-from functional_training import (
     create_default_config,
     update_config,
     validate_config,
@@ -431,7 +439,7 @@ def validate_experiment_exists(
 # FastAPI App Creation (Functional Approach)
 # ============================================================================
 
-def create_fastapi_app() -> FastAPI:
+async def create_fastapi_app() -> FastAPI:
     """Create FastAPI app in a pure functional way."""
     app_config = create_app_config()
     app = FastAPI(**app_config)
@@ -653,7 +661,6 @@ async def inference(
             )
         
         # Load model (simplified - replace with actual model loading logic)
-        import torch
         checkpoint = torch.load(request.model_path, map_location='cpu')
         
         # Perform inference (simplified - replace with actual inference logic)
@@ -834,6 +841,5 @@ def demo_functional_api():
     print("- GET /stats - API statistics")
 
 if __name__ == "__main__":
-    import uvicorn
     demo_functional_api()
     uvicorn.run(app, host="0.0.0.0", port=8000) 

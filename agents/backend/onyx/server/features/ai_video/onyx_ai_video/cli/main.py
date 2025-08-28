@@ -1,9 +1,10 @@
-"""
-Onyx AI Video System - CLI
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Command-line interface for the Onyx AI Video system with system
-management, video generation, and plugin administration.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import argparse
@@ -13,13 +14,22 @@ import os
 from typing import Any, Dict, List, Optional
 from pathlib import Path
 import logging
-
 from ..api.main import OnyxAIVideoSystem, get_system, shutdown_system
 from ..core.models import VideoRequest, VideoResponse, SystemStatus, PerformanceMetrics
 from ..config.config_manager import OnyxConfigManager, create_config_file
 from ..utils.logger import OnyxLogger, setup_logger
 from ..utils.performance import get_performance_monitor
 from ..utils.security import get_security_manager
+            import time
+from typing import Any, List, Dict, Optional
+"""
+Onyx AI Video System - CLI
+
+Command-line interface for the Onyx AI Video system with system
+management, video generation, and plugin administration.
+"""
+
+
 
 
 class OnyxAIVideoCLI:
@@ -30,7 +40,7 @@ class OnyxAIVideoCLI:
     plugin administration, and monitoring.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.system: Optional[OnyxAIVideoSystem] = None
         self.logger = OnyxLogger("ai_video_cli")
         self.parser = self._create_parser()
@@ -317,7 +327,15 @@ Examples:
             if args.vision:
                 # Load image data
                 with open(args.vision, 'rb') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                     image_data = f.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 
                 response = await self.system.generate_video_with_vision(request, image_data)
             else:
@@ -524,7 +542,6 @@ Examples:
             if not self.system:
                 self.system = await get_system(args.config)
             
-            import time
             
             print("=== Real-time Monitoring ===")
             print("Press Ctrl+C to stop")
@@ -571,7 +588,7 @@ Examples:
             self.logger.error(f"Monitoring failed: {e}")
             return 1
     
-    async def _handle_requests(self, args) -> int:
+    async async def _handle_requests(self, args) -> int:
         """Handle requests command."""
         try:
             if not self.system:
@@ -657,5 +674,6 @@ def main():
     sys.exit(exit_code)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

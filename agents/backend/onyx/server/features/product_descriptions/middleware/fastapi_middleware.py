@@ -1,10 +1,13 @@
-"""
-FastAPI Middleware - Best Practices
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-This module implements FastAPI middleware following official documentation
-best practices for middleware order, error handling, performance monitoring,
-and security.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import time
 import json
@@ -21,9 +24,19 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.types import ASGIApp
 import uuid
+from ..models.fastapi_models import ErrorResponse
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+FastAPI Middleware - Best Practices
+
+This module implements FastAPI middleware following official documentation
+best practices for middleware order, error handling, performance monitoring,
+and security.
+"""
+
 
 # Import models
-from ..models.fastapi_models import ErrorResponse
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -50,7 +63,9 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.logger = logging.getLogger("request_logger")
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -159,7 +174,9 @@ class PerformanceMonitoringMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.logger = logging.getLogger("performance_logger")
         self.metrics = {
             "request_count": 0,
@@ -242,7 +259,9 @@ class ErrorHandlingMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.logger = logging.getLogger("error_logger")
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -320,7 +339,9 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """Add security headers to response."""
@@ -354,7 +375,9 @@ class RateLimitingMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app: ASGIApp, requests_per_minute: int = 100):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.requests_per_minute = requests_per_minute
         self.request_counts = {}
         self.logger = logging.getLogger("rate_limit_logger")
@@ -431,7 +454,9 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
     """
     
     def __init__(self, app: ASGIApp):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
         """Manage request context."""
@@ -530,7 +555,7 @@ class MiddlewareStack:
     Defines the order and configuration of middleware components.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.middleware_list = []
         self.performance_monitor = PerformanceMonitoringMiddleware(None)
     
@@ -538,7 +563,7 @@ class MiddlewareStack:
         """Add middleware to the stack."""
         self.middleware_list.append((middleware_class, kwargs))
     
-    def configure_default_stack(self):
+    def configure_default_stack(self) -> Any:
         """Configure default middleware stack with best practices."""
         # 1. Trusted Host (security)
         self.add_middleware(TrustedHostMiddleware, allowed_hosts=["*"])
@@ -585,11 +610,11 @@ class MiddlewareStack:
 # UTILITY FUNCTIONS
 # =============================================================================
 
-def get_request_id() -> Optional[str]:
+async def get_request_id() -> Optional[str]:
     """Get current request ID from context."""
     return request_id_var.get()
 
-def get_request_start_time() -> Optional[float]:
+async def get_request_start_time() -> Optional[float]:
     """Get request start time from context."""
     return start_time_var.get()
 

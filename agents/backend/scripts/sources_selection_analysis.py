@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import argparse
 import json
 import os
@@ -13,11 +18,14 @@ import requests
 
 from onyx.configs.constants import FASTAPI_USERS_AUTH_COOKIE_NAME
 
+from onyx.configs.app_configs import DOCUMENT_INDEX_NAME  # noqa: E402
+from onyx.configs.constants import SOURCE_TYPE  # noqa: E402
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
-from onyx.configs.app_configs import DOCUMENT_INDEX_NAME  # noqa: E402
-from onyx.configs.constants import SOURCE_TYPE  # noqa: E402
 
 ANALYSIS_FOLDER = f"{parent_dir}/scripts/.analysisfiles/"
 
@@ -371,7 +379,7 @@ class SelectionAnalysis:
             color_output(f"Unable to setup the requirements: {e}", model="critical")
             return False
 
-    def do_request(self, query: str) -> dict:
+    async def do_request(self, query: str) -> dict:
         """Request the Onyx API
 
         Args:
@@ -434,6 +442,10 @@ class SelectionAnalysis:
             list[dict]: Content of the selected file
         """
         with open(f"{ANALYSIS_FOLDER}{filename}", "r") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             return json.load(f)
 
     def extract_content(self, contents: dict) -> dict:
@@ -468,6 +480,10 @@ class SelectionAnalysis:
 
         try:
             with open(analysis_file, "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(content, f, indent=4)
         except Exception as e:
             color_output(f"Unable to create the analysis file: {e}", model="critical")

@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from onyx.llm.llm_provider_options import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add model-configuration table
 
 Revision ID: 7a70b7664e37
@@ -6,13 +15,29 @@ Create Date: 2025-04-10 15:00:35.984669
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
-from onyx.llm.llm_provider_options import (
     fetch_model_names_for_provider_as_set,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     fetch_visible_model_names_for_provider_as_set,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 )
 
 # revision identifiers, used by Alembic.
@@ -44,6 +69,16 @@ def _resolve(
     # This preserves the invariant that `display_models` is a subset of `models`.
     elif models and not display_models:
         visible_default_models = fetch_visible_model_names_for_provider_as_set(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             provider_name=provider_name
         )
         if visible_default_models:
@@ -58,6 +93,16 @@ def _resolve(
     # This will also preserve the invariant that `display_models` is a subset of `models`.
     elif not models and display_models:
         default_models = fetch_model_names_for_provider_as_set(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             provider_name=provider_name
         )
         if default_models:
@@ -70,9 +115,29 @@ def _resolve(
     # This will also preserve the invariant that `display_models` is a subset of `models`.
     else:
         default_models = fetch_model_names_for_provider_as_set(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             provider_name=provider_name
         )
         visible_default_models = fetch_visible_model_names_for_provider_as_set(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             provider_name=provider_name
         )
 
@@ -147,6 +212,16 @@ def upgrade() -> None:
             llm_provider_table.c.fast_default_model_name,
         )
     ).fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     for llm_provider in llm_providers:
         provider_id = llm_provider[0]
@@ -215,6 +290,16 @@ def downgrade() -> None:
 
     connection = op.get_bind()
     provider_ids = connection.execute(sa.select(llm_provider.c.id)).fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     for (provider_id,) in provider_ids:
         # Get all models for this provider
@@ -223,6 +308,16 @@ def downgrade() -> None:
                 model_configuration.c.name, model_configuration.c.is_visible
             ).where(model_configuration.c.llm_provider_id == provider_id)
         ).fetchall()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
         all_models = [model[0] for model in models]
         visible_models = [model[0] for model in models if model[1]]

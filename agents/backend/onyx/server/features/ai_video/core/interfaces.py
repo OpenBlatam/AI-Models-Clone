@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from abc import ABC, abstractmethod
+from typing import Protocol, Optional, Dict, Any, List
+from datetime import datetime
+from .types import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Interfaces Module - Abstract Protocol Definitions
 
@@ -5,11 +14,7 @@ This module defines the core interfaces for the modular AI video workflow system
 using Python's Protocol classes for structural typing and better flexibility.
 """
 
-from abc import ABC, abstractmethod
-from typing import Protocol, Optional, Dict, Any, List
-from datetime import datetime
 
-from .types import (
     ExtractedContent,
     ContentSuggestions,
     VideoGenerationResult,
@@ -270,7 +275,7 @@ class EventHandlerInterface(Protocol):
 class ConfigProviderInterface(Protocol):
     """Interface for configuration providers."""
     
-    def get_config(self, key: str, default: Any = None) -> Any:
+    def get_config(self, key: str, default: Any = None) -> Optional[Dict[str, Any]]:
         """Get configuration value."""
         ...
     

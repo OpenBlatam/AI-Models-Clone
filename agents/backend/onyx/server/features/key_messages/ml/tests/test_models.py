@@ -1,14 +1,25 @@
-"""
-Tests for ML Models Module
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 import torch
 import torch.nn as nn
 from unittest.mock import Mock, patch, MagicMock
 import tempfile
 import os
-
 from ..models import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Tests for ML Models Module
+"""
+
     BaseMessageModel,
     GPT2MessageModel,
     BERTClassifierModel,
@@ -24,7 +35,7 @@ from ..models import (
 class TestModelConfig:
     """Test ModelConfig dataclass."""
     
-    def test_model_config_creation(self):
+    def test_model_config_creation(self) -> Any:
         """Test ModelConfig creation with default values."""
         config = ModelConfig(model_name="test-model")
         
@@ -34,7 +45,7 @@ class TestModelConfig:
         assert config.top_p == 0.9
         assert config.do_sample is True
     
-    def test_model_config_custom_values(self):
+    def test_model_config_custom_values(self) -> Any:
         """Test ModelConfig creation with custom values."""
         config = ModelConfig(
             model_name="custom-model",
@@ -55,19 +66,19 @@ class TestModelConfig:
 class TestBaseMessageModel:
     """Test BaseMessageModel abstract class."""
     
-    def test_base_model_initialization(self):
+    def test_base_model_initialization(self) -> Any:
         """Test BaseMessageModel initialization."""
         config = ModelConfig(model_name="test")
         
         # Create a concrete implementation for testing
         class TestModel(BaseMessageModel):
-            def forward(self, input_ids, attention_mask=None):
+            def forward(self, input_ids, attention_mask=None) -> Any:
                 return torch.randn(input_ids.shape[0], input_ids.shape[1], 1000)
             
-            def generate(self, prompt, **kwargs):
+            def generate(self, prompt, **kwargs) -> Any:
                 return f"Generated: {prompt}"
             
-            def load_model(self, path):
+            def load_model(self, path) -> Any:
                 pass
         
         model = TestModel(config)
@@ -75,7 +86,7 @@ class TestBaseMessageModel:
         assert model.config == config
         assert model.device == torch.device("cpu")  # Default device
     
-    def test_base_model_abstract_methods(self):
+    def test_base_model_abstract_methods(self) -> Any:
         """Test that abstract methods raise NotImplementedError."""
         config = ModelConfig(model_name="test")
         model = BaseMessageModel(config)
@@ -94,7 +105,7 @@ class TestGPT2MessageModel:
     
     @patch('ml.models.AutoTokenizer')
     @patch('ml.models.AutoModelForCausalLM')
-    def test_gpt2_model_initialization(self, mock_model, mock_tokenizer):
+    def test_gpt2_model_initialization(self, mock_model, mock_tokenizer) -> Any:
         """Test GPT2MessageModel initialization."""
         # Mock tokenizer
         mock_tokenizer_instance = Mock()
@@ -118,7 +129,7 @@ class TestGPT2MessageModel:
     
     @patch('ml.models.AutoTokenizer')
     @patch('ml.models.AutoModelForCausalLM')
-    def test_gpt2_forward_pass(self, mock_model, mock_tokenizer):
+    def test_gpt2_forward_pass(self, mock_model, mock_tokenizer) -> Any:
         """Test GPT2MessageModel forward pass."""
         # Setup mocks
         mock_tokenizer_instance = Mock()
@@ -144,7 +155,7 @@ class TestGPT2MessageModel:
     
     @patch('ml.models.AutoTokenizer')
     @patch('ml.models.AutoModelForCausalLM')
-    def test_gpt2_generate(self, mock_model, mock_tokenizer):
+    def test_gpt2_generate(self, mock_model, mock_tokenizer) -> Any:
         """Test GPT2MessageModel text generation."""
         # Setup mocks
         mock_tokenizer_instance = Mock()
@@ -177,7 +188,7 @@ class TestBERTClassifierModel:
     
     @patch('ml.models.AutoTokenizer')
     @patch('ml.models.AutoModelForSequenceClassification')
-    def test_bert_model_initialization(self, mock_model, mock_tokenizer):
+    def test_bert_model_initialization(self, mock_model, mock_tokenizer) -> Any:
         """Test BERTClassifierModel initialization."""
         # Mock tokenizer
         mock_tokenizer_instance = Mock()
@@ -198,7 +209,7 @@ class TestBERTClassifierModel:
     
     @patch('ml.models.AutoTokenizer')
     @patch('ml.models.AutoModelForSequenceClassification')
-    def test_bert_classify(self, mock_model, mock_tokenizer):
+    def test_bert_classify(self, mock_model, mock_tokenizer) -> Any:
         """Test BERTClassifierModel classification."""
         # Setup mocks
         mock_tokenizer_instance = Mock()
@@ -226,7 +237,7 @@ class TestBERTClassifierModel:
 class TestCustomTransformerModel:
     """Test CustomTransformerModel class."""
     
-    def test_custom_model_initialization(self):
+    def test_custom_model_initialization(self) -> Any:
         """Test CustomTransformerModel initialization."""
         config = ModelConfig(model_name="custom", device="cpu")
         model = CustomTransformerModel(config, vocab_size=1000, d_model=256)
@@ -237,7 +248,7 @@ class TestCustomTransformerModel:
         assert isinstance(model.transformer, nn.TransformerEncoder)
         assert isinstance(model.output_layer, nn.Linear)
     
-    def test_custom_model_forward_pass(self):
+    def test_custom_model_forward_pass(self) -> Any:
         """Test CustomTransformerModel forward pass."""
         config = ModelConfig(model_name="custom", device="cpu")
         model = CustomTransformerModel(config, vocab_size=1000, d_model=256)
@@ -249,7 +260,7 @@ class TestCustomTransformerModel:
         
         assert output.shape == (1, 5, 1000)  # (batch_size, seq_len, vocab_size)
     
-    def test_custom_model_generate(self):
+    def test_custom_model_generate(self) -> Any:
         """Test CustomTransformerModel generation."""
         config = ModelConfig(model_name="custom", device="cpu")
         model = CustomTransformerModel(config, vocab_size=1000, d_model=256)
@@ -262,7 +273,7 @@ class TestCustomTransformerModel:
 class TestModelFactory:
     """Test ModelFactory class."""
     
-    def test_model_factory_available_models(self):
+    def test_model_factory_available_models(self) -> Any:
         """Test ModelFactory.get_available_models."""
         available_models = ModelFactory.get_available_models()
         
@@ -271,7 +282,7 @@ class TestModelFactory:
         assert "custom" in available_models
     
     @patch('ml.models.GPT2MessageModel')
-    def test_model_factory_create_gpt2(self, mock_gpt2):
+    def test_model_factory_create_gpt2(self, mock_gpt2) -> Any:
         """Test ModelFactory.create_model for GPT-2."""
         config = ModelConfig(model_name="gpt2")
         mock_gpt2.return_value = Mock()
@@ -282,7 +293,7 @@ class TestModelFactory:
         mock_gpt2.assert_called_once_with(config)
     
     @patch('ml.models.BERTClassifierModel')
-    def test_model_factory_create_bert(self, mock_bert):
+    def test_model_factory_create_bert(self, mock_bert) -> Any:
         """Test ModelFactory.create_model for BERT."""
         config = ModelConfig(model_name="bert-base-uncased")
         mock_bert.return_value = Mock()
@@ -293,7 +304,7 @@ class TestModelFactory:
         mock_bert.assert_called_once_with(config, num_labels=3)
     
     @patch('ml.models.CustomTransformerModel')
-    def test_model_factory_create_custom(self, mock_custom):
+    def test_model_factory_create_custom(self, mock_custom) -> Any:
         """Test ModelFactory.create_model for custom model."""
         config = ModelConfig(model_name="custom")
         mock_custom.return_value = Mock()
@@ -303,7 +314,7 @@ class TestModelFactory:
         assert model is not None
         mock_custom.assert_called_once_with(config, vocab_size=1000)
     
-    def test_model_factory_invalid_model_type(self):
+    def test_model_factory_invalid_model_type(self) -> Any:
         """Test ModelFactory.create_model with invalid model type."""
         config = ModelConfig(model_name="invalid")
         
@@ -313,7 +324,7 @@ class TestModelFactory:
 class TestModelEnsemble:
     """Test ModelEnsemble class."""
     
-    def test_model_ensemble_initialization(self):
+    def test_model_ensemble_initialization(self) -> Any:
         """Test ModelEnsemble initialization."""
         # Create mock models
         model1 = Mock()
@@ -326,7 +337,7 @@ class TestModelEnsemble:
         assert ensemble.models == models
         assert ensemble.weights == [0.5, 0.5]
     
-    def test_model_ensemble_custom_weights(self):
+    def test_model_ensemble_custom_weights(self) -> Any:
         """Test ModelEnsemble initialization with custom weights."""
         model1 = Mock()
         model2 = Mock()
@@ -338,7 +349,7 @@ class TestModelEnsemble:
         assert ensemble.models == models
         assert ensemble.weights == weights
     
-    def test_model_ensemble_weight_mismatch(self):
+    def test_model_ensemble_weight_mismatch(self) -> Any:
         """Test ModelEnsemble initialization with weight mismatch."""
         model1 = Mock()
         model2 = Mock()
@@ -348,7 +359,7 @@ class TestModelEnsemble:
         with pytest.raises(ValueError, match="Number of weights must match number of models"):
             ModelEnsemble(models, weights)
     
-    def test_model_ensemble_generate(self):
+    def test_model_ensemble_generate(self) -> Any:
         """Test ModelEnsemble text generation."""
         # Create mock models
         model1 = Mock()
@@ -366,7 +377,7 @@ class TestModelEnsemble:
         model1.generate.assert_called_once_with("test prompt")
         model2.generate.assert_called_once_with("test prompt")
     
-    def test_model_ensemble_classify(self):
+    def test_model_ensemble_classify(self) -> Any:
         """Test ModelEnsemble classification."""
         # Create mock models with classify method
         model1 = Mock()
@@ -389,7 +400,7 @@ class TestModelEnsemble:
 class TestModelConfigurations:
     """Test default model configurations."""
     
-    def test_default_gpt2_config(self):
+    def test_default_gpt2_config(self) -> Any:
         """Test DEFAULT_GPT2_CONFIG."""
         assert DEFAULT_GPT2_CONFIG.model_name == "gpt2"
         assert DEFAULT_GPT2_CONFIG.max_length == 512
@@ -397,14 +408,14 @@ class TestModelConfigurations:
         assert DEFAULT_GPT2_CONFIG.top_p == 0.9
         assert DEFAULT_GPT2_CONFIG.do_sample is True
     
-    def test_default_bert_config(self):
+    def test_default_bert_config(self) -> Any:
         """Test DEFAULT_BERT_CONFIG."""
         assert DEFAULT_BERT_CONFIG.model_name == "bert-base-uncased"
         assert DEFAULT_BERT_CONFIG.max_length == 512
         assert DEFAULT_BERT_CONFIG.temperature == 1.0
         assert DEFAULT_BERT_CONFIG.do_sample is False
     
-    def test_default_custom_config(self):
+    def test_default_custom_config(self) -> Any:
         """Test DEFAULT_CUSTOM_CONFIG."""
         assert DEFAULT_CUSTOM_CONFIG.model_name == "custom"
         assert DEFAULT_CUSTOM_CONFIG.max_length == 256
@@ -416,7 +427,7 @@ class TestModelPersistence:
     
     @patch('ml.models.AutoTokenizer')
     @patch('ml.models.AutoModelForCausalLM')
-    def test_gpt2_model_save_load(self, mock_model, mock_tokenizer):
+    def test_gpt2_model_save_load(self, mock_model, mock_tokenizer) -> Any:
         """Test GPT2MessageModel save and load functionality."""
         # Setup mocks
         mock_tokenizer_instance = Mock()
@@ -444,5 +455,6 @@ class TestModelPersistence:
             mock_tokenizer.from_pretrained.assert_called_with(save_path)
             mock_model.from_pretrained.assert_called_with(save_path)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__]) 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import cast
 from uuid import UUID
 
@@ -31,19 +33,22 @@ from onyx.tools.built_in_tools import get_built_in_tool_by_id
 from onyx.tools.models import DynamicSchemaInfo
 from onyx.tools.tool import Tool
 from onyx.tools.tool_implementations.custom.custom_tool import (
-    build_custom_tools_from_openapi_schema_and_headers,
-)
 from onyx.tools.tool_implementations.images.image_generation_tool import (
-    ImageGenerationTool,
-)
 from onyx.tools.tool_implementations.internet_search.internet_search_tool import (
-    InternetSearchTool,
-)
 from onyx.tools.tool_implementations.search.search_tool import SearchTool
 from onyx.tools.utils import compute_all_tool_tokens
 from onyx.tools.utils import explicit_tool_calling_supported
 from onyx.utils.headers import header_dict_to_header_list
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    build_custom_tools_from_openapi_schema_and_headers,
+)
+    ImageGenerationTool,
+)
+    InternetSearchTool,
+)
 
 logger = setup_logger()
 

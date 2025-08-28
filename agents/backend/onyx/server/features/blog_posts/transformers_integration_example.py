@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import torch
+import json
+import logging
+from pathlib import Path
+from typing import List, Dict, Any
+    from transformers_integration_system import (
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🚀 Transformers Integration Example
 ==================================
@@ -6,15 +28,9 @@ Comprehensive example demonstrating the transformers integration system
 with various use cases including training, text generation, and classification.
 """
 
-import torch
-import json
-import logging
-from pathlib import Path
-from typing import List, Dict, Any
 
 # Import the transformers integration system
 try:
-    from transformers_integration_system import (
         AdvancedTransformersTrainer, TransformersConfig, TransformersPipeline,
         create_transformers_config, get_available_models, validate_transformers_inputs,
         initialize_transformers_system
@@ -477,5 +493,6 @@ def main():
         print("⚠️ Some demonstrations failed. Check the output above for details.")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

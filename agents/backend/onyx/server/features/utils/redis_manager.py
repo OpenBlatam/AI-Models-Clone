@@ -1,7 +1,11 @@
-"""
-Redis Manager - Enhanced Onyx Integration
-Redis-based caching and data management for Onyx.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Any, Dict, List, Optional, Union, TypeVar, Generic
 import json
 import pickle
@@ -10,6 +14,12 @@ import redis
 from functools import wraps
 import logging
 from pydantic import BaseModel
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Redis Manager - Enhanced Onyx Integration
+Redis-based caching and data management for Onyx.
+"""
 
 logger = logging.getLogger(__name__)
 
@@ -195,9 +205,9 @@ class RedisManager:
 # Decorator for caching function results
 def cache_result(prefix: str, expire: Optional[int] = None):
     """Decorator to cache function results in Redis."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def wrapper(self, *args, **kwargs):
+        async def wrapper(self, *args, **kwargs) -> Any:
             # Generate cache key from function name and arguments
             key_parts = [func.__name__]
             key_parts.extend(str(arg) for arg in args)
@@ -315,6 +325,8 @@ redis_manager.clear_prefix('brand_voice')
 # Use decorator
 @cache_result(prefix='api_results', expire=300)  # 5 minutes
 async def get_api_data(self, endpoint: str, params: dict):
-    # API call implementation
+    
+    """get_api_data function."""
+# API call implementation
     pass
 """ 

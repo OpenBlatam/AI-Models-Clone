@@ -1,31 +1,36 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from langgraph.graph import END
 from langgraph.graph import START
 from langgraph.graph import StateGraph
 
 from onyx.agents.agent_search.dc_search_analysis.edges import (
-    parallel_object_research_consolidation_edge,
-)
 from onyx.agents.agent_search.dc_search_analysis.edges import (
-    parallel_object_source_research_edge,
-)
 from onyx.agents.agent_search.dc_search_analysis.nodes.a1_search_objects import (
-    search_objects,
-)
 from onyx.agents.agent_search.dc_search_analysis.nodes.a2_research_object_source import (
-    research_object_source,
-)
 from onyx.agents.agent_search.dc_search_analysis.nodes.a3_structure_research_by_object import (
-    structure_research_by_object,
-)
 from onyx.agents.agent_search.dc_search_analysis.nodes.a4_consolidate_object_research import (
-    consolidate_object_research,
-)
 from onyx.agents.agent_search.dc_search_analysis.nodes.a5_consolidate_research import (
-    consolidate_research,
-)
 from onyx.agents.agent_search.dc_search_analysis.states import MainInput
 from onyx.agents.agent_search.dc_search_analysis.states import MainState
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    parallel_object_research_consolidation_edge,
+)
+    parallel_object_source_research_edge,
+)
+    search_objects,
+)
+    research_object_source,
+)
+    structure_research_by_object,
+)
+    consolidate_object_research,
+)
+    consolidate_research,
+)
 
 logger = setup_logger()
 

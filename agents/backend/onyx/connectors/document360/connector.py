@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from datetime import datetime
 from datetime import timezone
 from typing import Any
@@ -9,8 +17,6 @@ import requests
 from onyx.configs.app_configs import INDEX_BATCH_SIZE
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.cross_connector_utils.rate_limit_wrapper import (
-    rate_limit_builder,
-)
 from onyx.connectors.document360.utils import flatten_child_categories
 from onyx.connectors.interfaces import GenerateDocumentsOutput
 from onyx.connectors.interfaces import LoadConnector
@@ -22,6 +28,13 @@ from onyx.connectors.models import Document
 from onyx.connectors.models import TextSection
 from onyx.file_processing.html_utils import parse_html_page_basic
 from onyx.utils.retry_wrapper import retry_builder
+    import time
+    import os
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    rate_limit_builder,
+)
 
 # Limitations and Potential Improvements
 # 1. The "Categories themselves contain potentially relevant information" but they're not pulled in
@@ -57,7 +70,7 @@ class Document360Connector(LoadConnector, PollConnector):
     # and then retry after a period
     @retry_builder()
     @rate_limit_builder(max_calls=100, period=60)
-    def _make_request(self, endpoint: str, params: Optional[dict] = None) -> Any:
+    async def _make_request(self, endpoint: str, params: Optional[dict] = None) -> Any:
         if not self.api_token:
             raise ConnectorMissingCredentialError("Document360")
 
@@ -85,7 +98,7 @@ class Document360Connector(LoadConnector, PollConnector):
 
         return workspace_id
 
-    def _get_articles_with_category(self, workspace_id: str) -> Any:
+    def _get_articles_with_category(self, workspace_id: str) -> Optional[Dict[str, Any]]:
         all_categories = self._make_request(
             f"ProjectVersions/{workspace_id}/categories"
         )
@@ -190,8 +203,6 @@ class Document360Connector(LoadConnector, PollConnector):
 
 
 if __name__ == "__main__":
-    import time
-    import os
 
     document360_connector = Document360Connector(os.environ["DOCUMENT360_WORKSPACE"])
     document360_connector.load_credentials(

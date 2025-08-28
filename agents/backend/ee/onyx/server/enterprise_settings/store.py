@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from io import BytesIO
 from typing import Any
@@ -20,6 +22,9 @@ from onyx.key_value_store.interface import KvKeyNotFoundError
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 _LOGO_FILENAME = "__logo__"
@@ -99,7 +104,7 @@ def guess_file_type(filename: str) -> str:
     return "application/octet-stream"
 
 
-def upload_logo(
+async def upload_logo(
     db_session: Session, file: UploadFile | str, is_logotype: bool = False
 ) -> bool:
     content: IO[Any]
@@ -113,7 +118,15 @@ def upload_logo(
             return False
 
         with open(file, "rb") as file_handle:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             file_content = file_handle.read()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         content = BytesIO(file_content)
         display_name = file
         file_type = guess_file_type(file)

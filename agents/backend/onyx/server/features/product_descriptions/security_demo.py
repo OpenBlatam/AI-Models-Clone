@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import FastAPI, APIRouter, HTTPException, status, Depends, Request, Response
 from pydantic import BaseModel, Field
 from typing import Dict, Any, List, Optional
@@ -8,8 +10,11 @@ import re
 import time
 from datetime import datetime, timedelta
 
-# Import security components
 from security_guidelines import (
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+# Import security components
     SecureInputValidator, SecurityAuthenticator, SecurityCrypto,
     SecurityLogger, SecurityHeaders, SecurityMiddleware,
     SecureScanRequest, SecureScanResponse, SecurityUtils,
@@ -410,7 +415,7 @@ async def get_security_best_practices() -> Dict[str, Any]:
     }
 
 @router.post("/file-upload-test")
-async def test_file_upload_security(file_content: str, filename: str) -> Dict[str, Any]:
+async async def test_file_upload_security(file_content: str, filename: str) -> Dict[str, Any]:
     """Test file upload security"""
     results = {
         "success": True,
@@ -527,7 +532,6 @@ app.add_middleware(SecurityMiddleware, authenticator=authenticator, logger=logge
 app.include_router(router)
 
 if __name__ == "__main__":
-    import uvicorn
     print("Security Guidelines Demo")
     print("Access API at: http://localhost:8000")
     print("API Documentation at: http://localhost:8000/docs")

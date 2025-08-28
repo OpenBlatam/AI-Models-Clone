@@ -1,12 +1,17 @@
-# The following prompts are used for the initial response before a chat history exists
-# It is used also for the one shot direct QA flow
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
-
 from onyx.prompts.constants import DEFAULT_IGNORE_STATEMENT
 from onyx.prompts.constants import FINAL_QUERY_PAT
 from onyx.prompts.constants import GENERAL_SEP_PAT
 from onyx.prompts.constants import QUESTION_PAT
 from onyx.prompts.constants import THOUGHT_PAT
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# The following prompts are used for the initial response before a chat history exists
+# It is used also for the one shot direct QA flow
+
 
 
 ONE_SHOT_SYSTEM_PROMPT = """
@@ -144,5 +149,6 @@ You MUST respond in the following format:
 
 
 # User the following for easy viewing of prompts
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     print(JSON_PROMPT)  # Default prompt used in the Onyx UI flow

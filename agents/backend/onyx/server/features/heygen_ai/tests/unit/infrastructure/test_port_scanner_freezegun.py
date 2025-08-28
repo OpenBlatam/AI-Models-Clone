@@ -3,7 +3,7 @@ import pytest
 freezegun = pytest.importorskip("freezegun")  # skip if freezegun not installed
 from freezegun import freeze_time  # type: ignore
 
-from agents.backend.onyx.server.features.heygen_ai.port_scanner import AsyncPortScanner
+from port_scanner import AsyncPortScanner
 import asyncio
 
 
@@ -20,12 +20,13 @@ async def test_scan_single_port_timestamp_freeze(monkeypatch):
 
         return object(), W()
 
-    import agents.backend.onyx.server.features.heygen_ai.port_scanner as mod
+    import port_scanner as mod
     monkeypatch.setattr(mod.asyncio, "open_connection", fake_open_connection)
 
     s = AsyncPortScanner()
     res = await s.scan_single_port("localhost", 80)
     assert res.scan_timestamp.isoformat().startswith("2025-01-01T00:00:00")
+
 
 
 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from typing import cast
 
@@ -6,36 +8,39 @@ from langchain_core.messages import HumanMessage
 from langchain_core.runnables.config import RunnableConfig
 
 from onyx.agents.agent_search.deep_search.shared.expanded_retrieval.states import (
-    DocVerificationInput,
-)
 from onyx.agents.agent_search.deep_search.shared.expanded_retrieval.states import (
-    DocVerificationUpdate,
-)
 from onyx.agents.agent_search.models import GraphConfig
 from onyx.agents.agent_search.shared_graph_utils.agent_prompt_ops import (
-    binary_string_test,
-)
 from onyx.agents.agent_search.shared_graph_utils.agent_prompt_ops import (
-    trim_prompt_piece,
-)
 from onyx.agents.agent_search.shared_graph_utils.constants import (
-    AGENT_POSITIVE_VALUE_STR,
-)
 from onyx.agents.agent_search.shared_graph_utils.models import LLMNodeErrorStrings
 from onyx.agents.agent_search.shared_graph_utils.utils import (
-    get_langgraph_node_log_string,
-)
 from onyx.configs.agent_configs import AGENT_MAX_TOKENS_VALIDATION
 from onyx.configs.agent_configs import AGENT_TIMEOUT_CONNECT_LLM_DOCUMENT_VERIFICATION
 from onyx.configs.agent_configs import AGENT_TIMEOUT_LLM_DOCUMENT_VERIFICATION
 from onyx.llm.chat_llm import LLMRateLimitError
 from onyx.llm.chat_llm import LLMTimeoutError
 from onyx.prompts.agent_search import (
-    DOCUMENT_VERIFICATION_PROMPT,
-)
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
 from onyx.utils.timing import log_function_time
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    DocVerificationInput,
+)
+    DocVerificationUpdate,
+)
+    binary_string_test,
+)
+    trim_prompt_piece,
+)
+    AGENT_POSITIVE_VALUE_STR,
+)
+    get_langgraph_node_log_string,
+)
+    DOCUMENT_VERIFICATION_PROMPT,
+)
 
 logger = setup_logger()
 
@@ -67,7 +72,7 @@ def verify_documents(
     retrieved_document_to_verify = state.retrieved_document_to_verify
     document_content = retrieved_document_to_verify.combined_content
 
-    graph_config = cast(GraphConfig, config["metadata"]["config"])
+    graph_config = cast(GraphConfig, config["metadata"]["config"f"])
     fast_llm = graph_config.tooling.fast_llm
 
     document_content = trim_prompt_piece(
@@ -78,9 +83,7 @@ def verify_documents(
 
     msg = [
         HumanMessage(
-            content=DOCUMENT_VERIFICATION_PROMPT.format(
-                question=question, document_content=document_content
-            )
+            content=DOCUMENT_VERIFICATION_PROMPT"
         )
     ]
 

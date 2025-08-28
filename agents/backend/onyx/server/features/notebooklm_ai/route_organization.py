@@ -1,3 +1,29 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+from typing import Dict, List, Optional, Any, Callable
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
+import logging
+from datetime import datetime
+from structured_routes_app import (
+        import time
+        import asyncio
+        import hashlib
+        import time
+        import asyncio
+        import time
+        import psutil
+        import time
+        import psutil
+        import time
+        import re
+from typing import Any, List, Dict, Optional
 """
 Route Organization and Dependency Management
 - Clear separation of route handlers by domain
@@ -6,13 +32,7 @@ Route Organization and Dependency Management
 - Improved maintainability and readability
 """
 
-from typing import Dict, List, Optional, Any, Callable
-from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import JSONResponse
-import logging
-from datetime import datetime
 
-from structured_routes_app import (
     DiffusionRequest, BatchDiffusionRequest, DiffusionResponse, BatchDiffusionResponse,
     HealthResponse, ErrorResponse, DependencyContainer, AsyncDiffusionService,
     AsyncExternalAPIService, get_current_user, get_rate_limit_info,
@@ -160,9 +180,6 @@ class DiffusionRouteHandlers:
         rate_limit: Dict[str, Any] = Depends(get_rate_limit_info)
     ) -> DiffusionResponse:
         """Generate single image from text prompt."""
-        import time
-        import asyncio
-        import hashlib
         
         start_time = time.time()
         
@@ -221,8 +238,6 @@ class DiffusionRouteHandlers:
         rate_limit: Dict[str, Any] = Depends(get_rate_limit_info)
     ) -> BatchDiffusionResponse:
         """Generate multiple images in batch."""
-        import time
-        import asyncio
         
         start_time = time.time()
         
@@ -300,7 +315,6 @@ class HealthRouteHandlers:
     @staticmethod
     async def health_check() -> HealthResponse:
         """Basic health check endpoint."""
-        import time
         
         return HealthResponse(
             status="healthy",
@@ -322,8 +336,6 @@ class HealthRouteHandlers:
         container: DependencyContainer = Depends(get_dependency_container)
     ) -> Dict[str, Any]:
         """Detailed health check with system information."""
-        import psutil
-        import time
         
         try:
             # Test database connection
@@ -375,8 +387,6 @@ class AdminRouteHandlers:
         container: DependencyContainer = Depends(get_dependency_container)
     ) -> Dict[str, Any]:
         """Get system performance statistics."""
-        import psutil
-        import time
         
         try:
             # Get database stats
@@ -535,7 +545,6 @@ class RouteValidation:
     @staticmethod
     def sanitize_prompt(prompt: str) -> str:
         """Sanitize user prompt."""
-        import re
         # Remove potentially harmful characters
         sanitized = re.sub(r'[<>"\']', '', prompt.strip())
         return sanitized[:1000]  # Limit length 

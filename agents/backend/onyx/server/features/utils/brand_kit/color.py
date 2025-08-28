@@ -1,13 +1,33 @@
-"""
-Brand Kit Color Component - Onyx Integration
-Component for managing brand colors with advanced features.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Any, Dict, List, Optional, Union, Literal, Tuple
 from dataclasses import dataclass, field
 from datetime import datetime
 import colorsys
 import re
 from ..base import ModelField, ValidationMixin, CacheMixin, EventMixin, IndexMixin, PermissionMixin, StatusMixin
+        from prometheus_client import Counter
+        import structlog
+        from prometheus_client import Counter
+        import structlog
+        import numpy as np
+        import pandas as pd
+        from prometheus_client import Counter
+        import structlog
+        import orjson
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Brand Kit Color Component - Onyx Integration
+Component for managing brand colors with advanced features.
+"""
 
 @dataclass
 class BrandKitColor:
@@ -30,7 +50,7 @@ class BrandKitColor:
     version: str = '1.0.0'
     metadata: Dict[str, Any] = field(default_factory=dict)
 
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Initialize color field with validation and caching"""
         self.color_field = ModelField(
             name=self.name,
@@ -69,7 +89,7 @@ class BrandKitColor:
         )
         self._calculate_color_properties()
 
-    def _calculate_color_properties(self):
+    def _calculate_color_properties(self) -> Any:
         """Calculate advanced color properties"""
         if self.hex:
             # Convert hex to RGB
@@ -100,7 +120,7 @@ class BrandKitColor:
             # Calculate accessibility level
             self._calculate_accessibility_level()
 
-    def _calculate_accessibility_level(self):
+    def _calculate_accessibility_level(self) -> Any:
         """Calculate WCAG accessibility level"""
         if self.contrast_ratio >= 7.0:
             self.accessibility_level = 'AAA'
@@ -252,7 +272,7 @@ class BrandKitColor:
         if s == 0:
             r = g = b = l
         else:
-            def hue_to_rgb(p, q, t):
+            def hue_to_rgb(p, q, t) -> Any:
                 if t < 0:
                     t += 1
                 if t > 1:
@@ -302,8 +322,6 @@ class BrandKitColor:
     @classmethod
     def batch_to_dicts(cls, objs: List["BrandKitColor"]) -> List[dict]:
         """Convierte una lista de BrandKitColor a lista de dicts, con métricas y logging."""
-        from prometheus_client import Counter
-        import structlog
         logger = structlog.get_logger()
         metric = Counter('brandkitcolor_batch_to_dicts_total', 'Total batch_to_dicts calls')
         metric.inc()
@@ -317,8 +335,6 @@ class BrandKitColor:
     @classmethod
     def batch_from_dicts(cls, dicts: List[dict]) -> List["BrandKitColor"]:
         """Convierte una lista de dicts a BrandKitColor, con métricas y logging."""
-        from prometheus_client import Counter
-        import structlog
         logger = structlog.get_logger()
         metric = Counter('brandkitcolor_batch_from_dicts_total', 'Total batch_from_dicts calls')
         metric.inc()
@@ -331,22 +347,18 @@ class BrandKitColor:
     @classmethod
     def batch_to_numpy(cls, objs: List["BrandKitColor"]):
         """Convierte una lista de BrandKitColor a un array numpy."""
-        import numpy as np
         dicts = cls.batch_to_dicts(objs)
         return np.array(dicts)
 
     @classmethod
     def batch_to_pandas(cls, objs: List["BrandKitColor"]):
         """Convierte una lista de BrandKitColor a un DataFrame pandas."""
-        import pandas as pd
         dicts = cls.batch_to_dicts(objs)
         return pd.DataFrame(dicts)
 
     @classmethod
     def batch_deduplicate(cls, objs: List["BrandKitColor"], key="name") -> List["BrandKitColor"]:
         """Elimina duplicados por key, validando unicidad y tipos."""
-        from prometheus_client import Counter
-        import structlog
         logger = structlog.get_logger()
         metric = Counter('brandkitcolor_batch_deduplicate_total', 'Total batch_deduplicate calls')
         metric.inc()
@@ -365,7 +377,6 @@ class BrandKitColor:
     @classmethod
     def to_training_example(cls, obj: "BrandKitColor") -> dict:
         """Convierte un BrandKitColor a ejemplo de entrenamiento ML/LLM."""
-        import orjson
         return orjson.loads(orjson.dumps(obj.get_data()))
 
     @classmethod

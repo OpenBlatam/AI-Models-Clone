@@ -1,17 +1,26 @@
-"""
-Model Decorators - Onyx Integration
-Decorators for model operations and validations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any, Callable, Dict, List, Optional, Type, TypeVar, Union
 from functools import wraps
 import time
 import logging
 from datetime import datetime
+    from .model_utils import ModelRegistry
+                from .model_utils import ModelCache
+                from .model_utils import ModelValidator
+from datetime import datetime
+from typing import List, Optional
+import logging
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Model Decorators - Onyx Integration
+Decorators for model operations and validations.
+"""
 T = TypeVar('T', bound="OnyxBaseModel")
 
 def register_model(model_class: Type[T]) -> Type[T]:
     """Decorator to register a model class."""
-    from .model_utils import ModelRegistry
     ModelRegistry.register(model_class)
     return model_class
 
@@ -25,7 +34,6 @@ def cache_model(key_field: str):
             
             # Cache the model if it's an instance of OnyxBaseModel
             if isinstance(result, OnyxBaseModel):
-                from .model_utils import ModelCache
                 key = getattr(result, key_field)
                 ModelCache.set(result, str(key))
             
@@ -43,7 +51,6 @@ def validate_model(validate_types: bool = True, validate_custom: bool = True):
             
             # Validate the model if it's an instance of OnyxBaseModel
             if isinstance(result, OnyxBaseModel):
-                from .model_utils import ModelValidator
                 validator = ModelValidator()
                 
                 # Validate required fields
@@ -174,9 +181,6 @@ def validate_schema(schema: Dict[str, Any]):
 
 # Example usage:
 """
-from datetime import datetime
-from typing import List, Optional
-import logging
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)

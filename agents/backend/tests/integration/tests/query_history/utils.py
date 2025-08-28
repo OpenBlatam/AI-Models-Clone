@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from concurrent.futures import as_completed
 from concurrent.futures import ThreadPoolExecutor
 
@@ -12,6 +14,9 @@ from tests.integration.common_utils.test_models import DAQueryHistoryEntry
 from tests.integration.common_utils.test_models import DATestUser
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def _create_chat_session_with_feedback(
     admin_user: DATestUser,
     i: int,

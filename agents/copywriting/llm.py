@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Any, Dict, List
 
 from langchain.chat_models import ChatOpenAI
@@ -9,9 +11,14 @@ from agents.copywriting.model import CopywritingRequest, CopywritingResponse, Co
 from agents.copywriting.propmts.facebook import FACEBOOK_AD_PROMPT
 from agents.copywriting.propmts.youtube import YOUTUBE_AD_PROMPT
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class CopywritingLLM:
     def __init__(self, model_name: str = "gpt-4-turbo-preview"):
-        self.model = ChatOpenAI(model_name=model_name)
+        
+    """__init__ function."""
+self.model = ChatOpenAI(model_name=model_name)
         self.prompts = {
             "facebook": FACEBOOK_AD_PROMPT,
             "youtube": YOUTUBE_AD_PROMPT

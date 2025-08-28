@@ -1,0 +1,2 @@
+Requirement already satisfied: marshmallow in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (3.26.1)
+Requirement already satisfied: packaging>=17.0 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from marshmallow) (24.2)

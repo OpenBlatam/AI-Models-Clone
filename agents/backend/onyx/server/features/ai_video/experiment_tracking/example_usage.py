@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+import sys
+import time
+import logging
+import numpy as np
+from pathlib import Path
+from experiment_tracking import (
+        import matplotlib.pyplot as plt
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Example Usage of Experiment Tracking System
 ==========================================
@@ -15,17 +33,10 @@ Scenarios covered:
 7. Data export and visualization
 """
 
-import os
-import sys
-import time
-import logging
-import numpy as np
-from pathlib import Path
 
 # Add the parent directory to the path to import modules
 sys.path.append(str(Path(__file__).parent.parent))
 
-from experiment_tracking import (
     setup_experiment_tracking,
     create_video_experiment_tracker,
     log_training_step,
@@ -60,23 +71,23 @@ def example_1_basic_experiment_tracking():
     
     # Mock model and optimizer
     class MockModel:
-        def __init__(self):
+        def __init__(self) -> Any:
             self.weights = np.random.randn(100, 100)
         
-        def state_dict(self):
+        def state_dict(self) -> Any:
             return {"weights": self.weights}
         
-        def load_state_dict(self, state_dict):
+        def load_state_dict(self, state_dict) -> Any:
             self.weights = state_dict["weights"]
     
     class MockOptimizer:
-        def __init__(self):
+        def __init__(self) -> Any:
             self.lr = 1e-4
         
-        def state_dict(self):
+        def state_dict(self) -> Any:
             return {"lr": self.lr}
         
-        def load_state_dict(self, state_dict):
+        def load_state_dict(self, state_dict) -> Any:
             self.lr = state_dict["lr"]
     
     model = MockModel()
@@ -141,13 +152,13 @@ def example_2_video_specific_tracking():
     
     # Mock model
     class MockVideoModel:
-        def __init__(self):
+        def __init__(self) -> Any:
             self.weights = np.random.randn(100, 100)
         
-        def state_dict(self):
+        def state_dict(self) -> Any:
             return {"weights": self.weights}
         
-        def load_state_dict(self, state_dict):
+        def load_state_dict(self, state_dict) -> Any:
             self.weights = state_dict["weights"]
     
     model = MockVideoModel()
@@ -485,7 +496,6 @@ def example_6_data_visualization():
     
     # Create plots if matplotlib is available
     try:
-        import matplotlib.pyplot as plt
         
         # Plot metrics
         metrics.plot_all_metrics("exports/visualization_experiment/plots")
@@ -554,5 +564,6 @@ def main():
         logger.exception("Exception occurred")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

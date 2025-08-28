@@ -1,11 +1,16 @@
-"""
-Indexing logic for Copywriting records, following Onyx backend conventions.
-Supports CRUD, embedding, search, and batch operations.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from sqlalchemy.orm import Session
 from .copywriting import Copywriting, CopywritingCreate, CopywritingRead
 from typing import List, Optional, Any
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Indexing logic for Copywriting records, following Onyx backend conventions.
+Supports CRUD, embedding, search, and batch operations.
+"""
 
 logger = setup_logger()
 

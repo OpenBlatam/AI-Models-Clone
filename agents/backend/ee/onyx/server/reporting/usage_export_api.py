@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Generator
 from datetime import datetime
 
@@ -18,6 +20,9 @@ from onyx.db.engine import get_session
 from onyx.db.models import User
 from onyx.file_store.constants import STANDARD_CHUNK_SIZE
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 router = APIRouter()
 
 
@@ -60,6 +65,10 @@ def read_usage_report(
     def iterfile() -> Generator[bytes, None, None]:
         while True:
             chunk = file.read(STANDARD_CHUNK_SIZE)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             if not chunk:
                 break
             yield chunk

@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import os
+import boto3
+import logging
+import subprocess
+from datetime import datetime
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Script de automatización para entrenamiento continuo ML/LLM
 - Busca el archivo más reciente en MinIO (S3 compatible)
@@ -5,11 +14,6 @@ Script de automatización para entrenamiento continuo ML/LLM
 - Guarda el timestamp del último entrenamiento exitoso
 - Listo para cronjob o watcher
 """
-import os
-import boto3
-import logging
-import subprocess
-from datetime import datetime
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
 
@@ -39,7 +43,7 @@ if not files:
     exit(0)
 
 # Ordenar por fecha en el nombre del archivo (asume formato YYYY-MM-DD_HHMMSS)
-def extract_datetime(key):
+def extract_datetime(key) -> Any:
     try:
         base = os.path.basename(key)
         dt_str = base.split('.')[0].split('_')[-2] + '_' + base.split('.')[0].split('_')[-1]
@@ -54,7 +58,15 @@ latest_time = extract_datetime(latest_file)
 # 2. Leer el timestamp del último entrenamiento
 if os.path.exists(LAST_TRAINED_FILE):
     with open(LAST_TRAINED_FILE) as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         last_trained_str = f.read().strip()
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         last_trained = datetime.strptime(last_trained_str, '%Y-%m-%d_%H%M%S')
 else:
     last_trained = datetime.min
@@ -76,7 +88,15 @@ if latest_time > last_trained:
     try:
         subprocess.run(cmd, check=True)
         with open(LAST_TRAINED_FILE, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(latest_time.strftime('%Y-%m-%d_%H%M%S'))
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         logging.info('Entrenamiento exitoso y timestamp actualizado.')
     except subprocess.CalledProcessError as e:
         logging.error(f'Error en el entrenamiento: {e}')

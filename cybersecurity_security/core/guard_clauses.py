@@ -1,8 +1,7 @@
-"""
-Guard Clauses
-
-Comprehensive guard clause utilities for error and edge-case checking.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import inspect
@@ -12,8 +11,17 @@ from enum import Enum
 import re
 import ipaddress
 from datetime import datetime, timedelta
-
 from .error_handling import (
+import time 
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Guard Clauses
+
+Comprehensive guard clause utilities for error and edge-case checking.
+"""
+
+
     SecurityToolkitError, ValidationError, ConfigurationError,
     NetworkError, CryptoError, TimeoutError, ConnectionError
 )
@@ -48,9 +56,9 @@ class GuardSeverity(str, Enum):
 
 def guard_against_none(param_name: str, error_message: Optional[str] = None):
     """Guard against None values."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Check if parameter is None
             if param_name in kwargs and kwargs[param_name] is None:
                 msg = error_message or f"Parameter '{param_name}' cannot be None"
@@ -68,7 +76,7 @@ def guard_against_none(param_name: str, error_message: Optional[str] = None):
             return await func(*args, **kwargs)
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # Check if parameter is None
             if param_name in kwargs and kwargs[param_name] is None:
                 msg = error_message or f"Parameter '{param_name}' cannot be None"
@@ -93,9 +101,9 @@ def guard_against_none(param_name: str, error_message: Optional[str] = None):
 
 def guard_against_empty(param_name: str, error_message: Optional[str] = None):
     """Guard against empty values (None, empty string, empty list, empty dict)."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Check if parameter is empty
             if param_name in kwargs:
                 value = kwargs[param_name]
@@ -117,7 +125,7 @@ def guard_against_empty(param_name: str, error_message: Optional[str] = None):
             return await func(*args, **kwargs)
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # Check if parameter is empty
             if param_name in kwargs:
                 value = kwargs[param_name]
@@ -146,9 +154,9 @@ def guard_against_empty(param_name: str, error_message: Optional[str] = None):
 
 def guard_against_invalid_type(param_name: str, expected_type: Type, error_message: Optional[str] = None):
     """Guard against invalid parameter types."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Check parameter type
             if param_name in kwargs:
                 value = kwargs[param_name]
@@ -170,7 +178,7 @@ def guard_against_invalid_type(param_name: str, expected_type: Type, error_messa
             return await func(*args, **kwargs)
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # Check parameter type
             if param_name in kwargs:
                 value = kwargs[param_name]
@@ -201,9 +209,9 @@ def guard_against_invalid_range(param_name: str, min_value: Optional[Union[int, 
                                max_value: Optional[Union[int, float]] = None, 
                                error_message: Optional[str] = None):
     """Guard against values outside specified range."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Check parameter range
             if param_name in kwargs:
                 value = kwargs[param_name]
@@ -225,7 +233,7 @@ def guard_against_invalid_range(param_name: str, min_value: Optional[Union[int, 
             return await func(*args, **kwargs)
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # Check parameter range
             if param_name in kwargs:
                 value = kwargs[param_name]
@@ -254,9 +262,9 @@ def guard_against_invalid_range(param_name: str, min_value: Optional[Union[int, 
 
 def guard_against_invalid_format(param_name: str, pattern: str, error_message: Optional[str] = None):
     """Guard against invalid format using regex pattern."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Check parameter format
             if param_name in kwargs:
                 value = kwargs[param_name]
@@ -278,7 +286,7 @@ def guard_against_invalid_format(param_name: str, pattern: str, error_message: O
             return await func(*args, **kwargs)
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # Check parameter format
             if param_name in kwargs:
                 value = kwargs[param_name]
@@ -307,9 +315,9 @@ def guard_against_invalid_format(param_name: str, pattern: str, error_message: O
 
 def guard_against_timeout(timeout_param: str = "timeout", default_timeout: float = 30.0):
     """Guard against timeout issues."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Get timeout value
             timeout = kwargs.get(timeout_param, default_timeout)
             
@@ -324,7 +332,7 @@ def guard_against_timeout(timeout_param: str = "timeout", default_timeout: float
                 raise TimeoutError(f"Operation timed out after {timeout} seconds", timeout)
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # Get timeout value
             timeout = kwargs.get(timeout_param, default_timeout)
             
@@ -344,11 +352,11 @@ def guard_against_timeout(timeout_param: str = "timeout", default_timeout: float
 
 def guard_against_rate_limit(max_calls: int, time_window: float = 60.0):
     """Guard against rate limiting."""
-    def decorator(func):
+    def decorator(func) -> Any:
         call_history = []
         
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             current_time = time.time()
             
             # Clean old calls
@@ -368,7 +376,7 @@ def guard_against_rate_limit(max_calls: int, time_window: float = 60.0):
             return await func(*args, **kwargs)
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             current_time = time.time()
             
             # Clean old calls
@@ -686,15 +694,17 @@ class GuardContext:
     """Context manager for guard clauses."""
     
     def __init__(self, operation: str, module: str, function: str):
-        self.operation = operation
+        
+    """__init__ function."""
+self.operation = operation
         self.module = module
         self.function = function
         self.guards_applied = []
     
-    def __enter__(self):
+    def __enter__(self) -> Any:
         return self
     
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(self, exc_type, exc_val, exc_tb) -> Any:
         if exc_type is not None:
             # Log guard failure
             print(f"Guard failure in {self.module}.{self.function}: {exc_val}")
@@ -721,16 +731,16 @@ class GuardContext:
 
 def apply_guards(*guard_functions: Callable) -> Callable:
     """Decorator to apply multiple guard functions."""
-    def decorator(func):
+    def decorator(func) -> Any:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Apply all guard functions
             for guard_func in guard_functions:
                 guard_func(*args, **kwargs)
             return await func(*args, **kwargs)
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # Apply all guard functions
             for guard_func in guard_functions:
                 guard_func(*args, **kwargs)
@@ -745,7 +755,7 @@ def apply_guards(*guard_functions: Callable) -> Callable:
 def guard_function_signature(func: Callable) -> Callable:
     """Decorator to guard function signature based on type hints."""
     @wraps(func)
-    async def async_wrapper(*args, **kwargs):
+    async def async_wrapper(*args, **kwargs) -> Any:
         # Get function signature
         sig = inspect.signature(func)
         bound_args = sig.bind(*args, **kwargs)
@@ -772,7 +782,7 @@ def guard_function_signature(func: Callable) -> Callable:
         return await func(*args, **kwargs)
     
     @wraps(func)
-    def sync_wrapper(*args, **kwargs):
+    def sync_wrapper(*args, **kwargs) -> Any:
         # Get function signature
         sig = inspect.signature(func)
         bound_args = sig.bind(*args, **kwargs)
@@ -806,5 +816,3 @@ def guard_function_signature(func: Callable) -> Callable:
 # ============================================================================
 # IMPORTS FOR TIME MODULE
 # ============================================================================
-
-import time 

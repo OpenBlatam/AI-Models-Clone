@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from pathlib import Path
 
@@ -12,6 +14,9 @@ from onyx.configs.chat_configs import NUM_RETURNED_HITS
 from onyx.configs.chat_configs import TITLE_CONTENT_RATIO
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger(__name__)
 
 
@@ -37,6 +42,10 @@ def load_config() -> SearchEvalConfig:
     if not config_path.exists():
         raise FileNotFoundError(f"Search eval config file not found at {config_path}")
     with config_path.open("r") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         config_raw = yaml.safe_load(file)
 
     # create the export folder
@@ -67,6 +76,10 @@ def load_config() -> SearchEvalConfig:
     # export the config
     config_file = export_path / "search_eval_config.yaml"
     with config_file.open("w") as file:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         config_dict = config.model_dump(mode="python")
         config_dict["rank_profile"] = config.rank_profile.value
         yaml.dump(config_dict, file, sort_keys=False)

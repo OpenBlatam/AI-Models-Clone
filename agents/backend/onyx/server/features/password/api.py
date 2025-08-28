@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -15,6 +17,9 @@ from onyx.server.features.password.models import ChangePasswordRequest
 from onyx.server.features.password.models import UserResetRequest
 from onyx.server.features.password.models import UserResetResponse
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 router = APIRouter(prefix="/password")
 
 

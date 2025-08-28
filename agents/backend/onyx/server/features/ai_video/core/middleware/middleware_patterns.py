@@ -1,3 +1,39 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import time
+import logging
+import json
+import uuid
+import asyncio
+import psutil
+import traceback
+from typing import Dict, Any, Optional, Callable
+from datetime import datetime, timedelta
+from contextlib import asynccontextmanager
+from fastapi import Request, Response, HTTPException, status
+from fastapi.middleware.base import BaseHTTPMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.base import RequestResponseEndpoint
+from starlette.responses import JSONResponse, StreamingResponse
+import redis.asyncio as redis
+    from fastapi import FastAPI
+    from fastapi import FastAPI
+    import uvicorn
+from typing import Any, List, Dict, Optional
 """
 🔧 MIDDLEWARE PATTERNS - LOGGING, MONITORING & OPTIMIZATION
 ==========================================================
@@ -12,25 +48,7 @@ Comprehensive middleware patterns for FastAPI applications including:
 - Metrics collection
 """
 
-import time
-import logging
-import json
-import uuid
-import asyncio
-import psutil
-import traceback
-from typing import Dict, Any, Optional, Callable
-from datetime import datetime, timedelta
-from contextlib import asynccontextmanager
 
-from fastapi import Request, Response, HTTPException, status
-from fastapi.middleware.base import BaseHTTPMiddleware
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.middleware.trustedhost import TrustedHostMiddleware
-from starlette.middleware.base import RequestResponseEndpoint
-from starlette.responses import JSONResponse, StreamingResponse
-import redis.asyncio as redis
 
 logger = logging.getLogger(__name__)
 
@@ -46,7 +64,9 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
                  log_responses: bool = True,
                  log_errors: bool = True,
                  sensitive_headers: set = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.log_requests = log_requests
         self.log_responses = log_responses
         self.log_errors = log_errors
@@ -173,7 +193,9 @@ class ErrorMonitoringMiddleware(BaseHTTPMiddleware):
                  error_tracking: bool = True,
                  alert_threshold: int = 10,
                  alert_window: int = 300):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.error_tracking = error_tracking
         self.alert_threshold = alert_threshold
         self.alert_window = alert_window
@@ -245,7 +267,7 @@ class ErrorMonitoringMiddleware(BaseHTTPMiddleware):
         
         logger.error(f"Exception {type(exception).__name__} on {request.url.path}: {str(exception)}")
     
-    async def check_alert_threshold(self):
+    async def check_alert_threshold(self) -> Any:
         """Check if error threshold has been exceeded."""
         current_time = time.time()
         cutoff_time = current_time - self.alert_window
@@ -299,7 +321,9 @@ class PerformanceMiddleware(BaseHTTPMiddleware):
                  track_performance: bool = True,
                  slow_request_threshold: float = 1.0,
                  memory_tracking: bool = True):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.track_performance = track_performance
         self.slow_request_threshold = slow_request_threshold
         self.memory_tracking = memory_tracking
@@ -383,7 +407,7 @@ class PerformanceMiddleware(BaseHTTPMiddleware):
 class SecurityMiddleware(BaseHTTPMiddleware):
     """Middleware for security headers and protection."""
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         super().__init__(app)
     
     async def dispatch(self, request: Request, call_next: RequestResponseEndpoint) -> Response:
@@ -411,7 +435,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                  rate_limit: int = 100,
                  window: int = 3600,
                  redis_client: Optional[redis.Redis] = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.rate_limit = rate_limit
         self.window = window
         self.redis_client = redis_client
@@ -477,7 +503,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             logger.error(f"Rate limit check failed: {e}")
             return True  # Allow request if rate limiting fails
     
-    async def get_remaining_requests(self, client_id: str) -> int:
+    async async def get_remaining_requests(self, client_id: str) -> int:
         """Get remaining requests for client."""
         if not self.redis_client:
             return self.rate_limit
@@ -501,7 +527,9 @@ class CacheMiddleware(BaseHTTPMiddleware):
                  cache_ttl: int = 3600,
                  redis_client: Optional[redis.Redis] = None,
                  cacheable_paths: set = None):
-        super().__init__(app)
+        
+    """__init__ function."""
+super().__init__(app)
         self.cache_ttl = cache_ttl
         self.redis_client = redis_client
         self.cacheable_paths = cacheable_paths or {"/health", "/metrics"}
@@ -661,7 +689,6 @@ def create_middleware_stack(app,
 def example_basic_middleware():
     """Example of basic middleware usage."""
     
-    from fastapi import FastAPI
     
     app = FastAPI()
     
@@ -671,14 +698,15 @@ def example_basic_middleware():
     
     @app.get("/")
     async def root():
-        return {"message": "Hello World"}
+        
+    """root function."""
+return {"message": "Hello World"}
     
     return app
 
 def example_comprehensive_middleware():
     """Example of comprehensive middleware stack."""
     
-    from fastapi import FastAPI
     
     app = FastAPI()
     
@@ -703,11 +731,15 @@ def example_comprehensive_middleware():
     
     @app.get("/health")
     async def health_check():
-        return {"status": "healthy"}
+        
+    """health_check function."""
+return {"status": "healthy"}
     
     @app.get("/metrics")
     async def get_metrics():
-        return {"metrics": "data"}
+        
+    """get_metrics function."""
+return {"metrics": "data"}
     
     return app
 
@@ -715,5 +747,4 @@ if __name__ == "__main__":
     # Example usage
     app = example_comprehensive_middleware()
     
-    import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000) 

@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
+import pytest
+import asyncio
+from unittest.mock import patch, MagicMock
+from cybersecurity_security.attackers import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Tests for Attackers Module
 
@@ -5,10 +16,6 @@ Tests brute force and exploit functionality.
 WARNING: These tests are for authorized security testing only.
 """
 
-import pytest
-import asyncio
-from unittest.mock import patch, MagicMock
-from cybersecurity_security.attackers import (
     # Brute Forcers
     BruteForceRequest, BruteForceResult, BruteForceType,
     SSHBruteForceRequest, SSHBruteForceResult,
@@ -31,7 +38,7 @@ from cybersecurity_security.attackers import (
 class TestBruteForcers:
     """Test suite for brute force attackers."""
     
-    def test_brute_force_request_creation(self):
+    async def test_brute_force_request_creation(self) -> Any:
         """Test BruteForceRequest creation."""
         request = BruteForceRequest(
             target_host="192.168.1.1",
@@ -48,7 +55,7 @@ class TestBruteForcers:
         assert "password" in request.password_list
         assert request.attack_type == BruteForceType.SSH
     
-    def test_ssh_brute_force_request_creation(self):
+    async def test_ssh_brute_force_request_creation(self) -> Any:
         """Test SSHBruteForceRequest creation."""
         request = SSHBruteForceRequest(
             target_host="192.168.1.1",
@@ -62,7 +69,7 @@ class TestBruteForcers:
         assert request.target_port == 22
         assert request.max_concurrent_attempts == 3
     
-    def test_http_brute_force_request_creation(self):
+    async def test_http_brute_force_request_creation(self) -> Any:
         """Test HTTPBruteForceRequest creation."""
         request = HTTPBruteForceRequest(
             target_url="http://192.168.1.1",
@@ -76,7 +83,7 @@ class TestBruteForcers:
         assert request.auth_type == "basic"
         assert request.max_concurrent_attempts == 10
     
-    def test_ftp_brute_force_request_creation(self):
+    async def test_ftp_brute_force_request_creation(self) -> Any:
         """Test FTPBruteForceRequest creation."""
         request = FTPBruteForceRequest(
             target_host="192.168.1.1",
@@ -91,14 +98,14 @@ class TestBruteForcers:
         assert request.max_concurrent_attempts == 5
     
     @pytest.mark.asyncio
-    async def test_ssh_brute_force_async(self):
+    async def test_ssh_brute_force_async(self) -> Any:
         """Test SSH brute force attack."""
         with patch('paramiko.SSHClient') as mock_ssh:
             mock_ssh_instance = MagicMock()
             mock_ssh.return_value = mock_ssh_instance
             
             # Mock successful connection for one credential
-            def mock_connect(host, port, username, password, timeout):
+            def mock_connect(host, port, username, password, timeout) -> Any:
                 if username == "admin" and password == "password":
                     return None
                 raise Exception("Authentication failed")
@@ -123,14 +130,14 @@ class TestBruteForcers:
             assert result.successful_credentials[0]["password"] == "password"
     
     @pytest.mark.asyncio
-    async def test_http_brute_force_async(self):
+    async async def test_http_brute_force_async(self) -> Any:
         """Test HTTP brute force attack."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
             mock_response.status = 200
             
             # Mock successful authentication for one credential
-            def mock_get(url, auth=None, timeout=None):
+            def mock_get(url, auth=None, timeout=None) -> Optional[Dict[str, Any]]:
                 if auth and auth.login == "admin" and auth.password == "password":
                     mock_response.status = 200
                 else:
@@ -157,14 +164,14 @@ class TestBruteForcers:
             assert result.successful_credentials[0]["password"] == "password"
     
     @pytest.mark.asyncio
-    async def test_ftp_brute_force_async(self):
+    async def test_ftp_brute_force_async(self) -> Any:
         """Test FTP brute force attack."""
         with patch('ftplib.FTP') as mock_ftp:
             mock_ftp_instance = MagicMock()
             mock_ftp.return_value = mock_ftp_instance
             
             # Mock successful login for one credential
-            def mock_login(username, password):
+            def mock_login(username, password) -> Any:
                 if username == "admin" and password == "password":
                     return None
                 raise Exception("Authentication failed")
@@ -191,7 +198,7 @@ class TestBruteForcers:
 class TestExploiters:
     """Test suite for exploit attackers."""
     
-    def test_exploit_request_creation(self):
+    async def test_exploit_request_creation(self) -> Any:
         """Test ExploitRequest creation."""
         request = ExploitRequest(
             target_host="192.168.1.1",
@@ -205,7 +212,7 @@ class TestExploiters:
         assert request.exploit_type == ExploitType.SQL_INJECTION
         assert request.payload == "' OR 1=1--"
     
-    def test_buffer_overflow_request_creation(self):
+    async def test_buffer_overflow_request_creation(self) -> Any:
         """Test BufferOverflowRequest creation."""
         request = BufferOverflowRequest(
             target_host="192.168.1.1",
@@ -219,7 +226,7 @@ class TestExploiters:
         assert request.buffer_size == 1024
         assert request.shellcode == "\\x90\\x90\\x90"
     
-    def test_sql_injection_exploit_request_creation(self):
+    async def test_sql_injection_exploit_request_creation(self) -> Any:
         """Test SQLInjectionExploitRequest creation."""
         request = SQLInjectionExploitRequest(
             target_url="http://192.168.1.1/vulnerable.php",
@@ -233,7 +240,7 @@ class TestExploiters:
         assert request.injection_type == "union"
         assert request.payload == "' UNION SELECT 1,2,3--"
     
-    def test_xss_exploit_request_creation(self):
+    async def test_xss_exploit_request_creation(self) -> Any:
         """Test XSSExploitRequest creation."""
         request = XSSExploitRequest(
             target_url="http://192.168.1.1/vulnerable.php",
@@ -247,7 +254,7 @@ class TestExploiters:
         assert request.payload == "<script>alert('XSS')</script>"
         assert request.xss_type == "reflected"
     
-    def test_command_injection_request_creation(self):
+    async def test_command_injection_request_creation(self) -> Any:
         """Test CommandInjectionRequest creation."""
         request = CommandInjectionRequest(
             target_url="http://192.168.1.1/vulnerable.php",
@@ -262,7 +269,7 @@ class TestExploiters:
         assert request.injection_operator == ";"
     
     @pytest.mark.asyncio
-    async def test_buffer_overflow_test_async(self):
+    async def test_buffer_overflow_test_async(self) -> Any:
         """Test buffer overflow exploit."""
         with patch('socket.socket') as mock_socket:
             mock_sock = MagicMock()
@@ -288,7 +295,7 @@ class TestExploiters:
             assert result.crash_detected is True
     
     @pytest.mark.asyncio
-    async def test_sql_injection_exploit_async(self):
+    async def test_sql_injection_exploit_async(self) -> Any:
         """Test SQL injection exploit."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -312,7 +319,7 @@ class TestExploiters:
             assert result.is_successful is True
     
     @pytest.mark.asyncio
-    async def test_xss_exploit_async(self):
+    async def test_xss_exploit_async(self) -> Any:
         """Test XSS exploit."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -337,7 +344,7 @@ class TestExploiters:
             assert result.payload_reflected is True
     
     @pytest.mark.asyncio
-    async def test_command_injection_exploit_async(self):
+    async def test_command_injection_exploit_async(self) -> Any:
         """Test command injection exploit."""
         with patch('aiohttp.ClientSession') as mock_session:
             mock_response = MagicMock()
@@ -365,7 +372,7 @@ class TestAttackersIntegration:
     """Integration tests for attackers modules."""
     
     @pytest.mark.asyncio
-    async def test_multiple_attack_types(self):
+    async def test_multiple_attack_types(self) -> Any:
         """Test using multiple attack types together."""
         # Test SSH brute force
         ssh_request = SSHBruteForceRequest(

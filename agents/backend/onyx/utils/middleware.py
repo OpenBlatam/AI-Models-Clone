@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import base64
 import hashlib
 import logging
@@ -15,6 +17,8 @@ from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
 from shared_configs.contextvars import ONYX_REQUEST_ID_CONTEXTVAR
 
 
+from typing import Any, List, Dict, Optional
+import asyncio
 def add_onyx_tenant_id_middleware(app: FastAPI, logger: logging.LoggerAdapter) -> None:
     @app.middleware("http")
     async def set_tenant_id(
@@ -28,11 +32,11 @@ def add_onyx_tenant_id_middleware(app: FastAPI, logger: logging.LoggerAdapter) -
         return await call_next(request)
 
 
-def add_onyx_request_id_middleware(
+async def add_onyx_request_id_middleware(
     app: FastAPI, prefix: str, logger: logging.LoggerAdapter
 ) -> None:
     @app.middleware("http")
-    async def set_request_id(
+    async async def set_request_id(
         request: Request, call_next: Callable[[Request], Awaitable[Response]]
     ) -> Response:
         """Generate a request hash that can be used to track the lifecycle
@@ -51,20 +55,20 @@ def add_onyx_request_id_middleware(
         return await call_next(request)
 
 
-def make_randomized_onyx_request_id(prefix: str) -> str:
+async def make_randomized_onyx_request_id(prefix: str) -> str:
     """generates a randomized request id"""
 
     hash_input = str(uuid.uuid4())
     return _make_onyx_request_id(prefix, hash_input)
 
 
-def make_structured_onyx_request_id(prefix: str, request_url: str) -> str:
+async def make_structured_onyx_request_id(prefix: str, request_url: str) -> str:
     """Not used yet, but could be in the future!"""
     hash_input = f"{request_url}:{datetime.now(timezone.utc)}"
     return _make_onyx_request_id(prefix, hash_input)
 
 
-def _make_onyx_request_id(prefix: str, hash_input: str) -> str:
+async def _make_onyx_request_id(prefix: str, hash_input: str) -> str:
     """helper function to return an id given a string input"""
     hash_obj = hashlib.md5(hash_input.encode("utf-8"))
     hash_bytes = hash_obj.digest()[:6]  # Truncate to 6 bytes

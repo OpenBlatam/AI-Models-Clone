@@ -1,9 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import pytest
 
 from onyx.indexing.embedder import DefaultIndexingEmbedder
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class MockHeartbeat(IndexingHeartbeatInterface):
     def __init__(self) -> None:
         self.call_count = 0

@@ -1,3 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import torch
+import torch.nn as nn
+import torch.nn.functional as F
+from torch.utils.data import DataLoader
+from diffusers import (
+from diffusers.utils import randn_tensor
+from transformers import CLIPTextModel, CLIPTokenizer
+import numpy as np
+from PIL import Image
+import logging
+from typing import Dict, Any, List, Optional
+from pathlib import Path
+import time
+from diffusion_models import DiffusionModelManager, DiffusionConfig, GenerationConfig, CustomDiffusionPipeline
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 Diffusion Models Examples - Production Workflows
@@ -7,28 +31,13 @@ Comprehensive examples demonstrating diffusion model usage with Diffusers librar
 Includes: Stable Diffusion, DDPM, DDIM, custom training, schedulers, and optimization.
 """
 
-import asyncio
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from torch.utils.data import DataLoader
-from diffusers import (
     StableDiffusionPipeline, DDIMPipeline, DDPMPipeline,
     UNet2DConditionModel, AutoencoderKL, DDIMScheduler,
     DDPMScheduler, EulerDiscreteScheduler, DPMSolverMultistepScheduler,
     StableDiffusionImg2ImgPipeline, StableDiffusionInpaintPipeline,
     StableDiffusionControlNetPipeline, ControlNetModel
 )
-from diffusers.utils import randn_tensor
-from transformers import CLIPTextModel, CLIPTokenizer
-import numpy as np
-from PIL import Image
-import logging
-from typing import Dict, Any, List, Optional
-from pathlib import Path
-import time
 
-from diffusion_models import DiffusionModelManager, DiffusionConfig, GenerationConfig, CustomDiffusionPipeline
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,11 +46,11 @@ logger = logging.getLogger(__name__)
 class DiffusionExamples:
     """Comprehensive diffusion model examples."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.config = DiffusionConfig()
         self.manager = DiffusionModelManager(self.config)
     
-    async def example_stable_diffusion_basic(self):
+    async def example_stable_diffusion_basic(self) -> Any:
         """Basic Stable Diffusion image generation."""
         logger.info("Running basic Stable Diffusion example")
         
@@ -67,7 +76,7 @@ class DiffusionExamples:
         
         return images
     
-    async def example_stable_diffusion_batch(self):
+    async def example_stable_diffusion_batch(self) -> Any:
         """Batch image generation with multiple prompts."""
         logger.info("Running batch Stable Diffusion example")
         
@@ -103,7 +112,7 @@ class DiffusionExamples:
         
         return all_images
     
-    async def example_ddim_generation(self):
+    async def example_ddim_generation(self) -> Any:
         """DDIM model generation example."""
         logger.info("Running DDIM generation example")
         
@@ -126,7 +135,7 @@ class DiffusionExamples:
         
         return images
     
-    async def example_ddpm_generation(self):
+    async def example_ddpm_generation(self) -> Any:
         """DDPM model generation example."""
         logger.info("Running DDPM generation example")
         
@@ -149,7 +158,7 @@ class DiffusionExamples:
         
         return images
     
-    async def example_custom_pipeline(self):
+    async def example_custom_pipeline(self) -> Any:
         """Custom diffusion pipeline example."""
         logger.info("Running custom pipeline example")
         
@@ -174,7 +183,7 @@ class DiffusionExamples:
         
         return image
     
-    async def example_img2img_generation(self):
+    async def example_img2img_generation(self) -> Any:
         """Image-to-image generation example."""
         logger.info("Running img2img generation example")
         
@@ -206,7 +215,7 @@ class DiffusionExamples:
         
         return result.images
     
-    async def example_inpainting(self):
+    async def example_inpainting(self) -> Any:
         """Inpainting example."""
         logger.info("Running inpainting example")
         
@@ -246,7 +255,7 @@ class DiffusionExamples:
         
         return result.images
     
-    async def example_scheduler_comparison(self):
+    async def example_scheduler_comparison(self) -> Any:
         """Compare different schedulers."""
         logger.info("Running scheduler comparison example")
         
@@ -285,7 +294,7 @@ class DiffusionExamples:
         
         return results
     
-    async def example_memory_optimization(self):
+    async def example_memory_optimization(self) -> Any:
         """Memory optimization example."""
         logger.info("Running memory optimization example")
         
@@ -317,7 +326,7 @@ class DiffusionExamples:
         
         return images1, images2
     
-    async def example_control_net(self):
+    async def example_control_net(self) -> Any:
         """ControlNet example (if available)."""
         logger.info("Running ControlNet example")
         
@@ -360,7 +369,7 @@ class DiffusionExamples:
             logger.warning(f"ControlNet not available: {e}")
             return None
     
-    async def example_performance_benchmark(self):
+    async def example_performance_benchmark(self) -> Any:
         """Performance benchmarking example."""
         logger.info("Running performance benchmark")
         
@@ -395,7 +404,7 @@ class DiffusionExamples:
             "speedup": single_time * len(configs) / batch_time
         }
     
-    async def run_all_examples(self):
+    async def run_all_examples(self) -> Any:
         """Run all examples."""
         logger.info("Starting all diffusion examples")
         
@@ -459,7 +468,7 @@ class DiffusionExamples:
         logger.info("All examples completed")
         return results
     
-    def cleanup(self):
+    def cleanup(self) -> Any:
         """Cleanup resources."""
         self.manager.cleanup()
 
@@ -479,5 +488,6 @@ async def main():
         examples.cleanup()
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

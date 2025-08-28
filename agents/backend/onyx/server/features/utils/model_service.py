@@ -1,7 +1,5 @@
-"""
-Model Service - Onyx Integration
-Service for handling model operations with caching and validation.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from dataclasses import dataclass, field
@@ -12,13 +10,25 @@ from .model_schema import ModelSchema, SchemaConfig
 from .model_factory import ModelFactory
 from .model_registry import ModelRegistry
 from .model_manager import ModelManager
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+        from .base_model import OnyxBaseModel
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Model Service - Onyx Integration
+Service for handling model operations with caching and validation.
+"""
 
 T = TypeVar('T')
 
 class ModelService:
     """Service for handling model operations with caching and validation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize service."""
         self._manager = ModelManager()
         self._validation_cache: Dict[str, Dict[str, bool]] = {}
@@ -32,12 +42,10 @@ class ModelService:
     
     def register_model(self, name: str, model_class: Type['OnyxBaseModel']) -> None:
         """Register a model class."""
-        from .base_model import OnyxBaseModel
         self._manager.register_model(name, model_class)
     
     def create_model(self, name: str, data: Optional[Dict[str, Any]] = None, id: Optional[str] = None) -> Optional['OnyxBaseModel']:
         """Create a model."""
-        from .base_model import OnyxBaseModel
         # Validate data
         schema = self._manager.get_schema(name)
         if schema:
@@ -56,7 +64,6 @@ class ModelService:
     
     def get_model(self, name: str, id: str) -> Optional['OnyxBaseModel']:
         """Get a model by ID."""
-        from .base_model import OnyxBaseModel
         # Check validation cache
         if name in self._validation_cache and id in self._validation_cache[name]:
             timestamp = self._validation_timestamps[name][id]
@@ -81,7 +88,6 @@ class ModelService:
     
     def get_models(self, name: str) -> Dict[str, 'OnyxBaseModel']:
         """Get all models of a type."""
-        from .base_model import OnyxBaseModel
         models = self._manager.get_models(name)
         
         # Validate models
@@ -99,7 +105,6 @@ class ModelService:
     
     def update_model(self, name: str, id: str, data: Dict[str, Any]) -> Optional['OnyxBaseModel']:
         """Update a model."""
-        from .base_model import OnyxBaseModel
         # Validate data
         schema = self._manager.get_schema(name)
         if schema:

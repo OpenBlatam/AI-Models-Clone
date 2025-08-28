@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import json
+import time
+from typing import Dict, Any, List
+from datetime import datetime, timedelta
+import aiohttp
+import httpx
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.responses import JSONResponse
+import structlog
+from dependencies.shared_resources import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Shared Resources Dependency Injection Demo
 
@@ -16,20 +34,9 @@ Features demonstrated:
 - Context managers for resource management
 """
 
-import asyncio
-import json
-import time
-from typing import Dict, Any, List
-from datetime import datetime, timedelta
 
-import aiohttp
-import httpx
-from fastapi import FastAPI, Depends, HTTPException, status
-from fastapi.responses import JSONResponse
-import structlog
 
 # Import shared resources
-from dependencies.shared_resources import (
     SharedResourceConfig,
     ResourceConfig,
     CryptoConfig,
@@ -118,9 +125,11 @@ class NetworkService:
     """Service for demonstrating network operations."""
     
     def __init__(self, http_session: aiohttp.ClientSession):
-        self.http_session = http_session
+        
+    """__init__ function."""
+self.http_session = http_session
     
-    async def fetch_data(self, url: str) -> Dict[str, Any]:
+    async async def fetch_data(self, url: str) -> Dict[str, Any]:
         """Fetch data from a URL using the shared HTTP session."""
         try:
             async with self.http_session.get(url) as response:
@@ -145,7 +154,7 @@ class NetworkService:
                 "error": str(e)
             }
     
-    async def fetch_multiple_urls(self, urls: List[str]) -> List[Dict[str, Any]]:
+    async async def fetch_multiple_urls(self, urls: List[str]) -> List[Dict[str, Any]]:
         """Fetch data from multiple URLs concurrently."""
         tasks = [self.fetch_data(url) for url in urls]
         results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -167,7 +176,7 @@ class NetworkService:
 class CryptoService:
     """Service for demonstrating cryptographic operations."""
     
-    def __init__(self, crypto_backend):
+    def __init__(self, crypto_backend) -> Any:
         self.crypto_backend = crypto_backend
     
     async def encrypt_data(self, data: str) -> Dict[str, Any]:
@@ -271,7 +280,7 @@ class CryptoService:
 class CacheService:
     """Service for demonstrating cache operations."""
     
-    def __init__(self, redis_client):
+    def __init__(self, redis_client) -> Any:
         self.redis_client = redis_client
     
     async def set_cache(self, key: str, value: str, ttl: int = 3600) -> Dict[str, Any]:

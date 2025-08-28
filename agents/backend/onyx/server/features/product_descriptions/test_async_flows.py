@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import time
+import uuid
+import pytest
+from typing import Dict, List, Any, Optional
+from unittest.mock import AsyncMock, MagicMock, patch
+from async_non_blocking_flows import (
+from typing import Any, List, Dict, Optional
+import logging
 """
 Test Suite for Async Non-Blocking Flows
 
@@ -9,14 +23,7 @@ This test suite covers:
 - Async flow patterns and best practices
 """
 
-import asyncio
-import time
-import uuid
-import pytest
-from typing import Dict, List, Any, Optional
-from unittest.mock import AsyncMock, MagicMock, patch
 
-from async_non_blocking_flows import (
     AsyncFlowOrchestrator, EventBus, AsyncDataPipeline, ReactiveStream,
     AsyncMessageQueue, AsyncEvent, FlowContext, EventType, FlowType,
     DataValidationProcessor, DataEnrichmentProcessor, DataTransformationProcessor,
@@ -66,7 +73,7 @@ class TestEventBus:
     """Test cases for EventBus."""
     
     @pytest.mark.asyncio
-    async def test_event_bus_creation(self):
+    async def test_event_bus_creation(self) -> Any:
         """Test EventBus creation."""
         event_bus = EventBus()
         assert event_bus.subscribers == {}
@@ -74,7 +81,7 @@ class TestEventBus:
         assert not event_bus._running
     
     @pytest.mark.asyncio
-    async def test_event_bus_start_stop(self):
+    async def test_event_bus_start_stop(self) -> Any:
         """Test EventBus start and stop."""
         event_bus = EventBus()
         
@@ -86,7 +93,7 @@ class TestEventBus:
         assert not event_bus._running
     
     @pytest.mark.asyncio
-    async def test_event_publishing(self):
+    async def test_event_publishing(self) -> Any:
         """Test event publishing."""
         event_bus = EventBus()
         await event_bus.start()
@@ -108,7 +115,7 @@ class TestEventBus:
         await event_bus.stop()
     
     @pytest.mark.asyncio
-    async def test_event_subscription(self):
+    async def test_event_subscription(self) -> Any:
         """Test event subscription and handling."""
         event_bus = EventBus()
         await event_bus.start()
@@ -116,7 +123,9 @@ class TestEventBus:
         received_events = []
         
         async def event_handler(event: AsyncEvent):
-            received_events.append(event)
+            
+    """event_handler function."""
+received_events.append(event)
         
         event_bus.subscribe(EventType.DATA_PROCESSED, event_handler)
         
@@ -137,7 +146,7 @@ class TestEventBus:
         await event_bus.stop()
     
     @pytest.mark.asyncio
-    async def test_event_unsubscription(self):
+    async def test_event_unsubscription(self) -> Any:
         """Test event unsubscription."""
         event_bus = EventBus()
         await event_bus.start()
@@ -145,7 +154,9 @@ class TestEventBus:
         received_events = []
         
         async def event_handler(event: AsyncEvent):
-            received_events.append(event)
+            
+    """event_handler function."""
+received_events.append(event)
         
         event_bus.subscribe(EventType.DATA_PROCESSED, event_handler)
         event_bus.unsubscribe(EventType.DATA_PROCESSED, event_handler)
@@ -170,7 +181,7 @@ class TestAsyncDataPipeline:
     """Test cases for AsyncDataPipeline."""
     
     @pytest.mark.asyncio
-    async def test_pipeline_creation(self):
+    async def test_pipeline_creation(self) -> Any:
         """Test AsyncDataPipeline creation."""
         pipeline = AsyncDataPipeline("test_pipeline")
         assert pipeline.name == "test_pipeline"
@@ -179,7 +190,7 @@ class TestAsyncDataPipeline:
         assert pipeline.stats["errors"] == 0
     
     @pytest.mark.asyncio
-    async def test_pipeline_processor_addition(self):
+    async def test_pipeline_processor_addition(self) -> Any:
         """Test adding processors to pipeline."""
         pipeline = AsyncDataPipeline("test_pipeline")
         processor = DataValidationProcessor()
@@ -189,7 +200,7 @@ class TestAsyncDataPipeline:
         assert pipeline.processors[0] == processor
     
     @pytest.mark.asyncio
-    async def test_pipeline_start_stop(self):
+    async def test_pipeline_start_stop(self) -> Any:
         """Test pipeline start and stop."""
         pipeline = AsyncDataPipeline("test_pipeline")
         
@@ -203,7 +214,7 @@ class TestAsyncDataPipeline:
         assert pipeline.stats["end_time"] is not None
     
     @pytest.mark.asyncio
-    async def test_pipeline_data_processing(self, sample_data, sample_context):
+    async def test_pipeline_data_processing(self, sample_data, sample_context) -> Any:
         """Test data processing through pipeline."""
         pipeline = AsyncDataPipeline("test_pipeline")
         pipeline.add_processor(DataValidationProcessor())
@@ -230,7 +241,7 @@ class TestAsyncDataPipeline:
         assert "enrichment_timestamp" in result
     
     @pytest.mark.asyncio
-    async def test_pipeline_error_handling(self, sample_context):
+    async def test_pipeline_error_handling(self, sample_context) -> Any:
         """Test pipeline error handling."""
         pipeline = AsyncDataPipeline("test_pipeline")
         pipeline.add_processor(DataValidationProcessor())
@@ -255,7 +266,7 @@ class TestReactiveStream:
     """Test cases for ReactiveStream."""
     
     @pytest.mark.asyncio
-    async def test_stream_creation(self):
+    async def test_stream_creation(self) -> Any:
         """Test ReactiveStream creation."""
         stream = ReactiveStream("test_stream")
         assert stream.name == "test_stream"
@@ -263,36 +274,36 @@ class TestReactiveStream:
         assert len(stream.subscribers) == 0
     
     @pytest.mark.asyncio
-    async def test_stream_transformer_addition(self):
+    async def test_stream_transformer_addition(self) -> Any:
         """Test adding transformers to stream."""
         stream = ReactiveStream("test_stream")
         
-        async def test_transformer(data):
+        async def test_transformer(data) -> Any:
             return data
         
         stream.add_transformer(test_transformer)
         assert len(stream.transformers) == 1
     
     @pytest.mark.asyncio
-    async def test_stream_subscription(self):
+    async def test_stream_subscription(self) -> Any:
         """Test stream subscription."""
         stream = ReactiveStream("test_stream")
         
         received_data = []
         
-        async def test_subscriber(data):
+        async def test_subscriber(data) -> Any:
             received_data.append(data)
         
         stream.subscribe(test_subscriber)
         assert len(stream.subscribers) == 1
     
     @pytest.mark.asyncio
-    async def test_stream_data_processing(self):
+    async def test_stream_data_processing(self) -> Any:
         """Test data processing through stream."""
         stream = ReactiveStream("test_stream")
         
         # Add transformer
-        async def uppercase_transformer(data):
+        async def uppercase_transformer(data) -> Any:
             if isinstance(data, dict) and "name" in data:
                 data["name"] = data["name"].upper()
             return data
@@ -302,7 +313,7 @@ class TestReactiveStream:
         # Add subscriber
         received_data = []
         
-        async def test_subscriber(data):
+        async def test_subscriber(data) -> Any:
             received_data.append(data)
         
         stream.subscribe(test_subscriber)
@@ -325,7 +336,7 @@ class TestAsyncMessageQueue:
     """Test cases for AsyncMessageQueue."""
     
     @pytest.mark.asyncio
-    async def test_queue_creation(self):
+    async def test_queue_creation(self) -> Any:
         """Test AsyncMessageQueue creation."""
         queue = AsyncMessageQueue("test_queue")
         assert queue.name == "test_queue"
@@ -334,24 +345,24 @@ class TestAsyncMessageQueue:
         assert queue.stats["messages_processed"] == 0
     
     @pytest.mark.asyncio
-    async def test_queue_consumer_addition(self):
+    async def test_queue_consumer_addition(self) -> Any:
         """Test adding consumers to queue."""
         queue = AsyncMessageQueue("test_queue")
         
-        async def test_consumer(message):
+        async def test_consumer(message) -> Any:
             pass
         
         queue.add_consumer(test_consumer)
         assert len(queue.consumers) == 1
     
     @pytest.mark.asyncio
-    async def test_queue_message_processing(self):
+    async def test_queue_message_processing(self) -> Any:
         """Test message processing through queue."""
         queue = AsyncMessageQueue("test_queue")
         
         processed_messages = []
         
-        async def test_consumer(message):
+        async def test_consumer(message) -> Any:
             processed_messages.append(message)
         
         queue.add_consumer(test_consumer)
@@ -380,7 +391,7 @@ class TestAsyncFlowOrchestrator:
     """Test cases for AsyncFlowOrchestrator."""
     
     @pytest.mark.asyncio
-    async def test_orchestrator_creation(self):
+    async def test_orchestrator_creation(self) -> Any:
         """Test AsyncFlowOrchestrator creation."""
         orchestrator = AsyncFlowOrchestrator()
         assert len(orchestrator.flows) == 0
@@ -389,7 +400,7 @@ class TestAsyncFlowOrchestrator:
         assert len(orchestrator.message_queues) == 0
     
     @pytest.mark.asyncio
-    async def test_orchestrator_flow_management(self):
+    async def test_orchestrator_flow_management(self) -> Any:
         """Test adding flows to orchestrator."""
         orchestrator = AsyncFlowOrchestrator()
         
@@ -412,7 +423,7 @@ class TestAsyncFlowOrchestrator:
         assert "test_queue" in orchestrator.flows
     
     @pytest.mark.asyncio
-    async def test_orchestrator_start_stop(self):
+    async def test_orchestrator_start_stop(self) -> Any:
         """Test orchestrator start and stop."""
         orchestrator = AsyncFlowOrchestrator()
         
@@ -438,7 +449,7 @@ class TestAsyncFlowOrchestrator:
         assert not queue._running
     
     @pytest.mark.asyncio
-    async def test_orchestrator_event_publishing(self, sample_event):
+    async def test_orchestrator_event_publishing(self, sample_event) -> Any:
         """Test event publishing through orchestrator."""
         orchestrator = AsyncFlowOrchestrator()
         await orchestrator.start()
@@ -451,7 +462,7 @@ class TestAsyncFlowOrchestrator:
         await orchestrator.stop()
     
     @pytest.mark.asyncio
-    async def test_orchestrator_stats(self):
+    async def test_orchestrator_stats(self) -> Any:
         """Test orchestrator statistics."""
         orchestrator = AsyncFlowOrchestrator()
         
@@ -476,7 +487,7 @@ class TestDataProcessors:
     """Test cases for data processors."""
     
     @pytest.mark.asyncio
-    async def test_validation_processor(self, sample_data, sample_context):
+    async def test_validation_processor(self, sample_data, sample_context) -> Any:
         """Test DataValidationProcessor."""
         processor = DataValidationProcessor()
         
@@ -490,7 +501,7 @@ class TestDataProcessors:
         assert "validation_timestamp" in result
     
     @pytest.mark.asyncio
-    async def test_validation_processor_error(self, sample_context):
+    async def test_validation_processor_error(self, sample_context) -> Any:
         """Test DataValidationProcessor error handling."""
         processor = DataValidationProcessor()
         
@@ -500,7 +511,7 @@ class TestDataProcessors:
             await processor.process(invalid_data, sample_context)
     
     @pytest.mark.asyncio
-    async def test_enrichment_processor(self, sample_data, sample_context):
+    async def test_enrichment_processor(self, sample_data, sample_context) -> Any:
         """Test DataEnrichmentProcessor."""
         processor = DataEnrichmentProcessor()
         
@@ -518,7 +529,7 @@ class TestDataProcessors:
         assert "flow_context" in result
     
     @pytest.mark.asyncio
-    async def test_transformation_processor(self, sample_data, sample_context):
+    async def test_transformation_processor(self, sample_data, sample_context) -> Any:
         """Test DataTransformationProcessor."""
         processor = DataTransformationProcessor()
         
@@ -544,7 +555,7 @@ class TestFlowIntegration:
     """Integration tests for flow components."""
     
     @pytest.mark.asyncio
-    async def test_pipeline_with_processors(self, sample_data, sample_context):
+    async def test_pipeline_with_processors(self, sample_data, sample_context) -> Any:
         """Test complete pipeline with all processors."""
         pipeline = AsyncDataPipeline("integration_pipeline")
         pipeline.add_processor(DataValidationProcessor())
@@ -577,7 +588,7 @@ class TestFlowIntegration:
         assert "original_data" in result
     
     @pytest.mark.asyncio
-    async def test_event_driven_pipeline(self, sample_data, sample_context):
+    async def test_event_driven_pipeline(self, sample_data, sample_context) -> Any:
         """Test event-driven pipeline integration."""
         orchestrator = AsyncFlowOrchestrator()
         
@@ -592,7 +603,9 @@ class TestFlowIntegration:
         events_received = []
         
         async def event_handler(event: AsyncEvent):
-            events_received.append(event)
+            
+    """event_handler function."""
+events_received.append(event)
         
         orchestrator.subscribe_to_event(EventType.DATA_PROCESSED, event_handler)
         
@@ -619,7 +632,7 @@ class TestFlowIntegration:
         assert len(events_received) == 1
     
     @pytest.mark.asyncio
-    async def test_stream_with_queue(self):
+    async def test_stream_with_queue(self) -> Any:
         """Test stream integration with message queue."""
         orchestrator = AsyncFlowOrchestrator()
         
@@ -627,7 +640,7 @@ class TestFlowIntegration:
         stream = ReactiveStream("integration_stream")
         
         # Add transformer
-        async def test_transformer(data):
+        async def test_transformer(data) -> Any:
             data["transformed"] = True
             return data
         
@@ -638,7 +651,7 @@ class TestFlowIntegration:
         
         processed_messages = []
         
-        async def queue_consumer(message):
+        async def queue_consumer(message) -> Any:
             processed_messages.append(message)
         
         queue.add_consumer(queue_consumer)
@@ -649,7 +662,7 @@ class TestFlowIntegration:
         await orchestrator.start()
         
         # Subscribe stream to queue
-        async def stream_to_queue(data):
+        async def stream_to_queue(data) -> Any:
             await queue.send_message(data)
         
         stream.subscribe(stream_to_queue)
@@ -672,7 +685,7 @@ class TestPerformance:
     """Performance tests for async flows."""
     
     @pytest.mark.asyncio
-    async def test_pipeline_performance(self):
+    async def test_pipeline_performance(self) -> Any:
         """Test pipeline performance with multiple items."""
         pipeline = AsyncDataPipeline("performance_pipeline")
         pipeline.add_processor(DataValidationProcessor())
@@ -719,12 +732,12 @@ class TestPerformance:
         assert pipeline.stats["processed"] == 100
     
     @pytest.mark.asyncio
-    async def test_stream_performance(self):
+    async def test_stream_performance(self) -> Any:
         """Test stream performance with multiple subscribers."""
         stream = ReactiveStream("performance_stream")
         
         # Add transformer
-        async def test_transformer(data):
+        async def test_transformer(data) -> Any:
             data["processed"] = True
             return data
         
@@ -734,7 +747,7 @@ class TestPerformance:
         subscriber_results = [[] for _ in range(5)]
         
         for i in range(5):
-            async def subscriber(data, index=i):
+            async def subscriber(data, index=i) -> Any:
                 subscriber_results[index].append(data)
             
             stream.subscribe(subscriber)
@@ -766,13 +779,13 @@ class TestPerformance:
         assert processing_time < 3.0  # Should complete within 3 seconds
     
     @pytest.mark.asyncio
-    async def test_queue_performance(self):
+    async def test_queue_performance(self) -> Any:
         """Test message queue performance."""
         queue = AsyncMessageQueue("performance_queue")
         
         processed_messages = []
         
-        async def consumer(message):
+        async def consumer(message) -> Any:
             processed_messages.append(message)
             await asyncio.sleep(0.001)  # Simulate processing time
         
@@ -809,16 +822,16 @@ class TestErrorHandling:
     """Error handling tests for async flows."""
     
     @pytest.mark.asyncio
-    async def test_pipeline_processor_error(self, sample_context):
+    async def test_pipeline_processor_error(self, sample_context) -> Any:
         """Test pipeline error handling with processor failures."""
         pipeline = AsyncDataPipeline("error_pipeline")
         
         # Create failing processor
         class FailingProcessor(AsyncFlowProcessor):
-            async def can_process(self, data):
+            async def can_process(self, data) -> Any:
                 return True
             
-            async def process(self, data, context):
+            async def process(self, data, context) -> Any:
                 raise Exception("Processor failed")
         
         pipeline.add_processor(FailingProcessor())
@@ -835,19 +848,19 @@ class TestErrorHandling:
         assert pipeline.stats["errors"] > 0
     
     @pytest.mark.asyncio
-    async def test_stream_transformer_error(self):
+    async def test_stream_transformer_error(self) -> Any:
         """Test stream error handling with transformer failures."""
         stream = ReactiveStream("error_stream")
         
         # Create failing transformer
-        async def failing_transformer(data):
+        async def failing_transformer(data) -> Any:
             raise Exception("Transformer failed")
         
         stream.add_transformer(failing_transformer)
         
         received_data = []
         
-        async def subscriber(data):
+        async def subscriber(data) -> Any:
             received_data.append(data)
         
         stream.subscribe(subscriber)
@@ -865,12 +878,12 @@ class TestErrorHandling:
         assert len(received_data) == 0
     
     @pytest.mark.asyncio
-    async def test_queue_consumer_error(self):
+    async def test_queue_consumer_error(self) -> Any:
         """Test message queue error handling with consumer failures."""
         queue = AsyncMessageQueue("error_queue")
         
         # Create failing consumer
-        async def failing_consumer(message):
+        async def failing_consumer(message) -> Any:
             raise Exception("Consumer failed")
         
         queue.add_consumer(failing_consumer)
@@ -893,7 +906,7 @@ class TestUtilityFunctions:
     """Tests for utility functions."""
     
     @pytest.mark.asyncio
-    async def test_create_async_flow(self):
+    async def test_create_async_flow(self) -> Any:
         """Test create_async_flow function."""
         # Test pipeline creation
         pipeline = await create_async_flow(FlowType.PIPELINE, "test_pipeline")
@@ -915,7 +928,7 @@ class TestUtilityFunctions:
             await create_async_flow(FlowType.EVENT_DRIVEN, "test")
     
     @pytest.mark.asyncio
-    async def test_run_async_flow(self, sample_data, sample_context):
+    async def test_run_async_flow(self, sample_data, sample_context) -> Any:
         """Test run_async_flow function."""
         # Test with pipeline
         pipeline = AsyncDataPipeline("test_pipeline")
@@ -941,7 +954,7 @@ class TestBenchmarks:
     """Benchmark tests for performance comparison."""
     
     @pytest.mark.asyncio
-    async def test_benchmark_pipeline_vs_stream(self):
+    async def test_benchmark_pipeline_vs_stream(self) -> Any:
         """Benchmark pipeline vs stream performance."""
         # Setup pipeline
         pipeline = AsyncDataPipeline("benchmark_pipeline")
@@ -951,7 +964,7 @@ class TestBenchmarks:
         # Setup stream
         stream = ReactiveStream("benchmark_stream")
         
-        async def stream_transformer(data):
+        async def stream_transformer(data) -> Any:
             data["validated"] = True
             data["enriched"] = True
             return data
@@ -991,7 +1004,7 @@ class TestBenchmarks:
         
         stream_results = []
         
-        async def stream_subscriber(data):
+        async def stream_subscriber(data) -> Any:
             stream_results.append(data)
         
         stream.subscribe(stream_subscriber)

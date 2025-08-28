@@ -1,46 +1,106 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from httpx_oauth.clients.google import GoogleOAuth2
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from httpx_oauth.clients.openid import BASE_SCOPES
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from httpx_oauth.clients.openid import OpenID
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
 from ee.onyx.configs.app_configs import OIDC_SCOPE_OVERRIDE
 from ee.onyx.configs.app_configs import OPENID_CONFIG_URL
 from ee.onyx.server.analytics.api import router as analytics_router
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.auth_check import check_ee_router_auth
 from ee.onyx.server.documents.cc_pair import router as ee_document_cc_pair_router
 from ee.onyx.server.enterprise_settings.api import (
-    admin_router as enterprise_settings_admin_router,
-)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.enterprise_settings.api import (
-    basic_router as enterprise_settings_router,
-)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.manage.standard_answer import router as standard_answer_router
 from ee.onyx.server.middleware.tenant_tracking import (
-    add_api_server_tenant_id_middleware,
-)
 from ee.onyx.server.oauth.api import router as ee_oauth_router
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.query_and_chat.chat_backend import (
-    router as chat_router,
-)
 from ee.onyx.server.query_and_chat.query_backend import (
-    basic_router as query_router,
-)
 from ee.onyx.server.query_history.api import router as query_history_router
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.reporting.usage_export_api import router as usage_export_router
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.saml import router as saml_router
 from ee.onyx.server.seeding import seed_db
 from ee.onyx.server.tenants.api import router as tenants_router
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.token_rate_limits.api import (
-    router as token_rate_limit_settings_router,
-)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.server.user_group.api import router as user_group_router
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from ee.onyx.utils.encryption import test_encryption
 from onyx.auth.users import auth_backend
 from onyx.auth.users import create_onyx_oauth_router
 from onyx.auth.users import fastapi_users
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 from onyx.configs.app_configs import AUTH_TYPE
 from onyx.configs.app_configs import OAUTH_CLIENT_ID
 from onyx.configs.app_configs import OAUTH_CLIENT_SECRET
@@ -55,6 +115,26 @@ from onyx.main import use_route_function_names_as_operation_ids
 from onyx.utils.logger import setup_logger
 from onyx.utils.variable_functionality import global_version
 from shared_configs.configs import MULTI_TENANT
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    admin_router as enterprise_settings_admin_router,
+)
+    basic_router as enterprise_settings_router,
+)
+    add_api_server_tenant_id_middleware,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+)
+    router as chat_router,
+)
+    basic_router as query_router,
+)
+    router as token_rate_limit_settings_router,
+)
 
 logger = setup_logger()
 
@@ -73,7 +153,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
         yield
 
 
-def get_application() -> FastAPI:
+async def get_application() -> FastAPI:
     # Anything that happens at import time is not guaranteed to be running ee-version
     # Anything after the server startup will be running ee version
     global_version.set_ee()
@@ -84,9 +164,19 @@ def get_application() -> FastAPI:
 
     if MULTI_TENANT:
         add_api_server_tenant_id_middleware(application, logger)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     if AUTH_TYPE == AuthType.CLOUD:
         # For Google OAuth, refresh tokens are requested by:
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         # 1. Adding the right scopes
         # 2. Properly configuring OAuth in Google Cloud Console to allow offline access
         oauth_client = GoogleOAuth2(
@@ -113,11 +203,21 @@ def get_application() -> FastAPI:
         include_auth_router_with_prefix(
             application,
             fastapi_users.get_logout_router(auth_backend),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             prefix="/auth",
         )
 
     if AUTH_TYPE == AuthType.OIDC:
         # Ensure we request offline_access for refresh tokens
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         try:
             oidc_scopes = list(OIDC_SCOPE_OVERRIDE or BASE_SCOPES)
             if "offline_access" not in oidc_scopes:
@@ -150,6 +250,11 @@ def get_application() -> FastAPI:
         include_auth_router_with_prefix(
             application,
             fastapi_users.get_auth_router(auth_backend),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             prefix="/auth",
         )
 

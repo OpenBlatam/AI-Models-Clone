@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from datetime import datetime, timedelta
+from typing import Optional, List, Dict, Any, Union
+from enum import Enum
+from uuid import UUID, uuid4
+from pydantic import BaseModel, Field, validator, root_validator
+from pydantic.types import SecretStr
+        import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🏗️ Domain Entities
 ==================
@@ -6,13 +29,7 @@ Core business entities for the copywriting system using Pydantic
 for validation and serialization.
 """
 
-from datetime import datetime, timedelta
-from typing import Optional, List, Dict, Any, Union
-from enum import Enum
-from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, validator, root_validator
-from pydantic.types import SecretStr
 
 
 class ContentType(str, Enum):
@@ -94,13 +111,13 @@ class User(BaseModel):
     content_preferences: Dict[str, Any] = Field(default_factory=dict)
     
     @validator('email')
-    def validate_email(cls, v):
+    def validate_email(cls, v) -> bool:
         if '@' not in v:
             raise ValueError('Invalid email format')
         return v.lower()
     
     @validator('credits')
-    def validate_credits(cls, v):
+    def validate_credits(cls, v) -> bool:
         if v < 0:
             raise ValueError('Credits cannot be negative')
         return v
@@ -122,7 +139,8 @@ class User(BaseModel):
         self.credits = min(self.credits + amount, self.max_credits)
         self.updated_at = datetime.utcnow()
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)
@@ -159,19 +177,19 @@ class ContentRequest(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
     @validator('keywords')
-    def validate_keywords(cls, v):
+    def validate_keywords(cls, v) -> bool:
         if len(v) > 20:
             raise ValueError('Maximum 20 keywords allowed')
         return [kw.lower().strip() for kw in v if kw.strip()]
     
     @validator('tags')
-    def validate_tags(cls, v):
+    def validate_tags(cls, v) -> bool:
         if len(v) > 50:
             raise ValueError('Maximum 50 tags allowed')
         return [tag.lower().strip() for tag in v if tag.strip()]
     
     @root_validator
-    def validate_content_parameters(cls, values):
+    def validate_content_parameters(cls, values) -> bool:
         content_type = values.get('content_type')
         word_count = values.get('word_count')
         
@@ -227,7 +245,8 @@ class ContentRequest(BaseModel):
         
         return credits
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)
@@ -272,13 +291,13 @@ class GeneratedContent(BaseModel):
     versions: List[Dict[str, Any]] = Field(default_factory=list, description="Content versions")
     
     @validator('content')
-    def validate_content(cls, v):
+    def validate_content(cls, v) -> bool:
         if not v.strip():
             raise ValueError('Content cannot be empty')
         return v
     
     @validator('word_count')
-    def validate_word_count(cls, v):
+    def validate_word_count(cls, v) -> bool:
         if v <= 0:
             raise ValueError('Word count must be positive')
         return v
@@ -318,7 +337,8 @@ class GeneratedContent(BaseModel):
         
         return suggestions
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)
@@ -357,15 +377,14 @@ class ContentTemplate(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
     def render_prompt(self, **kwargs) -> str:
-        """Render the prompt template with provided parameters"""
+        """Render the prompt template with provided parameters"""f"
         try:
-            return self.prompt_template.format(**kwargs)
+            return self.prompt_template"
         except KeyError as e:
             raise ValueError(f"Missing required parameter: {e}")
     
     def get_required_parameters(self) -> List[str]:
         """Get list of required parameters"""
-        import re
         pattern = r'\{(\w+)\}'
         return list(set(re.findall(pattern, self.prompt_template)))
     
@@ -375,7 +394,8 @@ class ContentTemplate(BaseModel):
         self.last_used = datetime.utcnow()
         self.updated_at = datetime.utcnow()
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)
@@ -425,7 +445,7 @@ class UsageMetrics(BaseModel):
         """Calculate net credits (used - earned)"""
         return self.credits_used - self.credits_earned
     
-    def add_request(self, content_type: ContentType, successful: bool, 
+    async def add_request(self, content_type: ContentType, successful: bool, 
                    credits: int, generation_time: float = 0.0) -> None:
         """Add a new request to metrics"""
         self.total_requests += 1
@@ -449,7 +469,8 @@ class UsageMetrics(BaseModel):
         
         self.updated_at = datetime.utcnow()
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)

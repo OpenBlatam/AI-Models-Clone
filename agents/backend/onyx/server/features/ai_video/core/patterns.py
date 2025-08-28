@@ -1,3 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import logging
+import asyncio
+import functools
+from typing import (
+from dataclasses import dataclass, field
+from enum import Enum, auto
+from ..error_handling import (
+from .validators import (
+from .error_handlers import (
+from typing import Any, List, Dict, Optional
 """
 🎯 HAPPY PATH PATTERNS - CORE MODULE
 ====================================
@@ -7,17 +19,10 @@ condiciones de error se manejan primero y la lógica principal se coloca al fina
 para mejorar la legibilidad del código.
 """
 
-import logging
-import asyncio
-import functools
-from typing import (
     Any, Optional, Union, Dict, List, Tuple, Callable, 
     TypeVar, Generic, Protocol, runtime_checkable
 )
-from dataclasses import dataclass, field
-from enum import Enum, auto
 
-from ..error_handling import (
     AIVideoError, ErrorCategory, ErrorSeverity, ErrorContext,
     ValidationError, SystemError, ConfigurationError
 )
@@ -54,7 +59,7 @@ def happy_path_last(
     """Decorador para implementar happy path last."""
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # 1. Validaciones al inicio
             if validators:
                 for validator in validators:
@@ -92,7 +97,7 @@ def happy_path_last(
                 return {"error": f"Function execution failed: {e}"}
         
         @functools.wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # 1. Validaciones al inicio
             if validators:
                 for validator in validators:
@@ -154,7 +159,7 @@ class HappyPathPatterns:
     def validation_first_pattern(func: Callable) -> Callable:
         """Patrón: validaciones primero, happy path al final."""
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # 1. Validaciones al inicio
             if not _validate_inputs(*args, **kwargs):
                 return {"error": "Input validation failed"}
@@ -174,7 +179,7 @@ class HappyPathPatterns:
     def error_handling_first_pattern(func: Callable) -> Callable:
         """Patrón: manejo de errores primero, happy path al final."""
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # 1. Manejo de errores al inicio
             error_result = _handle_common_errors(*args, **kwargs)
             if error_result is not None:
@@ -197,7 +202,7 @@ class HappyPathPatterns:
     def guard_clause_first_pattern(func: Callable) -> Callable:
         """Patrón: guard clauses primero, happy path al final."""
         @functools.wraps(func)
-        def wrapper(*args, **kwargs):
+        def wrapper(*args, **kwargs) -> Any:
             # 1. Guard clauses al inicio
             if _is_none_or_empty(*args, **kwargs):
                 return {"error": "Required parameters are missing"}
@@ -255,11 +260,9 @@ def setup_happy_path_last():
 happy_path_system = setup_happy_path_last()
 
 # Importar funciones auxiliares
-from .validators import (
     _validate_inputs, _validate_resources, _validate_state
 )
 
-from .error_handlers import (
     _handle_common_errors, _handle_system_errors, _handle_business_errors,
     _is_none_or_empty, _is_invalid_format, _is_insufficient_resources
 ) 

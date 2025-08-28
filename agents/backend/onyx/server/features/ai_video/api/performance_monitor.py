@@ -1,3 +1,26 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import time
+import statistics
+from typing import Dict, List, Optional, Any, Callable
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from collections import defaultdict, deque
+import logging
+from contextlib import asynccontextmanager
+from functools import wraps
+import json
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 API Performance Monitor
@@ -11,17 +34,6 @@ Comprehensive performance monitoring system for tracking API metrics:
 - Real-time metrics collection
 """
 
-import asyncio
-import time
-import statistics
-from typing import Dict, List, Optional, Any, Callable
-from dataclasses import dataclass, field
-from datetime import datetime, timedelta
-from collections import defaultdict, deque
-import logging
-from contextlib import asynccontextmanager
-from functools import wraps
-import json
 
 # Performance monitoring logger
 logger = logging.getLogger(__name__)
@@ -103,7 +115,7 @@ class APIPerformanceMonitor:
                 pass
         logger.info("API Performance Monitor stopped")
     
-    def start_request(self, request_id: str, endpoint: str, method: str) -> None:
+    async def start_request(self, request_id: str, endpoint: str, method: str) -> None:
         """Start tracking a new request."""
         metrics = PerformanceMetrics(
             request_id=request_id,
@@ -113,7 +125,7 @@ class APIPerformanceMonitor:
         )
         self.current_requests[request_id] = metrics
     
-    def end_request(self, request_id: str, status_code: int, error: Optional[str] = None) -> None:
+    async def end_request(self, request_id: str, status_code: int, error: Optional[str] = None) -> None:
         """End tracking a request and calculate metrics."""
         if request_id not in self.current_requests:
             return
@@ -324,7 +336,7 @@ def monitor_performance(endpoint: str):
     """Decorator to monitor function performance."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             request_id = f"{endpoint}_{int(time.time() * 1000)}"
             performance_monitor.start_request(request_id, endpoint, "POST")
             
@@ -337,7 +349,7 @@ def monitor_performance(endpoint: str):
                 raise
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             request_id = f"{endpoint}_{int(time.time() * 1000)}"
             performance_monitor.start_request(request_id, endpoint, "POST")
             

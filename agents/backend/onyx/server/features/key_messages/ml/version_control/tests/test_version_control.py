@@ -1,7 +1,7 @@
-"""
-Tests for Version Control System
-Tests Git management, configuration versioning, model versioning, and change tracking
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
 import os
 import tempfile
@@ -12,15 +12,23 @@ from pathlib import Path
 import pytest
 import torch
 import torch.nn as nn
-
 from ..git_manager import GitManager, GitConfig, GitCommit, GitBranch, GitTag
 from ..config_versioning import (
+from ..model_versioning import (
+from ..change_tracking import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Tests for Version Control System
+Tests Git management, configuration versioning, model versioning, and change tracking
+"""
+
+
     ConfigVersionManager, ConfigSnapshot, ConfigChange, ConfigDiff, ConfigHistory
 )
-from ..model_versioning import (
     ModelVersionManager, ModelMetadata, ModelVersion, ModelInfo, ModelRegistry
 )
-from ..change_tracking import (
     ChangeTracker, ChangeEntry, ChangeLog, ChangeType
 )
 
@@ -28,14 +36,14 @@ class TestGitManager:
     """Tests for Git manager functionality."""
     
     @pytest.fixture
-    def temp_repo(self):
+    def temp_repo(self) -> Any:
         """Create a temporary repository for testing."""
         temp_dir = tempfile.mkdtemp()
         yield temp_dir
         shutil.rmtree(temp_dir)
     
     @pytest.fixture
-    def git_manager(self, temp_repo):
+    def git_manager(self, temp_repo) -> Any:
         """Create a Git manager instance."""
         config = GitConfig(
             repo_path=temp_repo,
@@ -44,7 +52,7 @@ class TestGitManager:
         )
         return GitManager(config)
     
-    def test_git_config_validation(self):
+    def test_git_config_validation(self) -> Any:
         """Test Git configuration validation."""
         # Valid config
         config = GitConfig(
@@ -61,7 +69,7 @@ class TestGitManager:
         with pytest.raises(ValueError):
             GitConfig(user_name="Test User", user_email="")
     
-    def test_is_repo(self, git_manager, temp_repo):
+    def test_is_repo(self, git_manager, temp_repo) -> Any:
         """Test repository detection."""
         # Should not be a repo initially
         assert not git_manager.is_repo()
@@ -70,7 +78,7 @@ class TestGitManager:
         git_manager.init_repo()
         assert git_manager.is_repo()
     
-    def test_init_repo(self, git_manager, temp_repo):
+    def test_init_repo(self, git_manager, temp_repo) -> Any:
         """Test repository initialization."""
         # Create a test file
         test_file = Path(temp_repo) / "test.txt"
@@ -87,7 +95,7 @@ class TestGitManager:
         status = git_manager.status()
         assert "last_commit" in status
     
-    def test_stage_and_commit(self, git_manager, temp_repo):
+    def test_stage_and_commit(self, git_manager, temp_repo) -> Any:
         """Test staging and committing files."""
         # Initialize repo
         git_manager.init_repo()
@@ -108,7 +116,7 @@ class TestGitManager:
         assert len(status["staged_files"]) == 0
         assert status["last_commit"]["message"] == "Add test file"
     
-    def test_branch_operations(self, git_manager, temp_repo):
+    def test_branch_operations(self, git_manager, temp_repo) -> Any:
         """Test branch operations."""
         # Initialize repo
         git_manager.init_repo()
@@ -129,7 +137,7 @@ class TestGitManager:
         # Checkout branch
         assert git_manager.checkout_branch("feature-branch")
     
-    def test_tag_operations(self, git_manager, temp_repo):
+    def test_tag_operations(self, git_manager, temp_repo) -> Any:
         """Test tag operations."""
         # Initialize repo
         git_manager.init_repo()
@@ -149,7 +157,7 @@ class TestGitManager:
         assert tags[0].name == "v1.0.0"
         assert tags[0].message == "Release version 1.0.0"
     
-    def test_commit_history(self, git_manager, temp_repo):
+    def test_commit_history(self, git_manager, temp_repo) -> Any:
         """Test commit history retrieval."""
         # Initialize repo
         git_manager.init_repo()
@@ -172,7 +180,7 @@ class TestGitManager:
             assert commit.message
             assert commit.author
     
-    def test_file_history(self, git_manager, temp_repo):
+    def test_file_history(self, git_manager, temp_repo) -> Any:
         """Test file history retrieval."""
         # Initialize repo
         git_manager.init_repo()
@@ -191,7 +199,7 @@ class TestGitManager:
         history = git_manager.get_file_history("test.txt")
         assert len(history) == 2
     
-    def test_diff_operations(self, git_manager, temp_repo):
+    def test_diff_operations(self, git_manager, temp_repo) -> Any:
         """Test diff operations."""
         # Initialize repo
         git_manager.init_repo()
@@ -212,7 +220,7 @@ class TestGitManager:
         assert "Initial content" in diff
         assert "Modified content" in diff
     
-    def test_repo_info(self, git_manager, temp_repo):
+    def test_repo_info(self, git_manager, temp_repo) -> Any:
         """Test repository information retrieval."""
         # Initialize repo
         git_manager.init_repo()
@@ -228,14 +236,14 @@ class TestConfigVersionManager:
     """Tests for configuration versioning functionality."""
     
     @pytest.fixture
-    def temp_config_dir(self):
+    def temp_config_dir(self) -> Any:
         """Create a temporary config directory."""
         temp_dir = tempfile.mkdtemp()
         yield temp_dir
         shutil.rmtree(temp_dir)
     
     @pytest.fixture
-    def config_manager(self, temp_config_dir):
+    def config_manager(self, temp_config_dir) -> Any:
         """Create a config version manager instance."""
         return ConfigVersionManager(
             config_dir=temp_config_dir,
@@ -245,7 +253,7 @@ class TestConfigVersionManager:
         )
     
     @pytest.fixture
-    def sample_config(self):
+    def sample_config(self) -> Any:
         """Create a sample configuration."""
         return {
             "models": {
@@ -261,7 +269,7 @@ class TestConfigVersionManager:
             }
         }
     
-    def test_config_snapshot_creation(self, config_manager, sample_config):
+    def test_config_snapshot_creation(self, config_manager, sample_config) -> Any:
         """Test configuration snapshot creation."""
         snapshot = config_manager.create_snapshot(
             config=sample_config,
@@ -278,7 +286,7 @@ class TestConfigVersionManager:
         assert "initial" in snapshot.tags
         assert "gpt2" in snapshot.tags
     
-    def test_config_snapshot_loading(self, config_manager, sample_config):
+    def test_config_snapshot_loading(self, config_manager, sample_config) -> Any:
         """Test configuration snapshot loading."""
         # Create snapshot
         original_snapshot = config_manager.create_snapshot(
@@ -294,7 +302,7 @@ class TestConfigVersionManager:
         assert loaded_snapshot.config == original_snapshot.config
         assert loaded_snapshot.description == original_snapshot.description
     
-    def test_config_history(self, config_manager, sample_config):
+    def test_config_history(self, config_manager, sample_config) -> Any:
         """Test configuration history retrieval."""
         # Create multiple snapshots
         for i in range(3):
@@ -314,7 +322,7 @@ class TestConfigVersionManager:
         assert history.latest_version is not None
         assert len(history.snapshots) == 3
     
-    def test_config_comparison(self, config_manager, sample_config):
+    def test_config_comparison(self, config_manager, sample_config) -> Any:
         """Test configuration comparison."""
         # Create two snapshots
         snapshot1 = config_manager.create_snapshot(
@@ -340,7 +348,7 @@ class TestConfigVersionManager:
         assert diff.changes[0].old_value == 10
         assert diff.changes[0].new_value == 20
     
-    def test_config_restoration(self, config_manager, sample_config):
+    def test_config_restoration(self, config_manager, sample_config) -> Any:
         """Test configuration restoration."""
         # Create snapshot
         snapshot = config_manager.create_snapshot(
@@ -353,7 +361,7 @@ class TestConfigVersionManager:
         
         assert restored_config == sample_config
     
-    def test_config_search(self, config_manager, sample_config):
+    def test_config_search(self, config_manager, sample_config) -> Any:
         """Test configuration search functionality."""
         # Create snapshots with different descriptions
         config_manager.create_snapshot(
@@ -385,7 +393,7 @@ class TestConfigVersionManager:
         assert len(results) == 1
         assert "development" in results[0].tags
     
-    def test_config_export_import(self, config_manager, sample_config, tempfile):
+    def test_config_export_import(self, config_manager, sample_config, tempfile) -> Any:
         """Test configuration export and import."""
         # Create snapshot
         snapshot = config_manager.create_snapshot(
@@ -405,7 +413,7 @@ class TestConfigVersionManager:
         # Cleanup
         os.remove(export_path)
     
-    def test_config_cleanup(self, config_manager, sample_config):
+    def test_config_cleanup(self, config_manager, sample_config) -> Any:
         """Test configuration cleanup functionality."""
         # Create more snapshots than max_history
         for i in range(15):
@@ -422,14 +430,14 @@ class TestModelVersionManager:
     """Tests for model versioning functionality."""
     
     @pytest.fixture
-    def temp_registry(self):
+    def temp_registry(self) -> Any:
         """Create a temporary model registry."""
         temp_dir = tempfile.mkdtemp()
         yield temp_dir
         shutil.rmtree(temp_dir)
     
     @pytest.fixture
-    def model_manager(self, temp_registry):
+    def model_manager(self, temp_registry) -> Any:
         """Create a model version manager instance."""
         return ModelVersionManager(
             registry_path=temp_registry,
@@ -439,7 +447,7 @@ class TestModelVersionManager:
         )
     
     @pytest.fixture
-    def sample_model(self):
+    def sample_model(self) -> Any:
         """Create a sample model."""
         model = nn.Sequential(
             nn.Linear(10, 5),
@@ -449,7 +457,7 @@ class TestModelVersionManager:
         return model
     
     @pytest.fixture
-    def sample_metadata(self):
+    def sample_metadata(self) -> Any:
         """Create sample model metadata."""
         return {
             "architecture": "simple_mlp",
@@ -460,7 +468,7 @@ class TestModelVersionManager:
             "python_version": "3.9"
         }
     
-    def test_model_registration(self, model_manager, sample_model, sample_metadata, tempfile):
+    def test_model_registration(self, model_manager, sample_model, sample_metadata, tempfile) -> Any:
         """Test model registration."""
         # Save model to temporary file
         model_path = tempfile.mktemp(suffix=".pt")
@@ -484,7 +492,7 @@ class TestModelVersionManager:
         # Cleanup
         os.remove(model_path)
     
-    def test_model_loading(self, model_manager, sample_model, sample_metadata, tempfile):
+    def test_model_loading(self, model_manager, sample_model, sample_metadata, tempfile) -> Any:
         """Test model loading."""
         # Save and register model
         model_path = tempfile.mktemp(suffix=".pt")
@@ -506,7 +514,7 @@ class TestModelVersionManager:
         # Cleanup
         os.remove(model_path)
     
-    def test_model_listing(self, model_manager, sample_model, sample_metadata, tempfile):
+    def test_model_listing(self, model_manager, sample_model, sample_metadata, tempfile) -> List[Any]:
         """Test model listing functionality."""
         # Register multiple models
         for i in range(3):
@@ -530,7 +538,7 @@ class TestModelVersionManager:
             assert isinstance(model, ModelInfo)
             assert model.name.startswith("test_model_")
     
-    def test_model_versions(self, model_manager, sample_model, sample_metadata, tempfile):
+    def test_model_versions(self, model_manager, sample_model, sample_metadata, tempfile) -> Any:
         """Test model version management."""
         # Register multiple versions
         for i in range(3):
@@ -559,7 +567,7 @@ class TestModelVersionManager:
         assert "1.1.0" in version_numbers
         assert "1.2.0" in version_numbers
     
-    def test_model_metadata(self, model_manager, sample_model, sample_metadata, tempfile):
+    def test_model_metadata(self, model_manager, sample_model, sample_metadata, tempfile) -> Any:
         """Test model metadata retrieval."""
         # Register model
         model_path = tempfile.mktemp(suffix=".pt")
@@ -582,7 +590,7 @@ class TestModelVersionManager:
         
         os.remove(model_path)
     
-    def test_model_search(self, model_manager, sample_model, sample_metadata, tempfile):
+    def test_model_search(self, model_manager, sample_model, sample_metadata, tempfile) -> Any:
         """Test model search functionality."""
         # Register models with different architectures
         architectures = ["gpt2", "bert", "transformer"]
@@ -608,7 +616,7 @@ class TestModelVersionManager:
         assert len(results) == 1
         assert "gpt2" in results[0].name
     
-    def test_model_deletion(self, model_manager, sample_model, sample_metadata, tempfile):
+    def test_model_deletion(self, model_manager, sample_model, sample_metadata, tempfile) -> Any:
         """Test model deletion."""
         # Register model
         model_path = tempfile.mktemp(suffix=".pt")
@@ -630,7 +638,7 @@ class TestModelVersionManager:
         
         os.remove(model_path)
     
-    def test_model_export_import(self, model_manager, sample_model, sample_metadata, tempfile):
+    def test_model_export_import(self, model_manager, sample_model, sample_metadata, tempfile) -> Any:
         """Test model export and import."""
         # Register model
         model_path = tempfile.mktemp(suffix=".pt")
@@ -666,7 +674,7 @@ class TestChangeTracker:
     """Tests for change tracking functionality."""
     
     @pytest.fixture
-    def temp_log_file(self):
+    def temp_log_file(self) -> Any:
         """Create a temporary log file."""
         temp_file = tempfile.mktemp(suffix=".json")
         yield temp_file
@@ -674,7 +682,7 @@ class TestChangeTracker:
             os.remove(temp_file)
     
     @pytest.fixture
-    def change_tracker(self, temp_log_file):
+    def change_tracker(self, temp_log_file) -> Any:
         """Create a change tracker instance."""
         return ChangeTracker(
             log_file=temp_log_file,
@@ -683,7 +691,7 @@ class TestChangeTracker:
             max_entries=100
         )
     
-    def test_change_logging(self, change_tracker):
+    def test_change_logging(self, change_tracker) -> Any:
         """Test basic change logging."""
         entry_id = change_tracker.log_change(
             change_type=ChangeType.CONFIG_UPDATE,
@@ -703,7 +711,7 @@ class TestChangeTracker:
         assert entry.description == "Test configuration update"
         assert entry.author == "Test User"
     
-    def test_config_update_logging(self, change_tracker):
+    def test_config_update_logging(self, change_tracker) -> Any:
         """Test configuration update logging."""
         old_config = {"learning_rate": 1e-4, "batch_size": 16}
         new_config = {"learning_rate": 5e-5, "batch_size": 32}
@@ -723,7 +731,7 @@ class TestChangeTracker:
         assert "config.yaml" in entry.affected_files
         assert entry.metadata["change_count"] == 2
     
-    def test_model_training_logging(self, change_tracker):
+    def test_model_training_logging(self, change_tracker) -> Any:
         """Test model training logging."""
         metrics = {"accuracy": 0.85, "loss": 0.15}
         
@@ -744,7 +752,7 @@ class TestChangeTracker:
         assert entry.metadata["accuracy"] == 0.85
         assert entry.metadata["training_time"] == "2h 30m"
     
-    def test_model_registration_logging(self, change_tracker):
+    def test_model_registration_logging(self, change_tracker) -> Any:
         """Test model registration logging."""
         metadata = {
             "architecture": "gpt2",
@@ -768,7 +776,7 @@ class TestChangeTracker:
         assert entry.metadata["version"] == "1.0.0"
         assert entry.metadata["accuracy"] == 0.87
     
-    def test_code_change_logging(self, change_tracker):
+    def test_code_change_logging(self, change_tracker) -> Any:
         """Test code change logging."""
         files_changed = ["models.py", "trainer.py", "config.py"]
         
@@ -787,7 +795,7 @@ class TestChangeTracker:
         assert len(entry.affected_files) == 3
         assert entry.metadata["commit_hash"] == "abc123"
     
-    def test_experiment_run_logging(self, change_tracker):
+    def test_experiment_run_logging(self, change_tracker) -> Any:
         """Test experiment run logging."""
         metrics = {"accuracy": 0.89, "loss": 0.11, "success": True}
         
@@ -806,7 +814,7 @@ class TestChangeTracker:
         assert entry.metadata["experiment_name"] == "gpt2_fine_tuning"
         assert entry.metadata["success"] is True
     
-    def test_change_filtering(self, change_tracker):
+    def test_change_filtering(self, change_tracker) -> Any:
         """Test change filtering functionality."""
         # Create different types of changes
         change_tracker.log_change(
@@ -842,7 +850,7 @@ class TestChangeTracker:
         )
         assert len(user1_config_changes) == 2
     
-    def test_change_search(self, change_tracker):
+    def test_change_search(self, change_tracker) -> Any:
         """Test change search functionality."""
         # Create changes with different descriptions
         change_tracker.log_change(
@@ -869,7 +877,7 @@ class TestChangeTracker:
         assert len(results) == 1
         assert "bert" in results[0].tags
     
-    def test_change_statistics(self, change_tracker):
+    def test_change_statistics(self, change_tracker) -> Any:
         """Test change statistics functionality."""
         # Create various changes
         for i in range(5):
@@ -895,7 +903,7 @@ class TestChangeTracker:
         assert stats["entries_by_author"]["User 1"] == 5
         assert stats["entries_by_author"]["User 2"] == 3
     
-    def test_change_log_export_import(self, change_tracker, tempfile):
+    def test_change_log_export_import(self, change_tracker, tempfile) -> Any:
         """Test change log export and import."""
         # Create some changes
         change_tracker.log_change(
@@ -925,7 +933,7 @@ class TestChangeTracker:
         # Cleanup
         os.remove(export_path)
     
-    def test_change_entry_operations(self, change_tracker):
+    def test_change_entry_operations(self, change_tracker) -> Any:
         """Test change entry operations."""
         # Create entry
         entry_id = change_tracker.log_change(
@@ -957,13 +965,13 @@ class TestIntegration:
     """Integration tests for the version control system."""
     
     @pytest.fixture
-    def temp_workspace(self):
+    def temp_workspace(self) -> Any:
         """Create a temporary workspace for integration testing."""
         temp_dir = tempfile.mkdtemp()
         yield temp_dir
         shutil.rmtree(temp_dir)
     
-    def test_full_workflow(self, temp_workspace):
+    def test_full_workflow(self, temp_workspace) -> Any:
         """Test a complete version control workflow."""
         # Create managers
         git_config = GitConfig(
@@ -1044,5 +1052,6 @@ class TestIntegration:
         # Cleanup
         os.remove(model_path)
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__]) 

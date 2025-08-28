@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add tables for UI-based LLM configuration
 
 Revision ID: 401c1ac29467
@@ -6,13 +14,10 @@ Create Date: 2024-04-13 18:07:29.153817
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "401c1ac29467"
-down_revision = "703313b75876"
+revision: str = "401c1ac29467"
+down_revision: str = "703313b75876"
 branch_labels: None = None
 depends_on: None = None
 
@@ -23,8 +28,38 @@ def upgrade() -> None:
         sa.Column("id", sa.Integer(), nullable=False),
         sa.Column("name", sa.String(), nullable=False),
         sa.Column("api_key", sa.String(), nullable=True),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         sa.Column("api_base", sa.String(), nullable=True),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         sa.Column("api_version", sa.String(), nullable=True),
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         sa.Column(
             "custom_config",
             postgresql.JSONB(astext_type=sa.Text()),

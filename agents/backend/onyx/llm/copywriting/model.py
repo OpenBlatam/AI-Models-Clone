@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import List, Optional, TYPE_CHECKING
 from pydantic import BaseModel, Field
 from langchain.schema.messages import BaseMessage, HumanMessage
@@ -7,8 +9,11 @@ from onyx.llm.exceptions import GenAIDisabledException
 from onyx.llm.utils import dict_based_prompt_to_langchain_prompt, message_to_string
 from onyx.utils.logger import setup_logger
 
-if TYPE_CHECKING:
     from onyx.db.models import ChatMessage
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+if TYPE_CHECKING:
 
 logger = setup_logger()
 

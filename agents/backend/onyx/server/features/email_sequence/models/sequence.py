@@ -1,14 +1,21 @@
-"""
-Email Sequence Models
-
-This module contains the core models for email sequences, steps, and triggers.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
 
 from datetime import datetime, timedelta
 from enum import Enum
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field, validator
 from uuid import UUID, uuid4
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Email Sequence Models
+
+This module contains the core models for email sequences, steps, and triggers.
+"""
+
 
 
 class TriggerType(str, Enum):
@@ -49,7 +56,7 @@ class SequenceTrigger(BaseModel):
     scheduled_time: Optional[datetime] = None
     
     @validator('delay_hours', 'delay_days')
-    def validate_delay(cls, v):
+    def validate_delay(cls, v) -> bool:
         if v is not None and v < 0:
             raise ValueError("Delay must be non-negative")
         return v
@@ -91,13 +98,13 @@ class SequenceStep(BaseModel):
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     
     @validator('order')
-    def validate_order(cls, v):
+    def validate_order(cls, v) -> bool:
         if v < 1:
             raise ValueError("Step order must be at least 1")
         return v
     
     @validator('delay_hours', 'delay_days')
-    def validate_delay(cls, v):
+    def validate_delay(cls, v) -> bool:
         if v is not None and v < 0:
             raise ValueError("Delay must be non-negative")
         return v
@@ -147,7 +154,7 @@ class EmailSequence(BaseModel):
     completed_subscribers: int = 0
     
     @validator('steps')
-    def validate_steps_order(cls, v):
+    def validate_steps_order(cls, v) -> bool:
         """Validate that steps have unique and sequential order"""
         if not v:
             return v
@@ -162,7 +169,7 @@ class EmailSequence(BaseModel):
         return v
     
     @validator('name')
-    def validate_name(cls, v):
+    def validate_name(cls, v) -> bool:
         if not v.strip():
             raise ValueError("Name cannot be empty")
         return v.strip()
@@ -226,7 +233,8 @@ class EmailSequence(BaseModel):
         """Archive the sequence"""
         self.status = SequenceStatus.ARCHIVED
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat(),
             UUID: lambda v: str(v)

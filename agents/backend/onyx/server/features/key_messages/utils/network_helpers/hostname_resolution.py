@@ -1,6 +1,5 @@
-"""
-Hostname resolution utilities for cybersecurity tools.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, field_validator
 import structlog
@@ -10,6 +9,14 @@ import aiohttp
 import dns.resolver
 import dns.reversename
 from concurrent.futures import ThreadPoolExecutor
+        import time
+        import time
+        import re
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Hostname resolution utilities for cybersecurity tools.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -21,13 +28,13 @@ class HostnameResolutionInput(BaseModel):
     use_dns_cache: bool = True
     
     @field_validator('hostname')
-    def validate_hostname(cls, v):
+    def validate_hostname(cls, v) -> bool:
         if not v:
             raise ValueError("Hostname cannot be empty")
         return v
     
     @field_validator('record_types')
-    def validate_record_types(cls, v):
+    def validate_record_types(cls, v) -> bool:
         valid_types = ["A", "AAAA", "MX", "NS", "TXT", "CNAME", "PTR", "SOA"]
         for record_type in v:
             if record_type not in valid_types:
@@ -35,7 +42,7 @@ class HostnameResolutionInput(BaseModel):
         return v
     
     @field_validator('timeout')
-    def validate_timeout(cls, v):
+    def validate_timeout(cls, v) -> bool:
         if v <= 0:
             raise ValueError("Timeout must be positive")
         return v
@@ -58,7 +65,6 @@ def resolve_hostname(input_data: HostnameResolutionInput) -> ResolutionResult:
     Resolve hostname to IP addresses and DNS records.
     """
     try:
-        import time
         start_time = time.time()
         
         # Resolve hostname to IP addresses
@@ -195,7 +201,6 @@ async def resolve_hostname_async(input_data: HostnameResolutionInput) -> Resolut
     Async version of hostname resolution.
     """
     try:
-        import time
         start_time = time.time()
         
         # Use ThreadPoolExecutor for blocking operations
@@ -263,7 +268,6 @@ def validate_hostname_format(hostname: str) -> bool:
         True if valid, False otherwise
     """
     try:
-        import re
         
         # Basic hostname validation regex
         pattern = r'^[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?)*$'

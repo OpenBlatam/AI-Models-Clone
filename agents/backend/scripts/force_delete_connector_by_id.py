@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import argparse
 import os
 import sys
@@ -11,6 +19,21 @@ from onyx.db.search_settings import get_active_search_settings
 from onyx.db.tag import delete_orphan_tags__no_commit
 from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 
+from onyx.db.models import (
+from onyx.db.connector import fetch_connector_by_id
+from onyx.db.document import get_documents_for_connector_credential_pair
+from onyx.db.index_attempt import (
+from onyx.db.models import ConnectorCredentialPair
+from onyx.document_index.interfaces import DocumentIndex
+from onyx.utils.logger import setup_logger
+from onyx.configs.constants import DocumentSource
+from onyx.db.connector_credential_pair import (
+from onyx.db.engine import get_session_context_manager
+from onyx.document_index.factory import get_default_document_index
+from onyx.file_store.file_store import get_default_file_store
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Modify sys.path
 current_dir = os.path.dirname(os.path.abspath(__file__))
 parent_dir = os.path.dirname(current_dir)
@@ -20,27 +43,15 @@ sys.path.append(parent_dir)
 # flake8: noqa: E402
 
 # Now import Onyx modules
-from onyx.db.models import (
     DocumentSet__ConnectorCredentialPair,
     UserGroup__ConnectorCredentialPair,
 )
-from onyx.db.connector import fetch_connector_by_id
-from onyx.db.document import get_documents_for_connector_credential_pair
-from onyx.db.index_attempt import (
     delete_index_attempts,
     cancel_indexing_attempts_for_ccpair,
 )
-from onyx.db.models import ConnectorCredentialPair
-from onyx.document_index.interfaces import DocumentIndex
-from onyx.utils.logger import setup_logger
-from onyx.configs.constants import DocumentSource
-from onyx.db.connector_credential_pair import (
     get_connector_credential_pair_from_id,
     get_connector_credential_pair,
 )
-from onyx.db.engine import get_session_context_manager
-from onyx.document_index.factory import get_default_document_index
-from onyx.file_store.file_store import get_default_file_store
 
 # pylint: enable=E402
 # flake8: noqa: E402

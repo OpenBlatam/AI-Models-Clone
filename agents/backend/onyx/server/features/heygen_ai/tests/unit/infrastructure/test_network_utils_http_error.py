@@ -1,6 +1,6 @@
 import pytest
 
-from agents.backend.onyx.server.features.heygen_ai.network_utils import NetworkUtils
+from network_utils import NetworkUtils
 
 
 @pytest.mark.asyncio
@@ -22,13 +22,14 @@ async def test_check_http_status_raises(monkeypatch):
 
             return _R()
 
-    import agents.backend.onyx.server.features.heygen_ai.network_utils as mod
+    import network_utils as mod
     monkeypatch.setattr(mod, "aiohttp", type("x", (), {"ClientSession": lambda timeout=None: FakeSession(), "ClientTimeout": lambda total: total}))
 
     utils = NetworkUtils()
     info = await utils.check_http_status("https://example.com")
     assert info["is_accessible"] is False
     assert isinstance(info["error_message"], str) and "boom" in info["error_message"]
+
 
 
 

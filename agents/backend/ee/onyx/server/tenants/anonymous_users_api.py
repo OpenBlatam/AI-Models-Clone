@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -7,8 +9,6 @@ from sqlalchemy.exc import IntegrityError
 from ee.onyx.auth.users import generate_anonymous_user_jwt_token
 from ee.onyx.server.tenants.anonymous_user_path import get_anonymous_user_path
 from ee.onyx.server.tenants.anonymous_user_path import (
-    get_tenant_id_for_anonymous_user_path,
-)
 from ee.onyx.server.tenants.anonymous_user_path import modify_anonymous_user_path
 from ee.onyx.server.tenants.anonymous_user_path import validate_anonymous_user_path
 from ee.onyx.server.tenants.models import AnonymousUserPath
@@ -21,6 +21,11 @@ from onyx.configs.constants import FASTAPI_USERS_AUTH_COOKIE_NAME
 from onyx.db.engine import get_session_with_shared_schema
 from onyx.utils.logger import setup_logger
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_tenant_id_for_anonymous_user_path,
+)
 
 logger = setup_logger()
 

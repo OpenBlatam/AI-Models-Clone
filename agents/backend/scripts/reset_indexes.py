@@ -1,18 +1,23 @@
-# This file is purely for development use, not included in any builds
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 import sys
 from time import sleep
-
 import requests
 from requests.exceptions import RequestException
+from onyx.configs.app_configs import DOCUMENT_INDEX_NAME  # noqa: E402
+from onyx.document_index.vespa.index import DOCUMENT_ID_ENDPOINT  # noqa: E402
+from onyx.utils.logger import setup_logger  # noqa: E402
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# This file is purely for development use, not included in any builds
+
 
 # makes it so `PYTHONPATH=.` is not required when running this script
 parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(parent_dir)
 
-from onyx.configs.app_configs import DOCUMENT_INDEX_NAME  # noqa: E402
-from onyx.document_index.vespa.index import DOCUMENT_ID_ENDPOINT  # noqa: E402
-from onyx.utils.logger import setup_logger  # noqa: E402
 
 logger = setup_logger()
 
@@ -70,5 +75,6 @@ def main() -> int:
     return 1
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     sys.exit(main())

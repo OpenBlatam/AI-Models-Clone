@@ -1,3 +1,9 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """set built in to default
 
 Revision ID: 2cdeff6d8c93
@@ -6,12 +12,11 @@ Create Date: 2025-02-11 14:57:51.308775
 
 """
 
-from alembic import op
 
 
 # revision identifiers, used by Alembic.
-revision = "2cdeff6d8c93"
-down_revision = "f5437cc136c5"
+revision: str = "2cdeff6d8c93"
+down_revision: str = "f5437cc136c5"
 branch_labels = None
 depends_on = None
 

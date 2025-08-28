@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 import json
 import time
 from collections.abc import Callable
@@ -21,8 +29,6 @@ from onyx.configs.app_configs import OAUTH_CONFLUENCE_CLOUD_CLIENT_ID
 from onyx.configs.app_configs import OAUTH_CONFLUENCE_CLOUD_CLIENT_SECRET
 from onyx.connectors.confluence.models import ConfluenceUser
 from onyx.connectors.confluence.user_profile_override import (
-    process_confluence_user_profiles_override,
-)
 from onyx.connectors.confluence.utils import _handle_http_error
 from onyx.connectors.confluence.utils import confluence_refresh_tokens
 from onyx.connectors.confluence.utils import get_start_param_from_url
@@ -32,6 +38,12 @@ from onyx.file_processing.html_utils import format_document_soup
 from onyx.redis.redis_pool import get_redis_client
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_with_timeout
+        from atlassian.errors import ApiPermissionError  # type:ignore
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    process_confluence_user_profiles_override,
+)
 
 logger = setup_logger()
 
@@ -397,7 +409,7 @@ class OnyxConfluence:
     #         # Re-init the Confluence client with the originally stored args
     #         self._confluence = Confluence(self._url, *self._args, **self._kwargs)
 
-    def __getattr__(self, name: str) -> Any:
+    def __getattr__(self, name: str) -> Optional[Dict[str, Any]]:
         """Dynamically intercept attribute/method access."""
         attr = getattr(self._confluence, name, None)
         if attr is None:
@@ -830,7 +842,7 @@ class OnyxConfluence:
 
         return response.get("result", [])
 
-    def get_current_user(self, expand: str | None = None) -> Any:
+    def get_current_user(self, expand: str | None = None) -> Optional[Dict[str, Any]]:
         """
         Implements a method that isn't in the third party client.
 
@@ -840,7 +852,6 @@ class OnyxConfluence:
         :return: Returns the user details
         """
 
-        from atlassian.errors import ApiPermissionError  # type:ignore
 
         url = "rest/api/user/current"
         params = {}

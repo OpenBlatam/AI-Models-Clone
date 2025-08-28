@@ -1,12 +1,6 @@
-"""
-THIS IS NOT USEFUL OR USED FOR PERMISSION SYNCING
-WHEN USERGROUPS ARE ADDED TO A CHANNEL, IT JUST RESOLVES ALL THE USERS TO THAT CHANNEL
-SO WHEN CHECKING IF A USER CAN ACCESS A DOCUMENT, WE ONLY NEED TO CHECK THEIR EMAIL
-THERE IS NO USERGROUP <-> DOCUMENT PERMISSION MAPPING
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from slack_sdk import WebClient
-
 from ee.onyx.db.external_perm import ExternalUserGroup
 from ee.onyx.external_permissions.slack.utils import fetch_user_id_to_email_map
 from onyx.connectors.credentials_provider import OnyxDBCredentialsProvider
@@ -15,6 +9,17 @@ from onyx.connectors.slack.utils import make_paginated_slack_api_call
 from onyx.db.models import ConnectorCredentialPair
 from onyx.redis.redis_pool import get_redis_client
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+THIS IS NOT USEFUL OR USED FOR PERMISSION SYNCING
+WHEN USERGROUPS ARE ADDED TO A CHANNEL, IT JUST RESOLVES ALL THE USERS TO THAT CHANNEL
+SO WHEN CHECKING IF A USER CAN ACCESS A DOCUMENT, WE ONLY NEED TO CHECK THEIR EMAIL
+THERE IS NO USERGROUP <-> DOCUMENT PERMISSION MAPPING
+"""
+
+
 
 logger = setup_logger()
 

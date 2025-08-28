@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 import concurrent.futures
 import os
 import sys
@@ -8,10 +13,6 @@ from sqlalchemy.orm import Session
 from onyx.document_index.document_index_utils import get_multipass_config
 from shared_configs.configs import POSTGRES_DEFAULT_SCHEMA
 
-# makes it so `PYTHONPATH=.` is not required when running this script
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-sys.path.append(parent_dir)
-
 from onyx.context.search.models import IndexFilters  # noqa: E402
 from onyx.document_index.interfaces import VespaChunkRequest  # noqa: E402
 from onyx.db.engine import get_session_context_manager  # noqa: E402
@@ -20,6 +21,13 @@ from onyx.db.tag import delete_orphan_tags__no_commit  # noqa: E402
 from onyx.db.search_settings import get_current_search_settings  # noqa: E402
 from onyx.document_index.vespa.index import VespaIndex  # noqa: E402
 from onyx.db.document import get_document  # noqa: E402
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+# makes it so `PYTHONPATH=.` is not required when running this script
+parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.append(parent_dir)
+
 
 BATCH_SIZE = 100
 
@@ -143,5 +151,6 @@ def main() -> None:
             print(f"Total documents processed so far: {total_processed}")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main()

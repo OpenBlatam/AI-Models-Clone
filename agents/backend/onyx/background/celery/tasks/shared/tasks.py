@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import time
 from enum import Enum
 from http import HTTPStatus
@@ -30,6 +35,9 @@ from onyx.httpx.httpx_pool import HttpxPool
 from onyx.redis.redis_pool import get_redis_client
 from onyx.server.documents.models import ConnectorCredentialPairIdentifier
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 DOCUMENT_BY_CC_PAIR_CLEANUP_MAX_RETRIES = 3
 
 

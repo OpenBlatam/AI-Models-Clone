@@ -1,3 +1,21 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import threading
+import time
+from typing import Dict, List, Optional, Tuple, Any, Callable
+from dataclasses import dataclass
+from datetime import datetime
+import json
+import structlog
+from pathlib import Path
+    from scapy.all import *
+    from scapy.layers.inet import IP, TCP, UDP, ICMP
+    from scapy.layers.dns import DNS, DNSQR, DNSRR
+    from scapy.layers.http import HTTP, HTTPRequest, HTTPResponse
+    from scapy.layers.l2 import Ether, ARP
+from typing import Any, List, Dict, Optional
+import logging
 #!/usr/bin/env python3
 """
 Scapy Packet Crafting and Sniffing Examples
@@ -14,23 +32,9 @@ Features:
 - Security testing and validation
 """
 
-import asyncio
-import threading
-import time
-from typing import Dict, List, Optional, Tuple, Any, Callable
-from dataclasses import dataclass
-from datetime import datetime
-import json
-import structlog
-from pathlib import Path
 
 # Scapy imports
 try:
-    from scapy.all import *
-    from scapy.layers.inet import IP, TCP, UDP, ICMP
-    from scapy.layers.dns import DNS, DNSQR, DNSRR
-    from scapy.layers.http import HTTP, HTTPRequest, HTTPResponse
-    from scapy.layers.l2 import Ether, ARP
     SCAPY_AVAILABLE = True
 except ImportError:
     SCAPY_AVAILABLE = False
@@ -91,7 +95,9 @@ class PacketCraftingEngine:
     """Advanced packet crafting engine using Scapy."""
     
     def __init__(self, interface: Optional[str] = None):
-        self.interface = interface or conf.iface
+        
+    """__init__ function."""
+self.interface = interface or conf.iface
         self.packet_count = 0
         self.crafted_packets = []
         
@@ -275,7 +281,7 @@ class PacketCraftingEngine:
                         error=str(e))
             raise PacketCraftingError(f"DNS query packet crafting failed: {str(e)}")
     
-    def craft_arp_request(self, target_ip: str) -> Packet:
+    async def craft_arp_request(self, target_ip: str) -> Packet:
         """Craft an ARP request packet."""
         # Guard clauses - all error conditions first
         if not target_ip or not isinstance(target_ip, str):
@@ -341,7 +347,9 @@ class PacketSniffer:
     """Advanced packet sniffing and analysis engine."""
     
     def __init__(self, interface: Optional[str] = None):
-        self.interface = interface or conf.iface
+        
+    """__init__ function."""
+self.interface = interface or conf.iface
         self.is_sniffing = False
         self.captured_packets = []
         self.sniffing_thread = None
@@ -367,6 +375,10 @@ class PacketSniffer:
         try:
             self.is_sniffing = True
             self.sniffing_thread = threading.Thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 target=self._sniff_packets,
                 args=(filter_expr, packet_count, timeout, callback)
             )
@@ -394,7 +406,7 @@ class PacketSniffer:
                       timeout: int, callback: Optional[Callable]) -> None:
         """Internal method for packet sniffing."""
         try:
-            def packet_handler(packet):
+            def packet_handler(packet) -> Any:
                 packet_info = self._extract_packet_info(packet)
                 self.captured_packets.append(packet_info)
                 
@@ -531,7 +543,9 @@ class NetworkScanner:
     """Network scanning and reconnaissance using Scapy."""
     
     def __init__(self, interface: Optional[str] = None):
-        self.interface = interface or conf.iface
+        
+    """__init__ function."""
+self.interface = interface or conf.iface
         self.crafting_engine = PacketCraftingEngine(interface)
         self.sniffer = PacketSniffer(interface)
         

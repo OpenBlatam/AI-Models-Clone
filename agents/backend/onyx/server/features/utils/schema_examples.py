@@ -1,7 +1,10 @@
-"""
-Schema Examples - Comprehensive Usage Examples
-Complete examples demonstrating Pydantic schema usage, patterns, and best practices.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, Generic
@@ -9,16 +12,25 @@ from datetime import datetime, date, timedelta
 import uuid
 import re
 from enum import Enum
-
 from pydantic import BaseModel, Field, computed_field, field_validator, model_validator
 import structlog
-
 from .pydantic_schemas import (
+from .schema_validators import validation_registry, ValidationResult
+from .schema_integration import (
+    from fastapi import APIRouter, HTTPException, status
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Schema Examples - Comprehensive Usage Examples
+Complete examples demonstrating Pydantic schema usage, patterns, and best practices.
+"""
+
+
+
     BaseInputModel, BaseOutputModel, PaginatedOutputModel,
     SchemaFactory, schema_registry, validate_input, validate_output
 )
-from .schema_validators import validation_registry, ValidationResult
-from .schema_integration import (
     schema_endpoint, OnyxSchemaIntegration, SchemaResponseHandler
 )
 
@@ -542,14 +554,14 @@ def demonstrate_onyx_integration():
     
     # Mock Onyx model
     class MockOnyxProduct:
-        def __init__(self, **data):
+        def __init__(self, **data) -> Any:
             self.id = data.get('id', str(uuid.uuid4()))
             self.name = data.get('name', '')
             self.price = data.get('price', 0.0)
             self.category = data.get('category', '')
             self.created_at = data.get('created_at', datetime.utcnow())
         
-        def to_dict(self):
+        def to_dict(self) -> Any:
             return {
                 'id': self.id,
                 'name': self.name,
@@ -590,7 +602,6 @@ def demonstrate_onyx_integration():
 def create_api_examples():
     """Create example API endpoints with schema integration."""
     
-    from fastapi import APIRouter, HTTPException, status
     
     router = APIRouter()
     

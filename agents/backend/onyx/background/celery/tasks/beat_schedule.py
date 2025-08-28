@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import copy
 from datetime import timedelta
 from typing import Any
@@ -9,6 +14,10 @@ from onyx.configs.constants import OnyxCeleryQueues
 from onyx.configs.constants import OnyxCeleryTask
 from shared_configs.configs import MULTI_TENANT
 
+    from incoming templates.
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # choosing 15 minutes because it roughly gives us enough time to process many tasks
 # we might be able to reduce this greatly if we can run a unified
 # loop across all tenants rather than tasks per tenant
@@ -253,7 +262,6 @@ def generate_cloud_tasks(
     to speed up or slow down the task generation rate. useful in production.
 
     Returns a list of cloud tasks, which consists of incoming tasks + tasks generated
-    from incoming templates.
     """
 
     if beat_multiplier <= 0:

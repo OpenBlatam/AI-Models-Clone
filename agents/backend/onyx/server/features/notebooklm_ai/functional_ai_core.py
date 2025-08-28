@@ -1,7 +1,13 @@
-"""
-Functional AI Core - Proper separation of CPU-bound and I/O-bound operations
-Uses def for pure CPU operations, async def for I/O operations
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import functools
@@ -10,6 +16,18 @@ from dataclasses import dataclass
 import torch
 import numpy as np
 from diffusers import DiffusionPipeline, DDIMScheduler
+    import re
+    import time
+    import aiohttp
+        import time
+            import time
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Functional AI Core - Proper separation of CPU-bound and I/O-bound operations
+Uses def for pure CPU operations, async def for I/O operations
+"""
+
 
 # ============================================================================
 # CORE DATA STRUCTURES
@@ -69,7 +87,6 @@ def validate_generation_config(config: GenerationConfig) -> Tuple[bool, Optional
 
 def sanitize_prompt(prompt: str) -> str:
     """Sanitize and normalize prompt text - CPU-bound"""
-    import re
     # Remove excessive whitespace
     sanitized = re.sub(r'\s+', ' ', prompt.strip())
     # Remove potentially harmful characters
@@ -128,7 +145,6 @@ async def generate_image_async(
     config: GenerationConfig
 ) -> GenerationResult:
     """Asynchronous image generation - I/O-bound (GPU operations)"""
-    import time
     start_time = time.time()
     
     try:
@@ -208,9 +224,8 @@ async def save_image_to_disk(
     except Exception:
         return False
 
-async def fetch_model_metadata(model_id: str) -> Dict[str, Any]:
+async async def fetch_model_metadata(model_id: str) -> Dict[str, Any]:
     """Fetch model metadata from remote - I/O-bound"""
-    import aiohttp
     
     async with aiohttp.ClientSession() as session:
         async with session.get(f"https://huggingface.co/api/models/{model_id}") as response:
@@ -238,7 +253,6 @@ def with_performance_monitoring[T](func: Callable[..., T]) -> Callable[..., T]:
     """Decorator to monitor function performance - CPU-bound"""
     @functools.wraps(func)
     def wrapper(*args, **kwargs) -> T:
-        import time
         start_time = time.time()
         result = func(*args, **kwargs)
         execution_time = time.time() - start_time
@@ -253,7 +267,6 @@ def with_caching[T](cache_duration: int = 3600):
     def decorator(func: Callable[..., T]) -> Callable[..., T]:
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> T:
-            import time
             cache_key = str((args, tuple(sorted(kwargs.items()))))
             current_time = time.time()
             

@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Optional
 from urllib.parse import urlparse
 
@@ -7,6 +12,9 @@ from playwright.sync_api import sync_playwright
 from onyx.file_processing.html_utils import web_html_cleanup
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 # Constants

@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 import asyncio
 import re
@@ -5,8 +13,11 @@ import time
 from unittest.mock import patch, MagicMock
 from typing import List, Dict, Any
 
-# Import sanitization components
 from input_sanitization import (
+        import sys
+from typing import Any, List, Dict, Optional
+import logging
+# Import sanitization components
     InputSanitizer, SecureCommandExecutor, SanitizationLevel, InputType,
     SanitizationRequest, SanitizationResponse, CommandExecutionRequest, CommandExecutionResponse
 )
@@ -14,11 +25,11 @@ from input_sanitization import (
 class TestInputSanitizer:
     """Test cases for InputSanitizer"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.sanitizer = InputSanitizer()
     
-    def test_sanitize_shell_command_dangerous_characters(self):
+    def test_sanitize_shell_command_dangerous_characters(self) -> Any:
         """Test shell command sanitization with dangerous characters"""
         dangerous_commands = [
             "ls -la; rm -rf /",
@@ -38,7 +49,7 @@ class TestInputSanitizer:
             assert '`' not in result.sanitized
             assert '$(' not in result.sanitized
     
-    def test_sanitize_shell_command_safe(self):
+    def test_sanitize_shell_command_safe(self) -> Any:
         """Test shell command sanitization with safe commands"""
         safe_commands = [
             "ping 192.168.1.1",
@@ -54,7 +65,7 @@ class TestInputSanitizer:
             assert result.is_safe is True
             assert result.changes_made is False
     
-    def test_sanitize_file_path_traversal(self):
+    def test_sanitize_file_path_traversal(self) -> Any:
         """Test file path sanitization with path traversal attempts"""
         traversal_paths = [
             "../../../etc/passwd",
@@ -72,7 +83,7 @@ class TestInputSanitizer:
             assert not result.sanitized.startswith('/')
             assert not result.sanitized.startswith('\\')
     
-    def test_sanitize_file_path_safe(self):
+    def test_sanitize_file_path_safe(self) -> Any:
         """Test file path sanitization with safe paths"""
         safe_paths = [
             "file.txt",
@@ -87,7 +98,7 @@ class TestInputSanitizer:
             assert result.is_safe is True
             assert result.changes_made is False
     
-    def test_sanitize_url_dangerous_protocols(self):
+    def test_sanitize_url_dangerous_protocols(self) -> Any:
         """Test URL sanitization with dangerous protocols"""
         dangerous_urls = [
             "javascript:alert('xss')",
@@ -102,7 +113,7 @@ class TestInputSanitizer:
             assert result.changes_made is True
             assert result.sanitized == '' or 'javascript:' not in result.sanitized.lower()
     
-    def test_sanitize_url_safe(self):
+    def test_sanitize_url_safe(self) -> Any:
         """Test URL sanitization with safe URLs"""
         safe_urls = [
             "https://example.com/path",
@@ -116,7 +127,7 @@ class TestInputSanitizer:
             assert result.is_safe is True
             assert result.changes_made is False
     
-    def test_sanitize_sql_query_injection(self):
+    def test_sanitize_sql_query_injection(self) -> Any:
         """Test SQL query sanitization with injection attempts"""
         injection_queries = [
             "'; DROP TABLE users; --",
@@ -134,7 +145,7 @@ class TestInputSanitizer:
             assert 'UNION' not in result.sanitized.upper()
             assert 'WAITFOR' not in result.sanitized.upper()
     
-    def test_sanitize_sql_query_safe(self):
+    def test_sanitize_sql_query_safe(self) -> Any:
         """Test SQL query sanitization with safe queries"""
         safe_queries = [
             "SELECT name FROM users",
@@ -148,7 +159,7 @@ class TestInputSanitizer:
             assert result.is_safe is True
             assert result.changes_made is False
     
-    def test_sanitize_html_content_xss(self):
+    def test_sanitize_html_content_xss(self) -> Any:
         """Test HTML content sanitization with XSS attempts"""
         xss_payloads = [
             "<script>alert('xss')</script>",
@@ -166,7 +177,7 @@ class TestInputSanitizer:
             assert 'javascript:' not in result.sanitized.lower()
             assert 'onerror=' not in result.sanitized.lower()
     
-    def test_sanitize_html_content_safe(self):
+    def test_sanitize_html_content_safe(self) -> Any:
         """Test HTML content sanitization with safe content"""
         safe_content = [
             "Hello World",
@@ -181,7 +192,7 @@ class TestInputSanitizer:
             assert result.is_safe is True
             assert result.changes_made is False
     
-    def test_sanitize_json_data_dangerous(self):
+    def test_sanitize_json_data_dangerous(self) -> Any:
         """Test JSON data sanitization with dangerous content"""
         dangerous_json = [
             '{"function": "alert(\'xss\')"}',
@@ -198,7 +209,7 @@ class TestInputSanitizer:
             assert 'eval' not in result.sanitized
             assert 'setTimeout' not in result.sanitized
     
-    def test_sanitize_json_data_safe(self):
+    def test_sanitize_json_data_safe(self) -> Any:
         """Test JSON data sanitization with safe content"""
         safe_json = [
             '{"name": "John", "age": 30}',
@@ -212,7 +223,7 @@ class TestInputSanitizer:
             assert result.is_safe is True
             assert result.changes_made is False
     
-    def test_sanitize_network_address_local(self):
+    def test_sanitize_network_address_local(self) -> Any:
         """Test network address sanitization with local addresses"""
         local_addresses = [
             "127.0.0.1",
@@ -228,7 +239,7 @@ class TestInputSanitizer:
             assert result.changes_made is True
             assert result.sanitized == ''
     
-    def test_sanitize_network_address_safe(self):
+    def test_sanitize_network_address_safe(self) -> Any:
         """Test network address sanitization with safe addresses"""
         safe_addresses = [
             "8.8.8.8",
@@ -244,7 +255,7 @@ class TestInputSanitizer:
             assert result.is_safe is True
             assert result.changes_made is False
     
-    def test_sanitize_user_input_dangerous(self):
+    def test_sanitize_user_input_dangerous(self) -> Any:
         """Test user input sanitization with dangerous content"""
         dangerous_inputs = [
             "<script>alert('xss')</script>",
@@ -261,7 +272,7 @@ class TestInputSanitizer:
             assert 'javascript:' not in result.sanitized.lower()
             assert 'alert(' not in result.sanitized.lower()
     
-    def test_sanitize_user_input_safe(self):
+    def test_sanitize_user_input_safe(self) -> Any:
         """Test user input sanitization with safe content"""
         safe_inputs = [
             "Hello World",
@@ -276,7 +287,7 @@ class TestInputSanitizer:
             assert result.is_safe is True
             assert result.changes_made is False
     
-    def test_sanitization_levels(self):
+    def test_sanitization_levels(self) -> Any:
         """Test different sanitization levels"""
         test_input = "ls -la; rm -rf /"
         
@@ -293,7 +304,7 @@ class TestInputSanitizer:
                 # Low and medium levels may not make changes
                 assert result.changes_made is False or result.changes_made is True
     
-    def test_custom_patterns(self):
+    def test_custom_patterns(self) -> Any:
         """Test sanitization with custom patterns"""
         test_input = "test input with custom pattern"
         custom_patterns = [r'custom pattern']
@@ -307,7 +318,7 @@ class TestInputSanitizer:
         assert result.changes_made is True
         assert 'custom pattern' not in result.sanitized
     
-    def test_whitelist_validation(self):
+    def test_whitelist_validation(self) -> List[Any]:
         """Test whitelist pattern validation"""
         # Test with input that doesn't match whitelist
         test_input = "invalid input with special chars: <>&\"'"
@@ -316,7 +327,7 @@ class TestInputSanitizer:
         # Should not be safe due to whitelist validation
         assert result.is_safe is False
     
-    def test_logging(self):
+    def test_logging(self) -> Any:
         """Test that sanitization attempts are logged"""
         with patch('logging.Logger.info') as mock_logger:
             self.sanitizer.sanitize_input("test input", InputType.USER_INPUT)
@@ -325,12 +336,12 @@ class TestInputSanitizer:
 class TestSecureCommandExecutor:
     """Test cases for SecureCommandExecutor"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.sanitizer = InputSanitizer()
         self.executor = SecureCommandExecutor(self.sanitizer)
     
-    def test_allowed_commands(self):
+    def test_allowed_commands(self) -> Any:
         """Test that only allowed commands are permitted"""
         allowed_commands = [
             'ping', 'nslookup', 'traceroute', 'whois', 'dig',
@@ -340,7 +351,7 @@ class TestSecureCommandExecutor:
         for cmd in allowed_commands:
             assert cmd in self.executor.allowed_commands
     
-    def test_dangerous_commands_blocked(self):
+    def test_dangerous_commands_blocked(self) -> Any:
         """Test that dangerous commands are blocked"""
         dangerous_commands = [
             'rm', 'del', 'format', 'mkfs', 'dd', 'shutdown', 'reboot',
@@ -351,7 +362,7 @@ class TestSecureCommandExecutor:
             assert cmd not in self.executor.allowed_commands
     
     @pytest.mark.asyncio
-    async def test_execute_safe_command(self):
+    async def test_execute_safe_command(self) -> Any:
         """Test execution of safe command"""
         with patch('asyncio.create_subprocess_exec') as mock_subprocess:
             # Mock successful command execution
@@ -367,19 +378,19 @@ class TestSecureCommandExecutor:
             assert result["sanitized"] is True
     
     @pytest.mark.asyncio
-    async def test_execute_dangerous_command_blocked(self):
+    async def test_execute_dangerous_command_blocked(self) -> Any:
         """Test that dangerous commands are blocked"""
         with pytest.raises(Exception):
             await self.executor.execute_command("rm", ["-rf", "/"])
     
     @pytest.mark.asyncio
-    async def test_execute_unsafe_command_blocked(self):
+    async def test_execute_unsafe_command_blocked(self) -> Any:
         """Test that unsafe commands are blocked"""
         with pytest.raises(Exception):
             await self.executor.execute_command("ls; rm -rf /")
     
     @pytest.mark.asyncio
-    async def test_command_timeout(self):
+    async def test_command_timeout(self) -> Any:
         """Test command execution timeout"""
         with patch('asyncio.create_subprocess_exec') as mock_subprocess:
             # Mock command that takes too long
@@ -391,7 +402,7 @@ class TestSecureCommandExecutor:
                 await self.executor.execute_command("ping", ["-c", "100", "127.0.0.1"])
     
     @pytest.mark.asyncio
-    async def test_command_execution_error(self):
+    async def test_command_execution_error(self) -> Any:
         """Test command execution error handling"""
         with patch('asyncio.create_subprocess_exec') as mock_subprocess:
             # Mock command execution error
@@ -403,7 +414,7 @@ class TestSecureCommandExecutor:
 class TestSanitizationModels:
     """Test cases for Pydantic models"""
     
-    def test_sanitization_request_valid(self):
+    async def test_sanitization_request_valid(self) -> Any:
         """Test valid sanitization request"""
         request = SanitizationRequest(
             input_data="test input",
@@ -415,7 +426,7 @@ class TestSanitizationModels:
         assert request.input_type == InputType.USER_INPUT
         assert request.sanitization_level == SanitizationLevel.HIGH
     
-    def test_sanitization_request_invalid_type(self):
+    async def test_sanitization_request_invalid_type(self) -> Any:
         """Test sanitization request with invalid input type"""
         with pytest.raises(ValueError):
             SanitizationRequest(
@@ -424,7 +435,7 @@ class TestSanitizationModels:
                 sanitization_level=SanitizationLevel.HIGH
             )
     
-    def test_command_execution_request_valid(self):
+    async def test_command_execution_request_valid(self) -> Any:
         """Test valid command execution request"""
         request = CommandExecutionRequest(
             command="ping",
@@ -436,7 +447,7 @@ class TestSanitizationModels:
         assert request.arguments == ["-c", "1", "127.0.0.1"]
         assert request.timeout == 30
     
-    def test_command_execution_request_invalid_timeout(self):
+    async def test_command_execution_request_invalid_timeout(self) -> Any:
         """Test command execution request with invalid timeout"""
         with pytest.raises(ValueError):
             CommandExecutionRequest(
@@ -447,12 +458,12 @@ class TestSanitizationModels:
 class TestSanitizationIntegration:
     """Integration tests for sanitization system"""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment"""
         self.sanitizer = InputSanitizer()
         self.executor = SecureCommandExecutor(self.sanitizer)
     
-    def test_comprehensive_sanitization_workflow(self):
+    def test_comprehensive_sanitization_workflow(self) -> Any:
         """Test comprehensive sanitization workflow"""
         # Test multiple input types
         test_cases = [
@@ -472,7 +483,7 @@ class TestSanitizationIntegration:
             assert result.changes_made is True
             assert result.original != result.sanitized
     
-    def test_sanitization_performance(self):
+    def test_sanitization_performance(self) -> Any:
         """Test sanitization performance"""
         test_input = "test input with multiple dangerous patterns: <script>alert('xss')</script>; rm -rf /"
         
@@ -484,9 +495,8 @@ class TestSanitizationIntegration:
         # Should complete 1000 sanitizations in reasonable time
         assert end_time - start_time < 1.0  # Less than 1 second
     
-    def test_sanitization_memory_usage(self):
+    def test_sanitization_memory_usage(self) -> Any:
         """Test sanitization memory usage"""
-        import sys
         
         # Large input for memory testing
         large_input = "x" * 10000
@@ -498,5 +508,6 @@ class TestSanitizationIntegration:
         # Memory usage should be reasonable
         assert final_memory < initial_memory * 2  # Not more than 2x original
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

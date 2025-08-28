@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from http import HTTPStatus
 
 import requests
@@ -13,6 +15,9 @@ from tests.integration.common_utils.managers.user import UserManager
 from tests.integration.common_utils.test_models import DATestUser
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def test_first_user_is_admin(reset_multitenant: None) -> None:
     """Test that the first user of a tenant is automatically assigned ADMIN role."""
     test_user: DATestUser = UserManager.create(name="test", email="test@test.com")

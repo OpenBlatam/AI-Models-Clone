@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 from copy import copy
 from dataclasses import dataclass
@@ -14,6 +16,9 @@ from onyx.configs.app_configs import WEB_CONNECTOR_IGNORED_ELEMENTS
 from onyx.file_processing.enums import HtmlBasedConnectorTransformLinksStrategy
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 MINTLIFY_UNWANTED = ["sticky", "hidden"]

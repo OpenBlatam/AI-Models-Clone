@@ -1,17 +1,13 @@
-"""
-🚀 FastAPI-Specific Guidelines for SQLAlchemy 2.0
-================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive FastAPI guidelines with:
-- Dependency injection patterns
-- Request/response models
-- Error handling
-- Middleware configuration
-- Performance optimization
-- Security best practices
-- Testing strategies
-- Production deployment
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import os
 import asyncio
@@ -19,12 +15,7 @@ import logging
 from typing import List, Optional, Dict, Any, Annotated
 from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
-
 from fastapi import (
-    FastAPI, Depends, HTTPException, status, Request, Response,
-    BackgroundTasks, Query, Path, Body, Header, Cookie, Form, File,
-    UploadFile, APIRouter, middleware, Middleware
-)
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
@@ -40,8 +31,30 @@ import uvicorn
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-
 from .sqlalchemy_2_implementation import (
+        from httpx import AsyncClient
+from typing import Any, List, Dict, Optional
+"""
+🚀 FastAPI-Specific Guidelines for SQLAlchemy 2.0
+================================================
+
+Comprehensive FastAPI guidelines with:
+- Dependency injection patterns
+- Request/response models
+- Error handling
+- Middleware configuration
+- Performance optimization
+- Security best practices
+- Testing strategies
+- Production deployment
+"""
+
+
+    FastAPI, Depends, HTTPException, status, Request, Response,
+    BackgroundTasks, Query, Path, Body, Header, Cookie, Form, File,
+    UploadFile, APIRouter, middleware, Middleware
+)
+
     DatabaseConfig, SQLAlchemy2Manager,
     TextAnalysisCreate, TextAnalysisUpdate, BatchAnalysisCreate,
     TextAnalysisResponse, BatchAnalysisResponse,
@@ -143,7 +156,7 @@ class BatchCreateRequest(BaseModel):
     )
     
     @validator('texts')
-    def validate_texts(cls, v):
+    def validate_texts(cls, v) -> bool:
         """Validate text lengths."""
         for text in v:
             if len(text) > 10000:
@@ -168,7 +181,7 @@ class AnalysisUpdateRequest(BaseModel):
 class DatabaseDependency:
     """Database dependency manager."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.settings = Settings()
         self._db_manager: Optional[SQLAlchemy2Manager] = None
     
@@ -186,7 +199,7 @@ class DatabaseDependency:
         
         return self._db_manager
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup database manager."""
         if self._db_manager:
             await self._db_manager.cleanup()
@@ -214,12 +227,14 @@ class SecurityMiddleware:
     """Security middleware for request validation."""
     
     def __init__(self, app: FastAPI):
-        self.app = app
+        
+    """__init__ function."""
+self.app = app
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         # Add security headers
         if scope["type"] == "http":
-            async def send_with_headers(message):
+            async def send_with_headers(message) -> Any:
                 if message["type"] == "http.response.start":
                     message["headers"].extend([
                         (b"X-Content-Type-Options", b"nosniff"),
@@ -239,10 +254,12 @@ class RequestLoggingMiddleware:
     """Request logging middleware."""
     
     def __init__(self, app: FastAPI):
-        self.app = app
+        
+    """__init__ function."""
+self.app = app
         self.logger = structlog.get_logger(__name__)
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         if scope["type"] == "http":
             start_time = datetime.now()
             request_id = f"req_{start_time.timestamp()}"
@@ -256,7 +273,7 @@ class RequestLoggingMiddleware:
                 client=scope.get("client", ("unknown", 0))[0]
             )
             
-            async def send_with_logging(message):
+            async def send_with_logging(message) -> Any:
                 if message["type"] == "http.response.start":
                     end_time = datetime.now()
                     duration = (end_time - start_time).total_seconds()
@@ -289,7 +306,9 @@ class CustomHTTPException(HTTPException):
         error_code: Optional[str] = None,
         request_id: Optional[str] = None
     ):
-        super().__init__(status_code=status_code, detail=detail)
+        
+    """__init__ function."""
+super().__init__(status_code=status_code, detail=detail)
         self.error_code = error_code
         self.request_id = request_id
 
@@ -724,7 +743,9 @@ def create_app() -> FastAPI:
     
     # Custom OpenAPI schema
     def custom_openapi():
-        if app.openapi_schema:
+        
+    """custom_openapi function."""
+if app.openapi_schema:
             return app.openapi_schema
         
         openapi_schema = get_openapi(
@@ -780,16 +801,17 @@ class TestClient:
     """Test client for FastAPI application."""
     
     def __init__(self, app: FastAPI):
-        self.app = app
+        
+    """__init__ function."""
+self.app = app
         self.client = None
     
-    async def __aenter__(self):
+    async def __aenter__(self) -> Any:
         """Async context manager entry."""
-        from httpx import AsyncClient
         self.client = AsyncClient(app=self.app, base_url="http://test")
         return self.client
     
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
+    async def __aexit__(self, exc_type, exc_val, exc_tb) -> Any:
         """Async context manager exit."""
         if self.client:
             await self.client.aclose()

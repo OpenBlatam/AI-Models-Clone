@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .core.patterns import (
+from .core.validators import (
+from .core.error_handlers import (
+from .examples.video_processing import (
+from .examples.data_processing import (
+from .examples.async_examples import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🎯 HAPPY PATH LAST - MAIN MODULE
 ================================
@@ -18,7 +29,6 @@ Este módulo proporciona:
 # CORE IMPORTS
 # =============================================================================
 
-from .core.patterns import (
     happy_path_last,
     HappyPathPattern,
     HappyPathResult,
@@ -29,7 +39,6 @@ from .core.patterns import (
     happy_path_system
 )
 
-from .core.validators import (
     validate_video_path,
     validate_batch_size,
     validate_quality,
@@ -43,7 +52,6 @@ from .core.validators import (
     validate_with_context
 )
 
-from .core.error_handlers import (
     handle_video_processing_errors,
     handle_model_loading_errors,
     handle_data_processing_errors,
@@ -56,7 +64,6 @@ from .core.error_handlers import (
 # EXAMPLE IMPORTS
 # =============================================================================
 
-from .examples.video_processing import (
     process_video_happy_path_last,
     load_model_happy_path_last,
     process_video_decorated,
@@ -65,7 +72,6 @@ from .examples.video_processing import (
     process_video_happy_path_last_clean
 )
 
-from .examples.data_processing import (
     process_data_happy_path_last,
     process_batch_data_happy_path_last,
     process_data_decorated,
@@ -78,7 +84,6 @@ from .examples.data_processing import (
     process_data_happy_path_last_clean
 )
 
-from .examples.async_examples import (
     async_process_video_happy_path_last,
     async_load_model_happy_path_last,
     async_load_model_decorated,

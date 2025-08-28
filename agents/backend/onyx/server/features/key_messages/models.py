@@ -1,10 +1,21 @@
-"""
-Key Messages models for Onyx.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from pydantic import BaseModel, Field, validator
 from typing import List, Optional, Dict, Any
 from datetime import datetime
 from enum import Enum
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Key Messages models for Onyx.
+"""
 
 class MessageType(str, Enum):
     """Types of messages that can be generated."""
@@ -42,7 +53,7 @@ class KeyMessageRequest(BaseModel):
     call_to_action: Optional[str] = Field(None, description="Specific call to action")
 
     @validator('message')
-    def validate_message(cls, v):
+    def validate_message(cls, v) -> bool:
         """Validate message with guard clauses."""
         if not v or not v.strip():
             raise ValueError("Message cannot be empty")
@@ -56,21 +67,21 @@ class KeyMessageRequest(BaseModel):
         return v.strip()
 
     @validator('target_audience')
-    def validate_target_audience(cls, v):
+    def validate_target_audience(cls, v) -> Optional[Dict[str, Any]]:
         """Validate target audience."""
         if v is not None and len(v) > 500:
             raise ValueError("Target audience description too long (max 500 characters)")
         return v
 
     @validator('context')
-    def validate_context(cls, v):
+    def validate_context(cls, v) -> bool:
         """Validate context."""
         if v is not None and len(v) > 2000:
             raise ValueError("Context too long (max 2000 characters)")
         return v
 
     @validator('keywords')
-    def validate_keywords(cls, v):
+    def validate_keywords(cls, v) -> bool:
         """Validate keywords."""
         if len(v) > 20:
             raise ValueError("Too many keywords (max 20)")
@@ -85,7 +96,7 @@ class KeyMessageRequest(BaseModel):
         return [kw.strip() for kw in v]
 
     @validator('max_length')
-    def validate_max_length(cls, v):
+    def validate_max_length(cls, v) -> bool:
         """Validate max length."""
         if v is not None:
             if v <= 0:
@@ -97,7 +108,7 @@ class KeyMessageRequest(BaseModel):
         return v
 
     @validator('brand_voice')
-    def validate_brand_voice(cls, v):
+    def validate_brand_voice(cls, v) -> bool:
         """Validate brand voice settings."""
         if v is not None and not isinstance(v, dict):
             raise ValueError("Brand voice must be a dictionary")
@@ -108,14 +119,14 @@ class KeyMessageRequest(BaseModel):
         return v
 
     @validator('industry')
-    def validate_industry(cls, v):
+    def validate_industry(cls, v) -> bool:
         """Validate industry."""
         if v is not None and len(v) > 100:
             raise ValueError("Industry description too long (max 100 characters)")
         return v
 
     @validator('call_to_action')
-    def validate_call_to_action(cls, v):
+    def validate_call_to_action(cls, v) -> bool:
         """Validate call to action."""
         if v is not None and len(v) > 200:
             raise ValueError("Call to action too long (max 200 characters)")
@@ -138,14 +149,14 @@ class GeneratedResponse(BaseModel):
     suggestions: List[str] = Field(default_factory=list, description="Additional suggestions")
 
     @validator('id')
-    def validate_id(cls, v):
+    def validate_id(cls, v) -> bool:
         """Validate response ID."""
         if not v or not v.strip():
             raise ValueError("Response ID cannot be empty")
         return v
 
     @validator('response')
-    def validate_response(cls, v):
+    def validate_response(cls, v) -> bool:
         """Validate generated response."""
         if not v or not v.strip():
             raise ValueError("Generated response cannot be empty")
@@ -156,21 +167,21 @@ class GeneratedResponse(BaseModel):
         return v
 
     @validator('word_count')
-    def validate_word_count(cls, v):
+    def validate_word_count(cls, v) -> bool:
         """Validate word count."""
         if v < 0:
             raise ValueError("Word count cannot be negative")
         return v
 
     @validator('character_count')
-    def validate_character_count(cls, v):
+    def validate_character_count(cls, v) -> bool:
         """Validate character count."""
         if v < 0:
             raise ValueError("Character count cannot be negative")
         return v
 
     @validator('processing_time')
-    def validate_processing_time(cls, v):
+    def validate_processing_time(cls, v) -> bool:
         """Validate processing time."""
         if v < 0:
             raise ValueError("Processing time cannot be negative")
@@ -181,14 +192,14 @@ class GeneratedResponse(BaseModel):
         return v
 
     @validator('sentiment_score')
-    def validate_sentiment_score(cls, v):
+    def validate_sentiment_score(cls, v) -> bool:
         """Validate sentiment score."""
         if v is not None and (v < -1 or v > 1):
             raise ValueError("Sentiment score must be between -1 and 1")
         return v
 
     @validator('readability_score')
-    def validate_readability_score(cls, v):
+    def validate_readability_score(cls, v) -> bool:
         """Validate readability score."""
         if v is not None and (v < 0 or v > 1):
             raise ValueError("Readability score must be between 0 and 1")
@@ -204,14 +215,14 @@ class KeyMessageResponse(BaseModel):
     metadata: Optional[Dict[str, Any]] = Field(None, description="Additional metadata")
 
     @validator('processing_time')
-    def validate_processing_time(cls, v):
+    def validate_processing_time(cls, v) -> bool:
         """Validate processing time."""
         if v < 0:
             raise ValueError("Processing time cannot be negative")
         return v
 
     @validator('error')
-    def validate_error(cls, v):
+    def validate_error(cls, v) -> bool:
         """Validate error message."""
         if v is not None and len(v) > 1000:
             raise ValueError("Error message too long (max 1000 characters)")
@@ -227,7 +238,7 @@ class MessageAnalysis(BaseModel):
     suggestions: List[str] = Field(default_factory=list, description="Improvement suggestions")
 
     @validator('sentiment')
-    def validate_sentiment(cls, v):
+    def validate_sentiment(cls, v) -> bool:
         """Validate sentiment."""
         valid_sentiments = ['positive', 'negative', 'neutral', 'mixed']
         if v not in valid_sentiments:
@@ -235,14 +246,14 @@ class MessageAnalysis(BaseModel):
         return v
 
     @validator('tone_consistency', 'clarity_score', 'engagement_potential', 'keyword_optimization')
-    def validate_scores(cls, v):
+    def validate_scores(cls, v) -> bool:
         """Validate score values."""
         if v < 0 or v > 1:
             raise ValueError("Score must be between 0 and 1")
         return v
 
     @validator('suggestions')
-    def validate_suggestions(cls, v):
+    def validate_suggestions(cls, v) -> bool:
         """Validate suggestions."""
         if len(v) > 10:
             raise ValueError("Too many suggestions (max 10)")
@@ -262,7 +273,7 @@ class BatchKeyMessageRequest(BaseModel):
     batch_size: Optional[int] = Field(10, description="Maximum batch size for processing")
 
     @validator('messages')
-    def validate_messages(cls, v):
+    def validate_messages(cls, v) -> bool:
         """Validate messages list."""
         if not v:
             raise ValueError("Messages list cannot be empty")
@@ -273,7 +284,7 @@ class BatchKeyMessageRequest(BaseModel):
         return v
 
     @validator('batch_size')
-    def validate_batch_size(cls, v):
+    def validate_batch_size(cls, v) -> bool:
         """Validate batch size."""
         if v is not None:
             if v <= 0:
@@ -293,21 +304,21 @@ class BatchKeyMessageResponse(BaseModel):
     processing_time: float = Field(..., description="Total processing time")
 
     @validator('total_processed')
-    def validate_total_processed(cls, v):
+    def validate_total_processed(cls, v) -> bool:
         """Validate total processed count."""
         if v < 0:
             raise ValueError("Total processed cannot be negative")
         return v
 
     @validator('failed_count')
-    def validate_failed_count(cls, v):
+    def validate_failed_count(cls, v) -> bool:
         """Validate failed count."""
         if v < 0:
             raise ValueError("Failed count cannot be negative")
         return v
 
     @validator('processing_time')
-    def validate_processing_time(cls, v):
+    def validate_processing_time(cls, v) -> bool:
         """Validate processing time."""
         if v < 0:
             raise ValueError("Processing time cannot be negative")

@@ -1,11 +1,5 @@
-#!/usr/bin/env python3
-"""
-Error Handling and Validation Module
-
-Comprehensive error handling and validation system for the AI Video system
-with early returns, proper error categorization, and robust validation.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import logging
 import traceback
@@ -14,9 +8,18 @@ from typing import Dict, Any, Optional, List, Tuple, Union, Callable, Type
 from dataclasses import dataclass, field
 from functools import wraps
 from contextlib import asynccontextmanager
+from .exceptions import (
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Error Handling and Validation Module
+
+Comprehensive error handling and validation system for the AI Video system
+with early returns, proper error categorization, and robust validation.
+"""
+
 
 # Import existing exceptions
-from .exceptions import (
     AIVideoError, ConfigurationError, ValidationError, WorkflowError,
     SecurityError, PerformanceError, ResourceError, DependencyError
 )
@@ -83,7 +86,7 @@ class ValidationResult:
 class ErrorHandler:
     """Centralized error handling with early returns and proper categorization."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_counts: Dict[str, int] = {}
         self.recovery_strategies: Dict[str, Callable] = {}
         self.error_callbacks: List[Callable] = []
@@ -189,7 +192,7 @@ class ErrorHandler:
 class Validator:
     """Comprehensive validation with early returns and field-specific validation."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.validators: Dict[str, Callable] = {}
         self.custom_validators: Dict[str, Callable] = {}
     
@@ -356,7 +359,9 @@ class AsyncErrorHandler:
     """Async error handling with proper resource management."""
     
     def __init__(self, error_handler: ErrorHandler):
-        self.error_handler = error_handler
+        
+    """__init__ function."""
+self.error_handler = error_handler
         self.active_operations: Dict[str, asyncio.Task] = {}
     
     @asynccontextmanager
@@ -432,7 +437,7 @@ def handle_errors(context_operation: Optional[str] = None):
     """Decorator for error handling with early returns."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             context = ErrorContext(operation=context_operation or func.__name__)
             
             try:
@@ -442,7 +447,7 @@ def handle_errors(context_operation: Optional[str] = None):
                 raise error
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             context = ErrorContext(operation=context_operation or func.__name__)
             
             try:
@@ -459,7 +464,7 @@ def validate_input(schema: Dict[str, Any]):
     """Decorator for input validation with early returns."""
     def decorator(func: Callable) -> Callable:
         @wraps(func)
-        async def async_wrapper(*args, **kwargs):
+        async def async_wrapper(*args, **kwargs) -> Any:
             # Validate kwargs
             validation_result = validator.validate_data(kwargs, schema)
             if not validation_result.is_valid:
@@ -468,7 +473,7 @@ def validate_input(schema: Dict[str, Any]):
             return await func(*args, **kwargs)
         
         @wraps(func)
-        def sync_wrapper(*args, **kwargs):
+        def sync_wrapper(*args, **kwargs) -> Any:
             # Validate kwargs
             validation_result = validator.validate_data(kwargs, schema)
             if not validation_result.is_valid:

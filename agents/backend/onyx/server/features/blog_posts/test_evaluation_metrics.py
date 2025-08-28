@@ -1,10 +1,13 @@
-"""
-🧪 Evaluation Metrics Test Suite
-================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive test suite for evaluation metrics system with unit tests,
-integration tests, and performance benchmarks.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import time
@@ -17,17 +20,27 @@ from pathlib import Path
 import unittest
 from unittest.mock import Mock, patch, MagicMock
 import warnings
-
 import torch
 import torch.nn as nn
 import numpy as np
 import pandas as pd
 from sklearn.datasets import make_classification, make_regression
 from sklearn.model_selection import train_test_split
-
-# Import our systems
 from .production_transformers import DeviceManager
 from .evaluation_metrics import (
+    import asyncio
+from typing import Any, List, Dict, Optional
+"""
+🧪 Evaluation Metrics Test Suite
+================================
+
+Comprehensive test suite for evaluation metrics system with unit tests,
+integration tests, and performance benchmarks.
+"""
+
+
+
+# Import our systems
     EvaluationMetrics, MetricConfig, TaskType, MetricType, EvaluationResult,
     create_evaluation_metrics, create_metric_config
 )
@@ -37,7 +50,7 @@ logger = logging.getLogger(__name__)
 class TestMetricConfig(unittest.TestCase):
     """Test metric configuration."""
     
-    def test_default_config(self):
+    def test_default_config(self) -> Any:
         """Test default configuration."""
         config = MetricConfig(task_type=TaskType.CLASSIFICATION)
         
@@ -48,7 +61,7 @@ class TestMetricConfig(unittest.TestCase):
         self.assertEqual(config.threshold, 0.5)
         self.assertEqual(len(config.metric_types), 6)  # Default metrics for classification
     
-    def test_custom_config(self):
+    def test_custom_config(self) -> Any:
         """Test custom configuration."""
         config = MetricConfig(
             task_type=TaskType.REGRESSION,
@@ -66,7 +79,7 @@ class TestMetricConfig(unittest.TestCase):
         self.assertEqual(config.threshold, 0.7)
         self.assertEqual(len(config.metric_types), 3)
     
-    def test_default_metrics_by_task(self):
+    def test_default_metrics_by_task(self) -> Any:
         """Test default metrics for different task types."""
         # Classification
         config = MetricConfig(task_type=TaskType.CLASSIFICATION)
@@ -95,7 +108,7 @@ class TestMetricConfig(unittest.TestCase):
 class TestEvaluationResult(unittest.TestCase):
     """Test evaluation result."""
     
-    def test_evaluation_result_creation(self):
+    def test_evaluation_result_creation(self) -> Any:
         """Test evaluation result creation."""
         result = EvaluationResult(
             task_type=TaskType.CLASSIFICATION,
@@ -114,7 +127,7 @@ class TestEvaluationResult(unittest.TestCase):
         self.assertEqual(result.detailed_metrics['precision'], 0.83)
         self.assertEqual(result.metadata['num_samples'], 100)
     
-    def test_to_dict(self):
+    def test_to_dict(self) -> Any:
         """Test conversion to dictionary."""
         result = EvaluationResult(
             task_type=TaskType.CLASSIFICATION,
@@ -128,7 +141,7 @@ class TestEvaluationResult(unittest.TestCase):
         self.assertEqual(result_dict['metrics']['accuracy'], 0.85)
         self.assertIsInstance(result_dict['confusion_matrix'], list)
     
-    def test_save_and_load(self):
+    def test_save_and_load(self) -> Any:
         """Test saving and loading evaluation result."""
         result = EvaluationResult(
             task_type=TaskType.CLASSIFICATION,
@@ -158,16 +171,16 @@ class TestEvaluationResult(unittest.TestCase):
 class TestEvaluationMetrics(unittest.TestCase):
     """Test evaluation metrics implementation."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    async def test_classification_metrics(self):
+    async def test_classification_metrics(self) -> Any:
         """Test classification metrics calculation."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -207,7 +220,7 @@ class TestEvaluationMetrics(unittest.TestCase):
         self.assertGreaterEqual(result.metrics['f1'], 0.0)
         self.assertLessEqual(result.metrics['f1'], 1.0)
     
-    async def test_regression_metrics(self):
+    async def test_regression_metrics(self) -> Any:
         """Test regression metrics calculation."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -244,7 +257,7 @@ class TestEvaluationMetrics(unittest.TestCase):
         self.assertGreaterEqual(result.metrics['explained_variance'], 0.0)
         self.assertLessEqual(result.metrics['explained_variance'], 1.0)
     
-    async def test_binary_classification(self):
+    async def test_binary_classification(self) -> Any:
         """Test binary classification metrics."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -280,7 +293,7 @@ class TestEvaluationMetrics(unittest.TestCase):
         self.assertGreaterEqual(result.metrics['pr_auc'], 0.0)
         self.assertLessEqual(result.metrics['pr_auc'], 1.0)
     
-    async def test_multi_class_classification(self):
+    async def test_multi_class_classification(self) -> Any:
         """Test multi-class classification metrics."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -316,12 +329,12 @@ class TestEvaluationMetrics(unittest.TestCase):
         self.assertGreaterEqual(result.metrics['top_k_accuracy'], 0.0)
         self.assertLessEqual(result.metrics['top_k_accuracy'], 1.0)
     
-    async def test_custom_metrics(self):
+    async def test_custom_metrics(self) -> Any:
         """Test custom metrics."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
         # Define custom metric
-        def custom_metric(y_true, y_pred, y_prob):
+        def custom_metric(y_true, y_pred, y_prob) -> Any:
             return np.mean(y_true == y_pred) * 100  # Accuracy as percentage
         
         # Create test data
@@ -342,7 +355,7 @@ class TestEvaluationMetrics(unittest.TestCase):
         self.assertIn('custom_accuracy', result.metrics)
         self.assertEqual(result.metrics['custom_accuracy'], 60.0)  # 3/5 correct = 60%
     
-    async def test_different_averages(self):
+    async def test_different_averages(self) -> Any:
         """Test different averaging methods."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -379,7 +392,7 @@ class TestEvaluationMetrics(unittest.TestCase):
             self.assertGreaterEqual(result.metrics['f1'], 0.0)
             self.assertLessEqual(result.metrics['f1'], 1.0)
     
-    async def test_error_handling(self):
+    async def test_error_handling(self) -> Any:
         """Test error handling in metric calculation."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -396,7 +409,7 @@ class TestEvaluationMetrics(unittest.TestCase):
         with self.assertRaises(ValueError):
             evaluator.evaluate(config, y_true, y_pred)
     
-    async def test_plot_confusion_matrix(self):
+    async def test_plot_confusion_matrix(self) -> Any:
         """Test confusion matrix plotting."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -411,7 +424,7 @@ class TestEvaluationMetrics(unittest.TestCase):
         # Check if plot was saved
         self.assertTrue(plot_path.exists())
     
-    async def test_plot_metrics_comparison(self):
+    async def test_plot_metrics_comparison(self) -> Any:
         """Test metrics comparison plotting."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -434,16 +447,16 @@ class TestEvaluationMetrics(unittest.TestCase):
 class TestIntegration(unittest.TestCase):
     """Integration tests."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    async def test_end_to_end_classification(self):
+    async def test_end_to_end_classification(self) -> Any:
         """Test end-to-end classification evaluation."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -498,7 +511,7 @@ class TestIntegration(unittest.TestCase):
         self.assertIn('num_samples', result.metadata)
         self.assertEqual(result.metadata['num_samples'], len(y_test))
     
-    async def test_end_to_end_regression(self):
+    async def test_end_to_end_regression(self) -> Any:
         """Test end-to-end regression evaluation."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -543,7 +556,7 @@ class TestIntegration(unittest.TestCase):
         self.assertIn('num_samples', result.metadata)
         self.assertEqual(result.metadata['num_samples'], len(y_test))
     
-    async def test_task_specific_evaluation(self):
+    async def test_task_specific_evaluation(self) -> Any:
         """Test task-specific evaluation scenarios."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -583,16 +596,16 @@ class TestIntegration(unittest.TestCase):
 class TestPerformanceBenchmarks(unittest.TestCase):
     """Performance benchmarks."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up benchmark environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up benchmark environment."""
         shutil.rmtree(self.temp_dir)
     
-    async def benchmark_large_dataset_evaluation(self):
+    async def benchmark_large_dataset_evaluation(self) -> Any:
         """Benchmark evaluation on large dataset."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -623,7 +636,7 @@ class TestPerformanceBenchmarks(unittest.TestCase):
         self.assertLess(evaluation_time, 10.0)  # Should complete within 10 seconds
         logger.info(f"Large dataset evaluation benchmark: {evaluation_time:.4f} seconds")
     
-    async def benchmark_multiple_metrics(self):
+    async def benchmark_multiple_metrics(self) -> Any:
         """Benchmark evaluation with many metrics."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -660,16 +673,16 @@ class TestPerformanceBenchmarks(unittest.TestCase):
 class TestErrorHandling(unittest.TestCase):
     """Test error handling."""
     
-    def setUp(self):
+    def setUp(self) -> Any:
         """Set up test environment."""
         self.device_manager = DeviceManager()
         self.temp_dir = tempfile.mkdtemp()
     
-    def tearDown(self):
+    def tearDown(self) -> Any:
         """Clean up test environment."""
         shutil.rmtree(self.temp_dir)
     
-    async def test_invalid_inputs(self):
+    async def test_invalid_inputs(self) -> Any:
         """Test handling of invalid inputs."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -690,7 +703,7 @@ class TestErrorHandling(unittest.TestCase):
         with self.assertRaises(ValueError):
             evaluator.evaluate(config, np.array([0, 1, 2]), np.array([0, 1]))
     
-    async def test_unsupported_metrics(self):
+    async def test_unsupported_metrics(self) -> Any:
         """Test handling of unsupported metrics."""
         evaluator = await create_evaluation_metrics(self.device_manager)
         
@@ -841,10 +854,11 @@ async def quick_regression_test():
 
 # Example usage
 if __name__ == "__main__":
-    import asyncio
     
     async def main():
-        print("🚀 Evaluation Metrics Test Suite")
+        
+    """main function."""
+print("🚀 Evaluation Metrics Test Suite")
         print("=" * 50)
         
         # Run quick tests

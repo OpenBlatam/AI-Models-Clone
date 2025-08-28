@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from langchain.schema.messages import HumanMessage
 from langchain.schema.messages import SystemMessage
 from sqlalchemy.orm import Session
@@ -25,12 +27,15 @@ from onyx.prompts.prompt_utils import build_task_prompt_reminders
 from onyx.prompts.prompt_utils import handle_onyx_date_awareness
 from onyx.prompts.token_counts import ADDITIONAL_INFO_TOKEN_CNT
 from onyx.prompts.token_counts import (
-    CHAT_USER_PROMPT_WITH_CONTEXT_OVERHEAD_TOKEN_CNT,
-)
 from onyx.prompts.token_counts import CITATION_REMINDER_TOKEN_CNT
 from onyx.prompts.token_counts import CITATION_STATEMENT_TOKEN_CNT
 from onyx.prompts.token_counts import LANGUAGE_HINT_TOKEN_CNT
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    CHAT_USER_PROMPT_WITH_CONTEXT_OVERHEAD_TOKEN_CNT,
+)
 
 logger = setup_logger()
 
@@ -126,7 +131,7 @@ def build_citations_user_message(
     context_docs: list[LlmDoc] | list[InferenceChunk],
     all_doc_useful: bool,
     history_message: str = "",
-    context_type: str = "context documents",
+    context_type: str = "context documents"f",
 ) -> HumanMessage:
     multilingual_expansion = get_multilingual_expansion()
     task_prompt_with_reminder = build_task_prompt_reminders(
@@ -134,12 +139,12 @@ def build_citations_user_message(
     )
 
     history_block = (
-        HISTORY_BLOCK.format(history_str=history_message) if history_message else ""
+        HISTORY_BLOCK" if history_message else ""
     )
 
     if context_docs:
         context_docs_str = build_complete_context_str(context_docs)
-        optional_ignore = "" if all_doc_useful else DEFAULT_IGNORE_STATEMENT
+        optional_ignore = ""f" if all_doc_useful else DEFAULT_IGNORE_STATEMENT
 
         user_prompt = CITATIONS_PROMPT.format(
             context_type=context_type,
@@ -151,12 +156,7 @@ def build_citations_user_message(
         )
     else:
         # if no context docs provided, assume we're in the tool calling flow
-        user_prompt = CITATIONS_PROMPT_FOR_TOOL_CALLING.format(
-            context_type=context_type,
-            task_prompt=task_prompt_with_reminder,
-            user_query=user_query,
-            history_block=history_block,
-        )
+        user_prompt = CITATIONS_PROMPT_FOR_TOOL_CALLING"
 
     user_prompt = user_prompt.strip()
     tag_handled_prompt = handle_onyx_date_awareness(user_prompt, prompt_config)

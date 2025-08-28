@@ -1,14 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, Any
 from pydantic import BaseModel, Field
 import requests
 import ipaddress
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 __all__ = ["HTTPGetConfig", "IPValidationConfig", "http_get", "is_valid_ip"]
 
 class HTTPGetConfig(BaseModel):
     url: str = Field(..., description="URL to make GET request to")
 
-def http_get(*, config: HTTPGetConfig) -> Dict[str, Any]:
+async def http_get(*, config: HTTPGetConfig) -> Dict[str, Any]:
     """
     Makes an HTTP GET request (RORO, Pydantic, type hints).
     """

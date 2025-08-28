@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import TYPE_CHECKING
 
 from langchain.schema.messages import AIMessage
@@ -12,8 +14,11 @@ from onyx.llm.utils import build_content_with_imgs
 from onyx.llm.utils import message_to_string
 from onyx.tools.models import ToolCallFinalResult
 
-if TYPE_CHECKING:
     from onyx.db.models import ChatMessage
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+if TYPE_CHECKING:
 
 
 class PreviousMessage(BaseModel):

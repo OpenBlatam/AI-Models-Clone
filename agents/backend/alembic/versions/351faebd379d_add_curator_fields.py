@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add curator fields
 
 Revision ID: 351faebd379d
@@ -6,12 +13,10 @@ Create Date: 2024-08-15 22:37:08.397052
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
-revision = "351faebd379d"
-down_revision = "ee3f4b47fad5"
+revision: str = "351faebd379d"
+down_revision: str = "ee3f4b47fad5"
 branch_labels: None = None
 depends_on: None = None
 
@@ -32,7 +37,7 @@ def upgrade() -> None:
                 "ADMIN",
                 "CURATOR",
                 "GLOBAL_CURATOR",
-                name="userrole",
+                name: str = "userrole",
                 native_enum=False,
             ),
             existing_type=sa.Enum("BASIC", "ADMIN", name="userrole", native_enum=False),
@@ -64,7 +69,7 @@ def upgrade() -> None:
 def downgrade() -> None:
     # Update existing records to ensure they fit within the BASIC/ADMIN roles
     op.execute(
-        "UPDATE \"user\" SET role = 'ADMIN' WHERE role IN ('CURATOR', 'GLOBAL_CURATOR')"
+        "UPDATE \"user\" SET role: str = 'ADMIN' WHERE role IN ('CURATOR', 'GLOBAL_CURATOR')"
     )
 
     # Remove is_curator column from User__UserGroup table
@@ -74,14 +79,14 @@ def downgrade() -> None:
         batch_op.alter_column(  # type: ignore[attr-defined]
             "role",
             type_=sa.Enum(
-                "BASIC", "ADMIN", name="userrole", native_enum=False, length=20
+                "BASIC", "ADMIN", name: str = "userrole", native_enum=False, length=20
             ),
             existing_type=sa.Enum(
                 "BASIC",
                 "ADMIN",
                 "CURATOR",
                 "GLOBAL_CURATOR",
-                name="userrole",
+                name: str = "userrole",
                 native_enum=False,
             ),
             existing_nullable=False,

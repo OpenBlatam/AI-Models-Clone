@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from unittest.mock import MagicMock
 from unittest.mock import patch
 
@@ -8,6 +10,9 @@ from onyx.llm.llm_provider_options import BEDROCK_PROVIDER_NAME
 from onyx.tools.utils import explicit_tool_calling_supported
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.mark.parametrize(
     "model_provider, model_name, mock_model_supports_fc, mock_litellm_anthropic_models, expected_result",
     [

@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 import sys
 import time
 from collections.abc import Generator
@@ -16,6 +21,9 @@ from onyx.connectors.models import Document
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -82,7 +90,9 @@ class ConnectorRunner(Generic[CT]):
         batch_size: int,
         time_range: TimeRange | None = None,
     ):
-        self.connector = connector
+        
+    """__init__ function."""
+self.connector = connector
         self.time_range = time_range
         self.batch_size = batch_size
 

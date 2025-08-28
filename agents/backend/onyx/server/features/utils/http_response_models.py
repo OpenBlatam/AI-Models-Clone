@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, Dict, List, Optional, Union, Generic, TypeVar
+from datetime import datetime
+from enum import Enum
+from dataclasses import dataclass, field
+from pydantic import BaseModel, Field, validator
+from fastapi import status
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 📋 HTTP Response Models
 ======================
@@ -6,13 +17,7 @@ Standardized HTTP response models for consistent API responses.
 Provides structured success and error response formats.
 """
 
-from typing import Any, Dict, List, Optional, Union, Generic, TypeVar
-from datetime import datetime
-from enum import Enum
-from dataclasses import dataclass, field
 
-from pydantic import BaseModel, Field, validator
-from fastapi import status
 
 T = TypeVar('T')
 
@@ -42,7 +47,7 @@ class PaginationInfo(BaseModel):
     has_prev: bool = Field(..., description="Whether there is a previous page")
     
     @validator('total_pages', always=True)
-    def calculate_total_pages(cls, v, values):
+    def calculate_total_pages(cls, v, values) -> Any:
         """Calculate total pages based on total items and per page"""
         if 'total_items' in values and 'per_page' in values:
             return (values['total_items'] + values['per_page'] - 1) // values['per_page']
@@ -67,7 +72,8 @@ class ErrorDetail(BaseModel):
     help_url: Optional[str] = Field(None, description="Help URL for this error")
     additional_data: Dict[str, Any] = Field(default_factory=dict, description="Additional error data")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -84,7 +90,8 @@ class SuccessResponse(BaseModel, Generic[T]):
     pagination: Optional[PaginationInfo] = Field(None, description="Pagination information")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -98,7 +105,8 @@ class ErrorResponse(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.utcnow, description="Response timestamp")
     request_id: Optional[str] = Field(None, description="Request ID for tracking")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -116,7 +124,8 @@ class PartialSuccessResponse(BaseModel, Generic[T]):
     pagination: Optional[PaginationInfo] = Field(None, description="Pagination information")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -134,7 +143,8 @@ class ListResponse(BaseModel, Generic[T]):
     pagination: Optional[PaginationInfo] = Field(None, description="Pagination information")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -149,7 +159,8 @@ class HealthCheckResponse(BaseModel):
     uptime: Optional[float] = Field(None, description="Application uptime in seconds")
     checks: Dict[str, Dict[str, Any]] = Field(default_factory=dict, description="Individual health checks")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -162,7 +173,8 @@ class MetricsResponse(BaseModel):
     metrics: Dict[str, Any] = Field(..., description="Application metrics")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -182,7 +194,8 @@ class BatchResponse(BaseModel, Generic[T]):
     request_id: Optional[str] = Field(None, description="Request ID for tracking")
     metadata: Dict[str, Any] = Field(default_factory=dict, description="Additional metadata")
     
-    class Config:
+    @dataclass
+class Config:
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
@@ -486,5 +499,6 @@ def example_usage():
     print("Batch Response:", batch_response.dict())
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     example_usage() 

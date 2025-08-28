@@ -1,3 +1,7 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
 from pydantic import BaseModel
 
 from onyx.chat.prompt_builder.answer_prompt_builder import PromptSnapshot
@@ -9,6 +13,9 @@ from onyx.tools.models import ToolResponse
 from onyx.tools.tool import Tool
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # TODO: adapt the tool choice/tool call to allow for parallel tool calls by
 # creating a subgraph that can be invoked in parallel via Send/Command APIs
 class ToolChoiceInput(BaseModel):
@@ -38,7 +45,8 @@ class ToolChoice(BaseModel):
     id: str | None
     search_tool_override_kwargs: SearchToolOverrideKwargs = SearchToolOverrideKwargs()
 
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
 
 

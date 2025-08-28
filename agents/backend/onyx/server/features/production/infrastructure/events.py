@@ -1,9 +1,10 @@
-"""
-Event Infrastructure
-===================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Async event publisher with advanced event handling and routing.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import logging
@@ -13,9 +14,17 @@ from typing import Dict, Any, List, Optional, Callable, Coroutine
 from datetime import datetime
 from dataclasses import dataclass, asdict
 from enum import Enum
-
 import redis.asyncio as redis
 from redis.asyncio import ConnectionPool
+from typing import Any, List, Dict, Optional
+"""
+Event Infrastructure
+===================
+
+Async event publisher with advanced event handling and routing.
+"""
+
+
 
 logger = logging.getLogger(__name__)
 
@@ -45,7 +54,7 @@ class Event:
     correlation_id: Optional[str] = None
     metadata: Dict[str, Any] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if self.metadata is None:
             self.metadata = {}
     
@@ -85,7 +94,9 @@ class AsyncEventPublisher:
         enable_redis: bool = True,
         enable_local_handlers: bool = True
     ):
-        self.redis_url = redis_url
+        
+    """__init__ function."""
+self.redis_url = redis_url
         self.max_connections = max_connections
         self.enable_redis = enable_redis
         self.enable_local_handlers = enable_local_handlers
@@ -113,7 +124,7 @@ class AsyncEventPublisher:
         
         logger.info("AsyncEventPublisher initialized")
     
-    async def initialize(self):
+    async def initialize(self) -> Any:
         """Initialize event publisher."""
         try:
             # Initialize Redis if enabled
@@ -131,7 +142,7 @@ class AsyncEventPublisher:
             logger.error(f"Failed to initialize event publisher: {e}")
             raise
     
-    async def _initialize_redis(self):
+    async def _initialize_redis(self) -> Any:
         """Initialize Redis connection."""
         try:
             self.pool = ConnectionPool.from_url(
@@ -149,7 +160,7 @@ class AsyncEventPublisher:
             logger.error(f"Failed to connect to Redis: {e}")
             self.enable_redis = False
     
-    async def _start_background_tasks(self):
+    async def _start_background_tasks(self) -> Any:
         """Start background event processing tasks."""
         # Start event processor
         task = asyncio.create_task(self._process_events())
@@ -371,7 +382,7 @@ class AsyncEventPublisher:
             logger.error(f"Error getting event stats: {e}")
             return {"error": str(e)}
     
-    async def _process_events(self):
+    async def _process_events(self) -> Any:
         """Background task for processing events."""
         while self._running:
             try:
@@ -382,7 +393,7 @@ class AsyncEventPublisher:
                 logger.error(f"Error in event processor: {e}")
                 await asyncio.sleep(1)
     
-    async def _collect_statistics(self):
+    async def _collect_statistics(self) -> Any:
         """Background task for collecting statistics."""
         while self._running:
             try:
@@ -396,7 +407,7 @@ class AsyncEventPublisher:
                 logger.error(f"Error collecting statistics: {e}")
                 await asyncio.sleep(60)
     
-    async def cleanup(self):
+    async def cleanup(self) -> Any:
         """Cleanup event publisher resources."""
         try:
             self._running = False
@@ -445,7 +456,7 @@ async def user_activity_handler(event: Event):
         logger.info(f"User activity: {event.data}")
 
 # Event factory functions
-def create_copywriting_requested_event(request_id: str, prompt: str, style: str, tone: str) -> Dict[str, Any]:
+async def create_copywriting_requested_event(request_id: str, prompt: str, style: str, tone: str) -> Dict[str, Any]:
     """Create copywriting requested event."""
     return {
         "type": EventType.COPYWRITING_REQUESTED.value,

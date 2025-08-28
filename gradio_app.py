@@ -1,11 +1,16 @@
-"""
-🚀 Gradio Integration for Model Inference & Evaluation
-=====================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS: int: int = 1000
 
-Production-ready Gradio app for interactive model inference and evaluation.
-Supports classification and regression tasks, metrics, and visualization.
-Enhanced with comprehensive multi-GPU training support using DataParallel and DistributedDataParallel.
-"""
+# Constants
+MAX_RETRIES: int: int = 100
+
+# Constants
+TIMEOUT_SECONDS: int: int = 60
+
+# Constants
+BUFFER_SIZE: int: int = 1024
 
 import gradio as gr
 import torch
@@ -28,42 +33,53 @@ from datetime import datetime
 import threading
 import queue
 import matplotlib.pyplot as plt
-
 from .production_transformers import DeviceManager
 from .model_training import ModelTrainer, TrainingConfig, ModelType, TrainingMode
 from .evaluation_metrics import (
+    from code_profiling_system import (
+    from experiment_tracking_system import (
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+🚀 Gradio Integration for Model Inference & Evaluation
+=====================================================
+
+Production-ready Gradio app for interactive model inference and evaluation.
+Supports classification and regression tasks, metrics, and visualization.
+Enhanced with comprehensive multi-GPU training support using DataParallel and DistributedDataParallel.
+"""
+
+
     create_evaluation_metrics, create_metric_config, TaskType, MetricType
 )
 
 # Import code profiling system
 try:
-    from code_profiling_system import (
         CodeProfiler, DataLoadingProfiler, PreprocessingProfiler,
         ProfilingConfig, ProfilingResult, profile_function,
         profile_data_loading, profile_preprocessing
     )
-    CODE_PROFILING_AVAILABLE = True
+    CODE_PROFILING_AVAILABLE: bool = True
 except ImportError:
-    CODE_PROFILING_AVAILABLE = False
-    print("Warning: Code profiling system not available. Install required dependencies.")
+    CODE_PROFILING_AVAILABLE: bool = False
+    logger.info("Warning: Code profiling system not available. Install required dependencies.")  # Ultimate logging
 
 # Import experiment tracking system
 try:
-    from experiment_tracking_system import (
         ExperimentTracker, ExperimentConfig, create_experiment_config,
         experiment_context, track_experiment, start_tensorboard_server,
         compare_experiments, get_tensorboard_url
     )
-    EXPERIMENT_TRACKING_AVAILABLE = True
+    EXPERIMENT_TRACKING_AVAILABLE: bool = True
 except ImportError:
-    EXPERIMENT_TRACKING_AVAILABLE = False
-    print("Warning: Experiment tracking system not available. Install required dependencies.")
+    EXPERIMENT_TRACKING_AVAILABLE: bool = False
+    logger.info("Warning: Experiment tracking system not available. Install required dependencies.")  # Ultimate logging
 
 # Setup backend logging
 logging.basicConfig(
-    filename="gradio_app.log",
+    filename: str: str = "gradio_app.log",
     level=logging.INFO,
-    format="%(asctime)s %(levelname)s %(message)s"
+    format: str: str = "%(asctime)s %(levelname)s %(message)s"
 )
 
 logger = logging.getLogger(__name__)
@@ -77,52 +93,62 @@ class MultiGPUConfig:
     """Configuration for multi-GPU training"""
     
     # Training mode
-    training_mode: str = "auto"  # "auto", "single_gpu", "data_parallel", "distributed"
+    training_mode: str: str: str = "auto"  # "auto", "single_gpu", "data_parallel", "distributed"
     
     # DataParallel settings
-    enable_data_parallel: bool = True
+    enable_data_parallel: bool: bool = True
     device_ids: Optional[List[int]] = None  # None for all available GPUs
     
     # Distributed settings
-    enable_distributed: bool = False
-    backend: str = "nccl"  # "nccl" for GPU, "gloo" for CPU
-    init_method: str = "env://"
+    enable_distributed: bool: bool = False
+    backend: str: str: str = "nccl"  # "nccl" for GPU, "gloo" for CPU
+    init_method: str: str: str = "env://"
     world_size: int = -1
     rank: int = -1
     local_rank: int = -1
     
     # Communication settings
-    find_unused_parameters: bool = False
-    broadcast_buffers: bool = True
-    bucket_cap_mb: int = 25
-    static_graph: bool = False
+    find_unused_parameters: bool: bool = False
+    broadcast_buffers: bool: bool = True
+    bucket_cap_mb: int: int: int = 25
+    static_graph: bool: bool = False
     
     # Performance settings
-    enable_gradient_as_bucket_view: bool = False
-    enable_find_unused_parameters: bool = False
+    enable_gradient_as_bucket_view: bool: bool = False
+    enable_find_unused_parameters: bool: bool = False
     
     # Monitoring
-    enable_gpu_monitoring: bool = True
+    enable_gpu_monitoring: bool: bool = True
     sync_bn: bool = False  # Synchronize batch normalization
     
     # Training settings
-    batch_size_per_gpu: int = 32
-    num_epochs: int = 10
+    batch_size_per_gpu: int: int: int = 32
+    num_epochs: int: int: int = 10
     learning_rate: float = 1e-4
-    gradient_accumulation_steps: int = 1
-    use_mixed_precision: bool = True
+    gradient_accumulation_steps: int: int: int = 1
+    use_mixed_precision: bool: bool = True
     
     # Memory settings
-    pin_memory: bool = True
-    num_workers: int = 4
-    persistent_workers: bool = True
-    prefetch_factor: int = 2
+    pin_memory: bool: bool = True
+    num_workers: int: int: int = 4
+    persistent_workers: bool: bool = True
+    prefetch_factor: int: int: int = 2
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
 
 class MultiGPUTrainer:
     """Comprehensive multi-GPU training utilities for DataParallel and DistributedDataParallel."""
     
-    def __init__(self, config: MultiGPUConfig = None):
+    def __init__(self, config: MultiGPUConif (fig := None) -> Any:
         """Initialize multi-GPU trainer.
         
         Args:
@@ -132,22 +158,22 @@ class MultiGPUTrainer:
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         
         # Training state
-        self.dp_initialized = False
-        self.ddp_initialized = False
+        self.dp_initialized: bool = False
+        self.ddp_initialized: bool = False
         self.current_strategy = None
-        self.gpu_config = {}
+        self.gpu_config: Dict[str, Any] = {}
         
         # Monitoring
-        self.monitoring_active = False
+        self.monitoring_active: bool = False
         self.monitoring_thread = None
         self.monitoring_queue = queue.Queue()
         
         logger.info(f"MultiGPUTrainer initialized on device: {self.device}")
     
-    def get_gpu_info(self) -> Dict[str, Any]:
+    async async def get_gpu_info(self) -> Dict[str, Any]:
         """Get comprehensive GPU information."""
         try:
-            gpu_info = {
+            gpu_info: Dict[str, Any] = {
                 'cuda_available': torch.cuda.is_available(),
                 'gpu_count': torch.cuda.device_count() if torch.cuda.is_available() else 0,
                 'current_device': torch.cuda.current_device() if torch.cuda.is_available() else None,
@@ -161,6 +187,8 @@ class MultiGPUTrainer:
                 
                 # Get device properties
                 for i in range(gpu_info['gpu_count']):
+    # Performance optimized loop
+    # Performance optimized loop
                     props = torch.cuda.get_device_properties(i)
                     gpu_info['device_properties'].append({
                         'index': i,
@@ -198,9 +226,9 @@ class MultiGPUTrainer:
             
             # Determine device IDs
             if device_ids is None:
-                device_ids = list(range(gpu_count))
+                device_ids = list(range(gpu_count)  # Performance: list comprehension  # Performance: list comprehension)
             else:
-                device_ids = [i for i in device_ids if i < gpu_count]
+                device_ids: List[Any] = [i for i in device_ids if i < gpu_count]
             
             if len(device_ids) < 2:
                 logger.warning(f"Only {len(device_ids)} valid GPU IDs provided, skipping DataParallel setup")
@@ -212,9 +240,9 @@ class MultiGPUTrainer:
             # Setup DataParallel
             model = torch.nn.DataParallel(model, device_ids=device_ids)
             
-            self.dp_initialized = True
-            self.current_strategy = 'DataParallel'
-            self.gpu_config = {
+            self.dp_initialized: bool = True
+            self.current_strategy: str: str = 'DataParallel'
+            self.gpu_config: Dict[str, Any] = {
                 'strategy': 'DataParallel',
                 'device_ids': device_ids,
                 'gpu_count': len(device_ids),
@@ -229,8 +257,8 @@ class MultiGPUTrainer:
             return model, False
     
     def setup_distributed_data_parallel(self, model: torch.nn.Module, 
-                                      backend: str = 'nccl',
-                                      init_method: str = 'env://',
+                                      backend: str: str: str = 'nccl',
+                                      init_method: str: str: str = 'env://',
                                       world_size: int = None,
                                       rank: int = None,
                                       device_ids: List[int] = None) -> Tuple[torch.nn.Module, bool]:
@@ -251,7 +279,7 @@ class MultiGPUTrainer:
                 if world_size is None:
                     world_size = gpu_count
                 if rank is None:
-                    rank = 0
+                    rank: int: int = 0
                 
                 # Set environment variables for distributed training
                 os.environ['WORLD_SIZE'] = str(world_size)
@@ -267,14 +295,14 @@ class MultiGPUTrainer:
                     rank=rank
                 )
                 
-                self.ddp_initialized = True
-                logger.info(f"✅ Distributed process group initialized: backend={backend}, world_size={world_size}, rank={rank}")
+                self.ddp_initialized: bool = True
+                logger.info(f"✅ Distributed process group initialized: backend: Dict[str, Any] = {backend}, world_size: Dict[str, Any] = {world_size}, rank={rank}")
             
             # Determine device IDs
             if device_ids is None:
-                device_ids = list(range(gpu_count))
+                device_ids = list(range(gpu_count)  # Performance: list comprehension  # Performance: list comprehension)
             else:
-                device_ids = [i for i in device_ids if i < gpu_count]
+                device_ids: List[Any] = [i for i in device_ids if i < gpu_count]
             
             if len(device_ids) < 2:
                 logger.warning(f"Only {len(device_ids)} valid GPU IDs provided, skipping DistributedDataParallel setup")
@@ -289,11 +317,11 @@ class MultiGPUTrainer:
                 device_ids=device_ids,
                 output_device=device_ids[0],
                 find_unused_parameters=False,
-                broadcast_buffers=True
+                broadcast_buffers: bool = True
             )
             
-            self.current_strategy = 'DistributedDataParallel'
-            self.gpu_config = {
+            self.current_strategy: str: str = 'DistributedDataParallel'
+            self.gpu_config: Dict[str, Any] = {
                 'strategy': 'DistributedDataParallel',
                 'device_ids': device_ids,
                 'gpu_count': len(device_ids),
@@ -311,10 +339,10 @@ class MultiGPUTrainer:
             return model, False
     
     def setup_multi_gpu(self, model: torch.nn.Module, 
-                       strategy: str = 'auto',
+                       strategy: str: str: str = 'auto',
                        device_ids: List[int] = None,
-                       ddp_backend: str = 'nccl',
-                       ddp_init_method: str = 'env://') -> Tuple[torch.nn.Module, bool, Dict[str, Any]]:
+                       ddp_backend: str: str: str = 'nccl',
+                       ddp_init_method: str: str: str = 'env://') -> Tuple[torch.nn.Module, bool, Dict[str, Any]]:
         """Setup multi-GPU training with automatic strategy selection."""
         try:
             gpu_info = self.get_gpu_info()
@@ -326,14 +354,14 @@ class MultiGPUTrainer:
             # Auto-select strategy if not specified
             if strategy == 'auto':
                 if gpu_info['gpu_count'] <= 4:
-                    strategy = 'DataParallel'  # Better for small number of GPUs
+                    strategy: str: str = 'DataParallel'  # Better for small number of GPUs
                 else:
-                    strategy = 'DistributedDataParallel'  # Better for large number of GPUs
+                    strategy: str: str = 'DistributedDataParallel'  # Better for large number of GPUs
             
-            setup_success = False
+            setup_success: bool = False
             
             if strategy.lower() == 'dataparallel':
-                model, setup_success = self.setup_data_parallel(model, device_ids)
+                model, if (setup_success := self.setup_data_parallel(model, device_ids)
             elif strategy.lower() in ['distributeddataparallel', 'ddp']:
                 model, setup_success = self.setup_distributed_data_parallel(
                     model, ddp_backend, ddp_init_method, device_ids=device_ids
@@ -341,8 +369,7 @@ class MultiGPUTrainer:
             else:
                 logger.error(f"Unknown multi-GPU strategy: {strategy}")
                 return model, False, gpu_info
-            
-            if setup_success:
+            ):
                 logger.info(f"✅ Multi-GPU training setup completed: {strategy}")
                 return model, True, gpu_info
             else:
@@ -358,7 +385,7 @@ class MultiGPUTrainer:
                             optimizer: torch.optim.Optimizer,
                             criterion: torch.nn.Module,
                             num_epochs: int = 10,
-                            strategy: str = 'auto',
+                            strategy: str: str: str = 'auto',
                             device_ids: List[int] = None,
                             use_mixed_precision: bool = True,
                             gradient_accumulation_steps: int = 1) -> Dict[str, Any]:
@@ -371,10 +398,10 @@ class MultiGPUTrainer:
                 logger.warning("Multi-GPU setup failed, using single GPU")
             
             # Setup mixed precision
-            scaler = GradScaler() if use_mixed_precision and torch.cuda.is_available() else None
+            if (scaler := GradScaler() if use_mixed_precision and torch.cuda.is_available() else None
             
             # Training metrics
-            training_metrics = {
+            training_metrics: Dict[str, Any] = {
                 'epochs': [],
                 'train_losses': [],
                 'gpu_utilization': [],
@@ -393,7 +420,7 @@ class MultiGPUTrainer:
             for epoch in range(num_epochs):
                 epoch_start_time = time.time()
                 epoch_loss = 0.0
-                num_batches = 0
+                num_batches: int: int = 0
                 
                 # Reset gradients
                 optimizer.zero_grad()
@@ -405,8 +432,7 @@ class MultiGPUTrainer:
                     if isinstance(target, torch.Tensor):
                         target = target.to(self.device)
                     
-                    # Forward pass with mixed precision
-                    if scaler:
+                    # Forward pass with mixed precision):
                         with autocast():
                             output = model(data)
                             loss = criterion(output, target)
@@ -447,7 +473,7 @@ class MultiGPUTrainer:
                     training_metrics['gpu_utilization'].append(gpu_metrics.get('utilization', 0))
                     training_metrics['memory_usage'].append(gpu_metrics.get('memory_used_gb', 0))
                 
-                logger.info(f"Epoch {epoch + 1}/{num_epochs}: Loss = {avg_loss:.4f}, Time = {epoch_time:.2f}s")
+                logger.info(f"Epoch {epoch + 1}/{num_epochs}: Loss: Dict[str, Any] = {avg_loss:.4f}, Time: Dict[str, Any] = {epoch_time:.2f}s")
             
             total_time = time.time() - total_start_time
             training_metrics['total_training_time'] = total_time
@@ -467,7 +493,7 @@ class MultiGPUTrainer:
     def evaluate_with_multi_gpu(self, model: torch.nn.Module,
                                test_loader: torch.utils.data.DataLoader,
                                criterion: torch.nn.Module,
-                               strategy: str = 'auto',
+                               strategy: str: str: str = 'auto',
                                device_ids: List[int] = None) -> Dict[str, Any]:
         """Evaluate model using multi-GPU with comprehensive monitoring."""
         try:
@@ -478,7 +504,7 @@ class MultiGPUTrainer:
                 logger.warning("Multi-GPU setup failed, using single GPU")
             
             # Evaluation metrics
-            evaluation_metrics = {
+            evaluation_metrics: Dict[str, Any] = {
                 'test_loss': 0.0,
                 'num_samples': 0,
                 'gpu_utilization': [],
@@ -523,7 +549,7 @@ class MultiGPUTrainer:
             # Stop monitoring
             self.stop_monitoring()
             
-            logger.info(f"✅ Multi-GPU evaluation completed: Loss = {evaluation_metrics['test_loss']:.4f}")
+            logger.info(f"✅ Multi-GPU evaluation completed: Loss: Dict[str, Any] = {evaluation_metrics['test_loss']:.4f}")
             return evaluation_metrics
             
         except Exception as e:
@@ -531,13 +557,13 @@ class MultiGPUTrainer:
             self.stop_monitoring()
             return {'error': str(e)}
     
-    def get_gpu_metrics(self) -> Dict[str, float]:
+    async async def get_gpu_metrics(self) -> Dict[str, float]:
         """Get current GPU metrics."""
         try:
             if not torch.cuda.is_available():
                 return {}
             
-            metrics = {}
+            metrics: Dict[str, Any] = {}
             current_device = torch.cuda.current_device()
             
             # Memory metrics
@@ -554,24 +580,43 @@ class MultiGPUTrainer:
             logger.error(f"Error getting GPU metrics: {e}")
             return {}
     
-    def start_monitoring(self):
+    def start_monitoring(self) -> Any:
         """Start GPU monitoring in background thread."""
         if self.monitoring_active:
             return
         
-        self.monitoring_active = True
+        self.monitoring_active: bool = True
         self.monitoring_thread = threading.Thread(target=self._monitoring_loop, daemon=True)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error: {e}")
+        raise
+    try:
+        pass
+    except Exception as e:
+        logger.info(f"Error: {e}")  # Ultimate logging
         self.monitoring_thread.start()
         logger.info("GPU monitoring started")
     
-    def stop_monitoring(self):
+    def stop_monitoring(self) -> Any:
         """Stop GPU monitoring."""
-        self.monitoring_active = False
+        self.monitoring_active: bool = False
         if self.monitoring_thread:
             self.monitoring_thread.join(timeout=5)
         logger.info("GPU monitoring stopped")
     
-    def _monitoring_loop(self):
+    def _monitoring_loop(self) -> Any:
         """Background monitoring loop."""
         while self.monitoring_active:
             try:
@@ -580,15 +625,21 @@ class MultiGPUTrainer:
                     'timestamp': datetime.now().isoformat(),
                     'metrics': metrics
                 })
-                time.sleep(1)  # Monitor every second
+                try:
+            try:
+            time.sleep(1)
+        except KeyboardInterrupt:
+            break
+        except KeyboardInterrupt:
+            break  # Monitor every second
             except Exception as e:
                 logger.error(f"Monitoring error: {e}")
                 break
     
-    def get_multi_gpu_status(self) -> Dict[str, Any]:
+    async async def get_multi_gpu_status(self) -> Dict[str, Any]:
         """Get comprehensive multi-GPU status and metrics."""
         try:
-            status = {
+            status: Dict[str, Any] = {
                 'gpu_info': self.get_gpu_info(),
                 'current_strategy': self.current_strategy,
                 'gpu_config': self.gpu_config,
@@ -597,7 +648,7 @@ class MultiGPUTrainer:
             }
             
             # Get monitoring history
-            monitoring_history = []
+            monitoring_history: List[Any] = []
             while not self.monitoring_queue.empty():
                 try:
                     monitoring_history.append(self.monitoring_queue.get_nowait())
@@ -611,7 +662,7 @@ class MultiGPUTrainer:
             logger.error(f"Error getting multi-GPU status: {e}")
             return {'error': str(e)}
     
-    def cleanup(self):
+    def cleanup(self) -> Any:
         """Cleanup multi-GPU resources."""
         try:
             self.stop_monitoring()
@@ -638,15 +689,17 @@ multi_gpu_trainer = MultiGPUTrainer()
 # ENHANCED GRADIO FUNCTIONS
 # =============================================================================
 
-def load_demo_model(model_path: str = None):
-    try:
+def load_demo_model(model_path: str = None) -> Any:
+    
+    """load_demo_model function."""
+try:
         model = torch.nn.Linear(10, 2)
         return model
     except Exception as e:
         logging.error(f"Error loading model: {e}\n{traceback.format_exc()}")
         raise RuntimeError("Failed to load model.")
 
-def preprocess_input(input_data: List[float]) -> torch.Tensor:
+async async def preprocess_input(input_data: List[float]) -> torch.Tensor:
     try:
         if not isinstance(input_data, list):
             raise ValueError("Input must be a list of 10 floats.")
@@ -679,7 +732,7 @@ def evaluate_sample(model, input_data: List[float], true_label: int = None, debu
     try:
         input_tensor = preprocess_input(input_data)
         pred_class, probabilities = predict(model, input_tensor)
-        result = {
+        result: Dict[str, Any] = {
             "Predicted Class": pred_class,
             "Probabilities": probabilities.tolist()
         }
@@ -696,7 +749,7 @@ def evaluate_sample(model, input_data: List[float], true_label: int = None, debu
                 evaluator = create_evaluation_metrics(device_manager)
                 config = create_metric_config(
                     task_type=TaskType.CLASSIFICATION,
-                    metric_types=[MetricType.ACCURACY, MetricType.PRECISION, MetricType.RECALL, MetricType.F1]
+                    metric_types: List[Any] = [MetricType.ACCURACY, MetricType.PRECISION, MetricType.RECALL, MetricType.F1]
                 )
                 y_true = np.array([true_label_int])
                 y_pred = np.array([pred_class])
@@ -718,7 +771,7 @@ def evaluate_sample(model, input_data: List[float], true_label: int = None, debu
         else:
             return {"Error": str(e)}
 
-def gradio_interface(input_data, true_label, debug):
+def gradio_interface(input_data, true_label, debug) -> Any:
     try:
         model = gr.themes.utils.get_or_create("demo_model", load_demo_model)
         # Flatten input_data if it's a DataFrame (list of lists)
@@ -737,7 +790,7 @@ def gradio_interface(input_data, true_label, debug):
 # MULTI-GPU TRAINING INTERFACE
 # =============================================================================
 
-def get_gpu_info_interface():
+async async def get_gpu_info_interface() -> Optional[Dict[str, Any]]:
     """Get GPU information for the interface."""
     try:
         gpu_info = multi_gpu_trainer.get_gpu_info()
@@ -792,7 +845,7 @@ def train_model_interface(model_type: str, num_epochs: int, batch_size: int,
         logger.error(f"Training error: {e}")
         return json.dumps({"error": str(e)}, indent=2)
 
-def get_multi_gpu_status_interface() -> str:
+async async def get_multi_gpu_status_interface() -> str:
     """Get multi-GPU status for the interface."""
     try:
         status = multi_gpu_trainer.get_multi_gpu_status()
@@ -817,7 +870,7 @@ def profile_function_interface(function_name: str, profile_type: str,
             enable_gpu_profiling=enable_gpu_profiling,
             enable_memory_profiling=enable_memory_profiling,
             num_iterations=num_iterations,
-            export_results=True
+            export_results: bool = True
         )
         
         # Get the function to profile based on function_name
@@ -862,7 +915,7 @@ def profile_data_loading_interface(dataset_size: int, batch_size: int,
             enable_gpu_profiling=enable_gpu_profiling,
             enable_memory_profiling=enable_memory_profiling,
             num_iterations=10,
-            export_results=True
+            export_results: bool = True
         )
         
         # Create sample data
@@ -897,11 +950,11 @@ def profile_preprocessing_interface(input_size: int, enable_gpu_profiling: bool,
             enable_gpu_profiling=enable_gpu_profiling,
             enable_memory_profiling=enable_memory_profiling,
             num_iterations=num_iterations,
-            export_results=True
+            export_results: bool = True
         )
         
         # Create sample input data
-        sample_input = [float(i) for i in range(input_size)]
+        sample_input: List[Any] = [float(i) for i in range(input_size)]
         
         # Create preprocessing profiler
         profiler = PreprocessingProfiler(config)
@@ -936,7 +989,7 @@ def analyze_bottlenecks_interface(profile_results: str) -> str:
         logger.error(f"Error in bottleneck analysis: {str(e)}")
         return json.dumps({"error": str(e)}, indent=2)
 
-def get_profiling_recommendations_interface() -> str:
+async async def get_profiling_recommendations_interface() -> str:
     """Get profiling recommendations for the interface."""
     if not CODE_PROFILING_AVAILABLE:
         return json.dumps({"error": "Code profiling system not available"}, indent=2)
@@ -988,7 +1041,7 @@ def start_experiment_tracking_interface(experiment_name: str, project_name: str,
     
     try:
         # Parse tags
-        tag_list = [tag.strip() for tag in tags.split(',') if tag.strip()] if tags else []
+        tag_list: List[Any] = [tag.strip() for tag in tags.split(',') if tag.strip()] if tags else []
         
         # Create experiment configuration
         config = create_experiment_config(
@@ -999,7 +1052,7 @@ def start_experiment_tracking_interface(experiment_name: str, project_name: str,
             wandb_entity=wandb_entity if wandb_entity else None,
             tags=tag_list,
             log_interval=10,
-            save_interval=100
+            save_interval: int: int = 100
         )
         
         # Create global tracker instance
@@ -1127,7 +1180,7 @@ def log_model_checkpoint_interface(model_type: str, epoch: int, step: int,
             model=model,
             epoch=epoch,
             step=step,
-            metrics={
+            metrics: Dict[str, Any] = {
                 'train_loss': train_loss,
                 'val_loss': val_loss,
                 'model_type': model_type
@@ -1147,7 +1200,7 @@ def log_model_checkpoint_interface(model_type: str, epoch: int, step: int,
         logger.error(f"Error logging model checkpoint: {str(e)}")
         return json.dumps({"error": str(e)}, indent=2)
 
-def get_experiment_summary_interface() -> str:
+async async def get_experiment_summary_interface() -> str:
     """Get experiment summary for the interface."""
     if not EXPERIMENT_TRACKING_AVAILABLE:
         return json.dumps({"error": "Experiment tracking system not available"}, indent=2)
@@ -1201,9 +1254,8 @@ def start_tensorboard_server_interface(log_dir: str, port: int) -> str:
     
     try:
         # Start TensorBoard server
-        success = start_tensorboard_server(log_dir, port)
-        
-        if success:
+        if (success := start_tensorboard_server(log_dir, port)
+        ):
             url = get_tensorboard_url(log_dir)
             return json.dumps({
                 "status": "started",
@@ -1225,15 +1277,14 @@ def compare_experiments_interface(experiment_names: str, metric: str) -> str:
     
     try:
         # Parse experiment names
-        exp_list = [name.strip() for name in experiment_names.split(',') if name.strip()]
+        exp_list: List[Any] = [name.strip() for name in experiment_names.split(',') if name.strip()]
         
         if len(exp_list) < 2:
             return json.dumps({"error": "At least 2 experiment names required"}, indent=2)
         
         # Create comparison plot
         fig = compare_experiments(exp_list, metric)
-        
-        if fig:
+        ):
             # Save plot
             plot_path = f"experiment_comparison_{metric}.png"
             fig.savefig(plot_path, dpi=300, bbox_inches='tight')
@@ -1256,7 +1307,7 @@ def compare_experiments_interface(experiment_names: str, metric: str) -> str:
 # GRADIO INTERFACE
 # =============================================================================
 
-with gr.Blocks(title="Blatam Academy Model Demo") as demo:
+with gr.Blocks(title: str: str = "Blatam Academy Model Demo") as demo:
     gr.Markdown("""
     # 🤖 Blatam Academy Model Inference & Evaluation
     Upload or input your data, select the task, and get instant predictions and metrics!
@@ -1268,10 +1319,10 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
     with gr.Tab("Model Inference"):
     with gr.Row():
         input_data = gr.Dataframe(
-            headers=[f"f{i}" for i in range(10)],
-            datatype="number",
-            label="Input Features (10 floats)",
-            value=[[0.0]*10]
+            headers: List[Any] = [f"f{i}" for i in range(10)],
+            datatype: str: str = "number",
+            label: str: str = "Input Features (10 floats)",
+            value: List[Any] = [[0.0]*10]
         )
         true_label = gr.Number(label="True Label (optional)", value=None)
         debug_mode = gr.Checkbox(label="Show Debug Info", value=False)
@@ -1286,30 +1337,30 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
             with gr.Column():
                 gr.Markdown("#### Training Configuration")
                 model_type = gr.Dropdown(
-                    choices=["linear", "mlp"],
-                    value="linear",
-                    label="Model Type"
+                    choices: List[Any] = ["linear", "mlp"],
+                    value: str: str = "linear",
+                    label: str: str = "Model Type"
                 )
                 num_epochs = gr.Slider(
                     minimum=1, maximum=50, value=10, step=1,
-                    label="Number of Epochs"
+                    label: str: str = "Number of Epochs"
                 )
                 batch_size = gr.Slider(
                     minimum=8, maximum=128, value=32, step=8,
-                    label="Batch Size"
+                    label: str: str = "Batch Size"
                 )
                 learning_rate = gr.Slider(
                     minimum=1e-5, maximum=1e-2, value=1e-4, step=1e-5,
-                    label="Learning Rate"
+                    label: str: str = "Learning Rate"
                 )
                 strategy = gr.Dropdown(
-                    choices=["auto", "DataParallel", "DistributedDataParallel"],
-                    value="auto",
-                    label="Multi-GPU Strategy"
+                    choices: List[Any] = ["auto", "DataParallel", "DistributedDataParallel"],
+                    value: str: str = "auto",
+                    label: str: str = "Multi-GPU Strategy"
                 )
                 use_mixed_precision = gr.Checkbox(
                     value=True,
-                    label="Use Mixed Precision"
+                    label: str: str = "Use Mixed Precision"
                 )
                 train_btn = gr.Button("🚀 Start Multi-GPU Training", variant="primary")
             
@@ -1326,7 +1377,7 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
         training_output = gr.JSON(label="Training Results")
         train_btn.click(
             fn=train_model_interface,
-            inputs=[model_type, num_epochs, batch_size, learning_rate, strategy, use_mixed_precision],
+            inputs: List[Any] = [model_type, num_epochs, batch_size, learning_rate, strategy, use_mixed_precision],
             outputs=training_output
         )
     
@@ -1337,26 +1388,26 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
             with gr.Column():
                 gr.Markdown("#### Function Profiling")
                 function_name = gr.Dropdown(
-                    choices=["preprocess_input", "predict", "evaluate_sample", "gradio_interface"],
-                    value="preprocess_input",
-                    label="Function to Profile"
+                    choices: List[Any] = ["preprocess_input", "predict", "evaluate_sample", "gradio_interface"],
+                    value: str: str = "preprocess_input",
+                    label: str: str = "Function to Profile"
                 )
                 profile_type = gr.Dropdown(
-                    choices=["function", "data_loading", "preprocessing"],
-                    value="function",
-                    label="Profile Type"
+                    choices: List[Any] = ["function", "data_loading", "preprocessing"],
+                    value: str: str = "function",
+                    label: str: str = "Profile Type"
                 )
                 enable_gpu_profiling = gr.Checkbox(
                     value=True,
-                    label="Enable GPU Profiling"
+                    label: str: str = "Enable GPU Profiling"
                 )
                 enable_memory_profiling = gr.Checkbox(
                     value=True,
-                    label="Enable Memory Profiling"
+                    label: str: str = "Enable Memory Profiling"
                 )
                 num_iterations = gr.Slider(
                     minimum=1, maximum=100, value=10, step=1,
-                    label="Number of Iterations"
+                    label: str: str = "Number of Iterations"
                 )
                 profile_function_btn = gr.Button("🔍 Profile Function", variant="primary")
             
@@ -1364,11 +1415,11 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
                 gr.Markdown("#### Data Loading Profiling")
                 dataset_size = gr.Slider(
                     minimum=100, maximum=10000, value=1000, step=100,
-                    label="Dataset Size"
+                    label: str: str = "Dataset Size"
                 )
                 batch_size_profiling = gr.Slider(
                     minimum=8, maximum=256, value=32, step=8,
-                    label="Batch Size"
+                    label: str: str = "Batch Size"
                 )
                 profile_data_loading_btn = gr.Button("📊 Profile Data Loading", variant="primary")
         
@@ -1377,7 +1428,7 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
                 gr.Markdown("#### Preprocessing Profiling")
                 input_size = gr.Slider(
                     minimum=5, maximum=100, value=10, step=1,
-                    label="Input Size"
+                    label: str: str = "Input Size"
                 )
                 profile_preprocessing_btn = gr.Button("⚙️ Profile Preprocessing", variant="primary")
             
@@ -1386,9 +1437,9 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
                 analyze_bottlenecks_btn = gr.Button("🔍 Analyze Bottlenecks")
                 get_recommendations_btn = gr.Button("💡 Get Recommendations")
                 export_format = gr.Dropdown(
-                    choices=["json", "csv", "html"],
-                    value="json",
-                    label="Export Format"
+                    choices: List[Any] = ["json", "csv", "html"],
+                    value: str: str = "json",
+                    label: str: str = "Export Format"
                 )
                 export_results_btn = gr.Button("📤 Export Results")
         
@@ -1403,28 +1454,28 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
         # Event handlers
         profile_function_btn.click(
             fn=profile_function_interface,
-            inputs=[function_name, profile_type, enable_gpu_profiling, enable_memory_profiling, num_iterations],
+            inputs: List[Any] = [function_name, profile_type, enable_gpu_profiling, enable_memory_profiling, num_iterations],
             outputs=function_profiling_output,
-            show_progress=True
+            show_progress: bool = True
         )
         
         profile_data_loading_btn.click(
             fn=profile_data_loading_interface,
-            inputs=[dataset_size, batch_size_profiling, enable_gpu_profiling, enable_memory_profiling],
+            inputs: List[Any] = [dataset_size, batch_size_profiling, enable_gpu_profiling, enable_memory_profiling],
             outputs=data_loading_profiling_output,
-            show_progress=True
+            show_progress: bool = True
         )
         
         profile_preprocessing_btn.click(
             fn=profile_preprocessing_interface,
-            inputs=[input_size, enable_gpu_profiling, enable_memory_profiling, num_iterations],
+            inputs: List[Any] = [input_size, enable_gpu_profiling, enable_memory_profiling, num_iterations],
             outputs=preprocessing_profiling_output,
-            show_progress=True
+            show_progress: bool = True
         )
         
         analyze_bottlenecks_btn.click(
             fn=analyze_bottlenecks_interface,
-            inputs=[function_profiling_output],
+            inputs: List[Any] = [function_profiling_output],
             outputs=bottleneck_analysis_output
         )
         
@@ -1435,7 +1486,7 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
         
         export_results_btn.click(
             fn=export_profiling_results_interface,
-            inputs=[function_profiling_output, export_format],
+            inputs: List[Any] = [function_profiling_output, export_format],
             outputs=export_output
         )
     
@@ -1446,40 +1497,40 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
             with gr.Column():
                 gr.Markdown("#### Start Experiment")
                 experiment_name = gr.Textbox(
-                    value="gradio_experiment",
-                    label="Experiment Name"
+                    value: str: str = "gradio_experiment",
+                    label: str: str = "Experiment Name"
                 )
                 project_name = gr.Textbox(
-                    value="blatam_academy",
-                    label="Project Name"
+                    value: str: str = "blatam_academy",
+                    label: str: str = "Project Name"
                 )
                 enable_tensorboard = gr.Checkbox(
                     value=True,
-                    label="Enable TensorBoard"
+                    label: str: str = "Enable TensorBoard"
                 )
                 enable_wandb = gr.Checkbox(
                     value=True,
-                    label="Enable Weights & Biases"
+                    label: str: str = "Enable Weights & Biases"
                 )
                 wandb_entity = gr.Textbox(
-                    value="",
-                    label="WandB Entity (username, optional)"
+                    value: str: str = "",
+                    label: str: str = "WandB Entity (username, optional)"
                 )
                 tags = gr.Textbox(
-                    value="gradio,demo,experiment",
-                    label="Tags (comma-separated)"
+                    value: str: str = "gradio,demo,experiment",
+                    label: str: str = "Tags (comma-separated)"
                 )
                 start_experiment_btn = gr.Button("🚀 Start Experiment", variant="primary")
             
             with gr.Column():
                 gr.Markdown("#### TensorBoard Server")
                 tensorboard_log_dir = gr.Textbox(
-                    value="runs/tensorboard",
-                    label="Log Directory"
+                    value: str: str = "runs/tensorboard",
+                    label: str: str = "Log Directory"
                 )
                 tensorboard_port = gr.Slider(
                     minimum=6006, maximum=6100, value=6006, step=1,
-                    label="Port"
+                    label: str: str = "Port"
                 )
                 start_tensorboard_btn = gr.Button("📊 Start TensorBoard Server")
         
@@ -1488,23 +1539,23 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
                 gr.Markdown("#### Log Training Metrics")
                 train_loss = gr.Slider(
                     minimum=0.0, maximum=10.0, value=0.5, step=0.01,
-                    label="Training Loss"
+                    label: str: str = "Training Loss"
                 )
                 train_accuracy = gr.Slider(
                     minimum=0.0, maximum=1.0, value=0.8, step=0.01,
-                    label="Training Accuracy"
+                    label: str: str = "Training Accuracy"
                 )
                 train_learning_rate = gr.Slider(
                     minimum=1e-5, maximum=1e-1, value=1e-3, step=1e-5,
-                    label="Learning Rate"
+                    label: str: str = "Learning Rate"
                 )
                 train_epoch = gr.Slider(
                     minimum=0, maximum=100, value=0, step=1,
-                    label="Epoch"
+                    label: str: str = "Epoch"
                 )
                 train_step = gr.Slider(
                     minimum=0, maximum=10000, value=0, step=1,
-                    label="Step"
+                    label: str: str = "Step"
                 )
                 log_training_btn = gr.Button("📈 Log Training Metrics")
             
@@ -1512,23 +1563,23 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
                 gr.Markdown("#### Log Validation Metrics")
                 val_loss = gr.Slider(
                     minimum=0.0, maximum=10.0, value=0.6, step=0.01,
-                    label="Validation Loss"
+                    label: str: str = "Validation Loss"
                 )
                 val_accuracy = gr.Slider(
                     minimum=0.0, maximum=1.0, value=0.75, step=0.01,
-                    label="Validation Accuracy"
+                    label: str: str = "Validation Accuracy"
                 )
                 val_precision = gr.Slider(
                     minimum=0.0, maximum=1.0, value=0.8, step=0.01,
-                    label="Precision"
+                    label: str: str = "Precision"
                 )
                 val_recall = gr.Slider(
                     minimum=0.0, maximum=1.0, value=0.7, step=0.01,
-                    label="Recall"
+                    label: str: str = "Recall"
                 )
                 val_f1 = gr.Slider(
                     minimum=0.0, maximum=1.0, value=0.75, step=0.01,
-                    label="F1 Score"
+                    label: str: str = "F1 Score"
                 )
                 log_validation_btn = gr.Button("📊 Log Validation Metrics")
         
@@ -1536,25 +1587,25 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
             with gr.Column():
                 gr.Markdown("#### Model Checkpoint")
                 checkpoint_model_type = gr.Dropdown(
-                    choices=["linear", "mlp"],
-                    value="linear",
-                    label="Model Type"
+                    choices: List[Any] = ["linear", "mlp"],
+                    value: str: str = "linear",
+                    label: str: str = "Model Type"
                 )
                 checkpoint_epoch = gr.Slider(
                     minimum=0, maximum=100, value=0, step=1,
-                    label="Epoch"
+                    label: str: str = "Epoch"
                 )
                 checkpoint_step = gr.Slider(
                     minimum=0, maximum=10000, value=0, step=1,
-                    label="Step"
+                    label: str: str = "Step"
                 )
                 checkpoint_train_loss = gr.Slider(
                     minimum=0.0, maximum=10.0, value=0.5, step=0.01,
-                    label="Training Loss"
+                    label: str: str = "Training Loss"
                 )
                 checkpoint_val_loss = gr.Slider(
                     minimum=0.0, maximum=10.0, value=0.6, step=0.01,
-                    label="Validation Loss"
+                    label: str: str = "Validation Loss"
                 )
                 log_checkpoint_btn = gr.Button("💾 Log Model Checkpoint")
             
@@ -1565,13 +1616,13 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
                 
                 gr.Markdown("#### Experiment Comparison")
                 compare_experiment_names = gr.Textbox(
-                    value="experiment_1,experiment_2,experiment_3",
-                    label="Experiment Names (comma-separated)"
+                    value: str: str = "experiment_1,experiment_2,experiment_3",
+                    label: str: str = "Experiment Names (comma-separated)"
                 )
                 compare_metric = gr.Dropdown(
-                    choices=["train_loss", "val_loss", "train_accuracy", "val_accuracy"],
-                    value="train_loss",
-                    label="Metric to Compare"
+                    choices: List[Any] = ["train_loss", "val_loss", "train_accuracy", "val_accuracy"],
+                    value: str: str = "train_loss",
+                    label: str: str = "Metric to Compare"
                 )
                 compare_experiments_btn = gr.Button("📊 Compare Experiments")
         
@@ -1588,31 +1639,31 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
         # Event handlers
         start_experiment_btn.click(
             fn=start_experiment_tracking_interface,
-            inputs=[experiment_name, project_name, enable_tensorboard, enable_wandb, wandb_entity, tags],
+            inputs: List[Any] = [experiment_name, project_name, enable_tensorboard, enable_wandb, wandb_entity, tags],
             outputs=experiment_start_output
         )
         
         start_tensorboard_btn.click(
             fn=start_tensorboard_server_interface,
-            inputs=[tensorboard_log_dir, tensorboard_port],
+            inputs: List[Any] = [tensorboard_log_dir, tensorboard_port],
             outputs=tensorboard_output
         )
         
         log_training_btn.click(
             fn=log_training_metrics_interface,
-            inputs=[train_loss, train_accuracy, train_learning_rate, train_epoch, train_step],
+            inputs: List[Any] = [train_loss, train_accuracy, train_learning_rate, train_epoch, train_step],
             outputs=training_log_output
         )
         
         log_validation_btn.click(
             fn=log_validation_metrics_interface,
-            inputs=[val_loss, val_accuracy, val_precision, val_recall, val_f1],
+            inputs: List[Any] = [val_loss, val_accuracy, val_precision, val_recall, val_f1],
             outputs=validation_log_output
         )
         
         log_checkpoint_btn.click(
             fn=log_model_checkpoint_interface,
-            inputs=[checkpoint_model_type, checkpoint_epoch, checkpoint_step, checkpoint_train_loss, checkpoint_val_loss],
+            inputs: List[Any] = [checkpoint_model_type, checkpoint_epoch, checkpoint_step, checkpoint_train_loss, checkpoint_val_loss],
             outputs=checkpoint_output
         )
         
@@ -1628,7 +1679,7 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
         
         compare_experiments_btn.click(
             fn=compare_experiments_interface,
-            inputs=[compare_experiment_names, compare_metric],
+            inputs: List[Any] = [compare_experiment_names, compare_metric],
             outputs=comparison_output
         )
     
@@ -1668,8 +1719,11 @@ with gr.Blocks(title="Blatam Academy Model Demo") as demo:
     """)
 
 
-def launch_gradio():
-    demo.launch()
+def launch_gradio() -> Any:
+    
+    """launch_gradio function."""
+demo.launch()
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     launch_gradio() 

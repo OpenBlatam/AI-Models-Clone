@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import csv
 import json
 import uuid
@@ -30,34 +32,38 @@ from onyx.tools.models import DynamicSchemaInfo
 from onyx.tools.models import MESSAGE_ID_PLACEHOLDER
 from onyx.tools.models import ToolResponse
 from onyx.tools.tool_implementations.custom.custom_tool_prompts import (
-    SHOULD_USE_CUSTOM_TOOL_SYSTEM_PROMPT,
-)
 from onyx.tools.tool_implementations.custom.custom_tool_prompts import (
-    SHOULD_USE_CUSTOM_TOOL_USER_PROMPT,
-)
 from onyx.tools.tool_implementations.custom.custom_tool_prompts import (
-    TOOL_ARG_SYSTEM_PROMPT,
-)
 from onyx.tools.tool_implementations.custom.custom_tool_prompts import (
-    TOOL_ARG_USER_PROMPT,
-)
 from onyx.tools.tool_implementations.custom.custom_tool_prompts import USE_TOOL
 from onyx.tools.tool_implementations.custom.openapi_parsing import MethodSpec
 from onyx.tools.tool_implementations.custom.openapi_parsing import (
-    openapi_to_method_specs,
-)
 from onyx.tools.tool_implementations.custom.openapi_parsing import openapi_to_url
 from onyx.tools.tool_implementations.custom.openapi_parsing import REQUEST_BODY
 from onyx.tools.tool_implementations.custom.openapi_parsing import (
-    validate_openapi_schema,
-)
 from onyx.tools.tool_implementations.custom.prompt import (
-    build_custom_image_generation_user_prompt,
-)
 from onyx.utils.headers import header_list_to_header_dict
 from onyx.utils.headers import HeaderItemDict
 from onyx.utils.logger import setup_logger
 from onyx.utils.special_types import JSON_ro
+    import openai
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    SHOULD_USE_CUSTOM_TOOL_SYSTEM_PROMPT,
+)
+    SHOULD_USE_CUSTOM_TOOL_USER_PROMPT,
+)
+    TOOL_ARG_SYSTEM_PROMPT,
+)
+    TOOL_ARG_USER_PROMPT,
+)
+    openapi_to_method_specs,
+)
+    validate_openapi_schema,
+)
+    build_custom_image_generation_user_prompt,
+)
 
 logger = setup_logger()
 
@@ -137,7 +143,7 @@ class CustomTool(BaseTool):
         # For JSON or other responses, return as-is
         return json.dumps(response.tool_result)
 
-    """For LLMs which do NOT support explicit tool calling"""
+    """For LLMs which do NOT support explicit tool calling"""f"
 
     def get_args_for_non_tool_calling_llm(
         self,
@@ -167,12 +173,7 @@ class CustomTool(BaseTool):
             [
                 SystemMessage(content=TOOL_ARG_SYSTEM_PROMPT),
                 HumanMessage(
-                    content=TOOL_ARG_USER_PROMPT.format(
-                        history=history,
-                        query=query,
-                        tool_name=self.name,
-                        tool_description=self.description,
-                        tool_args=self.tool_definition()["function"]["parameters"],
+                    content=TOOL_ARG_USER_PROMPT"["function"]["parameters"],
                     )
                 ),
             ]
@@ -339,6 +340,10 @@ class CustomTool(BaseTool):
                             file_id=file_id,
                             filename=file_id,
                             content=file_io.read(),
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                             file_type=file_type,
                         )
                     )
@@ -363,7 +368,7 @@ class CustomTool(BaseTool):
         return response.tool_result
 
 
-def build_custom_tools_from_openapi_schema_and_headers(
+async def build_custom_tools_from_openapi_schema_and_headers(
     openapi_schema: dict[str, Any],
     custom_headers: list[HeaderItemDict] | None = None,
     dynamic_schema_info: DynamicSchemaInfo | None = None,
@@ -397,7 +402,6 @@ def build_custom_tools_from_openapi_schema_and_headers(
 
 
 if __name__ == "__main__":
-    import openai
 
     openapi_schema = {
         "openapi": "3.0.0",

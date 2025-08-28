@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from uuid import UUID
 
 from fastapi import HTTPException
@@ -15,6 +17,9 @@ from onyx.server.features.input_prompt.models import InputPromptSnapshot
 from onyx.server.manage.models import UserInfo
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -156,7 +161,7 @@ def remove_input_prompt(
     db_session.commit()
 
 
-def fetch_input_prompt_by_id(
+async def fetch_input_prompt_by_id(
     id: int, user_id: UUID | None, db_session: Session
 ) -> InputPrompt:
     query = select(InputPrompt).where(InputPrompt.id == id)
@@ -177,14 +182,14 @@ def fetch_input_prompt_by_id(
     return result
 
 
-def fetch_public_input_prompts(
+async def fetch_public_input_prompts(
     db_session: Session,
 ) -> list[InputPrompt]:
     query = select(InputPrompt).where(InputPrompt.is_public)
     return list(db_session.scalars(query).all())
 
 
-def fetch_input_prompts_by_user(
+async def fetch_input_prompts_by_user(
     db_session: Session,
     user_id: UUID | None,
     active: bool | None = None,

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import re
 from datetime import datetime
 from enum import Enum
@@ -28,6 +30,9 @@ from onyx.server.models import FullUserSnapshot
 from onyx.server.models import InvitedUserSnapshot
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 if TYPE_CHECKING:
     pass
 
@@ -377,7 +382,7 @@ class StandardAnswerCreationRequest(BaseModel):
         return value
 
     @model_validator(mode="after")
-    def validate_only_match_any_if_not_regex(self) -> Any:
+    def validate_only_match_any_if_not_regex(self) -> bool:
         if self.match_regex and self.match_any_keywords:
             raise ValueError(
                 "Can only match any keywords in keyword mode, not regex mode"
@@ -386,7 +391,7 @@ class StandardAnswerCreationRequest(BaseModel):
         return self
 
     @model_validator(mode="after")
-    def validate_keyword_if_regex(self) -> Any:
+    def validate_keyword_if_regex(self) -> bool:
         if not self.match_regex:
             # no validation for keywords
             return self

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import gradio as gr
 import numpy as np
 import torch
@@ -6,16 +8,19 @@ from sklearn.metrics import confusion_matrix, roc_curve, auc, precision_recall_c
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 # Example: Simple model for demonstration (replace with your real model)
 class SimpleCyberModel(nn.Module):
-    def __init__(self, input_dim=10, num_classes=2):
+    def __init__(self, input_dim=10, num_classes=2) -> Any:
         super().__init__()
         self.net = nn.Sequential(
             nn.Linear(input_dim, 32),
             nn.ReLU(),
             nn.Linear(32, num_classes)
         )
-    def forward(self, x):
+    def forward(self, x) -> Any:
         return self.net(x)
 
 # Instantiate and load model (replace with your trained model)
@@ -24,7 +29,7 @@ num_classes = 2
 model = SimpleCyberModel(input_dim=input_dim, num_classes=num_classes)
 model.eval()
 
-def sanitize_metric(value):
+def sanitize_metric(value) -> Any:
     if isinstance(value, np.ndarray):
         value = value.astype(float)
         value[~np.isfinite(value)] = 0.0
@@ -33,7 +38,7 @@ def sanitize_metric(value):
         return 0.0
     return value
 
-def predict(features):
+def predict(features) -> Any:
     # features: list of floats
     x = torch.tensor(features, dtype=torch.float32).unsqueeze(0)
     with torch.no_grad():
@@ -43,7 +48,7 @@ def predict(features):
     probs = sanitize_metric(probs)
     return {f"Class {i}": float(p) for i, p in enumerate(probs)}, pred
 
-def batch_predict(batch):
+def batch_predict(batch) -> Any:
     # batch: list of lists
     x = torch.tensor(batch, dtype=torch.float32)
     with torch.no_grad():
@@ -53,7 +58,7 @@ def batch_predict(batch):
     probs = sanitize_metric(probs)
     return preds, probs
 
-def plot_confusion_matrix(y_true, y_pred):
+def plot_confusion_matrix(y_true, y_pred) -> Any:
     cm = confusion_matrix(y_true, y_pred)
     fig, ax = plt.subplots(figsize=(4, 4))
     sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", ax=ax)
@@ -63,7 +68,7 @@ def plot_confusion_matrix(y_true, y_pred):
     plt.tight_layout()
     return fig
 
-def plot_roc_curve(y_true, y_score):
+def plot_roc_curve(y_true, y_score) -> Any:
     if y_score.shape[1] == 2:
         fpr, tpr, _ = roc_curve(y_true, y_score[:, 1])
         roc_auc = auc(fpr, tpr)
@@ -78,7 +83,7 @@ def plot_roc_curve(y_true, y_score):
         return fig
     return None
 
-def plot_pr_curve(y_true, y_score):
+def plot_pr_curve(y_true, y_score) -> Any:
     if y_score.shape[1] == 2:
         precision, recall, _ = precision_recall_curve(y_true, y_score[:, 1])
         fig, ax = plt.subplots()
@@ -91,7 +96,7 @@ def plot_pr_curve(y_true, y_score):
         return fig
     return None
 
-def batch_metrics(batch, labels):
+def batch_metrics(batch, labels) -> Any:
     preds, probs = batch_predict(batch)
     y_true = np.array(labels)
     y_pred = preds
@@ -142,5 +147,6 @@ demo = gr.TabbedInterface(
     tab_names=["Single Inference", "Batch Metrics"]
 )
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     demo.launch() 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from datetime import timezone
 from uuid import UUID
@@ -20,6 +22,9 @@ from onyx.db.tasks import register_task
 from onyx.server.settings.store import load_settings
 from onyx.utils.logger import setup_logger
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 # mark as EE for all tasks in this file
@@ -36,6 +41,11 @@ def perform_ttl_management_task(
     self: Task, retention_limit_days: int, *, tenant_id: str
 ) -> None:
     task_id = self.request.id
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     if not task_id:
         raise RuntimeError("No task id defined for this task; cannot identify it")
 

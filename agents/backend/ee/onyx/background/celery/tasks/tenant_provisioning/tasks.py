@@ -1,15 +1,14 @@
-"""
-Periodic tasks for tenant pre-provisioning.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 import asyncio
 import datetime
 import uuid
-
 from celery import shared_task
 from celery import Task
 from redis.lock import Lock as RedisLock
-
 from ee.onyx.server.tenants.provisioning import setup_tenant
 from ee.onyx.server.tenants.schema_management import create_schema_if_not_exists
 from ee.onyx.server.tenants.schema_management import get_current_alembic_version
@@ -24,6 +23,15 @@ from onyx.db.models import AvailableTenant
 from onyx.redis.redis_pool import get_redis_client
 from shared_configs.configs import MULTI_TENANT
 from shared_configs.configs import TENANT_ID_PREFIX
+                from ee.onyx.server.tenants.provisioning import (
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Periodic tasks for tenant pre-provisioning.
+"""
+
+
+
 
 # Default number of pre-provisioned tenants to maintain
 DEFAULT_TARGET_AVAILABLE_TENANTS = 5
@@ -177,7 +185,6 @@ def pre_provision_tenant() -> None:
                 f"Rolling back failed tenant provisioning for: {tenant_id}"
             )
             try:
-                from ee.onyx.server.tenants.provisioning import (
                     rollback_tenant_provisioning,
                 )
 

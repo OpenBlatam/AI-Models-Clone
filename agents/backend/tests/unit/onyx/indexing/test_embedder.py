@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Generator
 from unittest.mock import Mock
 from unittest.mock import patch
@@ -15,6 +17,9 @@ from shared_configs.enums import EmbeddingProvider
 from shared_configs.enums import EmbedTextType
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def mock_embedding_model() -> Generator[Mock, None, None]:
     with patch("onyx.indexing.embedder.EmbeddingModel") as mock:

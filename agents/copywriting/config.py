@@ -1,6 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from dataclasses import dataclass
+
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from typing import Dict, Any
 from pydantic import BaseModel
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class CopywritingConfig(BaseModel):
     """Configuration for the copywriting service."""
     
@@ -29,5 +42,6 @@ class CopywritingConfig(BaseModel):
     include_platform_tips: bool = True
     include_character_count: bool = True
     
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True

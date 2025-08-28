@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from uuid import UUID
 
 from fastapi import APIRouter
@@ -12,8 +14,6 @@ from onyx.configs.constants import MessageType
 from onyx.context.search.models import IndexFilters
 from onyx.context.search.models import SearchDoc
 from onyx.context.search.preprocessing.access_filters import (
-    build_access_filters_for_user,
-)
 from onyx.context.search.utils import chunks_or_sections_to_search_docs
 from onyx.db.chat import get_chat_messages_by_session
 from onyx.db.chat import get_chat_session_by_id
@@ -37,6 +37,11 @@ from onyx.server.query_and_chat.models import SourceTag
 from onyx.server.query_and_chat.models import TagResponse
 from onyx.utils.logger import setup_logger
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    build_access_filters_for_user,
+)
 
 logger = setup_logger()
 

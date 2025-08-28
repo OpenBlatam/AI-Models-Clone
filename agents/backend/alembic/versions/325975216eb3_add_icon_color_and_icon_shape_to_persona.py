@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import random
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.sql import table, column, select
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add icon_color and icon_shape to Persona
 
 Revision ID: 325975216eb3
@@ -6,19 +15,15 @@ Create Date: 2024-07-24 21:29:31.784562
 
 """
 
-import random
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.sql import table, column, select
 
 # revision identifiers, used by Alembic.
-revision = "325975216eb3"
-down_revision = "91ffac7e65b3"
+revision: str = "325975216eb3"
+down_revision: str = "91ffac7e65b3"
 branch_labels: None = None
 depends_on: None = None
 
 
-colorOptions = [
+colorOptions: List[Any] = [
     "#FF6FBF",
     "#6FB1FF",
     "#B76FFF",
@@ -31,9 +36,9 @@ colorOptions = [
 
 # Function to generate a random shape ensuring at least 3 of the middle 4 squares are filled
 def generate_random_shape() -> int:
-    center_squares = [12, 10, 6, 14, 13, 11, 7, 15]
+    center_squares: List[Any] = [12, 10, 6, 14, 13, 11, 7, 15]
     center_fill = random.choice(center_squares)
-    remaining_squares = [i for i in range(16) if not (center_fill & (1 << i))]
+    remaining_squares: List[Any] = [i for i in range(16) if not (center_fill & (1 << i))]
     random.shuffle(remaining_squares)
     for i in range(10 - bin(center_fill).count("1")):
         center_fill |= 1 << remaining_squares[i]

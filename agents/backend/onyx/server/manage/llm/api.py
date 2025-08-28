@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Callable
 from datetime import datetime
 from datetime import timezone
@@ -38,6 +40,9 @@ from onyx.server.manage.llm.models import VisionProviderResponse
 from onyx.utils.logger import setup_logger
 from onyx.utils.threadpool_concurrency import run_functions_tuples_in_parallel
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 admin_router = APIRouter(prefix="/admin/llm")

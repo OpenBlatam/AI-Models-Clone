@@ -1,7 +1,10 @@
-"""
-Schema Integration - FastAPI and Onyx Integration
-Integration system for Pydantic schemas with FastAPI, Onyx, and comprehensive API patterns.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
 
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union, Generic, Callable
@@ -9,19 +12,30 @@ from datetime import datetime
 import asyncio
 from functools import wraps
 import time
-
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError, BaseModel
 import structlog
-
 from .pydantic_schemas import (
-    BaseInputModel, BaseOutputModel, PaginatedOutputModel, 
-    schema_registry, SchemaFactory, validate_input, validate_output
-)
 from .schema_validators import validation_registry, ValidationResult
 from .http_response_models import SuccessResponse, ErrorResponse, ListResponse
 from .http_exception_system import HTTPExceptionFactory, OnyxHTTPException
+    from .pydantic_schemas import UserCreateInput, UserOutput, UserListOutput
+    from .pydantic_schemas import BlogPostCreateInput, BlogPostOutput
+from fastapi import FastAPI
+from .schema_integration import setup_schema_integration
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Schema Integration - FastAPI and Onyx Integration
+Integration system for Pydantic schemas with FastAPI, Onyx, and comprehensive API patterns.
+"""
+
+
+
+    BaseInputModel, BaseOutputModel, PaginatedOutputModel, 
+    schema_registry, SchemaFactory, validate_input, validate_output
+)
 
 logger = structlog.get_logger(__name__)
 
@@ -34,7 +48,7 @@ class SchemaIntegrationManager:
     Manager for integrating Pydantic schemas with FastAPI and Onyx.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self._routers: Dict[str, APIRouter] = {}
         self._middleware: List[Callable] = []
         self._dependencies: Dict[str, Callable] = {}
@@ -76,7 +90,9 @@ class FastAPISchemaDecorator:
                  validate_output: bool = True,
                  enable_caching: bool = False,
                  cache_ttl: int = 300):
-        self.input_model = input_model
+        
+    """__init__ function."""
+self.input_model = input_model
         self.output_model = output_model
         self.validate_input = validate_input
         self.validate_output = validate_output
@@ -85,7 +101,7 @@ class FastAPISchemaDecorator:
     
     def __call__(self, func: Callable) -> Callable:
         @wraps(func)
-        async def wrapper(*args, **kwargs):
+        async def wrapper(*args, **kwargs) -> Any:
             start_time = time.perf_counter()
             
             try:
@@ -156,7 +172,7 @@ class FastAPISchemaDecorator:
         
         return input_instance.model_dump()
     
-    async def _validate_output(self, result: Any) -> Any:
+    async def _validate_output(self, result: Any) -> bool:
         """Validate output data."""
         if isinstance(result, dict):
             # Convert dict to output model
@@ -262,10 +278,10 @@ class SchemaMiddleware:
     Middleware for schema validation and monitoring.
     """
     
-    def __init__(self, app):
+    def __init__(self, app) -> Any:
         self.app = app
     
-    async def __call__(self, scope, receive, send):
+    async def __call__(self, scope, receive, send) -> Any:
         if scope["type"] == "http":
             # Add schema validation to request
             request = Request(scope, receive)
@@ -388,7 +404,6 @@ class SchemaDependencyInjection:
 def create_user_router() -> APIRouter:
     """Create a user router with schema integration."""
     
-    from .pydantic_schemas import UserCreateInput, UserOutput, UserListOutput
     
     router = APIRouter(prefix="/users", tags=["users"])
     
@@ -506,7 +521,6 @@ def create_user_router() -> APIRouter:
 def create_blog_router() -> APIRouter:
     """Create a blog post router with schema integration."""
     
-    from .pydantic_schemas import BlogPostCreateInput, BlogPostOutput
     
     router = APIRouter(prefix="/blog", tags=["blog"])
     
@@ -552,7 +566,7 @@ def create_blog_router() -> APIRouter:
     return router
 
 # Integration setup function
-def setup_schema_integration(app):
+def setup_schema_integration(app) -> Any:
     """Setup schema integration with FastAPI app."""
     
     # Register routers
@@ -579,8 +593,6 @@ def setup_schema_integration(app):
 
 # Example usage in FastAPI app
 """
-from fastapi import FastAPI
-from .schema_integration import setup_schema_integration
 
 app = FastAPI(title="Schema Integration Example")
 
@@ -589,5 +601,7 @@ setup_schema_integration(app)
 
 @app.get("/health")
 async def health_check():
-    return {"status": "healthy", "timestamp": datetime.utcnow()}
+    
+    """health_check function."""
+return {"status": "healthy", "timestamp": datetime.utcnow()}
 """ 

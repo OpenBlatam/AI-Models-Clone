@@ -1,10 +1,10 @@
-"""
-Gradio Web Interface for Email Sequence System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-A comprehensive web interface for the email sequence AI system with
-all features including sequence generation, evaluation, training,
-and gradient management.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 import gradio as gr
 import asyncio
@@ -18,23 +18,32 @@ import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime
-
-# Add the parent directory to the path to import modules
 import sys
-sys.path.append(str(Path(__file__).parent))
-
 from core.sequence_generator import EmailSequenceGenerator, GeneratorConfig
 from core.evaluation_metrics import EmailSequenceEvaluator, MetricsConfig
 from core.training_optimization import (
+from core.gradient_management import GradientManager, GradientConfig
+from models.sequence import EmailSequence, SequenceStep
+from models.subscriber import Subscriber
+from models.template import EmailTemplate
+from typing import Any, List, Dict, Optional
+"""
+Gradio Web Interface for Email Sequence System
+
+A comprehensive web interface for the email sequence AI system with
+all features including sequence generation, evaluation, training,
+and gradient management.
+"""
+
+
+# Add the parent directory to the path to import modules
+sys.path.append(str(Path(__file__).parent))
+
     TrainingOptimizer,
     EarlyStoppingConfig,
     LRSchedulerConfig,
     GradientManagementConfig
 )
-from core.gradient_management import GradientManager, GradientConfig
-from models.sequence import EmailSequence, SequenceStep
-from models.subscriber import Subscriber
-from models.template import EmailTemplate
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -50,7 +59,7 @@ training_history = []
 class GradioEmailSequenceApp:
     """Gradio application for email sequence system"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.sequence_generator = None
         self.evaluator = None
         self.training_optimizer = None
@@ -114,7 +123,7 @@ class GradioEmailSequenceApp:
             )
         ]
     
-    def generate_sequence_interface(self):
+    def generate_sequence_interface(self) -> Any:
         """Create the sequence generation interface"""
         
         with gr.Tab("Sequence Generation"):
@@ -260,7 +269,7 @@ class GradioEmailSequenceApp:
         
         return preview
     
-    def evaluation_interface(self):
+    def evaluation_interface(self) -> Any:
         """Create the evaluation interface"""
         
         with gr.Tab("Sequence Evaluation"):
@@ -447,7 +456,7 @@ class GradioEmailSequenceApp:
         
         return fig
     
-    def training_interface(self):
+    def training_interface(self) -> Any:
         """Create the training interface"""
         
         with gr.Tab("Model Training"):
@@ -685,7 +694,7 @@ class GradioEmailSequenceApp:
         
         return fig
     
-    def gradient_management_interface(self):
+    def gradient_management_interface(self) -> Any:
         """Create the gradient management interface"""
         
         with gr.Tab("Gradient Management"):
@@ -993,5 +1002,6 @@ def main():
     )
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

@@ -1,6 +1,10 @@
-"""
-Integration tests for workflow modules.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import pytest
 import asyncio
@@ -8,25 +12,31 @@ import tempfile
 import json
 from pathlib import Path
 from unittest.mock import Mock, AsyncMock, patch
-
 from ...workflows.video_workflow import (
+from ...workflows.workflow_manager import (
+from ...core.models import VideoRequest, VideoResponse, VideoQuality, VideoFormat, WorkflowStep
+from typing import Any, List, Dict, Optional
+import logging
+"""
+Integration tests for workflow modules.
+"""
+
+
     OnyxVideoWorkflow, VideoWorkflowConfig, VideoWorkflowStep,
     create_video_workflow, execute_workflow_step, validate_workflow,
     get_workflow_status, create_workflow_report
 )
-from ...workflows.workflow_manager import (
     WorkflowManager, WorkflowDefinition, WorkflowExecution,
     register_workflow, execute_workflow, get_workflow_info,
     list_workflows, delete_workflow, update_workflow
 )
-from ...core.models import VideoRequest, VideoResponse, VideoQuality, VideoFormat, WorkflowStep
 
 
 class TestOnyxVideoWorkflow:
     """Test OnyxVideoWorkflow class."""
     
     @pytest.mark.integration
-    async def test_workflow_initialization(self, temp_dir):
+    async def test_workflow_initialization(self, temp_dir) -> Any:
         """Test workflow initialization."""
         config = VideoWorkflowConfig(
             max_steps=10,
@@ -47,7 +57,7 @@ class TestOnyxVideoWorkflow:
         assert workflow.cache is not None
     
     @pytest.mark.integration
-    async def test_basic_video_generation(self, temp_dir, sample_video_request):
+    async def test_basic_video_generation(self, temp_dir, sample_video_request) -> Any:
         """Test basic video generation workflow."""
         config = VideoWorkflowConfig()
         workflow = OnyxVideoWorkflow(config)
@@ -75,7 +85,7 @@ class TestOnyxVideoWorkflow:
                 assert response.fps == 30.0
     
     @pytest.mark.integration
-    async def test_video_generation_with_vision(self, temp_dir, sample_video_request):
+    async def test_video_generation_with_vision(self, temp_dir, sample_video_request) -> Any:
         """Test video generation with vision capabilities."""
         config = VideoWorkflowConfig()
         workflow = OnyxVideoWorkflow(config)
@@ -104,7 +114,7 @@ class TestOnyxVideoWorkflow:
                     assert response.metadata["vision_used"] is True
     
     @pytest.mark.integration
-    async def test_workflow_steps_execution(self, temp_dir, sample_video_request):
+    async def test_workflow_steps_execution(self, temp_dir, sample_video_request) -> Any:
         """Test individual workflow steps execution."""
         config = VideoWorkflowConfig()
         workflow = OnyxVideoWorkflow(config)
@@ -133,7 +143,7 @@ class TestOnyxVideoWorkflow:
             assert "output_path" in result["output"]
     
     @pytest.mark.integration
-    async def test_workflow_error_handling(self, sample_video_request):
+    async def test_workflow_error_handling(self, sample_video_request) -> Any:
         """Test workflow error handling."""
         config = VideoWorkflowConfig()
         workflow = OnyxVideoWorkflow(config)
@@ -145,7 +155,7 @@ class TestOnyxVideoWorkflow:
                 await workflow.generate_video(sample_video_request)
     
     @pytest.mark.integration
-    async def test_workflow_retry_mechanism(self, sample_video_request):
+    async def test_workflow_retry_mechanism(self, sample_video_request) -> Any:
         """Test workflow retry mechanism."""
         config = VideoWorkflowConfig(retry_attempts=3)
         workflow = OnyxVideoWorkflow(config)
@@ -154,7 +164,9 @@ class TestOnyxVideoWorkflow:
         # Mock step that fails twice then succeeds
         call_count = 0
         async def failing_then_succeeding():
-            nonlocal call_count
+            
+    """failing_then_succeeding function."""
+nonlocal call_count
             call_count += 1
             if call_count < 3:
                 raise Exception("Temporary failure")
@@ -173,7 +185,7 @@ class TestOnyxVideoWorkflow:
                 assert call_count == 3  # Should have retried twice
     
     @pytest.mark.integration
-    async def test_workflow_timeout_handling(self, sample_video_request):
+    async def test_workflow_timeout_handling(self, sample_video_request) -> Any:
         """Test workflow timeout handling."""
         config = VideoWorkflowConfig(timeout=1)  # 1 second timeout
         workflow = OnyxVideoWorkflow(config)
@@ -181,7 +193,9 @@ class TestOnyxVideoWorkflow:
         
         # Mock step that takes too long
         async def slow_operation():
-            await asyncio.sleep(2)  # Takes 2 seconds
+            
+    """slow_operation function."""
+await asyncio.sleep(2)  # Takes 2 seconds
             return "Too late"
         
         with patch.object(workflow, '_generate_script', new_callable=AsyncMock, side_effect=slow_operation):
@@ -189,7 +203,7 @@ class TestOnyxVideoWorkflow:
                 await workflow.generate_video(sample_video_request)
     
     @pytest.mark.integration
-    async def test_workflow_caching(self, sample_video_request):
+    async def test_workflow_caching(self, sample_video_request) -> Any:
         """Test workflow caching functionality."""
         config = VideoWorkflowConfig(cache_enabled=True, cache_size=10)
         workflow = OnyxVideoWorkflow(config)
@@ -215,7 +229,7 @@ class TestOnyxVideoWorkflow:
                 assert len(workflow.cache) > 0
     
     @pytest.mark.integration
-    async def test_workflow_parallel_processing(self, temp_dir):
+    async def test_workflow_parallel_processing(self, temp_dir) -> Any:
         """Test parallel processing in workflow."""
         config = VideoWorkflowConfig(enable_parallel_processing=True)
         workflow = OnyxVideoWorkflow(config)
@@ -250,7 +264,7 @@ class TestOnyxVideoWorkflow:
                     assert response.status == "completed"
     
     @pytest.mark.integration
-    async def test_workflow_status_tracking(self, sample_video_request):
+    async def test_workflow_status_tracking(self, sample_video_request) -> Any:
         """Test workflow status tracking."""
         config = VideoWorkflowConfig()
         workflow = OnyxVideoWorkflow(config)
@@ -272,7 +286,7 @@ class TestOnyxVideoWorkflow:
                 assert workflow.execution_history[0]["status"] == "completed"
     
     @pytest.mark.integration
-    async def test_workflow_shutdown(self):
+    async def test_workflow_shutdown(self) -> Any:
         """Test workflow shutdown."""
         config = VideoWorkflowConfig()
         workflow = OnyxVideoWorkflow(config)
@@ -288,7 +302,7 @@ class TestWorkflowManager:
     """Test WorkflowManager class."""
     
     @pytest.mark.integration
-    async def test_workflow_manager_initialization(self):
+    async def test_workflow_manager_initialization(self) -> Any:
         """Test workflow manager initialization."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -298,7 +312,7 @@ class TestWorkflowManager:
         assert manager.executions is not None
     
     @pytest.mark.integration
-    async def test_register_workflow(self):
+    async def test_register_workflow(self) -> Any:
         """Test workflow registration."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -320,7 +334,7 @@ class TestWorkflowManager:
         assert manager.workflows["test_workflow"] == workflow_def
     
     @pytest.mark.integration
-    async def test_execute_workflow(self, sample_video_request):
+    async def test_execute_workflow(self, sample_video_request) -> Any:
         """Test workflow execution."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -340,7 +354,7 @@ class TestWorkflowManager:
         await manager.register_workflow(workflow_def)
         
         # Mock step execution
-        async def mock_step_execution(step_name, context):
+        async def mock_step_execution(step_name, context) -> Any:
             return {"status": "completed", "output": f"Step {step_name} completed"}
         
         with patch.object(manager, '_execute_workflow_step', new_callable=AsyncMock, side_effect=mock_step_execution):
@@ -351,7 +365,7 @@ class TestWorkflowManager:
             assert len(execution.step_results) == 2
     
     @pytest.mark.integration
-    async def test_get_workflow_info(self):
+    async def test_get_workflow_info(self) -> Optional[Dict[str, Any]]:
         """Test getting workflow information."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -378,7 +392,7 @@ class TestWorkflowManager:
         assert info["retry_attempts"] == 3
     
     @pytest.mark.integration
-    async def test_list_workflows(self):
+    async def test_list_workflows(self) -> List[Any]:
         """Test listing workflows."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -401,7 +415,7 @@ class TestWorkflowManager:
         assert any(w["name"] == "workflow3" for w in workflow_list)
     
     @pytest.mark.integration
-    async def test_delete_workflow(self):
+    async def test_delete_workflow(self) -> Any:
         """Test workflow deletion."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -418,7 +432,7 @@ class TestWorkflowManager:
         assert "test_workflow" not in manager.workflows
     
     @pytest.mark.integration
-    async def test_update_workflow(self):
+    async def test_update_workflow(self) -> Any:
         """Test workflow update."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -449,7 +463,7 @@ class TestWorkflowManager:
         assert len(stored_workflow.steps) == 2
     
     @pytest.mark.integration
-    async def test_workflow_execution_tracking(self, sample_video_request):
+    async def test_workflow_execution_tracking(self, sample_video_request) -> Any:
         """Test workflow execution tracking."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -463,7 +477,7 @@ class TestWorkflowManager:
         await manager.register_workflow(workflow_def)
         
         # Mock step execution
-        async def mock_step_execution(step_name, context):
+        async def mock_step_execution(step_name, context) -> Any:
             return {"status": "completed", "output": "Step completed"}
         
         with patch.object(manager, '_execute_workflow_step', new_callable=AsyncMock, side_effect=mock_step_execution):
@@ -475,7 +489,7 @@ class TestWorkflowManager:
             assert manager.executions[0].status == "completed"
     
     @pytest.mark.integration
-    async def test_workflow_error_handling(self, sample_video_request):
+    async def test_workflow_error_handling(self, sample_video_request) -> Any:
         """Test workflow error handling."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -489,7 +503,7 @@ class TestWorkflowManager:
         await manager.register_workflow(workflow_def)
         
         # Mock step to fail
-        async def failing_step(step_name, context):
+        async def failing_step(step_name, context) -> Any:
             raise Exception("Step failed")
         
         with patch.object(manager, '_execute_workflow_step', new_callable=AsyncMock, side_effect=failing_step):
@@ -497,7 +511,7 @@ class TestWorkflowManager:
                 await manager.execute_workflow("test_workflow", sample_video_request)
     
     @pytest.mark.integration
-    async def test_workflow_timeout_handling(self, sample_video_request):
+    async def test_workflow_timeout_handling(self, sample_video_request) -> Any:
         """Test workflow timeout handling."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -512,7 +526,7 @@ class TestWorkflowManager:
         await manager.register_workflow(workflow_def)
         
         # Mock step that takes too long
-        async def slow_step(step_name, context):
+        async def slow_step(step_name, context) -> Any:
             await asyncio.sleep(2)  # Takes 2 seconds
             return {"status": "completed"}
         
@@ -525,7 +539,7 @@ class TestWorkflowUtilities:
     """Test workflow utility functions."""
     
     @pytest.mark.integration
-    async def test_create_video_workflow(self):
+    async def test_create_video_workflow(self) -> Any:
         """Test create_video_workflow function."""
         config = VideoWorkflowConfig()
         workflow = await create_video_workflow(config)
@@ -535,13 +549,13 @@ class TestWorkflowUtilities:
         assert workflow.config == config
     
     @pytest.mark.integration
-    async def test_execute_workflow_step(self):
+    async def test_execute_workflow_step(self) -> Any:
         """Test execute_workflow_step function."""
         step = WorkflowStep(name="test_step", description="Test step")
         context = {"input": "test input"}
         
         # Mock step execution
-        async def mock_step_function(step_name, context):
+        async def mock_step_function(step_name, context) -> Any:
             return {"status": "completed", "output": "Step completed"}
         
         with patch('onyx_ai_video.workflows.video_workflow._execute_step_function', 
@@ -552,7 +566,7 @@ class TestWorkflowUtilities:
             assert result["output"] == "Step completed"
     
     @pytest.mark.integration
-    async def test_validate_workflow(self):
+    async def test_validate_workflow(self) -> bool:
         """Test validate_workflow function."""
         # Valid workflow
         valid_workflow = WorkflowDefinition(
@@ -577,7 +591,7 @@ class TestWorkflowUtilities:
         assert len(errors) > 0
     
     @pytest.mark.integration
-    async def test_get_workflow_status(self):
+    async def test_get_workflow_status(self) -> Optional[Dict[str, Any]]:
         """Test get_workflow_status function."""
         manager = WorkflowManager()
         await manager.initialize()
@@ -597,7 +611,7 @@ class TestWorkflowUtilities:
         assert "execution_count" in status
     
     @pytest.mark.integration
-    async def test_create_workflow_report(self):
+    async def test_create_workflow_report(self) -> Any:
         """Test create_workflow_report function."""
         manager = WorkflowManager()
         await manager.initialize()

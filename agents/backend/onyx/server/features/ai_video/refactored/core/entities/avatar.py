@@ -1,3 +1,17 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+from datetime import datetime
+from enum import Enum
+from typing import Dict, Optional
+from uuid import UUID
+from pydantic import Field, field_validator
+from .base import AggregateRoot
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Avatar Entity
 ============
@@ -5,14 +19,8 @@ Avatar Entity
 Avatar entity representing AI-generated avatars with voice and appearance configuration.
 """
 
-from datetime import datetime
-from enum import Enum
-from typing import Dict, Optional
-from uuid import UUID
 
-from pydantic import Field, field_validator
 
-from .base import AggregateRoot
 
 
 class AvatarGender(str, Enum):

@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from datetime import datetime
+from enum import Enum
+from typing import Any, Dict, List, Optional
+from uuid import UUID, uuid4
+from pydantic import BaseModel, Field, field_validator, model_validator
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Pydantic v2 Schemas for Video API
 ================================
@@ -9,12 +28,7 @@ Modern Pydantic v2 models with:
 - Clear documentation
 """
 
-from datetime import datetime
-from enum import Enum
-from typing import Any, Dict, List, Optional
-from uuid import UUID, uuid4
 
-from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class VideoQuality(str, Enum):
@@ -187,7 +201,7 @@ class BatchVideoRequest(BaseModel):
     
     @field_validator("request_ids")
     @classmethod
-    def validate_request_ids(cls, v: List[str]) -> List[str]:
+    async def validate_request_ids(cls, v: List[str]) -> List[str]:
         if len(set(v)) != len(v):
             raise ValueError("Duplicate request IDs not allowed")
         return v

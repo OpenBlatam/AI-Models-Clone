@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import asyncio
+import logging
+from typing import List, Dict, Any, Optional
+from datetime import datetime, timedelta
+from fastapi import FastAPI, HTTPException, status, Request
+from fastapi.responses import JSONResponse
+from .pydantic_schemas import (
+from .pydantic_validation import (
+            from .pydantic_schemas import VideoMetadata
+            import time
+from typing import Any, List, Dict, Optional
 """
 Pydantic Validation Examples
 ===========================
@@ -14,15 +36,8 @@ Examples include:
 - Middleware integration
 """
 
-import asyncio
-import logging
-from typing import List, Dict, Any, Optional
-from datetime import datetime, timedelta
 
-from fastapi import FastAPI, HTTPException, status, Request
-from fastapi.responses import JSONResponse
 
-from .pydantic_schemas import (
     VideoGenerationInput, BatchGenerationInput, VideoEditInput,
     VideoGenerationResponse, BatchGenerationResponse, VideoEditResponse,
     SystemHealth, UserQuota, APIError, VideoStatus, QualityLevel,
@@ -30,7 +45,6 @@ from .pydantic_schemas import (
     create_video_id, create_batch_id, create_error_response, create_success_response
 )
 
-from .pydantic_validation import (
     ValidationConfig, PydanticValidationMiddleware,
     validate_request, validate_response, validate_input_output,
     ValidationUtils, ValidationPerformanceMonitor,
@@ -249,7 +263,6 @@ class ResponseValidationExamples:
         """Example: Create and validate video generation response."""
         try:
             # Create video metadata
-            from .pydantic_schemas import VideoMetadata
             
             metadata = VideoMetadata(
                 video_id=create_video_id(),
@@ -478,7 +491,6 @@ class PerformanceMonitoringExamples:
     def validate_with_performance_tracking():
         """Example: Validate with performance tracking."""
         try:
-            import time
             
             # Track validation time
             start_time = time.time()
@@ -724,5 +736,6 @@ async def run_all_examples():
     
     print("\n✅ All examples completed successfully!")
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(run_all_examples()) 

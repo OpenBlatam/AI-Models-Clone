@@ -1,9 +1,13 @@
-"""
-FastAPI Application for AI Video Generation
-==========================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Scalable FastAPI application with latest best practices for AI video generation.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Depends, status
 from fastapi.middleware.cors import CORSMiddleware
@@ -18,6 +22,16 @@ import time
 import uuid
 from datetime import datetime
 import json
+from agents.backend.onyx.server.features.os_content import os_content_router
+    import uvicorn
+from typing import Any, List, Dict, Optional
+"""
+FastAPI Application for AI Video Generation
+==========================================
+
+Scalable FastAPI application with latest best practices for AI video generation.
+"""
+
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -46,7 +60,7 @@ class VideoGenerationRequest(BaseModel):
     num_inference_steps: int = Field(default=50, ge=10, le=100, description="Number of inference steps")
     
     @validator('height', 'width')
-    def validate_dimensions(cls, v):
+    def validate_dimensions(cls, v) -> bool:
         if v % 64 != 0:
             raise ValueError('Height and width must be divisible by 64')
         return v
@@ -68,7 +82,7 @@ class JobStatusResponse(BaseModel):
 
 # AI Video Pipeline (simplified for import)
 class AIVideoPipeline:
-    def __init__(self):
+    def __init__(self) -> Any:
         logger.info("AI Video Pipeline initialized (simplified mode)")
     
     async def generate_video(self, request: VideoGenerationRequest, job_id: str):
@@ -95,6 +109,8 @@ app.add_middleware(
 )
 
 app.add_middleware(GZipMiddleware, minimum_size=1000)
+
+app.include_router(os_content_router)
 
 # Dependency injection
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
@@ -183,7 +199,7 @@ async def get_video(video_id: str, current_user: Dict = Depends(get_current_user
 
 # Error handlers
 @app.exception_handler(Exception)
-async def global_exception_handler(request, exc):
+async def global_exception_handler(request, exc) -> Any:
     """Global exception handler."""
     logger.error(f"Unhandled exception: {str(exc)}")
     return JSONResponse(
@@ -192,7 +208,6 @@ async def global_exception_handler(request, exc):
     )
 
 if __name__ == "__main__":
-    import uvicorn
     uvicorn.run(
         "fastapi_app:app",
         host="0.0.0.0",

@@ -1,6 +1,11 @@
-"""
-Tests for Training Module
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 import pytest
 import torch
 import torch.nn as nn
@@ -9,26 +14,33 @@ from unittest.mock import Mock, patch, MagicMock
 import tempfile
 import os
 from pathlib import Path
-
 from ..training import (
+from ..models import BaseMessageModel, ModelConfig
+from ..data_loader import MessageDataset
+        import shutil
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Tests for Training Module
+"""
+
     Trainer,
     TrainingManager,
     TrainingConfig,
     DEFAULT_TRAINING_CONFIG
 )
-from ..models import BaseMessageModel, ModelConfig
-from ..data_loader import MessageDataset
 
 class MockDataset(Dataset):
     """Mock dataset for testing."""
     
-    def __init__(self, size=100):
+    def __init__(self, size=100) -> Any:
         self.size = size
     
-    def __len__(self):
+    def __len__(self) -> Any:
         return self.size
     
-    def __getitem__(self, idx):
+    def __getitem__(self, idx) -> Optional[Dict[str, Any]]:
         return {
             'input_ids': torch.randint(0, 1000, (10,)),
             'attention_mask': torch.ones(10),
@@ -40,27 +52,27 @@ class MockDataset(Dataset):
 class MockModel(BaseMessageModel):
     """Mock model for testing."""
     
-    def __init__(self, config):
+    def __init__(self, config) -> Any:
         super().__init__(config)
         self.linear = nn.Linear(10, 1000)  # Simple linear layer
     
-    def forward(self, input_ids, attention_mask=None):
+    def forward(self, input_ids, attention_mask=None) -> Any:
         # Simple forward pass
         batch_size, seq_len = input_ids.shape
         return type('obj', (object,), {
             'logits': self.linear(input_ids.float())
         })
     
-    def generate(self, prompt, **kwargs):
+    def generate(self, prompt, **kwargs) -> Any:
         return f"Generated: {prompt}"
     
-    def load_model(self, path):
+    def load_model(self, path) -> Any:
         pass
 
 class TestTrainingConfig:
     """Test TrainingConfig dataclass."""
     
-    def test_training_config_creation(self):
+    def test_training_config_creation(self) -> Any:
         """Test TrainingConfig creation with default values."""
         config = TrainingConfig(model_type="gpt2")
         
@@ -86,7 +98,7 @@ class TestTrainingConfig:
         assert config.val_ratio == 0.15
         assert config.test_ratio == 0.15
     
-    def test_training_config_custom_values(self):
+    def test_training_config_custom_values(self) -> Any:
         """Test TrainingConfig creation with custom values."""
         config = TrainingConfig(
             model_type="bert",
@@ -109,7 +121,7 @@ class TestTrainingConfig:
 class TestTrainer:
     """Test Trainer class."""
     
-    def test_trainer_initialization(self):
+    def test_trainer_initialization(self) -> Any:
         """Test Trainer initialization."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -135,7 +147,7 @@ class TestTrainer:
         assert trainer.best_val_loss == float('inf')
         assert len(trainer.training_history) == 0
     
-    def test_setup_optimizer(self):
+    def test_setup_optimizer(self) -> Any:
         """Test optimizer setup."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -153,7 +165,7 @@ class TestTrainer:
         assert isinstance(trainer.optimizer, torch.optim.AdamW)
         assert len(trainer.optimizer.param_groups) == 2  # One for weight decay, one without
     
-    def test_setup_scheduler(self):
+    def test_setup_scheduler(self) -> Any:
         """Test scheduler setup."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -171,7 +183,7 @@ class TestTrainer:
         
         assert isinstance(trainer.scheduler, torch.optim.lr_scheduler.CosineAnnealingLR)
     
-    def test_setup_scheduler_linear(self):
+    def test_setup_scheduler_linear(self) -> Any:
         """Test linear scheduler setup."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -189,7 +201,7 @@ class TestTrainer:
         
         assert isinstance(trainer.scheduler, torch.optim.lr_scheduler.LinearLR)
     
-    def test_setup_scheduler_step(self):
+    def test_setup_scheduler_step(self) -> Any:
         """Test step scheduler setup."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -208,7 +220,7 @@ class TestTrainer:
         assert isinstance(trainer.scheduler, torch.optim.lr_scheduler.StepLR)
     
     @patch('ml.training.SummaryWriter')
-    def test_setup_experiment_tracking_tensorboard(self, mock_writer):
+    def test_setup_experiment_tracking_tensorboard(self, mock_writer) -> Any:
         """Test TensorBoard setup."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -227,7 +239,7 @@ class TestTrainer:
         mock_writer.assert_called_once()
     
     @patch('ml.training.wandb')
-    def test_setup_experiment_tracking_wandb(self, mock_wandb):
+    def test_setup_experiment_tracking_wandb(self, mock_wandb) -> Any:
         """Test Weights & Biases setup."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -244,7 +256,7 @@ class TestTrainer:
         
         mock_wandb.init.assert_called_once()
     
-    def test_move_batch_to_device(self):
+    def test_move_batch_to_device(self) -> Any:
         """Test batch device movement."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -273,7 +285,7 @@ class TestTrainer:
         assert device_batch['labels'].device == torch.device("cpu")
         assert device_batch['text'] == 'test'  # Non-tensor unchanged
     
-    def test_compute_loss(self):
+    def test_compute_loss(self) -> Any:
         """Test loss computation."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -298,7 +310,7 @@ class TestTrainer:
         assert isinstance(loss, torch.Tensor)
         assert loss.requires_grad
     
-    def test_save_checkpoint(self):
+    def test_save_checkpoint(self) -> Any:
         """Test checkpoint saving."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -321,7 +333,7 @@ class TestTrainer:
             checkpoint_file = trainer.checkpoint_dir / "test_checkpoint.pt"
             assert checkpoint_file.exists()
     
-    def test_load_checkpoint(self):
+    def test_load_checkpoint(self) -> Any:
         """Test checkpoint loading."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -352,7 +364,7 @@ class TestTrainer:
             assert trainer.global_step == 1
             assert trainer.best_val_loss == float('inf')  # Should be loaded from checkpoint
     
-    def test_validate_epoch(self):
+    def test_validate_epoch(self) -> bool:
         """Test validation epoch."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -372,7 +384,7 @@ class TestTrainer:
         assert isinstance(val_loss, float)
         assert val_loss >= 0
     
-    def test_get_training_summary(self):
+    def test_get_training_summary(self) -> Optional[Dict[str, Any]]:
         """Test training summary generation."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -403,7 +415,7 @@ class TestTrainer:
         assert len(summary['training_history']) == 2
         assert 'config' in summary
     
-    def test_cleanup(self):
+    def test_cleanup(self) -> Any:
         """Test trainer cleanup."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -430,7 +442,7 @@ class TestTrainer:
 class TestTrainingManager:
     """Test TrainingManager class."""
     
-    def test_training_manager_initialization(self):
+    def test_training_manager_initialization(self) -> Any:
         """Test TrainingManager initialization."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -446,7 +458,7 @@ class TestTrainingManager:
     
     @patch('ml.training.DataManager')
     @patch('ml.training.ModelFactory')
-    def test_prepare_training(self, mock_factory, mock_data_manager_class):
+    def test_prepare_training(self, mock_factory, mock_data_manager_class) -> Any:
         """Test training preparation."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -486,7 +498,7 @@ class TestTrainingManager:
     
     @patch('ml.training.DataManager')
     @patch('ml.training.ModelFactory')
-    def test_train_model(self, mock_factory, mock_data_manager_class):
+    def test_train_model(self, mock_factory, mock_data_manager_class) -> Any:
         """Test complete training pipeline."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -536,14 +548,13 @@ class TestTrainingManager:
         assert 'model_path' in results
         
         # Cleanup
-        import shutil
         if Path("./test_checkpoints").exists():
             shutil.rmtree("./test_checkpoints")
 
 class TestDefaultTrainingConfig:
     """Test default training configuration."""
     
-    def test_default_training_config(self):
+    def test_default_training_config(self) -> Any:
         """Test DEFAULT_TRAINING_CONFIG."""
         assert DEFAULT_TRAINING_CONFIG.model_type == "gpt2"
         assert DEFAULT_TRAINING_CONFIG.model_name == "gpt2"
@@ -559,7 +570,7 @@ class TestDefaultTrainingConfig:
 class TestTrainingIntegration:
     """Integration tests for training."""
     
-    def test_end_to_end_training_short(self):
+    def test_end_to_end_training_short(self) -> Any:
         """Test end-to-end training with minimal epochs."""
         config = TrainingConfig(
             model_type="gpt2",
@@ -588,7 +599,7 @@ class TestTrainingIntegration:
         assert 'config' in results
         assert results['final_epoch'] == 1
     
-    def test_mixed_precision_training(self):
+    def test_mixed_precision_training(self) -> Any:
         """Test mixed precision training."""
         if not torch.cuda.is_available():
             pytest.skip("CUDA not available for mixed precision test")
@@ -619,5 +630,6 @@ class TestTrainingIntegration:
         assert isinstance(results, dict)
         assert 'best_val_loss' in results
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__]) 

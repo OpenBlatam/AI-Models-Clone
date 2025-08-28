@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from datetime import datetime
 from enum import Enum as PyEnum
 from typing import List
@@ -12,6 +14,9 @@ from onyx.file_store.models import ChatFileType
 from onyx.server.query_and_chat.chat_utils import mime_type_to_chat_file_type
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class UserFileStatus(str, PyEnum):
     FAILED = "FAILED"
     INDEXING = "INDEXING"

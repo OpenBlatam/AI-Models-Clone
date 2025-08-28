@@ -1,9 +1,10 @@
-"""
-🎯 Facebook Posts - Refactored Domain Models
-============================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
 
-Modelos del dominio refactorizados siguiendo Clean Architecture y patrones de Onyx.
-"""
+# Constants
+TIMEOUT_SECONDS = 60
 
 from abc import ABC, abstractmethod
 from typing import List, Optional, Dict, Any, Union
@@ -13,6 +14,17 @@ from datetime import datetime
 import uuid
 import hashlib
 from pydantic import BaseModel, Field, validator, root_validator
+        import re
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+🎯 Facebook Posts - Refactored Domain Models
+============================================
+
+Modelos del dominio refactorizados siguiendo Clean Architecture y patrones de Onyx.
+"""
+
 
 
 # ===== DOMAIN ENUMS =====
@@ -123,7 +135,7 @@ class ContentSpecification:
     brand_voice: Optional[str] = None
     campaign_id: Optional[str] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not self.topic or len(self.topic.strip()) < 3:
             raise ValueError("Topic must be at least 3 characters")
 
@@ -139,7 +151,7 @@ class GenerationParameters:
     hashtag_limit: int = 5
     emoji_density: float = 0.1  # Percentage of words that should be emojis
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         if not 50 <= self.max_length <= 2000:
             raise ValueError("max_length must be between 50 and 2000")
         if not 0 <= self.emoji_density <= 0.5:
@@ -227,13 +239,13 @@ class FacebookPostContent(BaseModel):
     call_to_action: Optional[str] = None
     
     @validator('text')
-    def validate_text_content(cls, v):
+    def validate_text_content(cls, v) -> bool:
         if not v.strip():
             raise ValueError('Text content cannot be empty')
         return v.strip()
     
     @validator('hashtags')
-    def validate_hashtags(cls, v):
+    def validate_hashtags(cls, v) -> bool:
         validated = []
         for tag in v:
             clean_tag = tag.strip().replace('#', '').lower()
@@ -242,7 +254,7 @@ class FacebookPostContent(BaseModel):
         return validated[:10]  # Limit to 10
     
     @validator('mentions')
-    def validate_mentions(cls, v):
+    def validate_mentions(cls, v) -> bool:
         validated = []
         for mention in v:
             clean_mention = mention.strip().replace('@', '')
@@ -262,7 +274,6 @@ class FacebookPostContent(BaseModel):
     
     def calculate_metrics(self) -> ContentMetrics:
         """Calcular métricas del contenido."""
-        import re
         
         text = self.text
         words = text.split()
@@ -387,14 +398,15 @@ class FacebookPostEntity(BaseModel):
     langchain_metadata: Dict[str, Any] = Field(default_factory=dict)
     generation_trace: List[Dict[str, Any]] = Field(default_factory=list)
     
-    class Config:
+    @dataclass
+class Config:
         arbitrary_types_allowed = True
         json_encoders = {
             datetime: lambda v: v.isoformat()
         }
     
     @root_validator
-    def validate_consistency(cls, values):
+    def validate_consistency(cls, values) -> bool:
         """Validar consistencia entre campos."""
         content = values.get('content')
         params = values.get('generation_params')

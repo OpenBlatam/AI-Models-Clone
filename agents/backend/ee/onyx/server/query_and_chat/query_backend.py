@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from collections.abc import Generator
 
@@ -10,8 +12,6 @@ from sqlalchemy.orm import Session
 
 from ee.onyx.chat.process_message import gather_stream_for_answer_api
 from ee.onyx.onyxbot.slack.handlers.handle_standard_answers import (
-    oneoff_standard_answers,
-)
 from ee.onyx.server.query_and_chat.models import DocumentSearchRequest
 from ee.onyx.server.query_and_chat.models import OneShotQARequest
 from ee.onyx.server.query_and_chat.models import OneShotQAResponse
@@ -41,6 +41,11 @@ from onyx.llm.factory import get_main_llm_from_tuple
 from onyx.natural_language_processing.utils import get_tokenizer
 from onyx.server.utils import get_json_line
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    oneoff_standard_answers,
+)
 
 
 logger = setup_logger()
@@ -181,6 +186,10 @@ def get_answer_stream(
     )
 
     combined_message = combine_message_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         messages=query_request.messages,
         max_tokens=max_history_tokens,
         llm_tokenizer=llm_tokenizer,

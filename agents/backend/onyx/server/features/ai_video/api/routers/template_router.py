@@ -1,3 +1,19 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+from typing import List, Optional
+from fastapi import APIRouter, BackgroundTasks, Depends, Query, status
+from ..dependencies.auth import get_current_user, require_permissions
+from ..dependencies.rate_limit import check_rate_limit
+from ..schemas.template_schemas import (
+from ..schemas.video_schemas import APIResponse
+from ..services.template_service import (
+from ..utils.response import create_error_response, create_success_response
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Template Router - AI Avatar and Template System
 ==============================================
@@ -5,13 +21,8 @@ Template Router - AI Avatar and Template System
 Router for template selection, AI avatar creation, and image synchronization.
 """
 
-from typing import List, Optional
 
-from fastapi import APIRouter, BackgroundTasks, Depends, Query, status
 
-from ..dependencies.auth import get_current_user, require_permissions
-from ..dependencies.rate_limit import check_rate_limit
-from ..schemas.template_schemas import (
     AvatarPreviewRequest,
     AvatarPreviewResponse,
     TemplateCategory,
@@ -19,8 +30,6 @@ from ..schemas.template_schemas import (
     TemplateVideoRequest,
     TemplateVideoResponse,
 )
-from ..schemas.video_schemas import APIResponse
-from ..services.template_service import (
     create_avatar_preview,
     create_template_video,
     get_avatar_preview_status,
@@ -28,7 +37,6 @@ from ..services.template_service import (
     get_templates_list,
     get_template_video_status,
 )
-from ..utils.response import create_error_response, create_success_response
 
 
 router = APIRouter()

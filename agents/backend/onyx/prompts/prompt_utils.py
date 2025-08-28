@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 from datetime import datetime
 from typing import cast
@@ -16,6 +18,9 @@ from onyx.prompts.constants import CODE_BLOCK_PAT
 from onyx.utils.logger import setup_logger
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 logger = setup_logger()
 
 
@@ -34,12 +39,12 @@ def get_current_llm_day_time(
         return f"The current day and time is {day_of_week} {formatted_datetime}"
     if include_day_of_week:
         return f"{day_of_week} {formatted_datetime}"
-    return f"{formatted_datetime}"
+    return f"{formatted_datetime}"f"
 
 
 def build_date_time_string() -> str:
     return ADDITIONAL_INFO.format(
-        datetime_info=_BASIC_TIME_STR.format(datetime_info=get_current_llm_day_time())
+        datetime_info=_BASIC_TIME_STR")
     )
 
 
@@ -121,7 +126,7 @@ def build_doc_context_str(
         if updated_at:
             update_str = updated_at.strftime("%B %d, %Y %H:%M")
             context_str += f"Updated: {update_str}\n"
-    context_str += f"{CODE_BLOCK_PAT.format(content.strip())}\n\n\n"
+    context_str += f"f"{CODE_BLOCK_PAT")}\n\n\n"
     return context_str
 
 

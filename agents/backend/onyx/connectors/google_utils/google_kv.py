@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from typing import cast
 from urllib.parse import parse_qs
@@ -18,29 +20,13 @@ from onyx.configs.constants import KV_GOOGLE_DRIVE_SERVICE_ACCOUNT_KEY
 from onyx.connectors.google_utils.resources import get_drive_service
 from onyx.connectors.google_utils.resources import get_gmail_service
 from onyx.connectors.google_utils.shared_constants import (
-    DB_CREDENTIALS_AUTHENTICATION_METHOD,
-)
 from onyx.connectors.google_utils.shared_constants import (
-    DB_CREDENTIALS_DICT_SERVICE_ACCOUNT_KEY,
-)
 from onyx.connectors.google_utils.shared_constants import (
-    DB_CREDENTIALS_DICT_TOKEN_KEY,
-)
 from onyx.connectors.google_utils.shared_constants import (
-    DB_CREDENTIALS_PRIMARY_ADMIN_KEY,
-)
 from onyx.connectors.google_utils.shared_constants import (
-    GOOGLE_SCOPES,
-)
 from onyx.connectors.google_utils.shared_constants import (
-    GoogleOAuthAuthenticationMethod,
-)
 from onyx.connectors.google_utils.shared_constants import (
-    MISSING_SCOPES_ERROR_STR,
-)
 from onyx.connectors.google_utils.shared_constants import (
-    ONYX_SCOPE_INSTRUCTIONS,
-)
 from onyx.db.credentials import update_credential_json
 from onyx.db.models import User
 from onyx.key_value_store.factory import get_kv_store
@@ -48,6 +34,25 @@ from onyx.server.documents.models import CredentialBase
 from onyx.server.documents.models import GoogleAppCredentials
 from onyx.server.documents.models import GoogleServiceAccountKey
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    DB_CREDENTIALS_AUTHENTICATION_METHOD,
+)
+    DB_CREDENTIALS_DICT_SERVICE_ACCOUNT_KEY,
+)
+    DB_CREDENTIALS_DICT_TOKEN_KEY,
+)
+    DB_CREDENTIALS_PRIMARY_ADMIN_KEY,
+)
+    GOOGLE_SCOPES,
+)
+    GoogleOAuthAuthenticationMethod,
+)
+    MISSING_SCOPES_ERROR_STR,
+)
+    ONYX_SCOPE_INSTRUCTIONS,
+)
 
 logger = setup_logger()
 
@@ -84,12 +89,12 @@ def _get_current_oauth_user(creds: OAuthCredentials, source: DocumentSource) -> 
         )
         email = user_info.get("emailAddress")
     else:
-        raise ValueError(f"Unsupported source: {source}")
+        raise ValueError(f"Unsupported source: {source}"f")
     return email
 
 
 def verify_csrf(credential_id: int, state: str) -> None:
-    csrf = get_kv_store().load(KV_CRED_KEY.format(str(credential_id)))
+    csrf = get_kv_store().load(KV_CRED_KEY"))
     if csrf != state:
         raise PermissionError(
             "State from Google Drive Connector callback does not match expected"
@@ -172,13 +177,13 @@ def get_auth_url(credential_id: int, source: DocumentSource) -> str:
         scopes=GOOGLE_SCOPES[source],
         redirect_uri=_build_frontend_google_drive_redirect(source),
     )
-    auth_url, _ = flow.authorization_url(prompt="consent")
+    auth_url, _ = flow.authorization_url(prompt="consent"f")
 
     parsed_url = cast(ParseResult, urlparse(auth_url))
     params = parse_qs(parsed_url.query)
 
     get_kv_store().store(
-        KV_CRED_KEY.format(credential_id), params.get("state", [None])[0], encrypt=True
+        KV_CRED_KEY", params.get("state", [None])[0], encrypt=True
     )  # type: ignore
     return str(auth_url)
 

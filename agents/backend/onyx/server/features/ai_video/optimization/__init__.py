@@ -1,3 +1,20 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import os
+from pathlib import Path
+    from . import ultra_performance_optimizers
+    from . import optimized_video_ai
+    from . import optimized_video_ai_ultra
+    from . import mega_optimizer
+    from . import speed_test
+    from . import demo_optimizacion
+    from . import performance_optimizer
+    import logging
+        from .demo_optimizacion import demo_optimizacion_completa
+        from .speed_test import run_speed_test
+        from .mega_optimizer import create_mega_optimizer as create_mega
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 OPTIMIZACIONES DE RENDIMIENTO Y ALGORITMOS AVANZADOS
 ===================================================
@@ -11,8 +28,6 @@ Estructura del módulo:
 """
 
 # Importaciones automáticas
-import os
-from pathlib import Path
 
 # Metadata del módulo
 __module_name__ = "optimization"
@@ -45,15 +60,7 @@ def list_files():
 
 # Importaciones principales para facilitar el uso
 try:
-    from . import ultra_performance_optimizers
-    from . import optimized_video_ai
-    from . import optimized_video_ai_ultra
-    from . import mega_optimizer
-    from . import speed_test
-    from . import demo_optimizacion
-    from . import performance_optimizer
 except ImportError as e:
-    import logging
     logging.warning(f"No se pudieron importar algunos módulos de optimization: {e}")
 
 # Funciones de conveniencia
@@ -83,7 +90,6 @@ def get_available_optimizers():
 async def run_optimization_demo():
     """Ejecutar demo completo de optimización."""
     try:
-        from .demo_optimizacion import demo_optimizacion_completa
         await demo_optimizacion_completa()
     except ImportError:
         print("❌ Demo de optimización no disponible")
@@ -92,7 +98,6 @@ async def run_optimization_demo():
 async def run_speed_test():
     """Ejecutar speed test de optimizadores."""
     try:
-        from .speed_test import run_speed_test
         await run_speed_test()
     except ImportError:
         print("❌ Speed test no disponible")
@@ -101,7 +106,6 @@ async def run_speed_test():
 async def create_mega_optimizer():
     """Crear instancia del mega optimizer."""
     try:
-        from .mega_optimizer import create_mega_optimizer as create_mega
         return await create_mega()
     except ImportError:
         print("❌ Mega Optimizer no disponible")

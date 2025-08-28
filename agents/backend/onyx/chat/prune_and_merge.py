@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from collections import defaultdict
 from copy import deepcopy
@@ -7,8 +9,6 @@ from pydantic import BaseModel
 
 from onyx.chat.models import ContextualPruningConfig
 from onyx.chat.models import (
-    LlmDoc,
-)
 from onyx.chat.models import PromptConfig
 from onyx.chat.prompt_builder.citations_prompt import compute_max_document_tokens
 from onyx.configs.constants import IGNORE_FOR_QA
@@ -21,6 +21,11 @@ from onyx.natural_language_processing.utils import tokenizer_trim_content
 from onyx.prompts.prompt_utils import build_doc_context_str
 from onyx.tools.tool_implementations.search.search_utils import section_to_dict
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    LlmDoc,
+)
 
 
 logger = setup_logger()

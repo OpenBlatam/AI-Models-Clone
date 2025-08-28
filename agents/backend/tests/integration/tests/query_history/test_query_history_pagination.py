@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from datetime import datetime
 
@@ -8,6 +10,9 @@ from tests.integration.common_utils.managers.query_history import QueryHistoryMa
 from tests.integration.common_utils.test_models import DAQueryHistoryEntry
 from tests.integration.common_utils.test_models import DATestUser
 from tests.integration.tests.query_history.utils import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
     setup_chat_sessions_with_different_feedback,
 )
 

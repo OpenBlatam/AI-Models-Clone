@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import json
+from datetime import datetime
+from decimal import Decimal
+from enhanced_quality_config import get_enhanced_config
+from enhanced_quality_schemas import (
+from enhanced_quality_services import (
+            from enhanced_quality_services import ValidationError
+from typing import Any, List, Dict, Optional
+import logging
 """
 Enhanced Quality Demo
 ====================
@@ -6,20 +21,13 @@ Demonstración completa de las mejoras de calidad implementadas
 con ejemplos prácticos de uso y características enterprise.
 """
 
-import asyncio
-import json
-from datetime import datetime
-from decimal import Decimal
 
-from enhanced_quality_config import get_enhanced_config
-from enhanced_quality_schemas import (
     EnhancedProductCreateRequest,
     Money, Currency, SKU, Dimensions,
     ProductType, ProductStatus,
     ProductPricing, ProductInventory, ProductSEO,
     ProductIdentity
 )
-from enhanced_quality_services import (
     Result, EnhancedRedisCache, enhanced_services
 )
 
@@ -164,7 +172,6 @@ async def demo_enhanced_quality_features():
         if success:
             return Result.ok({"id": "prod_123", "name": "Test Product"})
         else:
-            from enhanced_quality_services import ValidationError
             return Result.fail(ValidationError("Database connection failed", code="DB_ERROR"))
     
     # Operación exitosa
@@ -345,5 +352,6 @@ async def demo_enhanced_quality_features():
     print("   🚀 Production-ready con resilience patterns")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(demo_enhanced_quality_features()) 

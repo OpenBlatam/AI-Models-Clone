@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+from datetime import datetime, timedelta
+from typing import Dict, List, Optional
+from uuid import uuid4
+from fastapi import BackgroundTasks
+from ..schemas.template_schemas import (
+from ..utils.cache import get_cache_client
+from ..utils.metrics import record_metric
+from typing import Any, List, Dict, Optional
+import logging
 """
 Template Service - AI Avatar and Image Sync Logic
 ================================================
@@ -5,14 +20,8 @@ Template Service - AI Avatar and Image Sync Logic
 Business logic for template-based video generation with AI avatars.
 """
 
-import asyncio
-from datetime import datetime, timedelta
-from typing import Dict, List, Optional
-from uuid import uuid4
 
-from fastapi import BackgroundTasks
 
-from ..schemas.template_schemas import (
     AvatarPreviewRequest,
     AvatarPreviewResponse,
     TemplateCategory,
@@ -21,8 +30,6 @@ from ..schemas.template_schemas import (
     TemplateVideoRequest,
     TemplateVideoResponse,
 )
-from ..utils.cache import get_cache_client
-from ..utils.metrics import record_metric
 
 
 # Mock templates data

@@ -1,11 +1,5 @@
-"""
-Data Splitting and Cross-Validation for Email Sequence System
-
-Advanced data splitting strategies including train/validation/test splits,
-cross-validation, stratified sampling, and time-series aware splitting
-for email sequence datasets.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import asyncio
 import logging
 from typing import Dict, List, Any, Optional, Tuple, Union, Callable
@@ -14,7 +8,6 @@ import math
 import random
 from pathlib import Path
 import json
-
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -22,6 +15,23 @@ from torch.utils.data import Dataset, Subset, DataLoader
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import (
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
+import matplotlib.pyplot as plt
+import seaborn as sns
+from tqdm import tqdm
+from ..models.sequence import EmailSequence, SequenceStep
+from ..models.subscriber import Subscriber
+from ..models.template import EmailTemplate
+from typing import Any, List, Dict, Optional
+"""
+Data Splitting and Cross-Validation for Email Sequence System
+
+Advanced data splitting strategies including train/validation/test splits,
+cross-validation, stratified sampling, and time-series aware splitting
+for email sequence datasets.
+"""
+
+
     train_test_split,
     KFold,
     StratifiedKFold,
@@ -32,14 +42,7 @@ from sklearn.model_selection import (
     GridSearchCV,
     RandomizedSearchCV
 )
-from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-import matplotlib.pyplot as plt
-import seaborn as sns
-from tqdm import tqdm
 
-from ..models.sequence import EmailSequence, SequenceStep
-from ..models.subscriber import Subscriber
-from ..models.template import EmailTemplate
 
 logger = logging.getLogger(__name__)
 
@@ -83,7 +86,9 @@ class DataSplitter:
     """Advanced data splitter for email sequences"""
     
     def __init__(self, config: DataSplitConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.splits = {}
         self.split_metadata = {}
         
@@ -466,6 +471,10 @@ class DataSplitter:
             }
             
             with open(filepath, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 json.dump(data, f, indent=2, default=str)
             
             logger.info(f"Splits saved to {filepath}")
@@ -477,6 +486,10 @@ class DataSplitter:
         filepath = splits_dir / filepath
         
         with open(filepath, 'r') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             data = json.load(f)
         
         self.splits = data["splits"]
@@ -490,7 +503,9 @@ class CrossValidator:
     """Advanced cross-validation for email sequences"""
     
     def __init__(self, config: DataSplitConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.cv_results = {}
         
         logger.info("Cross Validator initialized")
@@ -737,7 +752,9 @@ class DataSplitManager:
     """Manager for data splitting and cross-validation"""
     
     def __init__(self, config: DataSplitConfig):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.splitter = DataSplitter(config)
         self.cross_validator = CrossValidator(config)
         

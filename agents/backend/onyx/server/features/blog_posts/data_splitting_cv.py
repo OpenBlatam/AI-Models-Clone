@@ -1,11 +1,10 @@
-"""
-🚀 Data Splitting & Cross-Validation System - Production Ready
-==============================================================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Enterprise-grade data splitting and cross-validation system with
-proper train/validation/test splits, stratified sampling, time series splits,
-and advanced cross-validation strategies for AI training.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import time
@@ -18,27 +17,47 @@ from pathlib import Path
 from enum import Enum
 import warnings
 from collections import defaultdict
-
 import torch
 import torch.nn as nn
 from torch.utils.data import Dataset, Subset, DataLoader, random_split
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import (
-    train_test_split, StratifiedShuffleSplit, StratifiedKFold,
-    TimeSeriesSplit, GroupShuffleSplit, GroupKFold,
-    LeaveOneOut, LeavePOut, RepeatedStratifiedKFold,
-    cross_val_score, cross_validate
-)
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import make_scorer, accuracy_score, f1_score
 import matplotlib.pyplot as plt
 import seaborn as sns
 from tqdm import tqdm
-
-# Import our production engines
 from .production_transformers import DeviceManager
 from .efficient_data_loader import (
+        from sklearn.model_selection import KFold
+        from sklearn.model_selection import StratifiedKFold
+        from sklearn.model_selection import TimeSeriesSplit
+        from sklearn.model_selection import GroupKFold
+        from sklearn.model_selection import LeaveOneOut
+        from sklearn.model_selection import LeavePOut
+        from sklearn.model_selection import RepeatedStratifiedKFold
+        from .model_training import ModelTrainer
+        from .efficient_data_loader import DataLoaderFactory
+    from .efficient_data_loader import DataLoaderManager
+from typing import Any, List, Dict, Optional
+"""
+🚀 Data Splitting & Cross-Validation System - Production Ready
+==============================================================
+
+Enterprise-grade data splitting and cross-validation system with
+proper train/validation/test splits, stratified sampling, time series splits,
+and advanced cross-validation strategies for AI training.
+"""
+
+
+    train_test_split, StratifiedShuffleSplit, StratifiedKFold,
+    TimeSeriesSplit, GroupShuffleSplit, GroupKFold,
+    LeaveOneOut, LeavePOut, RepeatedStratifiedKFold,
+    cross_val_score, cross_validate
+)
+
+# Import our production engines
     DataLoaderManager, DataLoaderConfig, DataFormat, CacheStrategy,
     OptimizedTextDataset, CachedDataset
 )
@@ -85,7 +104,7 @@ class SplitConfig:
     # Custom splitting
     custom_split_function: Optional[Callable] = None
     
-    def __post_init__(self):
+    def __post_init__(self) -> Any:
         """Validate configuration."""
         total_ratio = self.train_ratio + self.val_ratio + self.test_ratio
         if not np.isclose(total_ratio, 1.0, atol=1e-6):
@@ -170,7 +189,9 @@ class DataSplitter:
     """Production-ready data splitter."""
     
     def __init__(self, device_manager: DeviceManager):
-        self.device_manager = device_manager
+        
+    """__init__ function."""
+self.device_manager = device_manager
         self.logger = logging.getLogger(f"{__name__}.DataSplitter")
     
     def split_dataset(self, dataset: Dataset, config: SplitConfig) -> SplitResult:
@@ -481,7 +502,9 @@ class CrossValidator:
     """Production-ready cross-validator."""
     
     def __init__(self, device_manager: DeviceManager):
-        self.device_manager = device_manager
+        
+    """__init__ function."""
+self.device_manager = device_manager
         self.logger = logging.getLogger(f"{__name__}.CrossValidator")
     
     async def cross_validate(self, dataset: Dataset, config: CrossValidationConfig,
@@ -567,7 +590,6 @@ class CrossValidator:
     
     def _create_k_fold_splits(self, indices: List[int], config: CrossValidationConfig) -> List[Tuple[List[int], List[int]]]:
         """Create K-fold splits."""
-        from sklearn.model_selection import KFold
         
         kf = KFold(n_splits=config.n_splits, shuffle=config.shuffle, random_state=config.random_state)
         splits = []
@@ -581,7 +603,6 @@ class CrossValidator:
     
     def _create_stratified_k_fold_splits(self, dataset: Dataset, indices: List[int], config: CrossValidationConfig) -> List[Tuple[List[int], List[int]]]:
         """Create stratified K-fold splits."""
-        from sklearn.model_selection import StratifiedKFold
         
         # Extract labels for stratification
         labels = self._extract_labels(dataset, indices)
@@ -598,7 +619,6 @@ class CrossValidator:
     
     def _create_time_series_cv_splits(self, dataset: Dataset, indices: List[int], config: CrossValidationConfig) -> List[Tuple[List[int], List[int]]]:
         """Create time series CV splits."""
-        from sklearn.model_selection import TimeSeriesSplit
         
         if config.time_column is None:
             raise ValueError("time_column must be specified for time series CV")
@@ -618,7 +638,6 @@ class CrossValidator:
     
     def _create_group_k_fold_splits(self, dataset: Dataset, indices: List[int], config: CrossValidationConfig) -> List[Tuple[List[int], List[int]]]:
         """Create group K-fold splits."""
-        from sklearn.model_selection import GroupKFold
         
         if config.group_column is None:
             raise ValueError("group_column must be specified for group K-fold CV")
@@ -638,7 +657,6 @@ class CrossValidator:
     
     def _create_leave_one_out_splits(self, indices: List[int], config: CrossValidationConfig) -> List[Tuple[List[int], List[int]]]:
         """Create leave-one-out splits."""
-        from sklearn.model_selection import LeaveOneOut
         
         loo = LeaveOneOut()
         splits = []
@@ -652,7 +670,6 @@ class CrossValidator:
     
     def _create_leave_p_out_splits(self, indices: List[int], config: CrossValidationConfig) -> List[Tuple[List[int], List[int]]]:
         """Create leave-P-out splits."""
-        from sklearn.model_selection import LeavePOut
         
         lpo = LeavePOut(p=config.p)
         splits = []
@@ -666,7 +683,6 @@ class CrossValidator:
     
     def _create_repeated_stratified_k_fold_splits(self, dataset: Dataset, indices: List[int], config: CrossValidationConfig) -> List[Tuple[List[int], List[int]]]:
         """Create repeated stratified K-fold splits."""
-        from sklearn.model_selection import RepeatedStratifiedKFold
         
         # Extract labels for stratification
         labels = self._extract_labels(dataset, indices)
@@ -795,7 +811,6 @@ class CrossValidator:
     def _create_model(self, model_class, training_config, num_classes: int):
         """Create model instance."""
         # This would integrate with your existing model creation logic
-        from .model_training import ModelTrainer
         trainer = ModelTrainer(self.device_manager)
         return trainer.create_model(training_config, num_classes)
     
@@ -868,7 +883,9 @@ class DataSplittingManager:
     """Manager for data splitting and cross-validation operations."""
     
     def __init__(self, device_manager: DeviceManager):
-        self.device_manager = device_manager
+        
+    """__init__ function."""
+self.device_manager = device_manager
         self.splitter = DataSplitter(device_manager)
         self.cross_validator = CrossValidator(device_manager)
         self.logger = logging.getLogger(f"{__name__}.DataSplittingManager")
@@ -900,7 +917,6 @@ class DataSplittingManager:
     def create_dataloaders_from_split(self, split_result: SplitResult,
                                     data_loader_config: DataLoaderConfig) -> Tuple[DataLoader, DataLoader, DataLoader]:
         """Create DataLoaders from split result."""
-        from .efficient_data_loader import DataLoaderFactory
         
         factory = DataLoaderFactory(self.device_manager)
         
@@ -1036,7 +1052,6 @@ async def quick_cross_validate(
     )
     
     # Create mock data loader manager for CV
-    from .efficient_data_loader import DataLoaderManager
     data_loader_manager = await DataLoaderManager(device_manager).__aenter__()
     
     return await manager.cross_validator.cross_validate(
@@ -1046,7 +1061,9 @@ async def quick_cross_validate(
 # Example usage
 if __name__ == "__main__":
     async def demo():
-        # Create sample dataset
+        
+    """demo function."""
+# Create sample dataset
         texts = [f"Sample text {i}" for i in range(1000)]
         labels = [i % 3 for i in range(1000)]  # 3 classes
         

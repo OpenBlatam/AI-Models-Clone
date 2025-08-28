@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
+
+import time
+import json
+import gzip
+from typing import Any, Dict, List, Optional, Union
+from datetime import datetime
+from dataclasses import dataclass
+from pydantic import BaseModel, Field, validator, ConfigDict
+from pydantic.dataclasses import dataclass as pydantic_dataclass
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 🚀 PRODUCTION SERIALIZERS - Ultra-Fast Data Serialization
 =========================================================
@@ -9,15 +31,7 @@ Serializers enterprise optimizados para:
 - Cacheo de serialización
 """
 
-import time
-import json
-import gzip
-from typing import Any, Dict, List, Optional, Union
-from datetime import datetime
-from dataclasses import dataclass
 
-from pydantic import BaseModel, Field, validator, ConfigDict
-from pydantic.dataclasses import dataclass as pydantic_dataclass
 
 
 # ═══════════════════════════════════════════════════════════════
@@ -90,7 +104,7 @@ class AnalysisRequestSerializer(BaseModel):
     
     # Validadores optimizados
     @validator('text')
-    def validate_text(cls, v):
+    def validate_text(cls, v) -> bool:
         """Validar y sanitizar texto de entrada."""
         if not v or not v.strip():
             raise ValueError("El texto no puede estar vacío")
@@ -108,7 +122,7 @@ class AnalysisRequestSerializer(BaseModel):
         return v
     
     @validator('analysis_types')
-    def validate_analysis_types(cls, v):
+    def validate_analysis_types(cls, v) -> bool:
         """Validar tipos de análisis."""
         if not v:
             return ["sentiment"]  # Default
@@ -125,7 +139,7 @@ class AnalysisRequestSerializer(BaseModel):
         return list(set(v))  # Eliminar duplicados
     
     @validator('processing_tier')
-    def validate_processing_tier(cls, v):
+    def validate_processing_tier(cls, v) -> bool:
         """Validar tier de procesamiento."""
         if v is None:
             return v
@@ -136,7 +150,7 @@ class AnalysisRequestSerializer(BaseModel):
         
         return v
     
-    def to_internal_request(self) -> Dict[str, Any]:
+    async def to_internal_request(self) -> Dict[str, Any]:
         """Convertir a formato interno optimizado."""
         return {
             "text": self.text,
@@ -212,7 +226,7 @@ class BatchAnalysisRequestSerializer(BaseModel):
     )
     
     @validator('texts')
-    def validate_texts(cls, v):
+    def validate_texts(cls, v) -> bool:
         """Validar lista de textos."""
         if not v:
             raise ValueError("Lista de textos no puede estar vacía")
@@ -436,7 +450,9 @@ class SerializationCache:
     """
     
     def __init__(self, max_size: int = 1000):
-        self.cache: Dict[str, bytes] = {}
+        
+    """__init__ function."""
+self.cache: Dict[str, bytes] = {}
         self.access_count: Dict[str, int] = {}
         self.max_size = max_size
     
@@ -488,7 +504,7 @@ def optimize_json_response(data: Dict[str, Any], compress: bool = False) -> Unio
         JSON string o bytes comprimidos
     """
     # Optimizar floats para reducir tamaño
-    def optimize_floats(obj):
+    def optimize_floats(obj) -> Any:
         if isinstance(obj, float):
             return round(obj, 4)
         elif isinstance(obj, dict):
@@ -515,7 +531,7 @@ def optimize_json_response(data: Dict[str, Any], compress: bool = False) -> Unio
 
 def optimize_response_size(data: Dict[str, Any]) -> Dict[str, Any]:
     """Optimizar tamaño de respuesta."""
-    def optimize_floats(obj):
+    def optimize_floats(obj) -> Any:
         if isinstance(obj, float):
             return round(obj, 4)
         elif isinstance(obj, dict):

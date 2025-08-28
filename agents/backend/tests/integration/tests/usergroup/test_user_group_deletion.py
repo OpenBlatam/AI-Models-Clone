@@ -1,18 +1,7 @@
-"""
-This tests the deletion of a user group with the following foreign key constraints:
-- connector_credential_pair
-- user
-- credential
-- llm_provider
-- document_set
-- token_rate_limit (Not Implemented)
-- persona
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
-
 import pytest
-
 from onyx.server.documents.models import DocumentSource
 from tests.integration.common_utils.managers.cc_pair import CCPairManager
 from tests.integration.common_utils.managers.credential import CredentialManager
@@ -28,6 +17,22 @@ from tests.integration.common_utils.test_models import DATestPersona
 from tests.integration.common_utils.test_models import DATestUser
 from tests.integration.common_utils.test_models import DATestUserGroup
 from tests.integration.common_utils.vespa import vespa_fixture
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+This tests the deletion of a user group with the following foreign key constraints:
+- connector_credential_pair
+- user
+- credential
+- llm_provider
+- document_set
+- token_rate_limit (Not Implemented)
+- persona
+"""
+
+
+
 
 
 @pytest.mark.skipif(

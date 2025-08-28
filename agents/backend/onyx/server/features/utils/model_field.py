@@ -1,7 +1,5 @@
-"""
-Model Field - Onyx Integration
-Field definition and validation for models.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from __future__ import annotations
 from typing import Any, Dict, List, Optional, Type, TypeVar, Union
 from dataclasses import dataclass, field
@@ -10,6 +8,13 @@ from functools import lru_cache
 import time
 from .base_types import CACHE_TTL, VALIDATION_TIMEOUT
 from .validation_mixin import ValidationMixin
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Model Field - Onyx Integration
+Field definition and validation for models.
+"""
 
 T = TypeVar('T')
 
@@ -99,7 +104,7 @@ class ModelField(ValidationMixin):
         
         return errors
     
-    def get_default(self) -> Any:
+    def get_default(self) -> Optional[Dict[str, Any]]:
         """Get default value."""
         if self.config.default is not None:
             return self.config.default

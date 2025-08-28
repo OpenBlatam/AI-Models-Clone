@@ -1,3 +1,22 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+import os
+import sys
+import argparse
+import subprocess
+import threading
+import time
+import webbrowser
+from typing import List, Dict, Optional
+import logging
+import sys
+import os
+from {demo['file'].replace('.py', '')} import main
+from typing import Any, List, Dict, Optional
+import asyncio
 #!/usr/bin/env python3
 """
 Comprehensive Demo Launcher
@@ -10,15 +29,6 @@ This module provides a unified launcher for all interactive demos:
 - Individual component demos
 """
 
-import os
-import sys
-import argparse
-import subprocess
-import threading
-import time
-import webbrowser
-from typing import List, Dict, Optional
-import logging
 
 # Add the current directory to the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
@@ -31,7 +41,7 @@ logger = logging.getLogger(__name__)
 class DemoLauncher:
     """Comprehensive demo launcher for all interactive demos"""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.demos = {
             'main': {
                 'name': 'Main Interactive Demos',
@@ -185,6 +195,10 @@ class DemoLauncher:
                 cmd.append('--share')
             
             process = subprocess.Popen(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 cmd,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.PIPE,
@@ -209,6 +223,10 @@ class DemoLauncher:
                 # Open browser
                 try:
                     webbrowser.open(f"http://localhost:{demo_port}")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 except:
                     pass
                 
@@ -341,14 +359,11 @@ Standalone Demo Script: {demo['name']}
 Usage: python {demo['file']}
 """
 
-import sys
-import os
 
 # Add the current directory to the path
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 # Import and run the demo
-from {demo['file'].replace('.py', '')} import main
 
 if __name__ == "__main__":
     main()
@@ -356,7 +371,15 @@ if __name__ == "__main__":
         
         script_file = f"run_{demo_key}_demo.py"
         with open(script_file, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write(script_content)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         print(f"✅ Created standalone script: {script_file}")
         return script_file
@@ -420,5 +443,6 @@ def main():
         print("  python demo_launcher.py --all")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     main() 

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from uuid import UUID
 
 import requests
@@ -7,10 +9,17 @@ from tests.integration.common_utils.constants import API_SERVER_URL
 from tests.integration.common_utils.constants import GENERAL_HEADERS
 from tests.integration.common_utils.test_models import DATestUser
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 THREADS_URL = f"{API_SERVER_URL}/openai-assistants/threads"
 
 
 def test_create_thread(admin_user: DATestUser | None) -> None:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     response = requests.post(
         THREADS_URL,
         json={"messages": None, "metadata": {"key": "value"}},
@@ -26,6 +35,10 @@ def test_create_thread(admin_user: DATestUser | None) -> None:
 
 
 def test_retrieve_thread(admin_user: DATestUser | None) -> None:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     # First, create a thread
     create_response = requests.post(
         THREADS_URL,
@@ -49,6 +62,10 @@ def test_retrieve_thread(admin_user: DATestUser | None) -> None:
 
 
 def test_modify_thread(admin_user: DATestUser | None) -> None:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     # First, create a thread
     create_response = requests.post(
         THREADS_URL,
@@ -72,6 +89,10 @@ def test_modify_thread(admin_user: DATestUser | None) -> None:
 
 
 def test_delete_thread(admin_user: DATestUser | None) -> None:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     # First, create a thread
     create_response = requests.post(
         THREADS_URL,

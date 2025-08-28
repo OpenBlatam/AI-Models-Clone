@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
 from typing import cast
 from typing import Generic
 from typing import TypeVar
@@ -11,6 +16,9 @@ from onyx.connectors.models import ConnectorCheckpoint
 from onyx.connectors.models import ConnectorFailure
 from onyx.connectors.models import Document
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 _ITERATION_LIMIT = 100_000
 
 

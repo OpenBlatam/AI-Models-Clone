@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 import io
 import math
 import time
@@ -21,27 +26,30 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
 from onyx.configs.app_configs import (
-    CONFLUENCE_CONNECTOR_ATTACHMENT_CHAR_COUNT_THRESHOLD,
-)
 from onyx.configs.app_configs import CONFLUENCE_CONNECTOR_ATTACHMENT_SIZE_THRESHOLD
 from onyx.configs.constants import FileOrigin
-
-if TYPE_CHECKING:
     from onyx.connectors.confluence.onyx_confluence import OnyxConfluence
-
 from onyx.db.engine import get_session_with_current_tenant
 from onyx.db.models import PGFileStore
 from onyx.db.pg_file_store import create_populate_lobj
 from onyx.db.pg_file_store import save_bytes_to_pgfilestore
 from onyx.db.pg_file_store import upsert_pgfilestore
 from onyx.file_processing.extract_file_text import (
+from onyx.file_processing.file_validation import is_valid_image_type
+from onyx.file_processing.image_utils import store_image_and_create_section
+from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    CONFLUENCE_CONNECTOR_ATTACHMENT_CHAR_COUNT_THRESHOLD,
+)
+
+if TYPE_CHECKING:
+
     OnyxExtensionType,
     extract_file_text,
     is_accepted_file_ext,
 )
-from onyx.file_processing.file_validation import is_valid_image_type
-from onyx.file_processing.image_utils import store_image_and_create_section
-from onyx.utils.logger import setup_logger
 
 logger = setup_logger()
 
@@ -454,7 +462,7 @@ def handle_confluence_rate_limit(confluence_call: F) -> F:
     return cast(F, wrapped_call)
 
 
-def _handle_http_error(e: requests.HTTPError, attempt: int) -> int:
+async def _handle_http_error(e: requests.HTTPError, attempt: int) -> int:
     MIN_DELAY = 2
     MAX_DELAY = 60
     STARTING_DELAY = 5
@@ -573,7 +581,7 @@ def attachment_to_file_record(
     return pgfilestore, image_data
 
 
-def _attachment_to_download_link(
+async def _attachment_to_download_link(
     confluence_client: "OnyxConfluence", attachment: dict[str, Any]
 ) -> str:
     """Extracts the download link to images."""

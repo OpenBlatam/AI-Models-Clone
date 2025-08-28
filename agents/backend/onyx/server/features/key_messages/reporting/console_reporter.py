@@ -1,6 +1,5 @@
-"""
-Console reporting module for cybersecurity assessment results.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from typing import Dict, List, Optional, Any
 from pydantic import BaseModel, field_validator
 from datetime import datetime
@@ -10,6 +9,12 @@ from rich.table import Table
 from rich.panel import Panel
 from rich.text import Text
 from rich.progress import Progress, SpinnerColumn, TextColumn
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Console reporting module for cybersecurity assessment results.
+"""
 
 logger = structlog.get_logger(__name__)
 
@@ -22,13 +27,13 @@ class ConsoleReportInput(BaseModel):
     color_output: bool = True
     
     @field_validator('scan_results')
-    def validate_scan_results(cls, v):
+    def validate_scan_results(cls, v) -> bool:
         if not v:
             raise ValueError("Scan results cannot be empty")
         return v
     
     @field_validator('target_info')
-    def validate_target_info(cls, v):
+    def validate_target_info(cls, v) -> Optional[Dict[str, Any]]:
         if not v:
             raise ValueError("Target info cannot be empty")
         return v

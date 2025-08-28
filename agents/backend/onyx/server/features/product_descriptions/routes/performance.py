@@ -1,3 +1,18 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import List, Optional, Dict, Any
+from fastapi import APIRouter, Depends, HTTPException, status
+import logging
+from datetime import datetime, timedelta
+from ..dependencies.auth import get_authenticated_user, require_permission
+from ..routes.base import get_request_context, log_route_access
+from ..schemas.base import BaseResponse, ErrorResponse
+from ..pydantic_schemas import (
+from ..performance_metrics import PerformanceMonitor
+from ..caching_manager import CachingManager
+from ..async_database_api_operations import AsyncDatabaseManager
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 Performance Router
 
@@ -5,18 +20,10 @@ This module contains routes for performance monitoring, metrics collection,
 and optimization endpoints. Provides real-time insights into system performance.
 """
 
-from typing import List, Optional, Dict, Any
-from fastapi import APIRouter, Depends, HTTPException, status
-import logging
-from datetime import datetime, timedelta
 
 # Import dependencies
-from ..dependencies.auth import get_authenticated_user, require_permission
-from ..routes.base import get_request_context, log_route_access
 
 # Import schemas
-from ..schemas.base import BaseResponse, ErrorResponse
-from ..pydantic_schemas import (
     PerformanceMetricsResponse,
     PerformanceAlertResponse,
     OptimizationRequest,
@@ -26,9 +33,6 @@ from ..pydantic_schemas import (
 )
 
 # Import services
-from ..performance_metrics import PerformanceMonitor
-from ..caching_manager import CachingManager
-from ..async_database_api_operations import AsyncDatabaseManager
 
 # Initialize router
 router = APIRouter(prefix="/performance", tags=["performance"])

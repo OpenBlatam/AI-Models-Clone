@@ -1,16 +1,27 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+import pytest
+import asyncio
+from unittest.mock import Mock, patch, MagicMock
+from typing import Dict, Any
+from utils.network_ops import (
+        import time
+        import time
+        from utils.network_ops import validate_target_address
+        from utils.network_ops import sanitize_target_address
+from typing import Any, List, Dict, Optional
+import logging
 """
 Tests for Network Operations Module.
 
 Tests packet crafting, sniffing, and port scanning functionality.
 """
 
-import pytest
-import asyncio
-from unittest.mock import Mock, patch, MagicMock
-from typing import Dict, Any
 
 # Import the functions to test
-from utils.network_ops import (
     craft_tcp_packet, craft_udp_packet, craft_icmp_packet,
     craft_dns_packet, craft_arp_packet,
     send_packet, sniff_packets,
@@ -58,7 +69,7 @@ def sample_scan_config():
 class TestPacketCrafting:
     """Test packet crafting functionality."""
     
-    def test_craft_tcp_packet_success(self, sample_packet_config):
+    def test_craft_tcp_packet_success(self, sample_packet_config) -> Any:
         """Test successful TCP packet crafting."""
         if not SCAPY_AVAILABLE:
             pytest.skip("Scapy not available")
@@ -68,13 +79,13 @@ class TestPacketCrafting:
         assert packet is not None
         # Add more specific assertions based on Scapy packet structure
     
-    def test_craft_tcp_packet_no_scapy(self, sample_packet_config):
+    def test_craft_tcp_packet_no_scapy(self, sample_packet_config) -> Any:
         """Test TCP packet crafting when Scapy is not available."""
         with patch('utils.network_ops.SCAPY_AVAILABLE', False):
             packet = craft_tcp_packet(sample_packet_config)
             assert packet is None
     
-    def test_craft_udp_packet_success(self, sample_packet_config):
+    def test_craft_udp_packet_success(self, sample_packet_config) -> Any:
         """Test successful UDP packet crafting."""
         if not SCAPY_AVAILABLE:
             pytest.skip("Scapy not available")
@@ -84,7 +95,7 @@ class TestPacketCrafting:
         
         assert packet is not None
     
-    def test_craft_icmp_packet_success(self, sample_packet_config):
+    def test_craft_icmp_packet_success(self, sample_packet_config) -> Any:
         """Test successful ICMP packet crafting."""
         if not SCAPY_AVAILABLE:
             pytest.skip("Scapy not available")
@@ -94,7 +105,7 @@ class TestPacketCrafting:
         
         assert packet is not None
     
-    def test_craft_dns_packet_success(self, sample_packet_config):
+    def test_craft_dns_packet_success(self, sample_packet_config) -> Any:
         """Test successful DNS packet crafting."""
         if not SCAPY_AVAILABLE:
             pytest.skip("Scapy not available")
@@ -104,7 +115,7 @@ class TestPacketCrafting:
         
         assert packet is not None
     
-    def test_craft_arp_packet_success(self, sample_packet_config):
+    def test_craft_arp_packet_success(self, sample_packet_config) -> Any:
         """Test successful ARP packet crafting."""
         if not SCAPY_AVAILABLE:
             pytest.skip("Scapy not available")
@@ -120,7 +131,7 @@ class TestPacketCrafting:
 class TestPacketOperations:
     """Test packet sending and sniffing functionality."""
     
-    def test_send_packet_success(self):
+    def test_send_packet_success(self) -> Any:
         """Test successful packet sending."""
         if not SCAPY_AVAILABLE:
             pytest.skip("Scapy not available")
@@ -138,14 +149,14 @@ class TestPacketOperations:
             assert result.source == "192.168.1.100"
             assert result.destination == "192.168.1.1"
     
-    def test_send_packet_no_scapy(self):
+    def test_send_packet_no_scapy(self) -> Any:
         """Test packet sending when Scapy is not available."""
         with patch('utils.network_ops.SCAPY_AVAILABLE', False):
             result = send_packet(Mock(), timeout=3)
             assert result.success is False
             assert "Scapy not available" in result.error_message
     
-    def test_sniff_packets_success(self):
+    def test_sniff_packets_success(self) -> Any:
         """Test successful packet sniffing."""
         if not SCAPY_AVAILABLE:
             pytest.skip("Scapy not available")
@@ -164,7 +175,7 @@ class TestPacketOperations:
             assert len(results) == 2
             assert all("source_ip" in result for result in results)
     
-    def test_sniff_packets_no_scapy(self):
+    def test_sniff_packets_no_scapy(self) -> Any:
         """Test packet sniffing when Scapy is not available."""
         with patch('utils.network_ops.SCAPY_AVAILABLE', False):
             results = sniff_packets(interface="eth0", count=2, timeout=10)
@@ -177,7 +188,7 @@ class TestPacketOperations:
 class TestPortScanning:
     """Test port scanning functionality."""
     
-    def test_scan_single_port_success(self):
+    def test_scan_single_port_success(self) -> Any:
         """Test successful single port scanning."""
         if not NMAP_AVAILABLE:
             pytest.skip("python-nmap not available")
@@ -206,13 +217,13 @@ class TestPortScanning:
             assert result.state == "open"
             assert result.service == "http"
     
-    def test_scan_single_port_no_nmap(self):
+    def test_scan_single_port_no_nmap(self) -> Any:
         """Test single port scanning when python-nmap is not available."""
         with patch('utils.network_ops.NMAP_AVAILABLE', False):
             result = scan_single_port("localhost", 80, "tcp", 5)
             assert result.state == "unknown"
     
-    def test_scan_port_range_success(self):
+    def test_scan_port_range_success(self) -> Any:
         """Test successful port range scanning."""
         if not NMAP_AVAILABLE:
             pytest.skip("python-nmap not available")
@@ -237,7 +248,7 @@ class TestPortScanning:
             assert result.open_ports == 1
             assert result.closed_ports == 1
     
-    def test_scan_port_range_no_nmap(self):
+    def test_scan_port_range_no_nmap(self) -> Any:
         """Test port range scanning when python-nmap is not available."""
         with patch('utils.network_ops.NMAP_AVAILABLE', False):
             result = scan_port_range("localhost", "80-443", ScanType.TCP_SYN, 5)
@@ -251,7 +262,7 @@ class TestPortScanning:
 class TestRoroInterfaces:
     """Test RORO interface functions."""
     
-    def test_craft_packet_roro_tcp(self, sample_packet_config):
+    def test_craft_packet_roro_tcp(self, sample_packet_config) -> Any:
         """Test TCP packet crafting via RORO interface."""
         request = {
             "packet_type": PacketType.TCP,
@@ -273,7 +284,7 @@ class TestRoroInterfaces:
         assert "success" in result
         assert result["packet_type"] == PacketType.TCP
     
-    def test_send_packet_roro(self):
+    def test_send_packet_roro(self) -> Any:
         """Test packet sending via RORO interface."""
         request = {
             "packet": Mock(),
@@ -298,7 +309,7 @@ class TestRoroInterfaces:
             assert result["success"] is True
             assert result["source"] == "192.168.1.100"
     
-    def test_sniff_packets_roro(self):
+    def test_sniff_packets_roro(self) -> Any:
         """Test packet sniffing via RORO interface."""
         request = {
             "interface": "eth0",
@@ -316,7 +327,7 @@ class TestRoroInterfaces:
             assert result["packets_captured"] == 1
             assert result["interface"] == "eth0"
     
-    def test_scan_ports_roro_single(self):
+    def test_scan_ports_roro_single(self) -> Any:
         """Test single port scanning via RORO interface."""
         request = {
             "host": "localhost",
@@ -343,7 +354,7 @@ class TestRoroInterfaces:
             assert result["port"] == 80
             assert result["state"] == "open"
     
-    def test_scan_ports_roro_range(self):
+    def test_scan_ports_roro_range(self) -> Any:
         """Test port range scanning via RORO interface."""
         request = {
             "host": "localhost",
@@ -379,7 +390,7 @@ class TestIntegration:
     """Integration tests for network operations."""
     
     @pytest.mark.asyncio
-    async def test_full_packet_workflow(self, sample_packet_config):
+    async def test_full_packet_workflow(self, sample_packet_config) -> Any:
         """Test complete packet crafting and sending workflow."""
         if not SCAPY_AVAILABLE:
             pytest.skip("Scapy not available")
@@ -396,7 +407,7 @@ class TestIntegration:
             assert result.success is True
     
     @pytest.mark.asyncio
-    async def test_full_scan_workflow(self):
+    async def test_full_scan_workflow(self) -> Any:
         """Test complete port scanning workflow."""
         if not NMAP_AVAILABLE:
             pytest.skip("python-nmap not available")
@@ -422,7 +433,7 @@ class TestIntegration:
 class TestErrorHandling:
     """Test error handling in network operations."""
     
-    def test_craft_packet_invalid_config(self):
+    def test_craft_packet_invalid_config(self) -> Any:
         """Test packet crafting with invalid configuration."""
         invalid_config = PacketConfig(
             source_ip="invalid-ip",
@@ -435,7 +446,7 @@ class TestErrorHandling:
         packet = craft_tcp_packet(invalid_config)
         # Result depends on Scapy availability
     
-    def test_scan_port_invalid_host(self):
+    def test_scan_port_invalid_host(self) -> Any:
         """Test port scanning with invalid host."""
         if not NMAP_AVAILABLE:
             pytest.skip("python-nmap not available")
@@ -449,7 +460,7 @@ class TestErrorHandling:
             
             assert result.state == "unknown"
     
-    def test_sniff_packets_invalid_interface(self):
+    def test_sniff_packets_invalid_interface(self) -> Any:
         """Test packet sniffing with invalid interface."""
         if not SCAPY_AVAILABLE:
             pytest.skip("Scapy not available")
@@ -468,9 +479,8 @@ class TestErrorHandling:
 class TestPerformance:
     """Performance tests for network operations."""
     
-    def test_packet_crafting_performance(self, sample_packet_config):
+    def test_packet_crafting_performance(self, sample_packet_config) -> Any:
         """Test packet crafting performance."""
-        import time
         
         start_time = time.time()
         
@@ -483,12 +493,11 @@ class TestPerformance:
         # Should complete 100 packet crafts in reasonable time
         assert duration < 10.0  # 10 seconds max
     
-    def test_scan_performance(self):
+    def test_scan_performance(self) -> Any:
         """Test port scanning performance."""
         if not NMAP_AVAILABLE:
             pytest.skip("python-nmap not available")
         
-        import time
         
         with patch('utils.network_ops.nmap.PortScanner') as mock_scanner_class:
             mock_scanner = Mock()
@@ -512,9 +521,8 @@ class TestPerformance:
 class TestSecurity:
     """Security tests for network operations."""
     
-    def test_private_ip_validation(self):
+    def test_private_ip_validation(self) -> Any:
         """Test validation of private IP addresses."""
-        from utils.network_ops import validate_target_address
         
         # Private IPs should be rejected
         assert not validate_target_address("192.168.1.1")
@@ -527,9 +535,8 @@ class TestSecurity:
         assert validate_target_address("8.8.8.8")
         assert validate_target_address("1.1.1.1")
     
-    def test_target_sanitization(self):
+    def test_target_sanitization(self) -> Optional[Dict[str, Any]]:
         """Test target address sanitization."""
-        from utils.network_ops import sanitize_target_address
         
         # Test URL sanitization
         assert sanitize_target_address("https://example.com:443/path") == "example.com"
@@ -540,5 +547,6 @@ class TestSecurity:
         assert sanitize_target_address("example.com:8080") == "example.com"
         assert sanitize_target_address("192.168.1.1:22") == "192.168.1.1"
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__]) 

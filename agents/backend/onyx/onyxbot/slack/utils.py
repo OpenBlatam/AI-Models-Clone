@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
 import logging
 import random
 import re
@@ -26,11 +34,7 @@ from onyx.configs.onyxbot_configs import DANSWER_BOT_MAX_QPM
 from onyx.configs.onyxbot_configs import DANSWER_BOT_MAX_WAIT_TIME
 from onyx.configs.onyxbot_configs import DANSWER_BOT_NUM_RETRIES
 from onyx.configs.onyxbot_configs import (
-    DANSWER_BOT_RESPONSE_LIMIT_PER_TIME_PERIOD,
-)
 from onyx.configs.onyxbot_configs import (
-    DANSWER_BOT_RESPONSE_LIMIT_TIME_PERIOD_SECONDS,
-)
 from onyx.connectors.slack.utils import SlackTextCleaner
 from onyx.db.engine import get_session_with_current_tenant
 from onyx.db.users import get_user_by_email
@@ -46,6 +50,12 @@ from onyx.utils.telemetry import optional_telemetry
 from onyx.utils.telemetry import RecordType
 from onyx.utils.text_processing import replace_whitespaces_w_space
 from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
+from typing import Any, List, Dict, Optional
+import asyncio
+    DANSWER_BOT_RESPONSE_LIMIT_PER_TIME_PERIOD,
+)
+    DANSWER_BOT_RESPONSE_LIMIT_TIME_PERIOD_SECONDS,
+)
 
 logger = setup_logger()
 
@@ -113,7 +123,7 @@ def rephrase_slack_message(msg: str) -> str:
         messages = [
             {
                 "role": "user",
-                "content": SLACK_LANGUAGE_REPHRASE_PROMPT.format(query=msg),
+                "content"f": SLACK_LANGUAGE_REPHRASE_PROMPT",
             },
         ]
 
@@ -438,7 +448,7 @@ def get_channel_name_from_id(
         raise e
 
 
-def fetch_slack_user_ids_from_emails(
+async def fetch_slack_user_ids_from_emails(
     user_emails: list[str], client: WebClient
 ) -> tuple[list[str], list[str]]:
     user_ids: list[str] = []
@@ -454,7 +464,7 @@ def fetch_slack_user_ids_from_emails(
     return user_ids, failed_to_find
 
 
-def fetch_user_ids_from_groups(
+async def fetch_user_ids_from_groups(
     given_names: list[str], client: WebClient
 ) -> tuple[list[str], list[str]]:
     user_ids: list[str] = []
@@ -491,7 +501,7 @@ def fetch_user_ids_from_groups(
     return user_ids, failed_to_find
 
 
-def fetch_group_ids_from_names(
+async def fetch_group_ids_from_names(
     given_names: list[str], client: WebClient
 ) -> tuple[list[str], list[str]]:
     group_data: list[str] = []
@@ -522,7 +532,7 @@ def fetch_group_ids_from_names(
     return group_data, failed_to_find
 
 
-def fetch_user_semantic_id_from_id(
+async def fetch_user_semantic_id_from_id(
     user_id: str | None, client: WebClient
 ) -> str | None:
     if not user_id:
@@ -542,6 +552,10 @@ def fetch_user_semantic_id_from_id(
 
 
 def read_slack_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
     tenant_id: str, channel: str, thread: str, client: WebClient
 ) -> list[ThreadMessage]:
     thread_messages: list[ThreadMessage] = []
@@ -713,7 +727,9 @@ def get_feedback_visibility() -> FeedbackVisibility:
 
 class TenantSocketModeClient(SocketModeClient):
     def __init__(self, tenant_id: str, slack_bot_id: int, *args: Any, **kwargs: Any):
-        super().__init__(*args, **kwargs)
+        
+    """__init__ function."""
+super().__init__(*args, **kwargs)
         self._tenant_id = tenant_id
         self.slack_bot_id = slack_bot_id
         self.bot_name: str = "Unnamed"

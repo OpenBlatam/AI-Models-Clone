@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+import os
+import time
+from pathlib import Path
+from typing import List, Dict, Any
+import json
+from diffusion_models import (
+from transformers_manager import TransformersManager, ModelConfig, ModelType
+        from PIL import Image, ImageDraw
+        from PIL import Image, ImageDraw
+        from PIL import Image, ImageDraw, ImageFilter
+from typing import Any, List, Dict, Optional
 """
 Diffusion Models Demo for Cybersecurity Applications
 ===================================================
@@ -20,23 +41,14 @@ Author: AI Assistant
 License: MIT
 """
 
-import asyncio
-import logging
-import os
-import time
-from pathlib import Path
-from typing import List, Dict, Any
-import json
 
 # Import our diffusion models manager
-from diffusion_models import (
     DiffusionModelsManager, DiffusionConfig, GenerationConfig,
     ImageToImageConfig, InpaintingConfig, ControlNetConfig,
     DiffusionTask, SchedulerType, SecurityPromptEngine
 )
 
 # Import transformers manager for integration
-from transformers_manager import TransformersManager, ModelConfig, ModelType
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -46,7 +58,7 @@ logger = logging.getLogger(__name__)
 class DiffusionModelsDemo:
     """Comprehensive demo for diffusion models in cybersecurity."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         """Initialize the demo."""
         self.diffusion_manager = DiffusionModelsManager()
         self.transformers_manager = TransformersManager()
@@ -67,7 +79,7 @@ class DiffusionModelsDemo:
             }
         }
     
-    async def run_comprehensive_demo(self):
+    async def run_comprehensive_demo(self) -> Any:
         """Run the complete diffusion models demo."""
         logger.info("🚀 Starting Comprehensive Diffusion Models Demo")
         
@@ -102,7 +114,7 @@ class DiffusionModelsDemo:
             logger.error(f"❌ Demo failed: {str(e)}")
             raise
     
-    async def demo_text_to_image_generation(self):
+    async def demo_text_to_image_generation(self) -> Any:
         """Demonstrate basic text-to-image generation."""
         logger.info("📝 Demo: Basic Text-to-Image Generation")
         
@@ -144,7 +156,7 @@ class DiffusionModelsDemo:
             
             logger.info(f"  ⏱️  Generation time: {result.processing_time:.2f}s")
     
-    async def demo_security_visualizations(self):
+    async def demo_security_visualizations(self) -> Any:
         """Demonstrate security-focused visualizations."""
         logger.info("🔒 Demo: Security Visualizations")
         
@@ -170,7 +182,7 @@ class DiffusionModelsDemo:
                     logger.info(f"    💾 Saved: {filename}")
                     logger.info(f"    ⏱️  Generation time: {result.processing_time:.2f}s")
     
-    async def demo_image_to_image(self):
+    async def demo_image_to_image(self) -> Any:
         """Demonstrate image-to-image transformation."""
         logger.info("🔄 Demo: Image-to-Image Transformation")
         
@@ -184,7 +196,6 @@ class DiffusionModelsDemo:
         await self.diffusion_manager.load_pipeline(config)
         
         # Create a simple test image (you can replace with actual image loading)
-        from PIL import Image, ImageDraw
         
         # Create a simple network diagram
         test_image = Image.new('RGB', (512, 512), color='white')
@@ -212,7 +223,7 @@ class DiffusionModelsDemo:
         logger.info("  💾 Saved: transformed_network.png")
         logger.info(f"  ⏱️  Transformation time: {result.processing_time:.2f}s")
     
-    async def demo_inpainting(self):
+    async def demo_inpainting(self) -> Any:
         """Demonstrate inpainting capabilities."""
         logger.info("🎨 Demo: Inpainting")
         
@@ -226,7 +237,6 @@ class DiffusionModelsDemo:
         await self.diffusion_manager.load_pipeline(config)
         
         # Create test image and mask
-        from PIL import Image, ImageDraw
         
         # Create a security dashboard image
         image = Image.new('RGB', (512, 512), color='lightblue')
@@ -263,7 +273,7 @@ class DiffusionModelsDemo:
         logger.info("  💾 Saved: inpainted_dashboard.png")
         logger.info(f"  ⏱️  Inpainting time: {result.processing_time:.2f}s")
     
-    async def demo_controlnet(self):
+    async def demo_controlnet(self) -> Any:
         """Demonstrate ControlNet integration."""
         logger.info("🎛️ Demo: ControlNet Integration")
         
@@ -277,7 +287,6 @@ class DiffusionModelsDemo:
         await self.diffusion_manager.load_pipeline(config)
         
         # Create control image (edge detection)
-        from PIL import Image, ImageDraw, ImageFilter
         
         # Create a simple diagram
         control_image = Image.new('RGB', (512, 512), color='white')
@@ -317,7 +326,7 @@ class DiffusionModelsDemo:
         logger.info("  💾 Saved: controlnet_generated.png")
         logger.info(f"  ⏱️  ControlNet generation time: {result.processing_time:.2f}s")
     
-    async def demo_performance_testing(self):
+    async def demo_performance_testing(self) -> Any:
         """Demonstrate performance testing and optimization."""
         logger.info("⚡ Demo: Performance Testing")
         
@@ -369,11 +378,15 @@ class DiffusionModelsDemo:
         
         # Save performance results
         with open(self.output_dir / "performance_results.json", "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             json.dump(performance_results, f, indent=2)
         
         logger.info("  💾 Saved: performance_results.json")
     
-    async def demo_transformers_integration(self):
+    async def demo_transformers_integration(self) -> Any:
         """Demonstrate integration with transformers manager."""
         logger.info("🔗 Demo: Transformers Integration")
         
@@ -414,7 +427,7 @@ class DiffusionModelsDemo:
             logger.info(f"    Inference time: {result.processing_time:.4f}s")
             logger.info(f"    Memory usage: {result.memory_usage['rss_mb']:.1f} MB")
     
-    async def demo_memory_management(self):
+    async def demo_memory_management(self) -> Any:
         """Demonstrate memory management capabilities."""
         logger.info("🧠 Demo: Memory Management")
         
@@ -456,7 +469,7 @@ class DiffusionModelsDemo:
         
         logger.info(f"  📊 Pipelines after cache clear: {len(self.diffusion_manager.list_loaded_pipelines())}")
     
-    async def demo_security_prompt_engineering(self):
+    async def demo_security_prompt_engineering(self) -> Any:
         """Demonstrate security-focused prompt engineering."""
         logger.info("🎯 Demo: Security Prompt Engineering")
         
@@ -524,5 +537,6 @@ async def main():
     print("✅ Demo completed successfully!")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

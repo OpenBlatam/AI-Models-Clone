@@ -1,11 +1,13 @@
-#!/usr/bin/env python3
-"""
-Gradio Error Handling and Input Validation System
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Comprehensive error handling and input validation for Gradio applications
-in the AI Video system. Provides robust error management, user-friendly
-error messages, and input validation with proper error categorization.
-"""
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+BUFFER_SIZE = 1024
 
 import asyncio
 import functools
@@ -17,21 +19,31 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from typing import (
-    Any, Callable, Dict, List, Optional, Tuple, Union, 
-    TypeVar, ParamSpec, Awaitable
-)
 import gradio as gr
 from pydantic import BaseModel, ValidationError as PydanticValidationError
 import numpy as np
 from PIL import Image
+from .core import (
+from .models import VideoRequest, VideoResponse
+from .utils.validation import validate_file_type, validate_file_size
+from typing import Any, List, Dict, Optional
+#!/usr/bin/env python3
+"""
+Gradio Error Handling and Input Validation System
+
+Comprehensive error handling and input validation for Gradio applications
+in the AI Video system. Provides robust error management, user-friendly
+error messages, and input validation with proper error categorization.
+"""
+
+    Any, Callable, Dict, List, Optional, Tuple, Union, 
+    TypeVar, ParamSpec, Awaitable
+)
 
 # Local imports
-from .core import (
     AIVideoError, ValidationError, ConfigurationError, WorkflowError,
     main_logger, performance_logger, security_logger
 )
-from .models import VideoRequest, VideoResponse
-from .utils.validation import validate_file_type, validate_file_size
 
 # Type variables for decorators
 T = TypeVar('T')
@@ -98,7 +110,7 @@ class GradioErrorHandler:
     and proper error categorization for the AI Video system.
     """
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.error_history: List[GradioErrorInfo] = []
         self.error_counts: Dict[str, int] = {}
         self.max_history_size = 1000
@@ -297,30 +309,25 @@ class GradioErrorHandler:
         
         if "length" in error_str:
             if "minimum" in error_str:
-                return self.user_messages["text_too_short"].format(
-                    min_length=context.get("min_length", 10)
+                return self.user_messages["text_too_short"f"]"
                 )
             elif "maximum" in error_str:
-                return self.user_messages["text_too_long"].format(
-                    max_length=context.get("max_length", 1000)
+                return self.user_messages["text_too_long"f"]"
                 )
         elif "quality" in error_str:
-            return self.user_messages["invalid_quality"].format(
-                allowed_values=", ".join(context.get("allowed_values", ["low", "medium", "high"]))
+            return self.user_messages["invalid_quality"f"]")
             )
         elif "duration" in error_str:
-            return self.user_messages["invalid_duration"].format(
-                min_value=context.get("min_value", 5),
+            return self.user_messages["invalid_duration"f"]",
                 max_value=context.get("max_value", 300)
             )
         elif "file" in error_str:
             if "size" in error_str:
                 max_size_mb = context.get("max_size_mb", 100)
-                return self.user_messages["file_too_large"].format(max_size=max_size_mb)
+                return self.user_messages["file_too_large"f"]"
             elif "type" in error_str:
                 allowed_types = context.get("allowed_types", ["mp4", "avi", "mov"])
-                return self.user_messages["invalid_file_type"].format(
-                    allowed_types=", ".join(allowed_types)
+                return self.user_messages["invalid_file_type"f"]"
                 )
         
         return "Please check your input and try again."
@@ -461,7 +468,9 @@ class GradioInputValidator:
     """
     
     def __init__(self, error_handler: GradioErrorHandler):
-        self.error_handler = error_handler
+        
+    """__init__ function."""
+self.error_handler = error_handler
         self.validation_rules: Dict[str, InputValidationRule] = {}
         
         # Default validation rules
@@ -584,7 +593,7 @@ class GradioInputValidator:
                     f"File too large. Maximum size: {max_size_mb:.1f} MB"
                 )
     
-    def validate_video_request(
+    async def validate_video_request(
         self,
         input_text: str,
         quality: str,

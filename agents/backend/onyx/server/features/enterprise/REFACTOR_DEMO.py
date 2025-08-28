@@ -1,3 +1,16 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+import asyncio
+import logging
+from enterprise import create_enterprise_app, EnterpriseConfig
+        import uvicorn
+from typing import Any, List, Dict, Optional
 #!/usr/bin/env python3
 """
 🚀 ENTERPRISE API - REFACTORED DEMO
@@ -22,9 +35,6 @@ STRUCTURE:
 - Presentation Layer: Controllers and middleware
 """
 
-import asyncio
-import logging
-from enterprise import create_enterprise_app, EnterpriseConfig
 
 # Configure logging
 logging.basicConfig(
@@ -95,7 +105,6 @@ async def main():
     
     # Run the server
     try:
-        import uvicorn
         uvicorn.run(app, host="0.0.0.0", port=8001, log_level="info")
     except ImportError:
         print("❌ uvicorn not installed. Install with: pip install uvicorn")
@@ -104,5 +113,6 @@ async def main():
         print("\n🛑 Server stopped")
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     asyncio.run(main()) 

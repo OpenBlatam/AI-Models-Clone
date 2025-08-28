@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import os
 from unittest.mock import MagicMock
 from unittest.mock import patch
@@ -13,6 +15,9 @@ from onyx.file_processing.extract_file_text import ACCEPTED_PLAIN_TEXT_FILE_EXTE
 from onyx.file_processing.extract_file_text import get_file_ext
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 @pytest.fixture
 def blob_connector(request: pytest.FixtureRequest) -> BlobStorageConnector:
     connector = BlobStorageConnector(

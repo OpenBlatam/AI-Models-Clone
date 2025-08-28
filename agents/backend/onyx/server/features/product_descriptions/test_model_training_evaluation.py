@@ -1,3 +1,40 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+import asyncio
+import json
+import os
+import tempfile
+import time
+from pathlib import Path
+from unittest.mock import AsyncMock, MagicMock, patch
+from typing import Dict, List, Any
+import numpy as np
+import pandas as pd
+import pytest
+import torch
+from sklearn.datasets import make_classification, make_regression
+from sklearn.model_selection import train_test_split
+from model_training_evaluation import (
+        import shutil
+        from transformers import AutoTokenizer
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+        import shutil
+            import shutil
+            import shutil
+from typing import Any, List, Dict, Optional
+import logging
 """
 Comprehensive Tests for Model Training and Evaluation System
 
@@ -10,23 +47,8 @@ This test suite covers:
 - Security and robustness testing
 """
 
-import asyncio
-import json
-import os
-import tempfile
-import time
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
-from typing import Dict, List, Any
 
-import numpy as np
-import pandas as pd
-import pytest
-import torch
-from sklearn.datasets import make_classification, make_regression
-from sklearn.model_selection import train_test_split
 
-from model_training_evaluation import (
     ModelTrainer, ModelEvaluator, HyperparameterOptimizer,
     ModelVersionManager, ModelDeploymentManager, ModelType,
     TrainingConfig, EvaluationMetrics, create_model_trainer,
@@ -39,7 +61,7 @@ from model_training_evaluation import (
 class TestTrainingConfig:
     """Test TrainingConfig dataclass."""
     
-    def test_training_config_creation(self):
+    def test_training_config_creation(self) -> Any:
         """Test creating TrainingConfig with default values."""
         config = TrainingConfig(
             model_type=ModelType.THREAT_DETECTION,
@@ -54,7 +76,7 @@ class TestTrainingConfig:
         assert config.batch_size == 32
         assert config.learning_rate == 1e-4
     
-    def test_training_config_custom_values(self):
+    def test_training_config_custom_values(self) -> Any:
         """Test creating TrainingConfig with custom values."""
         config = TrainingConfig(
             model_type=ModelType.ANOMALY_DETECTION,
@@ -74,7 +96,7 @@ class TestTrainingConfig:
 class TestEvaluationMetrics:
     """Test EvaluationMetrics dataclass."""
     
-    def test_evaluation_metrics_creation(self):
+    def test_evaluation_metrics_creation(self) -> Any:
         """Test creating EvaluationMetrics."""
         metrics = EvaluationMetrics(
             accuracy=0.85,
@@ -97,7 +119,7 @@ class TestEvaluationMetrics:
         assert metrics.inference_time == 0.05
         assert metrics.model_size_mb == 45.2
     
-    def test_evaluation_metrics_with_regression(self):
+    def test_evaluation_metrics_with_regression(self) -> Any:
         """Test EvaluationMetrics with regression metrics."""
         metrics = EvaluationMetrics(
             accuracy=0.85,
@@ -126,7 +148,7 @@ class TestEvaluationMetrics:
 class TestBaseDataset:
     """Test BaseDataset abstract class."""
     
-    def test_base_dataset_abstract_methods(self):
+    def test_base_dataset_abstract_methods(self) -> Any:
         """Test that BaseDataset cannot be instantiated directly."""
         with pytest.raises(TypeError):
             BaseDataset("test.csv")
@@ -135,7 +157,7 @@ class TestBaseDataset:
 class TestThreatDetectionDataset:
     """Test ThreatDetectionDataset."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test data."""
         self.temp_dir = tempfile.mkdtemp()
         self.dataset_path = os.path.join(self.temp_dir, "threat_data.csv")
@@ -153,12 +175,11 @@ class TestThreatDetectionDataset:
         df = pd.DataFrame(data)
         df.to_csv(self.dataset_path, index=False)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test data."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_threat_detection_dataset_creation(self):
+    def test_threat_detection_dataset_creation(self) -> Any:
         """Test creating ThreatDetectionDataset."""
         dataset = ThreatDetectionDataset(self.dataset_path)
         
@@ -167,9 +188,8 @@ class TestThreatDetectionDataset:
         assert len(dataset.labels) == 4
         assert dataset.labels == [0, 1, 1, 0]
     
-    def test_threat_detection_dataset_with_tokenizer(self):
+    def test_threat_detection_dataset_with_tokenizer(self) -> Any:
         """Test ThreatDetectionDataset with tokenizer."""
-        from transformers import AutoTokenizer
         
         tokenizer = AutoTokenizer.from_pretrained("distilbert-base-uncased")
         dataset = ThreatDetectionDataset(self.dataset_path, tokenizer, max_length=128)
@@ -179,7 +199,7 @@ class TestThreatDetectionDataset:
         assert 'input_ids' in dataset.data[0]
         assert 'attention_mask' in dataset.data[0]
     
-    def test_threat_detection_dataset_getitem(self):
+    def test_threat_detection_dataset_getitem(self) -> Optional[Dict[str, Any]]:
         """Test ThreatDetectionDataset __getitem__ method."""
         dataset = ThreatDetectionDataset(self.dataset_path)
         
@@ -188,7 +208,7 @@ class TestThreatDetectionDataset:
         assert len(item) == 2
         assert item[1] == 0  # label
     
-    def test_threat_detection_dataset_invalid_path(self):
+    def test_threat_detection_dataset_invalid_path(self) -> Any:
         """Test ThreatDetectionDataset with invalid path."""
         with pytest.raises(Exception):
             ThreatDetectionDataset("nonexistent.csv")
@@ -197,7 +217,7 @@ class TestThreatDetectionDataset:
 class TestAnomalyDetectionDataset:
     """Test AnomalyDetectionDataset."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test data."""
         self.temp_dir = tempfile.mkdtemp()
         self.dataset_path = os.path.join(self.temp_dir, "anomaly_data.csv")
@@ -217,12 +237,11 @@ class TestAnomalyDetectionDataset:
         df = pd.DataFrame(data)
         df.to_csv(self.dataset_path, index=False)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test data."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_anomaly_detection_dataset_creation(self):
+    def test_anomaly_detection_dataset_creation(self) -> Any:
         """Test creating AnomalyDetectionDataset."""
         dataset = AnomalyDetectionDataset(self.dataset_path)
         
@@ -232,7 +251,7 @@ class TestAnomalyDetectionDataset:
         assert dataset.data.shape[1] == 5  # 5 features
         assert dataset.labels.shape[0] == 4
     
-    def test_anomaly_detection_dataset_getitem(self):
+    def test_anomaly_detection_dataset_getitem(self) -> Optional[Dict[str, Any]]:
         """Test AnomalyDetectionDataset __getitem__ method."""
         dataset = AnomalyDetectionDataset(self.dataset_path)
         
@@ -246,7 +265,7 @@ class TestAnomalyDetectionDataset:
 class TestModelTrainer:
     """Test ModelTrainer class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.config = TrainingConfig(
@@ -259,12 +278,11 @@ class TestModelTrainer:
             batch_size=4
         )
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test environment."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_model_trainer_initialization(self):
+    def test_model_trainer_initialization(self) -> Any:
         """Test ModelTrainer initialization."""
         trainer = ModelTrainer(self.config)
         
@@ -273,7 +291,7 @@ class TestModelTrainer:
         assert trainer.tokenizer is None
         assert trainer.trainer is None
     
-    def test_setup_directories(self):
+    def test_setup_directories(self) -> Any:
         """Test directory setup."""
         trainer = ModelTrainer(self.config)
         
@@ -283,14 +301,14 @@ class TestModelTrainer:
     
     @patch('model_training_evaluation.mlflow.set_tracking_uri')
     @patch('model_training_evaluation.mlflow.set_experiment')
-    def test_setup_mlflow(self, mock_set_experiment, mock_set_tracking_uri):
+    def test_setup_mlflow(self, mock_set_experiment, mock_set_tracking_uri) -> Any:
         """Test MLflow setup."""
         trainer = ModelTrainer(self.config)
         
         mock_set_tracking_uri.assert_called_once_with("sqlite:///mlflow.db")
         mock_set_experiment.assert_called_once_with("cybersecurity_threat_detection")
     
-    def test_setup_model_threat_detection(self):
+    def test_setup_model_threat_detection(self) -> Any:
         """Test model setup for threat detection."""
         trainer = ModelTrainer(self.config)
         trainer._setup_model()
@@ -298,7 +316,7 @@ class TestModelTrainer:
         assert trainer.model is not None
         assert trainer.tokenizer is not None
     
-    def test_setup_model_anomaly_detection(self):
+    def test_setup_model_anomaly_detection(self) -> Any:
         """Test model setup for anomaly detection."""
         config = TrainingConfig(
             model_type=ModelType.ANOMALY_DETECTION,
@@ -314,7 +332,7 @@ class TestModelTrainer:
         assert trainer.model is not None
         assert trainer.tokenizer is None
     
-    def test_setup_model_unsupported_type(self):
+    def test_setup_model_unsupported_type(self) -> Any:
         """Test model setup with unsupported type."""
         config = TrainingConfig(
             model_type=ModelType.LOG_ANALYSIS,  # Unsupported
@@ -327,7 +345,7 @@ class TestModelTrainer:
         with pytest.raises(ValueError, match="Unsupported model type"):
             trainer._setup_model()
     
-    def test_setup_training_arguments(self):
+    def test_setup_training_arguments(self) -> Any:
         """Test training arguments setup."""
         trainer = ModelTrainer(self.config)
         training_args = trainer._setup_training_arguments()
@@ -337,7 +355,7 @@ class TestModelTrainer:
         assert training_args.per_device_train_batch_size == self.config.batch_size
         assert training_args.learning_rate == self.config.learning_rate
     
-    def test_calculate_model_size(self):
+    def test_calculate_model_size(self) -> Any:
         """Test model size calculation."""
         trainer = ModelTrainer(self.config)
         
@@ -346,12 +364,20 @@ class TestModelTrainer:
         os.makedirs(model_path, exist_ok=True)
         
         with open(os.path.join(model_path, "model.pt"), "w") as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             f.write("dummy model content")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         
         size = trainer._calculate_model_size(model_path)
         assert size > 0
     
-    def test_get_dataset_info(self):
+    def test_get_dataset_info(self) -> Optional[Dict[str, Any]]:
         """Test dataset info extraction."""
         trainer = ModelTrainer(self.config)
         
@@ -365,7 +391,7 @@ class TestModelTrainer:
         assert "text" in info["columns"]
         assert "label" in info["columns"]
     
-    def test_get_dependencies(self):
+    def test_get_dependencies(self) -> Optional[Dict[str, Any]]:
         """Test dependency extraction."""
         trainer = ModelTrainer(self.config)
         deps = trainer._get_dependencies()
@@ -378,20 +404,19 @@ class TestModelTrainer:
 class TestModelEvaluator:
     """Test ModelEvaluator class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.model_path = os.path.join(self.temp_dir, "test_model")
         os.makedirs(self.model_path, exist_ok=True)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test environment."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
     @patch('model_training_evaluation.AutoModelForSequenceClassification.from_pretrained')
     @patch('model_training_evaluation.AutoTokenizer.from_pretrained')
-    def test_model_evaluator_initialization(self, mock_tokenizer, mock_model):
+    def test_model_evaluator_initialization(self, mock_tokenizer, mock_model) -> Any:
         """Test ModelEvaluator initialization."""
         evaluator = ModelEvaluator(self.model_path, ModelType.THREAT_DETECTION)
         
@@ -400,12 +425,12 @@ class TestModelEvaluator:
         mock_model.assert_called_once_with(self.model_path)
         mock_tokenizer.assert_called_once_with(self.model_path)
     
-    def test_load_model_invalid_path(self):
+    def test_load_model_invalid_path(self) -> Any:
         """Test loading model from invalid path."""
         with pytest.raises(Exception):
             ModelEvaluator("nonexistent_path", ModelType.THREAT_DETECTION)
     
-    def test_calculate_metrics_threat_detection(self):
+    def test_calculate_metrics_threat_detection(self) -> Any:
         """Test metrics calculation for threat detection."""
         evaluator = ModelEvaluator(self.model_path, ModelType.THREAT_DETECTION)
         
@@ -422,7 +447,7 @@ class TestModelEvaluator:
         assert metrics.roc_auc > 0
         assert metrics.inference_time == 0.05
     
-    def test_calculate_metrics_anomaly_detection(self):
+    def test_calculate_metrics_anomaly_detection(self) -> Any:
         """Test metrics calculation for anomaly detection."""
         evaluator = ModelEvaluator(self.model_path, ModelType.ANOMALY_DETECTION)
         
@@ -439,7 +464,7 @@ class TestModelEvaluator:
 class TestHyperparameterOptimizer:
     """Test HyperparameterOptimizer class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.dataset_path = os.path.join(self.temp_dir, "test_data.csv")
@@ -449,12 +474,11 @@ class TestHyperparameterOptimizer:
         df = pd.DataFrame(data)
         df.to_csv(self.dataset_path, index=False)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test environment."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_hyperparameter_optimizer_initialization(self):
+    def test_hyperparameter_optimizer_initialization(self) -> Any:
         """Test HyperparameterOptimizer initialization."""
         optimizer = HyperparameterOptimizer(
             ModelType.THREAT_DETECTION,
@@ -467,7 +491,7 @@ class TestHyperparameterOptimizer:
     
     @patch('model_training_evaluation.ModelTrainer')
     @patch('model_training_evaluation.optuna.create_study')
-    def test_optimize(self, mock_create_study, mock_trainer):
+    def test_optimize(self, mock_create_study, mock_trainer) -> Any:
         """Test hyperparameter optimization."""
         # Mock study
         mock_study = MagicMock()
@@ -495,18 +519,17 @@ class TestHyperparameterOptimizer:
 class TestModelVersionManager:
     """Test ModelVersionManager class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.models_dir = os.path.join(self.temp_dir, "models")
         os.makedirs(self.models_dir, exist_ok=True)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test environment."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_model_version_manager_initialization(self):
+    def test_model_version_manager_initialization(self) -> Any:
         """Test ModelVersionManager initialization."""
         manager = ModelVersionManager(self.models_dir)
         
@@ -514,7 +537,7 @@ class TestModelVersionManager:
         assert manager.metadata_file == Path(self.models_dir) / "metadata.json"
         assert manager.metadata == {}
     
-    def test_register_model(self):
+    def test_register_model(self) -> Any:
         """Test model registration."""
         manager = ModelVersionManager(self.models_dir)
         
@@ -540,7 +563,7 @@ class TestModelVersionManager:
         assert manager.metadata["test-id"]["model_name"] == "test-model"
         assert manager.metadata["test-id"]["model_type"] == "threat_detection"
     
-    def test_get_model(self):
+    def test_get_model(self) -> Optional[Dict[str, Any]]:
         """Test getting model by ID."""
         manager = ModelVersionManager(self.models_dir)
         
@@ -570,7 +593,7 @@ class TestModelVersionManager:
         # Get non-existent model
         assert manager.get_model("nonexistent") is None
     
-    def test_list_models(self):
+    def test_list_models(self) -> List[Any]:
         """Test listing models."""
         manager = ModelVersionManager(self.models_dir)
         
@@ -604,7 +627,7 @@ class TestModelVersionManager:
         anomaly_models = manager.list_models(ModelType.ANOMALY_DETECTION)
         assert len(anomaly_models) == 1
     
-    def test_set_production_model(self):
+    def test_set_production_model(self) -> Any:
         """Test setting production model."""
         manager = ModelVersionManager(self.models_dir)
         
@@ -635,7 +658,7 @@ class TestModelVersionManager:
         assert len(production_models) == 1
         assert production_models[0]["model_id"] == "test-id-1"
     
-    def test_get_production_model(self):
+    def test_get_production_model(self) -> Optional[Dict[str, Any]]:
         """Test getting production model."""
         manager = ModelVersionManager(self.models_dir)
         
@@ -670,18 +693,17 @@ class TestModelVersionManager:
 class TestModelDeploymentManager:
     """Test ModelDeploymentManager class."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.models_dir = os.path.join(self.temp_dir, "models")
         os.makedirs(self.models_dir, exist_ok=True)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test environment."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_model_deployment_manager_initialization(self):
+    def test_model_deployment_manager_initialization(self) -> Any:
         """Test ModelDeploymentManager initialization."""
         manager = ModelDeploymentManager(self.models_dir)
         
@@ -691,7 +713,7 @@ class TestModelDeploymentManager:
     
     @patch('model_training_evaluation.AutoModelForSequenceClassification.from_pretrained')
     @patch('model_training_evaluation.AutoTokenizer.from_pretrained')
-    async def test_deploy_model(self, mock_tokenizer, mock_model):
+    async def test_deploy_model(self, mock_tokenizer, mock_model) -> Any:
         """Test model deployment."""
         manager = ModelDeploymentManager(self.models_dir)
         
@@ -711,7 +733,7 @@ class TestModelDeploymentManager:
         mock_model.assert_called_once_with("/path/to/model")
         mock_tokenizer.assert_called_once_with("/path/to/model")
     
-    async def test_deploy_model_no_production(self):
+    async def test_deploy_model_no_production(self) -> Any:
         """Test deploying model when no production model exists."""
         manager = ModelDeploymentManager(self.models_dir)
         manager.version_manager.get_production_model = MagicMock(return_value=None)
@@ -719,7 +741,7 @@ class TestModelDeploymentManager:
         with pytest.raises(ValueError, match="No production model found"):
             await manager.deploy_model(ModelType.THREAT_DETECTION)
     
-    async def test_predict(self):
+    async def test_predict(self) -> Any:
         """Test model prediction."""
         manager = ModelDeploymentManager(self.models_dir)
         
@@ -752,14 +774,14 @@ class TestModelDeploymentManager:
                 assert "inference_time" in result
                 assert result["model_id"] == "test-id"
     
-    async def test_predict_undeployed_model(self):
+    async def test_predict_undeployed_model(self) -> Any:
         """Test prediction with undeployed model."""
         manager = ModelDeploymentManager(self.models_dir)
         
         with pytest.raises(ValueError, match="Model test-deployment not deployed"):
             await manager.predict("test-deployment", "test input")
     
-    def test_list_deployed_models(self):
+    def test_list_deployed_models(self) -> List[Any]:
         """Test listing deployed models."""
         manager = ModelDeploymentManager(self.models_dir)
         
@@ -772,7 +794,7 @@ class TestModelDeploymentManager:
         assert "deployment-1" in deployed_models
         assert "deployment-2" in deployed_models
     
-    def test_undeploy_model(self):
+    def test_undeploy_model(self) -> Any:
         """Test model undeployment."""
         manager = ModelDeploymentManager(self.models_dir)
         
@@ -784,7 +806,7 @@ class TestModelDeploymentManager:
         
         assert "test-deployment" not in manager.deployed_models
     
-    def test_undeploy_nonexistent_model(self):
+    def test_undeploy_nonexistent_model(self) -> Any:
         """Test undeploying non-existent model."""
         manager = ModelDeploymentManager(self.models_dir)
         
@@ -795,7 +817,7 @@ class TestModelDeploymentManager:
 class TestUtilityFunctions:
     """Test utility functions."""
     
-    def test_calculate_model_complexity(self):
+    def test_calculate_model_complexity(self) -> Any:
         """Test model complexity calculation."""
         # Create a simple model
         model = torch.nn.Sequential(
@@ -812,7 +834,7 @@ class TestUtilityFunctions:
         assert complexity["total_parameters"] > 0
         assert complexity["trainable_parameters"] > 0
     
-    def test_validate_model_performance(self):
+    def test_validate_model_performance(self) -> bool:
         """Test model performance validation."""
         metrics = EvaluationMetrics(
             accuracy=0.85,
@@ -851,7 +873,7 @@ class TestUtilityFunctions:
         is_valid = validate_model_performance(metrics, strict_thresholds)
         assert is_valid is False
     
-    def test_create_model_trainer(self):
+    def test_create_model_trainer(self) -> Any:
         """Test model trainer factory function."""
         trainer = create_model_trainer(
             ModelType.THREAT_DETECTION,
@@ -869,7 +891,7 @@ class TestUtilityFunctions:
 class TestIntegrationTests:
     """Integration tests for complete workflows."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment."""
         self.temp_dir = tempfile.mkdtemp()
         self.dataset_path = os.path.join(self.temp_dir, "test_data.csv")
@@ -882,13 +904,12 @@ class TestIntegrationTests:
         df = pd.DataFrame({'text': texts, 'label': y})
         df.to_csv(self.dataset_path, index=False)
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test environment."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
     @pytest.mark.asyncio
-    async def test_complete_training_evaluation_workflow(self):
+    async def test_complete_training_evaluation_workflow(self) -> Any:
         """Test complete training and evaluation workflow."""
         # Create config
         config = TrainingConfig(
@@ -918,7 +939,7 @@ class TestIntegrationTests:
         assert metrics.f1_score > 0
     
     @pytest.mark.asyncio
-    async def test_model_versioning_workflow(self):
+    async def test_model_versioning_workflow(self) -> Any:
         """Test complete model versioning workflow."""
         # Create version manager
         version_manager = ModelVersionManager(self.temp_dir)
@@ -951,7 +972,7 @@ class TestIntegrationTests:
         assert production_model["model_id"] == "test-id"
     
     @pytest.mark.asyncio
-    async def test_deployment_workflow(self):
+    async def test_deployment_workflow(self) -> Any:
         """Test complete deployment workflow."""
         # Create deployment manager
         deployment_manager = ModelDeploymentManager(self.temp_dir)
@@ -985,16 +1006,15 @@ class TestIntegrationTests:
 class TestPerformanceTests:
     """Performance tests."""
     
-    def setup_method(self):
+    def setup_method(self) -> Any:
         """Setup test environment."""
         self.temp_dir = tempfile.mkdtemp()
     
-    def teardown_method(self):
+    def teardown_method(self) -> Any:
         """Cleanup test environment."""
-        import shutil
         shutil.rmtree(self.temp_dir)
     
-    def test_model_complexity_performance(self):
+    def test_model_complexity_performance(self) -> Any:
         """Test model complexity calculation performance."""
         # Create a large model
         model = torch.nn.Sequential(
@@ -1014,7 +1034,7 @@ class TestPerformanceTests:
         assert calculation_time < 1.0  # Should complete within 1 second
         assert complexity["total_parameters"] > 1000000  # Large model
     
-    def test_metrics_validation_performance(self):
+    def test_metrics_validation_performance(self) -> Any:
         """Test metrics validation performance."""
         metrics = EvaluationMetrics(
             accuracy=0.85,
@@ -1050,7 +1070,7 @@ class TestPerformanceTests:
 class TestErrorHandling:
     """Test error handling and edge cases."""
     
-    def test_invalid_model_type(self):
+    def test_invalid_model_type(self) -> Any:
         """Test handling of invalid model types."""
         with pytest.raises(ValueError):
             TrainingConfig(
@@ -1059,7 +1079,7 @@ class TestErrorHandling:
                 dataset_path="test.csv"
             )
     
-    def test_invalid_dataset_path(self):
+    def test_invalid_dataset_path(self) -> Any:
         """Test handling of invalid dataset paths."""
         config = TrainingConfig(
             model_type=ModelType.THREAT_DETECTION,
@@ -1072,7 +1092,7 @@ class TestErrorHandling:
         with pytest.raises(Exception):
             trainer._get_dataset_info()
     
-    def test_empty_dataset(self):
+    def test_empty_dataset(self) -> Any:
         """Test handling of empty datasets."""
         temp_dir = tempfile.mkdtemp()
         try:
@@ -1085,10 +1105,9 @@ class TestErrorHandling:
             with pytest.raises(Exception):
                 ThreatDetectionDataset(empty_dataset_path)
         finally:
-            import shutil
             shutil.rmtree(temp_dir)
     
-    def test_malformed_dataset(self):
+    def test_malformed_dataset(self) -> Any:
         """Test handling of malformed datasets."""
         temp_dir = tempfile.mkdtemp()
         try:
@@ -1096,15 +1115,27 @@ class TestErrorHandling:
             
             # Create malformed dataset
             with open(malformed_dataset_path, 'w') as f:
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write("invalid,csv,format\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
                 f.write("no,proper,columns\n")
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
             
             with pytest.raises(Exception):
                 ThreatDetectionDataset(malformed_dataset_path)
         finally:
-            import shutil
             shutil.rmtree(temp_dir)
 
 
-if __name__ == "__main__":
+match __name__:
+    case "__main__":
     pytest.main([__file__, "-v"]) 

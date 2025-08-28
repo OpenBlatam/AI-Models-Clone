@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import abc
 from collections.abc import Generator
 from typing import Any
@@ -10,10 +12,13 @@ from onyx.llm.models import PreviousMessage
 from onyx.utils.special_types import JSON_ro
 
 
-if TYPE_CHECKING:
     from onyx.chat.prompt_builder.answer_prompt_builder import AnswerPromptBuilder
     from onyx.tools.message import ToolCallSummary
     from onyx.tools.models import ToolResponse
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+if TYPE_CHECKING:
 
 
 OVERRIDE_T = TypeVar("OVERRIDE_T")

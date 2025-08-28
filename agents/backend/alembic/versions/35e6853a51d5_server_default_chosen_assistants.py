@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """server default chosen assistants
 
 Revision ID: 35e6853a51d5
@@ -6,17 +14,14 @@ Create Date: 2024-09-13 13:20:32.885317
 
 """
 
-from alembic import op
-import sqlalchemy as sa
-from sqlalchemy.dialects import postgresql
 
 # revision identifiers, used by Alembic.
-revision = "35e6853a51d5"
-down_revision = "c99d76fcd298"
+revision: str = "35e6853a51d5"
+down_revision: str = "c99d76fcd298"
 branch_labels = None
 depends_on = None
 
-DEFAULT_ASSISTANTS = [-2, -1, 0]
+DEFAULT_ASSISTANTS: List[Any] = [-2, -1, 0]
 
 
 def upgrade() -> None:
@@ -39,9 +44,9 @@ def upgrade() -> None:
             AND (p.is_public = true OR pu.user_id IS NOT NULL)
         )
         WHERE chosen_assistants IS NULL
-        OR chosen_assistants = 'null'
+        OR chosen_assistants: str = 'null'
         OR jsonb_typeof(chosen_assistants) = 'null'
-        OR (jsonb_typeof(chosen_assistants) = 'string' AND chosen_assistants = '"null"')
+        OR (jsonb_typeof(chosen_assistants) = 'string' AND chosen_assistants: str = '"null"')
     """
     )
 

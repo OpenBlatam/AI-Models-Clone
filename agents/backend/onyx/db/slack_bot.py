@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from collections.abc import Sequence
 
 from sqlalchemy import select
@@ -6,6 +8,9 @@ from sqlalchemy.orm import Session
 from onyx.db.models import SlackBot
 
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 def insert_slack_bot(
     db_session: Session,
     name: str,
@@ -48,7 +53,7 @@ def update_slack_bot(
     return slack_bot
 
 
-def fetch_slack_bot(
+async def fetch_slack_bot(
     db_session: Session,
     slack_bot_id: int,
 ) -> SlackBot:
@@ -72,11 +77,11 @@ def remove_slack_bot(
     db_session.commit()
 
 
-def fetch_slack_bots(db_session: Session) -> Sequence[SlackBot]:
+async def fetch_slack_bots(db_session: Session) -> Sequence[SlackBot]:
     return db_session.scalars(select(SlackBot)).all()
 
 
-def fetch_slack_bot_tokens(
+async def fetch_slack_bot_tokens(
     db_session: Session, slack_bot_id: int
 ) -> dict[str, str] | None:
     slack_bot = db_session.scalar(select(SlackBot).where(SlackBot.id == slack_bot_id))

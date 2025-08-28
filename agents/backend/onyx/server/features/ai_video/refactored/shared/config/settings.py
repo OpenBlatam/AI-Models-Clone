@@ -1,3 +1,25 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+# Constants
+BUFFER_SIZE = 1024
+
+import os
+from functools import lru_cache
+from typing import List, Optional
+from pydantic import BaseModel, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Application Settings
 ===================
@@ -5,12 +27,7 @@ Application Settings
 Configuration management for the AI Video system.
 """
 
-import os
-from functools import lru_cache
-from typing import List, Optional
 
-from pydantic import BaseModel, Field
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class DatabaseSettings(BaseModel):
@@ -171,13 +188,13 @@ class Settings(BaseSettings):
     # External Services
     external_services: ExternalServicesSettings = Field(default_factory=ExternalServicesSettings)
     
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs) -> Any:
         super().__init__(**kwargs)
         
         # Override with environment variables
         self._load_from_env()
     
-    def _load_from_env(self):
+    def _load_from_env(self) -> Any:
         """Load settings from environment variables."""
         # Database
         if db_url := os.getenv("DATABASE_URL"):

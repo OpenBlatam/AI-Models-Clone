@@ -1,3 +1,28 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+import asyncio
+import time
+import logging
+import functools
+import inspect
+from typing import Any, Dict, List, Optional, Callable, Union, Tuple, TypeVar, Generic, Awaitable, Type
+from dataclasses import dataclass, field
+from collections import defaultdict, deque
+from datetime import datetime, timedelta
+from enum import Enum
+import json
+from pathlib import Path
+import weakref
+import contextlib
+from abc import ABC, abstractmethod
+import structlog
+from pydantic import BaseModel, Field
+import numpy as np
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, Request, Response
+from fastapi.responses import JSONResponse
+from fastapi.routing import APIRoute
+            import yaml
+from typing import Any, List, Dict, Optional
 """
 📁 Route Organization System
 ============================
@@ -15,28 +40,7 @@ Comprehensive route organization system for FastAPI:
 - Dependency mapping and visualization
 """
 
-import asyncio
-import time
-import logging
-import functools
-import inspect
-from typing import Any, Dict, List, Optional, Callable, Union, Tuple, TypeVar, Generic, Awaitable, Type
-from dataclasses import dataclass, field
-from collections import defaultdict, deque
-from datetime import datetime, timedelta
-from enum import Enum
-import json
-from pathlib import Path
-import weakref
-import contextlib
-from abc import ABC, abstractmethod
 
-import structlog
-from pydantic import BaseModel, Field
-import numpy as np
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, Request, Response
-from fastapi.responses import JSONResponse
-from fastapi.routing import APIRoute
 
 logger = structlog.get_logger(__name__)
 
@@ -115,7 +119,9 @@ class RouteOrganizer:
     """Main route organizer"""
     
     def __init__(self, app: FastAPI):
-        self.app = app
+        
+    """__init__ function."""
+self.app = app
         self.routers: Dict[str, APIRouter] = {}
         self.routes: Dict[str, RouteInfo] = {}
         self.route_groups: Dict[RouteGroup, List[str]] = defaultdict(list)
@@ -254,7 +260,6 @@ class RouteOrganizer:
         }
         
         if format.lower() == "yaml":
-            import yaml
             return yaml.dump(organization, default_flow_style=False)
         else:
             return json.dumps(organization, indent=2, default=str)
@@ -265,7 +270,9 @@ class OrganizedRouteBuilder:
     """Builder for creating organized routes"""
     
     def __init__(self, organizer: RouteOrganizer):
-        self.organizer = organizer
+        
+    """__init__ function."""
+self.organizer = organizer
         self.info = RouteInfo(
             path="",
             method="GET",
@@ -378,7 +385,9 @@ class OrganizedRouterFactory:
     """Factory for creating organized routers"""
     
     def __init__(self, organizer: RouteOrganizer):
-        self.organizer = organizer
+        
+    """__init__ function."""
+self.organizer = organizer
     
     def create_auth_router(self, prefix: str = "/auth", version: RouteVersion = RouteVersion.V1) -> APIRouter:
         """Create authentication router"""
@@ -466,7 +475,9 @@ class RouteAnalyzer:
     """Analyze and discover routes"""
     
     def __init__(self, app: FastAPI):
-        self.app = app
+        
+    """__init__ function."""
+self.app = app
     
     def discover_routes(self) -> List[Dict[str, Any]]:
         """Discover all routes in the application"""
@@ -557,37 +568,49 @@ def create_organized_app() -> FastAPI:
     # Example organized route definitions
     @builder.path("/login").method("POST").group(RouteGroup.AUTH).summary("User login")
     async def login():
-        return {"message": "Login endpoint"}
+        
+    """login function."""
+return {"message": "Login endpoint"}
     
     auth_router = builder.build(auth_router)
     
     @builder.path("/profile").method("GET").group(RouteGroup.USERS).summary("Get user profile")
     async def get_profile():
-        return {"message": "User profile"}
+        
+    """get_profile function."""
+return {"message": "User profile"}
     
     user_router = builder.build(user_router)
     
     @builder.path("/posts").method("POST").group(RouteGroup.CONTENT).summary("Create post")
     async def create_post():
-        return {"message": "Post created"}
+        
+    """create_post function."""
+return {"message": "Post created"}
     
     content_router = builder.build(content_router)
     
     @builder.path("/").method("GET").group(RouteGroup.HEALTH).summary("Health check")
     async def health_check():
-        return {"status": "healthy"}
+        
+    """health_check function."""
+return {"status": "healthy"}
     
     health_router = builder.build(health_router)
     
     @builder.path("/metrics").method("GET").group(RouteGroup.MONITORING).summary("Get metrics")
     async def get_metrics():
-        return {"metrics": "available"}
+        
+    """get_metrics function."""
+return {"metrics": "available"}
     
     monitoring_router = builder.build(monitoring_router)
     
     @builder.path("/analytics").method("GET").group(RouteGroup.ANALYTICS).summary("Get analytics")
     async def get_analytics():
-        return {"analytics": "available"}
+        
+    """get_analytics function."""
+return {"analytics": "available"}
     
     analytics_router = builder.build(analytics_router)
     

@@ -1,3 +1,10 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+import sqlalchemy as sa
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Add standard_answer tables
 
 Revision ID: c18cdf4b497e
@@ -6,8 +13,6 @@ Create Date: 2024-06-06 15:15:02.000648
 
 """
 
-from alembic import op
-import sqlalchemy as sa
 
 # revision identifiers, used by Alembic.
 revision = "c18cdf4b497e"

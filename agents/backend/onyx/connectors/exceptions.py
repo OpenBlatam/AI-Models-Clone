@@ -1,8 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 class ValidationError(Exception):
     """General exception for validation errors."""
 
     def __init__(self, message: str):
-        self.message = message
+        
+    """__init__ function."""
+self.message = message
         super().__init__(self.message)
 
 
@@ -10,7 +17,9 @@ class ConnectorValidationError(ValidationError):
     """General exception for connector validation errors."""
 
     def __init__(self, message: str):
-        self.message = message
+        
+    """__init__ function."""
+self.message = message
         super().__init__(self.message)
 
 
@@ -26,21 +35,27 @@ class UnexpectedValidationError(ValidationError):
     """
 
     def __init__(self, message: str = "Unexpected error during connector validation"):
-        super().__init__(message)
+        
+    """__init__ function."""
+super().__init__(message)
 
 
 class CredentialInvalidError(ConnectorValidationError):
     """Raised when a connector's credential is invalid."""
 
     def __init__(self, message: str = "Credential is invalid"):
-        super().__init__(message)
+        
+    """__init__ function."""
+super().__init__(message)
 
 
 class CredentialExpiredError(ConnectorValidationError):
     """Raised when a connector's credential is expired."""
 
     def __init__(self, message: str = "Credential has expired"):
-        super().__init__(message)
+        
+    """__init__ function."""
+super().__init__(message)
 
 
 class InsufficientPermissionsError(ConnectorValidationError):
@@ -49,4 +64,6 @@ class InsufficientPermissionsError(ConnectorValidationError):
     def __init__(
         self, message: str = "Insufficient permissions for the requested operation"
     ):
-        super().__init__(message)
+        
+    """__init__ function."""
+super().__init__(message)

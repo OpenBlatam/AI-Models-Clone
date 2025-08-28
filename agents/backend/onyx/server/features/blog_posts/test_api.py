@@ -1,9 +1,10 @@
-"""
-🌐 API TESTS - Blog Model
-========================
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
 
-Tests para APIs REST del sistema de análisis de contenido de blog.
-"""
+# Constants
+MAX_RETRIES = 100
 
 import asyncio
 import json
@@ -11,12 +12,21 @@ import time
 from typing import Dict, Any, Optional
 from unittest.mock import MagicMock, AsyncMock
 from test_simple import SimplifiedBlogAnalyzer, BlogAnalysisResult
+from typing import Any, List, Dict, Optional
+import logging
+"""
+🌐 API TESTS - Blog Model
+========================
+
+Tests para APIs REST del sistema de análisis de contenido de blog.
+"""
+
 
 
 class MockAPIClient:
     """Cliente API mock para testing."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.analyzer = SimplifiedBlogAnalyzer()
         self.request_count = 0
         self.response_times = []
@@ -73,7 +83,7 @@ class MockAPIClient:
             "request_id": f"req_{self.request_count}"
         }
     
-    async def _handle_analyze_request(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async async def _handle_analyze_request(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Manejar request de análisis individual."""
         if "content" not in data:
             return {"error": "Missing 'content' field", "status": 400}
@@ -112,7 +122,7 @@ class MockAPIClient:
                 }
             }
     
-    async def _handle_batch_request(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async async def _handle_batch_request(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Manejar request de análisis en lote."""
         if "contents" not in data:
             return {"error": "Missing 'contents' field", "status": 400}
@@ -143,7 +153,7 @@ class MockAPIClient:
             }
         }
     
-    async def _handle_health_request(self, data: Dict[str, Any]) -> Dict[str, Any]:
+    async async def _handle_health_request(self, data: Dict[str, Any]) -> Dict[str, Any]:
         """Manejar request de health check."""
         stats = self.analyzer.get_stats()
         
@@ -157,7 +167,7 @@ class MockAPIClient:
             }
         }
     
-    async def _handle_stats_request(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    async async def _handle_stats_request(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Manejar request de estadísticas."""
         return {
             "status": 200,
@@ -172,7 +182,7 @@ class MockAPIClient:
             }
         }
     
-    async def _handle_metrics_request(self, params: Dict[str, Any]) -> Dict[str, Any]:
+    async async def _handle_metrics_request(self, params: Dict[str, Any]) -> Dict[str, Any]:
         """Manejar request de métricas."""
         return {
             "status": 200,
@@ -192,10 +202,10 @@ class MockAPIClient:
 class TestBlogAPI:
     """Tests para API del sistema de blog."""
     
-    def __init__(self):
+    def __init__(self) -> Any:
         self.client = MockAPIClient()
     
-    async def test_single_analysis_endpoint(self):
+    async def test_single_analysis_endpoint(self) -> Any:
         """Test endpoint de análisis individual."""
         print("🌐 Testing single analysis endpoint...")
         
@@ -228,7 +238,7 @@ class TestBlogAPI:
         
         print("✅ Single analysis endpoint tests passed!")
     
-    async def test_batch_analysis_endpoint(self):
+    async def test_batch_analysis_endpoint(self) -> Any:
         """Test endpoint de análisis en lote."""
         print("🌐 Testing batch analysis endpoint...")
         
@@ -272,7 +282,7 @@ class TestBlogAPI:
         
         print("✅ Batch analysis endpoint tests passed!")
     
-    async def test_health_endpoint(self):
+    async def test_health_endpoint(self) -> Any:
         """Test endpoint de health check."""
         print("🌐 Testing health endpoint...")
         
@@ -285,7 +295,7 @@ class TestBlogAPI:
         
         print("✅ Health endpoint test passed!")
     
-    async def test_stats_endpoint(self):
+    async def test_stats_endpoint(self) -> Any:
         """Test endpoint de estadísticas."""
         print("🌐 Testing stats endpoint...")
         
@@ -302,7 +312,7 @@ class TestBlogAPI:
         
         print("✅ Stats endpoint test passed!")
     
-    async def test_metrics_endpoint(self):
+    async def test_metrics_endpoint(self) -> Any:
         """Test endpoint de métricas."""
         print("🌐 Testing metrics endpoint...")
         
@@ -315,7 +325,7 @@ class TestBlogAPI:
         
         print("✅ Metrics endpoint test passed!")
     
-    async def test_api_performance(self):
+    async async def test_api_performance(self) -> Any:
         """Test performance de la API."""
         print("🌐 Testing API performance...")
         
@@ -347,7 +357,7 @@ class TestBlogAPI:
         print(f"   Throughput: {throughput:.1f} req/s")
         print("✅ API performance test passed!")
     
-    async def test_error_handling(self):
+    async def test_error_handling(self) -> Any:
         """Test manejo de errores de la API."""
         print("🌐 Testing API error handling...")
         
@@ -369,7 +379,7 @@ class TestBlogAPI:
         
         print("✅ API error handling test passed!")
     
-    async def test_request_validation(self):
+    async async def test_request_validation(self) -> Any:
         """Test validación de requests."""
         print("🌐 Testing request validation...")
         

@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import logging
 import time
 from collections.abc import Awaitable
@@ -8,6 +10,8 @@ from fastapi import Request
 from fastapi import Response
 
 
+from typing import Any, List, Dict, Optional
+import asyncio
 def add_latency_logging_middleware(app: FastAPI, logger: logging.LoggerAdapter) -> None:
     @app.middleware("http")
     async def log_latency(

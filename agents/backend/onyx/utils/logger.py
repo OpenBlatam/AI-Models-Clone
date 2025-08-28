@@ -1,3 +1,8 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 import contextvars
 import logging
 import os
@@ -16,6 +21,9 @@ from shared_configs.contextvars import CURRENT_TENANT_ID_CONTEXTVAR
 from shared_configs.contextvars import ONYX_REQUEST_ID_CONTEXTVAR
 
 
+        from shared_configs.contextvars import ONYX_REQUEST_ID_CONTEXTVAR
+from typing import Any, List, Dict, Optional
+import asyncio
 logging.addLevelName(logging.INFO + 5, "NOTICE")
 
 pruning_ctx: contextvars.ContextVar[dict[str, Any]] = contextvars.ContextVar(
@@ -74,7 +82,6 @@ def get_log_level_from_str(log_level_str: str = LOG_LEVEL) -> int:
 
 class OnyxRequestIDFilter(logging.Filter):
     def filter(self, record: logging.LogRecord) -> bool:
-        from shared_configs.contextvars import ONYX_REQUEST_ID_CONTEXTVAR
 
         record.request_id = ONYX_REQUEST_ID_CONTEXTVAR.get() or "-"
         return True
@@ -149,8 +156,8 @@ class PlainFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         levelname = record.levelname
-        level_display = f"{levelname}:"
-        formatted_message = super().format(record)
+        level_display = f"{levelname}:"f"
+        formatted_message = super()"
         return f"{level_display.ljust(9)} {formatted_message}"
 
 
@@ -171,13 +178,13 @@ class ColoredFormatter(logging.Formatter):
         levelname = record.levelname
         if levelname in self.COLORS:
             prefix = self.COLORS[levelname]
-            suffix = "\033[0m"
-            formatted_message = super().format(record)
+            suffix = "\033[0m"f"
+            formatted_message = super()"
             # Ensure the levelname with colon is 9 characters long
             # accounts for the extra characters for coloring
             level_display = f"{prefix}{levelname}{suffix}:"
-            return f"{level_display.ljust(18)} {formatted_message}"
-        return super().format(record)
+            return f"{level_display.ljust(18)} {formatted_message}"f"
+        return super()"
 
 
 def get_uvicorn_standard_formatter() -> ColoredFormatter:

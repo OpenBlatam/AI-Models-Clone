@@ -1,10 +1,5 @@
-"""
-Enterprise Middleware Stack
-===========================
-
-Collection of enterprise-grade middleware components.
-"""
-
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import time
 import uuid
 from fastapi import Request, Response
@@ -14,6 +9,15 @@ from ...core.interfaces.metrics_interface import IMetricsService
 from ...core.interfaces.rate_limit_interface import IRateLimitService
 from ...shared.utils import safe_get_client_ip, create_response_headers
 import logging
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Enterprise Middleware Stack
+===========================
+
+Collection of enterprise-grade middleware components.
+"""
+
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +28,9 @@ class EnterpriseMiddlewareStack:
     def __init__(self, config: EnterpriseConfig, 
                  metrics_service: IMetricsService,
                  rate_limit_service: IRateLimitService):
-        self.config = config
+        
+    """__init__ function."""
+self.config = config
         self.metrics_service = metrics_service
         self.rate_limit_service = rate_limit_service
     

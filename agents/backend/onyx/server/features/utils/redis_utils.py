@@ -1,7 +1,8 @@
-"""
-Redis Utilities - Onyx Integration
-Utility functions for Redis operations in Onyx with enhanced error handling.
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
+
 from typing import Any, Dict, List, Optional, Union, TypeVar, Generic
 import json
 import pickle
@@ -13,6 +14,12 @@ from pydantic import BaseModel
 import time
 from .redis_config import RedisConfig, get_config
 from .error_system import (
+from typing import Any, List, Dict, Optional
+import asyncio
+"""
+Redis Utilities - Onyx Integration
+Utility functions for Redis operations in Onyx with enhanced error handling.
+"""
     error_factory,
     ErrorContext,
     CacheError,
@@ -28,7 +35,7 @@ T = TypeVar('T', bound=BaseModel)
 
 class DateTimeEncoder(json.JSONEncoder):
     """Custom JSON encoder for datetime objects."""
-    def default(self, obj):
+    def default(self, obj) -> Any:
         if isinstance(obj, datetime):
             return obj.isoformat()
         return super().default(obj)

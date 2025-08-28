@@ -1,11 +1,10 @@
-"""
-Rules defined here:
-https://confluence.atlassian.com/conf85/check-who-can-view-a-page-1283360557.html
-"""
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+TIMEOUT_SECONDS = 60
 
 from collections.abc import Generator
 from typing import Any
-
 from ee.onyx.configs.app_configs import CONFLUENCE_ANONYMOUS_ACCESS_IS_PUBLIC
 from ee.onyx.external_permissions.confluence.constants import ALL_CONF_EMAILS_GROUP_NAME
 from ee.onyx.external_permissions.perm_sync_types import FetchAllDocumentsFunction
@@ -13,8 +12,6 @@ from onyx.access.models import DocExternalAccess
 from onyx.access.models import ExternalAccess
 from onyx.connectors.confluence.connector import ConfluenceConnector
 from onyx.connectors.confluence.onyx_confluence import (
-    get_user_email_from_username__server,
-)
 from onyx.connectors.confluence.onyx_confluence import OnyxConfluence
 from onyx.connectors.credentials_provider import OnyxDBCredentialsProvider
 from onyx.connectors.models import SlimDocument
@@ -22,6 +19,22 @@ from onyx.db.models import ConnectorCredentialPair
 from onyx.indexing.indexing_heartbeat import IndexingHeartbeatInterface
 from onyx.utils.logger import setup_logger
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+"""
+Rules defined here:
+https://confluence.atlassian.com/conf85/check-who-can-view-a-page-1283360557.html
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
+"""
+
+
+    get_user_email_from_username__server,
+)
 
 logger = setup_logger()
 
@@ -29,7 +42,7 @@ _VIEWSPACE_PERMISSION_TYPE = "VIEWSPACE"
 _REQUEST_PAGINATION_LIMIT = 5000
 
 
-def _get_server_space_permissions(
+async def _get_server_space_permissions(
     confluence_client: OnyxConfluence, space_key: str
 ) -> ExternalAccess:
     space_permissions = confluence_client.get_all_space_permissions_server(
@@ -91,7 +104,7 @@ def _get_server_space_permissions(
     )
 
 
-def _get_cloud_space_permissions(
+async def _get_cloud_space_permissions(
     confluence_client: OnyxConfluence, space_key: str
 ) -> ExternalAccess:
     space_permissions_result = confluence_client.get_space(
@@ -126,7 +139,7 @@ def _get_cloud_space_permissions(
     )
 
 
-def _get_space_permissions(
+async def _get_space_permissions(
     confluence_client: OnyxConfluence,
     is_cloud: bool,
 ) -> dict[str, ExternalAccess]:
@@ -233,7 +246,7 @@ def _extract_read_access_restrictions(
     )
 
 
-def _get_all_page_restrictions(
+async def _get_all_page_restrictions(
     confluence_client: OnyxConfluence,
     perm_sync_data: dict[str, Any],
 ) -> ExternalAccess | None:
@@ -269,6 +282,11 @@ def _get_all_page_restrictions(
     ancestors: list[dict[str, Any]] = perm_sync_data.get("ancestors", [])
     # ancestors seem to be in order from root to immediate parent
     # https://community.atlassian.com/forums/Confluence-questions/Order-of-ancestors-in-REST-API-response-Confluence-Server-amp/qaq-p/2385981
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     # we want the restrictions from the immediate parent to take precedence, so we should
     # reverse the list
     for ancestor in reversed(ancestors):
@@ -298,7 +316,12 @@ def _get_all_page_restrictions(
     return None
 
 
-def _fetch_all_page_restrictions(
+async async def _fetch_all_page_restrictions(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     confluence_client: OnyxConfluence,
     slim_docs: list[SlimDocument],
     space_permissions_by_space_key: dict[str, ExternalAccess],
@@ -315,6 +338,11 @@ def _fetch_all_page_restrictions(
                 raise RuntimeError("confluence_doc_sync: Stop signal detected")
 
             callback.progress("confluence_doc_sync:fetch_all_page_restrictions", 1)
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
         if slim_doc.perm_sync_data is None:
             raise ValueError(
@@ -337,10 +365,25 @@ def _fetch_all_page_restrictions(
         if not (space_permissions := space_permissions_by_space_key.get(space_key)):
             logger.warning(
                 f"Individually fetching space permissions for space {space_key}. This is "
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
                 "unexpected. It means the permissions were not able to fetched initially."
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
             )
             try:
                 # If the space permissions are not in the cache, then fetch them
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
                 if is_cloud:
                     retrieved_space_permissions = _get_cloud_space_permissions(
                         confluence_client=confluence_client, space_key=space_key
@@ -354,6 +397,11 @@ def _fetch_all_page_restrictions(
             except Exception as e:
                 logger.warning(
                     f"Error fetching space permissions for space {space_key}: {e}"
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
                 )
 
         if not space_permissions:
@@ -388,17 +436,37 @@ def _fetch_all_page_restrictions(
             )
 
     logger.info("Finished fetching all page restrictions")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
 
 def confluence_doc_sync(
     cc_pair: ConnectorCredentialPair,
     fetch_all_existing_docs_fn: FetchAllDocumentsFunction,
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     callback: IndexingHeartbeatInterface | None,
 ) -> Generator[DocExternalAccess, None, None]:
     """
     Fetches document permissions from Confluence and yields DocExternalAccess objects.
     Compares fetched documents against existing documents in the DB for the connector.
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     If a document exists in the DB but not in the Confluence fetch, it's marked as restricted.
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     """
     logger.info(f"Starting confluence doc sync for CC Pair ID: {cc_pair.id}")
     confluence_connector = ConfluenceConnector(
@@ -437,16 +505,36 @@ def confluence_doc_sync(
     # Find documents that are no longer accessible in Confluence
     logger.info(f"Querying existing document IDs for CC Pair ID: {cc_pair.id}")
     existing_doc_ids = fetch_all_existing_docs_fn()
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     # Find missing doc IDs
     fetched_doc_ids = {doc.id for doc in slim_docs}
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     missing_doc_ids = set(existing_doc_ids) - fetched_doc_ids
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
 
     # Yield access removal for missing docs. Better to be safe.
     if missing_doc_ids:
         logger.warning(
             f"Found {len(missing_doc_ids)} documents that are in the DB but "
             "not present in Confluence fetch. Making them inaccessible."
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         )
         for missing_id in missing_doc_ids:
             logger.warning(f"Removing access for document ID: {missing_id}")
@@ -460,7 +548,17 @@ def confluence_doc_sync(
             )
 
     logger.info("Fetching all page restrictions for fetched documents")
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
     yield from _fetch_all_page_restrictions(
+    try:
+        pass
+    except Exception as e:
+        logger.error(f"Error in {__name__}: {e}")
+        raise
         confluence_client=confluence_connector.confluence_client,
         slim_docs=slim_docs,
         space_permissions_by_space_key=space_permissions_by_space_key,

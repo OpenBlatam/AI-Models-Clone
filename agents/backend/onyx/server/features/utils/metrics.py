@@ -1,7 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 from prometheus_fastapi_instrumentator import Instrumentator
 from prometheus_client import Counter, Histogram
 from typing import Callable
 
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """Métricas Prometheus e instrumentación automática para FastAPI LLM API."""
 
 instrumentator = Instrumentator()

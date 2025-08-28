@@ -1,3 +1,11 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
 from datetime import datetime
 from http import HTTPStatus
 
@@ -12,8 +20,6 @@ from sqlalchemy.orm import Session
 from onyx.auth.users import current_curator_or_admin_user
 from onyx.auth.users import current_user
 from onyx.background.celery.tasks.pruning.tasks import (
-    try_creating_prune_generator_task,
-)
 from onyx.background.celery.versioned_apps.client import app as client_app
 from onyx.background.indexing.models import IndexAttemptErrorPydantic
 from onyx.configs.constants import OnyxCeleryPriority
@@ -23,12 +29,8 @@ from onyx.connectors.factory import validate_ccpair_for_user
 from onyx.db.connector import delete_connector
 from onyx.db.connector_credential_pair import add_credential_to_connector
 from onyx.db.connector_credential_pair import (
-    get_connector_credential_pair_from_id_for_user,
-)
 from onyx.db.connector_credential_pair import remove_credential_from_connector
 from onyx.db.connector_credential_pair import (
-    update_connector_credential_pair_from_id,
-)
 from onyx.db.document import get_document_counts_for_cc_pairs
 from onyx.db.document import get_documents_for_cc_pair
 from onyx.db.engine import get_session
@@ -58,6 +60,15 @@ from onyx.server.models import StatusResponse
 from onyx.utils.logger import setup_logger
 from onyx.utils.variable_functionality import fetch_ee_implementation_or_noop
 from shared_configs.contextvars import get_current_tenant_id
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    try_creating_prune_generator_task,
+)
+    get_connector_credential_pair_from_id_for_user,
+)
+    update_connector_credential_pair_from_id,
+)
 
 logger = setup_logger()
 router = APIRouter(prefix="/manage")

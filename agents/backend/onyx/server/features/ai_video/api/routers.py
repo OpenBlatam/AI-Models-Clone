@@ -1,3 +1,24 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
+from fastapi import APIRouter, HTTPException, status, Depends, BackgroundTasks, Query, Path
+from .models import (
+from .video_service import VideoService
+from .dependencies import get_video_service, get_current_user
+from .background_tasks import cleanup_temp_files
+import logging
+from typing import Optional
+    from datetime import datetime
+from typing import Any, List, Dict, Optional
+import asyncio
 """
 🚀 FASTAPI ROUTERS - AI VIDEO SYSTEM
 ====================================
@@ -5,16 +26,9 @@
 API endpoints and routers for the AI Video system.
 """
 
-from fastapi import APIRouter, HTTPException, status, Depends, BackgroundTasks, Query, Path
-from .models import (
     VideoData, VideoResponse, BatchVideoRequest, BatchVideoResponse,
     VideoListResponse, VideoQuality, ErrorResponse
 )
-from .video_service import VideoService
-from .dependencies import get_video_service, get_current_user
-from .background_tasks import cleanup_temp_files
-import logging
-from typing import Optional
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -258,7 +272,6 @@ health_router = APIRouter(prefix="/health", tags=["health"])
 )
 async def health_check():
     """Health check endpoint."""
-    from datetime import datetime
     
     return {
         "status": "healthy",

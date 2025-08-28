@@ -1,3 +1,12 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from alembic import op
+from onyx.db.models import ConnectorCredentialPair
+from onyx.db.enums import ConnectorCredentialPairStatus
+from sqlalchemy import update
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """remove inactive ccpair status on downgrade
 
 Revision ID: acaab4ef4507
@@ -6,10 +15,6 @@ Create Date: 2025-02-16 18:21:41.330212
 
 """
 
-from alembic import op
-from onyx.db.models import ConnectorCredentialPair
-from onyx.db.enums import ConnectorCredentialPairStatus
-from sqlalchemy import update
 
 # revision identifiers, used by Alembic.
 revision = "acaab4ef4507"

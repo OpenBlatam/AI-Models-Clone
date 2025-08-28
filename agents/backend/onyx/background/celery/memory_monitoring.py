@@ -1,12 +1,19 @@
-# backend/onyx/background/celery/memory_monitoring.py
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+BUFFER_SIZE = 1024
+
 import logging
 import os
 from logging.handlers import RotatingFileHandler
-
 import psutil
-
 from onyx.utils.logger import is_running_in_container
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import asyncio
+# backend/onyx/background/celery/memory_monitoring.py
+
+
 
 # Regular application logger
 logger = setup_logger()

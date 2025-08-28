@@ -1,3 +1,14 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+# Constants
+MAX_CONNECTIONS = 1000
+
+# Constants
+MAX_RETRIES = 100
+
+# Constants
+TIMEOUT_SECONDS = 60
+
 from fastapi import FastAPI, APIRouter, HTTPException, status, Depends
 from pydantic import BaseModel, Field
 from typing import Dict, Any, List, Optional, Tuple
@@ -7,8 +18,11 @@ import socket
 import time
 from datetime import datetime
 
-# Import secure defaults components
 from secure_defaults import (
+    import uvicorn
+from typing import Any, List, Dict, Optional
+import logging
+# Import secure defaults components
     SecureDefaultsManager, SecurityLevel, CipherStrength,
     SecurityDefaultsRequest, SecurityDefaultsResponse,
     PasswordValidationRequest, PasswordValidationResponse,
@@ -541,7 +555,6 @@ app = FastAPI(
 app.include_router(router)
 
 if __name__ == "__main__":
-    import uvicorn
     print("Secure Defaults Demo")
     print("Access API at: http://localhost:8000")
     print("API Documentation at: http://localhost:8000/docs")

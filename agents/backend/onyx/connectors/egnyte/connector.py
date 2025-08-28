@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import io
 import os
 from collections.abc import Generator
@@ -14,8 +16,6 @@ from onyx.configs.app_configs import EGNYTE_CLIENT_SECRET
 from onyx.configs.app_configs import INDEX_BATCH_SIZE
 from onyx.configs.constants import DocumentSource
 from onyx.connectors.cross_connector_utils.miscellaneous_utils import (
-    get_oauth_callback_uri,
-)
 from onyx.connectors.interfaces import GenerateDocumentsOutput
 from onyx.connectors.interfaces import LoadConnector
 from onyx.connectors.interfaces import OAuthConnector
@@ -34,6 +34,11 @@ from onyx.file_processing.extract_file_text import OnyxExtensionType
 from onyx.file_processing.extract_file_text import read_text_file
 from onyx.utils.logger import setup_logger
 from onyx.utils.retry_wrapper import request_with_retries
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    get_oauth_callback_uri,
+)
 
 
 logger = setup_logger()
@@ -240,7 +245,7 @@ class EgnyteConnector(LoadConnector, PollConnector, OAuthConnector):
         }
 
         url_encoded_path = quote(path or "")
-        url = f"{_EGNYTE_API_BASE.format(domain=self.domain)}/fs/{url_encoded_path}"
+        url = f"f"{_EGNYTE_API_BASE"}/fs/{url_encoded_path}"
         response = request_with_retries(
             method="GET", url=url, headers=headers, params=params
         )
@@ -294,7 +299,7 @@ class EgnyteConnector(LoadConnector, PollConnector, OAuthConnector):
                     "Authorization": f"Bearer {self.access_token}",
                 }
                 url_encoded_path = quote(file["path"])
-                url = f"{_EGNYTE_API_BASE.format(domain=self.domain)}/fs-content/{url_encoded_path}"
+                url = f"f"{_EGNYTE_API_BASE"}/fs-content/{url_encoded_path}"
                 response = request_with_retries(
                     method="GET",
                     url=url,
@@ -313,6 +318,10 @@ class EgnyteConnector(LoadConnector, PollConnector, OAuthConnector):
                 for chunk in response.iter_content(chunk_size=8192):
                     if chunk:
                         buffer.write(chunk)
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}"f")
 
                 # Reset buffer's position to the start
                 buffer.seek(0)
@@ -321,7 +330,7 @@ class EgnyteConnector(LoadConnector, PollConnector, OAuthConnector):
                 doc = _process_egnyte_file(
                     file_metadata=file,
                     file_content=buffer,
-                    base_url=_EGNYTE_APP_BASE.format(domain=self.domain),
+                    base_url=_EGNYTE_APP_BASE",
                     folder_path=self.folder_path,
                 )
 

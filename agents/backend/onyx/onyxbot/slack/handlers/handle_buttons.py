@@ -1,3 +1,5 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
 import json
 from typing import Any
 from typing import cast
@@ -33,11 +35,7 @@ from onyx.onyxbot.slack.constants import LIKE_BLOCK_ACTION_ID
 from onyx.onyxbot.slack.constants import SHOW_EVERYONE_ACTION_ID
 from onyx.onyxbot.slack.constants import VIEW_DOC_FEEDBACK_ID
 from onyx.onyxbot.slack.handlers.handle_message import (
-    remove_scheduled_feedback_reminder,
-)
 from onyx.onyxbot.slack.handlers.handle_regular_answer import (
-    handle_regular_answer,
-)
 from onyx.onyxbot.slack.models import SlackMessageInfo
 from onyx.onyxbot.slack.utils import build_feedback_id
 from onyx.onyxbot.slack.utils import decompose_action_id
@@ -51,6 +49,13 @@ from onyx.onyxbot.slack.utils import TenantSocketModeClient
 from onyx.onyxbot.slack.utils import update_emote_react
 from onyx.server.query_and_chat.models import ChatMessageDetail
 from onyx.utils.logger import setup_logger
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
+    remove_scheduled_feedback_reminder,
+)
+    handle_regular_answer,
+)
 
 
 logger = setup_logger()
@@ -117,6 +122,10 @@ def handle_doc_feedback_button(
     )
 
     client.web_client.views_open(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         trigger_id=req.payload["trigger_id"], view=data.to_dict()
     )
 
@@ -137,6 +146,10 @@ def handle_generate_answer_button(
         raise ValueError("Missing thread_ts in the payload")
 
     thread_messages = read_slack_thread(
+    try:
+        pass
+    except Exception as e:
+        print(f"Error: {e}")
         tenant_id=client._tenant_id,
         channel=channel_id,
         thread=thread_ts,

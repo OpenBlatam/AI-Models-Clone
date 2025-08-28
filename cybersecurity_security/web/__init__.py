@@ -1,10 +1,15 @@
+from typing_extensions import Literal, TypedDict
+from typing import Any, List, Dict, Optional, Union, Tuple
+from .web_security import (
+from typing import Any, List, Dict, Optional
+import logging
+import asyncio
 """
 Web Application Security Module
 
 Provides web application security features including FastAPI integration and JWT authentication.
 """
 
-from .web_security import (
     AppConfig,
     JWTConfig,
     UserData,
