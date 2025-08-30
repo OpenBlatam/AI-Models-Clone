@@ -1,387 +1,644 @@
 """
-Service registry and management for the Blaze AI module.
+Blaze AI Enhanced Services v7.0.0
 
-This module provides a centralized service registry that handles:
-- Service registration and discovery
-- Dependency injection and lifecycle management
-- Service health monitoring
-- Service configuration management
-- Service metrics and performance tracking
+Service layer with advanced lifecycle management, dependency resolution,
+and integration with quantum optimization and neural turbo engines.
 """
-
-from __future__ import annotations
 
 import asyncio
 import logging
-import time
+from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Callable, Type
-from abc import ABC, abstractmethod
+from typing import Any, Dict, List, Optional, Set, Type, Union
+import threading
+import time
+from pathlib import Path
 
-from ..core.interfaces import CoreConfig, HealthStatus
-from ..utils.logging import get_logger
+from ..core import BlazeComponent, ComponentConfig, ComponentType, ComponentStatus
+from ..engines import EngineManager, EngineConfig, OptimizationLevel
+
+logger = logging.getLogger(__name__)
+
+# ============================================================================
+# ENUMS AND CONSTANTS
+# ============================================================================
+
+class ServiceType(Enum):
+    """Service types for different AI operations."""
+    AI_PROCESSING = "ai_processing"
+    DATA_MANAGEMENT = "data_management"
+    MODEL_TRAINING = "model_training"
+    INFERENCE = "inference"
+    OPTIMIZATION = "optimization"
+    MONITORING = "monitoring"
+    INTEGRATION = "integration"
+    CUSTOM = "custom"
 
 class ServiceStatus(Enum):
     """Service operational status."""
-    INITIALIZING = "initializing"
-    RUNNING = "running"
     STOPPED = "stopped"
+    STARTING = "starting"
+    RUNNING = "running"
+    PAUSED = "paused"
+    STOPPING = "stopping"
     ERROR = "error"
-    DEGRADED = "degraded"
+    MAINTENANCE = "maintenance"
+
+class ServicePriority(Enum):
+    """Service priority levels."""
+    CRITICAL = 1
+    HIGH = 2
+    MEDIUM = 3
+    LOW = 4
+    BACKGROUND = 5
+
+# ============================================================================
+# CONFIGURATION CLASSES
+# ============================================================================
 
 @dataclass
-class ServiceInfo:
-    """Information about a registered service."""
-    name: str
-    service_class: Type
-    instance: Optional[Any] = None
-    status: ServiceStatus = ServiceStatus.INITIALIZING
-    config: Dict[str, Any] = field(default_factory=dict)
+class ServiceConfig(ComponentConfig):
+    """Configuration for services."""
+    service_type: ServiceType = ServiceType.AI_PROCESSING
+    priority: ServicePriority = ServicePriority.MEDIUM
+    auto_restart: bool = True
+    max_restart_attempts: int = 3
+    restart_delay: float = 5.0
     dependencies: List[str] = field(default_factory=list)
-    health_check: Optional[Callable] = None
-    startup_time: Optional[float] = None
-    last_health_check: Optional[float] = None
-    error_count: int = 0
-    total_requests: int = 0
-    successful_requests: int = 0
+    health_check_interval: float = 30.0
+    timeout_seconds: float = 60.0
+    
+    def to_dict(self) -> Dict[str, Any]:
+        """Convert to dictionary."""
+        base_dict = super().to_dict()
+        base_dict.update({
+            "service_type": self.service_type.value,
+            "priority": self.priority.value,
+            "auto_restart": self.auto_restart,
+            "max_restart_attempts": self.max_restart_attempts,
+            "restart_delay": self.auto_restart,
+            "dependencies": self.dependencies,
+            "health_check_interval": self.health_check_interval
+        })
+        return base_dict
+    
+    @classmethod
+    def from_dict(cls, data: Dict[str, Any]) -> 'ServiceConfig':
+        """Create from dictionary."""
+        base_config = super().from_dict(data)
+        return cls(
+            **base_config.__dict__,
+            service_type=ServiceType(data.get("service_type", "ai_processing")),
+            priority=ServicePriority(data.get("priority", 3)),
+            auto_restart=data.get("auto_restart", True),
+            max_restart_attempts=data.get("max_restart_attempts", 3),
+            restart_delay=data.get("restart_delay", 5.0),
+            dependencies=data.get("dependencies", []),
+            health_check_interval=data.get("health_check_interval", 30.0)
+        )
 
-class Service(ABC):
-    """Base service class with common functionality."""
+# ============================================================================
+# BASE SERVICE CLASSES
+# ============================================================================
+
+class BlazeService(BlazeComponent):
+    """Base service class for Blaze AI."""
     
-    def __init__(self, name: str, config: Dict[str, Any]):
-        self.name = name
-        self.config = config
-        self.logger = get_logger(f"service.{name}")
-        self.status = ServiceStatus.INITIALIZING
-        self.startup_time = None
-        self.error_count = 0
-        self.total_requests = 0
-        self.successful_requests = 0
+    def __init__(self, config: ServiceConfig):
+        super().__init__(config)
+        self.service_config = config
+        self.service_status = ServiceStatus.STOPPED
+        self.restart_count = 0
+        self.last_health_check = 0
+        self.health_check_cache: Optional[Dict[str, Any]] = None
+        self.health_check_cache_ttl = 5.0  # 5 seconds cache
+        self._service_lock = asyncio.Lock()
+        self._health_check_task: Optional[asyncio.Task] = None
     
     @abstractmethod
-    async def initialize(self) -> None:
+    async def start(self) -> bool:
+        """Start the service."""
+        pass
+    
+    @abstractmethod
+    async def stop(self) -> bool:
+        """Stop the service."""
+        pass
+    
+    @abstractmethod
+    async def pause(self) -> bool:
+        """Pause the service."""
+        pass
+    
+    @abstractmethod
+    async def resume(self) -> bool:
+        """Resume the service."""
+        pass
+    
+    async def initialize(self) -> bool:
         """Initialize the service."""
-        pass
+        try:
+            if self.service_config.auto_start:
+                await self.start()
+            else:
+                self.service_status = ServiceStatus.STOPPED
+            
+            self.status = ComponentStatus.READY
+            self.start_time = time.time()
+            
+            # Start health check monitoring
+            if self.service_config.health_check_interval > 0:
+                self._health_check_task = asyncio.create_task(self._health_check_loop())
+            
+            logger.info(f"Service initialized: {self.service_config.name}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Failed to initialize service {self.service_config.name}: {e}")
+            self._record_error(e)
+            return False
     
-    @abstractmethod
-    async def shutdown(self) -> None:
+    async def shutdown(self) -> bool:
         """Shutdown the service."""
-        pass
+        try:
+            # Stop health check monitoring
+            if self._health_check_task:
+                self._health_check_task.cancel()
+                try:
+                    await self._health_check_task
+                except asyncio.CancelledError:
+                    pass
+            
+            # Stop the service
+            if self.service_status == ServiceStatus.RUNNING:
+                await self.stop()
+            
+            self.status = ComponentStatus.SHUTDOWN
+            logger.info(f"Service shutdown: {self.service_config.name}")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error during service shutdown: {e}")
+            return False
     
     async def health_check(self) -> Dict[str, Any]:
-        """Perform a health check on the service."""
-        return {
-            "status": self.status.value,
-            "uptime": time.time() - self.startup_time if self.startup_time else 0,
-            "error_count": self.error_count,
-            "total_requests": self.total_requests,
-            "success_rate": self.successful_requests / self.total_requests if self.total_requests > 0 else 1.0
-        }
-    
-    def record_request(self, success: bool = True):
-        """Record a request for metrics."""
-        self.total_requests += 1
-        if success:
-            self.successful_requests += 1
-        else:
-            self.error_count += 1
-    
-    def get_metrics(self) -> Dict[str, Any]:
-        """Get service metrics."""
-        return {
-            "name": self.name,
-            "status": self.status.value,
-            "uptime": time.time() - self.startup_time if self.startup_time else 0,
-            "error_count": self.error_count,
-            "total_requests": self.total_requests,
-            "successful_requests": self.successful_requests,
-            "success_rate": self.successful_requests / self.total_requests if self.total_requests > 0 else 1.0
-        }
-
-class ServiceRegistry:
-    """
-    Centralized service registry for the Blaze AI module.
-    
-    Provides:
-    - Service registration and discovery
-    - Dependency injection
-    - Service lifecycle management
-    - Health monitoring
-    - Configuration management
-    """
-    
-    def __init__(self, config: Optional[CoreConfig] = None):
-        self.config = config or CoreConfig()
-        self.logger = get_logger("service_registry")
-        self.services: Dict[str, ServiceInfo] = {}
-        self.service_instances: Dict[str, Service] = {}
-        self._initialization_lock = asyncio.Lock()
-        self._health_check_task: Optional[asyncio.Task] = None
+        """Check service health with caching."""
+        current_time = time.time()
         
-        # Register default services
-        self._register_default_services()
+        # Return cached result if still valid
+        if (self.health_check_cache and 
+            current_time - self.last_health_check < self.health_check_cache_ttl):
+            return self.health_check_cache
         
-        # Start health monitoring
-        self._start_health_monitoring()
-    
-    def _register_default_services(self):
-        """Register default services."""
+        # Perform actual health check
         try:
-            from .seo import SEOService
-            from .brand import BrandVoiceService
-            from .generation import ContentGenerationService
-            from .analytics import AnalyticsService
-            from .planner import ContentPlannerService
+            health_data = await self._perform_health_check()
+            health_data.update({
+                "service_status": self.service_status.value,
+                "restart_count": self.restart_count,
+                "last_health_check": current_time
+            })
             
-            # Register SEO service
-            seo_config = self.config.get_component_config("seo_service")
-            self.register_service("seo", SEOService, seo_config)
+            # Cache the result
+            self.health_check_cache = health_data
+            self.last_health_check = current_time
             
-            # Register brand voice service
-            brand_config = self.config.get_component_config("brand_service")
-            self.register_service("brand", BrandVoiceService, brand_config)
-            
-            # Register content generation service
-            generation_config = self.config.get_component_config("generation_service")
-            self.register_service("generation", ContentGenerationService, generation_config)
-            
-            # Register analytics service
-            analytics_config = self.config.get_component_config("analytics_service")
-            self.register_service("analytics", AnalyticsService, analytics_config)
-            
-            # Register planner service
-            planner_config = self.config.get_component_config("planner_service")
-            self.register_service("planner", ContentPlannerService, planner_config)
-            
-            self.logger.info("Default services registered successfully")
+            return health_data
             
         except Exception as e:
-            self.logger.error(f"Failed to register default services: {e}")
-            raise
-    
-    def register_service(self, name: str, service_class: Type[Service], 
-                        config: Optional[Dict[str, Any]] = None,
-                        dependencies: Optional[List[str]] = None,
-                        health_check: Optional[Callable] = None) -> None:
-        """
-        Register a service with the registry.
-        
-        Args:
-            name: Service name
-            service_class: Service class to instantiate
-            config: Service configuration
-            dependencies: List of service dependencies
-            health_check: Custom health check function
-        """
-        if name in self.services:
-            self.logger.warning(f"Service '{name}' already registered, overwriting")
-        
-        self.services[name] = ServiceInfo(
-            name=name,
-            service_class=service_class,
-            config=config or {},
-            dependencies=dependencies or [],
-            health_check=health_check
-        )
-        
-        self.logger.info(f"Service '{name}' registered successfully")
-    
-    async def get_service(self, name: str) -> Service:
-        """
-        Get a service instance, initializing it if necessary.
-        
-        Args:
-            name: Service name
-            
-        Returns:
-            Service instance
-            
-        Raises:
-            ValueError: If service not found
-            Exception: If service initialization fails
-        """
-        if name not in self.services:
-            raise ValueError(f"Service '{name}' not found")
-        
-        # Return existing instance if available
-        if name in self.service_instances:
-            return self.service_instances[name]
-        
-        # Initialize service
-        async with self._initialization_lock:
-            # Double-check after acquiring lock
-            if name in self.service_instances:
-                return self.service_instances[name]
-            
-            return await self._initialize_service(name)
-    
-    async def _initialize_service(self, name: str) -> Service:
-        """Initialize a service and its dependencies."""
-        service_info = self.services[name]
-        
-        # Check dependencies first
-        for dep_name in service_info.dependencies:
-            if dep_name not in self.services:
-                raise ValueError(f"Service '{name}' depends on '{dep_name}' which is not registered")
-            
-            # Ensure dependency is initialized
-            await self.get_service(dep_name)
-        
-        try:
-            # Create service instance
-            service_instance = service_info.service_class(name, service_info.config)
-            
-            # Initialize the service
-            await service_instance.initialize()
-            
-            # Update service info
-            service_info.instance = service_instance
-            service_info.status = ServiceStatus.RUNNING
-            service_info.startup_time = time.time()
-            
-            # Store instance
-            self.service_instances[name] = service_instance
-            
-            self.logger.info(f"Service '{name}' initialized successfully")
-            return service_instance
-            
-        except Exception as e:
-            service_info.status = ServiceStatus.ERROR
-            self.logger.error(f"Failed to initialize service '{name}': {e}")
-            raise
-    
-    def has_service(self, name: str) -> bool:
-        """Check if a service is registered."""
-        return name in self.services
-    
-    def list_services(self) -> List[str]:
-        """List all registered service names."""
-        return list(self.services.keys())
-    
-    def list_running_services(self) -> List[str]:
-        """List all running service names."""
-        return [name for name, info in self.services.items() 
-                if info.status == ServiceStatus.RUNNING]
-    
-    async def shutdown_service(self, name: str) -> None:
-        """Shutdown a specific service."""
-        if name in self.service_instances:
-            service = self.service_instances[name]
-            try:
-                await service.shutdown()
-                self.services[name].status = ServiceStatus.STOPPED
-                self.logger.info(f"Service '{name}' shutdown successfully")
-            except Exception as e:
-                self.logger.error(f"Failed to shutdown service '{name}': {e}")
-                raise
-    
-    async def shutdown_all(self) -> None:
-        """Shutdown all services."""
-        self.logger.info("Shutting down all services")
-        
-        # Stop health monitoring
-        if self._health_check_task and not self._health_check_task.done():
-            self._health_check_task.cancel()
-            try:
-                await self._health_check_task
-            except asyncio.CancelledError:
-                pass
-        
-        # Shutdown all services
-        shutdown_tasks = []
-        for name in self.service_instances:
-            shutdown_tasks.append(asyncio.create_task(self.shutdown_service(name)))
-        
-        if shutdown_tasks:
-            await asyncio.gather(*shutdown_tasks, return_exceptions=True)
-        
-        self.logger.info("All services shutdown complete")
-    
-    def get_service_status(self) -> Dict[str, Any]:
-        """Get status of all services."""
-        status = {}
-        for name, info in self.services.items():
-            status[name] = {
-                'status': info.status.value,
-                'dependencies': info.dependencies,
-                'startup_time': info.startup_time,
-                'last_health_check': info.last_health_check,
-                'error_count': info.error_count,
-                'total_requests': info.total_requests,
-                'successful_requests': info.successful_requests
+            error_data = {
+                "status": "error",
+                "error": str(e),
+                "service_status": self.service_status.value,
+                "restart_count": self.restart_count,
+                "last_health_check": current_time
             }
-            
-            # Add instance metrics if available
-            if info.instance:
-                status[name]['instance_metrics'] = info.instance.get_metrics()
-        
-        return status
+            self.health_check_cache = error_data
+            self.last_health_check = current_time
+            return error_data
     
-    async def health_check_all(self) -> Dict[str, Any]:
-        """Perform health checks on all services."""
-        health_results = {}
-        
-        for name, info in self.services.items():
-            try:
-                if info.instance:
-                    health_result = await info.instance.health_check()
-                elif info.health_check:
-                    health_result = await info.health_check()
-                else:
-                    health_result = {
-                        "status": info.status.value,
-                        "message": "No health check available"
-                    }
-                
-                health_results[name] = health_result
-                info.last_health_check = time.time()
-                
-            except Exception as e:
-                health_results[name] = {
-                    "status": "error",
-                    "message": str(e)
-                }
-                info.error_count += 1
-        
-        return health_results
+    async def _perform_health_check(self) -> Dict[str, Any]:
+        """Perform the actual health check."""
+        # Base health check - override in subclasses
+        return {
+            "status": "healthy",
+            "uptime": time.time() - self.start_time if self.start_time else 0,
+            "error_count": self.error_count
+        }
     
-    def _start_health_monitoring(self):
-        """Start the health monitoring task."""
-        if self.config.monitoring.enable_metrics:
-            self._health_check_task = asyncio.create_task(self._health_monitor_loop())
-    
-    async def _health_monitor_loop(self):
-        """Health monitoring loop."""
+    async def _health_check_loop(self):
+        """Background health check loop."""
         while True:
             try:
-                await self.health_check_all()
-                await asyncio.sleep(self.config.monitoring.health_check_interval)
+                await asyncio.sleep(self.service_config.health_check_interval)
+                await self.health_check()
+            except asyncio.CancelledError:
+                break
             except Exception as e:
-                self.logger.error(f"Health monitoring error: {e}")
-                await asyncio.sleep(5)  # Short delay on error
+                logger.error(f"Error in health check loop: {e}")
+                await asyncio.sleep(5.0)
+    
+    async def restart(self) -> bool:
+        """Restart the service."""
+        try:
+            logger.info(f"Restarting service: {self.service_config.name}")
+            
+            if self.service_status == ServiceStatus.RUNNING:
+                await self.stop()
+            
+            await asyncio.sleep(self.service_config.restart_delay)
+            
+            if await self.start():
+                self.restart_count += 1
+                logger.info(f"Service restarted successfully: {self.service_config.name}")
+                return True
+            else:
+                logger.error(f"Failed to restart service: {self.service_config.name}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error during service restart: {e}")
+            return False
 
-# Global service registry instance
-_default_service_registry: Optional[ServiceRegistry] = None
+# ============================================================================
+# SERVICE REGISTRY
+# ============================================================================
 
-def get_service_registry(config: Optional[CoreConfig] = None) -> ServiceRegistry:
-    """Get the global service registry instance."""
-    global _default_service_registry
-    if _default_service_registry is None:
-        _default_service_registry = ServiceRegistry(config)
-    return _default_service_registry
+class ServiceRegistry:
+    """Registry for managing available services."""
+    
+    def __init__(self):
+        self.services: Dict[str, Type[BlazeService]] = {}
+        self.metadata: Dict[str, Dict[str, Any]] = {}
+        self.dependencies: Dict[str, Set[str]] = {}
+        self._lock = threading.Lock()
+    
+    def register_service(self, name: str, service_class: Type[BlazeService], 
+                        metadata: Optional[Dict[str, Any]] = None,
+                        dependencies: Optional[List[str]] = None):
+        """Register a service class."""
+        with self._lock:
+            self.services[name] = service_class
+            self.metadata[name] = metadata or {}
+            self.dependencies[name] = set(dependencies or [])
+            logger.info(f"Service registered: {name}")
+    
+    def get_service_class(self, name: str) -> Optional[Type[BlazeService]]:
+        """Get service class by name."""
+        return self.services.get(name)
+    
+    def list_services(self) -> List[str]:
+        """List all registered services."""
+        return list(self.services.keys())
+    
+    def get_metadata(self, name: str) -> Dict[str, Any]:
+        """Get service metadata."""
+        return self.metadata.get(name, {})
+    
+    def get_dependencies(self, name: str) -> Set[str]:
+        """Get service dependencies."""
+        return self.dependencies.get(name, set())
+    
+    def resolve_dependencies(self, service_name: str) -> List[str]:
+        """Resolve service dependencies in order."""
+        resolved = []
+        visited = set()
+        
+        def visit(name: str):
+            if name in visited:
+                return
+            visited.add(name)
+            
+            for dep in self.dependencies.get(name, []):
+                visit(dep)
+            
+            resolved.append(name)
+        
+        visit(service_name)
+        return resolved
+    
+    def check_circular_dependencies(self) -> List[List[str]]:
+        """Check for circular dependencies."""
+        cycles = []
+        visited = set()
+        rec_stack = set()
+        
+        def dfs(name: str, path: List[str]):
+            if name in rec_stack:
+                cycle = path[path.index(name):]
+                cycles.append(cycle)
+                return
+            
+            if name in visited:
+                return
+            
+            visited.add(name)
+            rec_stack.add(name)
+            path.append(name)
+            
+            for dep in self.dependencies.get(name, []):
+                dfs(dep, path)
+            
+            rec_stack.remove(name)
+            path.pop()
+        
+        for service_name in self.services:
+            if service_name not in visited:
+                dfs(service_name, [])
+        
+        return cycles
 
-# Legacy alias for backward compatibility
-BlazeServiceRegistry = ServiceRegistry
+# ============================================================================
+# SERVICE MANAGER
+# ============================================================================
 
-# Export main components
+class ServiceManager:
+    """Manager for creating and managing service instances."""
+    
+    def __init__(self, registry: ServiceRegistry, engine_manager: Optional[EngineManager] = None):
+        self.registry = registry
+        self.engine_manager = engine_manager
+        self.active_services: Dict[str, BlazeService] = {}
+        self.service_configs: Dict[str, ServiceConfig] = {}
+        self.service_status: Dict[str, ServiceStatus] = {}
+        self._lock = threading.Lock()
+        self._monitoring_task: Optional[asyncio.Task] = None
+    
+    async def create_service(self, name: str, config: ServiceConfig) -> Optional[BlazeService]:
+        """Create and initialize a service instance."""
+        try:
+            service_class = self.registry.get_service_class(name)
+            if not service_class:
+                logger.error(f"Unknown service: {name}")
+                return None
+            
+            # Check dependencies
+            if not await self._check_dependencies(config.dependencies):
+                logger.error(f"Service dependencies not met: {name}")
+                return None
+            
+            service = service_class(config)
+            if await service.initialize():
+                with self._lock:
+                    self.active_services[name] = service
+                    self.service_configs[name] = config
+                    self.service_status[name] = service.service_status
+                logger.info(f"Service created successfully: {name}")
+                return service
+            else:
+                logger.error(f"Failed to initialize service: {name}")
+                return None
+                
+        except Exception as e:
+            logger.error(f"Error creating service {name}: {e}")
+            return None
+    
+    async def _check_dependencies(self, dependencies: List[str]) -> bool:
+        """Check if service dependencies are met."""
+        for dep in dependencies:
+            if dep not in self.active_services:
+                return False
+            if self.service_status.get(dep) != ServiceStatus.RUNNING:
+                return False
+        return True
+    
+    async def start_service(self, name: str) -> bool:
+        """Start a service."""
+        try:
+            service = self.active_services.get(name)
+            if not service:
+                logger.error(f"Service not found: {name}")
+                return False
+            
+            if await service.start():
+                with self._lock:
+                    self.service_status[name] = service.service_status
+                logger.info(f"Service started: {name}")
+                return True
+            else:
+                logger.error(f"Failed to start service: {name}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error starting service {name}: {e}")
+            return False
+    
+    async def stop_service(self, name: str) -> bool:
+        """Stop a service."""
+        try:
+            service = self.active_services.get(name)
+            if not service:
+                logger.error(f"Service not found: {name}")
+                return False
+            
+            if await service.stop():
+                with self._lock:
+                    self.service_status[name] = service.service_status
+                logger.info(f"Service stopped: {name}")
+                return True
+            else:
+                logger.error(f"Failed to stop service: {name}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error stopping service {name}: {e}")
+            return False
+    
+    async def restart_service(self, name: str) -> bool:
+        """Restart a service."""
+        try:
+            service = self.active_services.get(name)
+            if not service:
+                logger.error(f"Service not found: {name}")
+                return False
+            
+            if await service.restart():
+                with self._lock:
+                    self.service_status[name] = service.service_status
+                logger.info(f"Service restarted: {name}")
+                return True
+            else:
+                logger.error(f"Failed to restart service: {name}")
+                return False
+                
+        except Exception as e:
+            logger.error(f"Error restarting service {name}: {e}")
+            return False
+    
+    async def get_service(self, name: str) -> Optional[BlazeService]:
+        """Get an active service instance."""
+        return self.active_services.get(name)
+    
+    async def shutdown_service(self, name: str) -> bool:
+        """Shutdown and remove a service."""
+        try:
+            service = self.active_services.get(name)
+            if service:
+                await service.shutdown()
+                with self._lock:
+                    del self.active_services[name]
+                    del self.service_configs[name]
+                    del self.service_status[name]
+                logger.info(f"Service shutdown: {name}")
+                return True
+            return False
+        except Exception as e:
+            logger.error(f"Error shutting down service {name}: {e}")
+            return False
+    
+    async def shutdown_all(self):
+        """Shutdown all active services."""
+        for name in list(self.active_services.keys()):
+            await self.shutdown_service(name)
+    
+    async def get_all_services_status(self) -> Dict[str, Dict[str, Any]]:
+        """Get status of all active services."""
+        status = {}
+        for name, service in self.active_services.items():
+            try:
+                status[name] = await service.health_check()
+            except Exception as e:
+                status[name] = {"status": "error", "error": str(e)}
+        return status
+    
+    async def start_monitoring(self):
+        """Start service monitoring."""
+        if not self._monitoring_task:
+            self._monitoring_task = asyncio.create_task(self._monitoring_loop())
+            logger.info("Service monitoring started")
+    
+    async def stop_monitoring(self):
+        """Stop service monitoring."""
+        if self._monitoring_task:
+            self._monitoring_task.cancel()
+            try:
+                await self._monitoring_task
+            except asyncio.CancelledError:
+                pass
+            logger.info("Service monitoring stopped")
+    
+    async def _monitoring_loop(self):
+        """Service monitoring loop."""
+        while True:
+            try:
+                await asyncio.sleep(30.0)  # Check every 30 seconds
+                
+                # Check for services that need restart
+                for name, service in self.active_services.items():
+                    config = self.service_configs[name]
+                    if (config.auto_restart and 
+                        service.service_status == ServiceStatus.ERROR and
+                        service.restart_count < config.max_restart_attempts):
+                        
+                        logger.info(f"Auto-restarting service: {name}")
+                        await service.restart()
+                        
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Error in service monitoring loop: {e}")
+                await asyncio.sleep(5.0)
+
+# ============================================================================
+# FACTORY FUNCTIONS
+# ============================================================================
+
+def create_service_registry() -> ServiceRegistry:
+    """Create a default service registry."""
+    registry = ServiceRegistry()
+    
+    # Register built-in services
+    registry.register_service("ai_processor", BlazeService, {
+        "description": "AI processing service",
+        "version": "7.0.0",
+        "type": ServiceType.AI_PROCESSING
+    })
+    
+    registry.register_service("data_manager", BlazeService, {
+        "description": "Data management service",
+        "version": "7.0.0",
+        "type": ServiceType.DATA_MANAGEMENT
+    })
+    
+    registry.register_service("model_trainer", BlazeService, {
+        "description": "Model training service",
+        "version": "7.0.0",
+        "type": ServiceType.MODEL_TRAINING
+    })
+    
+    return registry
+
+def create_service_manager(registry: Optional[ServiceRegistry] = None,
+                          engine_manager: Optional[EngineManager] = None) -> ServiceManager:
+    """Create a service manager."""
+    if registry is None:
+        registry = create_service_registry()
+    return ServiceManager(registry, engine_manager)
+
+def create_default_service_configs() -> Dict[str, ServiceConfig]:
+    """Create default service configurations."""
+    configs = {}
+    
+    configs["ai_processor"] = ServiceConfig(
+        name="ai_processor",
+        component_type=ComponentType.SERVICE,
+        service_type=ServiceType.AI_PROCESSING,
+        priority=ServicePriority.HIGH,
+        performance_level=OptimizationLevel.ADVANCED,
+        auto_restart=True,
+        max_restart_attempts=3
+    )
+    
+    configs["data_manager"] = ServiceConfig(
+        name="data_manager",
+        component_type=ComponentType.SERVICE,
+        service_type=ServiceType.DATA_MANAGEMENT,
+        priority=ServicePriority.MEDIUM,
+        performance_level=OptimizationLevel.STANDARD,
+        auto_restart=True,
+        max_restart_attempts=3
+    )
+    
+    configs["model_trainer"] = ServiceConfig(
+        name="model_trainer",
+        component_type=ComponentType.SERVICE,
+        service_type=ServiceType.MODEL_TRAINING,
+        priority=ServicePriority.MEDIUM,
+        performance_level=OptimizationLevel.ADVANCED,
+        auto_restart=True,
+        max_restart_attempts=3
+    )
+    
+    return configs
+
+# ============================================================================
+# EXPORTS
+# ============================================================================
+
 __all__ = [
+    # Enums
+    "ServiceType",
     "ServiceStatus",
-    "ServiceInfo",
-    "Service",
+    "ServicePriority",
+    
+    # Configuration
+    "ServiceConfig",
+    
+    # Base Classes
+    "BlazeService",
+    
+    # Management
     "ServiceRegistry",
-    "BlazeServiceRegistry",
-    "get_service_registry"
+    "ServiceManager",
+    
+    # Factory Functions
+    "create_service_registry",
+    "create_service_manager",
+    "create_default_service_configs"
 ]
+
+# Version info
+__version__ = "7.0.0"
 
 

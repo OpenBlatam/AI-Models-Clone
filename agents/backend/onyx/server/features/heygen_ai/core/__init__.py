@@ -37,6 +37,15 @@ except ImportError:
     LANGCHAIN_AVAILABLE = False
     logging.warning("LangChain manager not available")
 
+# Plugin System
+from .plugin_system import (
+    PluginManager, PluginConfig, PluginMetadata, PluginInfo,
+    BasePlugin, BaseModelPlugin, BaseOptimizationPlugin, BaseFeaturePlugin,
+    HeyGenAIPlugin, ModelPlugin, OptimizationPlugin, FeaturePlugin,
+    create_plugin_manager, get_plugin_manager,
+    register_plugin, get_plugin_by_name, get_plugins_by_type
+)
+
 __all__ = [
     "ExternalAPIManager",
     "ServiceConfig", 

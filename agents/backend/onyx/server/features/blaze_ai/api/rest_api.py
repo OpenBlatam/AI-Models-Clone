@@ -869,3 +869,4 @@ def get_rest_api(config: Optional[CoreConfig] = None) -> AdvancedRESTAPI:
         _global_api = AdvancedRESTAPI(config)
     return _global_api
 
+

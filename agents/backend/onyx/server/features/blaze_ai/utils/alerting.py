@@ -605,3 +605,4 @@ async def shutdown_alerting_engine():
         await _global_alerting_engine.shutdown()
         _global_alerting_engine = None
 
+

@@ -334,3 +334,4 @@ def create_stable_circuit_breaker() -> CircuitBreaker:
     )
     return CircuitBreaker(config)
 
+

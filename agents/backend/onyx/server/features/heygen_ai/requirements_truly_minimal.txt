@@ -1,0 +1,132 @@
+# 🚀 HeyGen AI - Truly Minimal Requirements
+# ==========================================
+# Only the essential dependencies for deep learning, transformers, diffusion, and LLMs
+
+# 🧠 CORE DEEP LEARNING & MACHINE LEARNING
+torch>=2.2.0
+torchvision>=0.17.0
+torchaudio>=2.2.0
+transformers>=4.40.0
+diffusers>=0.25.0
+accelerate>=0.30.0
+peft>=0.7.0
+bitsandbytes>=0.43.0
+
+# 🚀 PERFORMANCE OPTIMIZATION
+xformers>=0.0.23
+flash-attn>=2.5.0
+triton>=2.1.0
+
+# 🎯 QUANTIZATION & COMPRESSION
+onnx>=1.15.0
+onnxruntime>=1.18.0
+optimum>=1.20.0
+
+# 📊 DATA SCIENCE & UTILITIES
+numpy>=1.24.0
+pandas>=2.1.0
+scikit-learn>=1.3.0
+tqdm>=4.66.0
+Pillow>=10.2.0
+opencv-python>=4.9.0
+scipy>=1.11.0
+
+# 🌐 WEB INTERFACE & API
+gradio>=4.0.0
+fastapi>=0.104.0
+uvicorn>=0.24.0
+
+# 🔧 DEVELOPMENT & TESTING
+pytest>=7.4.0
+black>=23.11.0
+isort>=5.12.0
+flake8>=6.1.0
+
+# 📁 CONFIGURATION & UTILITIES
+PyYAML>=6.0.1
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+
+# 📊 MONITORING & LOGGING
+wandb>=0.16.0
+tensorboard>=2.15.0
+loguru>=0.7.0
+
+# 🚀 PERFORMANCE PROFILING
+pynvml>=11.5.0
+psutil>=5.9.0
+GPUtil>=1.4.0
+
+# 🌐 DISTRIBUTED TRAINING
+mpi4py>=3.1.4
+horovod>=0.28.0
+
+# 🔐 SECURITY
+cryptography>=41.0.0
+PyJWT>=2.8.0
+
+# 🔄 ASYNC PROCESSING
+aiohttp>=3.9.0
+websockets>=12.0
+
+# 💾 DATABASE
+redis>=5.0.0
+sqlalchemy>=2.0.0
+
+# 📊 DATA PROCESSING
+dask>=2023.0.0
+
+# 🧪 TESTING
+pytest-cov>=4.1.0
+coverage>=7.3.0
+
+# 📚 UTILITIES
+click>=8.1.0
+rich>=13.6.0
+
+# 🔧 BUILD TOOLS
+poetry>=1.7.0
+pre-commit>=3.5.0
+
+# 🌐 NETWORK
+requests>=2.31.0
+httpx>=0.25.0
+
+# 🔍 OPTIMIZATION
+optuna>=3.4.0
+hyperopt>=0.2.7
+
+# 📊 STATISTICS
+statsmodels>=0.14.0
+xgboost>=2.0.0
+lightgbm>=4.0.0
+
+# 🎯 COMPUTER VISION
+imageio>=2.31.0
+albumentations>=1.3.0
+
+# 🎵 AUDIO & SPEECH
+librosa>=0.10.0
+soundfile>=0.12.0
+
+# 📝 NLP
+spacy>=3.7.0
+nltk>=3.8.0
+sentence-transformers>=2.2.0
+
+# 🔍 SEMANTIC SEARCH
+faiss-cpu>=1.7.0
+chromadb>=0.4.0
+
+# 📊 GRAPH NEURAL NETWORKS
+torch-geometric>=2.3.0
+networkx>=3.1.0
+
+# 🔬 VISUALIZATION
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.17.0
+
+# 🏗️ MLOPS
+mlflow>=2.8.0
+docker>=6.1.0

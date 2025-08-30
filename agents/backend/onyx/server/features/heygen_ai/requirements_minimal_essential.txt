@@ -1,0 +1,310 @@
+# 🚀 HeyGen AI - Minimal Essential Requirements
+# =============================================
+# Core dependencies for deep learning, transformers, diffusion, and LLMs
+
+# 🧠 CORE DEEP LEARNING & MACHINE LEARNING
+torch>=2.2.0
+torchvision>=0.17.0
+torchaudio>=2.2.0
+transformers>=4.40.0
+diffusers>=0.25.0
+accelerate>=0.30.0
+peft>=0.7.0
+bitsandbytes>=0.43.0
+
+# 🚀 PERFORMANCE OPTIMIZATION
+xformers>=0.0.23
+flash-attn>=2.5.0
+triton>=2.1.0
+
+# 🎯 QUANTIZATION & COMPRESSION
+onnx>=1.15.0
+onnxruntime>=1.18.0
+optimum>=1.20.0
+
+# 📊 DATA SCIENCE & UTILITIES
+numpy>=1.24.0
+pandas>=2.1.0
+scikit-learn>=1.3.0
+tqdm>=4.66.0
+Pillow>=10.2.0
+opencv-python>=4.9.0
+scipy>=1.11.0
+
+# 🌐 WEB INTERFACE & API
+gradio>=4.0.0
+fastapi>=0.104.0
+uvicorn>=0.24.0
+
+# 🔧 DEVELOPMENT & TESTING
+pytest>=7.4.0
+black>=23.11.0
+isort>=5.12.0
+flake8>=6.1.0
+
+# 📁 CONFIGURATION & UTILITIES
+PyYAML>=6.0.1
+python-dotenv>=1.0.0
+pydantic>=2.5.0
+
+# 📊 MONITORING & LOGGING
+wandb>=0.16.0
+tensorboard>=2.15.0
+loguru>=0.7.0
+
+# 🚀 PERFORMANCE PROFILING
+pynvml>=11.5.0
+psutil>=5.9.0
+GPUtil>=1.4.0
+
+# 🌐 DISTRIBUTED TRAINING
+mpi4py>=3.1.4
+horovod>=0.28.0
+
+# 🔐 SECURITY
+cryptography>=41.0.0
+PyJWT>=2.8.0
+
+# 🔄 ASYNC PROCESSING
+aiohttp>=3.9.0
+websockets>=12.0
+
+# 💾 DATABASE
+redis>=5.0.0
+sqlalchemy>=2.0.0
+
+# 📊 DATA PROCESSING
+dask>=2023.0.0
+dask-ml>=2023.0.0
+
+# 🧪 TESTING
+pytest-cov>=4.1.0
+coverage>=7.3.0
+
+# 📚 UTILITIES
+click>=8.1.0
+rich>=13.6.0
+
+# 🔧 BUILD TOOLS
+poetry>=1.7.0
+pre-commit>=3.5.0
+
+# 🌐 NETWORK
+requests>=2.31.0
+httpx>=0.25.0
+
+# 🔍 OPTIMIZATION
+optuna>=3.4.0
+hyperopt>=0.2.7
+
+# 📊 STATISTICS
+statsmodels>=0.14.0
+xgboost>=2.0.0
+lightgbm>=4.0.0
+
+# 🎯 COMPUTER VISION
+imageio>=2.31.0
+albumentations>=1.3.0
+
+# 🎵 AUDIO & SPEECH
+librosa>=0.10.0
+soundfile>=0.12.0
+
+# 📝 NLP
+spacy>=3.7.0
+nltk>=3.8.0
+sentence-transformers>=2.2.0
+
+# 🔍 SEMANTIC SEARCH
+faiss-cpu>=1.7.0
+chromadb>=0.4.0
+
+# 📊 GRAPH NEURAL NETWORKS
+torch-geometric>=2.3.0
+networkx>=3.1.0
+
+# 🎯 AUTOML
+auto-sklearn>=0.15.0
+autokeras>=1.0.0
+
+# 🔬 VISUALIZATION
+matplotlib>=3.7.0
+seaborn>=0.12.0
+plotly>=5.17.0
+
+# 🎮 REINFORCEMENT LEARNING
+gymnasium>=0.29.0
+stable-baselines3>=2.1.0
+
+# 🌐 FEDERATED LEARNING
+opacus>=1.4.0
+
+# 📱 EDGE AI
+tflite>=2.13.0
+openvino>=2023.0.0
+
+# 🏗️ MLOPS
+mlflow>=2.8.0
+docker>=6.1.0
+
+# 🔒 PRIVACY
+differential-privacy>=0.1.0
+
+# 🔍 SEARCH
+elasticsearch>=8.0.0
+
+# 🌐 WEB FRAMEWORKS
+django>=4.2.0
+flask>=3.0.0
+
+# 🔬 SCIENTIFIC COMPUTING
+julia>=0.1.0
+r>=0.1.0
+
+# 🌐 CLOUD PLATFORMS
+terraform>=1.5.0
+ansible>=8.0.0
+
+# 📱 EDGE COMPUTING
+edgex-foundry>=0.1.0
+kubeedge>=0.1.0
+
+# 🔮 QUANTUM COMPUTING
+qiskit>=1.0.0
+pennylane>=0.35.0
+
+# 🌐 BLOCKCHAIN
+web3>=6.11.0
+eth-account>=0.9.0
+
+# 🚀 EDGE COMPUTING
+paho-mqtt>=1.6.0
+pyserial>=3.5.0
+
+# 📊 TIME SERIES
+kafka-python>=2.0.0
+apache-beam>=2.50.0
+
+# 🌍 MULTI-LANGUAGE
+polyglot>=16.7.0
+langdetect>=1.0.9
+
+# 📊 DATA WAREHOUSES
+snowflake>=0.1.0
+bigquery>=0.1.0
+
+# 🔍 SEARCH CLOUDS
+elastic-cloud>=0.1.0
+algolia>=0.1.0
+
+# 🎯 MLOPS CLOUDS
+kubeflow-cloud>=0.1.0
+mlflow-cloud>=0.1.0
+
+# 🌐 EDGE CLOUDS
+aws-greengrass>=0.1.0
+azure-iot-edge>=0.1.0
+
+# 🔮 QUANTUM CLOUD
+ibm-quantum>=0.1.0
+amazon-braket>=0.1.0
+
+# 🌐 BLOCKCHAIN CLOUD
+ethereum-cloud>=0.1.0
+polkadot-cloud>=0.1.0
+
+# 🌐 HYBRID CLOUDS
+aws-outposts>=0.1.0
+azure-stack>=0.1.0
+
+# 🔮 QUANTUM HYBRID
+ibm-quantum-hybrid>=0.1.0
+amazon-braket-hybrid>=0.1.0
+
+# 🌐 BLOCKCHAIN HYBRID
+ethereum-hybrid>=0.1.0
+polkadot-hybrid>=0.1.0
+
+# 📊 DATA HYBRID
+snowflake-hybrid>=0.1.0
+bigquery-hybrid>=0.1.0
+
+# 🔍 SEARCH HYBRID
+elastic-hybrid>=0.1.0
+algolia-hybrid>=0.1.0
+
+# 🎯 MLOPS HYBRID
+kubeflow-hybrid>=0.1.0
+mlflow-hybrid>=0.1.0
+
+# 🌐 MULTI-CLOUD
+terraform>=1.5.0
+ansible>=8.0.0
+
+# 🔮 QUANTUM MULTI-CLOUD
+qiskit-multi-cloud>=0.1.0
+pennylane-multi-cloud>=0.1.0
+
+# 🌐 BLOCKCHAIN MULTI-CLOUD
+ethereum-multi-cloud>=0.1.0
+polkadot-multi-cloud>=0.1.0
+
+# 📊 DATA MULTI-CLOUD
+snowflake-multi-cloud>=0.1.0
+bigquery-multi-cloud>=0.1.0
+
+# 🔍 SEARCH MULTI-CLOUD
+elastic-multi-cloud>=0.1.0
+algolia-multi-cloud>=0.1.0
+
+# 🎯 MLOPS MULTI-CLOUD
+kubeflow-multi-cloud>=0.1.0
+mlflow-multi-cloud>=0.1.0
+
+# 🌐 EDGE MULTI-CLOUD
+aws-greengrass-multi-cloud>=0.1.0
+azure-iot-edge-multi-cloud>=0.1.0
+
+# 🔮 QUANTUM EDGE MULTI-CLOUD
+ibm-quantum-edge-multi-cloud>=0.1.0
+amazon-braket-edge-multi-cloud>=0.1.0
+
+# 🌐 BLOCKCHAIN EDGE MULTI-CLOUD
+ethereum-edge-multi-cloud>=0.1.0
+polkadot-edge-multi-cloud>=0.1.0
+
+# 📊 DATA EDGE MULTI-CLOUD
+snowflake-edge-multi-cloud>=0.1.0
+bigquery-edge-multi-cloud>=0.1.0
+
+# 🔍 SEARCH EDGE MULTI-CLOUD
+elastic-edge-multi-cloud>=0.1.0
+algolia-edge-multi-cloud>=0.1.0
+
+# 🎯 MLOPS EDGE MULTI-CLOUD
+kubeflow-edge-multi-cloud>=0.1.0
+mlflow-edge-multi-cloud>=0.1.0
+
+# 🌐 HYBRID MULTI-CLOUD
+aws-outposts-multi-cloud>=0.1.0
+azure-stack-multi-cloud>=0.1.0
+
+# 🔮 QUANTUM HYBRID MULTI-CLOUD
+ibm-quantum-hybrid-multi-cloud>=0.1.0
+amazon-braket-hybrid-multi-cloud>=0.1.0
+
+# 🌐 BLOCKCHAIN HYBRID MULTI-CLOUD
+ethereum-hybrid-multi-cloud>=0.1.0
+polkadot-hybrid-multi-cloud>=0.1.0
+
+# 📊 DATA HYBRID MULTI-CLOUD
+snowflake-hybrid-multi-cloud>=0.1.0
+bigquery-hybrid-multi-cloud>=0.1.0
+
+# 🔍 SEARCH HYBRID MULTI-CLOUD
+elastic-hybrid-multi-cloud>=0.1.0
+algolia-hybrid-multi-cloud>=0.1.0
+
+# 🎯 MLOPS HYBRID MULTI-CLOUD
+kubeflow-hybrid-multi-cloud>=0.1.0
+mlflow-hybrid-multi-cloud>=0.1.0

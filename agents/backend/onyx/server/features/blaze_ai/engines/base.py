@@ -330,3 +330,4 @@ class Engine(ABC, Executable, HealthCheckable, Configurable, MetricsProvider):
         current_requests = self._get_metrics("current_requests", 0)
         return min(100.0, (current_requests / self.capabilities.max_concurrent_requests) * 100.0)
 
+
