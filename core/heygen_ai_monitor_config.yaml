@@ -1,0 +1,418 @@
+# HeyGen AI Intelligent Monitor Configuration v4.0
+# Specialized configuration for AI-intensive systems
+
+# Core monitoring settings
+monitoring:
+  interval: 10.0  # seconds
+  enable_real_time_monitoring: true
+  enable_historical_analysis: true
+  enable_predictive_analytics: true
+  
+# AI model monitoring configuration
+ai_model_monitoring:
+  enabled: true
+  
+  # HeyGen AI specific models
+  models:
+    heygen_ai_model:
+      name: "HeyGen AI Core Model"
+      type: "diffusion_model"
+      expected_inference_time: 150.0  # milliseconds
+      expected_memory_usage: 2048.0   # MB
+      expected_gpu_utilization: 75.0  # percentage
+      expected_accuracy: 0.95
+      expected_throughput: 100.0      # requests per second
+      
+    heygen_video_model:
+      name: "HeyGen Video Generation Model"
+      type: "video_diffusion"
+      expected_inference_time: 5000.0  # milliseconds
+      expected_memory_usage: 8192.0    # MB
+      expected_gpu_utilization: 90.0   # percentage
+      expected_accuracy: 0.92
+      expected_throughput: 10.0        # videos per minute
+      
+    heygen_audio_model:
+      name: "HeyGen Audio Synthesis Model"
+      type: "audio_diffusion"
+      expected_inference_time: 200.0   # milliseconds
+      expected_memory_usage: 1024.0    # MB
+      expected_gpu_utilization: 60.0   # percentage
+      expected_accuracy: 0.98
+      expected_throughput: 200.0       # audio clips per minute
+
+# Performance thresholds for HeyGen AI
+performance_thresholds:
+  # CPU usage thresholds
+  cpu_usage:
+    warning_threshold: 75.0
+    critical_threshold: 90.0
+    operator: ">"
+    action: "auto_scale"
+    
+  # Memory usage thresholds
+  memory_usage:
+    warning_threshold: 80.0
+    critical_threshold: 95.0
+    operator: ">"
+    action: "memory_optimization"
+    
+  # GPU utilization thresholds
+  gpu_utilization:
+    warning_threshold: 85.0
+    critical_threshold: 95.0
+    operator: ">"
+    action: "gpu_optimization"
+    
+  # Inference time thresholds
+  inference_time:
+    warning_threshold: 2000.0  # milliseconds
+    critical_threshold: 5000.0
+    operator: ">"
+    action: "performance_optimization"
+    
+  # Error rate thresholds
+  error_rate:
+    warning_threshold: 0.05  # 5%
+    critical_threshold: 0.15 # 15%
+    operator: ">"
+    action: "alert"
+
+# Auto-optimization configuration
+auto_optimization:
+  enabled: true
+  
+  # Optimization rules for HeyGen AI
+  rules:
+    cpu_optimization:
+      trigger_conditions:
+        cpu_usage:
+          threshold: 75.0
+          duration: 300  # 5 minutes
+        response_time:
+          threshold: 2000.0
+          duration: 180  # 3 minutes
+      actions:
+        - type: "scale_workers"
+          parameters:
+            increase_factor: 1.5
+            max_workers: 20
+          priority: 1
+        - type: "optimize_batch_size"
+          parameters:
+            reduce_factor: 0.8
+          priority: 2
+          
+    memory_optimization:
+      trigger_conditions:
+        memory_usage:
+          threshold: 80.0
+          duration: 300
+        swap_usage:
+          threshold: 20.0
+          duration: 180
+      actions:
+        - type: "cleanup_memory"
+          parameters:
+            aggressive: true
+          priority: 1
+        - type: "restart_service"
+          parameters:
+            service_name: "heygen_ai_worker"
+          priority: 2
+          
+    gpu_optimization:
+      trigger_conditions:
+        gpu_utilization:
+          threshold: 85.0
+          duration: 300
+        gpu_memory_usage:
+          threshold: 85.0
+          duration: 180
+      actions:
+        - type: "adjust_batch_size"
+          parameters:
+            reduce_factor: 0.7
+          priority: 1
+        - type: "load_balance_gpu"
+          parameters:
+            redistribute: true
+          priority: 2
+
+# Resource prediction configuration
+resource_prediction:
+  enabled: true
+  
+  # Prediction horizons
+  time_horizons:
+    short_term: 300.0    # 5 minutes
+    medium_term: 1800.0  # 30 minutes
+    long_term: 3600.0    # 1 hour
+    
+  # Metrics to predict
+  predicted_metrics:
+    - "cpu_usage"
+    - "memory_usage"
+    - "gpu_utilization"
+    - "inference_time"
+    - "throughput"
+    
+  # Confidence thresholds
+  confidence_thresholds:
+    high_confidence: 0.8
+    medium_confidence: 0.6
+    low_confidence: 0.4
+
+# Alerting and notification configuration
+alerting:
+  enabled: true
+  
+  # Alert channels
+  channels:
+    slack:
+      enabled: true
+      webhook_url: "${SLACK_WEBHOOK_URL}"
+      channel: "#heygen-alerts"
+      
+    email:
+      enabled: true
+      smtp_server: "${SMTP_SERVER}"
+      smtp_port: 587
+      username: "${ALERT_EMAIL_USERNAME}"
+      password: "${ALERT_EMAIL_PASSWORD}"
+      recipients:
+        - "ops@heygen.ai"
+        - "ai-team@heygen.ai"
+        
+    pagerduty:
+      enabled: true
+      api_key: "${PAGERDUTY_API_KEY}"
+      service_id: "${PAGERDUTY_SERVICE_ID}"
+      
+  # Alert escalation rules
+  escalation_rules:
+    - level: 1
+      delay_minutes: 0
+      actions: ["log", "notify_team"]
+      channels: ["slack", "email"]
+      
+    - level: 2
+      delay_minutes: 5
+      actions: ["escalate", "create_incident"]
+      channels: ["slack", "email", "pagerduty"]
+      
+    - level: 3
+      delay_minutes: 15
+      actions: ["escalate_management", "emergency_response"]
+      channels: ["phone", "slack", "email"]
+
+# Integration settings
+integration:
+  # Performance monitor integration
+  performance_monitor:
+    enabled: true
+    auto_discover: true
+    
+  # Health monitor integration
+  health_monitor:
+    enabled: true
+    auto_discover: true
+    
+  # External monitoring systems
+  external:
+    prometheus:
+      enabled: true
+      endpoint: "/metrics"
+      port: 9090
+      
+    grafana:
+      enabled: true
+      dashboard_auto_create: true
+      dashboards:
+        - name: "HeyGen AI Performance"
+          template: "ai_performance_dashboard"
+          
+    datadog:
+      enabled: false
+      api_key: "${DATADOG_API_KEY}"
+      app_key: "${DATADOG_APP_KEY}"
+
+# Data retention and storage
+data_retention:
+  # Performance data retention
+  performance_data:
+    retention_days: 30
+    compression_enabled: true
+    compression_level: 6
+    
+  # Alert history retention
+  alert_history:
+    retention_days: 90
+    
+  # Optimization history retention
+  optimization_history:
+    retention_days: 180
+    
+  # AI model metrics retention
+  ai_model_metrics:
+    retention_days: 365
+    high_resolution_days: 7  # Keep high-resolution data for 7 days
+
+# Export and reporting
+export:
+  # Export formats
+  formats:
+    - "json"
+    - "csv"
+    - "prometheus"
+    - "influxdb"
+    
+  # Export schedule
+  schedule:
+    enabled: true
+    interval_hours: 1
+    retention_days: 30
+    
+  # Export destinations
+  destinations:
+    local:
+      enabled: true
+      path: "./heygen_ai_metrics"
+      
+    s3:
+      enabled: false
+      bucket: "${S3_METRICS_BUCKET}"
+      region: "${AWS_REGION}"
+      
+    influxdb:
+      enabled: false
+      url: "${INFLUXDB_URL}"
+      token: "${INFLUXDB_TOKEN}"
+      org: "${INFLUXDB_ORG}"
+      bucket: "heygen_ai_metrics"
+
+# Security and access control
+security:
+  # API access control
+  api_access:
+    enabled: true
+    authentication_required: true
+    rate_limiting:
+      enabled: true
+      requests_per_minute: 100
+      
+  # Data encryption
+  encryption:
+    enabled: true
+    algorithm: "AES-256"
+    
+  # Audit logging
+  audit_logging:
+    enabled: true
+    log_level: "INFO"
+    retention_days: 365
+
+# Performance optimization settings
+optimization:
+  # Memory management
+  memory:
+    max_cache_size: "2GB"
+    cleanup_interval: 300  # seconds
+    aggressive_cleanup_threshold: 90.0
+    
+  # Data processing
+  data_processing:
+    batch_size: 100
+    parallel_workers: 8
+    max_queue_size: 1000
+    
+  # Storage optimization
+  storage:
+    compression: true
+    compression_level: 6
+    auto_cleanup: true
+    cleanup_threshold: 80.0
+
+# HeyGen AI specific settings
+heygen_ai_specific:
+  # Model serving configuration
+  model_serving:
+    enable_auto_scaling: true
+    min_instances: 2
+    max_instances: 20
+    scaling_cooldown: 300  # seconds
+    
+  # Batch processing optimization
+  batch_processing:
+    enable_dynamic_batching: true
+    max_batch_size: 64
+    min_batch_size: 8
+    batch_timeout: 5000  # milliseconds
+    
+  # GPU optimization
+  gpu_optimization:
+    enable_mixed_precision: true
+    enable_tensor_cores: true
+    memory_fraction: 0.9
+    enable_memory_growth: true
+    
+  # Inference optimization
+  inference_optimization:
+    enable_model_caching: true
+    enable_response_caching: true
+    cache_ttl: 3600  # seconds
+    enable_quantization: false  # Enable for production if needed
+
+# Monitoring dashboard configuration
+dashboard:
+  # Real-time monitoring
+  real_time:
+    enabled: true
+    update_interval: 5.0  # seconds
+    max_data_points: 1000
+    
+  # Historical analysis
+  historical:
+    enabled: true
+    default_time_range: "24h"
+    available_ranges:
+      - "1h"
+      - "6h"
+      - "24h"
+      - "7d"
+      - "30d"
+      
+  # Custom widgets
+  widgets:
+    - name: "AI Model Performance"
+      type: "line_chart"
+      metrics: ["inference_time", "accuracy", "throughput"]
+      
+    - name: "Resource Usage"
+      type: "area_chart"
+      metrics: ["cpu_usage", "memory_usage", "gpu_utilization"]
+      
+    - name: "Optimization Actions"
+      type: "table"
+      data_source: "optimization_history"
+      
+    - name: "Predictions"
+      type: "forecast_chart"
+      metrics: ["cpu_usage", "memory_usage"]
+      time_horizon: 3600
+
+# Development and testing
+development:
+  # Debug mode
+  debug_mode: false
+  
+  # Test data generation
+  test_data:
+    enabled: false
+    data_volume: "medium"  # low, medium, high
+    
+  # Performance testing
+  performance_testing:
+    enabled: false
+    load_test_duration: 300  # seconds
+    target_rps: 100  # requests per second
