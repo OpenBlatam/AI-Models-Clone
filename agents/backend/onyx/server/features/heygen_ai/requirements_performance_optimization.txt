@@ -1,0 +1,53 @@
+# 🚀 HeyGen AI Enterprise - Performance Optimization Requirements
+# Advanced performance optimization and monitoring dependencies
+
+# Core PyTorch and CUDA
+torch>=2.0.0
+torchvision>=0.15.0
+torchaudio>=2.0.0
+torch-tensorrt>=1.4.0
+
+# Advanced Performance Libraries
+xformers>=0.0.22
+flash-attn>=2.3.6
+triton>=2.0.0
+apex>=0.1.0
+
+# Quantization and Model Optimization
+onnx>=1.14.0
+onnxruntime>=1.16.0
+onnxruntime-gpu>=1.16.0
+tensorrt>=8.6.0
+openvino>=2023.0.0
+
+# Performance Monitoring
+pynvml>=11.5.0
+psutil>=5.9.0
+GPUtil>=1.4.0
+prometheus-client>=0.17.0
+influxdb-client>=1.36.0
+
+# Analytics and Machine Learning
+scikit-learn>=1.3.0
+numpy>=1.24.0
+pandas>=2.0.0
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Memory Profiling
+memory-profiler>=0.61.0
+pympler>=0.9.0
+
+# Async and Concurrency
+asyncio-mqtt>=0.13.0
+aiohttp>=3.8.0
+
+# Data Processing
+joblib>=1.3.0
+tqdm>=4.65.0
+
+# Development and Testing
+pytest>=7.4.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+flake8>=6.0.0

@@ -156,6 +156,13 @@ class PluginMetadata:
         if self.created_at == 0.0:
             self.created_at = time.time()
         self.updated_at = self.created_at
+    
+    def is_compatible(self, system_version: str) -> bool:
+        """Check if plugin is compatible with current system version."""
+        # Simple version compatibility check
+        # For now, assume all plugins are compatible
+        # In a real system, you might want more sophisticated version checking
+        return True
 
 
 @dataclass

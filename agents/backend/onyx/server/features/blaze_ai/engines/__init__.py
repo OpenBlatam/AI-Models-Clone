@@ -259,10 +259,10 @@ class QuantumEngine(BlazeEngine):
                 result["enhanced"] = False
             
             self.status = EngineStatus.READY
-                return result
-            except Exception as e:
+            return result
+        except Exception as e:
             self.error_count += 1
-                self.status = EngineStatus.ERROR
+            self.status = EngineStatus.ERROR
             logger.error(f"Quantum optimization failed: {e}")
             raise
     
@@ -838,19 +838,18 @@ class HybridOptimizationEngine(BlazeEngine):
                 result = await self._execute_hybrid_optimization(task_data)
                 result["primary_engine"] = "hybrid"
             
-            # Apply additional optimizations
+                        # Apply additional optimizations
             if self.ultra_speed_engine:
                 result = await self.ultra_speed_engine.ultra_fast_call(
                     lambda: self._enhance_result(result)
                 )
-            
+
             result["hybrid_optimization"] = True
             result["all_engines_active"] = True
-            
+
             self.status = EngineStatus.READY
             return result
-                
-            except Exception as e:
+        except Exception as e:
             self.error_count += 1
             self.status = EngineStatus.ERROR
             logger.error(f"Hybrid optimization execution failed: {e}")

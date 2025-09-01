@@ -1,931 +1,612 @@
-#!/usr/bin/env python3
 """
-Multi-Agent Swarm Intelligence with Collaborative AI Optimization
-================================================================
-Cutting-edge multi-agent system with emergent behavior, collaborative optimization,
-and swarm intelligence for HeyGen AI.
+Multi-Agent Swarm Intelligence for HeyGen AI
+
+This module provides swarm intelligence capabilities with advanced features:
+- Emergent behavior systems
+- Adaptive coordination patterns
+- Specialized agent types
+- Scalable swarm architectures
 """
 
-import asyncio
-import time
-import json
-import structlog
-from typing import Dict, List, Optional, Any, Tuple, Callable, Union
-from dataclasses import dataclass, asdict
-from enum import Enum
-from datetime import datetime, timedelta
-import threading
-from concurrent.futures import ThreadPoolExecutor
-import numpy as np
-import torch
-import torch.nn as nn
-import torch.nn.functional as F
-from collections import defaultdict, deque
-import hashlib
-import secrets
+import logging
+import warnings
+from typing import Dict, List, Optional, Tuple, Any, Union
+from dataclasses import dataclass, field
 from pathlib import Path
-import pickle
+import gc
+import time
+import asyncio
 import random
 import math
-from abc import ABC, abstractmethod
 
-logger = structlog.get_logger()
+import torch
+import torch.nn as nn
+import numpy as np
+from tqdm import tqdm
 
-class AgentType(Enum):
-    """Types of AI agents in the swarm."""
-    OPTIMIZER = "optimizer"
-    EXPLORER = "explorer"
-    EXPLOITER = "exploiter"
-    COORDINATOR = "coordinator"
-    SPECIALIST = "specialist"
-    GENERALIST = "generalist"
-    ADAPTIVE = "adaptive"
+logger = logging.getLogger(__name__)
 
-class SwarmStrategy(Enum):
-    """Swarm intelligence strategies."""
-    PARTICLE_SWARM = "particle_swarm"
-    ANT_COLONY = "ant_colony"
-    BEE_COLONY = "bee_colony"
-    FISH_SCHOOL = "fish_school"
-    BIRD_FLOCK = "bird_flock"
-    EMERGENT_BEHAVIOR = "emergent_behavior"
-    COLLABORATIVE_LEARNING = "collaborative_learning"
-
-class CommunicationProtocol(Enum):
-    """Inter-agent communication protocols."""
-    DIRECT = "direct"
-    BROADCAST = "broadcast"
-    HIERARCHICAL = "hierarchical"
-    PEER_TO_PEER = "peer_to_peer"
-    EMERGENT_NETWORK = "emergent_network"
-    QUANTUM_ENTANGLED = "quantum_entangled"
-
-class OptimizationObjective(Enum):
-    """Optimization objectives for the swarm."""
-    PERFORMANCE = "performance"
-    EFFICIENCY = "efficiency"
-    ACCURACY = "accuracy"
-    SPEED = "speed"
-    MEMORY = "memory"
-    ENERGY = "energy"
-    MULTI_OBJECTIVE = "multi_objective"
 
 @dataclass
-class AgentState:
-    """State of an individual agent."""
-    agent_id: str
-    agent_type: AgentType
-    position: np.ndarray
-    velocity: np.ndarray
-    best_position: np.ndarray
-    best_fitness: float
-    current_fitness: float
-    energy_level: float
-    knowledge_base: Dict[str, Any]
-    communication_history: List[Dict[str, Any]]
-    last_update: float
-    is_active: bool = True
-
-@dataclass
-class SwarmConfiguration:
-    """Configuration for the swarm system."""
-    num_agents: int
-    swarm_strategy: SwarmStrategy
-    communication_protocol: CommunicationProtocol
-    optimization_objective: OptimizationObjective
-    search_space_dimensions: int
-    max_iterations: int
-    convergence_threshold: float
-    exploration_rate: float
-    exploitation_rate: float
-    collaboration_strength: float
-    emergent_behavior_enabled: bool = True
-
-@dataclass
-class SwarmMetrics:
-    """Performance metrics for the swarm."""
-    total_iterations: int
-    best_global_fitness: float
-    average_fitness: float
-    convergence_rate: float
-    exploration_efficiency: float
-    collaboration_efficiency: float
-    emergent_behavior_count: int
-    optimization_time: float
-    communication_overhead: float
-
-@dataclass
-class CommunicationMessage:
-    """Message between agents."""
-    message_id: str
-    sender_id: str
-    receiver_id: Optional[str]  # None for broadcast
-    message_type: str
-    content: Dict[str, Any]
-    timestamp: float
-    priority: int
-    ttl: float  # Time to live
-
-class BaseAgent(ABC):
-    """
-    Base class for all agents in the swarm.
-    """
+class SwarmConfig:
+    """Configuration for swarm intelligence."""
     
-    def __init__(
-        self,
-        agent_id: str,
-        agent_type: AgentType,
-        position: np.ndarray,
-        search_space_bounds: Tuple[np.ndarray, np.ndarray],
-        optimization_objective: OptimizationObjective
-    ):
+    # Swarm Settings
+    num_agents: int = 10
+    collaboration_mode: str = "hierarchical"  # hierarchical, decentralized, centralized
+    learning_rate: float = 0.01
+    
+    # Behavior Settings
+    enable_emergent_behavior: bool = True
+    enable_adaptive_coordination: bool = True
+    enable_specialization: bool = True
+    
+    # Communication Settings
+    communication_range: float = 100.0
+    communication_frequency: float = 1.0  # Hz
+    
+    # Performance Settings
+    max_iterations: int = 1000
+    convergence_threshold: float = 1e-6
+    enable_parallel_execution: bool = True
+
+
+@dataclass
+class AgentType:
+    """Agent type definitions."""
+    
+    type: str  # explorer, exploiter, coordinator, specialist
+    count: int
+    behavior: str
+    learning_rate: float
+    capabilities: List[str] = field(default_factory=list)
+    
+    def __post_init__(self):
+        if not self.capabilities:
+            self.capabilities = self._get_default_capabilities()
+    
+    def _get_default_capabilities(self) -> List[str]:
+        """Get default capabilities for agent type."""
+        if self.type == "explorer":
+            return ["exploration", "discovery", "mapping"]
+        elif self.type == "exploiter":
+            return ["optimization", "refinement", "efficiency"]
+        elif self.type == "coordinator":
+            return ["coordination", "communication", "planning"]
+        elif self.type == "specialist":
+            return ["expertise", "precision", "analysis"]
+        else:
+            return ["general"]
+
+
+class SwarmAgent:
+    """Individual agent in the swarm."""
+    
+    def __init__(self, agent_id: str, agent_type: AgentType, position: np.ndarray):
         self.agent_id = agent_id
         self.agent_type = agent_type
-        self.position = position.copy()
-        self.search_space_bounds = search_space_bounds
-        self.optimization_objective = optimization_objective
-        
-        # Initialize state
-        self.velocity = np.random.uniform(-1, 1, position.shape)
+        self.position = position
+        self.velocity = np.random.randn(len(position)) * 0.1
         self.best_position = position.copy()
         self.best_fitness = float('inf')
-        self.current_fitness = float('inf')
-        self.energy_level = 1.0
+        self.fitness_history = []
         
-        # Knowledge and communication
-        self.knowledge_base = {}
-        self.communication_history = []
-        self.last_update = time.time()
-        self.is_active = True
+        # Communication state
+        self.neighbors = []
+        self.messages = []
+        self.last_communication = time.time()
         
-        # Agent-specific parameters
-        self._init_agent_parameters()
-    
-    @abstractmethod
-    def _init_agent_parameters(self):
-        """Initialize agent-specific parameters."""
-        pass
-    
-    @abstractmethod
-    async def update_position(self, swarm_state: Dict[str, Any]) -> np.ndarray:
-        """Update agent position based on swarm state."""
-        pass
-    
-    @abstractmethod
-    async def evaluate_fitness(self, position: np.ndarray) -> float:
-        """Evaluate fitness of a position."""
-        pass
-    
-    @abstractmethod
-    async def communicate(self, other_agents: List['BaseAgent']) -> List[CommunicationMessage]:
-        """Generate communication messages."""
-        pass
-    
-    @abstractmethod
-    async def learn_from_communication(self, messages: List[CommunicationMessage]):
-        """Learn from received communication messages."""
-        pass
-    
-    def get_state(self) -> AgentState:
-        """Get current agent state."""
-        return AgentState(
-            agent_id=self.agent_id,
-            agent_type=self.agent_type,
-            position=self.position.copy(),
-            velocity=self.velocity.copy(),
-            best_position=self.best_position.copy(),
-            best_fitness=self.best_fitness,
-            current_fitness=self.current_fitness,
-            energy_level=self.energy_level,
-            knowledge_base=self.knowledge_base.copy(),
-            communication_history=self.communication_history.copy(),
-            last_update=self.last_update,
-            is_active=self.is_active
-        )
-    
-    def update_state(self, new_position: np.ndarray, new_fitness: float):
-        """Update agent state with new position and fitness."""
-        self.position = new_position.copy()
-        self.current_fitness = new_fitness
-        self.last_update = time.time()
+        # Learning state
+        self.learning_rate = agent_type.learning_rate
+        self.adaptation_factor = 1.0
         
-        # Update best position if better
-        if self._is_better_fitness(new_fitness, self.best_fitness):
-            self.best_position = new_position.copy()
-            self.best_fitness = new_fitness
+        # Specialization
+        self.specialization_level = 0.0
+        self.expertise_areas = agent_type.capabilities.copy()
     
-    def _is_better_fitness(self, fitness1: float, fitness2: float) -> bool:
-        """Check if fitness1 is better than fitness2 based on objective."""
-        if self.optimization_objective == OptimizationObjective.PERFORMANCE:
-            return fitness1 > fitness2
-        elif self.optimization_objective == OptimizationObjective.EFFICIENCY:
-            return fitness1 > fitness2
-        elif self.optimization_objective == OptimizationObjective.ACCURACY:
-            return fitness1 > fitness2
-        else:
-            return fitness1 < fitness2  # Default to minimization
-
-class OptimizerAgent(BaseAgent):
-    """
-    Agent specialized in optimization tasks.
-    """
-    
-    def _init_agent_parameters(self):
-        """Initialize optimizer-specific parameters."""
-        self.learning_rate = 0.1
-        self.momentum = 0.9
-        self.adaptation_rate = 0.05
-        self.optimization_history = []
-    
-    async def update_position(self, swarm_state: Dict[str, Any]) -> np.ndarray:
-        """Update position using optimization algorithms."""
+    def update_position(self, swarm_center: np.ndarray, global_best: np.ndarray):
+        """Update agent position using swarm intelligence algorithms."""
         try:
-            # Get global best position
-            global_best = swarm_state.get('global_best_position', self.best_position)
+            # Calculate social influence
+            social_influence = (global_best - self.position) * 0.1
             
-            # Calculate new velocity using PSO-like algorithm
-            cognitive_component = self.learning_rate * np.random.random() * (self.best_position - self.position)
-            social_component = self.learning_rate * np.random.random() * (global_best - self.position)
+            # Calculate swarm cohesion
+            cohesion = (swarm_center - self.position) * 0.05
             
-            # Update velocity with momentum
-            self.velocity = (self.momentum * self.velocity + 
-                           cognitive_component + social_component)
+            # Calculate individual memory
+            memory = (self.best_position - self.position) * 0.1
+            
+            # Update velocity
+            self.velocity = (0.7 * self.velocity + 
+                           0.2 * social_influence + 
+                           0.1 * cohesion + 
+                           0.1 * memory)
+            
+            # Apply velocity limits
+            self.velocity = np.clip(self.velocity, -1.0, 1.0)
             
             # Update position
-            new_position = self.position + self.velocity
+            self.position += self.velocity
             
-            # Apply bounds
-            new_position = np.clip(new_position, 
-                                 self.search_space_bounds[0], 
-                                 self.search_space_bounds[1])
+            # Update best position if improved
+            current_fitness = self._calculate_fitness()
+            if current_fitness < self.best_fitness:
+                self.best_position = self.position.copy()
+                self.best_fitness = current_fitness
             
-            return new_position
+            # Record fitness
+            self.fitness_history.append(current_fitness)
             
         except Exception as e:
-            logger.warning(f"Position update failed for optimizer agent {self.agent_id}: {e}")
-            return self.position
+            logger.warning(f"Failed to update position for agent {self.agent_id}: {e}")
     
-    async def evaluate_fitness(self, position: np.ndarray) -> float:
-        """Evaluate fitness using optimization metrics."""
+    def _calculate_fitness(self) -> float:
+        """Calculate fitness value for current position."""
         try:
-            # Calculate fitness based on position quality
-            # This is a simplified fitness function
-            distance_from_origin = np.linalg.norm(position)
-            smoothness = np.sum(np.diff(position)**2)
-            
-            # Multi-objective fitness
-            if self.optimization_objective == OptimizationObjective.MULTI_OBJECTIVE:
-                fitness = -distance_from_origin - 0.1 * smoothness
-            else:
-                fitness = -distance_from_origin
-            
-            return fitness
+            # Simple fitness function (distance from origin)
+            # In practice, this would be a more sophisticated objective function
+            distance = np.linalg.norm(self.position)
+            noise = np.random.normal(0, 0.1)
+            return distance + noise
             
         except Exception as e:
-            logger.warning(f"Fitness evaluation failed for optimizer agent {self.agent_id}: {e}")
+            logger.warning(f"Failed to calculate fitness for agent {self.agent_id}: {e}")
             return float('inf')
     
-    async def communicate(self, other_agents: List[BaseAgent]) -> List[CommunicationMessage]:
-        """Generate optimization insights."""
-        messages = []
-        
+    def communicate(self, other_agent: 'SwarmAgent', message: Dict[str, Any]):
+        """Communicate with another agent."""
         try:
-            # Share optimization insights
-            if self.optimization_history:
-                best_insight = max(self.optimization_history, key=lambda x: x.get('fitness', 0))
-                
-                message = CommunicationMessage(
-                    message_id=f"opt_{self.agent_id}_{int(time.time())}",
-                    sender_id=self.agent_id,
-                    receiver_id=None,  # Broadcast
-                    message_type="optimization_insight",
-                    content={
-                        'best_position': self.best_position.tolist(),
-                        'best_fitness': self.best_fitness,
-                        'optimization_strategy': 'gradient_descent',
-                        'learning_rate': self.learning_rate,
-                        'momentum': self.momentum
-                    },
-                    timestamp=time.time(),
-                    priority=2,
-                    ttl=300.0
-                )
-                messages.append(message)
-            
-            # Share knowledge with similar agents
-            for agent in other_agents:
-                if (agent.agent_type == AgentType.OPTIMIZER and 
-                    agent.agent_id != self.agent_id):
-                    
-                    message = CommunicationMessage(
-                        message_id=f"collab_{self.agent_id}_{agent.agent_id}_{int(time.time())}",
-                        sender_id=self.agent_id,
-                        receiver_id=agent.agent_id,
-                        message_type="collaboration_request",
-                        content={
-                            'proposed_strategy': 'parameter_sharing',
-                            'current_parameters': {
-                                'learning_rate': self.learning_rate,
-                                'momentum': self.momentum
-                            }
-                        },
-                        timestamp=time.time(),
-                        priority=1,
-                        ttl=180.0
-                    )
-                    messages.append(message)
-            
-        except Exception as e:
-            logger.warning(f"Communication failed for optimizer agent {self.agent_id}: {e}")
-        
-        return messages
-    
-    async def learn_from_communication(self, messages: List[CommunicationMessage]):
-        """Learn from optimization insights."""
-        try:
-            for message in messages:
-                if message.message_type == "optimization_insight":
-                    # Learn from other agents' insights
-                    if message.content.get('best_fitness', 0) > self.best_fitness:
-                        # Adapt learning rate based on successful strategies
-                        self.learning_rate *= 1.1
-                        self.learning_rate = min(self.learning_rate, 0.5)
-                
-                elif message.message_type == "collaboration_response":
-                    # Adapt based on collaboration
-                    if 'shared_parameters' in message.content:
-                        shared_lr = message.content['shared_parameters'].get('learning_rate')
-                        if shared_lr:
-                            self.learning_rate = (self.learning_rate + shared_lr) / 2
-                
-                # Record communication
-                self.communication_history.append({
-                    'message_id': message.message_id,
-                    'sender_id': message.sender_id,
-                    'message_type': message.message_type,
-                    'timestamp': message.timestamp,
-                    'content_summary': str(message.content)[:100]
+            if self._can_communicate(other_agent):
+                # Send message
+                other_agent.messages.append({
+                    'from': self.agent_id,
+                    'type': message['type'],
+                    'data': message['data'],
+                    'timestamp': time.time()
                 })
                 
-        except Exception as e:
-            logger.warning(f"Learning failed for optimizer agent {self.agent_id}: {e}")
-
-class ExplorerAgent(BaseAgent):
-    """
-    Agent specialized in exploring new areas of the search space.
-    """
-    
-    def _init_agent_parameters(self):
-        """Initialize explorer-specific parameters."""
-        self.exploration_radius = 2.0
-        self.curiosity_factor = 0.8
-        self.discovery_threshold = 0.1
-        self.exploration_history = []
-    
-    async def update_position(self, swarm_state: Dict[str, Any]) -> np.ndarray:
-        """Update position using exploration strategies."""
-        try:
-            # Get unexplored areas
-            explored_positions = swarm_state.get('explored_positions', [])
+                # Update communication timestamp
+                self.last_communication = time.time()
+                other_agent.last_communication = time.time()
+                
+                return True
+            return False
             
-            # Calculate exploration direction
-            if explored_positions:
-                # Move away from explored areas
-                explored_center = np.mean(explored_positions, axis=0)
-                exploration_direction = self.position - explored_center
-                exploration_direction = exploration_direction / (np.linalg.norm(exploration_direction) + 1e-8)
+        except Exception as e:
+            logger.warning(f"Communication failed between {self.agent_id} and {other_agent.agent_id}: {e}")
+            return False
+    
+    def _can_communicate(self, other_agent: 'SwarmAgent') -> bool:
+        """Check if communication is possible with another agent."""
+        try:
+            # Check distance
+            distance = np.linalg.norm(self.position - other_agent.position)
+            if distance > 100.0:  # Communication range
+                return False
+            
+            # Check communication frequency
+            time_since_last = time.time() - self.last_communication
+            if time_since_last < 1.0:  # Communication frequency limit
+                return False
+            
+            return True
+            
+        except Exception as e:
+            logger.warning(f"Communication check failed: {e}")
+            return False
+    
+    def adapt_behavior(self, swarm_state: Dict[str, Any]):
+        """Adapt behavior based on swarm state."""
+        try:
+            # Adapt learning rate based on swarm performance
+            if swarm_state.get('improving', False):
+                self.adaptation_factor *= 1.1
             else:
-                # Random exploration
-                exploration_direction = np.random.uniform(-1, 1, self.position.shape)
-                exploration_direction = exploration_direction / np.linalg.norm(exploration_direction)
+                self.adaptation_factor *= 0.9
             
-            # Add some randomness for better exploration
-            random_component = np.random.uniform(-0.5, 0.5, self.position.shape)
-            exploration_direction = exploration_direction + 0.3 * random_component
-            exploration_direction = exploration_direction / (np.linalg.norm(exploration_direction) + 1e-8)
+            # Clamp adaptation factor
+            self.adaptation_factor = np.clip(self.adaptation_factor, 0.1, 2.0)
             
-            # Update position
-            step_size = self.exploration_radius * self.curiosity_factor
-            new_position = self.position + step_size * exploration_direction
+            # Update learning rate
+            self.learning_rate = self.agent_type.learning_rate * self.adaptation_factor
             
-            # Apply bounds
-            new_position = np.clip(new_position, 
-                                 self.search_space_bounds[0], 
-                                 self.search_space_bounds[1])
-            
-            return new_position
+            # Adapt specialization based on swarm needs
+            if swarm_state.get('need_exploration', False) and 'exploration' in self.expertise_areas:
+                self.specialization_level = min(1.0, self.specialization_level + 0.1)
+            elif swarm_state.get('need_optimization', False) and 'optimization' in self.expertise_areas:
+                self.specialization_level = min(1.0, self.specialization_level + 0.1)
             
         except Exception as e:
-            logger.warning(f"Position update failed for explorer agent {self.agent_id}: {e}")
-            return self.position
+            logger.warning(f"Behavior adaptation failed for agent {self.agent_id}: {e}")
     
-    async def evaluate_fitness(self, position: np.ndarray) -> float:
-        """Evaluate fitness with exploration bonus."""
-        try:
-            # Base fitness
-            base_fitness = -np.linalg.norm(position)
-            
-            # Add exploration bonus
-            exploration_bonus = self.curiosity_factor * self.exploration_radius
-            
-            # Add novelty bonus for new areas
-            if position not in self.exploration_history:
-                novelty_bonus = 0.5
-                self.exploration_history.append(position.copy())
-            else:
-                novelty_bonus = 0.0
-            
-            total_fitness = base_fitness + exploration_bonus + novelty_bonus
-            return total_fitness
-            
-        except Exception as e:
-            logger.warning(f"Fitness evaluation failed for explorer agent {self.agent_id}: {e}")
-            return float('inf')
-    
-    async def communicate(self, other_agents: List[BaseAgent]) -> List[CommunicationMessage]:
-        """Generate exploration discoveries."""
-        messages = []
-        
-        try:
-            # Share exploration discoveries
-            if self.exploration_history:
-                recent_discoveries = self.exploration_history[-5:]  # Last 5 discoveries
-                
-                message = CommunicationMessage(
-                    message_id=f"explore_{self.agent_id}_{int(time.time())}",
-                    sender_id=self.agent_id,
-                    receiver_id=None,  # Broadcast
-                    message_type="exploration_discovery",
-                    content={
-                        'discovered_positions': [pos.tolist() for pos in recent_discoveries],
-                        'exploration_radius': self.exploration_radius,
-                        'curiosity_factor': self.curiosity_factor,
-                        'novelty_score': len(set(map(tuple, self.exploration_history)))
-                    },
-                    timestamp=time.time(),
-                    priority=1,
-                    ttl=600.0
-                )
-                messages.append(message)
-            
-            # Coordinate with other explorers
-            for agent in other_agents:
-                if (agent.agent_type == AgentType.EXPLORER and 
-                    agent.agent_id != self.agent_id):
-                    
-                    # Calculate distance to coordinate exploration
-                    distance = np.linalg.norm(self.position - agent.position)
-                    if distance < self.exploration_radius:
-                        message = CommunicationMessage(
-                            message_id=f"coord_{self.agent_id}_{agent.agent_id}_{int(time.time())}",
-                            sender_id=self.agent_id,
-                            receiver_id=agent.agent_id,
-                            message_type="exploration_coordination",
-                            content={
-                                'current_position': self.position.tolist(),
-                                'exploration_direction': self.velocity.tolist(),
-                                'suggested_coordination': 'avoid_overlap'
-                            },
-                            timestamp=time.time(),
-                            priority=2,
-                            ttl=120.0
-                        )
-                        messages.append(message)
-            
-        except Exception as e:
-            logger.warning(f"Communication failed for explorer agent {self.agent_id}: {e}")
-        
-        return messages
-    
-    async def learn_from_communication(self, messages: List[CommunicationMessage]):
-        """Learn from exploration discoveries."""
-        try:
-            for message in messages:
-                if message.message_type == "exploration_discovery":
-                    # Learn about new areas to explore
-                    discovered_positions = message.content.get('discovered_positions', [])
-                    for pos in discovered_positions:
-                        if len(pos) == len(self.position):
-                            pos_array = np.array(pos)
-                            if pos_array not in self.exploration_history:
-                                self.exploration_history.append(pos_array)
-                
-                elif message.message_type == "exploration_coordination":
-                    # Adapt exploration strategy based on coordination
-                    if 'suggested_coordination' in message.content:
-                        suggestion = message.content['suggested_coordination']
-                        if suggestion == 'avoid_overlap':
-                            # Increase exploration radius to avoid overlap
-                            self.exploration_radius *= 1.1
-                
-                # Record communication
-                self.communication_history.append({
-                    'message_id': message.message_id,
-                    'sender_id': message.sender_id,
-                    'message_type': message.message_type,
-                    'timestamp': message.timestamp,
-                    'content_summary': str(message.content)[:100]
-                })
-                
-        except Exception as e:
-            logger.warning(f"Learning failed for explorer agent {self.agent_id}: {e}")
+    def get_status(self) -> Dict[str, Any]:
+        """Get current agent status."""
+        return {
+            'agent_id': self.agent_id,
+            'type': self.agent_type.type,
+            'position': self.position.tolist(),
+            'velocity': self.velocity.tolist(),
+            'best_fitness': self.best_fitness,
+            'learning_rate': self.learning_rate,
+            'specialization_level': self.specialization_level,
+            'neighbors_count': len(self.neighbors),
+            'messages_count': len(self.messages)
+        }
 
-class SwarmIntelligenceManager:
-    """
-    Manager for the multi-agent swarm intelligence system.
-    """
+
+class SwarmCoordinator:
+    """Coordinates swarm behavior and communication."""
     
-    def __init__(
-        self,
-        config: SwarmConfiguration,
-        fitness_function: Optional[Callable[[np.ndarray], float]] = None
-    ):
+    def __init__(self, config: SwarmConfig):
         self.config = config
-        self.fitness_function = fitness_function
+        self.logger = logging.getLogger(f"{__name__}.coordinator")
+        self.agents: Dict[str, SwarmAgent] = {}
+        self.communication_graph = {}
+        self.swarm_state = {}
         
-        # Initialize agents
-        self.agents: Dict[str, BaseAgent] = {}
-        self.agent_states: Dict[str, AgentState] = {}
-        
-        # Swarm state
-        self.global_best_position = None
-        self.global_best_fitness = float('inf')
-        self.explored_positions = []
-        self.swarm_metrics = SwarmMetrics(
-            total_iterations=0,
-            best_global_fitness=float('inf'),
-            average_fitness=0.0,
-            convergence_rate=0.0,
-            exploration_efficiency=0.0,
-            collaboration_efficiency=0.0,
-            emergent_behavior_count=0,
-            optimization_time=0.0,
-            communication_overhead=0.0
-        )
-        
-        # Communication and coordination
-        self.message_queue = deque()
-        self.communication_network = defaultdict(list)
-        
-        # Initialize the swarm
-        self._initialize_swarm()
-    
-    def _initialize_swarm(self):
-        """Initialize the swarm with agents."""
+    def add_agent(self, agent: SwarmAgent) -> bool:
+        """Add an agent to the swarm."""
         try:
-            # Create agents based on configuration
-            agent_types = list(AgentType)
-            num_agents = self.config.num_agents
+            if agent.agent_id in self.agents:
+                self.logger.warning(f"Agent {agent.agent_id} already exists")
+                return False
             
-            for i in range(num_agents):
-                # Determine agent type
-                if i < num_agents // 3:
-                    agent_type = AgentType.OPTIMIZER
-                elif i < 2 * num_agents // 3:
-                    agent_type = AgentType.EXPLORER
-                else:
-                    agent_type = AgentType.SPECIALIST
-                
-                # Generate random position
-                position = np.random.uniform(
-                    self.config.search_space_bounds[0],
-                    self.config.search_space_bounds[1],
-                    self.config.search_space_dimensions
-                )
-                
-                # Create agent
-                if agent_type == AgentType.OPTIMIZER:
-                    agent = OptimizerAgent(
-                        agent_id=f"agent_{i}",
-                        agent_type=agent_type,
-                        position=position,
-                        search_space_bounds=self.config.search_space_bounds,
-                        optimization_objective=self.config.optimization_objective
-                    )
-                elif agent_type == AgentType.EXPLORER:
-                    agent = ExplorerAgent(
-                        agent_id=f"agent_{i}",
-                        agent_type=agent_type,
-                        position=position,
-                        search_space_bounds=self.config.search_space_bounds,
-                        optimization_objective=self.config.optimization_objective
-                        )
-                else:
-                    # Create a basic agent for other types
-                    agent = OptimizerAgent(
-                        agent_id=f"agent_{i}",
-                        agent_type=agent_type,
-                        position=position,
-                        search_space_bounds=self.config.search_space_bounds,
-                        optimization_objective=self.config.optimization_objective
-                    )
-                
-                self.agents[agent.agent_id] = agent
-                self.agent_states[agent.agent_id] = agent.get_state()
+            self.agents[agent.agent_id] = agent
+            self.communication_graph[agent.agent_id] = []
             
-            # Initialize global best
-            if self.agents:
-                first_agent = list(self.agents.values())[0]
-                self.global_best_position = first_agent.position.copy()
-                
-            logger.info(f"Initialized swarm with {len(self.agents)} agents")
+            self.logger.info(f"Added agent {agent.agent_id} of type {agent.agent_type.type}")
+            return True
             
         except Exception as e:
-            logger.error(f"Failed to initialize swarm: {e}")
-            raise
+            self.logger.error(f"Failed to add agent {agent.agent_id}: {e}")
+            return False
     
-    async def run_swarm_optimization(self) -> Dict[str, Any]:
-        """Run the swarm optimization process."""
+    def update_communication_graph(self):
+        """Update communication graph based on agent positions."""
         try:
-            optimization_start = time.time()
+            for agent_id, agent in self.agents.items():
+                self.communication_graph[agent_id] = []
+                
+                for other_id, other_agent in self.agents.items():
+                    if agent_id != other_id:
+                        distance = np.linalg.norm(agent.position - other_agent.position)
+                        if distance <= self.config.communication_range:
+                            self.communication_graph[agent_id].append(other_id)
             
-            for iteration in range(self.config.max_iterations):
-                iteration_start = time.time()
-                
-                # Update swarm state
-                swarm_state = self._get_swarm_state()
-                
-                # Run agent updates
-                await self._update_all_agents(swarm_state)
-                
-                # Handle communication
-                await self._handle_agent_communication()
-                
-                # Update global best
-                await self._update_global_best()
-                
-                # Check convergence
-                if await self._check_convergence():
-                    logger.info(f"Swarm converged at iteration {iteration}")
-                    break
-                
-                # Update metrics
-                await self._update_swarm_metrics(iteration, iteration_start)
-                
-                # Log progress
-                if iteration % 10 == 0:
-                    logger.info(f"Iteration {iteration}: Best fitness = {self.global_best_fitness:.6f}")
+        except Exception as e:
+            self.logger.error(f"Failed to update communication graph: {e}")
+    
+    def coordinate_swarm(self) -> Dict[str, Any]:
+        """Coordinate swarm behavior."""
+        try:
+            # Update communication graph
+            self.update_communication_graph()
             
-            # Final optimization time
-            self.swarm_metrics.optimization_time = time.time() - optimization_start
+            # Calculate swarm center
+            positions = [agent.position for agent in self.agents.values()]
+            swarm_center = np.mean(positions, axis=0)
             
-            # Generate results
-            results = {
-                'global_best_position': self.global_best_position.tolist() if self.global_best_position is not None else None,
-                'global_best_fitness': self.global_best_fitness,
-                'total_iterations': self.swarm_metrics.total_iterations,
-                'swarm_metrics': asdict(self.swarm_metrics),
-                'agent_summaries': await self._get_agent_summaries()
+            # Find global best
+            best_agent = min(self.agents.values(), key=lambda a: a.best_fitness)
+            global_best = best_agent.best_position
+            
+            # Update swarm state
+            self.swarm_state = {
+                'swarm_center': swarm_center.tolist(),
+                'global_best': global_best.tolist(),
+                'best_fitness': best_agent.best_fitness,
+                'improving': self._is_swarm_improving(),
+                'need_exploration': self._needs_exploration(),
+                'need_optimization': self._needs_optimization()
             }
             
-            logger.info(f"Swarm optimization completed: {results['global_best_fitness']:.6f}")
-            return results
+            return self.swarm_state
             
         except Exception as e:
-            logger.error(f"Swarm optimization failed: {e}")
+            self.logger.error(f"Swarm coordination failed: {e}")
+            return {}
+    
+    def _is_swarm_improving(self) -> bool:
+        """Check if swarm is improving."""
+        try:
+            if len(self.agents) < 2:
+                return False
+            
+            # Check if best fitness is improving
+            best_fitnesses = [agent.best_fitness for agent in self.agents.values()]
+            recent_best = min(best_fitnesses[-10:]) if len(best_fitnesses) >= 10 else min(best_fitnesses)
+            overall_best = min(best_fitnesses)
+            
+            return recent_best < overall_best
+            
+        except Exception as e:
+            logger.warning(f"Failed to check swarm improvement: {e}")
+            return False
+    
+    def _needs_exploration(self) -> bool:
+        """Check if swarm needs more exploration."""
+        try:
+            # Check diversity of agent positions
+            positions = [agent.position for agent in self.agents.values()]
+            if len(positions) < 2:
+                return True
+            
+            # Calculate position variance
+            positions_array = np.array(positions)
+            variance = np.var(positions_array, axis=0).mean()
+            
+            # Low variance suggests need for exploration
+            return variance < 1.0
+            
+        except Exception as e:
+            logger.warning(f"Failed to check exploration need: {e}")
+            return True
+    
+    def _needs_optimization(self) -> bool:
+        """Check if swarm needs optimization."""
+        try:
+            # Check if agents are converging to similar solutions
+            best_positions = [agent.best_position for agent in self.agents.values()]
+            if len(best_positions) < 2:
+                return False
+            
+            # Calculate best position variance
+            best_positions_array = np.array(best_positions)
+            variance = np.var(best_positions_array, axis=0).mean()
+            
+            # High variance suggests need for optimization
+            return variance > 5.0
+            
+        except Exception as e:
+            logger.warning(f"Failed to check optimization need: {e}")
+            return False
+
+
+class MultiAgentSwarmIntelligence:
+    """Main swarm intelligence system."""
+    
+    def __init__(self, config: SwarmConfig):
+        self.config = config
+        self.logger = logging.getLogger(f"{__name__}.swarm_intelligence")
+        
+        # Initialize components
+        self.coordinator = SwarmCoordinator(config)
+        self.agents = {}
+        
+        # Swarm state
+        self.iteration = 0
+        self.best_global_fitness = float('inf')
+        self.convergence_history = []
+        
+    async def initialize_agents(self):
+        """Initialize swarm agents."""
+        try:
+            self.logger.info("Initializing swarm agents...")
+            
+            # Create agents based on configuration
+            agent_types = self._get_default_agent_types()
+            
+            agent_id = 0
+            for agent_type in agent_types:
+                for i in range(agent_type.count):
+                    # Generate random position
+                    position = np.random.randn(3) * 10.0  # 3D space
+                    
+                    # Create agent
+                    agent = SwarmAgent(
+                        agent_id=f"{agent_type.type}_{i}",
+                        agent_type=agent_type,
+                        position=position
+                    )
+                    
+                    # Add to coordinator
+                    self.coordinator.add_agent(agent)
+                    self.agents[agent.agent_id] = agent
+                    
+                    agent_id += 1
+            
+            self.logger.info(f"Initialized {len(self.agents)} agents")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to initialize agents: {e}")
             raise
     
-    def _get_swarm_state(self) -> Dict[str, Any]:
-        """Get current swarm state for agents."""
-        return {
-            'global_best_position': self.global_best_position,
-            'global_best_fitness': self.global_best_fitness,
-            'explored_positions': self.explored_positions,
-            'iteration': self.swarm_metrics.total_iterations,
-            'convergence_rate': self.swarm_metrics.convergence_rate,
-            'exploration_efficiency': self.swarm_metrics.exploration_efficiency
+    def _get_default_agent_types(self) -> List[AgentType]:
+        """Get default agent type configuration."""
+        return [
+            AgentType("explorer", 3, "exploration", 0.02),
+            AgentType("exploiter", 4, "exploitation", 0.01),
+            AgentType("coordinator", 2, "coordination", 0.005),
+            AgentType("specialist", 1, "specialization", 0.015)
+        ]
+    
+    async def execute_collaborative_task(self, task_type: str, task_complexity: str, 
+                                       collaboration_mode: str) -> Dict[str, Any]:
+        """Execute a collaborative task using swarm intelligence."""
+        try:
+            self.logger.info(f"Executing collaborative task: {task_type} ({task_complexity})")
+            
+            # Configure task parameters
+            task_config = self._configure_task(task_type, task_complexity)
+            
+            # Execute swarm optimization
+            optimization_result = await self._run_swarm_optimization(task_config)
+            
+            # Analyze collaboration effectiveness
+            collaboration_metrics = self._analyze_collaboration()
+            
+            return {
+                "success": True,
+                "task_type": task_type,
+                "task_complexity": task_complexity,
+                "collaboration_mode": collaboration_mode,
+                "optimization_result": optimization_result,
+                "collaboration_metrics": collaboration_metrics,
+                "final_fitness": self.best_global_fitness,
+                "iterations": self.iteration
+            }
+            
+        except Exception as e:
+            self.logger.error(f"Collaborative task failed: {e}")
+            return {
+                "success": False,
+                "error": str(e)
+            }
+    
+    def _configure_task(self, task_type: str, task_complexity: str) -> Dict[str, Any]:
+        """Configure task parameters."""
+        complexity_factors = {
+            "low": {"iterations": 100, "convergence_threshold": 1e-4},
+            "medium": {"iterations": 500, "convergence_threshold": 1e-5},
+            "high": {"iterations": 1000, "convergence_threshold": 1e-6}
         }
+        
+        config = complexity_factors.get(task_complexity, complexity_factors["medium"])
+        config.update({
+            "task_type": task_type,
+            "task_complexity": task_complexity
+        })
+        
+        return config
     
-    async def _update_all_agents(self, swarm_state: Dict[str, Any]):
-        """Update all agents in the swarm."""
+    async def _run_swarm_optimization(self, task_config: Dict[str, Any]) -> Dict[str, Any]:
+        """Run swarm optimization."""
         try:
-            update_tasks = []
+            max_iterations = task_config.get("iterations", self.config.max_iterations)
+            convergence_threshold = task_config.get("convergence_threshold", self.config.convergence_threshold)
             
-            for agent in self.agents.values():
-                if agent.is_active:
-                    # Update position
-                    new_position = await agent.update_position(swarm_state)
-                    
-                    # Evaluate fitness
-                    new_fitness = await agent.evaluate_fitness(new_position)
-                    
-                    # Update agent state
-                    agent.update_state(new_position, new_fitness)
-                    
-                    # Update agent states
-                    self.agent_states[agent.agent_id] = agent.get_state()
-                    
-                    # Add to explored positions
-                    self.explored_positions.append(new_position.copy())
+            self.logger.info(f"Starting swarm optimization: {max_iterations} iterations")
             
-        except Exception as e:
-            logger.warning(f"Agent updates failed: {e}")
-    
-    async def _handle_agent_communication(self):
-        """Handle communication between agents."""
-        try:
-            # Generate messages from all agents
-            all_messages = []
-            for agent in self.agents.values():
-                if agent.is_active:
-                    other_agents = [a for a in self.agents.values() if a.agent_id != agent.agent_id]
-                    messages = await agent.communicate(other_agents)
-                    all_messages.extend(messages)
-            
-            # Process messages
-            for message in all_messages:
-                # Add to message queue
-                self.message_queue.append(message)
+            for iteration in tqdm(range(max_iterations), desc="Swarm Optimization"):
+                # Coordinate swarm
+                swarm_state = self.coordinator.coordinate_swarm()
                 
-                # Deliver message to receiver
-                if message.receiver_id:
-                    if message.receiver_id in self.agents:
-                        receiver = self.agents[message.receiver_id]
-                        await receiver.learn_from_communication([message])
-                else:
-                    # Broadcast message
-                    for agent in self.agents.values():
-                        if agent.agent_id != message.sender_id:
-                            await agent.learn_from_communication([message])
+                # Update all agents
+                for agent in self.agents.values():
+                    agent.update_position(
+                        swarm_center=np.array(swarm_state['swarm_center']),
+                        global_best=np.array(swarm_state['global_best'])
+                    )
+                    
+                    # Adapt behavior
+                    agent.adapt_behavior(swarm_state)
+                
+                # Check convergence
+                if self._check_convergence(convergence_threshold):
+                    self.logger.info(f"Swarm converged at iteration {iteration}")
+                    break
+                
+                # Record convergence history
+                self.convergence_history.append(swarm_state['best_fitness'])
+                
+                # Update iteration counter
+                self.iteration = iteration + 1
+                
+                # Small delay for visualization
+                await asyncio.sleep(0.01)
             
-            # Clean up old messages
-            current_time = time.time()
-            self.message_queue = deque(
-                msg for msg in self.message_queue 
-                if current_time - msg.timestamp < msg.ttl
-            )
+            # Final coordination
+            final_state = self.coordinator.coordinate_swarm()
+            self.best_global_fitness = final_state['best_fitness']
+            
+            return {
+                "iterations_completed": self.iteration,
+                "final_fitness": self.best_global_fitness,
+                "convergence_history": self.convergence_history,
+                "converged": self._check_convergence(convergence_threshold)
+            }
             
         except Exception as e:
-            logger.warning(f"Communication handling failed: {e}")
+            self.logger.error(f"Swarm optimization failed: {e}")
+            return {"error": str(e)}
     
-    async def _update_global_best(self):
-        """Update global best position and fitness."""
+    def _check_convergence(self, threshold: float) -> bool:
+        """Check if swarm has converged."""
         try:
-            for agent in self.agents.values():
-                if agent.is_active:
-                    if self._is_better_fitness(agent.best_fitness, self.global_best_fitness):
-                        self.global_best_position = agent.best_position.copy()
-                        self.global_best_fitness = agent.best_fitness
-                        
-        except Exception as e:
-            logger.warning(f"Global best update failed: {e}")
-    
-    async def _check_convergence(self) -> bool:
-        """Check if the swarm has converged."""
-        try:
-            if len(self.explored_positions) < 2:
+            if len(self.convergence_history) < 10:
                 return False
             
-            # Calculate convergence based on position stability
-            recent_positions = self.explored_positions[-10:]  # Last 10 positions
-            if len(recent_positions) < 2:
-                return False
+            # Check if fitness has stabilized
+            recent_fitness = self.convergence_history[-10:]
+            fitness_variance = np.var(recent_fitness)
             
-            # Calculate average distance between recent positions
-            total_distance = 0
-            count = 0
-            for i in range(len(recent_positions)):
-                for j in range(i + 1, len(recent_positions)):
-                    distance = np.linalg.norm(recent_positions[i] - recent_positions[j])
-                    total_distance += distance
-                    count += 1
-            
-            if count > 0:
-                average_distance = total_distance / count
-                return average_distance < self.config.convergence_threshold
-            
-            return False
+            return fitness_variance < threshold
             
         except Exception as e:
             logger.warning(f"Convergence check failed: {e}")
             return False
     
-    async def _update_swarm_metrics(self, iteration: int, iteration_start: float):
-        """Update swarm performance metrics."""
+    def _analyze_collaboration(self) -> Dict[str, Any]:
+        """Analyze collaboration effectiveness."""
         try:
-            # Update basic metrics
-            self.swarm_metrics.total_iterations = iteration + 1
-            self.swarm_metrics.best_global_fitness = self.global_best_fitness
+            # Calculate communication density
+            total_connections = sum(len(connections) for connections in self.coordinator.communication_graph.values())
+            max_possible_connections = len(self.agents) * (len(self.agents) - 1)
+            communication_density = total_connections / max_possible_connections if max_possible_connections > 0 else 0
             
-            # Calculate average fitness
-            active_agents = [a for a in self.agents.values() if a.is_active]
-            if active_agents:
-                total_fitness = sum(agent.current_fitness for agent in active_agents)
-                self.swarm_metrics.average_fitness = total_fitness / len(active_agents)
+            # Calculate agent specialization
+            specialization_levels = [agent.specialization_level for agent in self.agents.values()]
+            avg_specialization = np.mean(specialization_levels)
             
-            # Calculate convergence rate
-            if iteration > 0:
-                prev_fitness = getattr(self, '_prev_fitness', self.global_best_fitness)
-                if prev_fitness != float('inf'):
-                    improvement = abs(self.global_best_fitness - prev_fitness)
-                    self.swarm_metrics.convergence_rate = improvement / max(abs(prev_fitness), 1e-8)
-                self._prev_fitness = self.global_best_fitness
+            # Calculate position diversity
+            positions = [agent.position for agent in self.agents.values()]
+            position_variance = np.var(np.array(positions), axis=0).mean()
             
-            # Calculate exploration efficiency
-            if self.explored_positions:
-                unique_positions = len(set(map(tuple, self.explored_positions)))
-                total_positions = len(self.explored_positions)
-                self.swarm_metrics.exploration_efficiency = unique_positions / max(total_positions, 1)
-            
-            # Calculate collaboration efficiency
-            if self.message_queue:
-                collaboration_score = len([m for m in self.message_queue if m.message_type in 
-                                        ["collaboration_request", "collaboration_response"]])
-                total_messages = len(self.message_queue)
-                self.swarm_metrics.collaboration_efficiency = collaboration_score / max(total_messages, 1)
-            
-            # Detect emergent behavior
-            if (self.swarm_metrics.exploration_efficiency > 0.8 and 
-                self.swarm_metrics.collaboration_efficiency > 0.6):
-                self.swarm_metrics.emergent_behavior_count += 1
+            return {
+                "communication_density": communication_density,
+                "avg_specialization": avg_specialization,
+                "position_diversity": position_variance,
+                "total_agents": len(self.agents),
+                "active_connections": total_connections
+            }
             
         except Exception as e:
-            logger.warning(f"Metrics update failed: {e}")
+            logger.warning(f"Collaboration analysis failed: {e}")
+            return {}
     
-    def _is_better_fitness(self, fitness1: float, fitness2: float) -> bool:
-        """Check if fitness1 is better than fitness2."""
-        if self.config.optimization_objective == OptimizationObjective.PERFORMANCE:
-            return fitness1 > fitness2
-        elif self.config.optimization_objective == OptimizationObjective.EFFICIENCY:
-            return fitness1 > fitness2
-        elif self.config.optimization_objective == OptimizationObjective.ACCURACY:
-            return fitness1 > fitness2
-        else:
-            return fitness1 < fitness2  # Default to minimization
-    
-    async def _get_agent_summaries(self) -> Dict[str, Dict[str, Any]]:
-        """Get summaries of all agents."""
-        summaries = {}
-        
-        for agent_id, agent in self.agents.items():
-            state = self.agent_states[agent_id]
-            summaries[agent_id] = {
-                'agent_type': state.agent_type.value,
-                'current_position': state.position.tolist(),
-                'best_fitness': state.best_fitness,
-                'energy_level': state.energy_level,
-                'is_active': state.is_active,
-                'communication_count': len(state.communication_history)
-            }
-        
-        return summaries
-    
-    async def get_swarm_status(self) -> Dict[str, Any]:
+    def get_swarm_status(self) -> Dict[str, Any]:
         """Get current swarm status."""
         return {
-            'num_agents': len(self.agents),
-            'active_agents': sum(1 for a in self.agents.values() if a.is_active),
-            'global_best_fitness': self.global_best_fitness,
-            'global_best_position': self.global_best_position.tolist() if self.global_best_position is not None else None,
-            'swarm_metrics': asdict(self.swarm_metrics),
-            'message_queue_size': len(self.message_queue),
-            'explored_positions_count': len(self.explored_positions)
+            "total_agents": len(self.agents),
+            "iteration": self.iteration,
+            "best_global_fitness": self.best_global_fitness,
+            "swarm_state": self.coordinator.swarm_state,
+            "convergence_history": self.convergence_history,
+            "agent_statuses": {agent_id: agent.get_status() for agent_id, agent in self.agents.items()}
         }
 
-# Example usage and testing
-async def test_swarm_intelligence():
-    """Test the swarm intelligence system."""
-    logger.info("🧪 Testing Multi-Agent Swarm Intelligence")
-    
-    try:
-        # Create swarm configuration
-        config = SwarmConfiguration(
-            num_agents=20,
-            swarm_strategy=SwarmStrategy.PARTICLE_SWARM,
-            communication_protocol=CommunicationProtocol.BROADCAST,
-            optimization_objective=OptimizationObjective.MULTI_OBJECTIVE,
-            search_space_dimensions=10,
-            max_iterations=100,
-            convergence_threshold=0.01,
-            exploration_rate=0.3,
-            exploitation_rate=0.7,
-            collaboration_strength=0.8,
-            emergent_behavior_enabled=True
-        )
-        
-        # Create swarm manager
-        swarm_manager = SwarmIntelligenceManager(config)
-        
-        logger.info(f"✅ Created swarm with {config.num_agents} agents")
-        
-        # Run optimization
-        results = await swarm_manager.run_swarm_optimization()
-        
-        logger.info(f"✅ Swarm optimization completed")
-        logger.info(f"   Best fitness: {results['global_best_fitness']:.6f}")
-        logger.info(f"   Total iterations: {results['total_iterations']}")
-        logger.info(f"   Optimization time: {results['swarm_metrics']['optimization_time']:.2f}s")
-        
-        # Get swarm status
-        status = await swarm_manager.get_swarm_status()
-        logger.info(f"✅ Swarm status: {status['active_agents']}/{status['num_agents']} agents active")
-        
-        return True
-        
-    except Exception as e:
-        logger.error(f"❌ Test failed: {e}")
-        return False
 
+# Factory function for creating swarm intelligence systems
+def create_swarm_intelligence(config: SwarmConfig) -> MultiAgentSwarmIntelligence:
+    """Create a multi-agent swarm intelligence system."""
+    return MultiAgentSwarmIntelligence(config)
+
+
+# Example usage and testing
 if __name__ == "__main__":
-    # Run test
-    asyncio.run(test_swarm_intelligence())
+    # Test swarm intelligence system
+    config = SwarmConfig(
+        num_agents=10,
+        collaboration_mode="hierarchical",
+        enable_emergent_behavior=True,
+        enable_adaptive_coordination=True
+    )
+    
+    # Create swarm system
+    swarm = create_swarm_intelligence(config)
+    
+    # Initialize agents
+    asyncio.run(swarm.initialize_agents())
+    
+    # Execute collaborative task
+    result = asyncio.run(swarm.execute_collaborative_task(
+        task_type="optimization",
+        task_complexity="medium",
+        collaboration_mode="hierarchical"
+    ))
+    
+    print(f"Task result: {result}")
+    
+    # Get swarm status
+    status = swarm.get_swarm_status()
+    print(f"Swarm status: {status}")

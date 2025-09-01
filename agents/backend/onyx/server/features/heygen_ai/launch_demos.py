@@ -273,7 +273,7 @@ async def main():
                 print("❌ Invalid choice. Please enter a number between 1-9.")
             
             # Ask if user wants to continue
-            if choice in ["1", "2", "3", "4", "5"]:
+            if choice in ["1", "2", "3", "4", "5", "6"]:
                 continue_choice = input("\n🔄 Run another demo? (y/n): ").lower().strip()
                 if continue_choice != 'y':
                     print("\n👋 Goodbye! Thanks for using HeyGen AI Demo Launcher!")
