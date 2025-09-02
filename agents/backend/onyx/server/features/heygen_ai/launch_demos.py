@@ -34,11 +34,18 @@ def display_menu():
     print("2. 🔧 Refactored Demo with Ultra Performance")
     print("3. 🎯 Comprehensive Demo Runner")
     print("4. ⚡ Ultra Performance Benchmark")
-    print("5. 🔌 Plugin System Demo")
-    print("6. 🧪 Run All Demos")
-    print("7. 📋 Check System Requirements")
-    print("8. 🔧 Install Dependencies")
-    print("9. ❌ Exit")
+            print("5. 🔌 Plugin System Demo")
+        print("6. 🚀 Refactoring Demo")
+        print("7. 🧪 Test Refactoring")
+        print("8. 🎉 Final Refactoring Demo")
+        print("9. 📊 Performance Monitor Demo")
+        print("10. ⚡ Auto-Optimizer Demo")
+        print("11. 🧠 Intelligent Analyzer Demo")
+        print("12. 🎯 Smart Manager Demo")
+        print("13. 🧪 Run All Demos")
+        print("14. 📋 Check System Requirements")
+        print("15. 🔧 Install Dependencies")
+        print("16. ❌ Exit")
     print("=" * 60)
 
 
@@ -159,6 +166,20 @@ async def run_demo(demo_name, script_path):
                 from comprehensive_demo_runner import main
             elif script_name == "ultra_performance_benchmark":
                 from ultra_performance_benchmark import main
+            elif script_name == "demo_refactoring":
+                from demo_refactoring import main
+            elif script_name == "test_refactoring":
+                from test_refactoring import main
+            elif script_name == "demo_final_refactoring":
+                from demo_final_refactoring import main
+            elif script_name == "performance_monitor":
+                from performance_monitor import main
+            elif script_name == "auto_optimizer":
+                from auto_optimizer import main
+            elif script_name == "intelligent_analyzer":
+                from intelligent_analyzer import main
+            elif script_name == "smart_manager":
+                from smart_manager import main
             else:
                 print(f"❌ Unknown demo script: {script_name}")
                 return False
@@ -225,7 +246,7 @@ async def main():
     while True:
         try:
             display_menu()
-            choice = input("\nEnter your choice (1-8): ").strip()
+            choice = input("\nEnter your choice (1-16): ").strip()
             
             if choice == "1":
                 # Quick Start Ultra Performance Demo
@@ -253,24 +274,59 @@ async def main():
                 await run_demo("Plugin System Demo", script_path)
                 
             elif choice == "6":
+                # Refactoring Demo
+                script_path = Path(__file__).parent / "demo_refactoring.py"
+                await run_demo("Refactoring Demo", script_path)
+                
+            elif choice == "7":
+                # Test Refactoring
+                script_path = Path(__file__).parent / "test_refactoring.py"
+                await run_demo("Test Refactoring", script_path)
+                
+            elif choice == "8":
+                # Final Refactoring Demo
+                script_path = Path(__file__).parent / "demo_final_refactoring.py"
+                await run_demo("Final Refactoring Demo", script_path)
+                
+            elif choice == "9":
+                # Performance Monitor Demo
+                script_path = Path(__file__).parent / "performance_monitor.py"
+                await run_demo("Performance Monitor Demo", script_path)
+                
+            elif choice == "10":
+                # Auto-Optimizer Demo
+                script_path = Path(__file__).parent / "auto_optimizer.py"
+                await run_demo("Auto-Optimizer Demo", script_path)
+                
+            elif choice == "11":
+                # Intelligent Analyzer Demo
+                script_path = Path(__file__).parent / "intelligent_analyzer.py"
+                await run_demo("Intelligent Analyzer Demo", script_path)
+                
+            elif choice == "12":
+                # Smart Manager Demo
+                script_path = Path(__file__).parent / "smart_manager.py"
+                await run_demo("Smart Manager Demo", script_path)
+                
+            elif choice == "13":
                 # Run All Demos
                 await run_all_demos()
                 
-            elif choice == "7":
+            elif choice == "14":
                 # Check System Requirements
                 check_system_requirements()
                 
-            elif choice == "8":
+            elif choice == "15":
                 # Install Dependencies
                 install_dependencies()
                 
-            elif choice == "9":
+            elif choice == "16":
                 # Exit
                 print("\n👋 Goodbye! Thanks for using HeyGen AI Demo Launcher!")
                 break
                 
             else:
-                print("❌ Invalid choice. Please enter a number between 1-9.")
+                print("❌ Invalid choice. Please enter a number between 1-16.")
             
             # Ask if user wants to continue
             if choice in ["1", "2", "3", "4", "5", "6"]:
