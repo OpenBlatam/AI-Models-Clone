@@ -42,10 +42,11 @@ def display_menu():
         print("10. ⚡ Auto-Optimizer Demo")
         print("11. 🧠 Intelligent Analyzer Demo")
         print("12. 🎯 Smart Manager Demo")
-        print("13. 🧪 Run All Demos")
-        print("14. 📋 Check System Requirements")
-        print("15. 🔧 Install Dependencies")
-        print("16. ❌ Exit")
+        print("13. 🤖 Intelligent Integration System Demo")
+        print("14. 🧪 Run All Demos")
+        print("15. 📋 Check System Requirements")
+        print("16. 🔧 Install Dependencies")
+        print("17. ❌ Exit")
     print("=" * 60)
 
 
@@ -180,6 +181,8 @@ async def run_demo(demo_name, script_path):
                 from intelligent_analyzer import main
             elif script_name == "smart_manager":
                 from smart_manager import main
+            elif script_name == "intelligent_integration_system":
+                from intelligent_integration_system import main
             else:
                 print(f"❌ Unknown demo script: {script_name}")
                 return False
@@ -309,24 +312,29 @@ async def main():
                 await run_demo("Smart Manager Demo", script_path)
                 
             elif choice == "13":
+                # Intelligent Integration System Demo
+                script_path = Path(__file__).parent / "intelligent_integration_system.py"
+                await run_demo("Intelligent Integration System Demo", script_path)
+                
+            elif choice == "14":
                 # Run All Demos
                 await run_all_demos()
                 
-            elif choice == "14":
+            elif choice == "15":
                 # Check System Requirements
                 check_system_requirements()
                 
-            elif choice == "15":
+            elif choice == "16":
                 # Install Dependencies
                 install_dependencies()
                 
-            elif choice == "16":
+            elif choice == "17":
                 # Exit
                 print("\n👋 Goodbye! Thanks for using HeyGen AI Demo Launcher!")
                 break
                 
             else:
-                print("❌ Invalid choice. Please enter a number between 1-16.")
+                print("❌ Invalid choice. Please enter a number between 1-17.")
             
             # Ask if user wants to continue
             if choice in ["1", "2", "3", "4", "5", "6"]:
