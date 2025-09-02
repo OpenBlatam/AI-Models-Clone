@@ -1,214 +1,195 @@
-# HeyGen AI Configuration File
-# =============================
+# HeyGen AI - Unified Configuration
+# This file contains all configuration settings for the HeyGen AI system
 
-# Model Configuration
-model:
-  name: "HeyGen AI Ultra Performance"
+# =============================================================================
+# System Configuration
+# =============================================================================
+system:
+  name: "HeyGen AI"
   version: "2.0.0"
-  type: "multi_modal"
+  environment: "development"  # development, staging, production
+  debug: true
+  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
   
-  # Transformer Model Settings
-  transformer:
-    model_size: "base"  # small, base, medium, large, xl
-    vocab_size: 50257
-    hidden_size: 768
-    num_layers: 12
-    num_attention_heads: 12
-    intermediate_size: 3072
-    max_position_embeddings: 1024
-    dropout: 0.1
-    activation_function: "gelu"  # gelu, relu, swish
-    
-    # LoRA Configuration
-    enable_lora: false
-    lora_rank: 16
-    lora_alpha: 32
-    lora_dropout: 0.1
-  
-  # Diffusion Model Settings
-  diffusion:
-    model_type: "stable_diffusion"  # stable_diffusion, sdxl, controlnet
-    model_name: "runwayml/stable-diffusion-v1-5"
-    torch_dtype: "fp16"  # fp16, bf16, fp32
-    num_inference_steps: 50
-    guidance_scale: 7.5
-    height: 512
-    width: 512
+# =============================================================================
+# Plugin System Configuration
+# =============================================================================
+plugins:
+  enabled: true
+  auto_load: true
+  hot_reload: false
+  hot_reload_interval: 30.0
+  directories:
+    - "plugins"
+    - "extensions"
+    - "custom_models"
+    - "optimizations"
+    - "features"
+  validation:
+    enabled: true
+    allow_unsafe: false
+    check_dependencies: true
+  cache:
+    enabled: true
+    size: 100
+    ttl: 3600
 
+# =============================================================================
+# Model Configuration
+# =============================================================================
+models:
+  default_device: "auto"  # auto, cpu, cuda, mps
+  default_precision: "fp32"  # fp16, fp32, bf16
+  optimization:
+    quantization: true
+    pruning: true
+    compilation: true
+    mixed_precision: true
+  cache:
+    enabled: true
+    directory: "models/cache"
+    max_size_gb: 10
+
+# =============================================================================
 # Performance Configuration
+# =============================================================================
 performance:
-  # Ultra Performance Settings
-  enable_ultra_performance: true
-  performance_mode: "maximum"  # maximum, balanced, memory-efficient
-  
-  # PyTorch Optimizations
-  enable_torch_compile: true
-  enable_flash_attention: true
-  enable_memory_optimization: true
-  enable_attention_slicing: false
-  enable_vae_slicing: false
-  enable_model_cpu_offload: false
-  enable_xformers: true
-  
-  # Mixed Precision
-  mixed_precision: true
-  dtype: "fp16"  # fp16, bf16, fp32
-  
-  # Memory Management
-  enable_gradient_checkpointing: false
-  enable_dynamic_batching: true
-  enable_performance_profiling: true
+  optimization_level: "balanced"  # minimal, balanced, aggressive
+  memory_management:
+    enable_garbage_collection: true
+    gc_threshold: 0.8
+    memory_pool: true
+  threading:
+    max_workers: 4
+    thread_pool_size: 8
+  gpu:
+    memory_fraction: 0.9
+    allow_growth: true
+    enable_mixed_precision: true
 
-# Training Configuration
-training:
-  num_epochs: 10
-  batch_size: 8
-  gradient_accumulation_steps: 4
-  learning_rate: 1e-4
-  weight_decay: 0.01
-  warmup_steps: 1000
-  max_grad_norm: 1.0
-  
-  # Optimizer Settings
-  optimizer: "adamw"  # adamw, lion, sophia
-  scheduler: "cosine"  # cosine, linear, cosine_with_restarts
-  
-  # Advanced Training
-  enable_ultra_performance: true
-  enable_torch_compile: true
-  enable_flash_attention: true
-  enable_memory_optimization: true
-  enable_dynamic_batching: true
-  enable_performance_profiling: true
+# =============================================================================
+# API Configuration
+# =============================================================================
+api:
+  host: "0.0.0.0"
+  port: 8000
+  workers: 4
+  timeout: 30
+  cors:
+    enabled: true
+    origins: ["*"]
+    methods: ["GET", "POST", "PUT", "DELETE"]
+  rate_limiting:
+    enabled: true
+    requests_per_minute: 100
+    burst_size: 20
 
-# Data Configuration
-data:
-  data_dir: "data/"
-  batch_size: 16
-  num_workers: 4
-  max_length: 512
-  validation_split: 0.1
-  test_split: 0.1
-  
-  # Data Processing
-  enable_data_augmentation: true
-  enable_caching: true
-  cache_dir: "cache/"
+# =============================================================================
+# Database Configuration
+# =============================================================================
+database:
+  type: "sqlite"  # sqlite, postgresql, mysql
+  url: "sqlite:///heygen_ai.db"
+  pool_size: 10
+  max_overflow: 20
+  echo: false
 
-# MLOps Configuration
-mlops:
-  enable_experiment_tracking: true
-  enable_model_registry: true
-  enable_monitoring: true
-  enable_automated_ml: true
-  
-  # Experiment Tracking
-  tracking_backend: "wandb"  # wandb, mlflow, tensorboard
-  project_name: "heygen_ai"
-  
-  # Model Registry
-  registry_backend: "local"  # local, mlflow, docker
-  model_storage_path: "models/"
+# =============================================================================
+# Cache Configuration
+# =============================================================================
+cache:
+  type: "memory"  # memory, redis, memcached
+  redis:
+    host: "localhost"
+    port: 6379
+    db: 0
+    password: null
+  memory:
+    max_size_mb: 512
+    ttl: 3600
 
-# Advanced Features
-advanced:
-  # Multi-Agent System
-  enable_multi_agent: true
-  num_agents: 5
-  swarm_size: 10
-  
-  # Quantum Enhancement
-  enable_quantum_enhancement: true
-  hybrid_mode: true
-  
-  # Federated Learning
-  enable_federated_learning: false
-  num_clients: 3
-  
-  # Edge AI
-  enable_edge_ai: false
-  edge_devices: []
+# =============================================================================
+# Logging Configuration
+# =============================================================================
+logging:
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  handlers:
+    console:
+      enabled: true
+      level: "INFO"
+    file:
+      enabled: true
+      level: "DEBUG"
+      filename: "logs/heygen_ai.log"
+      max_bytes: 10485760  # 10MB
+      backup_count: 5
+    syslog:
+      enabled: false
+      host: "localhost"
+      port: 514
 
-# Interface Configuration
-interface:
-  # Gradio Interface
-  enable_gradio: true
-  gradio_port: 7860
-  gradio_share: false
-  
-  # API Interface
-  enable_api: true
-  api_port: 8000
-  api_host: "0.0.0.0"
-  
-  # Web Interface
-  enable_web: false
-  web_port: 3000
-
+# =============================================================================
 # Security Configuration
+# =============================================================================
 security:
-  enable_authentication: false
-  enable_rate_limiting: true
-  max_requests_per_minute: 100
-  
-  # API Keys
-  require_api_key: false
-  api_key_header: "X-API-Key"
+  authentication:
+    enabled: false
+    type: "jwt"  # jwt, oauth, basic
+    secret_key: "your-secret-key-here"
+    token_expiry: 3600
+  encryption:
+    enabled: false
+    algorithm: "AES-256-GCM"
+  ssl:
+    enabled: false
+    cert_file: "certs/cert.pem"
+    key_file: "certs/key.pem"
 
+# =============================================================================
 # Monitoring Configuration
+# =============================================================================
 monitoring:
-  enable_health_monitoring: true
-  enable_performance_monitoring: true
-  enable_error_tracking: true
-  
-  # Logging
-  log_level: "INFO"  # DEBUG, INFO, WARNING, ERROR
-  log_file: "logs/heygen_ai.log"
-  
-  # Metrics
-  enable_metrics_collection: true
-  metrics_interval: 60  # seconds
+  enabled: true
+  metrics:
+    prometheus: true
+    grafana: false
+  health_checks:
+    enabled: true
+    interval: 30
+  profiling:
+    enabled: false
+    sampling_rate: 0.1
 
-# Hardware Configuration
-hardware:
-  # Device Selection
-  device: "auto"  # auto, cuda, cpu, mps
-  
-  # GPU Settings
-  gpu_memory_fraction: 0.9
-  enable_multi_gpu: false
-  gpu_ids: [0]
-  
-  # CPU Settings
-  num_cpu_threads: "auto"
-  enable_cpu_optimization: true
+# =============================================================================
+# External Services Configuration
+# =============================================================================
+external_services:
+  openai:
+    enabled: false
+    api_key: ""
+    base_url: "https://api.openai.com/v1"
+  elevenlabs:
+    enabled: false
+    api_key: ""
+    base_url: "https://api.elevenlabs.io/v1"
+  cloud_storage:
+    type: "local"  # local, s3, azure, gcp
+    local:
+      directory: "storage"
+    s3:
+      bucket: ""
+      region: ""
+      access_key: ""
+      secret_key: ""
 
+# =============================================================================
 # Development Configuration
+# =============================================================================
 development:
-  enable_debug_mode: false
-  enable_profiling: false
-  enable_testing: false
-  
-  # Testing
-  test_data_dir: "tests/data/"
-  test_models_dir: "tests/models/"
-  
-  # Development Tools
-  enable_hot_reload: false
-  enable_auto_restart: false
-
-# Environment Configuration
-environment:
-  # Environment Variables
-  env_file: ".env"
-  
-  # Paths
-  base_path: "."
-  models_path: "models/"
-  data_path: "data/"
-  logs_path: "logs/"
-  cache_path: "cache/"
-  
-  # Temporary Files
-  temp_path: "temp/"
-  cleanup_temp_files: true
+  hot_reload: true
+  debug_toolbar: true
+  profiling: false
+  testing:
+    enabled: true
+    coverage: true
+    parallel: true
