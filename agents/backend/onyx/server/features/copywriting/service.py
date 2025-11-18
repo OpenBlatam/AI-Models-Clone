@@ -12,22 +12,34 @@ from typing import List, Dict, Any, Optional
 from datetime import datetime
 import uuid
 import logging
-    import orjson
-    import json as orjson
-    import aioredis
-    import httpx
-    import aiohttp
+import orjson
+import aioredis
+import httpx
+import aiohttp
 import structlog
 from functools import wraps
 from concurrent.futures import ThreadPoolExecutor
 import multiprocessing as mp
-from .models import (
-            import json
-        import hashlib
+from models import (
+    CopywritingRequest,
+    CopywritingResponse,
+    BatchCopywritingRequest,
+    BatchCopywritingResponse,
+    FeedbackRequest,
+    TaskStatus,
+    CopywritingInput,
+    CopywritingOutput,
+    Feedback,
+    SectionFeedback,
+    CopyVariantHistory,
+    get_settings
+)
+import json
+import hashlib
 from typing import Any, List, Dict, Optional
 
 # Import v11 optimized engine
-from .ultra_optimized_engine_v11 import UltraOptimizedEngineV11, get_engine, cleanup_engine
+from ultra_optimized_engine_v11 import UltraOptimizedEngineV11, get_engine, cleanup_engine
 
 """
 Optimized Copywriting Service with High-Performance Libraries.
@@ -57,6 +69,7 @@ except ImportError:
 # Performance monitoring
 
 # Import optimized models
+from models import (
     CopywritingInput, CopywritingOutput, CopyVariant, Metric,
     CopyTone, ContentType, Platform, Language, BrandVoice,
     get_settings, validate_input_fast, calculate_metrics_fast

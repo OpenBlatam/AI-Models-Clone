@@ -1,0 +1,52 @@
+# Core FastAPI dependencies
+fastapi>=0.115.0
+uvicorn[standard]>=0.32.0
+pydantic>=2.9.0
+pydantic-settings>=2.6.0
+python-multipart>=0.0.12
+
+# Async HTTP client
+aiohttp>=3.11.0
+httpx>=0.27.0
+
+# Caching - Optimized libraries with modern alternatives
+cachetools>=5.3.3  # Fast in-memory caching with TTL support
+diskcache>=5.6.3  # Fast disk-based cache (optional L3 tier)
+redis[hiredis]>=5.2.0  # Redis with hiredis for better performance
+aiocache>=0.12.2  # Async cache abstraction layer
+
+# Serialization - Ultra-fast options
+orjson>=3.10.0  # Fastest JSON serialization (Rust-based)
+msgpack>=1.1.0  # Binary serialization, faster than pickle
+rapidjson>=1.10  # Alternative fast JSON (C++ based)
+
+# Performance optimizations
+uvloop>=0.19.0  # Ultra-fast asyncio event loop (Linux/macOS)
+
+# Retry and resilience
+tenacity>=9.0.0  # Retry logic with exponential backoff
+backoff>=2.2.1  # Alternative retry library with decorators
+
+# Monitoring and observability
+prometheus-client>=0.20.0  # Metrics export
+psutil>=6.0.0  # System metrics
+structlog>=24.1.0  # Structured logging with better performance
+opentelemetry-api>=1.22.0  # OpenTelemetry for distributed tracing
+opentelemetry-sdk>=1.22.0
+opentelemetry-instrumentation-fastapi>=0.42b0
+
+# Utilities
+python-dotenv>=1.0.1
+typing-extensions>=4.12.0
+click>=8.1.7  # CLI utilities
+rich>=13.7.0  # Rich text and beautiful formatting
+
+# Development and testing
+pytest>=8.3.0
+pytest-asyncio>=0.24.0
+pytest-cov>=6.0.0
+pytest-benchmark>=4.0.0  # Performance benchmarking
+black>=24.0.0
+mypy>=1.11.0
+ruff>=0.5.0  # Fast Python linter (Rust-based, faster than flake8)
+

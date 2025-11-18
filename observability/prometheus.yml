@@ -1,0 +1,16 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+rule_files:
+  - prometheus-rules.yml
+
+scrape_configs:
+  - job_name: "content_redundancy_detector"
+    metrics_path: "/api/v1/metrics/prometheus"
+    static_configs:
+      # If your API runs on the host at http://localhost:8000
+      # In Docker on Windows/macOS, use host.docker.internal to reach the host from containers
+      - targets: ["host.docker.internal:8000"]
+
+

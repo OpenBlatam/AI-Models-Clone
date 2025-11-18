@@ -1,180 +1,68 @@
 [build-system]
-requires = ["setuptools>=68.2.0", "wheel>=0.41.0", "build>=1.0.0"]
+requires = ["setuptools>=68.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "intelligent-resource-manager"
+name = "truthgpt-spec"
 version = "1.0.0"
-description = "Sistema de Gestión de Recursos Inteligente con optimización automática y monitoreo predictivo"
-authors = [
-    {name = "AI Development Team", email = "dev@intelligent-system.com"}
-]
+description = "TruthGPT Optimization Core Specifications"
 readme = "README.md"
-license = {text = "MIT"}
-requires-python = ">=3.9"
+requires-python = ">=3.10"
+license = {text = "CC0-1.0"}
+authors = [
+    {name = "TruthGPT Team", email = "team@truthgpt.ai"}
+]
+keywords = ["AI", "machine learning", "optimization", "specifications"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
-    "Intended Audience :: System Administrators",
-    "License :: OSI Approved :: MIT License",
+    "Intended Audience :: Science/Research",
+    "License :: CC0 1.0 Universal (CC0 1.0) Public Domain Dedication",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Topic :: System :: Monitoring",
-    "Topic :: System :: Systems Administration",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
-
-keywords = ["resource-management", "monitoring", "optimization", "ai", "machine-learning", "gpu", "cpu", "memory"]
-
 dependencies = [
-    # Core ML & Deep Learning
-    "torch>=2.1.0",
-    "torchvision>=0.16.0",
-    "torchaudio>=2.1.0",
-    "transformers>=4.35.0",
-    "diffusers>=0.24.0",
-    "accelerate>=0.24.0",
-    "bitsandbytes>=0.41.0",
-    "peft>=0.6.0",
-    
-    # Resource Monitoring
-    "psutil>=5.9.0",
-    "GPUtil>=1.4.0",
+    "torch>=2.0.0",
     "numpy>=1.24.0",
-    "pandas>=2.1.0",
-    "scipy>=1.11.0",
-    
-    # Interfaces & Visualization
-    "gradio>=4.0.0",
-    "matplotlib>=3.7.0",
-    "plotly>=5.17.0",
-    "seaborn>=0.12.0",
-    
-    # Utilities
-    "tqdm>=4.66.0",
-    "Pillow>=10.0.0",
-    "opencv-python>=4.8.0",
-    "scikit-learn>=1.3.0",
-    "scikit-image>=0.21.0",
-    
-    # Monitoring & Performance
-    "tensorboard>=2.14.0",
-    "wandb>=0.16.0",
-    "mlflow>=2.7.0",
-    "optuna>=3.4.0",
-    
-    # Async & Distributed
-    "aiohttp>=3.9.0",
-    "websockets>=12.0",
-    "redis>=5.0.0",
-    "celery>=5.3.0",
-    
-    # Web & API
+    "pandas>=2.0.0",
+    "pydantic>=2.0.0",
     "fastapi>=0.104.0",
     "uvicorn>=0.24.0",
-    "pydantic>=2.4.0",
-    "httpx>=0.25.0",
-    
-    # Development & Testing
-    "pytest>=7.4.0",
-    "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.1.0",
-    "black>=23.9.0",
-    "flake8>=6.1.0",
-    "mypy>=1.6.0",
-    
-    # Utilities
-    "click>=8.1.0",
-    "rich>=13.6.0",
-    "typer>=0.9.0",
-    "python-dotenv>=1.0.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "pytest>=7.4.0",
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
     "pytest-asyncio>=0.21.0",
-    "pytest-cov>=4.1.0",
-    "pytest-benchmark>=4.0.0",
-    "black>=23.9.0",
-    "isort>=5.12.0",
-    "flake8>=6.1.0",
-    "mypy>=1.6.0",
-    "pre-commit>=3.5.0",
-    "tox>=4.11.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+    "pre-commit>=3.0.0",
 ]
-
-gpu = [
-    "cupy>=12.2.0",
-    "numba>=0.58.0",
-    "cudf>=23.10.0",
-    "cuml>=23.10.0",
-    "flash-attn>=2.3.0",
-    "apex>=0.1.0",
-    "deepspeed>=0.12.0",
-]
-
-distributed = [
-    "ray>=2.7.0",
-    "dask>=2023.10.0",
-    "polars>=0.19.0",
-    "vaex>=4.17.0",
-    "asyncio-mqtt>=0.13.0",
-]
-
-monitoring = [
-    "prometheus-client>=0.19.0",
-    "structlog>=23.2.0",
-    "sentry-sdk>=1.38.0",
-    "opentelemetry-api>=1.21.0",
-    "opentelemetry-sdk>=1.21.0",
-]
-
-database = [
-    "sqlalchemy>=2.0.0",
-    "pymongo>=4.6.0",
-    "influxdb-client>=1.38.0",
-    "elasticsearch>=8.10.0",
-    "asyncpg>=0.29.0",
-]
-
-profiling = [
-    "memory-profiler>=0.61.0",
-    "line-profiler>=4.1.0",
-    "py-spy>=0.3.14",
-    "pyinstrument>=4.6.0",
-]
-
-all = [
-    "intelligent-resource-manager[dev,gpu,distributed,monitoring,database,profiling]"
+docs = [
+    "mkdocs>=1.5.0",
+    "mkdocs-material>=9.0.0",
+    "mkdocstrings>=0.22.0",
 ]
 
 [project.urls]
-Homepage = "https://github.com/intelligent-system/resource-manager"
-Documentation = "https://intelligent-resource-manager.readthedocs.io"
-Repository = "https://github.com/intelligent-system/resource-manager.git"
-"Bug Tracker" = "https://github.com/intelligent-system/resource-manager/issues"
-"Release Notes" = "https://github.com/intelligent-system/resource-manager/releases"
+Homepage = "https://github.com/truthgpt/truthgpt-spec"
+Documentation = "https://docs.truthgpt.ai"
+Repository = "https://github.com/truthgpt/truthgpt-spec"
+Issues = "https://github.com/truthgpt/truthgpt-spec/issues"
 
-[project.scripts]
-resource-manager = "intelligent_resource_manager:main"
-resource-demo = "resource_manager_demo:main"
-
-[tool.setuptools.packages.find]
-where = ["."]
-include = ["intelligent_resource_manager*", "resource_manager_demo*"]
-
-[tool.setuptools.package-data]
-"*" = ["*.yaml", "*.yml", "*.json", "*.md"]
+[tool.setuptools]
+packages = ["specs", "docs", "examples", "tests"]
 
 [tool.black]
-line-length = 88
-target-version = ['py39', 'py310', 'py311', 'py312']
+line-length = 100
+target-version = ['py310', 'py311', 'py312']
 include = '\.pyi?$'
 extend-exclude = '''
 /(
@@ -190,123 +78,9 @@ extend-exclude = '''
 )/
 '''
 
-[tool.isort]
-profile = "black"
-multi_line_output = 3
-line_length = 88
-known_first_party = ["intelligent_resource_manager", "resource_manager_demo"]
-
-[tool.mypy]
-python_version = "3.9"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = true
-disallow_incomplete_defs = true
-check_untyped_defs = true
-disallow_untyped_decorators = true
-no_implicit_optional = true
-warn_redundant_casts = true
-warn_unused_ignores = true
-warn_no_return = true
-warn_unreachable = true
-strict_equality = true
-
-[[tool.mypy.overrides]]
-module = [
-    "torch.*",
-    "torchvision.*",
-    "transformers.*",
-    "diffusers.*",
-    "gradio.*",
-    "psutil.*",
-    "GPUtil.*",
-    "opencv.*",
-    "sklearn.*",
-    "skimage.*",
-    "matplotlib.*",
-    "seaborn.*",
-    "plotly.*",
-    "fastapi.*",
-    "uvicorn.*",
-    "redis.*",
-    "celery.*",
-    "ray.*",
-    "dask.*",
-    "polars.*",
-    "vaex.*",
-    "cupy.*",
-    "numba.*",
-    "cudf.*",
-    "cuml.*",
-    "apex.*",
-    "deepspeed.*",
-    "flash_attn.*",
-    "wandb.*",
-    "mlflow.*",
-    "optuna.*",
-    "tensorboard.*",
-    "prometheus_client.*",
-    "structlog.*",
-    "sentry_sdk.*",
-    "opentelemetry.*",
-    "sqlalchemy.*",
-    "pymongo.*",
-    "influxdb_client.*",
-    "elasticsearch.*",
-    "asyncpg.*",
-    "memory_profiler.*",
-    "line_profiler.*",
-    "py_spy.*",
-    "pyinstrument.*",
-]
-ignore_missing_imports = true
-
-[tool.pytest.ini_options]
-minversion = "7.0"
-addopts = "-ra -q --strict-markers --strict-config"
-testpaths = ["tests", "test_*"]
-python_files = ["test_*.py", "*_test.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-markers = [
-    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
-    "integration: marks tests as integration tests",
-    "unit: marks tests as unit tests",
-    "gpu: marks tests that require GPU",
-    "async: marks tests as async",
-]
-
-[tool.coverage.run]
-source = ["intelligent_resource_manager", "resource_manager_demo"]
-omit = [
-    "*/tests/*",
-    "*/test_*",
-    "*/__pycache__/*",
-    "*/venv/*",
-    "*/env/*",
-    "*/\.venv/*",
-]
-
-[tool.coverage.report]
-exclude_lines = [
-    "pragma: no cover",
-    "def __repr__",
-    "if self.debug:",
-    "if settings.DEBUG",
-    "raise AssertionError",
-    "raise NotImplementedError",
-    "if 0:",
-    "if __name__ == .__main__.:",
-    "class .*\\bProtocol\\):",
-    "@(abc\\.)?abstractmethod",
-]
-
-[tool.pytest.ini_options.asyncio_mode]
-mode = "auto"
-
 [tool.ruff]
-target-version = "py39"
-line-length = 88
+line-length = 100
+target-version = "py310"
 select = [
     "E",  # pycodestyle errors
     "W",  # pycodestyle warnings
@@ -325,58 +99,37 @@ ignore = [
 [tool.ruff.per-file-ignores]
 "__init__.py" = ["F401"]
 
-[tool.pre-commit]
-repos = [
-    {
-        repo = "https://github.com/pre-commit/pre-commit-hooks",
-        rev = "v4.5.0",
-        hooks = [
-            {id = "trailing-whitespace"},
-            {id = "end-of-file-fixer"},
-            {id = "check-yaml"},
-            {id = "check-added-large-files"},
-            {id = "check-merge-conflict"},
-        ],
-    },
-    {
-        repo = "https://github.com/psf/black",
-        rev = "23.9.1",
-        hooks = [{id = "black"}],
-    },
-    {
-        repo = "https://github.com/pycqa/isort",
-        rev = "5.12.0",
-        hooks = [{id = "isort"}],
-    },
-    {
-        repo = "https://github.com/pycqa/flake8",
-        rev = "6.1.0",
-        hooks = [{id = "flake8"}],
-    },
-    {
-        repo = "https://github.com/pre-commit/mirrors-mypy",
-        rev = "v1.6.1",
-        hooks = [{id = "mypy"}],
-    },
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
+[tool.coverage.run]
+source = ["specs", "tests"]
+omit = [
+    "*/tests/*",
+    "*/test_*.py",
+    "*/__pycache__/*",
 ]
 
-[tool.tox]
-legacy_tox_ini = """
-[tox]
-envlist = py39, py310, py311, py312
-isolated_build = True
-
-[testenv]
-deps =
-    pytest>=7.4.0
-    pytest-asyncio>=0.21.0
-    pytest-cov>=4.1.0
-    black>=23.9.0
-    flake8>=6.1.0
-    mypy>=1.6.0
-commands =
-    black --check --diff .
-    flake8 .
-    mypy intelligent_resource_manager resource_manager_demo
-    pytest tests/ {posargs}
-"""
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]

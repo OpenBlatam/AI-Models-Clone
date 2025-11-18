@@ -1,0 +1,59 @@
+groups:
+  - name: webhooks-alerts
+    interval: 30s
+    rules:
+      - alert: WebhookHighLatencyP95
+        expr: histogram_quantile(0.95, sum(rate(webhook_delivery_seconds_bucket[5m])) by (le)) > 2
+        for: 5m
+        labels:
+          severity: warning
+          service: content-redundancy-detector
+        annotations:
+          summary: "Webhook p95 latency alta (>2s)"
+          description: "La latencia p95 supera 2s por más de 5m"
+
+      - alert: WebhookHighFailureRate
+        expr: (sum(increase(webhook_deliveries_total{status="failed"}[5m])) / sum(increase(webhook_deliveries_total[5m]))) > 0.2
+        for: 5m
+        labels:
+          severity: critical
+          service: content-redundancy-detector
+        annotations:
+          summary: "Alta tasa de fallos (>20%)"
+          description: "La tasa de fallos de entregas supera 20% por más de 5m"
+
+      - alert: WebhookQueueAlmostFull
+        expr: webhook_queue_size > 0.8 * 1000
+        for: 2m
+        labels:
+          severity: warning
+          service: content-redundancy-detector
+        annotations:
+          summary: "Cola de webhooks casi llena"
+          description: "El tamaño de la cola supera 80% de su capacidad"
+
+      - alert: WebhookCircuitBreakerOpen
+        expr: sum by (endpoint_id) (webhook_circuit_breaker_state{endpoint_id!=""} == 2) > 0
+        for: 3m
+        labels:
+          severity: critical
+          service: content-redundancy-detector
+        annotations:
+          summary: "Circuit breaker abierto"
+          description: "Al menos un endpoint se encuentra con circuit breaker en estado OPEN"
+
+      - alert: WebhookTargetErrorsSpike
+        expr: sum(increase(webhook_target_status_total{status_code=~"5.."}[5m])) > 10
+        for: 5m
+        labels:
+          severity: warning
+          service: content-redundancy-detector
+        annotations:
+          summary: "Errores 5xx del destino elevados"
+          description: "Más de 10 respuestas 5xx de endpoints de destino en 5m"
+
+
+
+
+
+

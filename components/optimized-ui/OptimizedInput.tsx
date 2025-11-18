@@ -1,66 +1,85 @@
-import React, { forwardRef, useState, useCallback } from 'react';
-import { View, TextInput, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback, useMemo, forwardRef, useImperativeHandle } from 'react';
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle,
+  TextInputProps,
+  AccessibilityInfo,
+  Platform,
+  Animated,
+} from 'react-native';
+import { useWindowDimensions } from 'react-native';
+import { useColorScheme } from 'react-native';
 
 // ============================================================================
 // TYPES
 // ============================================================================
 
-interface OptimizedInputProps {
+interface OptimizedInputProps extends Omit<TextInputProps, 'style'> {
+  label?: string;
+  placeholder?: string;
   value: string;
   onChangeText: (text: string) => void;
-  placeholder?: string;
-  label?: string;
-  hasError?: boolean;
-  errorMessage?: string;
+  error?: string;
   helperText?: string;
   isRequired?: boolean;
   isDisabled?: boolean;
-  isSecureText?: boolean;
-  hasLeftIcon?: boolean;
-  leftIconName?: string;
-  leftIconColor?: string;
-  hasRightIcon?: boolean;
-  rightIconName?: string;
-  rightIconColor?: string;
-  canShowPasswordToggle?: boolean;
-  shouldShowCharacterCount?: boolean;
-  maxLength?: number;
-  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
-  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
-  autoCorrect?: boolean;
-  multiline?: boolean;
-  numberOfLines?: number;
-  style?: any;
-  inputStyle?: any;
-  labelStyle?: any;
-  errorStyle?: any;
-  helperStyle?: any;
+  isReadOnly?: boolean;
+  hasIcon?: boolean;
+  iconName?: string;
+  iconPosition?: 'left' | 'right';
+  onIconPress?: () => void;
+  variant?: 'outlined' | 'filled' | 'underlined';
+  size?: 'small' | 'medium' | 'large';
+  isFullWidth?: boolean;
+  containerStyle?: ViewStyle;
+  inputStyle?: TextStyle;
+  labelStyle?: TextStyle;
+  errorStyle?: TextStyle;
+  helperStyle?: TextStyle;
+  testID?: string;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
+  validationRules?: ValidationRule[];
+  onValidationChange?: (isValid: boolean, errors: string[]) => void;
+}
+
+interface ValidationRule {
+  test: (value: string) => boolean;
+  message: string;
+}
+
+interface InputRef {
+  focus: () => void;
+  blur: () => void;
+  clear: () => void;
+  validate: () => boolean;
 }
 
 // ============================================================================
 // STATIC CONTENT
 // ============================================================================
 
-const INPUT_STATES = {
-  default: {
-    borderColor: '#E5E5EA',
-    backgroundColor: '#FFFFFF',
-    textColor: '#000000',
+const INPUT_VARIANTS = {
+  outlined: {
+    borderWidth: 1,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
   },
-  focused: {
-    borderColor: '#007AFF',
-    backgroundColor: '#FFFFFF',
-    textColor: '#000000',
-  },
-  error: {
-    borderColor: '#FF3B30',
-    backgroundColor: '#FFFFFF',
-    textColor: '#000000',
-  },
-  disabled: {
-    borderColor: '#E5E5EA',
+  filled: {
+    borderWidth: 0,
+    borderRadius: 8,
     backgroundColor: '#F2F2F7',
-    textColor: '#8E8E93',
+  },
+  underlined: {
+    borderWidth: 0,
+    borderBottomWidth: 1,
+    borderRadius: 0,
+    backgroundColor: 'transparent',
   },
 } as const;
 
@@ -69,268 +88,283 @@ const INPUT_SIZES = {
     paddingVertical: 8,
     paddingHorizontal: 12,
     fontSize: 14,
-    borderRadius: 6,
+    minHeight: 36,
   },
   medium: {
     paddingVertical: 12,
     paddingHorizontal: 16,
     fontSize: 16,
-    borderRadius: 8,
+    minHeight: 44,
   },
   large: {
     paddingVertical: 16,
     paddingHorizontal: 20,
     fontSize: 18,
-    borderRadius: 10,
+    minHeight: 52,
   },
 } as const;
+
+// Default validation rules
+const DEFAULT_VALIDATION_RULES: ValidationRule[] = [
+  {
+    test: (value: string) => value.length > 0,
+    message: 'This field is required',
+  },
+];
 
 // ============================================================================
 // HELPERS
 // ============================================================================
 
-const getInputState = (props: OptimizedInputProps, isFocused: boolean) => {
-  const { hasError, isDisabled } = props;
-  
-  if (isDisabled) return INPUT_STATES.disabled;
-  if (hasError) return INPUT_STATES.error;
-  if (isFocused) return INPUT_STATES.focused;
-  return INPUT_STATES.default;
-};
+const getInputStyle = (
+  props: OptimizedInputProps,
+  isDark: boolean,
+  width: number,
+  isFocused: boolean,
+  hasError: boolean
+): ViewStyle => {
+  const { variant = 'outlined', size = 'medium', isDisabled, isFullWidth } = props;
+  const variantStyle = INPUT_VARIANTS[variant];
+  const sizeStyle = INPUT_SIZES[size];
 
-const getInputStyle = (props: OptimizedInputProps, isFocused: boolean) => {
-  const { multiline, numberOfLines = 1 } = props;
-  const state = getInputState(props, isFocused);
-  const size = INPUT_SIZES.medium;
-  
+  // Responsive adjustments
+  const responsivePadding = width < 375 ? sizeStyle.paddingHorizontal * 0.8 : sizeStyle.paddingHorizontal;
+  const responsiveFontSize = width < 375 ? sizeStyle.fontSize * 0.9 : sizeStyle.fontSize;
+
+  const baseColor = isDark ? '#3A3A3C' : '#E5E5EA';
+  const focusColor = isDark ? '#0A84FF' : '#007AFF';
+  const errorColor = isDark ? '#FF453A' : '#FF3B30';
+
   return {
-    ...state,
-    ...size,
-    minHeight: multiline ? numberOfLines * 24 : size.paddingVertical * 2 + 16,
+    ...variantStyle,
+    paddingVertical: sizeStyle.paddingVertical,
+    paddingHorizontal: responsivePadding,
+    fontSize: responsiveFontSize,
+    minHeight: sizeStyle.minHeight,
+    width: isFullWidth ? '100%' : 'auto',
+    borderColor: hasError ? errorColor : (isFocused ? focusColor : baseColor),
+    backgroundColor: variant === 'filled' ? (isDark ? '#2C2C2E' : '#F2F2F7') : 'transparent',
+    color: isDark ? '#FFFFFF' : '#000000',
+    opacity: isDisabled ? 0.6 : 1,
+    shadowColor: isDark ? '#000000' : '#000000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: isFocused ? 0.1 : 0,
+    shadowRadius: 2,
+    elevation: isFocused ? 1 : 0,
   };
 };
 
-const getLabelStyle = (props: OptimizedInputProps) => {
-  const { hasError, isDisabled } = props;
+const getLabelStyle = (props: OptimizedInputProps, isDark: boolean, width: number): TextStyle => {
+  const { size = 'medium' } = props;
+  const sizeStyle = INPUT_SIZES[size];
+  
+  // Responsive font size
+  const responsiveFontSize = width < 375 ? sizeStyle.fontSize * 0.8 : sizeStyle.fontSize * 0.9;
   
   return {
-    fontSize: 14,
-    fontWeight: '500',
-    color: isDisabled ? '#8E8E93' : hasError ? '#FF3B30' : '#000000',
+    fontSize: responsiveFontSize,
+    fontWeight: '500' as const,
+    color: isDark ? '#FFFFFF' : '#000000',
     marginBottom: 4,
+    includeFontPadding: false,
   };
-};
-
-const getErrorStyle = () => ({
-  fontSize: 12,
-  color: '#FF3B30',
-  marginTop: 4,
-});
-
-const getHelperStyle = () => ({
-  fontSize: 12,
-  color: '#8E8E93',
-  marginTop: 4,
-});
-
-// ============================================================================
-// SUBCOMPONENTS
-// ============================================================================
-
-const InputLabel: React.FC<{ props: OptimizedInputProps }> = ({ props }) => {
-  const { label, isRequired } = props;
-  
-  if (!label) return null;
-  
-  return (
-    <Text style={[styles.label, getLabelStyle(props)]}>
-      {label}
-      {isRequired && <Text style={styles.required}> *</Text>}
-    </Text>
-  );
-};
-
-const InputIcon: React.FC<{ 
-  iconName: string; 
-  color: string; 
-  position: 'left' | 'right';
-  onPress?: () => void;
-}> = ({ iconName, color, position, onPress }) => {
-  const iconStyle = position === 'left' ? styles.leftIcon : styles.rightIcon;
-  
-  if (onPress) {
-    return (
-      <TouchableOpacity onPress={onPress} style={iconStyle}>
-        <Text style={[styles.iconText, { color }]}>{iconName}</Text>
-      </TouchableOpacity>
-    );
-  }
-  
-  return (
-    <Text style={[styles.iconText, iconStyle, { color }]}>
-      {iconName}
-    </Text>
-  );
-};
-
-const InputError: React.FC<{ props: OptimizedInputProps }> = ({ props }) => {
-  const { hasError, errorMessage } = props;
-  
-  if (!hasError || !errorMessage) return null;
-  
-  return (
-    <Text style={[styles.errorText, getErrorStyle()]}>
-      {errorMessage}
-    </Text>
-  );
-};
-
-const InputHelper: React.FC<{ props: OptimizedInputProps }> = ({ props }) => {
-  const { helperText, shouldShowCharacterCount, value, maxLength } = props;
-  
-  if (!helperText && !shouldShowCharacterCount) return null;
-  
-  const characterCount = shouldShowCharacterCount && maxLength 
-    ? `${value.length}/${maxLength}`
-    : null;
-  
-  return (
-    <Text style={[styles.helperText, getHelperStyle()]}>
-      {helperText}
-      {characterCount && ` • ${characterCount}`}
-    </Text>
-  );
 };
 
 // ============================================================================
 // MAIN EXPORTED COMPONENT
 // ============================================================================
 
-export const OptimizedInput = forwardRef<TextInput, OptimizedInputProps>(({
+export const OptimizedInput = forwardRef<InputRef, OptimizedInputProps>(({
+  label,
+  placeholder,
   value,
   onChangeText,
-  placeholder,
-  label,
-  hasError = false,
-  errorMessage,
+  error,
   helperText,
   isRequired = false,
   isDisabled = false,
-  isSecureText = false,
-  hasLeftIcon = false,
-  leftIconName,
-  leftIconColor,
-  hasRightIcon = false,
-  rightIconName,
-  rightIconColor,
-  canShowPasswordToggle = false,
-  shouldShowCharacterCount = false,
-  maxLength,
-  keyboardType = 'default',
-  autoCapitalize = 'none',
-  autoCorrect = false,
-  multiline = false,
-  numberOfLines = 1,
-  style,
+  isReadOnly = false,
+  hasIcon = false,
+  iconName,
+  iconPosition = 'right',
+  onIconPress,
+  variant = 'outlined',
+  size = 'medium',
+  isFullWidth = false,
+  containerStyle,
   inputStyle,
   labelStyle,
   errorStyle,
   helperStyle,
+  testID,
+  accessibilityLabel,
+  accessibilityHint,
+  validationRules = DEFAULT_VALIDATION_RULES,
+  onValidationChange,
+  ...textInputProps
 }, ref) => {
-  const [isFocused, setIsFocused] = useState(false);
-  const [isPasswordVisible, setIsPasswordVisible] = useState(!isSecureText);
+  const colorScheme = useColorScheme();
+  const { width } = useWindowDimensions();
+  const isDark = colorScheme === 'dark';
   
+  const [isFocused, setIsFocused] = useState(false);
+  const [internalError, setInternalError] = useState<string | undefined>(error);
+  const [isValid, setIsValid] = useState(true);
+
+  // Memoized styles for performance
+  const inputStyleMemo = useMemo(() => 
+    getInputStyle({ variant, size, isDisabled, isFullWidth }, isDark, width, isFocused, !!internalError), 
+    [variant, size, isDisabled, isFullWidth, isDark, width, isFocused, internalError]
+  );
+
+  const labelStyleMemo = useMemo(() => 
+    getLabelStyle({ size }, isDark, width), 
+    [size, isDark, width]
+  );
+
+  // Validation function
+  const validateInput = useCallback((inputValue: string): boolean => {
+    if (validationRules.length === 0) return true;
+    
+    const errors: string[] = [];
+    
+    validationRules.forEach(rule => {
+      if (!rule.test(inputValue)) {
+        errors.push(rule.message);
+      }
+    });
+    
+    const isValidInput = errors.length === 0;
+    setIsValid(isValidInput);
+    setInternalError(errors[0] || undefined);
+    
+    onValidationChange?.(isValidInput, errors);
+    return isValidInput;
+  }, [validationRules, onValidationChange]);
+
+  // Handle text change with validation
+  const handleChangeText = useCallback((text: string) => {
+    onChangeText(text);
+    if (validationRules.length > 0) {
+      validateInput(text);
+    }
+  }, [onChangeText, validateInput]);
+
+  // Focus handlers
   const handleFocus = useCallback(() => {
     setIsFocused(true);
-  }, []);
-  
+    textInputProps.onFocus?.(undefined as any);
+  }, [textInputProps]);
+
   const handleBlur = useCallback(() => {
     setIsFocused(false);
-  }, []);
-  
-  const handlePasswordToggle = useCallback(() => {
-    setIsPasswordVisible(!isPasswordVisible);
-  }, [isPasswordVisible]);
-  
-  const handleRightIconPress = useCallback(() => {
-    if (canShowPasswordToggle) {
-      handlePasswordToggle();
-    }
-  }, [canShowPasswordToggle, handlePasswordToggle]);
-  
-  const inputState = getInputState({ hasError, isDisabled }, isFocused);
-  const inputStyles = getInputStyle({ hasError, isDisabled, multiline, numberOfLines }, isFocused);
-  
-  const shouldShowPasswordToggle = canShowPasswordToggle && isSecureText;
-  const shouldShowRightIcon = hasRightIcon || shouldShowPasswordToggle;
-  const rightIconToShow = shouldShowPasswordToggle 
-    ? (isPasswordVisible ? 'eye-off' : 'eye') 
-    : rightIconName;
-  
+    textInputProps.onBlur?.(undefined as any);
+  }, [textInputProps]);
+
+  // Expose methods via ref
+  useImperativeHandle(ref, () => ({
+    focus: () => {
+      // Focus will be handled by the TextInput ref
+    },
+    blur: () => {
+      // Blur will be handled by the TextInput ref
+    },
+    clear: () => {
+      onChangeText('');
+      setInternalError(undefined);
+      setIsValid(true);
+    },
+    validate: () => {
+      return validateInput(value);
+    },
+  }), [onChangeText, validateInput, value]);
+
+  // Memoized accessibility props
+  const accessibilityProps = useMemo(() => ({
+    accessible: true,
+    accessibilityLabel: accessibilityLabel || `${label || 'Input'} field`,
+    accessibilityHint: accessibilityHint || `Enter ${label || 'text'} in this field`,
+    accessibilityRole: 'text' as const,
+    accessibilityState: { 
+      disabled: isDisabled,
+      busy: false 
+    },
+  }), [accessibilityLabel, accessibilityHint, label, isDisabled]);
+
+  // Memoized icon component
+  const IconComponent = useMemo(() => {
+    if (!hasIcon || !iconName) return null;
+    
+    return (
+      <TouchableOpacity
+        style={[
+          styles.iconContainer,
+          iconPosition === 'left' ? styles.iconLeft : styles.iconRight,
+        ]}
+        onPress={onIconPress}
+        disabled={!onIconPress}
+        accessible={true}
+        accessibilityLabel={`${iconName} icon`}
+        accessibilityRole="button"
+      >
+        <Text style={[styles.icon, { color: isDark ? '#FFFFFF' : '#000000' }]}>
+          {iconName}
+        </Text>
+      </TouchableOpacity>
+    );
+  }, [hasIcon, iconName, iconPosition, onIconPress, isDark]);
+
+  const displayError = internalError || error;
+  const displayHelperText = helperText || (isRequired ? 'This field is required' : '');
+
   return (
-    <View style={[styles.container, style]}>
-      <InputLabel props={{ label, isRequired, hasError, isDisabled }} />
+    <View style={[styles.container, containerStyle]} testID={testID}>
+      {label && (
+        <Text style={[styles.label, labelStyleMemo, labelStyle]}>
+          {label}
+          {isRequired && <Text style={styles.required}> *</Text>}
+        </Text>
+      )}
       
-      <View style={[
-        styles.inputContainer,
-        {
-          borderColor: inputState.borderColor,
-          backgroundColor: inputState.backgroundColor,
-          borderRadius: inputStyles.borderRadius,
-        }
-      ]}>
-        {hasLeftIcon && leftIconName && (
-          <InputIcon
-            iconName={leftIconName}
-            color={leftIconColor || inputState.textColor}
-            position="left"
-          />
-        )}
+      <View style={styles.inputContainer}>
+        {iconPosition === 'left' && IconComponent}
         
         <TextInput
-          ref={ref}
+          style={[styles.input, inputStyleMemo, inputStyle]}
           value={value}
-          onChangeText={onChangeText}
-          placeholder={placeholder}
-          placeholderTextColor="#8E8E93"
-          secureTextEntry={isSecureText && !isPasswordVisible}
-          editable={!isDisabled}
-          maxLength={maxLength}
-          keyboardType={keyboardType}
-          autoCapitalize={autoCapitalize}
-          autoCorrect={autoCorrect}
-          multiline={multiline}
-          numberOfLines={numberOfLines}
-          style={[
-            styles.input,
-            {
-              color: inputState.textColor,
-              fontSize: inputStyles.fontSize,
-              paddingVertical: inputStyles.paddingVertical,
-              paddingHorizontal: inputStyles.paddingHorizontal,
-              minHeight: inputStyles.minHeight,
-            },
-            inputStyle,
-          ]}
+          onChangeText={handleChangeText}
           onFocus={handleFocus}
           onBlur={handleBlur}
+          placeholder={placeholder}
+          placeholderTextColor={isDark ? '#8E8E93' : '#8E8E93'}
+          editable={!isDisabled && !isReadOnly}
+          selectTextOnFocus={!isReadOnly}
+          {...textInputProps}
+          {...accessibilityProps}
         />
         
-        {shouldShowRightIcon && rightIconToShow && (
-          <InputIcon
-            iconName={rightIconToShow}
-            color={rightIconColor || inputState.textColor}
-            position="right"
-            onPress={shouldShowPasswordToggle ? handleRightIconPress : undefined}
-          />
-        )}
+        {iconPosition === 'right' && IconComponent}
       </View>
       
-      <InputError props={{ hasError, errorMessage }} />
-      <InputHelper props={{ helperText, shouldShowCharacterCount, value, maxLength }} />
+      {(displayError || displayHelperText) && (
+        <View style={styles.messageContainer}>
+          {displayError && (
+            <Text style={[styles.errorText, errorStyle]}>
+              {displayError}
+            </Text>
+          )}
+          {displayHelperText && !displayError && (
+            <Text style={[styles.helperText, helperStyle]}>
+              {displayHelperText}
+            </Text>
+          )}
+        </View>
+      )}
     </View>
   );
 });
+
+OptimizedInput.displayName = 'OptimizedInput';
 
 // ============================================================================
 // STYLES
@@ -343,6 +377,7 @@ const styles = StyleSheet.create({
   label: {
     fontWeight: '500',
     marginBottom: 4,
+    includeFontPadding: false,
   },
   required: {
     color: '#FF3B30',
@@ -350,27 +385,90 @@ const styles = StyleSheet.create({
   inputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
   },
   input: {
     flex: 1,
-    fontWeight: '400',
+    borderWidth: 1,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
-  leftIcon: {
-    paddingLeft: 16,
-    paddingRight: 8,
+  iconContainer: {
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  rightIcon: {
-    paddingRight: 16,
-    paddingLeft: 8,
+  iconLeft: {
+    marginRight: 8,
   },
-  iconText: {
-    fontSize: 16,
+  iconRight: {
+    marginLeft: 8,
+  },
+  icon: {
+    fontSize: 18,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+  },
+  messageContainer: {
+    marginTop: 4,
+    minHeight: 20,
   },
   errorText: {
-    fontWeight: '400',
+    fontSize: 12,
+    color: '#FF3B30',
+    includeFontPadding: false,
   },
   helperText: {
-    fontWeight: '400',
+    fontSize: 12,
+    color: '#8E8E93',
+    includeFontPadding: false,
+  },
+}); 
+  label: {
+    fontWeight: '500',
+    marginBottom: 4,
+    includeFontPadding: false,
+  },
+  required: {
+    color: '#FF3B30',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  input: {
+    flex: 1,
+    borderWidth: 1,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+  },
+  iconContainer: {
+    padding: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  iconLeft: {
+    marginRight: 8,
+  },
+  iconRight: {
+    marginLeft: 8,
+  },
+  icon: {
+    fontSize: 18,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
+  },
+  messageContainer: {
+    marginTop: 4,
+    minHeight: 20,
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#FF3B30',
+    includeFontPadding: false,
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#8E8E93',
+    includeFontPadding: false,
   },
 }); 

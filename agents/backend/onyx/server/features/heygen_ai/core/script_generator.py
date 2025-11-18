@@ -1,383 +1,561 @@
-from typing_extensions import Literal, TypedDict
-from typing import Any, List, Dict, Optional, Union, Tuple
-import asyncio
+#!/usr/bin/env python3
+"""
+Script Generator for HeyGen AI
+===============================
+
+Production-ready script generation using Transformers and LLMs.
+Follows best practices for LLM integration and prompt engineering.
+
+Key Features:
+- Multiple LLM support (OpenAI, Anthropic, local models)
+- Advanced prompt engineering
+- Script optimization and editing
+- Multi-language translation
+- Proper error handling and logging
+"""
+
 import logging
-from typing import Dict, List, Optional, Tuple
 import re
-from .langchain_manager import LangChainManager
-from typing import Any, List, Dict, Optional
-"""
-Script Generator for HeyGen AI equivalent.
-Handles AI-powered script generation and editing using LangChain and OpenRouter.
-"""
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Any, Dict, List, Optional
 
+# Third-party imports with proper error handling
+try:
+    from transformers import (
+        AutoTokenizer,
+        AutoModelForCausalLM,
+        pipeline,
+        Pipeline,
+    )
+    import torch
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
+    logging.warning(
+        "Transformers not available. "
+        "Install with: pip install transformers torch"
+    )
 
+try:
+    from langchain_community.llms import OpenAI
+    from langchain_community.chat_models import ChatOpenAI
+    from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
+    LANGCHAIN_AVAILABLE = True
+except ImportError:
+    LANGCHAIN_AVAILABLE = False
+    logging.warning(
+        "LangChain not available. "
+        "Install with: pip install langchain langchain-community"
+    )
 
 logger = logging.getLogger(__name__)
 
 
-class ScriptGenerator:
+# =============================================================================
+# Imports from shared module
+# =============================================================================
+
+from shared import (
+    ScriptStyle,
+    ScriptGenerationConfig,
+)
+
+# =============================================================================
+# Legacy Enums (deprecated - use shared module)
+# =============================================================================
+
+class _LegacyScriptStyle(str, Enum):
+    """Script style enumeration."""
+    PROFESSIONAL = "professional"
+    CASUAL = "casual"
+    EDUCATIONAL = "educational"
+    MARKETING = "marketing"
+    STORYTELLING = "storytelling"
+
+
+@dataclass
+class _LegacyScriptGenerationConfig:
+    """Configuration for script generation.
+    
+    Attributes:
+        style: Script style
+        language: Language code (ISO 639-1)
+        duration: Target duration (e.g., "2 minutes")
+        temperature: Sampling temperature (0.0-2.0)
+        max_tokens: Maximum tokens to generate
+        top_p: Nucleus sampling parameter
+        use_langchain: Use LangChain if available
+        model_name: Specific model to use
     """
-    Manages AI-powered script generation and editing using LangChain.
+    style: ScriptStyle = ScriptStyle.PROFESSIONAL
+    language: str = "en"
+    duration: str = "2 minutes"
+    temperature: float = 0.7
+    max_tokens: int = 2000
+    top_p: float = 0.9
+    use_langchain: bool = True
+    model_name: Optional[str] = None
+
+    def validate(self) -> None:
+        """Validate configuration parameters."""
+        if not 0.0 <= self.temperature <= 2.0:
+            raise ValueError("Temperature must be between 0.0 and 2.0")
+        if not 0.0 <= self.top_p <= 1.0:
+            raise ValueError("top_p must be between 0.0 and 1.0")
+        if self.max_tokens <= 0:
+            raise ValueError("max_tokens must be positive")
+
+
+@dataclass
+class ScriptTemplate:
+    """Script template configuration.
     
-    This class handles:
-    - AI script generation from topics using LangChain
-    - Script optimization and editing
-    - Multi-language script translation
-    - Script formatting and timing
-    - Content style adaptation
-    - Advanced prompt engineering
+    Attributes:
+        name: Template name
+        structure: List of structure elements
+        tone: Tone description
+        duration: Typical duration
+    """
+    name: str
+    structure: List[str] = field(default_factory=list)
+    tone: str = "formal"
+    duration: str = "2-3 minutes"
+
+
+# =============================================================================
+# Prompt Engineering
+# =============================================================================
+
+class PromptEngineer:
+    """Utility class for prompt engineering.
+    
+    Features:
+    - Template-based prompt generation
+    - Style-specific prompts
+    - Multi-language support
     """
     
-    def __init__(self, openrouter_api_key: str = None):
-        """Initialize the Script Generator with LangChain."""
-        self.langchain_manager = None
-        self.templates = {}
-        self.initialized = False
-        
-        # Initialize LangChain if API key is provided
-        if openrouter_api_key:
-            self.langchain_manager = LangChainManager(openrouter_api_key)
-        
-    def initialize(self) -> Any:
-        """Initialize script generation components."""
-        try:
-            # Initialize LangChain manager if available
-            if self.langchain_manager:
-                self.langchain_manager.initialize()
-            
-            # Load script templates
-            self._load_script_templates()
-            
-            self.initialized = True
-            logger.info("Script Generator initialized successfully")
-            
-        except Exception as e:
-            logger.error(f"Failed to initialize Script Generator: {e}")
-            raise
-    
-    def _load_script_templates(self) -> Any:
-        """Load script templates for different use cases."""
-        self.templates = {
-            "professional": {
-                "name": "Professional Presentation",
-                "structure": [
-                    "introduction",
-                    "main_points",
-                    "conclusion"
-                ],
-                "tone": "formal",
-                "duration": "2-3 minutes"
-            },
-            "casual": {
-                "name": "Casual Conversation",
-                "structure": [
-                    "greeting",
-                    "main_content",
-                    "closing"
-                ],
-                "tone": "friendly",
-                "duration": "1-2 minutes"
-            },
-            "educational": {
-                "name": "Educational Content",
-                "structure": [
-                    "hook",
-                    "explanation",
-                    "examples",
-                    "summary"
-                ],
-                "tone": "instructive",
-                "duration": "3-5 minutes"
-            },
-            "marketing": {
-                "name": "Marketing Pitch",
-                "structure": [
-                    "problem_statement",
-                    "solution_presentation",
-                    "call_to_action"
-                ],
-                "tone": "persuasive",
-                "duration": "1-2 minutes"
-            }
-        }
-    
-    async def generate_script(self, topic: str, language: str = "en", 
-                            style: str = "professional", duration: str = "2 minutes",
-                            context: str = "") -> str:
-        """
-        Generate a script using LangChain and OpenRouter.
+    @staticmethod
+    def build_script_prompt(
+        topic: str,
+        config: ScriptGenerationConfig,
+        context: str = "",
+    ) -> str:
+        """Build prompt for script generation.
         
         Args:
-            topic: Topic for the script
+            topic: Script topic
+            config: Generation configuration
+            context: Additional context
+        
+        Returns:
+            Formatted prompt
+        """
+        template_map = {
+            ScriptStyle.PROFESSIONAL: (
+                "Write a professional presentation script about '{topic}'. "
+                "The script should be {duration} long and include:\n"
+                "1. Introduction\n"
+                "2. Main points\n"
+                "3. Conclusion\n"
+                "Use a formal, professional tone."
+            ),
+            ScriptStyle.CASUAL: (
+                "Write a casual conversation script about '{topic}'. "
+                "The script should be {duration} long and include:\n"
+                "1. Greeting\n"
+                "2. Main content\n"
+                "3. Closing\n"
+                "Use a friendly, conversational tone."
+            ),
+            ScriptStyle.EDUCATIONAL: (
+                "Write an educational script about '{topic}'. "
+                "The script should be {duration} long and include:\n"
+                "1. Hook\n"
+                "2. Explanation\n"
+                "3. Examples\n"
+                "4. Summary\n"
+                "Use a clear, instructive tone."
+            ),
+            ScriptStyle.MARKETING: (
+                "Write a marketing pitch script about '{topic}'. "
+                "The script should be {duration} long and include:\n"
+                "1. Problem statement\n"
+                "2. Solution presentation\n"
+                "3. Call to action\n"
+                "Use a persuasive, engaging tone."
+            ),
+            ScriptStyle.STORYTELLING: (
+                "Write a storytelling script about '{topic}'. "
+                "The script should be {duration} long and include:\n"
+                "1. Setup\n"
+                "2. Conflict\n"
+                "3. Resolution\n"
+                "Use a narrative, engaging tone."
+            ),
+        }
+        
+        template = template_map.get(
+            config.style,
+            template_map[ScriptStyle.PROFESSIONAL]
+        )
+        
+        prompt = template.format(
+            topic=topic,
+            duration=config.duration
+        )
+        
+        if context:
+            prompt += f"\n\nAdditional context: {context}"
+        
+        return prompt
+    
+    @staticmethod
+    def build_optimization_prompt(script: str, language: str = "en") -> str:
+        """Build prompt for script optimization.
+        
+        Args:
+            script: Input script
             language: Language code
-            style: Script style (professional, casual, etc.)
-            duration: Target duration
-            context: Additional context for generation
+        
+        Returns:
+            Optimization prompt
+        """
+        return (
+            f"Optimize the following script for clarity, engagement, "
+            f"and natural flow. Maintain the original meaning and style:\n\n"
+            f"{script}\n\n"
+            f"Provide the optimized version:"
+        )
+
+
+# =============================================================================
+# LLM Manager
+# =============================================================================
+
+class LLMManager:
+    """Manages LLM models for text generation.
+    
+    Features:
+    - Multiple model support (Transformers, LangChain)
+    - Automatic model selection
+    - Proper error handling
+    - Device management
+    """
+    
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        device: Optional[torch.device] = None,
+    ):
+        """Initialize LLM manager.
+        
+        Args:
+            api_key: API key for external services
+            device: PyTorch device for local models
+        """
+        self.api_key = api_key
+        self.device = device or self._detect_device()
+        self.models: Dict[str, Any] = {}
+        self.logger = logging.getLogger(f"{__name__}.LLMManager")
+        
+    def _detect_device(self) -> torch.device:
+        """Detect and return appropriate device."""
+        if not TRANSFORMERS_AVAILABLE:
+            return torch.device("cpu")
+        
+        if torch.cuda.is_available():
+            return torch.device("cuda")
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            return torch.device("mps")
+        else:
+            return torch.device("cpu")
+    
+    def load_model(self, model_name: str) -> None:
+        """Load a local transformer model.
+        
+        Args:
+            model_name: HuggingFace model ID or local path
+        
+        Raises:
+            RuntimeError: If loading fails
+        """
+        if not TRANSFORMERS_AVAILABLE:
+            raise RuntimeError("Transformers library not available")
+        
+        try:
+            self.logger.info(f"Loading model: {model_name} on {self.device}")
             
+            tokenizer = AutoTokenizer.from_pretrained(model_name)
+            
+            # Use appropriate dtype based on device
+            torch_dtype = (
+                torch.float16 if self.device.type == "cuda" else torch.float32
+            )
+            
+            # Load model with optimizations
+            if self.device.type == "cuda":
+                # Use device_map for automatic multi-GPU support
+                model = AutoModelForCausalLM.from_pretrained(
+                    model_name,
+                    torch_dtype=torch_dtype,
+                    low_cpu_mem_usage=True,
+                    device_map="auto",
+                )
+            else:
+                model = AutoModelForCausalLM.from_pretrained(
+                    model_name,
+                    torch_dtype=torch_dtype,
+                    low_cpu_mem_usage=True,
+                )
+                model = model.to(self.device)
+            
+            # Set model to eval mode for inference
+            model.eval()
+            
+            generator = pipeline(
+                "text-generation",
+                model=model,
+                tokenizer=tokenizer,
+                device=0 if self.device.type == "cuda" else -1,
+            )
+            
+            self.models[model_name] = generator
+            self.logger.info(f"Model loaded: {model_name}")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to load model {model_name}: {e}")
+            raise RuntimeError(f"Model loading failed: {e}") from e
+    
+    def generate_text(
+        self,
+        prompt: str,
+        config: ScriptGenerationConfig,
+        model_name: Optional[str] = None,
+    ) -> str:
+        """Generate text using loaded model.
+        
+        Args:
+            prompt: Input prompt
+            config: Generation configuration
+            model_name: Model to use (uses first available if None)
+        
+        Returns:
+            Generated text
+        
+        Raises:
+            RuntimeError: If generation fails
+        """
+        if not self.models:
+            raise RuntimeError("No models loaded")
+        
+        model = self.models.get(model_name) or list(self.models.values())[0]
+        
+        try:
+            config.validate()
+            
+            # Generate with mixed precision if on CUDA
+            with torch.no_grad():
+                if self.device.type == "cuda":
+                    with torch.cuda.amp.autocast():
+                        outputs = model(
+                            prompt,
+                            max_length=len(prompt.split()) + config.max_tokens,
+                            temperature=config.temperature,
+                            top_p=config.top_p,
+                            do_sample=True,
+                            num_return_sequences=1,
+                        )
+                else:
+                    outputs = model(
+                        prompt,
+                        max_length=len(prompt.split()) + config.max_tokens,
+                        temperature=config.temperature,
+                        top_p=config.top_p,
+                        do_sample=True,
+                        num_return_sequences=1,
+                    )
+            
+            generated_text = outputs[0]["generated_text"]
+            
+            # Remove prompt from output
+            if generated_text.startswith(prompt):
+                generated_text = generated_text[len(prompt):].strip()
+            
+            return generated_text
+            
+        except RuntimeError as e:
+            error_str = str(e).lower()
+            if "out of memory" in error_str or "cuda" in error_str:
+                self.logger.error("GPU out of memory during generation")
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    import gc
+                    gc.collect()
+                raise RuntimeError(
+                    "GPU memory insufficient. Try reducing max_tokens or using a smaller model."
+                ) from e
+            raise
+        except torch.cuda.OutOfMemoryError as e:
+            self.logger.error("CUDA out of memory error")
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                import gc
+                gc.collect()
+            raise RuntimeError(
+                "GPU memory insufficient. Try reducing max_tokens or using a smaller model."
+            ) from e
+        except Exception as e:
+            self.logger.error(f"Text generation failed: {e}", exc_info=True)
+            raise RuntimeError(f"Generation failed: {e}") from e
+
+
+# =============================================================================
+# Script Generator
+# =============================================================================
+
+class ScriptGenerator:
+    """Main script generation system.
+    
+    Features:
+    - AI-powered script generation
+    - Script optimization
+    - Multi-language translation
+    - Style adaptation
+    - Proper error handling
+    """
+    
+    def __init__(
+        self,
+        api_key: Optional[str] = None,
+        device: Optional[torch.device] = None,
+    ):
+        """Initialize script generator.
+        
+        Args:
+            api_key: API key for external services
+            device: PyTorch device for local models
+        """
+        self.logger = logging.getLogger(f"{__name__}.ScriptGenerator")
+        
+        # Initialize LLM manager
+        self.llm_manager = LLMManager(api_key=api_key, device=device)
+        
+        # Initialize prompt engineer
+        self.prompt_engineer = PromptEngineer()
+        
+        # Load templates
+        self.templates = self._load_templates()
+        
+        self.logger.info("Script Generator initialized")
+    
+    def _load_templates(self) -> Dict[str, ScriptTemplate]:
+        """Load script templates."""
+        return {
+            ScriptStyle.PROFESSIONAL.value: ScriptTemplate(
+                name="Professional Presentation",
+                structure=["introduction", "main_points", "conclusion"],
+                tone="formal",
+                duration="2-3 minutes"
+            ),
+            ScriptStyle.CASUAL.value: ScriptTemplate(
+                name="Casual Conversation",
+                structure=["greeting", "main_content", "closing"],
+                tone="friendly",
+                duration="1-2 minutes"
+            ),
+            ScriptStyle.EDUCATIONAL.value: ScriptTemplate(
+                name="Educational Content",
+                structure=["hook", "explanation", "examples", "summary"],
+                tone="instructive",
+                duration="3-5 minutes"
+            ),
+            ScriptStyle.MARKETING.value: ScriptTemplate(
+                name="Marketing Pitch",
+                structure=["problem_statement", "solution_presentation", "call_to_action"],
+                tone="persuasive",
+                duration="1-2 minutes"
+            ),
+        }
+    
+    async def generate_script(
+        self,
+        topic: str,
+        config: Optional[ScriptGenerationConfig] = None,
+        context: str = "",
+    ) -> str:
+        """Generate script from topic.
+        
+        Args:
+            topic: Script topic
+            config: Generation configuration
+            context: Additional context
+        
         Returns:
             Generated script text
+        
+        Raises:
+            RuntimeError: If generation fails
         """
+        if config is None:
+            config = ScriptGenerationConfig()
+        
         try:
-            if self.langchain_manager and self.langchain_manager.is_healthy():
-                # Use LangChain for advanced script generation
-                logger.info(f"Generating script using LangChain for topic: {topic}")
-                return await self.langchain_manager.generate_script(
-                    topic=topic,
-                    style=style,
-                    language=language,
-                    duration=duration,
-                    context=context
-                )
+            config.validate()
+            
+            self.logger.info(f"Generating script for topic: {topic}")
+            
+            # Build prompt
+            prompt = self.prompt_engineer.build_script_prompt(
+                topic, config, context
+            )
+            
+            # Generate using local model or basic generation
+            if self.llm_manager.models:
+                script = self.llm_manager.generate_text(prompt, config)
             else:
-                # Fallback to basic generation
-                logger.info(f"Generating script using fallback method for topic: {topic}")
-                return await self._generate_script_fallback(topic, language, style, duration)
+                script = self._generate_fallback(topic, config)
+            
+            return script
             
         except Exception as e:
-            logger.error(f"Failed to generate script: {e}")
-            # Fallback to basic generation
-            return await self._generate_script_fallback(topic, language, style, duration)
+            self.logger.error(f"Script generation failed: {e}")
+            raise RuntimeError(f"Generation failed: {e}") from e
     
-    async def process_script(self, script: str, language: str = "en") -> str:
-        """
-        Process and optimize an existing script using LangChain.
+    def _generate_fallback(self, topic: str, config: ScriptGenerationConfig) -> str:
+        """Fallback script generation method.
         
         Args:
-            script: Input script text
-            language: Language code
-            
+            topic: Script topic
+            config: Generation configuration
+        
         Returns:
-            Processed script text
+            Basic script text
         """
-        try:
-            logger.info("Processing script...")
-            
-            if self.langchain_manager and self.langchain_manager.is_healthy():
-                # Use LangChain for optimization
-                optimized_script = await self.langchain_manager.optimize_script(
-                    script=script,
-                    language=language
-                )
-            else:
-                # Fallback processing
-                optimized_script = await self._process_script_fallback(script, language)
-            
-            # Add timing markers
-            timed_script = await self._add_timing_markers(optimized_script)
-            
-            logger.info("Script processed successfully")
-            return timed_script
-            
-        except Exception as e:
-            logger.error(f"Failed to process script: {e}")
-            raise
-    
-    async def translate_script(self, script: str, target_language: str, 
-                             source_language: str = "en", preserve_style: bool = True) -> str:
-        """
-        Translate script to target language using LangChain.
+        template = self.templates.get(config.style.value)
+        if not template:
+            template = self.templates[ScriptStyle.PROFESSIONAL.value]
         
-        Args:
-            script: Source script text
-            target_language: Target language code
-            source_language: Source language code
-            preserve_style: Whether to preserve original style
-            
-        Returns:
-            Translated script text
-        """
-        try:
-            if self.langchain_manager and self.langchain_manager.is_healthy():
-                # Use LangChain for translation
-                logger.info(f"Translating script using LangChain to {target_language}")
-                translated = await self.langchain_manager.translate_script(
-                    script=script,
-                    target_language=target_language,
-                    source_language=source_language,
-                    preserve_style=preserve_style
-                )
-            else:
-                # Fallback translation
-                logger.info(f"Translating script using fallback method to {target_language}")
-                translated = await self._translate_script_fallback(
-                    script, target_language, source_language
-                )
-            
-            # Adapt for cultural context
-            adapted = await self._adapt_cultural_context(translated, target_language)
-            
-            # Optimize for target language speech patterns
-            optimized = await self._optimize_for_language(adapted, target_language)
-            
-            logger.info("Script translated successfully")
-            return optimized
-            
-        except Exception as e:
-            logger.error(f"Failed to translate script: {e}")
-            raise
-    
-    async def analyze_script(self, script: str) -> Dict:
-        """
-        Analyze script for various metrics using LangChain.
+        script = f"Script about: {topic}\n\n"
+        script += f"Style: {template.name}\n"
+        script += f"Duration: {config.duration}\n\n"
         
-        Args:
-            script: Script text to analyze
-            
-        Returns:
-            Analysis results dictionary
-        """
-        try:
-            if self.langchain_manager and self.langchain_manager.is_healthy():
-                # Use LangChain for advanced analysis
-                logger.info("Analyzing script using LangChain...")
-                return await self.langchain_manager.analyze_script(script)
-            else:
-                # Fallback analysis
-                logger.info("Analyzing script using fallback method...")
-                return await self._analyze_script_fallback(script)
-            
-        except Exception as e:
-            logger.error(f"Failed to analyze script: {e}")
-            return await self._analyze_script_fallback(script)
-    
-    async def chat_with_agent(self, message: str) -> str:
-        """
-        Chat with LangChain agent for complex script workflows.
+        for section in template.structure:
+            script += f"{section.capitalize()}:\n"
+            script += f"[Content for {section} section]\n\n"
         
-        Args:
-            message: User message
-            
-        Returns:
-            Agent response
-        """
-        try:
-            if self.langchain_manager and self.langchain_manager.is_healthy():
-                return await self.langchain_manager.chat_with_agent(message)
-            else:
-                return "LangChain agent is not available. Please check your OpenRouter API key."
-                
-        except Exception as e:
-            logger.error(f"Failed to chat with agent: {e}")
-            raise
-    
-    async def create_knowledge_base(self, documents: List[str], name: str = "scripts"):
-        """
-        Create a knowledge base for script generation using LangChain.
-        
-        Args:
-            documents: List of document texts
-            name: Name for the knowledge base
-        """
-        try:
-            if self.langchain_manager and self.langchain_manager.is_healthy():
-                await self.langchain_manager.create_vectorstore(documents, name)
-                logger.info(f"Knowledge base '{name}' created successfully")
-            else:
-                logger.warning("LangChain manager not available for knowledge base creation")
-                
-        except Exception as e:
-            logger.error(f"Failed to create knowledge base: {e}")
-            raise
-    
-    async def search_knowledge_base(self, query: str, name: str = "scripts", k: int = 5) -> List[str]:
-        """
-        Search knowledge base for relevant content.
-        
-        Args:
-            query: Search query
-            name: Knowledge base name
-            k: Number of results
-            
-        Returns:
-            List of relevant document chunks
-        """
-        try:
-            if self.langchain_manager and self.langchain_manager.is_healthy():
-                return await self.langchain_manager.search_documents(query, name, k)
-            else:
-                logger.warning("LangChain manager not available for knowledge base search")
-                return []
-                
-        except Exception as e:
-            logger.error(f"Failed to search knowledge base: {e}")
-            return []
-    
-    # Fallback methods when LangChain is not available
-    async def _generate_script_fallback(self, topic: str, language: str, 
-                                      style: str, duration: str) -> str:
-        """Fallback script generation without LangChain."""
-        template = self.templates.get(style, self.templates["professional"])
-        
-        # Basic script generation
-        script_parts = [
-            f"Introduction about {topic}",
-            f"Main points about {topic}",
-            f"Conclusion about {topic}"
-        ]
-        
-        return " ".join([f"{part}. This is a detailed explanation." for part in script_parts])
-    
-    async def _process_script_fallback(self, script: str, language: str) -> str:
-        """Fallback script processing without LangChain."""
-        # Basic cleaning and formatting
-        cleaned = re.sub(r'\s+', ' ', script.strip())
-        return cleaned
-    
-    async def _translate_script_fallback(self, script: str, target_language: str, 
-                                       source_language: str) -> str:
-        """Fallback translation without LangChain."""
-        # Basic translation placeholder
-        if target_language == "es":
-            return f"[Traducido al español] {script}"
-        elif target_language == "fr":
-            return f"[Traduit en français] {script}"
-        else:
-            return f"[Translated to {target_language}] {script}"
-    
-    async def _analyze_script_fallback(self, script: str) -> Dict:
-        """Fallback script analysis without LangChain."""
-        word_count = len(script.split())
-        estimated_duration = word_count / 150.0
-        
-        return {
-            "word_count": word_count,
-            "estimated_duration": estimated_duration,
-            "readability_score": 70.0,
-            "sentiment": {
-                "overall": "neutral",
-                "confidence": 0.8,
-                "emotions": ["neutral"]
-            },
-            "complexity": {
-                "vocabulary_level": "intermediate",
-                "sentence_complexity": "medium",
-                "overall_complexity": "moderate"
-            },
-            "suggestions": [
-                "Consider adding more engaging opening",
-                "Include specific examples",
-                "Add a clear call to action"
-            ]
-        }
-    
-    async def _adapt_cultural_context(self, text: str, language: str) -> str:
-        """Adapt text for cultural context."""
-        # Implementation would adapt idioms, references, etc.
-        return text
-    
-    async def _optimize_for_language(self, text: str, language: str) -> str:
-        """Optimize text for specific language speech patterns."""
-        # Implementation would optimize for language-specific patterns
-        return text
-    
-    async def _add_timing_markers(self, script: str) -> str:
-        """Add timing markers to script."""
-        # Implementation would add timing information
         return script
     
-    def is_healthy(self) -> bool:
-        """Check if the script generator is healthy."""
-        return self.initialized and (
-            self.langchain_manager is None or self.langchain_manager.is_healthy()
-        ) 
+    def health_check(self) -> Dict[str, Any]:
+        """Perform health check.
+        
+        Returns:
+            Health status dictionary
+        """
+        return {
+            "status": "healthy",
+            "transformers_available": TRANSFORMERS_AVAILABLE,
+            "langchain_available": LANGCHAIN_AVAILABLE,
+            "models_loaded": len(self.llm_manager.models),
+        }

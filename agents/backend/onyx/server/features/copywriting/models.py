@@ -15,16 +15,14 @@ from functools import lru_cache
 import time
 from datetime import datetime
 import uuid
-    import orjson
-    import json as orjson
-    import msgspec
-    import polars as pl
-    import numpy as np
+import orjson
+import msgspec
+import polars as pl
+import numpy as np
 from pydantic import BaseModel, Field, validator, ConfigDict, computed_field
 from pydantic_settings import BaseSettings
 import structlog
-            import json
-            import json
+import json
 from typing import Any, List, Dict, Optional
 import logging
 import asyncio
@@ -225,7 +223,7 @@ class OptimizedBaseModel(BaseModel, FastSerializationMixin):
         use_enum_values=True,
         arbitrary_types_allowed=True,
         # Serialization optimizations
-        ser_json_bytes=JSON_AVAILABLE,
+        ser_json_bytes="utf8" if JSON_AVAILABLE else False,
         json_encoders={
             datetime: lambda v: v.isoformat(),
         } if not JSON_AVAILABLE else {}

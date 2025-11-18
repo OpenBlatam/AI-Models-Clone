@@ -1,0 +1,411 @@
+name: 🚀 Automated Test Suite
+
+on:
+  push:
+    branches: [ main, develop, feature/* ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Run tests daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+    inputs:
+      test_type:
+        description: 'Type of tests to run'
+        required: true
+        default: 'all'
+        type: choice
+        options:
+        - all
+        - unit
+        - integration
+        - performance
+        - coverage
+
+env:
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # Job 1: Environment Setup
+  setup:
+    name: 🔧 Environment Setup
+    runs-on: ubuntu-latest
+    outputs:
+      python-version: ${{ steps.python-version.outputs.version }}
+      cache-key: ${{ steps.cache-key.outputs.key }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: 🐍 Setup Python
+      id: python-version
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pytest-xdist pytest-html pytest-benchmark
+        pip install -r requirements.txt || echo "No requirements.txt found"
+    
+    - name: 🔑 Generate cache key
+      id: cache-key
+      run: echo "key=${{ runner.os }}-python-${{ env.PYTHON_VERSION }}-${{ hashFiles('**/requirements.txt', '**/pyproject.toml') }}" >> $GITHUB_OUTPUT
+
+  # Job 2: Unit Tests
+  unit-tests:
+    name: 🧪 Unit Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    if: ${{ github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'unit' || github.event.inputs.test_type == '' }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pytest-xdist pytest-html
+        pip install -r requirements.txt || echo "No requirements.txt found"
+    
+    - name: 🧪 Run Unit Tests - HeyGen AI
+      run: |
+        cd agents/backend/onyx/server/features/heygen_ai
+        python -m pytest tests/test_simplified.py tests/test_basic_imports.py -v --cov=. --cov-report=xml --cov-report=html --junitxml=test-results-heygen.xml
+    
+    - name: 🧪 Run Unit Tests - Copywriting
+      run: |
+        cd agents/backend/onyx/server/features/copywriting
+        python -m pytest tests/test_models_simple.py -v --cov=. --cov-report=xml --cov-report=html --junitxml=test-results-copywriting.xml
+    
+    - name: 📊 Upload coverage reports
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./agents/backend/onyx/server/features/heygen_ai/coverage.xml,./agents/backend/onyx/server/features/copywriting/coverage.xml
+        flags: unit-tests
+        name: unit-tests-coverage
+    
+    - name: 📄 Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: unit-test-results
+        path: |
+          agents/backend/onyx/server/features/heygen_ai/test-results-heygen.xml
+          agents/backend/onyx/server/features/copywriting/test-results-copywriting.xml
+          agents/backend/onyx/server/features/heygen_ai/htmlcov/
+          agents/backend/onyx/server/features/copywriting/htmlcov/
+
+  # Job 3: Integration Tests
+  integration-tests:
+    name: 🔗 Integration Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    if: ${{ github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'integration' || github.event.inputs.test_type == '' }}
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      
+      redis:
+        image: redis:7
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-cov pytest-xdist pytest-html
+        pip install psycopg2-binary redis
+        pip install -r requirements.txt || echo "No requirements.txt found"
+    
+    - name: 🔗 Run Integration Tests
+      run: |
+        cd agents/backend/onyx/server/features/heygen_ai
+        python -m pytest tests/test_coverage_advanced.py tests/test_fixtures_advanced.py -v --cov=. --cov-report=xml --junitxml=test-results-integration.xml
+      env:
+        DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test_db
+        REDIS_URL: redis://localhost:6379/0
+    
+    - name: 📊 Upload integration coverage
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./agents/backend/onyx/server/features/heygen_ai/coverage.xml
+        flags: integration-tests
+        name: integration-tests-coverage
+
+  # Job 4: Performance Tests
+  performance-tests:
+    name: ⚡ Performance Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    if: ${{ github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'performance' || github.event.inputs.test_type == '' }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: 📦 Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest pytest-benchmark pytest-xdist
+        pip install -r requirements.txt || echo "No requirements.txt found"
+    
+    - name: ⚡ Run Performance Tests
+      run: |
+        cd agents/backend/onyx/server/features/heygen_ai
+        python -m pytest tests/test_fixtures_advanced.py::test_performance_with_data -v --benchmark-only --benchmark-save=performance-results
+    
+    - name: 📊 Upload performance results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: performance-results
+        path: |
+          agents/backend/onyx/server/features/heygen_ai/.benchmarks/
+
+  # Job 5: Coverage Analysis
+  coverage-analysis:
+    name: 📊 Coverage Analysis
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests]
+    if: ${{ github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'coverage' || github.event.inputs.test_type == '' }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 📥 Download coverage artifacts
+      uses: actions/download-artifact@v3
+      with:
+        name: unit-test-results
+        path: ./coverage-data/
+    
+    - name: 📊 Generate coverage report
+      run: |
+        python -c "
+        import xml.etree.ElementTree as ET
+        import json
+        
+        # Parse coverage data
+        coverage_files = [
+            'coverage-data/agents/backend/onyx/server/features/heygen_ai/coverage.xml',
+            'coverage-data/agents/backend/onyx/server/features/copywriting/coverage.xml'
+        ]
+        
+        total_lines = 0
+        covered_lines = 0
+        
+        for file in coverage_files:
+            try:
+                tree = ET.parse(file)
+                root = tree.getroot()
+                lines_covered = int(root.get('lines-covered', 0))
+                lines_valid = int(root.get('lines-valid', 0))
+                total_lines += lines_valid
+                covered_lines += lines_covered
+            except:
+                pass
+        
+        coverage_percentage = (covered_lines / total_lines * 100) if total_lines > 0 else 0
+        
+        print(f'Total Lines: {total_lines}')
+        print(f'Covered Lines: {covered_lines}')
+        print(f'Coverage: {coverage_percentage:.2f}%')
+        
+        # Save coverage summary
+        with open('coverage-summary.json', 'w') as f:
+            json.dump({
+                'total_lines': total_lines,
+                'covered_lines': covered_lines,
+                'coverage_percentage': coverage_percentage
+            }, f)
+        "
+    
+    - name: 📄 Upload coverage summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-summary
+        path: coverage-summary.json
+
+  # Job 6: Test Results Summary
+  test-summary:
+    name: 📋 Test Results Summary
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, performance-tests, coverage-analysis]
+    if: always()
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 📥 Download all artifacts
+      uses: actions/download-artifact@v3
+      with:
+        path: ./artifacts/
+    
+    - name: 📋 Generate test summary
+      run: |
+        python -c "
+        import json
+        import os
+        from datetime import datetime
+        
+        # Generate comprehensive test summary
+        summary = {
+            'timestamp': datetime.now().isoformat(),
+            'workflow_run_id': os.environ.get('GITHUB_RUN_ID', 'unknown'),
+            'commit_sha': os.environ.get('GITHUB_SHA', 'unknown'),
+            'branch': os.environ.get('GITHUB_REF_NAME', 'unknown'),
+            'test_results': {
+                'unit_tests': 'completed' if os.path.exists('artifacts/unit-test-results') else 'skipped',
+                'integration_tests': 'completed' if os.path.exists('artifacts/integration-test-results') else 'skipped',
+                'performance_tests': 'completed' if os.path.exists('artifacts/performance-results') else 'skipped',
+                'coverage_analysis': 'completed' if os.path.exists('artifacts/coverage-summary') else 'skipped'
+            },
+            'artifacts': []
+        }
+        
+        # List all artifacts
+        for root, dirs, files in os.walk('artifacts'):
+            for file in files:
+                file_path = os.path.join(root, file)
+                summary['artifacts'].append({
+                    'name': file,
+                    'path': file_path,
+                    'size': os.path.getsize(file_path)
+                })
+        
+        # Save summary
+        with open('test-summary.json', 'w') as f:
+            json.dump(summary, f, indent=2)
+        
+        print('Test Summary Generated:')
+        print(json.dumps(summary, indent=2))
+        "
+    
+    - name: 📄 Upload test summary
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-summary
+        path: test-summary.json
+    
+    - name: 📊 Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v6
+      with:
+        script: |
+          const fs = require('fs');
+          const summary = JSON.parse(fs.readFileSync('test-summary.json', 'utf8'));
+          
+          const comment = `## 🧪 Test Results Summary
+          
+          **Workflow Run:** #${summary.workflow_run_id}
+          **Commit:** ${summary.commit_sha.substring(0, 7)}
+          **Branch:** ${summary.branch}
+          
+          ### Test Status:
+          - **Unit Tests:** ${summary.test_results.unit_tests}
+          - **Integration Tests:** ${summary.test_results.integration_tests}
+          - **Performance Tests:** ${summary.test_results.performance_tests}
+          - **Coverage Analysis:** ${summary.test_results.coverage_analysis}
+          
+          ### Artifacts Generated:
+          ${summary.artifacts.map(a => `- ${a.name} (${a.size} bytes)`).join('\n')}
+          
+          ---
+          *Generated on ${summary.timestamp}*
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  # Job 7: Security Tests
+  security-tests:
+    name: 🔒 Security Tests
+    runs-on: ubuntu-latest
+    needs: setup
+    if: ${{ github.event.inputs.test_type == 'all' || github.event.inputs.test_type == 'security' || github.event.inputs.test_type == '' }}
+    
+    steps:
+    - name: 📥 Checkout code
+      uses: actions/checkout@v4
+    
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ env.PYTHON_VERSION }}
+        cache: 'pip'
+    
+    - name: 📦 Install security tools
+      run: |
+        python -m pip install --upgrade pip
+        pip install bandit safety semgrep
+        pip install -r requirements.txt || echo "No requirements.txt found"
+    
+    - name: 🔒 Run Bandit security scan
+      run: |
+        bandit -r agents/backend/onyx/server/features/ -f json -o bandit-report.json || true
+        bandit -r agents/backend/onyx/server/features/ -f txt || true
+    
+    - name: 🔒 Run Safety check
+      run: |
+        safety check --json --output safety-report.json || true
+        safety check || true
+    
+    - name: 📄 Upload security reports
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: security-reports
+        path: |
+          bandit-report.json
+          safety-report.json

@@ -1,0 +1,278 @@
+# Core FastAPI and Web Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+gunicorn==21.2.0
+pydantic==2.5.0
+pydantic-settings==2.1.0
+
+# Database and ORM
+sqlalchemy==2.0.23
+asyncpg==0.29.0
+alembic==1.13.1
+psycopg2-binary==2.9.9
+
+# Redis and Caching
+redis==5.0.1
+aioredis==2.0.1
+diskcache==5.6.3
+
+# Authentication and Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+cryptography==41.0.8
+
+# HTTP and API
+httpx==0.25.2
+aiohttp==3.9.1
+requests==2.31.0
+
+# AI and Machine Learning
+openai==1.3.7
+anthropic==0.7.8
+cohere==4.37
+transformers==4.36.2
+torch==2.1.1
+scikit-learn==1.3.2
+numpy==1.24.4
+pandas==2.1.4
+xgboost==2.0.2
+lightgbm==4.1.0
+
+# Performance and Optimization
+numba==0.58.1
+cython==3.0.6
+ray==2.8.0
+dask==2023.12.0
+modin==0.23.0
+
+# Data Processing
+polars==0.20.2
+pyarrow==14.0.1
+great-expectations==0.18.5
+pandera==0.17.2
+prophet==1.1.4
+statsmodels==0.14.0
+
+# Monitoring and Observability
+prometheus-client==0.19.0
+grafana-api==1.0.3
+jaeger-client==4.8.0
+opentelemetry-api==1.21.0
+opentelemetry-sdk==1.21.0
+opentelemetry-instrumentation-fastapi==0.42b0
+structlog==23.2.0
+loguru==0.7.2
+sentry-sdk[fastapi]==1.38.0
+
+# Document Processing
+PyPDF2==3.0.1
+python-docx==1.1.0
+openpyxl==3.1.2
+python-pptx==0.6.23
+markdown==3.5.1
+beautifulsoup4==4.12.2
+
+# Image and Media Processing
+opencv-python==4.8.1.78
+Pillow==10.1.0
+matplotlib==3.8.2
+seaborn==0.13.0
+plotly==5.17.0
+scikit-image==0.22.0
+
+# Audio Processing
+librosa==0.10.1
+soundfile==0.12.1
+pydub==0.25.1
+SpeechRecognition==3.10.0
+
+# Analytics and ML
+xgboost==2.0.2
+lightgbm==4.1.0
+catboost==1.2.2
+tensorflow==2.15.0
+jax==0.4.20
+flax==0.7.5
+
+# Experimental and Cutting-Edge
+qiskit==0.45.2
+cirq==1.2.0
+pennylane==0.34.0
+web3==6.11.3
+onnx==1.15.0
+tensorrt==8.6.1
+
+# System and Performance
+psutil==5.9.6
+memory-profiler==0.61.0
+line-profiler==4.1.1
+py-spy==0.3.14
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.1
+pytest-cov==4.1.0
+pytest-mock==3.12.0
+httpx==0.25.2
+factory-boy==3.3.0
+faker==20.1.0
+
+# Development and Code Quality
+black==23.11.0
+isort==5.12.0
+flake8==6.1.0
+mypy==1.7.1
+pre-commit==3.6.0
+bandit==1.7.5
+
+# Utilities
+python-dotenv==1.0.0
+click==8.1.7
+rich==13.7.0
+typer==0.9.0
+jinja2==3.1.2
+python-dateutil==2.8.2
+pytz==2023.3
+
+# Background Tasks
+celery==5.3.4
+kombu==5.3.4
+flower==2.0.1
+
+# File and Storage
+boto3==1.34.0
+google-cloud-storage==2.10.0
+azure-storage-blob==12.19.0
+minio==7.2.0
+
+# Email
+fastapi-mail==1.4.1
+aiosmtplib==3.0.1
+
+# WebSocket
+websockets==12.0
+socketio==5.10.0
+
+# Compression
+gzip-stream==0.1.0
+brotli==1.1.0
+lz4==4.3.2
+zstandard==0.22.0
+
+# Configuration
+dynaconf==3.2.4
+pydantic-settings==2.1.0
+
+# Health Checks
+healthcheck==1.3.3
+
+# Rate Limiting
+slowapi==0.1.9
+limits==3.6.0
+
+# CORS
+fastapi-cors==0.0.6
+
+# Validation
+email-validator==2.1.0
+phonenumbers==8.13.26
+
+# Serialization
+orjson==3.9.10
+msgpack==1.0.7
+
+# Async Utilities
+asyncio-throttle==1.0.2
+aiofiles==23.2.1
+
+# Database Migrations
+alembic==1.13.1
+
+# Environment Management
+python-decouple==3.8
+
+# Logging
+structlog==23.2.0
+loguru==0.7.2
+
+# Metrics
+prometheus-client==0.19.0
+
+# Security
+cryptography==41.0.8
+bcrypt==4.1.2
+
+# Time and Date
+arrow==1.3.0
+pendulum==2.1.2
+
+# JSON and Data
+ujson==5.8.0
+simplejson==3.19.2
+
+# HTTP Client
+httpx==0.25.2
+aiohttp==3.9.1
+
+# Template Engine
+jinja2==3.1.2
+
+# Configuration Management
+dynaconf==3.2.4
+
+# File Processing
+python-magic==0.4.27
+mimetypes==0.1.0
+
+# Compression
+gzip-stream==0.1.0
+brotli==1.1.0
+
+# Async Database
+asyncpg==0.29.0
+aiomysql==0.2.0
+
+# Cache
+diskcache==5.6.3
+memcached==1.0.0
+
+# Background Jobs
+apscheduler==3.10.4
+
+# WebSocket
+websockets==12.0
+
+# Email
+aiosmtplib==3.0.1
+
+# File Upload
+python-multipart==0.0.6
+
+# Validation
+marshmallow==3.20.1
+cerberus==1.3.5
+
+# Serialization
+marshmallow==3.20.1
+pydantic==2.5.0
+
+# Async Support
+asyncio==3.4.3
+aiofiles==23.2.1
+
+# Performance
+uvloop==0.19.0
+httptools==0.6.1
+
+# Development
+watchfiles==0.21.0
+python-dotenv==1.0.0
+
+# Production
+gunicorn==21.2.0
+uvicorn[standard]==0.24.0
+
+
+
+

@@ -1,10 +1,7 @@
 from typing_extensions import Literal, TypedDict
-from typing import Any, List, Dict, Optional, Union, Tuple
-from dataclasses import dataclass
-
+from typing import Any, List, Dict, Optional
 from uuid import UUID, uuid4
-from pydantic import BaseModel, Field, validator, field_validator, ConfigDict, model_validator
-from typing import Dict, List, Optional, Any
+from pydantic import BaseModel, Field, field_validator, ConfigDict, model_validator
 from datetime import datetime
 import structlog
 import orjson
@@ -16,9 +13,6 @@ from onyx.server.documents.models import CredentialSnapshot
 from onyx.core.models import OnyxBaseModel
 from agents.backend.onyx.server.features.utils.ml_data_pipeline import send_training_example_kafka
 
-from typing import Any, List, Dict, Optional
-import logging
-import asyncio
 logger = structlog.get_logger()
 
 class ORJSONModel(OnyxBaseModel):
@@ -61,7 +55,7 @@ class DocumentSet(ORJSONModel):
         'id', 'name', 'documents', 'metadata', 'created_at', 'updated_at', 'created_by', 'updated_by',
         'source', 'version', 'trace_id', 'is_deleted'
     )
-    id: UUID = Field(default_factory=uuid7)
+    id: UUID = Field(default_factory=uuid4)
     name: str = Field(..., min_length=2, max_length=128, description="Nombre del set de documentos")
     documents: list[str] = Field(default_factory=list, description="Lista de documentos")
     metadata: dict = Field(default_factory=dict, description="Metadatos adicionales")
@@ -73,6 +67,13 @@ class DocumentSet(ORJSONModel):
     version: int = 1
     trace_id: str | None = None
     is_deleted: bool = False
+    # Campos ampliados para compatibilidad con modelo de base de datos existente
+    description: Optional[str] = None
+    cc_pair_descriptors: List[ConnectorCredentialPairDescriptor] = Field(default_factory=list)
+    is_up_to_date: Optional[bool] = None
+    is_public: Optional[bool] = None
+    users: List[UUID] = Field(default_factory=list)
+    groups: List[int] = Field(default_factory=list)
 
     @field_validator('name')
     def name_not_empty(cls, v) -> Any:
@@ -136,10 +137,8 @@ class DocumentSet(ORJSONModel):
         return self.model_dump_json()
 
     @classmethod
-    def from_json(cls, data: str):
-        
-    """from_json function."""
-return cls.model_validate_json(data)
+    def from_json(cls, data: str) -> "DocumentSet":
+        return cls.model_validate_json(data)
 
     def to_training_example(self) -> Any:
         return {
@@ -149,10 +148,12 @@ return cls.model_validate_json(data)
         }
 
     @classmethod
-    def from_training_example(cls, example: dict):
-        
-    """from_training_example function."""
-return cls(name=example["input"], documents=example.get("output", []), metadata=example.get("metadata", {}))
+    def from_training_example(cls, example: dict) -> "DocumentSet":
+        return cls(
+            name=example.get("input", ""),
+            documents=example.get("output", []) or [],
+            metadata=example.get("metadata", {}) or {},
+        )
 
     @classmethod
     def from_model(cls, document_set_model: DocumentSetDBModel) -> "DocumentSet":
@@ -190,7 +191,4 @@ return cls(name=example["input"], documents=example.get("output", []), metadata=
     # ds = DocumentSet(name="Set 1", documents=["doc1", "doc2"])
     # ds.send_to_kafka(topic="ml_training_examples", bootstrap_servers=["localhost:9092"])
 
-    @dataclass
-class Config:
-        frozen = True
-        validate_assignment = True
+    model_config = ConfigDict(validate_assignment=True)

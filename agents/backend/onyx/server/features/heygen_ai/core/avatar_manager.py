@@ -1,174 +1,382 @@
 #!/usr/bin/env python3
 """
-Enhanced Avatar Manager for HeyGen AI
-=====================================
+Avatar Manager for HeyGen AI
+============================
 
-Production-ready avatar generation system with:
-- Real avatar generation using Stable Diffusion
-- Advanced lip-sync with Wav2Lip
-- Facial expression control
-- Avatar customization and management
-- Multi-style avatar support
-- Real-time avatar generation
+Production-ready avatar generation system using Stable Diffusion.
+Follows best practices for deep learning and diffusion models.
+
+Key Features:
+- Stable Diffusion v1.5 and XL pipeline support
+- Mixed precision training/inference
+- Proper GPU utilization
+- Error handling and logging
+- Modular architecture
 """
 
 import asyncio
 import logging
-import time
 import uuid
-from pathlib import Path
-from typing import Any, Dict, List, Optional, Union, Tuple
 from dataclasses import dataclass, field
-import traceback
+from enum import Enum
+from pathlib import Path
+from typing import Any, Dict, List, Optional, Tuple
 
 import cv2
 import numpy as np
-from PIL import Image, ImageDraw, ImageFont
 import torch
-import torch.nn.functional as F
+from PIL import Image
 
-# Avatar generation libraries
+# Third-party imports with proper error handling
 try:
-    import diffusers
-    from diffusers import StableDiffusionPipeline, StableDiffusionXLPipeline
-    from diffusers import AutoencoderKL, UNet2DConditionModel
+    from diffusers import (
+        StableDiffusionPipeline,
+        StableDiffusionXLPipeline,
+        DDIMScheduler,
+        DPMSolverMultistepScheduler,
+    )
     from diffusers.utils import load_image
     DIFFUSERS_AVAILABLE = True
 except ImportError:
-    logging.warning("Diffusers not available. Install with: pip install diffusers")
     DIFFUSERS_AVAILABLE = False
+    logging.warning(
+        "Diffusers not available. Install with: pip install diffusers"
+    )
 
-# Lip-sync libraries
-try:
-    from wav2lip import Wav2Lip
-    WAV2LIP_AVAILABLE = True
-except ImportError:
-    logging.warning("Wav2Lip not available. Install with: pip install wav2lip")
-    WAV2LIP_AVAILABLE = False
-
-# Face detection and manipulation
 try:
     import mediapipe as mp
-    import face_recognition
     FACE_LIBS_AVAILABLE = True
 except ImportError:
-    logging.warning("Face libraries not available. Install with: pip install mediapipe face-recognition")
     FACE_LIBS_AVAILABLE = False
+    logging.warning(
+        "MediaPipe not available. Install with: pip install mediapipe"
+    )
 
 logger = logging.getLogger(__name__)
 
+
 # =============================================================================
-# Data Models
+# Imports from shared module
 # =============================================================================
 
-@dataclass
-class AvatarModel:
-    """Enhanced avatar model configuration."""
+from shared import (
+    AvatarStyle,
+    AvatarQuality,
+    Resolution,
+    AvatarGenerationConfig,
+    AvatarModel,
+)
+
+
+# =============================================================================
+# Imports from modular components
+# =============================================================================
+
+from core.diffusion import DiffusionPipelineManager
+from core.face_processing import FaceProcessingService
+from core.image_processing import ImageProcessor, PromptEnhancer
+
+# =============================================================================
+# Legacy Diffusion Pipeline Manager (deprecated - use core.diffusion)
+# =============================================================================
+
+class _LegacyDiffusionPipelineManager:
+    """Manages Stable Diffusion pipelines with proper GPU utilization.
     
-    id: str
-    name: str
-    style: str
-    gender: str
-    age_range: str
-    ethnicity: str
-    model_path: str
-    image_path: Optional[str] = None
-    characteristics: Dict[str, Any] = field(default_factory=dict)
-    lip_sync_support: bool = True
-    expression_support: bool = True
-    customization_level: str = "high"  # low, medium, high
-
-@dataclass
-class AvatarGenerationConfig:
-    """Configuration for avatar generation."""
+    Features:
+    - Automatic device detection (CPU/GPU)
+    - Mixed precision support
+    - Memory-efficient attention
+    - Scheduler configuration
+    - Proper error handling
+    """
     
-    resolution: str = "1080p"  # 720p, 1080p, 4k
-    style: str = "realistic"  # realistic, cartoon, anime, artistic
-    quality: str = "high"  # low, medium, high, ultra
-    enable_lip_sync: bool = True
-    enable_expressions: bool = True
-    enable_lighting: bool = True
-    enable_shadows: bool = True
-    seed: Optional[int] = None
-    num_inference_steps: int = 50
-    guidance_scale: float = 7.5
-
-class AvatarGenerationRequest:
-    """Request model for avatar generation."""
+    def __init__(self, device: Optional[torch.device] = None):
+        """Initialize pipeline manager.
+        
+        Args:
+            device: PyTorch device. Auto-detected if None.
+        """
+        self.device = device or self._detect_device()
+        self.pipelines: Dict[str, Any] = {}
+        self.torch_dtype = self._get_torch_dtype()
+        self.logger = logging.getLogger(f"{__name__}.DiffusionPipelineManager")
+        
+    def _detect_device(self) -> torch.device:
+        """Detect and return appropriate device."""
+        if torch.cuda.is_available():
+            return torch.device("cuda")
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
+            return torch.device("mps")
+        else:
+            return torch.device("cpu")
     
-    def __init__(self, avatar_id: str, audio_path: str, duration: Optional[int] = None, 
-                 quality: str = "high", enable_lip_sync: bool = True, 
-                 enable_expressions: bool = True, custom_settings: Optional[Dict[str, Any]] = None):
-        self.avatar_id = avatar_id
-        self.audio_path = audio_path
-        self.duration = duration
-        self.quality = quality
-        self.enable_lip_sync = enable_lip_sync
-        self.enable_expressions = enable_expressions
-        self.custom_settings = custom_settings or {}
+    def _get_torch_dtype(self) -> torch.dtype:
+        """Get appropriate torch dtype based on device."""
+        if self.device.type == "cuda":
+            return torch.float16  # Use FP16 on CUDA
+        elif self.device.type == "mps":
+            return torch.float32  # MPS doesn't support FP16
+        else:
+            return torch.float32  # Use FP32 on CPU
+    
+    def load_pipeline(
+        self,
+        model_id: str,
+        pipeline_type: str = "stable-diffusion-v1-5",
+    ) -> None:
+        """Load a diffusion pipeline.
+        
+        Args:
+            model_id: HuggingFace model ID or local path
+            pipeline_type: Type of pipeline (stable-diffusion-v1-5, stable-diffusion-xl)
+        
+        Raises:
+            RuntimeError: If diffusers is not available or loading fails
+        """
+        if not DIFFUSERS_AVAILABLE:
+            raise RuntimeError(
+                "Diffusers library not available. "
+                "Install with: pip install diffusers"
+            )
+        
+        try:
+            self.logger.info(f"Loading pipeline: {model_id} on {self.device}")
+            
+            if pipeline_type == "stable-diffusion-xl":
+                pipeline = StableDiffusionXLPipeline.from_pretrained(
+                    model_id,
+                    torch_dtype=self.torch_dtype,
+                    safety_checker=None,
+                    requires_safety_checker=False,
+                )
+            else:
+                pipeline = StableDiffusionPipeline.from_pretrained(
+                    model_id,
+                    torch_dtype=self.torch_dtype,
+                    safety_checker=None,
+                    requires_safety_checker=False,
+                )
+            
+            # Move to device
+            pipeline = pipeline.to(self.device)
+            
+            # Enable memory optimizations for better GPU utilization
+            pipeline.enable_attention_slicing(slice_size="max")
+            pipeline.enable_vae_slicing()
+            
+            # Enable CPU offload for memory-constrained systems
+            if self.device.type == "cuda":
+                try:
+                    pipeline.enable_model_cpu_offload()
+                    self.logger.info("CPU offload enabled for memory efficiency")
+                except Exception as e:
+                    self.logger.warning(f"CPU offload not available: {e}")
+            
+            # Compile model for faster inference (PyTorch 2.0+)
+            if hasattr(torch, "compile") and self.device.type == "cuda":
+                try:
+                    # Use mode="reduce-overhead" for better performance
+                    pipeline.unet = torch.compile(
+                        pipeline.unet,
+                        mode="reduce-overhead",
+                        fullgraph=False,
+                    )
+                    self.logger.info("Model compiled with torch.compile")
+                except Exception as e:
+                    self.logger.warning(f"torch.compile failed: {e}")
+            
+            self.pipelines[pipeline_type] = pipeline
+            self.logger.info(f"Pipeline loaded successfully: {pipeline_type}")
+            
+        except Exception as e:
+            self.logger.error(f"Failed to load pipeline {model_id}: {e}")
+            raise RuntimeError(f"Pipeline loading failed: {e}") from e
+    
+    def get_pipeline(self, pipeline_type: str) -> Optional[Any]:
+        """Get loaded pipeline by type."""
+        return self.pipelines.get(pipeline_type)
+    
+    def generate_image(
+        self,
+        prompt: str,
+        negative_prompt: str = "",
+        config: AvatarGenerationConfig = None,
+        pipeline_type: str = "stable-diffusion-v1-5",
+    ) -> Image.Image:
+        """Generate image using diffusion pipeline.
+        
+        Args:
+            prompt: Text prompt for generation
+            negative_prompt: Negative prompt
+            config: Generation configuration
+            pipeline_type: Pipeline type to use
+        
+        Returns:
+            Generated PIL Image
+        
+        Raises:
+            RuntimeError: If pipeline not available or generation fails
+        """
+        if config is None:
+            config = AvatarGenerationConfig()
+        
+        pipeline = self.get_pipeline(pipeline_type)
+        if pipeline is None:
+            raise RuntimeError(f"Pipeline {pipeline_type} not loaded")
+        
+        try:
+            # Configure scheduler
+            scheduler = self._get_scheduler(config.scheduler)
+            if scheduler:
+                pipeline.scheduler = scheduler.from_config(
+                    pipeline.scheduler.config
+                )
+            
+            # Set up generator for reproducibility
+            generator = None
+            if config.seed is not None:
+                generator = torch.Generator(device=self.device)
+                generator.manual_seed(config.seed)
+            
+            # Generate image with proper error handling and mixed precision
+            with torch.no_grad():
+                # Use autocast for mixed precision inference on CUDA
+                if self.device.type == "cuda" and self.torch_dtype == torch.float16:
+                    with torch.cuda.amp.autocast():
+                        result = pipeline(
+                            prompt=prompt,
+                            negative_prompt=negative_prompt,
+                            num_inference_steps=config.get_inference_steps(),
+                            guidance_scale=config.guidance_scale,
+                            generator=generator,
+                            height=config.get_resolution_tuple()[1],
+                            width=config.get_resolution_tuple()[0],
+                        )
+                else:
+                    result = pipeline(
+                        prompt=prompt,
+                        negative_prompt=negative_prompt,
+                        num_inference_steps=config.get_inference_steps(),
+                        guidance_scale=config.guidance_scale,
+                        generator=generator,
+                        height=config.get_resolution_tuple()[1],
+                        width=config.get_resolution_tuple()[0],
+                    )
+            
+            return result.images[0]
+            
+        except RuntimeError as e:
+            error_str = str(e).lower()
+            if "out of memory" in error_str or "cuda" in error_str:
+                self.logger.error("GPU out of memory during generation")
+                if torch.cuda.is_available():
+                    torch.cuda.empty_cache()
+                    # Try to free up memory
+                    import gc
+                    gc.collect()
+                raise RuntimeError(
+                    "GPU memory insufficient. Try reducing resolution or quality."
+                ) from e
+            raise
+        except torch.cuda.OutOfMemoryError as e:
+            self.logger.error("CUDA out of memory error")
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+                import gc
+                gc.collect()
+            raise RuntimeError(
+                "GPU memory insufficient. Try reducing resolution or quality."
+            ) from e
+        except Exception as e:
+            self.logger.error(f"Image generation failed: {e}", exc_info=True)
+            raise RuntimeError(f"Generation failed: {e}") from e
+    
+    @staticmethod
+    def _get_scheduler(scheduler_type: str):
+        """Get scheduler class by type."""
+        if not DIFFUSERS_AVAILABLE:
+            return None
+        
+        scheduler_map = {
+            "ddim": DDIMScheduler,
+            "dpm_solver": DPMSolverMultistepScheduler,
+        }
+        return scheduler_map.get(scheduler_type.lower())
+
 
 # =============================================================================
-# Face Processing Service
+# Legacy Face Processing Service (deprecated - use core.face_processing)
 # =============================================================================
 
-class FaceProcessingService:
-    """Service for face detection and manipulation."""
+class _LegacyFaceProcessingService:
+    """Service for face detection and enhancement using MediaPipe.
+    
+    Features:
+    - Face detection
+    - Face mesh for detailed landmarks
+    - Face enhancement
+    """
     
     def __init__(self):
+        """Initialize face processing service."""
         self.face_detection = None
         self.face_mesh = None
-        self.mp_drawing = None
-        self._initialize_face_detection()
+        self.logger = logging.getLogger(f"{__name__}.FaceProcessingService")
+        self._initialize()
     
-    def _initialize_face_detection(self):
-        """Initialize face detection and manipulation components."""
+    def _initialize(self) -> None:
+        """Initialize MediaPipe components."""
+        if not FACE_LIBS_AVAILABLE:
+            self.logger.warning("MediaPipe not available")
+            return
+        
         try:
-            if not FACE_LIBS_AVAILABLE:
-                logger.warning("Face libraries not available")
-                return
-            
-            # Initialize MediaPipe
             self.mp_face_detection = mp.solutions.face_detection
             self.mp_face_mesh = mp.solutions.face_mesh
-            self.mp_drawing = mp.solutions.drawing_utils
             
-            # Initialize face detection
             self.face_detection = self.mp_face_detection.FaceDetection(
-                model_selection=1, min_detection_confidence=0.5
+                model_selection=1,
+                min_detection_confidence=0.5,
             )
             
-            # Initialize face mesh
             self.face_mesh = self.mp_face_mesh.FaceMesh(
                 static_image_mode=False,
                 max_num_faces=1,
                 refine_landmarks=True,
                 min_detection_confidence=0.5,
-                min_tracking_confidence=0.5
+                min_tracking_confidence=0.5,
             )
             
-            logger.info("Face detection components initialized")
+            self.logger.info("Face processing service initialized")
             
         except Exception as e:
-            logger.error(f"Failed to initialize face detection: {e}")
+            self.logger.error(f"Failed to initialize face processing: {e}")
             raise
     
-    def enhance_face(self, img_array: np.ndarray) -> np.ndarray:
-        """Enhance facial features in the image."""
+    def enhance_face(self, image: np.ndarray) -> np.ndarray:
+        """Enhance facial features in image.
+        
+        Args:
+            image: Input image as numpy array (RGB)
+        
+        Returns:
+            Enhanced image
+        """
+        if not self.face_detection:
+            return image
+        
         try:
-            if not self.face_detection:
-                return img_array
-            
-            # Convert BGR to RGB
-            rgb_image = cv2.cvtColor(img_array, cv2.COLOR_RGB2BGR)
+            # Convert RGB to BGR for MediaPipe
+            rgb_image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
             
             # Detect faces
             results = self.face_detection.process(rgb_image)
             
             if results.detections:
                 for detection in results.detections:
-                    # Get face bounding box
                     bbox = detection.location_data.relative_bounding_box
-                    h, w, _ = img_array.shape
+                    h, w, _ = image.shape
                     
                     x = int(bbox.xmin * w)
                     y = int(bbox.ymin * h)
@@ -176,21 +384,22 @@ class FaceProcessingService:
                     height = int(bbox.height * h)
                     
                     # Enhance face region
-                    face_region = img_array[y:y+height, x:x+width]
+                    face_region = image[y:y+height, x:x+width]
                     enhanced_face = self._enhance_face_region(face_region)
-                    img_array[y:y+height, x:x+width] = enhanced_face
+                    image[y:y+height, x:x+width] = enhanced_face
             
-            return img_array
+            return image
             
         except Exception as e:
-            logger.warning(f"Face enhancement failed: {e}")
-            return img_array
+            self.logger.warning(f"Face enhancement failed: {e}")
+            return image
     
-    def _enhance_face_region(self, face_region: np.ndarray) -> np.ndarray:
+    @staticmethod
+    def _enhance_face_region(face_region: np.ndarray) -> np.ndarray:
         """Enhance a specific face region."""
         try:
             # Apply subtle sharpening
-            kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
+            kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
             enhanced = cv2.filter2D(face_region, -1, kernel)
             
             # Apply subtle color enhancement
@@ -199,474 +408,222 @@ class FaceProcessingService:
             return enhanced
             
         except Exception as e:
-            logger.warning(f"Face region enhancement failed: {e}")
+            logging.warning(f"Face region enhancement failed: {e}")
             return face_region
 
-# =============================================================================
-# Diffusion Pipeline Service
-# =============================================================================
-
-class DiffusionPipelineService:
-    """Service for managing Stable Diffusion pipelines."""
-    
-    def __init__(self):
-        self.pipelines = {}
-        self._initialize_pipelines()
-    
-    def _initialize_pipelines(self):
-        """Initialize Stable Diffusion pipelines."""
-        try:
-            if not DIFFUSERS_AVAILABLE:
-                logger.warning("Diffusers not available")
-                return
-            
-            # Initialize Stable Diffusion v1.5
-            self.pipelines["stable-diffusion-v1.5"] = StableDiffusionPipeline.from_pretrained(
-                "runwayml/stable-diffusion-v1-5",
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-                safety_checker=None,
-                requires_safety_checker=False
-            )
-            
-            # Initialize Stable Diffusion XL
-            self.pipelines["stable-diffusion-xl"] = StableDiffusionXLPipeline.from_pretrained(
-                "stabilityai/stable-diffusion-xl-base-1.0",
-                torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-                safety_checker=None,
-                requires_safety_checker=False
-            )
-            
-            # Move to GPU if available
-            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            for pipeline in self.pipelines.values():
-                pipeline = pipeline.to(device)
-                pipeline.enable_attention_slicing()
-                pipeline.enable_vae_slicing()
-            
-            logger.info("Diffusion pipelines initialized")
-            
-        except Exception as e:
-            logger.error(f"Failed to initialize diffusion pipelines: {e}")
-            raise
-    
-    def get_pipeline(self, style: str) -> Any:
-        """Get appropriate pipeline for avatar style."""
-        if style == "anime":
-            return self.pipelines.get("stable-diffusion-v1.5")
-        elif style == "ultra-realistic":
-            return self.pipelines.get("stable-diffusion-xl")
-        else:
-            return self.pipelines.get("stable-diffusion-v1.5")
-    
-    def is_available(self) -> bool:
-        """Check if pipelines are available."""
-        return len(self.pipelines) > 0
 
 # =============================================================================
-# Lip-sync Service
+# Legacy Image Processor (deprecated - use core.image_processing)
 # =============================================================================
 
-class LipSyncService:
-    """Service for lip-sync functionality."""
-    
-    def __init__(self):
-        self.lip_sync_model = None
-        self._initialize_lip_sync()
-    
-    def _initialize_lip_sync(self):
-        """Initialize lip-sync model."""
-        try:
-            if not WAV2LIP_AVAILABLE:
-                logger.warning("Wav2Lip not available")
-                return
-            
-            # Initialize Wav2Lip model
-            self.lip_sync_model = Wav2Lip()
-            logger.info("Lip-sync model initialized")
-            
-        except Exception as e:
-            logger.error(f"Failed to initialize lip-sync model: {e}")
-            raise
-    
-    def is_available(self) -> bool:
-        """Check if lip-sync is available."""
-        return self.lip_sync_model is not None
-
-# =============================================================================
-# Avatar Model Repository
-# =============================================================================
-
-class AvatarModelRepository:
-    """Repository for managing avatar models."""
-    
-    def __init__(self):
-        self.models = {}
-        self._load_avatar_models()
-    
-    def _load_avatar_models(self):
-        """Load predefined avatar models."""
-        self.models = {
-            "avatar_001": AvatarModel(
-                id="avatar_001",
-                name="Professional Male",
-                style="realistic",
-                gender="male",
-                age_range="25-35",
-                ethnicity="caucasian",
-                model_path="stable-diffusion-v1.5",
-                characteristics={
-                    "hair_color": "brown",
-                    "eye_color": "blue",
-                    "build": "athletic",
-                    "profession": "business"
-                }
-            ),
-            "avatar_002": AvatarModel(
-                id="avatar_002",
-                name="Professional Female",
-                style="realistic",
-                gender="female",
-                age_range="25-35",
-                ethnicity="asian",
-                model_path="stable-diffusion-v1.5",
-                characteristics={
-                    "hair_color": "black",
-                    "eye_color": "brown",
-                    "build": "slim",
-                    "profession": "executive"
-                }
-            ),
-            "avatar_003": AvatarModel(
-                id="avatar_003",
-                name="Anime Character",
-                style="anime",
-                gender="female",
-                age_range="18-25",
-                ethnicity="mixed",
-                model_path="stable-diffusion-v1.5",
-                characteristics={
-                    "hair_color": "pink",
-                    "eye_color": "blue",
-                    "build": "petite",
-                    "style": "kawaii"
-                }
-            )
-        }
-        logger.info(f"Loaded {len(self.models)} avatar models")
-    
-    def get_model(self, avatar_id: str) -> Optional[AvatarModel]:
-        """Get avatar model by ID."""
-        return self.models.get(avatar_id)
-    
-    def get_all_models(self) -> List[AvatarModel]:
-        """Get all avatar models."""
-        return list(self.models.values())
-    
-    def add_model(self, model: AvatarModel):
-        """Add a new avatar model."""
-        self.models[model.id] = model
-        logger.info(f"Added avatar model: {model.id}")
-
-# =============================================================================
-# Image Processing Service
-# =============================================================================
-
-class ImageProcessingService:
-    """Service for image processing and enhancement."""
+class _LegacyImageProcessor:
+    """Utility class for image processing operations."""
     
     @staticmethod
-    def enhance_prompt(prompt: str, style: str) -> str:
-        """Enhance prompt based on style and quality."""
+    def enhance_prompt(prompt: str, style: AvatarStyle) -> str:
+        """Enhance prompt based on style.
+        
+        Args:
+            prompt: Base prompt
+            style: Avatar style
+        
+        Returns:
+            Enhanced prompt
+        """
         style_enhancements = {
-            "realistic": "professional headshot, high quality, detailed, 8k, photorealistic",
-            "cartoon": "cartoon style, vibrant colors, clean lines, professional",
-            "anime": "anime style, detailed, professional, high quality",
-            "artistic": "artistic portrait, creative, high quality, detailed"
+            AvatarStyle.REALISTIC: (
+                "professional headshot, high quality, detailed, "
+                "8k, photorealistic, sharp focus"
+            ),
+            AvatarStyle.CARTOON: (
+                "cartoon style, vibrant colors, clean lines, "
+                "professional illustration"
+            ),
+            AvatarStyle.ANIME: (
+                "anime style, detailed, professional, high quality, "
+                "manga art style"
+            ),
+            AvatarStyle.ARTISTIC: (
+                "artistic portrait, creative, high quality, "
+                "detailed, unique style"
+            ),
         }
         
-        enhancement = style_enhancements.get(style, style_enhancements["realistic"])
+        enhancement = style_enhancements.get(style, style_enhancements[AvatarStyle.REALISTIC])
         return f"{prompt}, {enhancement}"
     
     @staticmethod
-    def post_process_avatar(image: Image.Image, config: AvatarGenerationConfig, 
-                           face_service: FaceProcessingService) -> Image.Image:
-        """Post-process generated avatar image."""
+    def post_process_image(
+        image: Image.Image,
+        config: AvatarGenerationConfig,
+        face_service: Optional[FaceProcessingService] = None,
+    ) -> Image.Image:
+        """Post-process generated image.
+        
+        Args:
+            image: Generated PIL Image
+            config: Generation configuration
+            face_service: Optional face processing service
+        
+        Returns:
+            Post-processed image
+        """
         try:
             # Convert to numpy array
             img_array = np.array(image)
             
-            # Face detection and enhancement
-            if FACE_LIBS_AVAILABLE:
+            # Face enhancement if available
+            if face_service and config.enable_expressions:
                 img_array = face_service.enhance_face(img_array)
             
-            # Apply quality enhancements
-            if config.quality in ["high", "ultra"]:
-                img_array = ImageProcessingService._apply_quality_enhancements(img_array)
+            # Quality enhancements
+            if config.quality in [AvatarQuality.HIGH, AvatarQuality.ULTRA]:
+                img_array = ImageProcessor._apply_quality_enhancements(img_array)
             
             # Convert back to PIL Image
             return Image.fromarray(img_array)
             
         except Exception as e:
-            logger.warning(f"Post-processing failed: {e}")
+            logging.warning(f"Post-processing failed: {e}")
             return image
     
     @staticmethod
     def _apply_quality_enhancements(img_array: np.ndarray) -> np.ndarray:
-        """Apply quality enhancements to the image."""
+        """Apply quality enhancements to image."""
         try:
-            # Apply subtle noise reduction
-            enhanced = cv2.fastNlMeansDenoisingColored(img_array, None, 10, 10, 7, 21)
+            # Apply noise reduction
+            enhanced = cv2.fastNlMeansDenoisingColored(
+                img_array, None, 10, 10, 7, 21
+            )
             
             # Apply subtle sharpening
-            kernel = np.array([[-1,-1,-1], [-1,9,-1], [-1,-1,-1]])
+            kernel = np.array([[-1, -1, -1], [-1, 9, -1], [-1, -1, -1]])
             enhanced = cv2.filter2D(enhanced, -1, kernel)
             
             return enhanced
             
         except Exception as e:
-            logger.warning(f"Quality enhancement failed: {e}")
+            logging.warning(f"Quality enhancement failed: {e}")
             return img_array
 
-# =============================================================================
-# Video Generation Service
-# =============================================================================
-
-class VideoGenerationService:
-    """Service for generating avatar videos."""
-    
-    @staticmethod
-    async def generate_lip_sync_video(avatar_image: np.ndarray, audio_path: str, 
-                                     config: AvatarGenerationConfig) -> str:
-        """Generate lip-sync video using Wav2Lip."""
-        try:
-            # This is a simplified implementation
-            # In production, you would use the actual Wav2Lip model
-            
-            # For now, create a simple video with the avatar
-            output_path = f"./generated_videos/avatar_video_{uuid.uuid4().hex[:8]}.mp4"
-            Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-            
-            # Create video writer
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            fps = 30
-            height, width = avatar_image.shape[:2]
-            
-            # Get audio duration (simplified)
-            audio_duration = 5.0  # Default duration
-            
-            out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-            
-            # Generate frames
-            num_frames = int(audio_duration * fps)
-            for i in range(num_frames):
-                # Apply subtle animation (simplified lip-sync simulation)
-                frame = avatar_image.copy()
-                
-                # Simulate lip movement
-                if i % 10 < 5:  # Simple lip animation
-                    # Apply subtle mouth region modification
-                    pass
-                
-                out.write(frame)
-            
-            out.release()
-            
-            return output_path
-            
-        except Exception as e:
-            logger.error(f"Lip-sync video generation failed: {e}")
-            raise
-    
-    @staticmethod
-    async def generate_static_video(avatar_image: np.ndarray, audio_path: str, 
-                                   config: AvatarGenerationConfig) -> str:
-        """Generate static video without lip-sync."""
-        try:
-            output_path = f"./generated_videos/avatar_static_{uuid.uuid4().hex[:8]}.mp4"
-            Path(output_path).parent.mkdir(parents=True, exist_ok=True)
-            
-            # Create video writer
-            fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-            fps = 30
-            height, width = avatar_image.shape[:2]
-            
-            # Get audio duration (simplified)
-            audio_duration = 5.0  # Default duration
-            
-            out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-            
-            # Generate static frames
-            num_frames = int(audio_duration * fps)
-            for _ in range(num_frames):
-                out.write(avatar_image)
-            
-            out.release()
-            
-            return output_path
-            
-        except Exception as e:
-            logger.error(f"Static video generation failed: {e}")
-            raise
 
 # =============================================================================
-# Enhanced Avatar Manager
+# Avatar Manager
 # =============================================================================
 
 class AvatarManager:
-    """
-    Enhanced avatar management system with real generation capabilities.
+    """Main avatar management system.
     
     Features:
-    - Real avatar generation using Stable Diffusion
-    - Advanced lip-sync with Wav2Lip
-    - Facial expression control
-    - Multi-style avatar support
-    - Avatar customization and management
+    - Avatar generation using Stable Diffusion
+    - Face processing and enhancement
+    - Image post-processing
+    - Proper error handling and logging
+    - GPU utilization and mixed precision
     """
     
-    def __init__(self):
-        """Initialize the enhanced avatar manager."""
-        self.initialized = False
-        
-        # Initialize services
-        self.face_service = FaceProcessingService()
-        self.diffusion_service = DiffusionPipelineService()
-        self.lip_sync_service = LipSyncService()
-        self.model_repository = AvatarModelRepository()
-        self.image_service = ImageProcessingService()
-        self.video_service = VideoGenerationService()
-        
-        # Initialize components
-        self._initialize_components()
-    
-    def _initialize_components(self):
-        """Initialize all avatar generation components."""
-        try:
-            # Check if core services are available
-            if not self.diffusion_service.is_available():
-                logger.warning("Diffusion pipelines not available")
-            
-            if not self.lip_sync_service.is_available():
-                logger.warning("Lip-sync not available")
-            
-            self.initialized = True
-            logger.info("Avatar Manager initialized successfully")
-            
-        except Exception as e:
-            logger.error(f"Failed to initialize Avatar Manager: {e}")
-            raise
-    
-    async def generate_avatar(self, prompt: str, config: AvatarGenerationConfig) -> str:
-        """
-        Generate a new avatar using Stable Diffusion.
+    def __init__(
+        self,
+        device: Optional[torch.device] = None,
+        model_id: str = "runwayml/stable-diffusion-v1-5",
+    ):
+        """Initialize avatar manager.
         
         Args:
-            prompt: Text description of the avatar
-            config: Generation configuration
-            
-        Returns:
-            Path to the generated avatar image
+            device: PyTorch device (auto-detected if None)
+            model_id: HuggingFace model ID for Stable Diffusion
         """
+        self.logger = logging.getLogger(f"{__name__}.AvatarManager")
+        self.device = device
+        
+        # Initialize services from modular components
+        self.pipeline_manager = DiffusionPipelineManager(device=device)
+        self.face_service = FaceProcessingService()
+        self.image_processor = ImageProcessor()
+        self.prompt_enhancer = PromptEnhancer()
+        
+        # Load default pipeline
         try:
-            if not self.initialized:
-                raise RuntimeError("Avatar Manager not initialized")
+            self.pipeline_manager.load_pipeline(model_id)
+        except Exception as e:
+            self.logger.error(f"Failed to initialize pipeline: {e}")
+            raise
+        
+        self.logger.info("Avatar Manager initialized successfully")
+    
+    async def generate_avatar(
+        self,
+        prompt: str,
+        config: Optional[AvatarGenerationConfig] = None,
+    ) -> str:
+        """Generate avatar image.
+        
+        Args:
+            prompt: Text description of avatar
+            config: Generation configuration
+        
+        Returns:
+            Path to generated avatar image
+        
+        Raises:
+            RuntimeError: If generation fails
+        """
+        if config is None:
+            config = AvatarGenerationConfig()
+        
+        try:
+            self.logger.info(f"Generating avatar with prompt: {prompt}")
             
-            logger.info(f"Generating avatar with prompt: {prompt}")
+            # Enhance prompt using prompt enhancer
+            enhanced_prompt = self.prompt_enhancer.enhance_prompt(
+                prompt, config.style
+            )
             
             # Select pipeline based on style
-            pipeline = self.diffusion_service.get_pipeline(config.style)
-            if not pipeline:
-                raise RuntimeError(f"No pipeline available for style: {config.style}")
-            
-            # Enhance prompt based on style
-            enhanced_prompt = self.image_service.enhance_prompt(prompt, config.style)
+            pipeline_type = (
+                "stable-diffusion-xl"
+                if config.style == AvatarStyle.REALISTIC
+                else "stable-diffusion-v1-5"
+            )
             
             # Generate image
-            with torch.no_grad():
-                image = pipeline(
-                    prompt=enhanced_prompt,
-                    num_inference_steps=config.num_inference_steps,
-                    guidance_scale=config.guidance_scale,
-                    generator=torch.Generator(device=pipeline.device).manual_seed(config.seed) if config.seed else None
-                ).images[0]
+            image = self.pipeline_manager.generate_image(
+                prompt=enhanced_prompt,
+                negative_prompt="blurry, low quality, distorted",
+                config=config,
+                pipeline_type=pipeline_type,
+            )
             
             # Post-process image
-            processed_image = self.image_service.post_process_avatar(image, config, self.face_service)
+            processed_image = self.image_processor.post_process_image(
+                image, config, self.face_service
+            )
             
             # Save image
-            output_path = f"./generated_avatars/avatar_{uuid.uuid4().hex[:8]}.png"
-            Path(output_path).parent.mkdir(parents=True, exist_ok=True)
+            output_dir = Path("./generated_avatars")
+            output_dir.mkdir(parents=True, exist_ok=True)
+            
+            output_path = output_dir / f"avatar_{uuid.uuid4().hex[:8]}.png"
             processed_image.save(output_path)
             
-            logger.info(f"Avatar generated successfully: {output_path}")
-            return output_path
+            self.logger.info(f"Avatar generated: {output_path}")
+            return str(output_path)
             
         except Exception as e:
-            logger.error(f"Avatar generation failed: {e}")
-            raise
-    
-    async def generate_avatar_video(self, avatar_path: str, audio_path: str, 
-                                   config: AvatarGenerationConfig) -> str:
-        """
-        Generate avatar video with lip-sync.
-        
-        Args:
-            avatar_path: Path to avatar image
-            audio_path: Path to audio file
-            config: Generation configuration
-            
-        Returns:
-            Path to the generated video
-        """
-        try:
-            if not self.initialized:
-                raise RuntimeError("Avatar Manager not initialized")
-            
-            logger.info(f"Generating avatar video: {avatar_path} + {audio_path}")
-            
-            # Load avatar image
-            avatar_image = cv2.imread(avatar_path)
-            if avatar_image is None:
-                raise ValueError(f"Could not load avatar image: {avatar_path}")
-            
-            # Generate lip-sync video
-            if config.enable_lip_sync and self.lip_sync_service.is_available():
-                video_path = await self.video_service.generate_lip_sync_video(avatar_image, audio_path, config)
-            else:
-                video_path = await self.video_service.generate_static_video(avatar_image, audio_path, config)
-            
-            logger.info(f"Avatar video generated successfully: {video_path}")
-            return video_path
-            
-        except Exception as e:
-            logger.error(f"Avatar video generation failed: {e}")
-            raise
-    
-    def get_available_avatars(self) -> List[Dict[str, Any]]:
-        """Get list of available avatar models."""
-        return [
-            {
-                "id": model.id,
-                "name": model.name,
-                "style": model.style,
-                "gender": model.gender,
-                "age_range": model.age_range,
-                "ethnicity": model.ethnicity,
-                "characteristics": model.characteristics
-            }
-            for model in self.model_repository.get_all_models()
-        ]
+            self.logger.error(f"Avatar generation failed: {e}")
+            raise RuntimeError(f"Generation failed: {e}") from e
     
     def health_check(self) -> Dict[str, Any]:
-        """Health check for the avatar manager."""
+        """Perform health check.
+        
+        Returns:
+            Health status dictionary
+        """
         return {
-            "status": "healthy" if self.initialized else "unhealthy",
-            "initialized": self.initialized,
-            "diffusers_available": DIFFUSERS_AVAILABLE,
-            "wav2lip_available": WAV2LIP_AVAILABLE,
-            "face_libs_available": FACE_LIBS_AVAILABLE,
-            "avatar_models_count": len(self.model_repository.get_all_models()),
-            "pipelines_count": len(self.diffusion_service.pipelines),
+            "status": "healthy",
+            "device": str(self.pipeline_manager.device),
+            "pipelines_loaded": len(self.pipeline_manager.pipelines),
             "face_service_available": self.face_service.face_detection is not None,
-            "lip_sync_available": self.lip_sync_service.is_available()
-        } 
+            "diffusers_available": DIFFUSERS_AVAILABLE,
+            "face_libs_available": FACE_LIBS_AVAILABLE,
+        }

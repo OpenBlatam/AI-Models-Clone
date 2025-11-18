@@ -1,0 +1,247 @@
+# TruthGPT Alerting Rules
+# Prometheus alerting rules for TruthGPT monitoring
+
+groups:
+  - name: truthgpt.rules
+    rules:
+      # High Error Rate Alert
+      - alert: TruthGPTHighErrorRate
+        expr: rate(truthgpt_requests_total{status=~"5.."}[5m]) / rate(truthgpt_requests_total[5m]) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT high error rate detected"
+          description: "TruthGPT error rate is {{ $value | humanizePercentage }} for the last 5 minutes"
+          runbook_url: "https://docs.truthgpt.com/runbooks/high-error-rate"
+
+      # High Response Time Alert
+      - alert: TruthGPTHighResponseTime
+        expr: histogram_quantile(0.95, rate(truthgpt_request_duration_seconds_bucket[5m])) > 1.0
+        for: 3m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT high response time detected"
+          description: "TruthGPT 95th percentile response time is {{ $value }}s"
+          runbook_url: "https://docs.truthgpt.com/runbooks/high-response-time"
+
+      # Low Throughput Alert
+      - alert: TruthGPTLowThroughput
+        expr: rate(truthgpt_inferences_total[5m]) < 1
+        for: 5m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT low throughput detected"
+          description: "TruthGPT throughput is {{ $value }} inferences/sec"
+          runbook_url: "https://docs.truthgpt.com/runbooks/low-throughput"
+
+      # GPU High Utilization Alert
+      - alert: TruthGPTGPUHighUtilization
+        expr: truthgpt_gpu_utilization > 90
+        for: 2m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT GPU high utilization"
+          description: "GPU {{ $labels.gpu_id }} utilization is {{ $value }}%"
+          runbook_url: "https://docs.truthgpt.com/runbooks/gpu-high-utilization"
+
+      # GPU Memory High Usage Alert
+      - alert: TruthGPTGPUMemoryHighUsage
+        expr: truthgpt_gpu_memory_usage_bytes / 1024^3 > 20
+        for: 2m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT GPU memory high usage"
+          description: "GPU {{ $labels.gpu_id }} memory usage is {{ $value }}GB"
+          runbook_url: "https://docs.truthgpt.com/runbooks/gpu-memory-high-usage"
+
+      # Expert High Utilization Alert
+      - alert: TruthGPTExpertHighUtilization
+        expr: truthgpt_expert_utilization > 95
+        for: 2m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT expert high utilization"
+          description: "Expert {{ $labels.expert_id }} utilization is {{ $value }}%"
+          runbook_url: "https://docs.truthgpt.com/runbooks/expert-high-utilization"
+
+      # Low Cache Hit Ratio Alert
+      - alert: TruthGPTLowCacheHitRatio
+        expr: rate(truthgpt_cache_hits_total[5m]) / (rate(truthgpt_cache_hits_total[5m]) + rate(truthgpt_cache_misses_total[5m])) < 0.7
+        for: 5m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT low cache hit ratio"
+          description: "Cache hit ratio is {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.truthgpt.com/runbooks/low-cache-hit-ratio"
+
+      # High Memory Usage Alert
+      - alert: TruthGPTHighMemoryUsage
+        expr: truthgpt_memory_usage_bytes / 1024^3 > 12
+        for: 2m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT high memory usage"
+          description: "Memory usage is {{ $value }}GB"
+          runbook_url: "https://docs.truthgpt.com/runbooks/high-memory-usage"
+
+      # Low Routing Accuracy Alert
+      - alert: TruthGPTLowRoutingAccuracy
+        expr: truthgpt_routing_accuracy < 80
+        for: 5m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT low routing accuracy"
+          description: "Routing accuracy is {{ $value }}%"
+          runbook_url: "https://docs.truthgpt.com/runbooks/low-routing-accuracy"
+
+      # Service Down Alert
+      - alert: TruthGPTServiceDown
+        expr: up{job="truthgpt"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT service is down"
+          description: "TruthGPT service has been down for more than 1 minute"
+          runbook_url: "https://docs.truthgpt.com/runbooks/service-down"
+
+      # Pod CrashLoopBackOff Alert
+      - alert: TruthGPTPodCrashLoopBackOff
+        expr: kube_pod_status_phase{phase="Running"} == 0 and kube_pod_status_phase{phase="Pending"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT pod in CrashLoopBackOff"
+          description: "Pod {{ $labels.pod }} is in CrashLoopBackOff state"
+          runbook_url: "https://docs.truthgpt.com/runbooks/pod-crashloopbackoff"
+
+      # High CPU Usage Alert
+      - alert: TruthGPTHighCPUUsage
+        expr: truthgpt_cpu_utilization > 80
+        for: 3m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT high CPU usage"
+          description: "CPU usage is {{ $value }}%"
+          runbook_url: "https://docs.truthgpt.com/runbooks/high-cpu-usage"
+
+      # Database Connection Alert
+      - alert: TruthGPTDatabaseConnection
+        expr: truthgpt_database_connections_active / truthgpt_database_connections_max > 0.9
+        for: 2m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT database connection pool high usage"
+          description: "Database connection pool usage is {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.truthgpt.com/runbooks/database-connection-pool"
+
+      # Cache Size Alert
+      - alert: TruthGPTCacheSizeHigh
+        expr: truthgpt_cache_size_bytes / 1024^3 > 5
+        for: 2m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT cache size is high"
+          description: "Cache {{ $labels.cache_level }} size is {{ $value }}GB"
+          runbook_url: "https://docs.truthgpt.com/runbooks/cache-size-high"
+
+      # Model Loading Time Alert
+      - alert: TruthGPTModelLoadingTimeHigh
+        expr: truthgpt_model_loading_duration_seconds > 30
+        for: 1m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT model loading time is high"
+          description: "Model {{ $labels.model_name }} loading time is {{ $value }}s"
+          runbook_url: "https://docs.truthgpt.com/runbooks/model-loading-time-high"
+
+      # Inference Latency Alert
+      - alert: TruthGPTInferenceLatencyHigh
+        expr: histogram_quantile(0.99, rate(truthgpt_inference_duration_seconds_bucket[5m])) > 2.0
+        for: 3m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT inference latency is high"
+          description: "99th percentile inference latency is {{ $value }}s"
+          runbook_url: "https://docs.truthgpt.com/runbooks/inference-latency-high"
+
+      # Token Processing Rate Alert
+      - alert: TruthGPTTokenProcessingRateLow
+        expr: rate(truthgpt_tokens_total[5m]) < 100
+        for: 5m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT token processing rate is low"
+          description: "Token processing rate is {{ $value }} tokens/sec"
+          runbook_url: "https://docs.truthgpt.com/runbooks/token-processing-rate-low"
+
+      # Batch Size Alert
+      - alert: TruthGPTBatchSizeLow
+        expr: truthgpt_batch_size < 2
+        for: 5m
+        labels:
+          severity: info
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT batch size is low"
+          description: "Average batch size is {{ $value }}"
+          runbook_url: "https://docs.truthgpt.com/runbooks/batch-size-low"
+
+      # Disk Space Alert
+      - alert: TruthGPTDiskSpaceLow
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.1
+        for: 2m
+        labels:
+          severity: critical
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT disk space is low"
+          description: "Disk space usage is {{ $value | humanizePercentage }}"
+          runbook_url: "https://docs.truthgpt.com/runbooks/disk-space-low"
+
+      # Network Latency Alert
+      - alert: TruthGPTNetworkLatencyHigh
+        expr: histogram_quantile(0.95, rate(truthgpt_network_latency_seconds_bucket[5m])) > 0.1
+        for: 3m
+        labels:
+          severity: warning
+          service: truthgpt
+        annotations:
+          summary: "TruthGPT network latency is high"
+          description: "95th percentile network latency is {{ $value }}s"
+          runbook_url: "https://docs.truthgpt.com/runbooks/network-latency-high"
+
+

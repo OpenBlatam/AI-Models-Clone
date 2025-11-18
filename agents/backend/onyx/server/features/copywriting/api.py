@@ -7,19 +7,19 @@ MAX_RETRIES = 100
 TIMEOUT_SECONDS = 60
 
 from fastapi import APIRouter, HTTPException, Query, Depends, Body, status, Request, Security
-from .models import CopywritingInput, CopywritingOutput, Feedback, SectionFeedback, CopyVariantHistory, get_settings
-from .service import CopywritingService
-from .tasks import generate_copywriting_task
+from models import CopywritingInput, CopywritingOutput, Feedback, SectionFeedback, CopyVariantHistory, get_settings
+from service import CopywritingService
+from tasks import generate_copywriting_task
 from typing import List, Optional
 from celery.result import AsyncResult
 import logging
 import os
 
 # Import the new v11 optimized engine and API components
-from .ultra_optimized_engine_v11 import UltraOptimizedEngineV11, get_engine, cleanup_engine
-from .optimized_api_v11 import APIConfig, PerformanceTracker
+from ultra_optimized_engine_v11 import UltraOptimizedEngineV11, get_engine, cleanup_engine
+from optimized_api_v11 import APIConfig, PerformanceTracker
 
-    from prometheus_fastapi_instrumentator import Instrumentator
+from prometheus_fastapi_instrumentator import Instrumentator
 from fastapi.security.api_key import APIKeyHeader
 from sqlalchemy import create_engine, Column, Integer, String, Float, Text, DateTime
 from sqlalchemy.ext.declarative import declarative_base
@@ -30,9 +30,9 @@ from sqlalchemy.orm import Session
 from fastapi import Depends
 from fastapi_limiter.depends import RateLimiter
 from fastapi_cache2.decorator import cache
-        import sys
-            from fastapi import FastAPI
-        from fastapi.responses import PlainTextResponse
+import sys
+from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
 from fastapi_filter import FilterDepends, with_prefix
 from fastapi_filter.contrib.sqlalchemy import Filter
 from typing import Any, List, Dict, Optional
@@ -147,9 +147,8 @@ if PROMETHEUS_AVAILABLE and instrumentator:
 
 @router.get("/metrics", include_in_schema=False)
 def metrics():
-    
     """metrics function."""
-if PROMETHEUS_AVAILABLE and instrumentator:
+    if PROMETHEUS_AVAILABLE and instrumentator:
         return instrumentator.registry.generate_latest(), 200, {"Content-Type": "text/plain; version=0.0.4; charset=utf-8"}
     else:
         return {"error": "Prometheus metrics not available. Install prometheus_fastapi_instrumentator."}

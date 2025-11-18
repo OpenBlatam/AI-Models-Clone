@@ -30,6 +30,7 @@ import structlog
 from ..utils.error_system import (
 from .notifications.api import router as notifications_router
 from .integrated.api import router as integrated_router
+from .professional_documents.api import router as professional_documents_router
 from typing import Any, List, Dict, Optional
 """
 FastAPI Application Factory - Onyx Integration
@@ -455,7 +456,8 @@ app = create_production_app(
     version="1.0.0",
     routers=[
         {"router": notifications_router, "prefix": "/api/v1/notifications", "tags": ["notifications"]},
-        {"router": integrated_router, "prefix": "/api/v1/integrated", "tags": ["integrated"]}
+        {"router": integrated_router, "prefix": "/api/v1/integrated", "tags": ["integrated"]},
+        {"router": professional_documents_router, "prefix": "/api/v1", "tags": ["professional-documents"]}
     ]
 )
 

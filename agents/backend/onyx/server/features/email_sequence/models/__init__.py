@@ -1,27 +1,57 @@
-from typing_extensions import Literal, TypedDict
-from typing import Any, List, Dict, Optional, Union, Tuple
-from .sequence import EmailSequence, SequenceStep, SequenceTrigger
-from .template import EmailTemplate, TemplateVariable
-from .campaign import EmailCampaign, CampaignMetrics
-from .subscriber import Subscriber, SubscriberSegment
-from typing import Any, List, Dict, Optional
-import logging
-import asyncio
 """
-Email Sequence Models
+Models module for Email Sequence System
 
-This module contains all the data models for the email sequence system.
+This module contains the data models for sequences, templates, subscribers,
+and campaigns using Pydantic v2.
 """
 
+from .sequence import (
+    EmailSequence,
+    SequenceStep,
+    SequenceTrigger,
+    TriggerType,
+    StepType,
+    SequenceStatus
+)
+from .template import (
+    EmailTemplate,
+    TemplateVariable,
+    TemplateStatus,
+    VariableType
+)
+from .subscriber import (
+    Subscriber,
+    SubscriberSegment,
+    SubscriberStatus
+)
+from .campaign import (
+    EmailCampaign,
+    CampaignMetrics,
+    CampaignStatus
+)
 
 __all__ = [
+    # Sequence models
     "EmailSequence",
-    "SequenceStep", 
+    "SequenceStep",
     "SequenceTrigger",
+    "TriggerType",
+    "StepType",
+    "SequenceStatus",
+    
+    # Template models
     "EmailTemplate",
     "TemplateVariable",
+    "TemplateStatus",
+    "VariableType",
+    
+    # Subscriber models
+    "Subscriber",
+    "SubscriberSegment",
+    "SubscriberStatus",
+    
+    # Campaign models
     "EmailCampaign",
     "CampaignMetrics",
-    "Subscriber",
-    "SubscriberSegment"
-] 
+    "CampaignStatus"
+]

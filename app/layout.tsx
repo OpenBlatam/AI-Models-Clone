@@ -1,41 +1,93 @@
-import "@/styles/globals.css";
-import type { Metadata } from "next";
-import { fontGeist, fontHeading, fontSans, fontUrban } from "@/assets/fonts";
-import { cn, constructMetadata } from "@/lib/utils";
-import { Toaster } from "@/components/ui/sonner";
-import { Analytics } from "@/components/analytics";
-import ModalProvider from "@/components/modals/providers";
-import { TailwindIndicator } from "@/components/tailwind-indicator";
-import { ChatLayout } from "@/components/chat-layout";
-import { AuthProvider } from "@/components/auth-provider";
-import { ThemeProvider } from "next-themes";
-import { MetaMaskProvider } from "@/components/web3/MetaMaskProvider";
-import { AblySpacesProvider } from "@/components/providers/ably-provider";
-import { StabilityProvider } from "@/components/providers/stability-provider";
-import { PerformanceProvider } from "@/components/providers/performance-provider";
-import { QueryProvider } from "@/components/providers/query-provider";
-interface RootLayoutProps {
-  children: React.ReactNode;
-}
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import { QueryProvider } from '@/components/providers/query-provider';
+import { Header } from '@/components/layout/header';
+import { Footer } from '@/components/layout/footer';
+import { Toaster } from '@/components/ui/toaster';
+import { Analytics } from '@/components/analytics';
+import '@/styles/globals.css';
 
-export const metadata: Metadata = constructMetadata({
-  title: "Blatam Academy",
-  description: "Empowering the next generation of tech leaders through innovative education and practical experience.",
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
 });
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export const metadata: Metadata = {
+  title: {
+    default: 'Blatam Academy - Next.js Platform',
+    template: '%s | Blatam Academy',
+  },
+  description: 'Modern Next.js platform built with best practices, TypeScript, and modern UI frameworks.',
+  keywords: [
+    'Next.js',
+    'React',
+    'TypeScript',
+    'Tailwind CSS',
+    'Modern Web Development',
+    'Blatam Academy',
+  ],
+  authors: [{ name: 'Blatam Academy Team' }],
+  creator: 'Blatam Academy',
+  publisher: 'Blatam Academy',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'),
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    url: '/',
+    title: 'Blatam Academy - Next.js Platform',
+    description: 'Modern Next.js platform built with best practices, TypeScript, and modern UI frameworks.',
+    siteName: 'Blatam Academy',
+    images: [
+      {
+        url: '/og-image.jpg',
+        width: 1200,
+        height: 630,
+        alt: 'Blatam Academy - Next.js Platform',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Blatam Academy - Next.js Platform',
+    description: 'Modern Next.js platform built with best practices, TypeScript, and modern UI frameworks.',
+    images: ['/og-image.jpg'],
+    creator: '@blatamacademy',
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
+  },
+  verification: {
+    google: process.env.GOOGLE_SITE_VERIFICATION,
+  },
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <head />
       <body
-        className={cn(
-          "min-h-screen bg-white font-sans antialiased",
-          fontSans.variable,
-          fontUrban.variable,
-          fontHeading.variable,
-          fontGeist.variable
-        )}
-        suppressHydrationWarning
+        className={`${inter.variable} font-sans antialiased bg-background text-foreground`}
       >
         <ThemeProvider
           attribute="class"
@@ -43,41 +95,17 @@ export default function RootLayout({ children }: RootLayoutProps) {
           enableSystem
           disableTransitionOnChange
         >
-          <StabilityProvider>
-            <PerformanceProvider>
-              <QueryProvider>
-                <AblySpacesProvider>
-                  <MetaMaskProvider>
-                    <AuthProvider>
-                {/* Custom widgets as raw HTML to avoid React/JSX errors */}
-                <div
-                  suppressHydrationWarning
-                  dangerouslySetInnerHTML={{
-                    __html: `
-                      <elevenlabs-convai agent-id="agent_01jw2hqjcmf5js8yr208bavbaq"></elevenlabs-convai>
-                      <script src="https://elevenlabs.io/convai-widget/index.js" async type="text/javascript"></script>
-                      <d-id-chatbot
-                        chat-title="Asistente IA"
-                        auth="TU_API_KEY"
-                        agent-id="TU_AGENT_ID"
-                        style="position: fixed; bottom: 20px; right: 100px; z-index: 9999;">
-                      </d-id-chatbot>
-                      <script src="https://unpkg.com/@d-id/chatbot@latest/dist/vanilla/index.js"></script>
-                    `,
-                  }}
-                />
-                <ChatLayout>
-                  <ModalProvider>{children}</ModalProvider>
-                </ChatLayout>
-                    <Analytics />
-                    <Toaster richColors closeButton />
-                    <TailwindIndicator />
-                    </AuthProvider>
-                  </MetaMaskProvider>
-                </AblySpacesProvider>
-              </QueryProvider>
-            </PerformanceProvider>
-          </StabilityProvider>
+          <QueryProvider>
+            <div className="min-h-screen flex flex-col">
+              <Header />
+              <main className="flex-1">
+                {children}
+              </main>
+              <Footer />
+            </div>
+            <Toaster />
+            <Analytics />
+          </QueryProvider>
         </ThemeProvider>
       </body>
     </html>

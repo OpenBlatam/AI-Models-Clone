@@ -8,7 +8,11 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import torch.cuda.amp as amp
-import torch.autocast
+try:
+    import torch.autocast
+except ImportError:
+    # Fallback for older PyTorch versions
+    torch.autocast = None
 import torch.profiler
 import torch.utils.data
 import torch.utils.data.distributed
@@ -272,7 +276,7 @@ class AdvancedCacheManager:
         return self._total_size / max(self._total_size, 1)
 
 # ============================================================================
- INTELLIGENT MODEL MANAGER
+# INTELLIGENT MODEL MANAGER
 # ============================================================================
 
 class IntelligentModelManager:

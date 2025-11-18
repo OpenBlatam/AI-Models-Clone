@@ -1,170 +1,102 @@
 {
-  "name": "blatam-academy",
+  "name": "blatam-academy-nextjs",
   "version": "1.0.0",
-  "main": "expo-router/entry",
+  "private": true,
   "scripts": {
-    // ============================================================================
-    // DEVELOPMENT SCRIPTS
-    // ============================================================================
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
-    "web": "expo start --web",
-    "dev": "expo start --dev-client",
-    "dev:clear": "expo start --clear",
-    "dev:tunnel": "expo start --tunnel",
-    
-    // ============================================================================
-    // BUILD SCRIPTS
-    // ============================================================================
-    "build": "expo build",
-    "build:android": "expo build --platform android",
-    "build:ios": "expo build --platform ios",
-    "build:web": "expo build --platform web",
-    "eas-build": "eas build",
-    "eas-submit": "eas submit",
-    "eas-update": "eas update",
-    
-    // ============================================================================
-    // TESTING SCRIPTS
-    // ============================================================================
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "lint:fix": "next lint --fix",
+    "type-check": "tsc --noEmit",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
-    "test:ci": "jest --ci --coverage --watchAll=false",
-    "e2e": "playwright test",
-    "e2e:ui": "playwright test --ui",
-    "e2e:report": "playwright show-report",
-    
-    // ============================================================================
-    // CODE QUALITY SCRIPTS
-    // ============================================================================
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
-    "type-check": "tsc --noEmit",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    "format:check": "prettier --check \"**/*.{js,jsx,ts,tsx,json,md}\"",
-    
-    // ============================================================================
-    // PERFORMANCE SCRIPTS
-    // ============================================================================
-    "analyze": "expo export --dump-assetmap",
-    "bundle:analyze": "npx react-native-bundle-visualizer",
-    "performance": "expo start --profile",
-    
-    // ============================================================================
-    // UTILITY SCRIPTS
-    // ============================================================================
-    "clean": "expo r -c && rm -rf node_modules/.cache",
-    "reset": "rm -rf node_modules && npm install",
-    "doctor": "expo doctor",
-    "preinstall": "npx only-allow npm"
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "prepare": "husky install",
+    "analyze": "ANALYZE=true npm run build"
   },
   "dependencies": {
-    // ============================================================================
-    // CORE FRAMEWORKS
-    // ============================================================================
-    "expo": "~50.0.0",
-    "expo-router": "~3.4.0",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-native": "0.73.6",
-    "react-native-web": "0.19.13",
-    
-    // ============================================================================
-    // NAVIGATION
-    // ============================================================================
-    "@react-navigation/bottom-tabs": "^6.5.11",
-    "@react-navigation/native": "^6.1.9",
-    "@react-navigation/stack": "^6.3.20",
-    "react-native-gesture-handler": "~2.14.0",
-    "react-native-reanimated": "~3.6.2",
-    "react-native-safe-area-context": "4.8.2",
-    "react-native-screens": "~3.29.0",
-    
-    // ============================================================================
-    // STATE MANAGEMENT & DATA
-    // ============================================================================
-    "@tanstack/react-query": "^5.17.9",
-    "zustand": "^4.4.7",
-    "@react-native-async-storage/async-storage": "1.21.0",
-    
-    // ============================================================================
-    // PERFORMANCE LIBRARIES
-    // ============================================================================
-    "@shopify/flash-list": "^1.6.3",
-    "react-native-fast-image": "^8.6.3",
-    "react-native-skeleton-placeholder": "^5.2.3",
-    
-    // ============================================================================
-    // INTERNATIONALIZATION
-    // ============================================================================
-    "i18next": "^23.7.16",
-    "react-i18next": "^14.0.1",
-    "expo-localization": "~14.8.3",
-    
-    // ============================================================================
-    // EXPO MODULES
-    // ============================================================================
-    "expo-constants": "~15.4.5",
-    "expo-font": "~11.10.3",
-    "expo-linking": "~6.2.2",
-    "expo-splash-screen": "~0.26.4",
-    "expo-status-bar": "~1.11.1",
-    "expo-system-ui": "~2.9.3",
-    "expo-web-browser": "~12.8.2"
+    "@hookform/resolvers": "^3.3.0",
+    "@next/swc-win32-x64-msvc": "15.5.2",
+    "@radix-ui/react-icons": "^1.3.0",
+    "@radix-ui/react-label": "^2.0.0",
+    "@radix-ui/react-progress": "1.1.7",
+    "@radix-ui/react-separator": "^1.0.0",
+    "@radix-ui/react-slot": "^1.0.0",
+    "@radix-ui/react-switch": "1.2.6",
+    "@radix-ui/react-tabs": "^1.0.0",
+    "@radix-ui/react-tooltip": "^1.0.0",
+    "@t3-oss/env-nextjs": "0.13.8",
+    "@tailwindcss/aspect-ratio": "^0.4.0",
+    "@tailwindcss/forms": "^0.5.0",
+    "@tailwindcss/typography": "^0.5.0",
+    "@tanstack/react-query": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.2.0",
+    "@types/react-dom": "^18.2.0",
+    "autoprefixer": "^10.4.0",
+    "axios": "^1.6.0",
+    "bcryptjs": "^2.4.3",
+    "class-variance-authority": "^0.7.0",
+    "clsx": "^2.0.0",
+    "framer-motion": "^10.16.0",
+    "jsonwebtoken": "^9.0.0",
+    "lucide-react": "^0.290.0",
+    "next": "^14.0.0",
+    "next-auth": "^4.24.0",
+    "next-intl": "^3.0.0",
+    "next-themes": "^0.2.0",
+    "postcss": "^8.4.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.47.0",
+    "react-hot-toast": "^2.4.0",
+    "sharp": "^0.32.0",
+    "swagger-jsdoc": "^6.2.0",
+    "swagger-ui-dist": "^5.0.0",
+    "swagger-ui-react": "^5.0.0",
+    "tailwind-merge": "^2.0.0",
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.0.0",
+    "zod": "^3.22.0",
+    "zustand": "^4.4.0"
   },
   "devDependencies": {
-    // ============================================================================
-    // CORE DEVELOPMENT TOOLS
-    // ============================================================================
-    "@babel/core": "^7.20.0",
-    "typescript": "^5.1.3",
-    "@types/react": "~18.2.45",
-    "@types/react-native": "~0.73.0",
-    "@types/node": "^20.11.0",
-    
-    // ============================================================================
-    // TESTING TOOLS
-    // ============================================================================
-    "@playwright/test": "1.54.2",
-    "@types/jest": "^29.5.11",
-    "jest": "^29.7.0",
-    
-    // ============================================================================
-    // CODE QUALITY TOOLS
-    // ============================================================================
-    "eslint": "^8.56.0",
-    "eslint-config-expo": "^7.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.19.0",
-    "@typescript-eslint/parser": "^6.19.0",
-    "prettier": "^3.2.0",
-    
-    // ============================================================================
-    // BUILD TOOLS
-    // ============================================================================
-    "expo-build-properties": "0.14.8",
-    "react-native-css-transformer": "2.0.0",
-    
-    // ============================================================================
-    // PERFORMANCE TOOLS
-    // ============================================================================
-    "react-native-bundle-visualizer": "^2.0.0",
-    
-    // ============================================================================
-    // UTILITY TOOLS
-    // ============================================================================
-    "ajv": "8.17.1",
-    "ajv-keywords": "5.1.0",
-    "schema-utils": "4.3.2"
+    "@playwright/test": "^1.40.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^13.4.0",
+    "@types/bcryptjs": "^2.4.0",
+    "@types/jsonwebtoken": "^9.0.0",
+    "@types/swagger-jsdoc": "^6.0.0",
+    "@types/swagger-ui-react": "^4.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "eslint-config-next": "^14.0.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-unused-imports": "^3.1.0",
+    "husky": "^8.0.0",
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
+    "prettier-plugin-tailwindcss": "^0.5.0",
+    "webpack-bundle-analyzer": "^4.10.0"
   },
-  "private": true,
-  "engines": {
-    "node": ">=18.0.0",
-    "npm": ">=9.0.0"
-  },
-  "resolutions": {
-    "react": "18.2.0",
-    "react-dom": "18.2.0"
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
   }
 }

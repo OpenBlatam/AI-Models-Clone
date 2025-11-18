@@ -1,140 +1,119 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useSelectedLayoutSegment } from "next/navigation";
-import { Menu, X } from "lucide-react";
-import { useSession } from "next-auth/react";
+import { useEffect } from 'react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { cn } from '@/lib/utils';
+import { X } from 'lucide-react';
 
-import { docsConfig } from "@/config/docs";
-import { marketingConfig } from "@/config/marketing";
-import { siteConfig } from "@/config/site";
-import { cn } from "@/lib/utils";
-import { DocsSidebarNav } from "@/components/docs/sidebar-nav";
-import { Icons } from "@/components/shared/icons";
+interface NavigationItem {
+  name: string;
+  href: string;
+}
 
-import { ModeToggle } from "./mode-toggle";
+interface MobileNavProps {
+  isOpen: boolean;
+  onClose: () => void;
+  navigation: NavigationItem[];
+  pathname: string;
+}
 
-export function NavMobile() {
-  const { data: session } = useSession();
-  const [open, setOpen] = useState(false);
-  const selectedLayout = useSelectedLayoutSegment();
-  const documentation = selectedLayout === "docs";
-
-  const configMap = {
-    docs: docsConfig.mainNav,
-  };
-
-  const links =
-    (selectedLayout && configMap[selectedLayout]) || marketingConfig.mainNav;
-
-  // prevent body scroll when modal is open
+export function MobileNav({ isOpen, onClose, navigation, pathname }: MobileNavProps) {
+  // Close mobile menu on escape key
   useEffect(() => {
-    if (open) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      // Prevent body scroll when mobile menu is open
+      document.body.style.overflow = 'hidden';
     }
-  }, [open]);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (isOpen && !target.closest('[data-mobile-nav]')) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
 
   return (
     <>
-      <button
-        onClick={() => setOpen(!open)}
+      {/* Backdrop */}
+      <div
+        className="fixed inset-0 z-40 bg-background/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      
+      {/* Mobile Navigation */}
+      <div
+        data-mobile-nav
         className={cn(
-          "fixed right-2 top-2.5 z-50 rounded-full p-2 transition-colors duration-200 hover:bg-muted focus:outline-none active:bg-muted md:hidden",
-          open && "hover:bg-muted active:bg-muted",
+          'fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-background border-l shadow-xl transition-transform duration-300 ease-in-out',
+          isOpen ? 'translate-x-0' : 'translate-x-full'
         )}
       >
-        {open ? (
-          <X className="size-5 text-muted-foreground" />
-        ) : (
-          <Menu className="size-5 text-muted-foreground" />
-        )}
-      </button>
-
-      <nav
-        className={cn(
-          "fixed inset-0 z-20 hidden w-full overflow-auto bg-background px-5 py-16 lg:hidden",
-          open && "block",
-        )}
-      >
-        <ul className="grid divide-y divide-muted">
-          {links && links.length > 0 && links.map(({ title, href }) => (
-            <li key={href} className="py-3">
-              <Link
-                href={href}
-                onClick={() => setOpen(false)}
-                className="flex w-full font-medium capitalize"
-              >
-                {title}
-              </Link>
-            </li>
-          ))}
-
-          {session ? (
-            <>
-              {session.user.role === "ADMIN" ? (
-                <li className="py-3">
-                  <Link
-                    href="/admin"
-                    onClick={() => setOpen(false)}
-                    className="flex w-full font-medium capitalize"
-                  >
-                    Admin
-                  </Link>
-                </li>
-              ) : null}
-
-              <li className="py-3">
-                <Link
-                  href="/dashboard"
-                  onClick={() => setOpen(false)}
-                  className="flex w-full font-medium capitalize"
-                >
-                  Dashboard
-                </Link>
-              </li>
-            </>
-          ) : (
-            <>
-              <li className="py-3">
-                <Link
-                  href="/login"
-                  onClick={() => setOpen(false)}
-                  className="flex w-full font-medium capitalize"
-                >
-                  Login
-                </Link>
-              </li>
-
-              <li className="py-3">
-                <Link
-                  href="/register"
-                  onClick={() => setOpen(false)}
-                  className="flex w-full font-medium capitalize"
-                >
-                  Sign up
-                </Link>
-              </li>
-            </>
-          )}
-        </ul>
-
-        {documentation ? (
-          <div className="mt-8 block md:hidden">
-            <DocsSidebarNav setOpen={setOpen} />
-          </div>
-        ) : null}
-
-        <div className="mt-5 flex items-center justify-end space-x-4">
-          <Link href={siteConfig.links.github} target="_blank" rel="noreferrer">
-            <Icons.gitHub className="size-6" />
-            <span className="sr-only">GitHub</span>
-          </Link>
-          <ModeToggle />
+        <div className="flex h-16 items-center justify-between border-b px-6">
+          <h2 className="text-lg font-semibold">Menu</h2>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClose}
+            aria-label="Close mobile menu"
+          >
+            <X className="h-5 w-5" />
+          </Button>
         </div>
-      </nav>
+
+        <nav className="flex flex-col space-y-1 p-6">
+          {navigation.map((item) => (
+            <Link
+              key={item.name}
+              href={item.href}
+              onClick={onClose}
+              className={cn(
+                'flex items-center px-3 py-2 text-base font-medium rounded-md transition-colors',
+                pathname === item.href
+                  ? 'bg-primary text-primary-foreground'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+              )}
+            >
+              {item.name}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Mobile CTA */}
+        <div className="absolute bottom-6 left-6 right-6">
+          <Button asChild className="w-full" size="lg">
+            <Link href="/get-started" onClick={onClose}>
+              Get Started
+            </Link>
+          </Button>
+        </div>
+      </div>
     </>
   );
 }
