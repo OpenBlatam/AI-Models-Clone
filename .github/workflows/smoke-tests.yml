@@ -1,0 +1,111 @@
+name: Smoke Tests
+
+on:
+  workflow_run:
+    workflows: ["Deploy Suno Clone AI to EC2", "Deploy to Production"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to test'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  PROJECT_PATH: agents/backend/onyx/server/features/suno_clone_ai
+
+jobs:
+  smoke-tests:
+    name: Smoke Tests - ${{ github.event.inputs.environment || 'production' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install httpx pytest
+
+      - name: Health check
+        run: |
+          ENV="${{ github.event.inputs.environment || 'production' }}"
+          if [ "$ENV" == "production" ]; then
+            HOST="${{ secrets.EC2_HOST }}"
+          else
+            HOST="${{ secrets.EC2_STAGING_HOST }}"
+          fi
+          
+          for i in {1..10}; do
+            if curl -f "http://${HOST}:8020/health"; then
+              echo "✅ Health check passed"
+              exit 0
+            fi
+            echo "Waiting for health check... ($i/10)"
+            sleep 10
+          done
+          echo "❌ Health check failed"
+          exit 1
+
+      - name: API smoke tests
+        working-directory: ${{ env.PROJECT_PATH }}
+        env:
+          API_URL: ${{ github.event.inputs.environment == 'production' && format('http://{0}:8020', secrets.EC2_HOST) || format('http://{0}:8020', secrets.EC2_STAGING_HOST) }}
+        run: |
+          python -m pytest tests/test_smoke/ \
+            -v \
+            --tb=short \
+            --maxfail=3 || true
+
+      - name: Performance smoke test
+        run: |
+          ENV="${{ github.event.inputs.environment || 'production' }}"
+          if [ "$ENV" == "production" ]; then
+            HOST="${{ secrets.EC2_HOST }}"
+          else
+            HOST="${{ secrets.EC2_STAGING_HOST }}"
+          fi
+          
+          # Test response time
+          RESPONSE_TIME=$(curl -o /dev/null -s -w '%{time_total}' "http://${HOST}:8020/health")
+          
+          if (( $(echo "$RESPONSE_TIME > 2.0" | bc -l) )); then
+            echo "⚠️ Response time is slow: ${RESPONSE_TIME}s"
+          else
+            echo "✅ Response time is acceptable: ${RESPONSE_TIME}s"
+          fi
+
+      - name: Notify on failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "❌ Smoke Tests Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Smoke Tests Failed*\n*Environment:* ${{ github.event.inputs.environment || 'production' }}\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+
+
+

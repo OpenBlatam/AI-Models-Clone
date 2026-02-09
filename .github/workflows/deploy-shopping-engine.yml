@@ -1,0 +1,84 @@
+name: Deploy Shopping Engine AI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'agents/backend/onyx/server/features/shopping_engine_ai/**'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  PROJECT_NAME: shopping-engine-ai
+  TF_WORKING_DIR: agents/backend/onyx/server/features/shopping_engine_ai/aws/terraform
+  ANSIBLE_WORKING_DIR: agents/backend/onyx/server/features/shopping_engine_ai/aws/ansible
+
+jobs:
+  deploy:
+    name: Build, Push, and Deploy
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init and Apply
+        working-directory: ${{ env.TF_WORKING_DIR }}
+        run: |
+          terraform init
+          terraform apply -auto-approve -var="key_name=deploy_key"
+          
+          # Output ECR URL
+          echo "ECR_REGISTRY=$(terraform output -raw ecr_repository_url)" >> $GITHUB_ENV
+
+      - name: Build and Push Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ env.PROJECT_NAME }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          cd agents/backend/onyx/server/features/shopping_engine_ai/aws
+          
+          # Build image
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -t $ECR_REGISTRY/$ECR_REPOSITORY:latest .
+          
+          # Push image
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+      - name: Run Ansible Deployment
+        working-directory: ${{ env.ANSIBLE_WORKING_DIR }}
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'False'
+          ANSIBLE_SSH_PRIVATE_KEY_FILE: ~/.ssh/deploy_key
+        run: |
+          # Install boto3 for dynamic inventory
+          pip install boto3 botocore
+          
+          # Run playbook using dynamic inventory
+          ansible-playbook -i inventory_aws_ec2.yml playbooks/deploy.yml \
+            -e "ecr_registry_url=${{ env.ECR_REGISTRY }}"

@@ -1,0 +1,76 @@
+# Expo Managed Workflow Dependencies
+
+# Core Expo dependencies
+expo>=49.0.0
+@expo/cli>=0.10.0
+expo-cli>=6.3.0
+
+# Development tools
+expo-dev-client>=3.3.0
+expo-updates>=0.18.0
+expo-notifications>=0.20.0
+expo-analytics>=0.2.0
+
+# Build and deployment
+eas-cli>=3.0.0
+@expo/config>=8.0.0
+@expo/metro-config>=0.10.0
+
+# Testing and quality
+jest>=29.0.0
+@testing-library/react-native>=12.0.0
+@testing-library/jest-native>=5.4.0
+
+# TypeScript support
+typescript>=5.0.0
+@types/react>=18.0.0
+@types/react-native>=0.72.0
+
+# Development utilities
+expo-splash-screen>=0.20.0
+expo-status-bar>=1.6.0
+expo-constants>=14.4.0
+expo-linking>=5.0.0
+expo-router>=2.0.0
+
+# Performance and monitoring
+expo-performance>=0.1.0
+expo-device>=5.4.0
+expo-application>=5.3.0
+
+# Security and authentication
+expo-crypto>=12.4.0
+expo-secure-store>=12.3.0
+expo-local-authentication>=13.4.0
+
+# UI and styling
+expo-linear-gradient>=12.3.0
+expo-blur>=12.4.0
+expo-haptics>=12.4.0
+
+# Media and assets
+expo-image-picker>=14.3.0
+expo-camera>=13.4.0
+expo-media-library>=15.4.0
+expo-av>=13.4.0
+
+# Networking and APIs
+expo-network>=5.4.0
+expo-file-system>=15.4.0
+expo-sqlite>=11.3.0
+
+# Location and sensors
+expo-location>=16.1.0
+expo-sensors>=12.3.0
+expo-accelerometer>=12.2.0
+
+# Development tools
+expo-module-scripts>=3.2.0
+expo-module-template>=1.0.0
+expo-yarn-workspaces>=2.3.0
+
+# Documentation and linting
+eslint>=8.0.0
+prettier>=2.8.0
+@typescript-eslint/eslint-plugin>=6.0.0
+@typescript-eslint/parser>=6.0.0 

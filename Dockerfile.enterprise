@@ -1,0 +1,143 @@
+# 🚀 ENTERPRISE API DOCKERFILE
+# Multi-stage build for production-ready FastAPI with microservices patterns
+
+# === BUILD STAGE ===
+FROM python:3.11-slim as builder
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    libssl-dev \
+    libffi-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy requirements first for better caching
+COPY requirements-enterprise.txt .
+
+# Install Python dependencies
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install -r requirements-enterprise.txt && \
+    pip install gunicorn[gevent]
+
+# === RUNTIME STAGE ===
+FROM python:3.11-slim as runtime
+
+# Set labels for container metadata
+LABEL maintainer="Enterprise Team" \
+      version="1.0.0" \
+      description="Enterprise FastAPI with microservices patterns" \
+      org.opencontainers.image.source="https://github.com/your-org/enterprise-api"
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    ENVIRONMENT=production \
+    HOST=0.0.0.0 \
+    PORT=8000 \
+    WORKERS=4 \
+    WORKER_CLASS=uvicorn.workers.UvicornWorker \
+    MAX_REQUESTS=1000 \
+    MAX_REQUESTS_JITTER=100 \
+    TIMEOUT=30 \
+    KEEPALIVE=2 \
+    PRELOAD=true
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y \
+    libpq5 \
+    curl \
+    redis-tools \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create non-root user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Create app directory
+WORKDIR /app
+
+# Copy virtual environment from builder stage
+COPY --from=builder /opt/venv /opt/venv
+
+# Copy application code
+COPY . .
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/tmp && \
+    chown -R appuser:appuser /app
+
+# Switch to non-root user
+USER appuser
+
+# === HEALTH CHECK ===
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health/live || exit 1
+
+# === PORTS ===
+EXPOSE 8000
+
+# === STARTUP SCRIPT ===
+COPY --chown=appuser:appuser docker/entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# === ENTRYPOINT ===
+ENTRYPOINT ["/app/entrypoint.sh"]
+
+# === DEFAULT COMMAND ===
+CMD ["gunicorn", "enterprise_demo:app", \
+     "--bind", "0.0.0.0:8000", \
+     "--workers", "4", \
+     "--worker-class", "uvicorn.workers.UvicornWorker", \
+     "--worker-connections", "1000", \
+     "--max-requests", "1000", \
+     "--max-requests-jitter", "100", \
+     "--timeout", "30", \
+     "--keepalive", "2", \
+     "--preload", \
+     "--access-logfile", "-", \
+     "--error-logfile", "-", \
+     "--log-level", "info"]
+
+# === ALTERNATIVE COMMANDS ===
+# Development mode:
+# CMD ["uvicorn", "enterprise_demo:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+# Single worker for debugging:
+# CMD ["python", "enterprise_demo.py"]
+
+# === BUILD OPTIMIZATION NOTES ===
+# To build with different targets:
+# 
+# Development build:
+# docker build --target builder -t enterprise-api:dev .
+# 
+# Production build:
+# docker build --target runtime -t enterprise-api:prod .
+# 
+# With build args:
+# docker build --build-arg ENVIRONMENT=staging -t enterprise-api:staging .
+# 
+# Multi-platform build:
+# docker buildx build --platform linux/amd64,linux/arm64 -t enterprise-api .
+
+# === PERFORMANCE OPTIMIZATIONS ===
+# 1. Multi-stage build reduces final image size
+# 2. Non-root user for security
+# 3. Virtual environment isolation
+# 4. Proper layer caching with requirements first
+# 5. Health checks for container orchestration
+# 6. Gunicorn with uvicorn workers for production
+# 7. Optimized worker settings
+# 8. Clean package cache to reduce size 

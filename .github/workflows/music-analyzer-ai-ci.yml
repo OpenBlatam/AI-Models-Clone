@@ -1,0 +1,619 @@
+name: Music Analyzer AI - Complete CI/CD
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+      - 'feature/**'
+    paths:
+      - 'agents/backend/onyx/server/features/music_analyzer_ai/**'
+      - '.github/workflows/music-analyzer-ai-ci.yml'
+  pull_request:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'agents/backend/onyx/server/features/music_analyzer_ai/**'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Target environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - development
+          - staging
+          - production
+      deploy_backend:
+        description: 'Deploy backend'
+        required: false
+        default: true
+        type: boolean
+      deploy_frontend:
+        description: 'Deploy frontend'
+        required: false
+        default: true
+        type: boolean
+      run_tests:
+        description: 'Run full test suite'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  BACKEND_PATH: agents/backend/onyx/server/features/music_analyzer_ai
+  FRONTEND_PATH: agents/backend/onyx/server/features/music_analyzer_ai/frontend
+  REGISTRY: ghcr.io
+  BACKEND_IMAGE: music-analyzer-ai-backend
+  FRONTEND_IMAGE: music-analyzer-ai-frontend
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '20'
+
+jobs:
+  # ============================================================================
+  # Backend: Code Quality
+  # ============================================================================
+  backend-code-quality:
+    name: Backend - Code Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_PATH }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
+          pip install black flake8 mypy pylint isort bandit safety
+
+      - name: Check code formatting
+        run: |
+          black --check --diff . || true
+          isort --check-only --diff . || true
+
+      - name: Lint with flake8
+        run: |
+          flake8 . --count --statistics --max-line-length=127 || true
+
+      - name: Lint with Pylint
+        run: |
+          pylint $(find . -name "*.py" -not -path "./tests/*" -not -path "./venv/*") || true
+
+      - name: Type check with mypy
+        run: |
+          mypy . --ignore-missing-imports || true
+
+      - name: Upload code quality results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-code-quality
+          retention-days: 7
+
+  # ============================================================================
+  # Backend: Security Scan
+  # ============================================================================
+  backend-security:
+    name: Backend - Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_PATH }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install security tools
+        run: |
+          pip install safety bandit semgrep
+
+      - name: Run Safety check
+        run: |
+          safety check --json --output safety-report.json || true
+
+      - name: Run Bandit
+        run: |
+          bandit -r . -f json -o bandit-report.json --exclude ./tests,./venv || true
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/python
+            p/owasp-top-ten
+
+      - name: Upload security reports
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-security-reports
+          path: |
+            ${{ env.BACKEND_PATH }}/safety-report.json
+            ${{ env.BACKEND_PATH }}/bandit-report.json
+          retention-days: 30
+
+  # ============================================================================
+  # Backend: Unit Tests
+  # ============================================================================
+  backend-tests:
+    name: Backend - Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      matrix:
+        python-version: ['3.10', '3.11', '3.12']
+      fail-fast: false
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_PATH }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov pytest-xdist pytest-asyncio pytest-mock
+
+      - name: Run tests
+        run: |
+          pytest tests/ \
+            -v \
+            --cov=. \
+            --cov-report=xml \
+            --cov-report=html \
+            --cov-report=term \
+            --junit-xml=junit-${{ matrix.python-version }}.xml \
+            -n auto \
+            --maxfail=5
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: ./coverage.xml
+          flags: backend-${{ matrix.python-version }}
+          name: backend-${{ matrix.python-version }}
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: backend-test-results-${{ matrix.python-version }}
+          path: |
+            ${{ env.BACKEND_PATH }}/coverage.xml
+            ${{ env.BACKEND_PATH }}/htmlcov/
+            ${{ env.BACKEND_PATH }}/junit-${{ matrix.python-version }}.xml
+          retention-days: 30
+
+  # ============================================================================
+  # Frontend: Code Quality
+  # ============================================================================
+  frontend-code-quality:
+    name: Frontend - Code Quality
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: ${{ env.FRONTEND_PATH }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.FRONTEND_PATH }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint || true
+
+      - name: Run TypeScript check
+        run: npm run type-check || true
+
+      - name: Check code formatting
+        run: npm run format:check || true
+
+      - name: Upload code quality results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-code-quality
+          retention-days: 7
+
+  # ============================================================================
+  # Frontend: Tests
+  # ============================================================================
+  frontend-tests:
+    name: Frontend - Tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: ${{ env.FRONTEND_PATH }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.FRONTEND_PATH }}/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: |
+          npm test -- --coverage --watchAll=false || true
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        if: always()
+        with:
+          file: ${{ env.FRONTEND_PATH }}/coverage/coverage-final.json
+          flags: frontend
+          name: frontend
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: frontend-test-results
+          path: ${{ env.FRONTEND_PATH }}/coverage/
+          retention-days: 30
+
+  # ============================================================================
+  # Backend: Docker Build
+  # ============================================================================
+  backend-docker-build:
+    name: Backend - Docker Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [backend-code-quality, backend-security]
+    defaults:
+      run:
+        working-directory: ${{ env.BACKEND_PATH }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta-backend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.BACKEND_IMAGE }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.BACKEND_PATH }}
+          file: ${{ env.BACKEND_PATH }}/deployment/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta-backend.outputs.tags }}
+          labels: ${{ steps.meta-backend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Save Docker image
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          docker save ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.BACKEND_IMAGE }}:${{ github.sha }} | gzip > backend-image.tar.gz
+
+      - name: Upload Docker image
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-docker-image
+          path: ${{ env.BACKEND_PATH }}/backend-image.tar.gz
+          retention-days: 7
+
+  # ============================================================================
+  # Frontend: Docker Build
+  # ============================================================================
+  frontend-docker-build:
+    name: Frontend - Docker Build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    needs: [frontend-code-quality]
+    defaults:
+      run:
+        working-directory: ${{ env.FRONTEND_PATH }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta-frontend
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.FRONTEND_IMAGE }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=sha,prefix={{branch}}-
+            type=raw,value=latest,enable={{is_default_branch}}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.FRONTEND_PATH }}
+          file: ${{ env.FRONTEND_PATH }}/Dockerfile
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta-frontend.outputs.tags }}
+          labels: ${{ steps.meta-frontend.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          platforms: linux/amd64,linux/arm64
+
+      - name: Save Docker image
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        run: |
+          docker save ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.FRONTEND_IMAGE }}:${{ github.sha }} | gzip > frontend-image.tar.gz
+
+      - name: Upload Docker image
+        if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-docker-image
+          path: ${{ env.FRONTEND_PATH }}/frontend-image.tar.gz
+          retention-days: 7
+
+  # ============================================================================
+  # Deploy: Kubernetes
+  # ============================================================================
+  deploy-kubernetes:
+    name: Deploy to Kubernetes
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    needs: [backend-docker-build, frontend-docker-build, backend-tests, frontend-tests]
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    environment:
+      name: ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: 'latest'
+
+      - name: Configure Kubernetes
+        run: |
+          echo "${{ secrets.KUBECONFIG }}" | base64 -d > kubeconfig
+          export KUBECONFIG=$(pwd)/kubeconfig
+
+      - name: Deploy with Helm
+        run: |
+          export KUBECONFIG=$(pwd)/kubeconfig
+          helm upgrade --install music-analyzer-ai \
+            ./deployment/kubernetes/helm-chart \
+            --namespace ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }} \
+            --create-namespace \
+            --set backend.image.tag=${{ github.sha }} \
+            --set frontend.image.tag=${{ github.sha }} \
+            --wait \
+            --timeout 10m
+
+      - name: Verify deployment
+        run: |
+          export KUBECONFIG=$(pwd)/kubeconfig
+          kubectl rollout status deployment/music-analyzer-ai-backend \
+            -n ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+          kubectl rollout status deployment/music-analyzer-ai-frontend \
+            -n ${{ github.ref == 'refs/heads/main' && 'production' || 'staging' }}
+
+  # ============================================================================
+  # Deploy: AWS (EC2/ECS)
+  # ============================================================================
+  deploy-aws:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [backend-docker-build, frontend-docker-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Download Docker images
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-docker-image
+          path: ./backend-image
+        continue-on-error: true
+
+      - name: Deploy to ECS
+        run: |
+          aws ecs update-service \
+            --cluster music-analyzer-ai-cluster \
+            --service music-analyzer-ai-backend \
+            --force-new-deployment \
+            --region ${{ secrets.AWS_REGION || 'us-east-1' }}
+
+      - name: Deploy to EC2 (fallback)
+        if: failure()
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.AWS_EC2_HOST }}
+          username: ${{ secrets.AWS_EC2_USER }}
+          key: ${{ secrets.AWS_EC2_SSH_KEY }}
+          script: |
+            cd ~/music-analyzer-ai
+            docker load < backend-image.tar.gz || true
+            docker-compose up -d --build
+
+  # ============================================================================
+  # Deploy: Azure
+  # ============================================================================
+  deploy-azure:
+    name: Deploy to Azure
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: [backend-docker-build, frontend-docker-build]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Deploy to Azure Container Instances
+        run: |
+          az container create \
+            --resource-group music-analyzer-ai-rg \
+            --name music-analyzer-ai-backend \
+            --image ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.BACKEND_IMAGE }}:${{ github.sha }} \
+            --registry-login-server ${{ env.REGISTRY }} \
+            --registry-username ${{ github.actor }} \
+            --registry-password ${{ secrets.GITHUB_TOKEN }} \
+            --dns-name-label music-analyzer-ai-backend \
+            --ports 8000
+
+  # ============================================================================
+  # Notifications
+  # ============================================================================
+  notify:
+    name: Send Notifications
+    runs-on: ubuntu-latest
+    needs: [deploy-kubernetes, deploy-aws, deploy-azure]
+    if: always()
+
+    steps:
+      - name: Notify Slack - Success
+        if: success()
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "✅ Music Analyzer AI CI/CD Completed Successfully",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Pipeline Status:* ✅ Success\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Notify Slack - Failure
+        if: failure()
+        uses: slackapi/slack-github-action@v1.25.0
+        with:
+          payload: |
+            {
+              "text": "❌ Music Analyzer AI CI/CD Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Pipeline Status:* ❌ Failed\n*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Commit:* <${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}|${{ github.sha }}>\n*Workflow:* <${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Run>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+
+
+

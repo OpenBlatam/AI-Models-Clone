@@ -1,0 +1,306 @@
+# Enhanced Performance Monitor Configuration v3.7
+# This file configures the performance monitoring system with various profiles
+
+# Global monitoring settings
+monitoring:
+  # Monitoring interval in seconds
+  interval: 5.0
+  
+  # Enable/disable auto-scaling
+  auto_scaling_enabled: true
+  
+  # Data retention settings
+  data_retention:
+    # Keep performance history for 24 hours
+    history_hours: 24
+    
+    # Keep alerts for 7 days
+    alerts_days: 7
+    
+    # Maximum number of data points per metric
+    max_data_points: 1000
+
+# Performance thresholds configuration
+thresholds:
+  # CPU usage thresholds
+  cpu_usage:
+    warning_threshold: 70.0
+    critical_threshold: 90.0
+    operator: ">"
+    enabled: true
+    action: "alert"
+    description: "CPU usage percentage"
+    
+  # Memory usage thresholds
+  memory_usage:
+    warning_threshold: 80.0
+    critical_threshold: 95.0
+    operator: ">"
+    enabled: true
+    action: "alert"
+    description: "Memory usage percentage"
+    
+  # Disk usage thresholds
+  disk_usage:
+    warning_threshold: 85.0
+    critical_threshold: 95.0
+    operator: ">"
+    enabled: true
+    action: "alert"
+    description: "Disk usage percentage"
+    
+  # Response time thresholds (milliseconds)
+  response_time:
+    warning_threshold: 1000.0
+    critical_threshold: 5000.0
+    operator: ">"
+    enabled: true
+    action: "alert"
+    description: "API response time in milliseconds"
+    
+  # Error rate thresholds (percentage)
+  error_rate:
+    warning_threshold: 5.0
+    critical_threshold: 15.0
+    operator: ">"
+    enabled: true
+    action: "alert"
+    description: "Error rate percentage"
+    
+  # Throughput thresholds (requests per second)
+  throughput:
+    warning_threshold: 100.0
+    critical_threshold: 50.0
+    operator: "<"
+    enabled: true
+    action: "auto_scale"
+    description: "Requests per second"
+    
+  # Network latency thresholds (milliseconds)
+  network_latency:
+    warning_threshold: 100.0
+    critical_threshold: 500.0
+    operator: ">"
+    enabled: true
+    action: "alert"
+    description: "Network latency in milliseconds"
+
+# Auto-scaling configuration
+auto_scaling:
+  enabled: true
+  
+  # Scaling thresholds for different metrics
+  thresholds:
+    cpu_usage:
+      scale_up_threshold: 80.0
+      scale_down_threshold: 20.0
+      scale_up_factor: 1.5
+      scale_down_factor: 0.7
+      
+    memory_usage:
+      scale_up_threshold: 85.0
+      scale_down_threshold: 30.0
+      scale_up_factor: 1.3
+      scale_down_factor: 0.8
+      
+    throughput:
+      scale_up_threshold: 80.0
+      scale_down_threshold: 30.0
+      scale_up_factor: 2.0
+      scale_down_factor: 0.5
+  
+  # Scaling actions
+  actions:
+    scale_up:
+      - "increase_worker_processes"
+      - "allocate_more_memory"
+      - "increase_thread_pool"
+      
+    scale_down:
+      - "decrease_worker_processes"
+      - "release_memory"
+      - "decrease_thread_pool"
+
+# Service-specific monitoring configuration
+services:
+  # Web API service monitoring
+  web_api:
+    enabled: true
+    metrics:
+      response_time:
+        description: "API response time"
+        unit: "milliseconds"
+        labels:
+          service: "web_api"
+          endpoint: "all"
+          
+      request_count:
+        description: "Number of requests"
+        unit: "count"
+        labels:
+          service: "web_api"
+          
+      error_count:
+        description: "Number of errors"
+        unit: "count"
+        labels:
+          service: "web_api"
+          
+      active_connections:
+        description: "Active connections"
+        unit: "count"
+        labels:
+          service: "web_api"
+  
+  # Database service monitoring
+  database:
+    enabled: true
+    metrics:
+      query_time:
+        description: "Database query time"
+        unit: "milliseconds"
+        labels:
+          service: "database"
+          
+      connection_count:
+        description: "Database connections"
+        unit: "count"
+        labels:
+          service: "database"
+          
+      cache_hit_rate:
+        description: "Cache hit rate"
+        unit: "percentage"
+        labels:
+          service: "database"
+  
+  # Background worker monitoring
+  background_worker:
+    enabled: true
+    metrics:
+      job_queue_size:
+        description: "Jobs in queue"
+        unit: "count"
+        labels:
+          service: "background_worker"
+          
+      job_processing_time:
+        description: "Job processing time"
+        unit: "seconds"
+        labels:
+          service: "background_worker"
+          
+      worker_count:
+        description: "Active workers"
+        unit: "count"
+        labels:
+          service: "background_worker"
+
+# Alerting configuration
+alerting:
+  enabled: true
+  
+  # Alert channels
+  channels:
+    email:
+      enabled: false
+      smtp_server: "smtp.example.com"
+      smtp_port: 587
+      username: "alerts@example.com"
+      password: ""
+      
+    slack:
+      enabled: false
+      webhook_url: ""
+      channel: "#alerts"
+      
+    webhook:
+      enabled: false
+      url: ""
+      headers: {}
+      
+    log:
+      enabled: true
+      level: "WARNING"
+  
+  # Alert rules
+  rules:
+    # Critical alerts - immediate notification
+    critical:
+      - "cpu_usage > 90%"
+      - "memory_usage > 95%"
+      - "disk_usage > 95%"
+      - "error_rate > 15%"
+      
+    # Warning alerts - notification with delay
+    warning:
+      - "cpu_usage > 70%"
+      - "memory_usage > 80%"
+      - "disk_usage > 85%"
+      - "response_time > 1000ms"
+
+# Export and reporting configuration
+export:
+  # Export formats
+  formats:
+    - "json"
+    - "csv"
+    - "prometheus"
+    
+  # Export schedule
+  schedule:
+    enabled: true
+    interval_hours: 1
+    retention_days: 30
+    
+  # Export destinations
+  destinations:
+    local:
+      enabled: true
+      path: "./metrics_exports"
+      
+    remote:
+      enabled: false
+      url: ""
+      credentials: {}
+
+# Integration settings
+integration:
+  # Metrics collector integration
+  metrics_collector:
+    enabled: true
+    auto_discover: true
+    
+  # Health monitor integration
+  health_monitor:
+    enabled: true
+    auto_discover: true
+    
+  # External monitoring systems
+  external:
+    prometheus:
+      enabled: false
+      endpoint: "/metrics"
+      port: 9090
+      
+    grafana:
+      enabled: false
+      dashboard_auto_create: true
+
+# Performance optimization settings
+optimization:
+  # Memory management
+  memory:
+    max_cache_size: "100MB"
+    cleanup_interval: 300  # seconds
+    
+  # Data processing
+  data_processing:
+    batch_size: 100
+    parallel_workers: 4
+    
+  # Storage optimization
+  storage:
+    compression: true
+    compression_level: 6
+    auto_cleanup: true

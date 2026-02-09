@@ -1,0 +1,39 @@
+# Production Requirements for Enhanced AI Model Demos System
+# Minimal dependencies for production deployment
+
+# Core PyTorch (with CUDA support if available)
+torch>=2.2.0
+torchvision>=0.17.0
+
+# Interactive web interface
+gradio>=4.37.0
+
+# Numerical computing
+numpy>=1.24.0
+
+# =============================================================================
+# TRANSFORMERS & NLP
+# =============================================================================
+
+# Core transformers for production
+transformers>=4.42.0
+tokenizers>=0.15.0
+accelerate>=0.31.0
+
+# =============================================================================
+# DIFFUSION MODELS & IMAGE GENERATION
+# =============================================================================
+
+# Core diffusers for production
+diffusers>=0.28.0
+Pillow>=10.0.0
+opencv-python>=4.8.0
+
+# Interactive plotting
+plotly>=5.17.0
+
+# System monitoring
+psutil>=5.9.0
+
+# Environment configuration
+python-dotenv>=1.0.0 

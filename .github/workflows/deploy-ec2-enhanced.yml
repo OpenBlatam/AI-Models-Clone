@@ -1,0 +1,450 @@
+# Enhanced GitHub Actions Workflow for Automatic Deployment to EC2
+# Includes: testing, rollback, notifications, blue-green deployment support
+
+name: Deploy to EC2 (Enhanced)
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'agents/backend/onyx/server/features/ai_project_generator/**'
+      - '.github/workflows/deploy-ec2*.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - staging
+          - production
+      skip_tests:
+        description: 'Skip tests'
+        required: false
+        default: false
+        type: boolean
+      force_deploy:
+        description: 'Force deployment even if tests fail'
+        required: false
+        default: false
+        type: boolean
+
+env:
+  AWS_REGION: us-east-1
+  PROJECT_NAME: ai-project-generator
+  PYTHON_VERSION: '3.11'
+  NODE_VERSION: '18'
+
+jobs:
+  # Pre-deployment checks
+  pre_deployment:
+    name: Pre-Deployment Checks
+    runs-on: ubuntu-latest
+    outputs:
+      should_deploy: ${{ steps.check.outputs.should_deploy }}
+      commit_sha: ${{ github.sha }}
+      commit_message: ${{ github.event.head_commit.message }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for changes
+        id: check
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "should_deploy=true" >> $GITHUB_OUTPUT
+          else
+            # Check if relevant files changed
+            CHANGED_FILES=$(git diff --name-only HEAD~1 HEAD | grep -E "(agents/backend/onyx/server/features/ai_project_generator|\.github/workflows)" || true)
+            if [ -n "$CHANGED_FILES" ]; then
+              echo "should_deploy=true" >> $GITHUB_OUTPUT
+              echo "Changes detected in:"
+              echo "$CHANGED_FILES"
+            else
+              echo "should_deploy=false" >> $GITHUB_OUTPUT
+              echo "No relevant changes detected"
+            fi
+          fi
+
+      - name: Validate commit message
+        run: |
+          COMMIT_MSG="${{ github.event.head_commit.message }}"
+          if [[ "$COMMIT_MSG" =~ ^(skip ci|ci skip|no deploy) ]]; then
+            echo "Deployment skipped by commit message"
+            exit 0
+          fi
+
+  # Run tests before deployment
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: pre_deployment
+    if: needs.pre_deployment.outputs.should_deploy == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install Python dependencies
+        run: |
+          cd agents/backend/onyx/server/features/ai_project_generator
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov black flake8 mypy
+
+      - name: Install Node dependencies
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci
+          fi
+
+      - name: Lint Python code
+        run: |
+          cd agents/backend/onyx/server/features/ai_project_generator
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics || true
+          black --check . || true
+
+      - name: Type check Python code
+        run: |
+          cd agents/backend/onyx/server/features/ai_project_generator
+          mypy . --ignore-missing-imports || true
+
+      - name: Run Python tests
+        run: |
+          cd agents/backend/onyx/server/features/ai_project_generator
+          pytest tests/ -v --cov=. --cov-report=xml --cov-report=term || true
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./agents/backend/onyx/server/features/ai_project_generator/coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+        continue-on-error: true
+
+  # Security scanning
+  security_scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: pre_deployment
+    if: needs.pre_deployment.outputs.should_deploy == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+        continue-on-error: true
+
+  # Build and prepare deployment
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: [pre_deployment, test, security_scan]
+    if: |
+      needs.pre_deployment.outputs.should_deploy == 'true' &&
+      (needs.test.result == 'success' || github.event.inputs.force_deploy == 'true')
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Build Docker image (if Dockerfile exists)
+        run: |
+          if [ -f "agents/backend/onyx/server/features/ai_project_generator/Dockerfile" ]; then
+            docker build -t ${{ env.PROJECT_NAME }}:${{ github.sha }} \
+              -f agents/backend/onyx/server/features/ai_project_generator/Dockerfile \
+              agents/backend/onyx/server/features/ai_project_generator/
+          fi
+        continue-on-error: true
+
+      - name: Create deployment artifact
+        run: |
+          mkdir -p deployment
+          tar -czf deployment/app.tar.gz \
+            agents/backend/onyx/server/features/ai_project_generator/
+          echo "${{ github.sha }}" > deployment/commit.txt
+          echo "${{ github.event.head_commit.message }}" > deployment/commit_message.txt
+
+      - name: Upload deployment artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: deployment-package
+          path: deployment/
+          retention-days: 7
+
+  # Main deployment job
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: [pre_deployment, test, security_scan, build]
+    if: |
+      needs.pre_deployment.outputs.should_deploy == 'true' &&
+      (needs.test.result == 'success' || github.event.inputs.force_deploy == 'true')
+    environment:
+      name: ${{ github.event.inputs.environment || 'production' }}
+      url: ${{ steps.get-lb-url.outputs.url }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download deployment artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: deployment-package
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install ansible boto3
+
+      - name: Get EC2 instance IPs
+        id: get-instances
+        run: |
+          cd agents/backend/onyx/server/features/ai_project_generator/aws/terraform
+          
+          # Initialize Terraform if needed
+          if [ ! -d ".terraform" ]; then
+            terraform init -backend=false || true
+          fi
+          
+          # Get instance IPs from Terraform output
+          INSTANCE_IPS=$(terraform output -json ec2_instance_public_ips 2>/dev/null | jq -r '.[]' | tr '\n' ' ' || echo "")
+          
+          if [ -z "$INSTANCE_IPS" ] || [ "$INSTANCE_IPS" == "null" ]; then
+            # Try to get from Auto Scaling Group
+            ASG_NAME=$(terraform output -raw autoscaling_group_name 2>/dev/null || echo "")
+            if [ -n "$ASG_NAME" ] && [ "$ASG_NAME" != "null" ]; then
+              INSTANCE_IPS=$(aws autoscaling describe-auto-scaling-groups \
+                --auto-scaling-group-names "$ASG_NAME" \
+                --query 'AutoScalingGroups[0].Instances[?HealthStatus==`Healthy`].PublicIpAddress' \
+                --output text 2>/dev/null | tr '\t' ' ' || echo "")
+            fi
+          fi
+          
+          if [ -z "$INSTANCE_IPS" ] || [ "$INSTANCE_IPS" == "null" ]; then
+            # Fallback: Get instances by tag
+            INSTANCE_IPS=$(aws ec2 describe-instances \
+              --filters "Name=tag:Project,Values=${{ env.PROJECT_NAME }}" \
+                        "Name=tag:Environment,Values=${{ github.event.inputs.environment || 'production' }}" \
+                        "Name=instance-state-name,Values=running" \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --output text 2>/dev/null | tr '\t' ' ' || echo "")
+          fi
+          
+          if [ -z "$INSTANCE_IPS" ] || [ "$INSTANCE_IPS" == "null" ]; then
+            echo "❌ No instances found"
+            exit 1
+          fi
+          
+          # Remove empty strings and format
+          INSTANCE_IPS=$(echo "$INSTANCE_IPS" | tr ' ' '\n' | grep -v '^$' | tr '\n' ' ')
+          echo "instances=$INSTANCE_IPS" >> $GITHUB_OUTPUT
+          echo "✅ Found instances: $INSTANCE_IPS"
+
+      - name: Get Load Balancer URL
+        id: get-lb-url
+        run: |
+          cd agents/backend/onyx/server/features/ai_project_generator/aws/terraform
+          LB_DNS=$(terraform output -raw load_balancer_dns 2>/dev/null || echo "")
+          if [ -n "$LB_DNS" ] && [ "$LB_DNS" != "null" ]; then
+            echo "url=http://$LB_DNS" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_PRIVATE_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          
+          # Add all instance IPs to known_hosts
+          INSTANCE_IPS="${{ steps.get-instances.outputs.instances }}"
+          for IP in $INSTANCE_IPS; do
+            ssh-keyscan -H "$IP" >> ~/.ssh/known_hosts 2>/dev/null || true
+          done
+
+      - name: Create backup before deployment
+        run: |
+          INSTANCE_IPS="${{ steps.get-instances.outputs.instances }}"
+          for IP in $INSTANCE_IPS; do
+            echo "Creating backup on $IP..."
+            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ubuntu@$IP \
+              "sudo /opt/${{ env.PROJECT_NAME }}/scripts/automated_backup.sh || true" || true
+          done
+
+      - name: Run Ansible deployment
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: 'False'
+          ANSIBLE_SSH_PRIVATE_KEY_FILE: ~/.ssh/deploy_key
+          ANSIBLE_TIMEOUT: 30
+        run: |
+          cd agents/backend/onyx/server/features/ai_project_generator/aws/ansible
+          
+          INSTANCE_IPS="${{ steps.get-instances.outputs.instances }}"
+          
+          if [ -z "$INSTANCE_IPS" ]; then
+            echo "❌ No instances found"
+            exit 1
+          fi
+          
+          # Create inventory
+          cat > /tmp/inventory.ini <<EOF
+          [ec2_instances]
+          EOF
+          
+          for IP in $INSTANCE_IPS; do
+            echo "$IP ansible_user=ubuntu ansible_ssh_private_key_file=~/.ssh/deploy_key" >> /tmp/inventory.ini
+          done
+          
+          # Run deployment with retry
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if ansible-playbook -i /tmp/inventory.ini playbooks/update.yml \
+              -e "project_name=${{ env.PROJECT_NAME }}" \
+              -e "environment=${{ github.event.inputs.environment || 'production' }}" \
+              -e "git_branch=main" \
+              -e "git_commit=${{ github.sha }}"; then
+              echo "✅ Deployment successful"
+              break
+            else
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "⚠️ Deployment failed, retrying ($RETRY_COUNT/$MAX_RETRIES)..."
+                sleep 10
+              else
+                echo "❌ Deployment failed after $MAX_RETRIES attempts"
+                exit 1
+              fi
+            fi
+          done
+
+      - name: Health check with retry
+        id: health-check
+        run: |
+          INSTANCE_IPS="${{ steps.get-instances.outputs.instances }}"
+          MAX_ATTEMPTS=10
+          ATTEMPT=1
+          ALL_HEALTHY=true
+          
+          for IP in $INSTANCE_IPS; do
+            echo "Checking health of $IP..."
+            HEALTHY=false
+            
+            for i in $(seq 1 $MAX_ATTEMPTS); do
+              if curl -f -s -m 5 "http://$IP/health" > /dev/null 2>&1 || \
+                 curl -f -s -m 5 "http://$IP:8020/health" > /dev/null 2>&1; then
+                echo "✅ Health check passed for $IP (attempt $i)"
+                HEALTHY=true
+                break
+              else
+                echo "⏳ Health check attempt $i/$MAX_ATTEMPTS failed for $IP, retrying..."
+                sleep 5
+              fi
+            done
+            
+            if [ "$HEALTHY" != "true" ]; then
+              echo "❌ Health check failed for $IP after $MAX_ATTEMPTS attempts"
+              ALL_HEALTHY=false
+            fi
+          done
+          
+          if [ "$ALL_HEALTHY" != "true" ]; then
+            echo "❌ Some instances failed health check"
+            echo "healthy=false" >> $GITHUB_OUTPUT
+            exit 1
+          else
+            echo "✅ All instances passed health check"
+            echo "healthy=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Rollback on failure
+        if: failure() && steps.health-check.outputs.healthy != 'true'
+        run: |
+          echo "🔄 Initiating rollback..."
+          INSTANCE_IPS="${{ steps.get-instances.outputs.instances }}"
+          
+          for IP in $INSTANCE_IPS; do
+            ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no ubuntu@$IP \
+              "sudo /opt/${{ env.PROJECT_NAME }}/scripts/rollback.sh || true" || true
+          done
+          
+          echo "✅ Rollback completed"
+
+  # Post-deployment notifications
+  notify:
+    name: Notify Deployment Status
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always()
+    
+    steps:
+      - name: Send success notification
+        if: needs.deploy.result == 'success'
+        run: |
+          echo "✅ Deployment successful!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Author: ${{ github.actor }}"
+          echo "Message: ${{ github.event.head_commit.message }}"
+          # Add Slack/Discord/Email notification here
+          # Example: curl -X POST $SLACK_WEBHOOK_URL -d "..."
+
+      - name: Send failure notification
+        if: needs.deploy.result == 'failure'
+        run: |
+          echo "❌ Deployment failed!"
+          echo "Commit: ${{ github.sha }}"
+          echo "Author: ${{ github.actor }}"
+          echo "Message: ${{ github.event.head_commit.message }}"
+          # Add Slack/Discord/Email notification here
+

@@ -1,0 +1,39 @@
+# Prometheus Configuration for Shared Library
+# ===========================================
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'shared-lib'
+    environment: 'development'
+
+scrape_configs:
+  # Prometheus itself
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # FastAPI services
+  - job_name: 'fastapi-services'
+    metrics_path: '/metrics'
+    static_configs:
+      - targets:
+        - 'localhost:8030'  # 3d_prototype_ai
+        - 'localhost:8010'  # music_analyzer_ai
+        - 'localhost:8020'  # Otros servicios
+    scrape_interval: 10s
+
+  # Redis
+  - job_name: 'redis'
+    static_configs:
+      - targets: ['redis:6379']
+
+  # RabbitMQ
+  - job_name: 'rabbitmq'
+    static_configs:
+      - targets: ['rabbitmq:15692']
+
+
+
+

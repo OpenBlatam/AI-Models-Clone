@@ -1,0 +1,430 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: ./agents/backend/onyx/server/features/business_agents
+      dockerfile: Dockerfile
+    container_name: business-agents-api
+    env_file:
+      - .env
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - CACHE_TTL_SECONDS=${CACHE_TTL_SECONDS:-10}
+      - RPS_LIMIT=${RPS_LIMIT:-200}
+      - MAX_BODY_BYTES=${MAX_BODY_BYTES:-5242880}
+      - REQUEST_TIMEOUT_SECONDS=${REQUEST_TIMEOUT_SECONDS:-30}
+      - ENABLE_OTEL=${ENABLE_OTEL:-false}
+      - ENFORCE_AUTH=${ENFORCE_AUTH:-false}
+      - API_KEY=${API_KEY:-}
+      - JWT_SECRET=${JWT_SECRET:-}
+      - JWT_ALGORITHM=${JWT_ALGORITHM:-HS256}
+      - JWT_AUDIENCE=${JWT_AUDIENCE:-}
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/ready"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+      - "6379:6379"
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command: ["--config.file=/etc/prometheus/prometheus.yml"]
+    ports:
+      - "9090:9090"
+    depends_on:
+      - api
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    depends_on:
+      - prometheus
+
+networks:
+  default:
+    name: onyx-stack
+# 🚀 **DOCKER COMPOSE PARA SISTEMA DE GESTIÓN DE RECURSOS INTELIGENTE**
+# Orquestación completa del sistema con todos sus componentes
+
+version: '3.8'
+
+# ============================================================================
+# 🔧 **SERVICIOS PRINCIPALES**
+# ============================================================================
+
+services:
+  # ========================================================================
+  # 🎮 **INTERFAZ PRINCIPAL - GRADIO**
+  # ========================================================================
+  resource-manager-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: intelligent-resource-manager-ui
+    ports:
+      - "7860:7860"
+    environment:
+      - GRADIO_SERVER_NAME=0.0.0.0
+      - GRADIO_SERVER_PORT=7860
+      - GRADIO_SHARE=False
+      - REDIS_URL=redis://redis:6379
+      - MONITORING_ENABLED=true
+    volumes:
+      - ./resource_config.yaml:/app/resource_config.yaml:ro
+      - resource_logs:/app/logs
+    depends_on:
+      - redis
+      - monitoring
+    networks:
+      - resource-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7860/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # ========================================================================
+  # 🧠 **SISTEMA PRINCIPAL DE GESTIÓN DE RECURSOS**
+  # ========================================================================
+  resource-manager-core:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: intelligent-resource-manager-core
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - MONITORING_ENABLED=true
+      - LOG_LEVEL=INFO
+      - GPU_ENABLED=true
+    volumes:
+      - ./resource_config.yaml:/app/resource_config.yaml:ro
+      - resource_logs:/app/logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    depends_on:
+      - redis
+      - monitoring
+    networks:
+      - resource-network
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    command: ["python", "intelligent_resource_manager.py"]
+
+  # ========================================================================
+  # 📊 **SISTEMA DE MONITOREO**
+  # ========================================================================
+  monitoring:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: monitoring
+    container_name: intelligent-resource-monitoring
+    ports:
+      - "9090:9090"
+      - "3000:3000"
+    environment:
+      - PROMETHEUS_ENABLED=true
+      - GRAFANA_ENABLED=true
+      - ALERTING_ENABLED=true
+    volumes:
+      - monitoring_data:/var/lib/prometheus
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - resource-network
+    restart: unless-stopped
+
+  # ========================================================================
+  # 🗄️ **BASE DE DATOS REDIS**
+  # ========================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: intelligent-resource-redis
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=resource_manager_2024
+    volumes:
+      - redis_data:/data
+      - ./redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - resource-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ========================================================================
+  # 📈 **GRAFANA PARA VISUALIZACIÓN**
+  # ========================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: intelligent-resource-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    networks:
+      - resource-network
+    restart: unless-stopped
+
+  # ========================================================================
+  # 📊 **PROMETHEUS PARA MÉTRICAS**
+  # ========================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: intelligent-resource-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - monitoring_data:/prometheus
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - resource-network
+    restart: unless-stopped
+
+  # ========================================================================
+  # 🔔 **SISTEMA DE ALERTAS**
+  # ========================================================================
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: intelligent-resource-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./monitoring/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+      - alertmanager_data:/alertmanager
+    command:
+      - '--config.file=/etc/alertmanager/alertmanager.yml'
+      - '--storage.path=/alertmanager'
+    networks:
+      - resource-network
+    restart: unless-stopped
+
+  # ========================================================================
+  # 🔄 **COLA DE TAREAS CELERY**
+  # ========================================================================
+  celery-worker:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: intelligent-resource-celery-worker
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - CELERY_TASK_SERIALIZER=json
+      - CELERY_RESULT_SERIALIZER=json
+      - CELERY_ACCEPT_CONTENT=json
+      - CELERY_TIMEZONE=UTC
+      - CELERY_ENABLE_UTC=True
+    volumes:
+      - ./resource_config.yaml:/app/resource_config.yaml:ro
+      - resource_logs:/app/logs
+    depends_on:
+      - redis
+    networks:
+      - resource-network
+    restart: unless-stopped
+    command: ["celery", "-A", "intelligent_resource_manager", "worker", "--loglevel=info"]
+
+  # ========================================================================
+  # 🌸 **FLOWER PARA MONITOREO DE CELERY**
+  # ========================================================================
+  flower:
+    image: mher/flower:latest
+    container_name: intelligent-resource-flower
+    ports:
+      - "5555:5555"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+    depends_on:
+      - redis
+      - celery-worker
+    networks:
+      - resource-network
+    restart: unless-stopped
+
+  # ========================================================================
+  # 🧪 **SISTEMA DE TESTING**
+  # ========================================================================
+  testing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: testing
+    container_name: intelligent-resource-testing
+    environment:
+      - PYTHONPATH=/app
+      - TESTING=True
+    volumes:
+      - .:/app
+      - test_results:/app/test_results
+    networks:
+      - resource-network
+    profiles:
+      - testing
+
+  # ========================================================================
+  # 🔬 **SISTEMA DE PROFILING**
+  # ========================================================================
+  profiling:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: profiling
+    container_name: intelligent-resource-profiling
+    environment:
+      - PROFILING_ENABLED=true
+      - PYTHONPATH=/app
+    volumes:
+      - .:/app
+      - profiling_data:/app/profiling_data
+    networks:
+      - resource-network
+    profiles:
+      - profiling
+
+  # ========================================================================
+  # 📚 **JUPYTER NOTEBOOK**
+  # ========================================================================
+  jupyter:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    container_name: intelligent-resource-jupyter
+    ports:
+      - "8888:8888"
+    environment:
+      - JUPYTER_ENABLE_LAB=yes
+      - JUPYTER_TOKEN=resource_manager_2024
+    volumes:
+      - .:/app
+      - jupyter_data:/home/appuser/.jupyter
+    working_dir: /app
+    networks:
+      - resource-network
+    restart: unless-stopped
+    profiles:
+      - development
+
+# ============================================================================
+# 🌐 **REDES**
+# ============================================================================
+
+networks:
+  resource-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+
+# ============================================================================
+# 💾 **VOLÚMENES**
+# ============================================================================
+
+volumes:
+  redis_data:
+    driver: local
+  monitoring_data:
+    driver: local
+  grafana_data:
+    driver: local
+  alertmanager_data:
+    driver: local
+  resource_logs:
+    driver: local
+  test_results:
+    driver: local
+  profiling_data:
+    driver: local
+  jupyter_data:
+    driver: local
+
+# ============================================================================
+# 🚨 **CONFIGURACIONES ADICIONALES**
+# ============================================================================
+
+# Configuración de recursos globales
+x-resource-limits: &resource-limits
+  deploy:
+    resources:
+      limits:
+        cpus: '2.0'
+        memory: 4G
+      reservations:
+        cpus: '1.0'
+        memory: 2G
+
+# Configuración de logging global
+x-logging: &logging-config
+  logging:
+    driver: "json-file"
+    options:
+      max-size: "10m"
+      max-file: "3"
+
+# Aplicar configuraciones globales a servicios principales
+services:
+  resource-manager-ui:
+    <<: *resource-limits
+    <<: *logging-config
+  
+  resource-manager-core:
+    <<: *resource-limits
+    <<: *logging-config
+  
+  monitoring:
+    <<: *logging-config
+  
+  celery-worker:
+    <<: *resource-limits
+    <<: *logging-config 

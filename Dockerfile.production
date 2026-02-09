@@ -1,0 +1,200 @@
+# =============================================================================
+# Production Dockerfile for Next-Level HeyGen AI FastAPI
+# Multi-stage build with security hardening and performance optimization
+# =============================================================================
+
+# =============================================================================
+# Build Stage - Dependencies and Compilation
+# =============================================================================
+FROM python:3.11-slim-bullseye as builder
+
+# Build arguments
+ARG OPTIMIZATION_TIER=3
+ARG ENABLE_GPU=true
+ARG BUILD_ENV=production
+
+# Set environment variables for build
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=100
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    gcc \
+    g++ \
+    cmake \
+    pkg-config \
+    libffi-dev \
+    libssl-dev \
+    libpq-dev \
+    libmagic1 \
+    ffmpeg \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Upgrade pip and install wheel
+RUN pip install --upgrade pip setuptools wheel
+
+# Copy requirements first for better caching
+COPY requirements-next-level.txt /tmp/
+COPY requirements-production.txt /tmp/
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r /tmp/requirements-next-level.txt && \
+    pip install --no-cache-dir -r /tmp/requirements-production.txt
+
+# =============================================================================
+# Production Stage - Runtime
+# =============================================================================
+FROM python:3.11-slim-bullseye as production
+
+# Production metadata
+LABEL maintainer="HeyGen AI Team" \
+      version="2.0.0" \
+      description="Next-Level Optimized HeyGen AI FastAPI Service" \
+      optimization_tier="quantum"
+
+# Security: Create non-root user
+RUN groupadd -r heygen && \
+    useradd -r -g heygen -s /bin/false -c "HeyGen AI Service" heygen
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    libmagic1 \
+    ffmpeg \
+    curl \
+    tini \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Copy virtual environment from builder
+COPY --from=builder /opt/venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Set production environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random \
+    ENVIRONMENT=production \
+    OPTIMIZATION_TIER=3 \
+    PROFILING_LEVEL=1 \
+    ENABLE_GPU_OPTIMIZATION=true \
+    ENABLE_REDIS=true \
+    ENABLE_REQUEST_BATCHING=true \
+    ENABLE_PERFORMANCE_PROFILING=true \
+    MAX_CONCURRENT_REQUESTS=1000 \
+    DEFAULT_BATCH_SIZE=8 \
+    LOG_LEVEL=info \
+    HOST=0.0.0.0 \
+    PORT=8000 \
+    WORKERS=4
+
+# Create application directories
+RUN mkdir -p /app /app/logs /app/data /app/cache /app/temp && \
+    chown -R heygen:heygen /app
+
+# Set working directory
+WORKDIR /app
+
+# Copy application code
+COPY --chown=heygen:heygen . .
+
+# Create additional directories for production
+RUN mkdir -p /app/outputs/videos /app/outputs/images /app/monitoring && \
+    chown -R heygen:heygen /app/outputs /app/monitoring
+
+# Copy production configuration
+COPY --chown=heygen:heygen config/production.env .env
+COPY --chown=heygen:heygen scripts/start-production.sh /app/start.sh
+COPY --chown=heygen:heygen scripts/healthcheck.py /app/healthcheck.py
+
+# Make scripts executable
+RUN chmod +x /app/start.sh /app/healthcheck.py
+
+# Security hardening
+RUN chmod -R 755 /app && \
+    chmod -R 644 /app/*.py /app/*.md /app/*.txt && \
+    chmod +x /app/start.sh /app/healthcheck.py && \
+    find /app -type f -name "*.py" -exec chmod 644 {} \;
+
+# Switch to non-root user
+USER heygen
+
+# Expose ports
+EXPOSE 8000 9090
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD python /app/healthcheck.py || exit 1
+
+# Use tini for proper signal handling
+ENTRYPOINT ["tini", "--"]
+
+# Default command
+CMD ["/app/start.sh"]
+
+# =============================================================================
+# Development Stage (Optional)
+# =============================================================================
+FROM production as development
+
+# Switch back to root for development tools
+USER root
+
+# Install development dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    vim \
+    htop \
+    ps auxf \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install development Python packages
+RUN pip install --no-cache-dir \
+    pytest \
+    pytest-asyncio \
+    pytest-cov \
+    black \
+    isort \
+    flake8 \
+    mypy \
+    ipython \
+    jupyter
+
+# Development environment variables
+ENV ENVIRONMENT=development \
+    LOG_LEVEL=debug \
+    RELOAD=true \
+    WORKERS=1
+
+# Switch back to heygen user
+USER heygen
+
+# Development command
+CMD ["python", "main_next_level.py"]
+
+# =============================================================================
+# Build Instructions
+# =============================================================================
+# 
+# Production build:
+# docker build --target production -t heygen-ai:latest .
+#
+# Development build:
+# docker build --target development -t heygen-ai:dev .
+#
+# Multi-platform build:
+# docker buildx build --platform linux/amd64,linux/arm64 -t heygen-ai:latest .
+#
+# Build with custom optimization:
+# docker build --build-arg OPTIMIZATION_TIER=3 --build-arg ENABLE_GPU=true -t heygen-ai:quantum .
+# 

@@ -1,0 +1,106 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: music-analyzer
+  labels:
+    app: music-analyzer
+    version: v2
+spec:
+  replicas: 3
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: music-analyzer
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 1
+  template:
+    metadata:
+      labels:
+        app: music-analyzer
+        version: v2
+        sidecar.istio.io/inject: "true"
+      annotations:
+        checksum/config: "{{ include \"music-analyzer.configChecksum\" . | default \"manual\" }}"
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8030"
+        prometheus.io/path: "/metrics"
+    spec:
+      serviceAccountName: music-analyzer
+      terminationGracePeriodSeconds: 60
+      containers:
+        - name: api
+          image: 123456789012.dkr.ecr.us-east-1.amazonaws.com/music-analyzer:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8030
+              name: http
+          env:
+            - name: ENVIRONMENT
+              value: "production"
+            - name: LOG_LEVEL
+              value: "INFO"
+            - name: AWS_REGION
+              value: "us-east-1"
+            - name: REDIS_URL
+              valueFrom:
+                secretKeyRef:
+                  name: music-analyzer-secrets
+                  key: redis_url
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: music-analyzer-secrets
+                  key: database_url
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 5
+            timeoutSeconds: 2
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 2
+            failureThreshold: 5
+          resources:
+            requests:
+              cpu: "200m"
+              memory: "512Mi"
+            limits:
+              cpu: "1"
+              memory: "1Gi"
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+      affinity:
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: app
+                      operator: In
+                      values:
+                        - music-analyzer
+                topologyKey: kubernetes.io/hostname
+      tolerations:
+        - key: "workload"
+          operator: "Equal"
+          value: "high-priority"
+          effect: "NoSchedule"
+
+
+
+

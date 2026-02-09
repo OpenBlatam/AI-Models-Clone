@@ -1,0 +1,2 @@
+Requirement already satisfied: asyncpg in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (0.29.0)
+Requirement already satisfied: async-timeout>=4.0.3 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from asyncpg) (5.0.1)

@@ -1,0 +1,47 @@
+---
+- name: Check Python version
+  command: python3 --version
+  register: python_version_check
+  changed_when: false
+
+- name: Install Python dependencies
+  apt:
+    name:
+      - python3
+      - python3-pip
+      - python3-venv
+      - python3-dev
+      - libpq-dev
+      - libssl-dev
+      - libffi-dev
+    state: present
+    update_cache: yes
+  when: ansible_os_family == "Debian"
+
+- name: Upgrade pip
+  pip:
+    name: pip
+    state: latest
+    executable: pip3
+
+- name: Install Python build dependencies
+  pip:
+    name:
+      - setuptools
+      - wheel
+      - virtualenv
+    state: latest
+    executable: pip3
+
+- name: Create Python virtual environment directory
+  file:
+    path: /opt/venv
+    state: directory
+    mode: '0755'
+
+- name: Display Python information
+  debug:
+    msg:
+      - "Python version: {{ python_version_check.stdout }}"
+      - "Python virtual environment: /opt/venv"
+

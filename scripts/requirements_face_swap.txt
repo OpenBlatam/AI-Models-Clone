@@ -1,0 +1,56 @@
+# Requisitos para Face Swap Model
+opencv-python>=4.8.0
+torch>=2.0.0
+torchvision>=0.15.0
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# Librerías profesionales para máxima calidad (RECOMENDADAS)
+# Instalación básica (mínimo requerido):
+opencv-python>=4.8.0
+numpy>=1.24.0
+Pillow>=10.0.0
+
+# Librerías profesionales (instalar para mejor calidad):
+mediapipe>=0.10.0
+face-alignment>=1.3.5
+scikit-image>=0.21.0
+insightface>=0.7.3
+onnxruntime>=1.16.0
+retinaface>=0.0.16
+albumentations>=1.3.1
+kornia>=0.7.0
+imageio>=2.31.0
+scipy>=1.11.0
+numba>=0.58.0
+
+# Nota: NumPy ya está incluido y es necesario para FFT
+# Todas las técnicas avanzadas están implementadas y funcionan
+# con fallbacks si alguna librería no está disponible
+
+# Nota: El script funciona con solo OpenCV, pero instala las librerías
+# profesionales para obtener resultados de máxima calidad
+
+# Librerías opcionales (más difíciles de instalar)
+# face-recognition>=1.3.0
+# dlib>=19.24.0
+
+# Nota: dlib puede requerir instalación adicional en Windows
+# En Windows, puedes necesitar:
+# 1. Instalar Visual Studio Build Tools
+# 2. pip install cmake
+# 3. pip install dlib
+
+# Instalación rápida de librerías profesionales:
+# pip install mediapipe face-alignment scikit-image
+
+# El script face_swap_professional.py detecta automáticamente
+# qué librerías están disponibles y usa el mejor método
+
+
+
+
+
+
+
+

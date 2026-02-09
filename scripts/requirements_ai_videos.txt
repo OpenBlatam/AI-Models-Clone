@@ -1,0 +1,15 @@
+moviepy>=1.0.3
+pillow>=10.0.0
+opencv-python>=4.8.0
+numpy>=1.24.0
+imageio>=2.31.0
+imageio-ffmpeg>=0.4.9
+scikit-image>=0.21.0
+
+
+
+
+
+
+
+

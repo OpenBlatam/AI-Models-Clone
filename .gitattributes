@@ -1,0 +1,17 @@
+# Normalize line endings
+* text=auto
+
+# Treat these as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+*.bin binary
+*.pt binary
+*.onnx binary
+

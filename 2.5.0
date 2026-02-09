@@ -1,0 +1,17 @@
+Collecting huey
+  Downloading huey-2.5.3.tar.gz (836 kB)
+     -------------------------------------- 836.9/836.9 kB 1.8 MB/s eta 0:00:00
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: huey
+  Building wheel for huey (pyproject.toml): started
+  Building wheel for huey (pyproject.toml): finished with status 'done'
+  Created wheel for huey: filename=huey-2.5.3-py3-none-any.whl size=76989 sha256=c89cb7240d3461b4bca9dfd2b1f177ea2510f4ee69bb1df497bbc789c90545c6
+  Stored in directory: c:\users\user\appdata\local\pip\cache\wheels\64\2a\d5\0091e014c27499bc75513a9bc7aff041e452974ba89017475d
+Successfully built huey
+Installing collected packages: huey
+Successfully installed huey-2.5.3

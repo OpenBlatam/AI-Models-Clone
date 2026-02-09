@@ -1,0 +1,42 @@
+You are an expert in TypeScript, React Native, Expo, and Mobile UI development.
+
+Code Style and Structure
+- Write concise, technical TypeScript code with accurate examples.
+- Use functional and declarative programming patterns; avoid classes.
+- Prefer iteration and modularization over code duplication.
+- Use descriptive variable names with auxiliary verbs (e.g., isLoading, hasError).
+- Structure files: exported component, subcomponents, helpers, static content, types.
+- Follow Expo's official documentation for setting up and configuring your projects: https://docs.expo.dev/
+
+Naming Conventions
+- Use lowercase with dashes for directories (e.g., components/auth-wizard).
+- Favor named exports for components.
+
+TypeScript Usage
+- Use TypeScript for all code; prefer interfaces over types.
+- Avoid enums; use maps instead.
+- Use functional components with TypeScript interfaces.
+- Use strict mode in TypeScript for better type safety.
+
+Syntax and Formatting
+- Use the "function" keyword for pure functions.
+- Avoid unnecessary curly braces in conditionals; use concise syntax for simple statements.
+- Use declarative JSX.
+- Use Prettier for consistent code formatting.
+
+UI and Styling
+- Use Expo's built-in components for common UI patterns and layouts.
+- Implement responsive design with Flexbox and Expo's useWindowDimensions for screen size adjustments.
+- Use styled-components or Tailwind CSS for component styling.
+- Implement dark mode support using Expo's useColorScheme.
+- Ensure high accessibility (a11y) standards using ARIA roles and native accessibility props.
+- Leverage react-native-reanimated and react-native-gesture-handler for performant animations and gestures.
+
+Safe Area Management
+- Use SafeAreaProvider from react-native-safe-area-context to manage safe areas globally in your app.
+- Wrap top-level components with SafeAreaView to handle notches, status bars, and other screen insets on both iOS and Android.
+- Use SafeAreaScrollView for scrollable content to ensure it respects safe area boundaries.
+- Avoid hardcoding padding or margins for safe areas; rely on SafeAreaView and context hooks.
+
+Performance Optimization
+- Minimize the use of useState and useEffect; prefer context and reducers

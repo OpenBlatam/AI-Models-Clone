@@ -1,0 +1,222 @@
+# 🚀 ENTERPRISE API CONFIGURATION EXAMPLE
+# Copy this file to .env and customize for your environment
+
+# === APPLICATION SETTINGS ===
+APP_NAME=Enterprise API
+APP_VERSION=1.0.0
+ENVIRONMENT=development
+DEBUG=true
+HOST=0.0.0.0
+PORT=8000
+
+# === SECURITY ===
+SECRET_KEY=change-me-in-production-ultra-secure-key-64-chars-minimum
+ALLOWED_ORIGINS=*
+TRUSTED_HOSTS=*
+
+# Enable HTTPS redirect in production
+ENABLE_HTTPS_REDIRECT=false
+
+# Session and security timeouts
+SESSION_TIMEOUT=3600
+MAX_LOGIN_ATTEMPTS=5
+
+# === CACHING ===
+REDIS_URL=redis://localhost:6379
+REDIS_MAX_CONNECTIONS=50
+CACHE_DEFAULT_TTL=3600
+MEMORY_CACHE_SIZE=10000
+CACHE_COMPRESSION=true
+CACHE_COMPRESSION_THRESHOLD=1024
+
+# === RATE LIMITING ===
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_RPM=1000
+RATE_LIMIT_RPH=10000
+RATE_LIMIT_BURST=100
+RATE_LIMIT_PER_USER=100
+RATE_LIMIT_PER_IP=500
+
+# Exempt IPs (comma-separated)
+RATE_LIMIT_EXEMPT_IPS=127.0.0.1,::1
+
+# === CIRCUIT BREAKER ===
+CB_FAILURE_THRESHOLD=5
+CB_RECOVERY_TIMEOUT=60
+CB_HALF_OPEN_CALLS=5
+CB_SLOW_CALL_THRESHOLD=5.0
+
+# === MONITORING & OBSERVABILITY ===
+ENABLE_METRICS=true
+ENABLE_TRACING=true
+ENABLE_LOGGING=true
+LOG_LEVEL=INFO
+STRUCTURED_LOGGING=true
+LOG_TO_FILE=false
+LOG_FILE_PATH=/var/log/app.log
+
+# Prometheus metrics
+METRICS_AUTH=prometheus:secure-password
+
+# Distributed tracing
+JAEGER_ENDPOINT=http://localhost:14268/api/traces
+TRACE_SAMPLE_RATE=0.1
+
+# === PERFORMANCE ===
+MAX_WORKERS=4
+WORKER_CONNECTIONS=1000
+KEEPALIVE_TIMEOUT=75
+REQUEST_TIMEOUT=30
+
+# Event loop optimization
+EVENT_LOOP_POLICY=asyncio
+ENABLE_UVLOOP=true
+
+# Connection pooling
+DB_POOL_SIZE=20
+DB_MAX_OVERFLOW=10
+HTTP_POOL_CONNECTIONS=50
+HTTP_POOL_MAXSIZE=100
+
+# === SERVERLESS OPTIMIZATION ===
+COLD_START_OPT=true
+LAZY_LOADING=true
+MINIMIZE_IMPORTS=true
+
+# Preload modules (comma-separated)
+PRELOAD_MODULES=fastapi,redis,orjson
+
+# AWS Lambda specific
+LAMBDA_TIMEOUT=300
+LAMBDA_MEMORY=512
+PROVISIONED_CONCURRENCY=0
+
+# === DATABASE ===
+DATABASE_URL=sqlite:///./app.db
+DB_ECHO=false
+DB_POOL_SIZE=20
+DB_MAX_OVERFLOW=10
+DB_POOL_TIMEOUT=30
+DB_POOL_RECYCLE=3600
+
+# Read replicas (comma-separated URLs)
+# READ_REPLICA_URLS=postgresql://user:pass@replica1:5432/db,postgresql://user:pass@replica2:5432/db
+
+# === API GATEWAY ===
+API_GATEWAY_ENABLED=false
+API_GATEWAY_URL=https://api.yourdomain.com
+API_PREFIX=/api/v1
+
+# === HEALTH CHECKS ===
+HEALTH_CHECK_INTERVAL=30
+ENABLE_STARTUP_PROBE=true
+
+# === PRODUCTION OVERRIDES ===
+# Uncomment and modify for production deployment
+
+# Security
+# SECRET_KEY=your-ultra-secure-production-key-minimum-64-characters-long
+# ALLOWED_ORIGINS=https://yourdomain.com,https://www.yourdomain.com
+# TRUSTED_HOSTS=yourdomain.com,www.yourdomain.com
+# ENABLE_HTTPS_REDIRECT=true
+
+# Performance
+# MAX_WORKERS=8
+# WORKER_CONNECTIONS=2000
+# DB_POOL_SIZE=50
+
+# Caching
+# REDIS_URL=redis://redis-cluster:6379
+# MEMORY_CACHE_SIZE=50000
+
+# Rate Limiting
+# RATE_LIMIT_RPM=5000
+# RATE_LIMIT_PER_IP=1000
+
+# Monitoring
+# METRICS_AUTH=prometheus:your-secure-metrics-password
+# JAEGER_ENDPOINT=http://jaeger:14268/api/traces
+
+# === DEVELOPMENT OVERRIDES ===
+# Uncomment for development environment
+
+# DEBUG=true
+# LOG_LEVEL=DEBUG
+# ENABLE_UVLOOP=false
+# RATE_LIMIT_ENABLED=false
+# CB_FAILURE_THRESHOLD=10
+
+# === TESTING OVERRIDES ===
+# Uncomment for testing environment
+
+# ENVIRONMENT=testing
+# DATABASE_URL=sqlite:///:memory:
+# REDIS_URL=redis://localhost:6380
+# RATE_LIMIT_ENABLED=false
+# ENABLE_METRICS=false
+
+# === STAGING OVERRIDES ===
+# Uncomment for staging environment
+
+# ENVIRONMENT=staging
+# SECRET_KEY=staging-secret-key-different-from-production
+# ALLOWED_ORIGINS=https://staging.yourdomain.com
+# RATE_LIMIT_RPM=2000
+
+# === CONTAINER SPECIFIC ===
+# Docker/Kubernetes environment variables
+
+# Service discovery
+# SERVICE_NAME=enterprise-api
+# SERVICE_VERSION=1.0.0
+# NAMESPACE=default
+
+# Resource limits
+# MEMORY_LIMIT=512Mi
+# CPU_LIMIT=500m
+
+# === CLOUD PROVIDER SETTINGS ===
+
+# AWS
+# AWS_REGION=us-east-1
+# AWS_ACCESS_KEY_ID=your-access-key
+# AWS_SECRET_ACCESS_KEY=your-secret-key
+
+# Google Cloud
+# GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json
+# GOOGLE_CLOUD_PROJECT=your-project-id
+
+# Azure
+# AZURE_TENANT_ID=your-tenant-id
+# AZURE_CLIENT_ID=your-client-id
+# AZURE_CLIENT_SECRET=your-client-secret
+
+# === EXTERNAL SERVICES ===
+
+# Email service
+# SMTP_HOST=smtp.yourdomain.com
+# SMTP_PORT=587
+# SMTP_USERNAME=noreply@yourdomain.com
+# SMTP_PASSWORD=your-smtp-password
+
+# Message queue
+# RABBITMQ_URL=amqp://user:pass@localhost:5672/
+# KAFKA_BOOTSTRAP_SERVERS=localhost:9092
+
+# File storage
+# S3_BUCKET=your-bucket-name
+# S3_REGION=us-east-1
+
+# === FEATURE FLAGS ===
+FEATURE_CACHE_WARMING=true
+FEATURE_BATCH_PROCESSING=true
+FEATURE_WEBSOCKETS=false
+FEATURE_GRAPHQL=false
+FEATURE_ADMIN_PANEL=true
+
+# === CUSTOM SETTINGS ===
+# Add your custom application settings here
+
+# CUSTOM_API_TIMEOUT=30
+# CUSTOM_BATCH_SIZE=100
+# CUSTOM_RETRY_ATTEMPTS=3 

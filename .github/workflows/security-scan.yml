@@ -1,0 +1,208 @@
+name: Security Scan - Suno Clone AI
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  push:
+    branches:
+      - main
+    paths:
+      - 'agents/backend/onyx/server/features/suno_clone_ai/**'
+      - 'agents/backend/onyx/server/features/suno_clone_ai/requirements.txt'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'agents/backend/onyx/server/features/suno_clone_ai/**'
+  workflow_dispatch:
+
+env:
+  PROJECT_PATH: agents/backend/onyx/server/features/suno_clone_ai
+
+jobs:
+  dependency-scan:
+    name: Dependency Vulnerability Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Safety
+        run: |
+          pip install safety
+
+      - name: Run Safety check
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          safety check \
+            --json \
+            --output safety-report.json \
+            --file requirements.txt || true
+
+      - name: Upload Safety report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: safety-report
+          path: ${{ env.PROJECT_PATH }}/safety-report.json
+          retention-days: 90
+
+      - name: Comment PR with vulnerabilities
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '${{ env.PROJECT_PATH }}/safety-report.json';
+            
+            if (fs.existsSync(path)) {
+              const report = JSON.parse(fs.readFileSync(path, 'utf8'));
+              if (report.vulnerabilities && report.vulnerabilities.length > 0) {
+                let comment = '## 🔒 Dependency Vulnerabilities Found\n\n';
+                report.vulnerabilities.forEach(v => {
+                  comment += `### ${v.package}\n`;
+                  comment += `- **Vulnerability ID:** ${v.vulnerability_id}\n`;
+                  comment += `- **Severity:** ${v.severity}\n`;
+                  comment += `- **Installed Version:** ${v.installed_version}\n`;
+                  comment += `- **Fixed Version:** ${v.fixed_versions.join(', ')}\n`;
+                  comment += `- **Description:** ${v.advisory}\n\n`;
+                });
+                
+                github.rest.issues.createComment({
+                  issue_number: context.issue.number,
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  body: comment
+                });
+              }
+            }
+
+  code-scan:
+    name: Code Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Bandit security linter
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          pip install bandit[toml]
+          bandit -r . \
+            -f json \
+            -o bandit-report.json \
+            --exclude ./tests,./venv,./.venv \
+            --severity-level medium || true
+
+      - name: Run Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/python
+            p/owasp-top-ten
+          generateSarif: "1"
+
+      - name: Upload Bandit results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: bandit-report
+          path: ${{ env.PROJECT_PATH }}/bandit-report.json
+          retention-days: 90
+
+      - name: Upload SARIF file
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
+
+  docker-scan:
+    name: Docker Image Security Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          docker build -t suno-clone-ai:scan .
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: suno-clone-ai:scan
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: trivy-results.sarif
+
+  secret-scan:
+    name: Secret Scanning
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Run TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
+
+  security-summary:
+    name: Security Scan Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-scan, code-scan, docker-scan, secret-scan]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Generate security summary
+        run: |
+          echo "## 🔒 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Scan Type | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-----------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Scan | ${{ needs.dependency-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Code Scan | ${{ needs.code-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Docker Scan | ${{ needs.docker-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secret Scan | ${{ needs.secret-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+
+
+
+

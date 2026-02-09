@@ -1,0 +1,33 @@
+apiVersion: linkerd.io/v1alpha2
+kind: ServiceProfile
+metadata:
+  name: music-analyzer.music-analyzer.svc.cluster.local
+  namespace: music-analyzer
+spec:
+  routes:
+    - name: GET /health
+      condition:
+        method: GET
+        pathRegex: "/health"
+      isRetryable: false
+      timeout: 1s
+    - name: GET /api/.*
+      condition:
+        method: GET
+        pathRegex: "/api/.*"
+      isRetryable: true
+      timeout: 5s
+    - name: POST /api/.*
+      condition:
+        method: POST
+        pathRegex: "/api/.*"
+      isRetryable: true
+      timeout: 10s
+  retryBudget:
+    retryRatio: 0.2
+    minRetriesPerSecond: 5
+    ttl: 10s
+
+
+
+

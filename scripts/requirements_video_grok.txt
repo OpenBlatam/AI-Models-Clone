@@ -1,0 +1,11 @@
+moviepy>=1.0.3
+pillow>=10.0.0
+xai-python>=0.1.0
+
+
+
+
+
+
+
+

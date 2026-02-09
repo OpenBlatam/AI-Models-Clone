@@ -1,0 +1,42 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: music-analyzer
+spec:
+  hosts:
+    - api.music-analyzer.io
+  gateways:
+    - mesh
+  http:
+    - match:
+        - uri:
+            prefix: /
+      retries:
+        attempts: 3
+        perTryTimeout: 2s
+        retryOn: 5xx,connect-failure,refused-stream
+      timeout: 10s
+      route:
+        - destination:
+            host: music-analyzer
+            port:
+              number: 80
+          weight: 90
+        - destination:
+            host: music-analyzer-canary
+            port:
+              number: 80
+          weight: 10
+      headers:
+        request:
+          add:
+            x-request-id: "%REQ(X-REQUEST-ID|%UPSTREAM_REQUEST_ID%)%"
+      fault:
+        abort:
+          percentage:
+            value: 0
+          httpStatus: 500
+
+
+
+

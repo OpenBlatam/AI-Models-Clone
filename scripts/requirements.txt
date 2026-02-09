@@ -1,0 +1,68 @@
+# Face Swap Professional - Requirements
+# =====================================
+# Librerías optimizadas para máxima calidad y rendimiento
+
+# Core Libraries (Esenciales)
+numpy>=1.24.0,<2.0.0
+opencv-python>=4.8.0
+opencv-contrib-python>=4.8.0  # Versión extendida con más funcionalidades
+
+# Face Detection & Recognition (Prioridad: Más preciso primero)
+insightface>=0.7.3  # ⭐ Mejor precisión para detección y landmarks
+onnxruntime>=1.15.0  # Runtime para modelos ONNX (InsightFace)
+onnxruntime-gpu>=1.15.0  # GPU acceleration (opcional, instalar solo si tienes GPU NVIDIA)
+
+# Alternativas de detección facial
+retinaface>=0.0.16  # ⭐ Excelente balance precisión/velocidad
+mediapipe>=0.10.0  # ⭐ Rápido y eficiente, bueno para landmarks
+face-alignment>=1.3.5  # ⭐ Preciso para landmarks 68 puntos
+
+# Procesamiento de Imágenes Avanzado
+Pillow>=10.0.0  # Procesamiento de imágenes mejorado
+scikit-image>=0.21.0  # ⭐ Transformaciones y filtros avanzados
+imageio>=2.31.0  # I/O de imágenes mejorado
+imageio-ffmpeg>=0.4.9  # Soporte para video
+
+# Visión Computacional con PyTorch (Opcional pero recomendado)
+torch>=2.0.0  # ⭐ Para modelos avanzados y optimizaciones
+torchvision>=0.15.0  # Utilidades de visión
+kornia>=0.7.0  # ⭐ Operaciones de visión computacional optimizadas
+
+# Augmentación y Transformaciones
+albumentations>=1.3.0  # ⭐ Augmentación de datos profesional
+
+# Computación Científica
+scipy>=1.11.0  # ⭐ Operaciones científicas avanzadas
+scikit-learn>=1.3.0  # Utilidades ML (opcional)
+
+# Optimización de Rendimiento
+numba>=0.58.0  # ⭐ JIT compilation para funciones críticas
+psutil>=5.9.0  # Monitoreo de recursos
+
+# Alternativas Adicionales (Opcionales pero recomendadas)
+# dlib>=19.24.0  # ⭐ Muy estable, requiere compilación (comentado por complejidad)
+# face-recognition>=1.3.0  # ⭐ Basado en dlib, fácil de usar (requiere dlib)
+
+# Utilidades
+tqdm>=4.66.0  # Barras de progreso
+pathlib2>=2.3.7; python_version<"3.4"  # Compatibilidad Python antiguo
+
+# Desarrollo y Testing (Opcional)
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Notas de Instalación:
+# ====================
+# 1. Para GPU NVIDIA: pip install onnxruntime-gpu (en lugar de onnxruntime)
+# 2. Para mejor rendimiento: pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
+# 3. dlib requiere compilación, considerar usar conda: conda install -c conda-forge dlib
+# 4. Instalación completa: pip install -r requirements.txt
+# 5. Instalación mínima (solo esenciales): pip install numpy opencv-python insightface onnxruntime
+
+
+
+
+
+
+
+

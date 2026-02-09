@@ -1,0 +1,179 @@
+name: Performance Tests - Suno Clone AI
+
+on:
+  schedule:
+    # Run weekly on Sundays at 3 AM UTC
+    - cron: '0 3 * * 0'
+  workflow_dispatch:
+    inputs:
+      users:
+        description: 'Number of concurrent users'
+        required: false
+        default: '50'
+        type: string
+      duration:
+        description: 'Test duration in seconds'
+        required: false
+        default: '300'
+        type: string
+  push:
+    branches:
+      - main
+    paths:
+      - 'agents/backend/onyx/server/features/suno_clone_ai/**'
+
+env:
+  PROJECT_PATH: agents/backend/onyx/server/features/suno_clone_ai
+
+jobs:
+  benchmark:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-benchmark
+
+      - name: Run benchmarks
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          pytest tests/test_load/ \
+            --benchmark-only \
+            --benchmark-json=benchmark-results.json \
+            --benchmark-compare \
+            --benchmark-compare-fail=min:5% \
+            -v
+
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmark-results
+          path: ${{ env.PROJECT_PATH }}/benchmark-results.json
+          retention-days: 90
+
+  load-test:
+    name: Load Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Locust
+        run: |
+          pip install locust
+
+      - name: Start application (if needed)
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          # This would start your app in a container or service
+          # For now, assuming app is running on test server
+          echo "Application should be running for load tests"
+
+      - name: Run Locust load tests
+        working-directory: ${{ env.PROJECT_PATH }}
+        env:
+          LOCUST_USERS: ${{ github.event.inputs.users || '50' }}
+          LOCUST_SPAWN_RATE: '5'
+          LOCUST_RUN_TIME: ${{ github.event.inputs.duration || '300' }}s
+          LOCUST_HOST: ${{ secrets.TEST_SERVER_URL || 'http://localhost:8020' }}
+        run: |
+          locust -f tests/test_load/locustfile.py \
+            --headless \
+            --users $LOCUST_USERS \
+            --spawn-rate $LOCUST_SPAWN_RATE \
+            --run-time $LOCUST_RUN_TIME \
+            --host $LOCUST_HOST \
+            --html=locust-report.html \
+            --csv=locust-results
+
+      - name: Upload load test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: load-test-results
+          path: |
+            ${{ env.PROJECT_PATH }}/locust-report.html
+            ${{ env.PROJECT_PATH }}/locust-results_*.csv
+          retention-days: 90
+
+  stress-test:
+    name: Stress Testing
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D9B
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run k6 stress test
+        working-directory: ${{ env.PROJECT_PATH }}
+        run: |
+          k6 run --vus 100 --duration 5m tests/test_load/stress-test.js || true
+
+      - name: Upload stress test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: stress-test-results
+          path: ${{ env.PROJECT_PATH }}/k6-results.json
+          retention-days: 90
+
+  performance-report:
+    name: Performance Report
+    runs-on: ubuntu-latest
+    needs: [benchmark, load-test]
+    if: always()
+
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Generate performance report
+        run: |
+          echo "## 📊 Performance Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Benchmark Results" >> $GITHUB_STEP_SUMMARY
+          echo "Check benchmark-results artifact for detailed metrics." >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Load Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "Check load-test-results artifact for detailed report." >> $GITHUB_STEP_SUMMARY
+
+
+
+

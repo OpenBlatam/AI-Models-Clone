@@ -1,0 +1,85 @@
+---
+- name: Create application directory
+  file:
+    path: "{{ app_dir | default('/opt/blatam-academy') }}"
+    state: directory
+    owner: "{{ app_user | default('ubuntu') }}"
+    group: "{{ app_user | default('ubuntu') }}"
+    mode: '0755'
+
+- name: Clone repository (if git_repository_url is defined)
+  git:
+    repo: "{{ git_repository_url }}"
+    dest: "{{ app_dir | default('/opt/blatam-academy') }}"
+    version: "{{ git_branch | default('main') }}"
+    update: yes
+  when: git_repository_url is defined
+
+- name: Copy application files (alternative to git)
+  copy:
+    src: "{{ local_app_path | default('../../../../') }}"
+    dest: "{{ app_dir | default('/opt/blatam-academy') }}"
+    exclude:
+      - ".git"
+      - "node_modules"
+      - "__pycache__"
+      - "*.pyc"
+      - ".env"
+  when: git_repository_url is not defined
+
+- name: Create .env file from template
+  template:
+    src: env.j2
+    dest: "{{ app_dir | default('/opt/blatam-academy') }}/.env"
+    owner: "{{ app_user | default('ubuntu') }}"
+    group: "{{ app_user | default('ubuntu') }}"
+    mode: '0600'
+  when: create_env_file | default(true)
+
+- name: Install Python dependencies
+  pip:
+    requirements: "{{ app_dir | default('/opt/blatam-academy') }}/requirements.txt"
+    virtualenv: /opt/venv
+    virtualenv_command: python3 -m venv
+  when: requirements_file_exists | default(true)
+
+- name: Build Docker images (if Dockerfile exists)
+  docker_image:
+    name: "{{ project_name | default('blatam-academy') }}"
+    path: "{{ app_dir | default('/opt/blatam-academy') }}"
+    state: present
+  when: use_docker | default(true)
+  ignore_errors: yes
+
+- name: Start application with Docker Compose
+  docker_compose:
+    project_src: "{{ app_dir | default('/opt/blatam-academy') }}"
+    state: present
+    build: yes
+    pull: yes
+  when: use_docker | default(true)
+  ignore_errors: yes
+
+- name: Start application with systemd (alternative)
+  systemd:
+    name: "{{ project_name | default('blatam-academy') }}"
+    enabled: yes
+    state: started
+    daemon_reload: yes
+  when: use_systemd | default(false)
+  ignore_errors: yes
+
+- name: Set ownership of application directory
+  file:
+    path: "{{ app_dir | default('/opt/blatam-academy') }}"
+    owner: "{{ app_user | default('ubuntu') }}"
+    group: "{{ app_user | default('ubuntu') }}"
+    recurse: yes
+
+- name: Display deployment information
+  debug:
+    msg:
+      - "Application deployed to: {{ app_dir | default('/opt/blatam-academy') }}"
+      - "Application user: {{ app_user | default('ubuntu') }}"
+      - "Check application status with: systemctl status {{ project_name | default('blatam-academy') }}"
+

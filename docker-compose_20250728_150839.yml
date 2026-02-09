@@ -1,0 +1,187 @@
+version: '3.8'
+
+services:
+  # Servicio SEO Principal
+  seo-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: seo-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+      - "9090:9090"  # Métricas Prometheus
+    environment:
+      - ENVIRONMENT=production
+      - HOST=0.0.0.0
+      - PORT=8000
+      - WORKERS=4
+      - LOG_LEVEL=INFO
+      - LOG_FORMAT=json
+      - ENABLE_METRICS=true
+      - ENABLE_PROMETHEUS=true
+      - HEALTH_CHECK_ENABLED=true
+      - RATE_LIMIT_PER_MINUTE=100
+      - MAX_CONCURRENT_REQUESTS=100
+      - REQUEST_TIMEOUT=30
+      - CACHE_TTL=3600
+      - CACHE_MAX_SIZE=2000
+      - SELENIUM_HEADLESS=true
+      - SELENIUM_TIMEOUT=30
+      - AI_MODEL=gpt-3.5-turbo
+      - AI_TEMPERATURE=0.1
+      - AI_MAX_RETRIES=3
+      - AI_TIMEOUT=30
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - ALLOWED_HOSTS=localhost,127.0.0.1,${DOMAIN:-localhost}
+      - CORS_ORIGINS=${CORS_ORIGINS:-*}
+      - REDIS_URL=redis://redis:6379/0
+      - SENTRY_DSN=${SENTRY_DSN}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    depends_on:
+      - redis
+      - prometheus
+    volumes:
+      - ./logs:/app/logs
+      - ./cache:/app/cache
+    networks:
+      - seo-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis para Cache y Rate Limiting
+  redis:
+    image: redis:7-alpine
+    container_name: seo-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+    command: redis-server /usr/local/etc/redis/redis.conf
+    networks:
+      - seo-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Prometheus para Métricas
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: seo-prometheus
+    restart: unless-stopped
+    ports:
+      - "9091:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+      - '--storage.tsdb.retention.time=200h'
+      - '--web.enable-lifecycle'
+    networks:
+      - seo-network
+
+  # Grafana para Visualización
+  grafana:
+    image: grafana/grafana:latest
+    container_name: seo-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana/dashboards:/etc/grafana/provisioning/dashboards
+      - ./grafana/datasources:/etc/grafana/provisioning/datasources
+    depends_on:
+      - prometheus
+    networks:
+      - seo-network
+
+  # Nginx como Reverse Proxy
+  nginx:
+    image: nginx:alpine
+    container_name: seo-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+      - ./logs/nginx:/var/log/nginx
+    depends_on:
+      - seo-service
+    networks:
+      - seo-network
+
+  # Elasticsearch para Logs
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.8.0
+    container_name: seo-elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - seo-network
+
+  # Kibana para Visualización de Logs
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.8.0
+    container_name: seo-kibana
+    restart: unless-stopped
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - seo-network
+
+  # Filebeat para Recolección de Logs
+  filebeat:
+    image: docker.elastic.co/beats/filebeat:8.8.0
+    container_name: seo-filebeat
+    restart: unless-stopped
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./logs:/var/log/seo:ro
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+    depends_on:
+      - elasticsearch
+    networks:
+      - seo-network
+
+volumes:
+  redis-data:
+    driver: local
+  prometheus-data:
+    driver: local
+  grafana-data:
+    driver: local
+  elasticsearch-data:
+    driver: local
+
+networks:
+  seo-network:
+    driver: bridge 

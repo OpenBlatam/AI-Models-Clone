@@ -1,0 +1,135 @@
+# 🚀 Configuración del Sistema de Gestión de Recursos Inteligente
+
+# Configuración general del sistema
+system:
+  name: "Intelligent Resource Management System"
+  version: "1.0.0"
+  auto_start: true
+  monitoring_interval: 30  # segundos
+  optimization_interval: 5  # segundos
+
+# Configuración de recursos
+resources:
+  cpu_memory:
+    resource_type: "memory"
+    max_usage: 0.85
+    optimal_usage: 0.65
+    critical_threshold: 0.92
+    auto_optimize: true
+    prediction_horizon: 300  # 5 minutos
+    optimization_strategies:
+      - emergency_cleanup
+      - aggressive_optimization
+      - preventive_optimization
+      - maintenance_optimization
+    
+  gpu:
+    resource_type: "gpu"
+    max_usage: 0.80
+    optimal_usage: 0.60
+    critical_threshold: 0.90
+    auto_optimize: true
+    prediction_horizon: 180  # 3 minutos
+    optimization_strategies:
+      - gpu_emergency_cleanup
+      - gpu_aggressive_optimization
+      - gpu_preventive_optimization
+      - gpu_maintenance
+
+# Configuración de optimización
+optimization:
+  priority_levels:
+    0: "emergency"      # Máxima prioridad
+    1: "critical"       # Crítico
+    2: "high"           # Alto
+    3: "medium"         # Medio
+    4: "low"            # Bajo
+  
+  action_types:
+    emergency_cleanup:
+      timeout: 5        # segundos
+      retry_count: 3
+      expected_improvement: 0.20
+    
+    aggressive_optimization:
+      timeout: 10
+      retry_count: 2
+      expected_improvement: 0.15
+    
+    preventive_optimization:
+      timeout: 15
+      retry_count: 1
+      expected_improvement: 0.10
+    
+    maintenance_optimization:
+      timeout: 30
+      retry_count: 1
+      expected_improvement: 0.05
+
+# Configuración de predicción
+prediction:
+  enabled: true
+  algorithm: "trend_analysis"
+  horizon: 300          # segundos
+  confidence_threshold: 0.75
+  update_frequency: 60  # segundos
+
+# Configuración de monitoreo
+monitoring:
+  metrics_history_size: 100
+  alert_thresholds:
+    warning: 0.75
+    critical: 0.90
+    emergency: 0.95
+  
+  logging:
+    level: "INFO"
+    format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    file: "resource_monitoring.log"
+    max_size: "10MB"
+    backup_count: 5
+
+# Configuración de notificaciones
+notifications:
+  enabled: true
+  channels:
+    - console
+    - file
+    - email  # Futuro
+    - webhook  # Futuro
+  
+  email:
+    smtp_server: "localhost"
+    smtp_port: 587
+    username: ""
+    password: ""
+    recipients: []
+
+# Configuración de persistencia
+persistence:
+  enabled: true
+  storage_type: "json"
+  file_path: "resource_metrics.json"
+  backup_enabled: true
+  backup_interval: 3600  # 1 hora
+  max_backups: 10
+
+# Configuración de integración
+integration:
+  external_systems:
+    - name: "monitoring_system"
+      enabled: true
+      endpoint: "http://localhost:8080/metrics"
+      auth_required: false
+    
+    - name: "alerting_system"
+      enabled: true
+      endpoint: "http://localhost:8081/alerts"
+      auth_required: false
+
+# Configuración de desarrollo
+development:
+  debug_mode: false
+  simulate_gpu: true
+  test_mode: false
+  performance_profiling: false

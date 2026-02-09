@@ -1,0 +1,51 @@
+---
+- name: Update Application Deployment
+  hosts: app_servers
+  become: yes
+  gather_facts: yes
+
+  vars:
+    app_dir: /opt/blatam-academy
+
+  tasks:
+    - name: Pull latest code
+      git:
+        repo: "{{ git_repository_url }}"
+        dest: "{{ app_dir }}"
+        version: "{{ git_branch | default('main') }}"
+        update: yes
+      when: git_repository_url is defined
+
+    - name: Stop application containers
+      docker_compose:
+        project_src: "{{ app_dir }}"
+        state: stopped
+      ignore_errors: yes
+
+    - name: Build and start application containers
+      docker_compose:
+        project_src: "{{ app_dir }}"
+        state: present
+        build: yes
+        pull: yes
+
+    - name: Restart Nginx
+      systemd:
+        name: nginx
+        state: restarted
+        enabled: yes
+
+    - name: Verify application is running
+      uri:
+        url: "http://localhost:8000/health"
+        method: GET
+        status_code: [200]
+      register: health_check
+      retries: 5
+      delay: 10
+      until: health_check.status == 200
+
+    - name: Display update completion
+      debug:
+        msg: "Application updated successfully!"
+

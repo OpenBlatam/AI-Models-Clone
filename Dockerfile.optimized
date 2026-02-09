@@ -1,0 +1,166 @@
+# =============================================================================
+# Optimized Multi-Stage Dockerfile for HeyGen AI FastAPI
+# Enhanced performance, security, and efficiency
+# =============================================================================
+
+# =============================================================================
+# Stage 1: Base Python Image with System Dependencies
+# =============================================================================
+FROM python:3.11-slim-bookworm AS base
+
+# Set environment variables for optimization
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONHASHSEED=random \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_DEFAULT_TIMEOUT=100
+
+# Install system dependencies with optimization
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    # Build dependencies
+    build-essential \
+    gcc \
+    g++ \
+    # System libraries
+    libpq-dev \
+    libffi-dev \
+    libssl-dev \
+    # Media processing
+    ffmpeg \
+    libavcodec-extra \
+    libopencv-dev \
+    # Utilities
+    curl \
+    wget \
+    git \
+    # Performance monitoring
+    htop \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# =============================================================================
+# Stage 2: Python Dependencies
+# =============================================================================
+FROM base AS dependencies
+
+# Create app user for security
+RUN groupadd -r appuser && useradd -r -g appuser appuser
+
+# Set working directory
+WORKDIR /app
+
+# Copy requirements files
+COPY requirements-optimized.txt requirements.txt
+COPY requirements-minimal.txt requirements-minimal.txt
+
+# Install Python dependencies with optimization
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r requirements-optimized.txt && \
+    # Clean up build dependencies that are no longer needed
+    apt-get purge -y --auto-remove build-essential gcc g++ && \
+    # Clear pip cache
+    pip cache purge && \
+    # Remove unnecessary files
+    find /usr/local -depth \
+        \( \
+            \( -type d -a \( -name test -o -name tests -o -name idle_test \) \) \
+            -o \
+            \( -type f -a \( -name '*.pyc' -o -name '*.pyo' \) \) \
+        \) -exec rm -rf '{}' +
+
+# =============================================================================
+# Stage 3: Application Code
+# =============================================================================
+FROM dependencies AS application
+
+# Copy application code
+COPY --chown=appuser:appuser . .
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/cache /app/temp /app/outputs/videos && \
+    chown -R appuser:appuser /app
+
+# =============================================================================
+# Stage 4: Production Optimized Image
+# =============================================================================
+FROM application AS production
+
+# Set production environment variables
+ENV ENVIRONMENT=production \
+    LOG_LEVEL=INFO \
+    WORKERS=4 \
+    OPTIMIZATION_LEVEL=aggressive \
+    PYTHONPATH=/app \
+    # Memory optimization
+    MALLOC_ARENA_MAX=4 \
+    # GPU optimization (if available)
+    CUDA_VISIBLE_DEVICES=0 \
+    # AsyncIO optimization
+    PYTHONASYNCIODEBUG=0
+
+# Performance optimizations
+RUN echo 'vm.swappiness=10' >> /etc/sysctl.conf && \
+    echo 'net.core.somaxconn=65535' >> /etc/sysctl.conf && \
+    echo 'net.ipv4.tcp_max_syn_backlog=65535' >> /etc/sysctl.conf
+
+# Switch to non-root user
+USER appuser
+
+# Health check with optimization
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:8000/health || exit 1
+
+# Expose port
+EXPOSE 8000
+
+# Use optimized startup script
+CMD ["python", "start_optimized.py", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+
+# =============================================================================
+# Stage 5: Development Image
+# =============================================================================
+FROM application AS development
+
+# Install development dependencies
+COPY requirements-dev.txt requirements-dev.txt
+RUN pip install --no-cache-dir -r requirements-dev.txt
+
+# Set development environment variables
+ENV ENVIRONMENT=development \
+    LOG_LEVEL=DEBUG \
+    WORKERS=1 \
+    RELOAD=true \
+    OPTIMIZATION_LEVEL=standard \
+    PYTHONPATH=/app
+
+# Switch to non-root user
+USER appuser
+
+# Expose port with debug support
+EXPOSE 8000 5678
+
+# Development startup command
+CMD ["python", "start_optimized.py", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+# =============================================================================
+# Stage 6: Testing Image
+# =============================================================================
+FROM development AS testing
+
+# Install testing dependencies
+COPY requirements-test.txt requirements-test.txt
+RUN pip install --no-cache-dir -r requirements-test.txt
+
+# Set testing environment variables
+ENV ENVIRONMENT=testing \
+    LOG_LEVEL=DEBUG \
+    PYTHONPATH=/app
+
+# Run tests by default
+CMD ["python", "-m", "pytest", "tests/", "-v", "--cov=api", "--cov-report=html"]
+
+# =============================================================================
+# Default target is production
+# =============================================================================
+FROM production AS final 

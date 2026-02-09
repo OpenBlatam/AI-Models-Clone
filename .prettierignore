@@ -1,0 +1,5 @@
+t trackdist
+node_modules
+.next
+build
+.contentlayer

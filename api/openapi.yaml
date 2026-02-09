@@ -1,0 +1,900 @@
+openapi: 3.0.3
+info:
+  title: TruthGPT Optimization Core API
+  description: |
+    Comprehensive API documentation for TruthGPT optimization core system.
+    This API provides access to advanced AI optimization capabilities including
+    PiMoE routing, ultra-optimization, lightning processing, and production-ready features.
+  version: 1.1.0
+  contact:
+    name: TruthGPT Team
+    email: support@truthgpt.com
+    url: https://truthgpt.com
+  license:
+    name: CC0-1.0
+    url: https://creativecommons.org/publicdomain/zero/1.0/
+  termsOfService: https://truthgpt.com/terms
+
+servers:
+  - url: https://api.truthgpt.com/v1
+    description: Production server
+  - url: https://staging-api.truthgpt.com/v1
+    description: Staging server
+  - url: http://localhost:8000/v1
+    description: Development server
+
+security:
+  - BearerAuth: []
+  - ApiKeyAuth: []
+
+paths:
+  /health:
+    get:
+      summary: Health Check
+      description: Check the health status of the TruthGPT service
+      operationId: healthCheck
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '503':
+          description: Service is unhealthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /ready:
+    get:
+      summary: Readiness Check
+      description: Check if the service is ready to accept requests
+      operationId: readinessCheck
+      tags:
+        - Health
+      security: []
+      responses:
+        '200':
+          description: Service is ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadinessResponse'
+        '503':
+          description: Service is not ready
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /inference:
+    post:
+      summary: Single Inference
+      description: Perform single inference with TruthGPT optimization
+      operationId: singleInference
+      tags:
+        - Inference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InferenceRequest'
+      responses:
+        '200':
+          description: Inference completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InferenceResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /inference/batch:
+    post:
+      summary: Batch Inference
+      description: Perform batch inference with TruthGPT optimization
+      operationId: batchInference
+      tags:
+        - Inference
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchInferenceRequest'
+      responses:
+        '200':
+          description: Batch inference completed successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchInferenceResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '429':
+          description: Rate limit exceeded
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /models:
+    get:
+      summary: List Available Models
+      description: Get list of available TruthGPT models
+      operationId: listModels
+      tags:
+        - Models
+      responses:
+        '200':
+          description: List of available models
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /models/{model_id}:
+    get:
+      summary: Get Model Information
+      description: Get detailed information about a specific model
+      operationId: getModelInfo
+      tags:
+        - Models
+      parameters:
+        - name: model_id
+          in: path
+          required: true
+          description: Model identifier
+          schema:
+            type: string
+            example: "TruthGPT-PiMoE-v1"
+      responses:
+        '200':
+          description: Model information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelInfoResponse'
+        '404':
+          description: Model not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /optimization/config:
+    get:
+      summary: Get Optimization Configuration
+      description: Get current optimization configuration
+      operationId: getOptimizationConfig
+      tags:
+        - Optimization
+      responses:
+        '200':
+          description: Optimization configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizationConfigResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    put:
+      summary: Update Optimization Configuration
+      description: Update optimization configuration
+      operationId: updateOptimizationConfig
+      tags:
+        - Optimization
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OptimizationConfigRequest'
+      responses:
+        '200':
+          description: Configuration updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OptimizationConfigResponse'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /metrics:
+    get:
+      summary: Get System Metrics
+      description: Get current system metrics and performance data
+      operationId: getMetrics
+      tags:
+        - Metrics
+      responses:
+        '200':
+          description: System metrics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MetricsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /experts:
+    get:
+      summary: Get Expert Information
+      description: Get information about PiMoE experts
+      operationId: getExpertInfo
+      tags:
+        - Experts
+      responses:
+        '200':
+          description: Expert information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExpertInfoResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cache/stats:
+    get:
+      summary: Get Cache Statistics
+      description: Get K/V cache statistics and performance data
+      operationId: getCacheStats
+      tags:
+        - Cache
+      responses:
+        '200':
+          description: Cache statistics
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CacheStatsResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /cache/clear:
+    post:
+      summary: Clear Cache
+      description: Clear K/V cache
+      operationId: clearCache
+      tags:
+        - Cache
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CacheClearRequest'
+      responses:
+        '200':
+          description: Cache cleared successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CacheClearResponse'
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: JWT token authentication
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: API key authentication
+
+  schemas:
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [healthy, unhealthy]
+          example: healthy
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-01-27T10:30:00Z"
+        version:
+          type: string
+          example: "1.1.0"
+        uptime:
+          type: number
+          format: float
+          example: 3600.5
+        checks:
+          type: object
+          properties:
+            database:
+              type: string
+              enum: [ok, error]
+            cache:
+              type: string
+              enum: [ok, error]
+            gpu:
+              type: string
+              enum: [ok, error]
+
+    ReadinessResponse:
+      type: object
+      properties:
+        ready:
+          type: boolean
+          example: true
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-01-27T10:30:00Z"
+        components:
+          type: object
+          properties:
+            model_loaded:
+              type: boolean
+            cache_initialized:
+              type: boolean
+            gpu_available:
+              type: boolean
+
+    InferenceRequest:
+      type: object
+      required:
+        - input_text
+      properties:
+        input_text:
+          type: string
+          description: Input text for inference
+          example: "What is the nature of reality?"
+        model_name:
+          type: string
+          description: Model to use for inference
+          default: "TruthGPT-PiMoE-v1"
+          example: "TruthGPT-PiMoE-v1"
+        max_tokens:
+          type: integer
+          description: Maximum number of tokens to generate
+          default: 512
+          minimum: 1
+          maximum: 4096
+          example: 512
+        temperature:
+          type: number
+          format: float
+          description: Sampling temperature
+          default: 0.7
+          minimum: 0.0
+          maximum: 2.0
+          example: 0.7
+        top_p:
+          type: number
+          format: float
+          description: Nucleus sampling parameter
+          default: 0.9
+          minimum: 0.0
+          maximum: 1.0
+          example: 0.9
+        top_k:
+          type: integer
+          description: Top-k sampling parameter
+          default: 50
+          minimum: 1
+          maximum: 100
+          example: 50
+        repetition_penalty:
+          type: number
+          format: float
+          description: Repetition penalty
+          default: 1.0
+          minimum: 0.0
+          maximum: 2.0
+          example: 1.0
+        stop_sequences:
+          type: array
+          items:
+            type: string
+          description: Stop sequences
+          example: ["\n\n", "Human:", "Assistant:"]
+        streaming:
+          type: boolean
+          description: Enable streaming response
+          default: false
+          example: false
+        optimization_level:
+          type: string
+          enum: [standard, ultra, lightning]
+          description: Optimization level
+          default: standard
+          example: ultra
+
+    InferenceResponse:
+      type: object
+      properties:
+        output_text:
+          type: string
+          description: Generated output text
+          example: "Reality is a complex concept that encompasses..."
+        model_name:
+          type: string
+          example: "TruthGPT-PiMoE-v1"
+        tokens_generated:
+          type: integer
+          example: 256
+        tokens_input:
+          type: integer
+          example: 12
+        inference_time:
+          type: number
+          format: float
+          description: Inference time in seconds
+          example: 0.245
+        expert_used:
+          type: string
+          example: "expert_3"
+        routing_confidence:
+          type: number
+          format: float
+          description: Routing confidence score
+          example: 0.92
+        cache_hit:
+          type: boolean
+          example: true
+        optimization_applied:
+          type: array
+          items:
+            type: string
+          example: ["mixed_precision", "dynamic_batching", "kv_cache"]
+
+    BatchInferenceRequest:
+      type: object
+      required:
+        - inputs
+      properties:
+        inputs:
+          type: array
+          items:
+            $ref: '#/components/schemas/InferenceRequest'
+          minItems: 1
+          maxItems: 32
+          example:
+            - input_text: "What is AI?"
+            - input_text: "Explain quantum computing"
+        batch_size:
+          type: integer
+          description: Batch size for processing
+          default: 8
+          minimum: 1
+          maximum: 32
+          example: 8
+        parallel_processing:
+          type: boolean
+          description: Enable parallel processing
+          default: true
+          example: true
+
+    BatchInferenceResponse:
+      type: object
+      properties:
+        results:
+          type: array
+          items:
+            $ref: '#/components/schemas/InferenceResponse'
+        batch_time:
+          type: number
+          format: float
+          description: Total batch processing time
+          example: 1.234
+        average_time_per_item:
+          type: number
+          format: float
+          description: Average time per item
+          example: 0.154
+        throughput:
+          type: number
+          format: float
+          description: Items processed per second
+          example: 6.49
+
+    ModelsResponse:
+      type: object
+      properties:
+        models:
+          type: array
+          items:
+            $ref: '#/components/schemas/ModelInfo'
+        total_count:
+          type: integer
+          example: 5
+
+    ModelInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "TruthGPT-PiMoE-v1"
+        name:
+          type: string
+          example: "TruthGPT PiMoE v1"
+        version:
+          type: string
+          example: "1.0.0"
+        description:
+          type: string
+          example: "Advanced PiMoE model with ultra-optimization"
+        parameters:
+          type: integer
+          example: 7000000000
+        experts:
+          type: integer
+          example: 8
+        status:
+          type: string
+          enum: [available, loading, error]
+          example: available
+        capabilities:
+          type: array
+          items:
+            type: string
+          example: ["text_generation", "reasoning", "code_generation"]
+
+    ModelInfoResponse:
+      allOf:
+        - $ref: '#/components/schemas/ModelInfo'
+        - type: object
+          properties:
+            loaded_at:
+              type: string
+              format: date-time
+            memory_usage:
+              type: integer
+              description: Memory usage in bytes
+            gpu_memory_usage:
+              type: integer
+              description: GPU memory usage in bytes
+            performance_metrics:
+              type: object
+              properties:
+                avg_inference_time:
+                  type: number
+                  format: float
+                throughput:
+                  type: number
+                  format: float
+                accuracy:
+                  type: number
+                  format: float
+
+    OptimizationConfigRequest:
+      type: object
+      properties:
+        mixed_precision:
+          type: boolean
+          description: Enable mixed precision
+          example: true
+        dynamic_batching:
+          type: boolean
+          description: Enable dynamic batching
+          example: true
+        lightning_processing:
+          type: boolean
+          description: Enable lightning processing
+          example: false
+        ultra_optimization:
+          type: boolean
+          description: Enable ultra optimization
+          example: true
+        cache_enabled:
+          type: boolean
+          description: Enable K/V cache
+          example: true
+        cache_size:
+          type: integer
+          description: Cache size in MB
+          example: 1024
+        max_batch_size:
+          type: integer
+          description: Maximum batch size
+          example: 32
+        gpu_memory_fraction:
+          type: number
+          format: float
+          description: GPU memory fraction to use
+          example: 0.8
+
+    OptimizationConfigResponse:
+      allOf:
+        - $ref: '#/components/schemas/OptimizationConfigRequest'
+        - type: object
+          properties:
+            applied_at:
+              type: string
+              format: date-time
+            status:
+              type: string
+              enum: [applied, pending, error]
+            performance_impact:
+              type: object
+              properties:
+                latency_change:
+                  type: number
+                  format: float
+                throughput_change:
+                  type: number
+                  format: float
+                memory_change:
+                  type: number
+                  format: float
+
+    MetricsResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        system:
+          type: object
+          properties:
+            cpu_usage:
+              type: number
+              format: float
+            memory_usage:
+              type: number
+              format: float
+            gpu_usage:
+              type: number
+              format: float
+            gpu_memory_usage:
+              type: number
+              format: float
+        performance:
+          type: object
+          properties:
+            requests_per_second:
+              type: number
+              format: float
+            avg_response_time:
+              type: number
+              format: float
+            p95_response_time:
+              type: number
+              format: float
+            p99_response_time:
+              type: number
+              format: float
+        cache:
+          type: object
+          properties:
+            hit_ratio:
+              type: number
+              format: float
+            miss_ratio:
+              type: number
+              format: float
+            size_mb:
+              type: number
+              format: float
+        experts:
+          type: object
+          properties:
+            total_experts:
+              type: integer
+            active_experts:
+              type: integer
+            avg_utilization:
+              type: number
+              format: float
+
+    ExpertInfoResponse:
+      type: object
+      properties:
+        experts:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                example: "expert_0"
+              specialization:
+                type: string
+                example: "language_processing"
+              status:
+                type: string
+                enum: [active, inactive, error]
+              utilization:
+                type: number
+                format: float
+              requests_processed:
+                type: integer
+              avg_response_time:
+                type: number
+                format: float
+        routing_stats:
+          type: object
+          properties:
+            total_routes:
+              type: integer
+            accuracy:
+              type: number
+              format: float
+            avg_routing_time:
+              type: number
+              format: float
+
+    CacheStatsResponse:
+      type: object
+      properties:
+        levels:
+          type: array
+          items:
+            type: object
+            properties:
+              level:
+                type: string
+                example: "L1"
+              size_mb:
+                type: number
+                format: float
+              hit_ratio:
+                type: number
+                format: float
+              miss_ratio:
+                type: number
+                format: float
+              evictions:
+                type: integer
+        total_stats:
+          type: object
+          properties:
+            total_size_mb:
+              type: number
+              format: float
+            overall_hit_ratio:
+              type: number
+              format: float
+            total_requests:
+              type: integer
+
+    CacheClearRequest:
+      type: object
+      properties:
+        level:
+          type: string
+          enum: [L1, L2, L3, all]
+          description: Cache level to clear
+          example: "all"
+        pattern:
+          type: string
+          description: Pattern to match for selective clearing
+          example: "user_*"
+
+    CacheClearResponse:
+      type: object
+      properties:
+        cleared:
+          type: boolean
+          example: true
+        items_cleared:
+          type: integer
+          example: 1024
+        level:
+          type: string
+          example: "all"
+        timestamp:
+          type: string
+          format: date-time
+
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Invalid request"
+        message:
+          type: string
+          example: "The provided input text is too long"
+        code:
+          type: string
+          example: "INVALID_INPUT"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2025-01-27T10:30:00Z"
+        request_id:
+          type: string
+          example: "req_123456789"
+
+tags:
+  - name: Health
+    description: Health and readiness checks
+  - name: Inference
+    description: Single and batch inference operations
+  - name: Models
+    description: Model management and information
+  - name: Optimization
+    description: Optimization configuration and settings
+  - name: Metrics
+    description: System metrics and performance data
+  - name: Experts
+    description: PiMoE expert information and statistics
+  - name: Cache
+    description: K/V cache management and statistics
+
+

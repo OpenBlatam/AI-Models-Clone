@@ -1,0 +1,63 @@
+# Blatam Academy Shared Library - Requirements
+# ============================================
+
+# Core FastAPI
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0
+pydantic>=2.0.0
+starlette>=0.27.0
+
+# Security & OAuth2
+python-jose[cryptography]>=3.3.0
+passlib[bcrypt]>=1.7.4
+
+# OpenTelemetry & Distributed Tracing
+opentelemetry-api>=1.21.0
+opentelemetry-sdk>=1.21.0
+opentelemetry-instrumentation-fastapi>=0.42b0
+opentelemetry-exporter-otlp-proto-grpc>=1.21.0
+opentelemetry-exporter-otlp-proto-http>=1.21.0
+
+# Message Brokers
+pika>=1.3.2  # RabbitMQ
+kafka-python>=2.0.2  # Kafka
+redis>=5.0.0  # Redis Pub/Sub
+
+# Async Workers
+celery>=5.3.4  # Celery
+rq>=1.15.1  # Redis Queue
+flower>=2.0.1  # Celery monitoring
+
+# Structured Logging
+python-json-logger>=2.0.7
+structlog>=23.2.0
+
+# Database Adapters
+boto3>=1.28.0  # AWS DynamoDB
+azure-cosmos>=4.5.0  # Azure Cosmos DB
+
+# Search & Cache
+elasticsearch>=8.10.0
+pymemcache>=4.0.0
+
+# Service Discovery
+python-consul>=1.1.0
+kubernetes>=28.1.0
+
+# API Gateways
+requests>=2.31.0  # Kong client
+
+# AWS Lambda Support
+mangum>=0.17.0
+
+# AWS Services
+boto3>=1.34.0
+botocore>=1.34.0
+
+# YAML for configs
+pyyaml>=6.0.2
+
+# Utilities
+psutil>=5.9.0
+aiohttp>=3.9.0
+

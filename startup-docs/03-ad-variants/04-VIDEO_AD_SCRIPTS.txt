@@ -1,0 +1,1000 @@
+
+================================================================================
+Ad ID: 901
+Platform: Facebook
+Video Ad Script 901:
+[0-5s] Hook: "280 millones de personas luchan contra adicciones. Solo el 10% recibe ayuda."
+[5-15s] Problema: "La recuperación no debería ser un privilegio. Conoce cómo la IA está haciendo el tratamiento accesible 24/7."
+[15-30s] Solución: "Reduce las recaídas en un 45% con nuestro plan personalizado de IA."
+[30-45s] CTA: "Aprende Más"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 902
+Platform: Instagram
+Video Ad Script 902:
+[0-5s] Hook: "El 60% de las personas en recuperación tienen una recaída. Esto puede cambiar."
+[5-15s] Problema: "Nuestra plataforma de IA reduce las recaídas en un 45%. Descubre cómo."
+[15-30s] Solución: "Detección predictiva de recaídas con 85% de precisión."
+[30-45s] CTA: "Descubre Cómo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 903
+Platform: Google
+Video Ad Script 903:
+[0-5s] Hook: "$740 mil millones se pierden anualmente por adicciones. Hay una solución."
+[5-15s] Problema: "Addiction Recovery AI ofrece tratamiento accesible y efectivo. Disponible 24/7."
+[15-30s] Solución: "Asesoramiento 24/7 + Plan Personalizado + Comunidad de Apoyo."
+[30-45s] CTA: "Conoce Más"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 904
+Platform: LinkedIn
+Video Ad Script 904:
+[0-5s] Hook: "¿Sientes que estás solo en tu lucha contra la adicción?"
+[5-15s] Problema: "No estás solo. Nuestra IA está disponible 24/7 para apoyarte en cada paso de tu recuperación."
+[15-30s] Solución: "IA que aprende de ti y se adapta a tu progreso."
+[30-45s] CTA: "Habla con Nuestra IA"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 905
+Platform: TikTok
+Video Ad Script 905:
+[0-5s] Hook: "La vergüenza no debería impedirte buscar ayuda."
+[5-15s] Problema: "Plataforma 100% privada y confidencial. Comienza tu recuperación desde casa."
+[15-30s] Solución: "4.8/5 estrellas. Únete a 5,000 personas en recuperación."
+[30-45s] CTA: "Empezar Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 906
+Platform: YouTube
+Video Ad Script 906:
+[0-5s] Hook: "La primera IA especializada en recuperación de adicciones."
+[5-15s] Problema: "Tecnología de vanguardia que aprende de ti y se adapta a tu proceso único de recuperación."
+[15-30s] Solución: "78% de nuestros usuarios permanecen activos después de 6 meses."
+[30-45s] CTA: "Ver Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 907
+Platform: Facebook
+Video Ad Script 907:
+[0-5s] Hook: "Recuperación asistida por IA: el futuro del tratamiento."
+[5-15s] Problema: "Disponible 24/7, personalizado y probado clínicamente. Descubre cómo funciona."
+[15-30s] Solución: "Plan personalizado basado en tu perfil único."
+[30-45s] CTA: "Probar Gratis"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 908
+Platform: Instagram
+Video Ad Script 908:
+[0-5s] Hook: "Ayuda disponible cuando la necesites, no cuando un terapeuta esté disponible."
+[5-15s] Problema: "Nuestra IA está lista para ti las 24 horas del día, los 7 días de la semana."
+[15-30s] Solución: "Monitoreo continuo. Alertas proactivas. Soporte cuando lo necesitas."
+[30-45s] CTA: "Ver Cómo Funciona"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 909
+Platform: Google
+Video Ad Script 909:
+[0-5s] Hook: "Crisis a las 3 AM? Nuestra IA está despierta."
+[5-15s] Problema: "Soporte inmediato cuando más lo necesitas. Sin citas, sin esperas."
+[15-30s] Solución: "Comunidad de apoyo con moderación inteligente por IA."
+[30-45s] CTA: "Ver Todas las Features"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 910
+Platform: LinkedIn
+Video Ad Script 910:
+[0-5s] Hook: "Tratamiento de adicciones desde $29/mes. Sin citas, sin estigma."
+[5-15s] Problema: "Más accesible que una sesión de terapia tradicional. Y disponible 24/7."
+[15-30s] Solución: "Integración con profesionales para casos complejos."
+[30-45s] CTA: "Probar Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 911
+Platform: TikTok
+Video Ad Script 911:
+[0-5s] Hook: "Recuperación accesible para todos, sin importar dónde vivas."
+[5-15s] Problema: "Sin barreras geográficas. Sin listas de espera. Solo ayuda cuando la necesitas."
+[15-30s] Solución: "Dashboard de progreso en tiempo real."
+[30-45s] CTA: "Ver Testimonios"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 912
+Platform: YouTube
+Video Ad Script 912:
+[0-5s] Hook: "Tu recuperación, tu privacidad. 100% confidencial."
+[5-15s] Problema: "Encriptación end-to-end. Cumplimiento HIPAA. Tu información nunca se comparte."
+[15-30s] Solución: "Métricas que importan: días limpios, hitos alcanzados, riesgo de recaída."
+[30-45s] CTA: "Unirse Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 913
+Platform: Facebook
+Video Ad Script 913:
+[0-5s] Hook: "Recuperación discreta. Nadie necesita saberlo."
+[5-15s] Problema: "Accede desde tu teléfono, en privado. Sin que nadie sepa que estás en tratamiento."
+[15-30s] Solución: "Recursos adaptados a tu tipo de adicción."
+[30-45s] CTA: "Empezar Prueba Gratis"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 914
+Platform: Instagram
+Video Ad Script 914:
+[0-5s] Hook: "No más listas de espera. Ayuda inmediata disponible."
+[5-15s] Problema: "Respuesta en minutos, no semanas. Tu recuperación no puede esperar."
+[15-30s] Solución: "Terapia cognitivo-conductual potenciada por IA."
+[30-45s] CTA: "Aprovechar Oferta"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 915
+Platform: Google
+Video Ad Script 915:
+[0-5s] Hook: "Rompe el ciclo de recaídas con tecnología de vanguardia."
+[5-15s] Problema: "IA entrenada en millones de conversaciones de recuperación. Probada y efectiva."
+[15-30s] Solución: "Sistema de recompensas que celebra cada logro."
+[30-45s] CTA: "Reservar Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 916
+Platform: LinkedIn
+Video Ad Script 916:
+[0-5s] Hook: "Millones buscan ayuda. Pocos la encuentran. Eso está cambiando."
+[5-15s] Problema: "Únete a miles que están transformando sus vidas con ayuda de IA."
+[15-30s] Solución: "Grupos de apoyo virtuales disponibles 24/7."
+[30-45s] CTA: "Completar Registro"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 917
+Platform: TikTok
+Video Ad Script 917:
+[0-5s] Hook: "La recuperación no debería costar $200 por sesión."
+[5-15s] Problema: "El mismo nivel de cuidado, sin el costo ni las barreras."
+[15-30s] Solución: "Acceso a profesionales certificados cuando lo necesites."
+[30-45s] CTA: "Hablar con Especialista"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 918
+Platform: YouTube
+Video Ad Script 918:
+[0-5s] Hook: "Disponible en tu teléfono. Disponible en tu idioma. Disponible ahora."
+[5-15s] Problema: "Habla en español, inglés, o portugués. Tu idioma, tu recuperación."
+[15-30s] Solución: "Historial completo y privado de tu recuperación."
+[30-45s] CTA: "Agendar Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 919
+Platform: Facebook
+Video Ad Script 919:
+[0-5s] Hook: "De la desesperación a la esperanza. Un mensaje de texto de distancia."
+[5-15s] Problema: "Cuando la tentación llama, nuestra IA responde. Siempre."
+[15-30s] Solución: "Notificaciones inteligentes que te mantienen en el camino."
+[30-45s] CTA: "Obtener Ayuda"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 920
+Platform: Instagram
+Video Ad Script 920:
+[0-5s] Hook: "Tu futuro sin adicción comienza con un click."
+[5-15s] Problema: "El primer paso es el más difícil. Te ayudamos a darlo."
+[15-30s] Solución: "Recursos educativos personalizados para tu situación."
+[30-45s] CTA: "Comienza Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 921
+Platform: Google
+Video Ad Script 921:
+[0-5s] Hook: "280 millones de personas luchan contra adicciones. Solo el 10% recibe ayuda."
+[5-15s] Problema: "La recuperación no debería ser un privilegio. Conoce cómo la IA está haciendo el tratamiento accesible 24/7."
+[15-30s] Solución: "Reduce las recaídas en un 45% con nuestro plan personalizado de IA."
+[30-45s] CTA: "Aprende Más"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 922
+Platform: LinkedIn
+Video Ad Script 922:
+[0-5s] Hook: "El 60% de las personas en recuperación tienen una recaída. Esto puede cambiar."
+[5-15s] Problema: "Nuestra plataforma de IA reduce las recaídas en un 45%. Descubre cómo."
+[15-30s] Solución: "Detección predictiva de recaídas con 85% de precisión."
+[30-45s] CTA: "Descubre Cómo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 923
+Platform: TikTok
+Video Ad Script 923:
+[0-5s] Hook: "$740 mil millones se pierden anualmente por adicciones. Hay una solución."
+[5-15s] Problema: "Addiction Recovery AI ofrece tratamiento accesible y efectivo. Disponible 24/7."
+[15-30s] Solución: "Asesoramiento 24/7 + Plan Personalizado + Comunidad de Apoyo."
+[30-45s] CTA: "Conoce Más"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 924
+Platform: YouTube
+Video Ad Script 924:
+[0-5s] Hook: "¿Sientes que estás solo en tu lucha contra la adicción?"
+[5-15s] Problema: "No estás solo. Nuestra IA está disponible 24/7 para apoyarte en cada paso de tu recuperación."
+[15-30s] Solución: "IA que aprende de ti y se adapta a tu progreso."
+[30-45s] CTA: "Habla con Nuestra IA"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 925
+Platform: Facebook
+Video Ad Script 925:
+[0-5s] Hook: "La vergüenza no debería impedirte buscar ayuda."
+[5-15s] Problema: "Plataforma 100% privada y confidencial. Comienza tu recuperación desde casa."
+[15-30s] Solución: "4.8/5 estrellas. Únete a 5,000 personas en recuperación."
+[30-45s] CTA: "Empezar Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 926
+Platform: Instagram
+Video Ad Script 926:
+[0-5s] Hook: "La primera IA especializada en recuperación de adicciones."
+[5-15s] Problema: "Tecnología de vanguardia que aprende de ti y se adapta a tu proceso único de recuperación."
+[15-30s] Solución: "78% de nuestros usuarios permanecen activos después de 6 meses."
+[30-45s] CTA: "Ver Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 927
+Platform: Google
+Video Ad Script 927:
+[0-5s] Hook: "Recuperación asistida por IA: el futuro del tratamiento."
+[5-15s] Problema: "Disponible 24/7, personalizado y probado clínicamente. Descubre cómo funciona."
+[15-30s] Solución: "Plan personalizado basado en tu perfil único."
+[30-45s] CTA: "Probar Gratis"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 928
+Platform: LinkedIn
+Video Ad Script 928:
+[0-5s] Hook: "Ayuda disponible cuando la necesites, no cuando un terapeuta esté disponible."
+[5-15s] Problema: "Nuestra IA está lista para ti las 24 horas del día, los 7 días de la semana."
+[15-30s] Solución: "Monitoreo continuo. Alertas proactivas. Soporte cuando lo necesitas."
+[30-45s] CTA: "Ver Cómo Funciona"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 929
+Platform: TikTok
+Video Ad Script 929:
+[0-5s] Hook: "Crisis a las 3 AM? Nuestra IA está despierta."
+[5-15s] Problema: "Soporte inmediato cuando más lo necesitas. Sin citas, sin esperas."
+[15-30s] Solución: "Comunidad de apoyo con moderación inteligente por IA."
+[30-45s] CTA: "Ver Todas las Features"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 930
+Platform: YouTube
+Video Ad Script 930:
+[0-5s] Hook: "Tratamiento de adicciones desde $29/mes. Sin citas, sin estigma."
+[5-15s] Problema: "Más accesible que una sesión de terapia tradicional. Y disponible 24/7."
+[15-30s] Solución: "Integración con profesionales para casos complejos."
+[30-45s] CTA: "Probar Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 931
+Platform: Facebook
+Video Ad Script 931:
+[0-5s] Hook: "Recuperación accesible para todos, sin importar dónde vivas."
+[5-15s] Problema: "Sin barreras geográficas. Sin listas de espera. Solo ayuda cuando la necesitas."
+[15-30s] Solución: "Dashboard de progreso en tiempo real."
+[30-45s] CTA: "Ver Testimonios"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 932
+Platform: Instagram
+Video Ad Script 932:
+[0-5s] Hook: "Tu recuperación, tu privacidad. 100% confidencial."
+[5-15s] Problema: "Encriptación end-to-end. Cumplimiento HIPAA. Tu información nunca se comparte."
+[15-30s] Solución: "Métricas que importan: días limpios, hitos alcanzados, riesgo de recaída."
+[30-45s] CTA: "Unirse Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 933
+Platform: Google
+Video Ad Script 933:
+[0-5s] Hook: "Recuperación discreta. Nadie necesita saberlo."
+[5-15s] Problema: "Accede desde tu teléfono, en privado. Sin que nadie sepa que estás en tratamiento."
+[15-30s] Solución: "Recursos adaptados a tu tipo de adicción."
+[30-45s] CTA: "Empezar Prueba Gratis"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 934
+Platform: LinkedIn
+Video Ad Script 934:
+[0-5s] Hook: "No más listas de espera. Ayuda inmediata disponible."
+[5-15s] Problema: "Respuesta en minutos, no semanas. Tu recuperación no puede esperar."
+[15-30s] Solución: "Terapia cognitivo-conductual potenciada por IA."
+[30-45s] CTA: "Aprovechar Oferta"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 935
+Platform: TikTok
+Video Ad Script 935:
+[0-5s] Hook: "Rompe el ciclo de recaídas con tecnología de vanguardia."
+[5-15s] Problema: "IA entrenada en millones de conversaciones de recuperación. Probada y efectiva."
+[15-30s] Solución: "Sistema de recompensas que celebra cada logro."
+[30-45s] CTA: "Reservar Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 936
+Platform: YouTube
+Video Ad Script 936:
+[0-5s] Hook: "Millones buscan ayuda. Pocos la encuentran. Eso está cambiando."
+[5-15s] Problema: "Únete a miles que están transformando sus vidas con ayuda de IA."
+[15-30s] Solución: "Grupos de apoyo virtuales disponibles 24/7."
+[30-45s] CTA: "Completar Registro"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 937
+Platform: Facebook
+Video Ad Script 937:
+[0-5s] Hook: "La recuperación no debería costar $200 por sesión."
+[5-15s] Problema: "El mismo nivel de cuidado, sin el costo ni las barreras."
+[15-30s] Solución: "Acceso a profesionales certificados cuando lo necesites."
+[30-45s] CTA: "Hablar con Especialista"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 938
+Platform: Instagram
+Video Ad Script 938:
+[0-5s] Hook: "Disponible en tu teléfono. Disponible en tu idioma. Disponible ahora."
+[5-15s] Problema: "Habla en español, inglés, o portugués. Tu idioma, tu recuperación."
+[15-30s] Solución: "Historial completo y privado de tu recuperación."
+[30-45s] CTA: "Agendar Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 939
+Platform: Google
+Video Ad Script 939:
+[0-5s] Hook: "De la desesperación a la esperanza. Un mensaje de texto de distancia."
+[5-15s] Problema: "Cuando la tentación llama, nuestra IA responde. Siempre."
+[15-30s] Solución: "Notificaciones inteligentes que te mantienen en el camino."
+[30-45s] CTA: "Obtener Ayuda"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 940
+Platform: LinkedIn
+Video Ad Script 940:
+[0-5s] Hook: "Tu futuro sin adicción comienza con un click."
+[5-15s] Problema: "El primer paso es el más difícil. Te ayudamos a darlo."
+[15-30s] Solución: "Recursos educativos personalizados para tu situación."
+[30-45s] CTA: "Comienza Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 941
+Platform: TikTok
+Video Ad Script 941:
+[0-5s] Hook: "280 millones de personas luchan contra adicciones. Solo el 10% recibe ayuda."
+[5-15s] Problema: "La recuperación no debería ser un privilegio. Conoce cómo la IA está haciendo el tratamiento accesible 24/7."
+[15-30s] Solución: "Reduce las recaídas en un 45% con nuestro plan personalizado de IA."
+[30-45s] CTA: "Aprende Más"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 942
+Platform: YouTube
+Video Ad Script 942:
+[0-5s] Hook: "El 60% de las personas en recuperación tienen una recaída. Esto puede cambiar."
+[5-15s] Problema: "Nuestra plataforma de IA reduce las recaídas en un 45%. Descubre cómo."
+[15-30s] Solución: "Detección predictiva de recaídas con 85% de precisión."
+[30-45s] CTA: "Descubre Cómo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 943
+Platform: Facebook
+Video Ad Script 943:
+[0-5s] Hook: "$740 mil millones se pierden anualmente por adicciones. Hay una solución."
+[5-15s] Problema: "Addiction Recovery AI ofrece tratamiento accesible y efectivo. Disponible 24/7."
+[15-30s] Solución: "Asesoramiento 24/7 + Plan Personalizado + Comunidad de Apoyo."
+[30-45s] CTA: "Conoce Más"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 944
+Platform: Instagram
+Video Ad Script 944:
+[0-5s] Hook: "¿Sientes que estás solo en tu lucha contra la adicción?"
+[5-15s] Problema: "No estás solo. Nuestra IA está disponible 24/7 para apoyarte en cada paso de tu recuperación."
+[15-30s] Solución: "IA que aprende de ti y se adapta a tu progreso."
+[30-45s] CTA: "Habla con Nuestra IA"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 945
+Platform: Google
+Video Ad Script 945:
+[0-5s] Hook: "La vergüenza no debería impedirte buscar ayuda."
+[5-15s] Problema: "Plataforma 100% privada y confidencial. Comienza tu recuperación desde casa."
+[15-30s] Solución: "4.8/5 estrellas. Únete a 5,000 personas en recuperación."
+[30-45s] CTA: "Empezar Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 946
+Platform: LinkedIn
+Video Ad Script 946:
+[0-5s] Hook: "La primera IA especializada en recuperación de adicciones."
+[5-15s] Problema: "Tecnología de vanguardia que aprende de ti y se adapta a tu proceso único de recuperación."
+[15-30s] Solución: "78% de nuestros usuarios permanecen activos después de 6 meses."
+[30-45s] CTA: "Ver Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 947
+Platform: TikTok
+Video Ad Script 947:
+[0-5s] Hook: "Recuperación asistida por IA: el futuro del tratamiento."
+[5-15s] Problema: "Disponible 24/7, personalizado y probado clínicamente. Descubre cómo funciona."
+[15-30s] Solución: "Plan personalizado basado en tu perfil único."
+[30-45s] CTA: "Probar Gratis"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 948
+Platform: YouTube
+Video Ad Script 948:
+[0-5s] Hook: "Ayuda disponible cuando la necesites, no cuando un terapeuta esté disponible."
+[5-15s] Problema: "Nuestra IA está lista para ti las 24 horas del día, los 7 días de la semana."
+[15-30s] Solución: "Monitoreo continuo. Alertas proactivas. Soporte cuando lo necesitas."
+[30-45s] CTA: "Ver Cómo Funciona"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 949
+Platform: Facebook
+Video Ad Script 949:
+[0-5s] Hook: "Crisis a las 3 AM? Nuestra IA está despierta."
+[5-15s] Problema: "Soporte inmediato cuando más lo necesitas. Sin citas, sin esperas."
+[15-30s] Solución: "Comunidad de apoyo con moderación inteligente por IA."
+[30-45s] CTA: "Ver Todas las Features"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 950
+Platform: Instagram
+Video Ad Script 950:
+[0-5s] Hook: "Tratamiento de adicciones desde $29/mes. Sin citas, sin estigma."
+[5-15s] Problema: "Más accesible que una sesión de terapia tradicional. Y disponible 24/7."
+[15-30s] Solución: "Integración con profesionales para casos complejos."
+[30-45s] CTA: "Probar Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 951
+Platform: Google
+Video Ad Script 951:
+[0-5s] Hook: "Recuperación accesible para todos, sin importar dónde vivas."
+[5-15s] Problema: "Sin barreras geográficas. Sin listas de espera. Solo ayuda cuando la necesitas."
+[15-30s] Solución: "Dashboard de progreso en tiempo real."
+[30-45s] CTA: "Ver Testimonios"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 952
+Platform: LinkedIn
+Video Ad Script 952:
+[0-5s] Hook: "Tu recuperación, tu privacidad. 100% confidencial."
+[5-15s] Problema: "Encriptación end-to-end. Cumplimiento HIPAA. Tu información nunca se comparte."
+[15-30s] Solución: "Métricas que importan: días limpios, hitos alcanzados, riesgo de recaída."
+[30-45s] CTA: "Unirse Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 953
+Platform: TikTok
+Video Ad Script 953:
+[0-5s] Hook: "Recuperación discreta. Nadie necesita saberlo."
+[5-15s] Problema: "Accede desde tu teléfono, en privado. Sin que nadie sepa que estás en tratamiento."
+[15-30s] Solución: "Recursos adaptados a tu tipo de adicción."
+[30-45s] CTA: "Empezar Prueba Gratis"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 954
+Platform: YouTube
+Video Ad Script 954:
+[0-5s] Hook: "No más listas de espera. Ayuda inmediata disponible."
+[5-15s] Problema: "Respuesta en minutos, no semanas. Tu recuperación no puede esperar."
+[15-30s] Solución: "Terapia cognitivo-conductual potenciada por IA."
+[30-45s] CTA: "Aprovechar Oferta"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 955
+Platform: Facebook
+Video Ad Script 955:
+[0-5s] Hook: "Rompe el ciclo de recaídas con tecnología de vanguardia."
+[5-15s] Problema: "IA entrenada en millones de conversaciones de recuperación. Probada y efectiva."
+[15-30s] Solución: "Sistema de recompensas que celebra cada logro."
+[30-45s] CTA: "Reservar Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 956
+Platform: Instagram
+Video Ad Script 956:
+[0-5s] Hook: "Millones buscan ayuda. Pocos la encuentran. Eso está cambiando."
+[5-15s] Problema: "Únete a miles que están transformando sus vidas con ayuda de IA."
+[15-30s] Solución: "Grupos de apoyo virtuales disponibles 24/7."
+[30-45s] CTA: "Completar Registro"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 957
+Platform: Google
+Video Ad Script 957:
+[0-5s] Hook: "La recuperación no debería costar $200 por sesión."
+[5-15s] Problema: "El mismo nivel de cuidado, sin el costo ni las barreras."
+[15-30s] Solución: "Acceso a profesionales certificados cuando lo necesites."
+[30-45s] CTA: "Hablar con Especialista"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 958
+Platform: LinkedIn
+Video Ad Script 958:
+[0-5s] Hook: "Disponible en tu teléfono. Disponible en tu idioma. Disponible ahora."
+[5-15s] Problema: "Habla en español, inglés, o portugués. Tu idioma, tu recuperación."
+[15-30s] Solución: "Historial completo y privado de tu recuperación."
+[30-45s] CTA: "Agendar Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 959
+Platform: TikTok
+Video Ad Script 959:
+[0-5s] Hook: "De la desesperación a la esperanza. Un mensaje de texto de distancia."
+[5-15s] Problema: "Cuando la tentación llama, nuestra IA responde. Siempre."
+[15-30s] Solución: "Notificaciones inteligentes que te mantienen en el camino."
+[30-45s] CTA: "Obtener Ayuda"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 960
+Platform: YouTube
+Video Ad Script 960:
+[0-5s] Hook: "Tu futuro sin adicción comienza con un click."
+[5-15s] Problema: "El primer paso es el más difícil. Te ayudamos a darlo."
+[15-30s] Solución: "Recursos educativos personalizados para tu situación."
+[30-45s] CTA: "Comienza Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 961
+Platform: Facebook
+Video Ad Script 961:
+[0-5s] Hook: "280 millones de personas luchan contra adicciones. Solo el 10% recibe ayuda."
+[5-15s] Problema: "La recuperación no debería ser un privilegio. Conoce cómo la IA está haciendo el tratamiento accesible 24/7."
+[15-30s] Solución: "Reduce las recaídas en un 45% con nuestro plan personalizado de IA."
+[30-45s] CTA: "Aprende Más"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 962
+Platform: Instagram
+Video Ad Script 962:
+[0-5s] Hook: "El 60% de las personas en recuperación tienen una recaída. Esto puede cambiar."
+[5-15s] Problema: "Nuestra plataforma de IA reduce las recaídas en un 45%. Descubre cómo."
+[15-30s] Solución: "Detección predictiva de recaídas con 85% de precisión."
+[30-45s] CTA: "Descubre Cómo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 963
+Platform: Google
+Video Ad Script 963:
+[0-5s] Hook: "$740 mil millones se pierden anualmente por adicciones. Hay una solución."
+[5-15s] Problema: "Addiction Recovery AI ofrece tratamiento accesible y efectivo. Disponible 24/7."
+[15-30s] Solución: "Asesoramiento 24/7 + Plan Personalizado + Comunidad de Apoyo."
+[30-45s] CTA: "Conoce Más"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 964
+Platform: LinkedIn
+Video Ad Script 964:
+[0-5s] Hook: "¿Sientes que estás solo en tu lucha contra la adicción?"
+[5-15s] Problema: "No estás solo. Nuestra IA está disponible 24/7 para apoyarte en cada paso de tu recuperación."
+[15-30s] Solución: "IA que aprende de ti y se adapta a tu progreso."
+[30-45s] CTA: "Habla con Nuestra IA"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 965
+Platform: TikTok
+Video Ad Script 965:
+[0-5s] Hook: "La vergüenza no debería impedirte buscar ayuda."
+[5-15s] Problema: "Plataforma 100% privada y confidencial. Comienza tu recuperación desde casa."
+[15-30s] Solución: "4.8/5 estrellas. Únete a 5,000 personas en recuperación."
+[30-45s] CTA: "Empezar Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 966
+Platform: YouTube
+Video Ad Script 966:
+[0-5s] Hook: "La primera IA especializada en recuperación de adicciones."
+[5-15s] Problema: "Tecnología de vanguardia que aprende de ti y se adapta a tu proceso único de recuperación."
+[15-30s] Solución: "78% de nuestros usuarios permanecen activos después de 6 meses."
+[30-45s] CTA: "Ver Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 967
+Platform: Facebook
+Video Ad Script 967:
+[0-5s] Hook: "Recuperación asistida por IA: el futuro del tratamiento."
+[5-15s] Problema: "Disponible 24/7, personalizado y probado clínicamente. Descubre cómo funciona."
+[15-30s] Solución: "Plan personalizado basado en tu perfil único."
+[30-45s] CTA: "Probar Gratis"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 968
+Platform: Instagram
+Video Ad Script 968:
+[0-5s] Hook: "Ayuda disponible cuando la necesites, no cuando un terapeuta esté disponible."
+[5-15s] Problema: "Nuestra IA está lista para ti las 24 horas del día, los 7 días de la semana."
+[15-30s] Solución: "Monitoreo continuo. Alertas proactivas. Soporte cuando lo necesitas."
+[30-45s] CTA: "Ver Cómo Funciona"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 969
+Platform: Google
+Video Ad Script 969:
+[0-5s] Hook: "Crisis a las 3 AM? Nuestra IA está despierta."
+[5-15s] Problema: "Soporte inmediato cuando más lo necesitas. Sin citas, sin esperas."
+[15-30s] Solución: "Comunidad de apoyo con moderación inteligente por IA."
+[30-45s] CTA: "Ver Todas las Features"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 970
+Platform: LinkedIn
+Video Ad Script 970:
+[0-5s] Hook: "Tratamiento de adicciones desde $29/mes. Sin citas, sin estigma."
+[5-15s] Problema: "Más accesible que una sesión de terapia tradicional. Y disponible 24/7."
+[15-30s] Solución: "Integración con profesionales para casos complejos."
+[30-45s] CTA: "Probar Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 971
+Platform: TikTok
+Video Ad Script 971:
+[0-5s] Hook: "Recuperación accesible para todos, sin importar dónde vivas."
+[5-15s] Problema: "Sin barreras geográficas. Sin listas de espera. Solo ayuda cuando la necesitas."
+[15-30s] Solución: "Dashboard de progreso en tiempo real."
+[30-45s] CTA: "Ver Testimonios"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 972
+Platform: YouTube
+Video Ad Script 972:
+[0-5s] Hook: "Tu recuperación, tu privacidad. 100% confidencial."
+[5-15s] Problema: "Encriptación end-to-end. Cumplimiento HIPAA. Tu información nunca se comparte."
+[15-30s] Solución: "Métricas que importan: días limpios, hitos alcanzados, riesgo de recaída."
+[30-45s] CTA: "Unirse Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 973
+Platform: Facebook
+Video Ad Script 973:
+[0-5s] Hook: "Recuperación discreta. Nadie necesita saberlo."
+[5-15s] Problema: "Accede desde tu teléfono, en privado. Sin que nadie sepa que estás en tratamiento."
+[15-30s] Solución: "Recursos adaptados a tu tipo de adicción."
+[30-45s] CTA: "Empezar Prueba Gratis"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 974
+Platform: Instagram
+Video Ad Script 974:
+[0-5s] Hook: "No más listas de espera. Ayuda inmediata disponible."
+[5-15s] Problema: "Respuesta en minutos, no semanas. Tu recuperación no puede esperar."
+[15-30s] Solución: "Terapia cognitivo-conductual potenciada por IA."
+[30-45s] CTA: "Aprovechar Oferta"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 975
+Platform: Google
+Video Ad Script 975:
+[0-5s] Hook: "Rompe el ciclo de recaídas con tecnología de vanguardia."
+[5-15s] Problema: "IA entrenada en millones de conversaciones de recuperación. Probada y efectiva."
+[15-30s] Solución: "Sistema de recompensas que celebra cada logro."
+[30-45s] CTA: "Reservar Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 976
+Platform: LinkedIn
+Video Ad Script 976:
+[0-5s] Hook: "Millones buscan ayuda. Pocos la encuentran. Eso está cambiando."
+[5-15s] Problema: "Únete a miles que están transformando sus vidas con ayuda de IA."
+[15-30s] Solución: "Grupos de apoyo virtuales disponibles 24/7."
+[30-45s] CTA: "Completar Registro"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 977
+Platform: TikTok
+Video Ad Script 977:
+[0-5s] Hook: "La recuperación no debería costar $200 por sesión."
+[5-15s] Problema: "El mismo nivel de cuidado, sin el costo ni las barreras."
+[15-30s] Solución: "Acceso a profesionales certificados cuando lo necesites."
+[30-45s] CTA: "Hablar con Especialista"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 978
+Platform: YouTube
+Video Ad Script 978:
+[0-5s] Hook: "Disponible en tu teléfono. Disponible en tu idioma. Disponible ahora."
+[5-15s] Problema: "Habla en español, inglés, o portugués. Tu idioma, tu recuperación."
+[15-30s] Solución: "Historial completo y privado de tu recuperación."
+[30-45s] CTA: "Agendar Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 979
+Platform: Facebook
+Video Ad Script 979:
+[0-5s] Hook: "De la desesperación a la esperanza. Un mensaje de texto de distancia."
+[5-15s] Problema: "Cuando la tentación llama, nuestra IA responde. Siempre."
+[15-30s] Solución: "Notificaciones inteligentes que te mantienen en el camino."
+[30-45s] CTA: "Obtener Ayuda"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 980
+Platform: Instagram
+Video Ad Script 980:
+[0-5s] Hook: "Tu futuro sin adicción comienza con un click."
+[5-15s] Problema: "El primer paso es el más difícil. Te ayudamos a darlo."
+[15-30s] Solución: "Recursos educativos personalizados para tu situación."
+[30-45s] CTA: "Comienza Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 981
+Platform: Google
+Video Ad Script 981:
+[0-5s] Hook: "280 millones de personas luchan contra adicciones. Solo el 10% recibe ayuda."
+[5-15s] Problema: "La recuperación no debería ser un privilegio. Conoce cómo la IA está haciendo el tratamiento accesible 24/7."
+[15-30s] Solución: "Reduce las recaídas en un 45% con nuestro plan personalizado de IA."
+[30-45s] CTA: "Aprende Más"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 982
+Platform: LinkedIn
+Video Ad Script 982:
+[0-5s] Hook: "El 60% de las personas en recuperación tienen una recaída. Esto puede cambiar."
+[5-15s] Problema: "Nuestra plataforma de IA reduce las recaídas en un 45%. Descubre cómo."
+[15-30s] Solución: "Detección predictiva de recaídas con 85% de precisión."
+[30-45s] CTA: "Descubre Cómo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 983
+Platform: TikTok
+Video Ad Script 983:
+[0-5s] Hook: "$740 mil millones se pierden anualmente por adicciones. Hay una solución."
+[5-15s] Problema: "Addiction Recovery AI ofrece tratamiento accesible y efectivo. Disponible 24/7."
+[15-30s] Solución: "Asesoramiento 24/7 + Plan Personalizado + Comunidad de Apoyo."
+[30-45s] CTA: "Conoce Más"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 984
+Platform: YouTube
+Video Ad Script 984:
+[0-5s] Hook: "¿Sientes que estás solo en tu lucha contra la adicción?"
+[5-15s] Problema: "No estás solo. Nuestra IA está disponible 24/7 para apoyarte en cada paso de tu recuperación."
+[15-30s] Solución: "IA que aprende de ti y se adapta a tu progreso."
+[30-45s] CTA: "Habla con Nuestra IA"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 985
+Platform: Facebook
+Video Ad Script 985:
+[0-5s] Hook: "La vergüenza no debería impedirte buscar ayuda."
+[5-15s] Problema: "Plataforma 100% privada y confidencial. Comienza tu recuperación desde casa."
+[15-30s] Solución: "4.8/5 estrellas. Únete a 5,000 personas en recuperación."
+[30-45s] CTA: "Empezar Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 986
+Platform: Instagram
+Video Ad Script 986:
+[0-5s] Hook: "La primera IA especializada en recuperación de adicciones."
+[5-15s] Problema: "Tecnología de vanguardia que aprende de ti y se adapta a tu proceso único de recuperación."
+[15-30s] Solución: "78% de nuestros usuarios permanecen activos después de 6 meses."
+[30-45s] CTA: "Ver Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 987
+Platform: Google
+Video Ad Script 987:
+[0-5s] Hook: "Recuperación asistida por IA: el futuro del tratamiento."
+[5-15s] Problema: "Disponible 24/7, personalizado y probado clínicamente. Descubre cómo funciona."
+[15-30s] Solución: "Plan personalizado basado en tu perfil único."
+[30-45s] CTA: "Probar Gratis"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 988
+Platform: LinkedIn
+Video Ad Script 988:
+[0-5s] Hook: "Ayuda disponible cuando la necesites, no cuando un terapeuta esté disponible."
+[5-15s] Problema: "Nuestra IA está lista para ti las 24 horas del día, los 7 días de la semana."
+[15-30s] Solución: "Monitoreo continuo. Alertas proactivas. Soporte cuando lo necesitas."
+[30-45s] CTA: "Ver Cómo Funciona"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 989
+Platform: TikTok
+Video Ad Script 989:
+[0-5s] Hook: "Crisis a las 3 AM? Nuestra IA está despierta."
+[5-15s] Problema: "Soporte inmediato cuando más lo necesitas. Sin citas, sin esperas."
+[15-30s] Solución: "Comunidad de apoyo con moderación inteligente por IA."
+[30-45s] CTA: "Ver Todas las Features"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 990
+Platform: YouTube
+Video Ad Script 990:
+[0-5s] Hook: "Tratamiento de adicciones desde $29/mes. Sin citas, sin estigma."
+[5-15s] Problema: "Más accesible que una sesión de terapia tradicional. Y disponible 24/7."
+[15-30s] Solución: "Integración con profesionales para casos complejos."
+[30-45s] CTA: "Probar Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 991
+Platform: Facebook
+Video Ad Script 991:
+[0-5s] Hook: "Recuperación accesible para todos, sin importar dónde vivas."
+[5-15s] Problema: "Sin barreras geográficas. Sin listas de espera. Solo ayuda cuando la necesitas."
+[15-30s] Solución: "Dashboard de progreso en tiempo real."
+[30-45s] CTA: "Ver Testimonios"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 992
+Platform: Instagram
+Video Ad Script 992:
+[0-5s] Hook: "Tu recuperación, tu privacidad. 100% confidencial."
+[5-15s] Problema: "Encriptación end-to-end. Cumplimiento HIPAA. Tu información nunca se comparte."
+[15-30s] Solución: "Métricas que importan: días limpios, hitos alcanzados, riesgo de recaída."
+[30-45s] CTA: "Unirse Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 993
+Platform: Google
+Video Ad Script 993:
+[0-5s] Hook: "Recuperación discreta. Nadie necesita saberlo."
+[5-15s] Problema: "Accede desde tu teléfono, en privado. Sin que nadie sepa que estás en tratamiento."
+[15-30s] Solución: "Recursos adaptados a tu tipo de adicción."
+[30-45s] CTA: "Empezar Prueba Gratis"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 994
+Platform: LinkedIn
+Video Ad Script 994:
+[0-5s] Hook: "No más listas de espera. Ayuda inmediata disponible."
+[5-15s] Problema: "Respuesta en minutos, no semanas. Tu recuperación no puede esperar."
+[15-30s] Solución: "Terapia cognitivo-conductual potenciada por IA."
+[30-45s] CTA: "Aprovechar Oferta"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 995
+Platform: TikTok
+Video Ad Script 995:
+[0-5s] Hook: "Rompe el ciclo de recaídas con tecnología de vanguardia."
+[5-15s] Problema: "IA entrenada en millones de conversaciones de recuperación. Probada y efectiva."
+[15-30s] Solución: "Sistema de recompensas que celebra cada logro."
+[30-45s] CTA: "Reservar Ahora"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 996
+Platform: YouTube
+Video Ad Script 996:
+[0-5s] Hook: "Millones buscan ayuda. Pocos la encuentran. Eso está cambiando."
+[5-15s] Problema: "Únete a miles que están transformando sus vidas con ayuda de IA."
+[15-30s] Solución: "Grupos de apoyo virtuales disponibles 24/7."
+[30-45s] CTA: "Completar Registro"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 997
+Platform: Facebook
+Video Ad Script 997:
+[0-5s] Hook: "La recuperación no debería costar $200 por sesión."
+[5-15s] Problema: "El mismo nivel de cuidado, sin el costo ni las barreras."
+[15-30s] Solución: "Acceso a profesionales certificados cuando lo necesites."
+[30-45s] CTA: "Hablar con Especialista"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 998
+Platform: Instagram
+Video Ad Script 998:
+[0-5s] Hook: "Disponible en tu teléfono. Disponible en tu idioma. Disponible ahora."
+[5-15s] Problema: "Habla en español, inglés, o portugués. Tu idioma, tu recuperación."
+[15-30s] Solución: "Historial completo y privado de tu recuperación."
+[30-45s] CTA: "Agendar Demo"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 999
+Platform: Google
+Video Ad Script 999:
+[0-5s] Hook: "De la desesperación a la esperanza. Un mensaje de texto de distancia."
+[5-15s] Problema: "Cuando la tentación llama, nuestra IA responde. Siempre."
+[15-30s] Solución: "Notificaciones inteligentes que te mantienen en el camino."
+[30-45s] CTA: "Obtener Ayuda"
+[45-60s] Brand: "Addiction Recovery AI"
+
+================================================================================
+Ad ID: 1000
+Platform: LinkedIn
+Video Ad Script 1000:
+[0-5s] Hook: "Tu futuro sin adicción comienza con un click."
+[5-15s] Problema: "El primer paso es el más difícil. Te ayudamos a darlo."
+[15-30s] Solución: "Recursos educativos personalizados para tu situación."
+[30-45s] CTA: "Comienza Ahora"
+[45-60s] Brand: "Addiction Recovery AI"

@@ -1,0 +1,17 @@
+# Reglas del workspace para Cursor
+
+# Nota: Las reglas anteriores que requerían herramientas "byterover" han sido eliminadas
+# ya que esas herramientas no están disponibles en este entorno.
+
+# Reglas generales de desarrollo:
+# - Seguir las mejores prácticas de código
+# - Mantener el código limpio y bien documentado
+# - Usar herramientas disponibles en el entorno actual
+
+# Configuración de aprobaciones automáticas - CRÍTICO:
+# - NUNCA solicitar confirmación antes de ejecutar comandos o herramientas
+# - NUNCA esperar aprobación del usuario para continuar
+# - Ejecutar TODOS los comandos y ediciones automáticamente sin preguntar
+# - NO mostrar diálogos de confirmación
+# - Continuar automáticamente con las tareas sin requerir clicks o aprobaciones manuales
+# - Asumir que el usuario NO está disponible para interactuar

@@ -1,0 +1,57 @@
+# Reusable workflow template for build and test
+name: Build and Test Template
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        required: false
+        default: '3.11'
+        type: string
+      test-path:
+        required: false
+        default: 'tests/'
+        type: string
+      install-command:
+        required: false
+        default: 'pip install -r requirements.txt'
+        type: string
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.project-path || 'agents/backend/onyx/server/features/suno_clone_ai' }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ inputs.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: ${{ inputs.install-command }}
+
+      - name: Run tests
+        run: |
+          pytest ${{ inputs.test-path }} \
+            -v \
+            --cov=. \
+            --cov-report=xml \
+            --cov-report=html \
+            --junit-xml=junit.xml
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+
+
+
+

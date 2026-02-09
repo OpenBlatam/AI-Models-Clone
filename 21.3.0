@@ -1,0 +1,10 @@
+Collecting argon2-cffi
+  Using cached argon2_cffi-25.1.0-py3-none-any.whl.metadata (4.1 kB)
+Collecting argon2-cffi-bindings (from argon2-cffi)
+  Using cached argon2_cffi_bindings-25.1.0-cp39-abi3-win_amd64.whl.metadata (7.5 kB)
+Requirement already satisfied: cffi>=1.0.1 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from argon2-cffi-bindings->argon2-cffi) (1.17.1)
+Requirement already satisfied: pycparser in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from cffi>=1.0.1->argon2-cffi-bindings->argon2-cffi) (2.22)
+Using cached argon2_cffi-25.1.0-py3-none-any.whl (14 kB)
+Using cached argon2_cffi_bindings-25.1.0-cp39-abi3-win_amd64.whl (31 kB)
+Installing collected packages: argon2-cffi-bindings, argon2-cffi
+Successfully installed argon2-cffi-25.1.0 argon2-cffi-bindings-25.1.0

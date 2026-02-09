@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Scheduler - Programador de Posts</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #ff0050 0%, #ff4081 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+        }
+
+        .section h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            border-bottom: 3px solid #ff0050;
+            padding-bottom: 10px;
+        }
+
+        .auth-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+
+        .status {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .status.connected {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .status.disconnected {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff0050 0%, #ff4081 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(255, 0, 80, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .config-section {
+            background: #fff;
+            border: 2px solid #e0e0e0;
+            padding: 25px;
+            border-radius: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ff0050;
+        }
+
+        .calendar-preview {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .calendar-preview h3 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .schedule-item {
+            background: white;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            border-left: 4px solid #ff0050;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .schedule-item .time {
+            font-weight: 600;
+            color: #ff0050;
+            font-size: 1.1em;
+        }
+
+        .schedule-item .date {
+            color: #666;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+
+        .stat-card .number {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card .label {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.active {
+            display: block;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #ff0050;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .info-box {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .info-box p {
+            color: #1976d2;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎵 TikTok Scheduler</h1>
+            <p>Programa tus posts automáticamente</p>
+        </div>
+
+        <div class="content">
+            <!-- Sección de Autenticación -->
+            <div class="section">
+                <div class="auth-section">
+                    <h2>🔐 Autenticación TikTok</h2>
+                    <div id="authStatus" class="status disconnected">
+                        ⚠️ No conectado a TikTok
+                    </div>
+                    <div id="configWarning" class="info-box"
+                        style="background: #f8d7da; border-left-color: #dc3545; display: none;">
+                        <p><strong>❌ CONFIGURACIÓN REQUERIDA</strong></p>
+                        <p>El Client Key de TikTok no está configurado. Por favor, edita el archivo
+                            <code>tiktok_scheduler.html</code> y configura tu Client Key en la línea 360.
+                        </p>
+                        <p><strong>Pasos:</strong></p>
+                        <ol style="margin-left: 20px; margin-top: 10px;">
+                            <li>Ve a <a href="https://developers.tiktok.com/"
+                                    target="_blank">https://developers.tiktok.com/</a></li>
+                            <li>Crea una aplicación y obtén tu Client Key</li>
+                            <li>Edita <code>tiktok_scheduler.html</code> línea 360</li>
+                            <li>Reemplaza <code>'TU_CLIENT_KEY_AQUI'</code> con tu Client Key real</li>
+                            <li>Recarga esta página</li>
+                        </ol>
+                    </div>
+                    <div class="info-box" style="background: #fff3cd; border-left-color: #ffc107;">
+                        <p><strong>🎯 Cuenta Objetivo:</strong> <span
+                                style="font-weight: bold; color: #ff0050;">@kassy_138</span></p>
+                        <p style="font-size: 0.9em; color: #856404;">Todos los posts se publicarán en esta cuenta</p>
+                    </div>
+                    <div class="info-box">
+                        <p><strong>Instrucciones:</strong></p>
+                        <p>1. <strong>Configura tu Client Key</strong> (ver advertencia arriba si es necesario)</p>
+                        <p>2. Haz clic en "Autorizar con TikTok"</p>
+                        <p>3. Inicia sesión con la cuenta <strong>@kassy_138</strong></p>
+                        <p>4. Autoriza la aplicación para publicar contenido</p>
+                        <p>5. Serás redirigido de vuelta a esta página</p>
+                    </div>
+                    <div id="accountInfo"
+                        style="display: none; margin-top: 15px; padding: 15px; background: #f8f9fa; border-radius: 10px;">
+                        <p><strong>Cuenta conectada:</strong> <span id="connectedAccount">-</span></p>
+                        <p id="accountValidation" style="margin-top: 10px;"></p>
+                    </div>
+                    <button id="authBtn" class="btn" onclick="authorizeTikTok()">
+                        🔗 Autorizar con TikTok
+                    </button>
+                    <button id="checkStatusBtn" class="btn" onclick="checkAuthStatus()"
+                        style="margin-top: 10px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        🔍 Verificar Estado
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sección de Configuración -->
+            <div class="section">
+                <div class="config-section">
+                    <h2>⚙️ Configuración de Programación</h2>
+                    <div class="form-group">
+                        <label for="postsPerDay">Posts por día:</label>
+                        <input type="number" id="postsPerDay" value="4" min="1" max="10" onchange="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label for="startDate">Fecha de inicio:</label>
+                        <input type="date" id="startDate" onchange="updatePreview()">
+                    </div>
+                    <div class="form-group">
+                        <label for="contentFolder">Carpeta de contenido:</label>
+                        <input type="text" id="contentFolder" value="instagram_downloads/69caylin" readonly>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="useVideos" checked>
+                            Usar videos generados con IA (recomendado para TikTok)
+                        </label>
+                        <small style="display: block; color: #666; margin-top: 5px;">
+                            Si está desactivado, usará las imágenes originales
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label>
+                            <input type="checkbox" id="randomTimes" checked onchange="updatePreview()">
+                            Horarios aleatorios
+                        </label>
+                    </div>
+                    <div class="form-group">
+                        <label for="timeRange">Rango de horarios (formato: HH:MM-HH:MM):</label>
+                        <input type="text" id="timeRange" value="09:00-22:00" placeholder="09:00-22:00"
+                            onchange="updatePreview()">
+                    </div>
+                    <button class="btn" onclick="generateSchedule()" style="margin-top: 20px;">
+                        📅 Generar Calendario
+                    </button>
+                </div>
+            </div>
+
+            <!-- Vista Previa del Calendario -->
+            <div class="section" id="calendarSection" style="display: none;">
+                <h2>📅 Vista Previa del Calendario</h2>
+                <div class="calendar-preview" id="calendarPreview"></div>
+                <div class="stats" id="statsContainer"></div>
+                <button class="btn" onclick="saveSchedule()" style="margin-top: 20px;">
+                    💾 Guardar y Activar Programación
+                </button>
+            </div>
+
+            <!-- Sección de Estado -->
+            <div class="section">
+                <h2>📊 Estado del Sistema</h2>
+                <div id="systemStatus" class="info-box">
+                    <p><strong>Estado:</strong> <span id="statusText">Inactivo</span></p>
+                    <p><strong>Cuenta objetivo:</strong> <span id="targetAccount"
+                            style="color: #ff0050; font-weight: bold;">@kassy_138</span></p>
+                    <p><strong>Posts programados:</strong> <span id="scheduledCount">0</span></p>
+                    <p><strong>Posts publicados:</strong> <span id="publishedCount">0</span></p>
+                    <p><strong>Próximo post:</strong> <span id="nextPost">-</span></p>
+                </div>
+                <button class="btn" onclick="startScheduler()"
+                    style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+                    ▶️ Iniciar Programador
+                </button>
+                <button class="btn" onclick="stopScheduler()"
+                    style="margin-top: 10px; background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%);">
+                    ⏹️ Detener Programador
+                </button>
+            </div>
+
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Procesando...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuración de TikTok OAuth
+        // IMPORTANTE: Edita esta línea con tu Client Key de TikTok
+        // Obtén tu Client Key en: https://developers.tiktok.com/
+        const TIKTOK_CLIENT_KEY = 'awdfpqe9vtflv9ht'; // ✅ Client Key configurado
+        const TIKTOK_REDIRECT_URI = window.location.origin + window.location.pathname;
+        const TIKTOK_SCOPES = 'user.info.basic,video.upload,video.publish';
+        const BACKEND_URL = 'http://localhost:8000'; // URL del backend Python
+
+        // Verificar si el Client Key no ha sido configurado
+        if (TIKTOK_CLIENT_KEY === 'TU_CLIENT_KEY_AQUI' || !TIKTOK_CLIENT_KEY || TIKTOK_CLIENT_KEY.trim() === '') {
+            console.error('❌ ERROR CRÍTICO: TIKTOK_CLIENT_KEY no configurado');
+            // Mostrar advertencia en la interfaz
+            window.addEventListener('DOMContentLoaded', function () {
+                const authSection = document.querySelector('.auth-section');
+                if (authSection) {
+                    const warningDiv = document.createElement('div');
+                    warningDiv.className = 'status disconnected';
+                    warningDiv.style.marginBottom = '20px';
+                    warningDiv.innerHTML = `
+                        <strong>⚠️ CONFIGURACIÓN REQUERIDA</strong><br>
+                        El Client Key de TikTok no está configurado.<br>
+                        <small>Edita tiktok_scheduler.html línea 360 y reemplaza 'TU_CLIENT_KEY_AQUI' con tu Client Key real.</small>
+                    `;
+                    authSection.insertBefore(warningDiv, authSection.firstChild.nextSibling);
+                }
+            });
+        }
+
+        // Verificar si hay código de autorización en la URL
+        window.onload = function () {
+            // Verificar configuración del Client Key
+            if (!TIKTOK_CLIENT_KEY || TIKTOK_CLIENT_KEY === 'TU_CLIENT_KEY_AQUI' || TIKTOK_CLIENT_KEY.trim() === '') {
+                const warningDiv = document.getElementById('configWarning');
+                if (warningDiv) {
+                    warningDiv.style.display = 'block';
+                }
+                // Deshabilitar botón de autorización
+                const authBtn = document.getElementById('authBtn');
+                if (authBtn) {
+                    authBtn.disabled = true;
+                    authBtn.style.opacity = '0.5';
+                    authBtn.title = 'Configura el Client Key primero';
+                }
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const authCode = urlParams.get('code');
+            const state = urlParams.get('state');
+
+            // Verificar si hay error en la URL (TikTok puede redirigir con error)
+            const error = urlParams.get('error');
+            const errorDescription = urlParams.get('error_description');
+
+            if (error) {
+                let errorMsg = 'Error al autorizar con TikTok:\n\n';
+                errorMsg += 'Error: ' + error + '\n';
+                if (errorDescription) {
+                    errorMsg += 'Descripción: ' + decodeURIComponent(errorDescription) + '\n\n';
+                }
+                errorMsg += 'Posibles causas:\n';
+                errorMsg += '1. Client Key no configurado o incorrecto\n';
+                errorMsg += '2. Redirect URI no coincide con el configurado en TikTok\n';
+                errorMsg += '3. La aplicación no está activa en TikTok Developer Portal\n';
+                errorMsg += '4. Los permisos (scopes) no están habilitados\n\n';
+                errorMsg += 'Verifica la configuración en https://developers.tiktok.com/';
+                alert(errorMsg);
+                // Limpiar parámetros de error de la URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            if (authCode) {
+                handleAuthCallback(authCode, state);
+            } else {
+                checkAuthStatus();
+            }
+            updatePreview();
+
+            // Establecer fecha de inicio por defecto (mañana)
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            document.getElementById('startDate').value = tomorrow.toISOString().split('T')[0];
+        };
+
+        // Autorizar con TikTok
+        function authorizeTikTok() {
+            // Validar que el Client Key esté configurado
+            if (!TIKTOK_CLIENT_KEY || TIKTOK_CLIENT_KEY === 'TU_CLIENT_KEY_AQUI' || TIKTOK_CLIENT_KEY.trim() === '') {
+                alert('❌ ERROR: Client Key no configurado\n\n' +
+                    'Por favor, configura tu Client Key de TikTok:\n\n' +
+                    '1. Ve a https://developers.tiktok.com/\n' +
+                    '2. Crea una aplicación y obtén tu Client Key\n' +
+                    '3. Edita el archivo tiktok_scheduler.html\n' +
+                    '4. Reemplaza "TU_CLIENT_KEY_AQUI" con tu Client Key real\n\n' +
+                    'Línea 360: const TIKTOK_CLIENT_KEY = \'TU_CLIENT_KEY_AQUI\';');
+                return;
+            }
+
+            const state = generateRandomString(16);
+            localStorage.setItem('tiktok_oauth_state', state);
+
+            // Validar que el redirect URI sea válido
+            if (!TIKTOK_REDIRECT_URI || TIKTOK_REDIRECT_URI.includes('undefined')) {
+                alert('❌ ERROR: Redirect URI no válido\n\n' +
+                    'El redirect URI debe estar configurado correctamente.\n' +
+                    'Actual: ' + TIKTOK_REDIRECT_URI);
+                return;
+            }
+
+            const authUrl = `https://www.tiktok.com/v2/auth/authorize/?` +
+                `client_key=${TIKTOK_CLIENT_KEY}&` +
+                `scope=${encodeURIComponent(TIKTOK_SCOPES)}&` +
+                `response_type=code&` +
+                `redirect_uri=${encodeURIComponent(TIKTOK_REDIRECT_URI)}&` +
+                `state=${state}`;
+
+            console.log('Redirigiendo a TikTok OAuth...');
+            console.log('Client Key:', TIKTOK_CLIENT_KEY.substring(0, 10) + '...');
+            console.log('Redirect URI:', TIKTOK_REDIRECT_URI);
+
+            window.location.href = authUrl;
+        }
+
+        // Manejar callback de autorización
+        async function handleAuthCallback(code, state) {
+            showLoading(true);
+            const savedState = localStorage.getItem('tiktok_oauth_state');
+
+            if (state !== savedState) {
+                alert('Error: Estado de seguridad no coincide');
+                showLoading(false);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/tiktok/exchange-token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ code, redirect_uri: TIKTOK_REDIRECT_URI })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('tiktok_access_token', data.access_token);
+                    localStorage.setItem('tiktok_refresh_token', data.refresh_token);
+                    // Verificar la cuenta después de obtener el token
+                    await checkAuthStatus();
+                    // Limpiar parámetros de URL
+                    window.history.replaceState({}, document.title, window.location.pathname);
+                } else {
+                    alert('Error al obtener token: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Verificar estado de autenticación
+        async function checkAuthStatus() {
+            const token = localStorage.getItem('tiktok_access_token');
+
+            if (!token) {
+                updateAuthStatus(false, null);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/tiktok/verify-token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ access_token: token })
+                });
+
+                const data = await response.json();
+                updateAuthStatus(data.valid, data);
+            } catch (error) {
+                console.error('Error:', error);
+                updateAuthStatus(false, null);
+            }
+        }
+
+        // Actualizar estado de autenticación en UI
+        function updateAuthStatus(connected, data) {
+            const statusDiv = document.getElementById('authStatus');
+            const authBtn = document.getElementById('authBtn');
+            const accountInfoDiv = document.getElementById('accountInfo');
+            const connectedAccountSpan = document.getElementById('connectedAccount');
+            const accountValidationP = document.getElementById('accountValidation');
+
+            if (connected && data && data.user_info) {
+                const username = data.current_username || data.user_info.username || 'Desconocido';
+                const isTargetAccount = data.is_target_account;
+
+                statusDiv.className = 'status connected';
+                statusDiv.textContent = '✅ Conectado a TikTok';
+                authBtn.disabled = false;
+                authBtn.textContent = '🔄 Re-autorizar';
+
+                // Mostrar información de la cuenta
+                accountInfoDiv.style.display = 'block';
+                connectedAccountSpan.textContent = '@' + username;
+
+                // Validar cuenta
+                if (isTargetAccount) {
+                    accountValidationP.innerHTML = '<span style="color: #28a745; font-weight: bold;">✅ Cuenta correcta: @kassy_138</span>';
+                    accountValidationP.style.color = '#28a745';
+                } else {
+                    accountValidationP.innerHTML = '<span style="color: #dc3545; font-weight: bold;">❌ Cuenta incorrecta. Debe ser @kassy_138</span>';
+                    accountValidationP.style.color = '#dc3545';
+                    statusDiv.className = 'status disconnected';
+                    statusDiv.textContent = '⚠️ Cuenta incorrecta: @' + username + ' (debe ser @kassy_138)';
+                }
+            } else {
+                statusDiv.className = 'status disconnected';
+                statusDiv.textContent = '⚠️ No conectado a TikTok';
+                authBtn.disabled = false;
+                authBtn.textContent = '🔗 Autorizar con TikTok';
+                accountInfoDiv.style.display = 'none';
+            }
+        }
+
+        // Generar vista previa del calendario
+        function updatePreview() {
+            const postsPerDay = parseInt(document.getElementById('postsPerDay').value) || 4;
+            const startDate = document.getElementById('startDate').value;
+            const randomTimes = document.getElementById('randomTimes').checked;
+            const timeRange = document.getElementById('timeRange').value;
+
+            if (!startDate) return;
+
+            const preview = document.getElementById('calendarPreview');
+            preview.innerHTML = '<h3>Próximos 7 días:</h3>';
+
+            const [startHour, startMin] = timeRange.split('-')[0].split(':').map(Number);
+            const [endHour, endMin] = timeRange.split('-')[1].split(':').map(Number);
+
+            for (let day = 0; day < 7; day++) {
+                const date = new Date(startDate);
+                date.setDate(date.getDate() + day);
+
+                const times = generateRandomTimes(postsPerDay, startHour, startMin, endHour, endMin, randomTimes);
+
+                times.forEach(time => {
+                    const scheduleItem = document.createElement('div');
+                    scheduleItem.className = 'schedule-item';
+                    scheduleItem.innerHTML = `
+                        <div>
+                            <div class="time">${time}</div>
+                            <div class="date">${date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
+                        </div>
+                    `;
+                    preview.appendChild(scheduleItem);
+                });
+            }
+
+            // Calcular estadísticas
+            const totalPosts = postsPerDay * 7;
+            const statsContainer = document.getElementById('statsContainer');
+            statsContainer.innerHTML = `
+                <div class="stat-card">
+                    <div class="number">${totalPosts}</div>
+                    <div class="label">Posts programados</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">${postsPerDay}</div>
+                    <div class="label">Posts por día</div>
+                </div>
+                <div class="stat-card">
+                    <div class="number">7</div>
+                    <div class="label">Días</div>
+                </div>
+            `;
+
+            document.getElementById('calendarSection').style.display = 'block';
+        }
+
+        // Generar horarios aleatorios
+        function generateRandomTimes(count, startHour, startMin, endHour, endMin, random) {
+            const times = [];
+            const startMinutes = startHour * 60 + startMin;
+            const endMinutes = endHour * 60 + endMin;
+            const interval = (endMinutes - startMinutes) / count;
+
+            for (let i = 0; i < count; i++) {
+                let minutes;
+                if (random) {
+                    const min = startMinutes + i * interval;
+                    const max = startMinutes + (i + 1) * interval;
+                    minutes = Math.floor(Math.random() * (max - min) + min);
+                } else {
+                    minutes = startMinutes + i * interval;
+                }
+
+                const hours = Math.floor(minutes / 60);
+                const mins = minutes % 60;
+                times.push(`${String(hours).padStart(2, '0')}:${String(mins).padStart(2, '0')}`);
+            }
+
+            return times.sort();
+        }
+
+        // Generar calendario completo
+        async function generateSchedule() {
+            showLoading(true);
+
+            const config = {
+                posts_per_day: parseInt(document.getElementById('postsPerDay').value),
+                start_date: document.getElementById('startDate').value,
+                content_folder: document.getElementById('contentFolder').value,
+                random_times: document.getElementById('randomTimes').checked,
+                time_range: document.getElementById('timeRange').value,
+                use_videos: document.getElementById('useVideos').checked
+            };
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/tiktok/generate-schedule`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(config)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    let message = `✅ Calendario generado: ${data.total_posts} posts programados`;
+                    if (data.videos_count !== undefined) {
+                        message += `\n\n📹 Videos: ${data.videos_count}`;
+                        message += `\n🖼️ Imágenes: ${data.images_count || 0}`;
+                        message += `\n\n${data.using_videos ? '✅ Usando videos con IA' : '⚠️ Usando imágenes (recomendado: videos)'}`;
+                    }
+                    alert(message);
+                    updateSystemStatus();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Guardar y activar programación
+        async function saveSchedule() {
+            const token = localStorage.getItem('tiktok_access_token');
+            if (!token) {
+                alert('Por favor, autoriza primero tu cuenta de TikTok');
+                return;
+            }
+
+            showLoading(true);
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/tiktok/save-schedule`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        access_token: token
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Programación guardada y activada');
+                    updateSystemStatus();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Iniciar programador
+        async function startScheduler() {
+            // Verificar cuenta antes de iniciar
+            const token = localStorage.getItem('tiktok_access_token');
+            if (token) {
+                try {
+                    const verifyResponse = await fetch(`${BACKEND_URL}/api/tiktok/verify-token`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ access_token: token })
+                    });
+
+                    const verifyData = await verifyResponse.json();
+                    if (!verifyData.is_target_account) {
+                        alert('❌ Error: La cuenta conectada no es @kassy_138. Por favor, autoriza con la cuenta correcta.');
+                        return;
+                    }
+                } catch (error) {
+                    console.error('Error verificando cuenta:', error);
+                }
+            }
+
+            showLoading(true);
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/tiktok/start-scheduler`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('✅ Programador iniciado para @kassy_138');
+                    updateSystemStatus();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Detener programador
+        async function stopScheduler() {
+            showLoading(true);
+
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/tiktok/stop-scheduler`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert('⏹️ Programador detenido');
+                    updateSystemStatus();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            } finally {
+                showLoading(false);
+            }
+        }
+
+        // Actualizar estado del sistema
+        async function updateSystemStatus() {
+            try {
+                const response = await fetch(`${BACKEND_URL}/api/tiktok/status`);
+                const data = await response.json();
+
+                document.getElementById('statusText').textContent = data.status || 'Inactivo';
+                document.getElementById('scheduledCount').textContent = data.scheduled_count || 0;
+                document.getElementById('publishedCount').textContent = data.published_count || 0;
+                document.getElementById('nextPost').textContent = data.next_post || '-';
+
+                if (data.target_account) {
+                    document.getElementById('targetAccount').textContent = '@' + data.target_account;
+                }
+
+                // Actualizar información de cuenta si está disponible
+                if (data.account_info) {
+                    const accountInfoDiv = document.getElementById('accountInfo');
+                    const connectedAccountSpan = document.getElementById('connectedAccount');
+                    const accountValidationP = document.getElementById('accountValidation');
+
+                    if (accountInfoDiv && connectedAccountSpan && accountValidationP) {
+                        accountInfoDiv.style.display = 'block';
+                        connectedAccountSpan.textContent = '@' + (data.account_info.username || 'Desconocido');
+
+                        if (data.account_info.is_target_account) {
+                            accountValidationP.innerHTML = '<span style="color: #28a745; font-weight: bold;">✅ Cuenta correcta</span>';
+                        } else {
+                            accountValidationP.innerHTML = '<span style="color: #dc3545; font-weight: bold;">❌ Cuenta incorrecta. Debe ser @kassy_138</span>';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Utilidades
+        function generateRandomString(length) {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        function showLoading(show) {
+            document.getElementById('loading').classList.toggle('active', show);
+        }
+
+        // Actualizar estado cada 30 segundos
+        setInterval(updateSystemStatus, 30000);
+    </script>
+</body>
+
+</html>

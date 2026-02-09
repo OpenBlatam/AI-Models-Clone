@@ -1,0 +1,36 @@
+Collecting auditlog
+  Downloading auditlog-0.0.5.tar.gz (12 kB)
+  Preparing metadata (setup.py): started
+  Preparing metadata (setup.py): finished with status 'done'
+Collecting django-jsonfield>=1.0.0 (from auditlog)
+  Downloading django_jsonfield-1.4.1-py2.py3-none-any.whl.metadata (10 kB)
+Collecting python-dateutil==2.6.0 (from auditlog)
+  Downloading python_dateutil-2.6.0-py2.py3-none-any.whl.metadata (1.1 kB)
+Requirement already satisfied: six>=1.5 in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from python-dateutil==2.6.0->auditlog) (1.17.0)
+Collecting Django>=1.11 (from django-jsonfield>=1.0.0->auditlog)
+  Downloading django-5.2.5-py3-none-any.whl.metadata (4.1 kB)
+Collecting asgiref>=3.8.1 (from Django>=1.11->django-jsonfield>=1.0.0->auditlog)
+  Downloading asgiref-3.9.1-py3-none-any.whl.metadata (9.3 kB)
+Collecting sqlparse>=0.3.1 (from Django>=1.11->django-jsonfield>=1.0.0->auditlog)
+  Using cached sqlparse-0.5.3-py3-none-any.whl.metadata (3.9 kB)
+Requirement already satisfied: tzdata in c:\users\user\appdata\local\programs\python\python311\lib\site-packages (from Django>=1.11->django-jsonfield>=1.0.0->auditlog) (2025.2)
+Downloading python_dateutil-2.6.0-py2.py3-none-any.whl (194 kB)
+   ---------------------------------------- 194.4/194.4 kB 2.0 MB/s eta 0:00:00
+Downloading django_jsonfield-1.4.1-py2.py3-none-any.whl (14 kB)
+Downloading django-5.2.5-py3-none-any.whl (8.3 MB)
+   ---------------------------------------- 8.3/8.3 MB 13.3 MB/s eta 0:00:00
+Downloading asgiref-3.9.1-py3-none-any.whl (23 kB)
+Downloading sqlparse-0.5.3-py3-none-any.whl (44 kB)
+   ---------------------------------------- 44.4/44.4 kB ? eta 0:00:00
+Building wheels for collected packages: auditlog
+  Building wheel for auditlog (setup.py): started
+  Building wheel for auditlog (setup.py): finished with status 'done'
+  Created wheel for auditlog: filename=auditlog-0.0.5-py3-none-any.whl size=18894 sha256=88fb7f52ed08671ac2b60b03e0626b89fe5a963540b11f63a116941edf4b6818
+  Stored in directory: c:\users\user\appdata\local\pip\cache\wheels\6a\64\fa\76b4a945b0cb96fd436a407865ac0014137050d33b65cfe530
+Successfully built auditlog
+Installing collected packages: sqlparse, python-dateutil, asgiref, Django, django-jsonfield, auditlog
+  Attempting uninstall: python-dateutil
+    Found existing installation: python-dateutil 2.8.2
+    Uninstalling python-dateutil-2.8.2:
+      Successfully uninstalled python-dateutil-2.8.2
+Successfully installed Django-5.2.5 asgiref-3.9.1 auditlog-0.0.5 django-jsonfield-1.4.1 python-dateutil-2.6.0 sqlparse-0.5.3

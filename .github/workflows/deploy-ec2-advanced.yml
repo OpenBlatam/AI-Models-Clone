@@ -1,0 +1,133 @@
+# Advanced GitHub Actions Workflow
+# Includes: Canary, Feature Flags, Performance Testing, Database Migrations
+
+name: Deploy to EC2 (Advanced)
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      deployment_strategy:
+        description: 'Deployment Strategy'
+        required: true
+        default: 'standard'
+        type: choice
+        options:
+          - standard
+          - canary
+          - blue-green
+      canary_percentage:
+        description: 'Canary Percentage (1-100)'
+        required: false
+        default: '10'
+        type: string
+      run_performance_tests:
+        description: 'Run Performance Tests'
+        required: false
+        default: true
+        type: boolean
+      run_migrations:
+        description: 'Run Database Migrations'
+        required: false
+        default: true
+        type: boolean
+
+env:
+  AWS_REGION: us-east-1
+  PROJECT_NAME: ai-project-generator
+
+jobs:
+  # Performance testing before deployment
+  performance_test:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+    if: github.event.inputs.run_performance_tests != 'false'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install locust pytest-benchmark
+
+      - name: Run performance tests
+        run: |
+          cd agents/backend/onyx/server/features/ai_project_generator
+          # Add performance test commands here
+          echo "Performance tests would run here"
+
+  # Database migration check
+  migration_check:
+    name: Database Migration Check
+    runs-on: ubuntu-latest
+    if: github.event.inputs.run_migrations == 'true'
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for migrations
+        run: |
+          if [ -d "agents/backend/onyx/server/features/ai_project_generator/migrations" ]; then
+            echo "migrations_found=true" >> $GITHUB_OUTPUT
+            echo "Found migrations directory"
+          else
+            echo "migrations_found=false" >> $GITHUB_OUTPUT
+            echo "No migrations directory found"
+          fi
+
+  # Deploy based on strategy
+  deploy:
+    name: Deploy to EC2
+    runs-on: ubuntu-latest
+    needs: [performance_test, migration_check]
+    environment:
+      name: production
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get deployment strategy
+        id: strategy
+        run: |
+          STRATEGY="${{ github.event.inputs.deployment_strategy || 'standard' }}"
+          echo "strategy=$STRATEGY" >> $GITHUB_OUTPUT
+          echo "Using deployment strategy: $STRATEGY"
+
+      - name: Deploy (Standard)
+        if: steps.strategy.outputs.strategy == 'standard'
+        run: |
+          echo "Running standard deployment"
+          # Use standard deployment workflow
+
+      - name: Deploy (Canary)
+        if: steps.strategy.outputs.strategy == 'canary'
+        run: |
+          echo "Running canary deployment"
+          CANARY_PERCENTAGE="${{ github.event.inputs.canary_percentage || '10' }}"
+          # SSH and run canary deployment script
+          # ssh ... "sudo /opt/ai-project-generator/scripts/canary_deploy.sh $CANARY_PERCENTAGE 300 deploy"
+
+      - name: Deploy (Blue-Green)
+        if: steps.strategy.outputs.strategy == 'blue-green'
+        run: |
+          echo "Running blue-green deployment"
+          # SSH and run blue-green deployment script
+          # ssh ... "sudo /opt/ai-project-generator/scripts/blue_green_deploy.sh deploy"
+

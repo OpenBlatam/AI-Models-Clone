@@ -1,0 +1,67 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: music-analyzer-rules
+  labels:
+    prometheus: k8s
+    role: alert-rules
+spec:
+  groups:
+    - name: availability
+      rules:
+        - alert: HighErrorRate
+          expr: |
+            sum(rate(http_requests_total{app="music-analyzer",status=~"5.."}[5m]))
+            /
+            sum(rate(http_requests_total{app="music-analyzer"}[5m]))
+            > 0.05
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "High error rate in music-analyzer"
+            description: "Error rate is {{ $value | humanizePercentage }} for more than 5 minutes."
+
+        - alert: HighLatencyP95
+          expr: |
+            histogram_quantile(
+              0.95,
+              sum(rate(http_request_duration_seconds_bucket{app="music-analyzer"}[5m])) by (le)
+            ) > 1
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "High P95 latency"
+            description: "P95 latency is {{ $value | humanizeDuration }}."
+
+    - name: saturation
+      rules:
+        - alert: CPUThrottling
+          expr: |
+            sum(rate(container_cpu_cfs_throttled_periods_total{pod=~"music-analyzer-.*"}[5m]))
+            /
+            sum(rate(container_cpu_cfs_periods_total{pod=~"music-analyzer-.*"}[5m]))
+            > 0.2
+          for: 10m
+          labels:
+            severity: warning
+          annotations:
+            summary: "CPU throttling detected"
+            description: "Pods are being throttled ({{ $value | humanizePercentage }})"
+
+        - alert: HPAStuckAtMax
+          expr: |
+            kube_horizontalpodautoscaler_status_desired_replicas{hpa="music-analyzer"}
+            ==
+            kube_horizontalpodautoscaler_spec_max_replicas{hpa="music-analyzer"}
+          for: 15m
+          labels:
+            severity: warning
+          annotations:
+            summary: "HPA at max replicas"
+            description: "HPA has been at max replicas for 15m"
+
+
+
+

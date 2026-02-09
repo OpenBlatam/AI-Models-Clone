@@ -1,0 +1,44 @@
+version: '3.8'
+
+# Docker Compose para Testing
+# ============================
+# Uso: docker-compose -f docker-compose.test.yml up --abort-on-container-exit
+
+services:
+  test:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dev
+    container_name: shared-lib-test
+    environment:
+      - ENVIRONMENT=test
+      - LOG_LEVEL=DEBUG
+      - PYTEST_CURRENT_TEST=1
+    volumes:
+      - ..:/app
+    command: pytest -v --cov=shared_lib --cov-report=html
+    networks:
+      - shared-lib-network
+
+  redis-test:
+    image: redis:7-alpine
+    container_name: shared-lib-redis-test
+    networks:
+      - shared-lib-network
+
+  rabbitmq-test:
+    image: rabbitmq:3-management-alpine
+    container_name: shared-lib-rabbitmq-test
+    environment:
+      - RABBITMQ_DEFAULT_USER=test
+      - RABBITMQ_DEFAULT_PASS=test
+    networks:
+      - shared-lib-network
+
+networks:
+  shared-lib-network:
+    driver: bridge
+
+
+
+

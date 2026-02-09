@@ -1,0 +1,120 @@
+name: Deploy Stake Casino AI to EC2
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'agents/backend/onyx/server/features/stake_casino_ai/**'
+      - '.github/workflows/deploy-stake-casino-ai.yml'
+  workflow_dispatch:
+
+env:
+  AWS_REGION: us-east-1
+  IMAGE_NAME: stake-casino-ai
+  REGISTRY: ghcr.io
+  PROJECT_PATH: agents/backend/onyx/server/features/stake_casino_ai
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=sha,format=long
+            type=ref,event=branch
+            latest
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ${{ env.PROJECT_PATH }}
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        working-directory: ${{ env.PROJECT_PATH }}/r_aws
+        run: terraform init
+
+      - name: Get EC2 IP
+        id: get-ip
+        working-directory: ${{ env.PROJECT_PATH }}/r_aws
+        run: |
+          # Try to get IP from Terraform state if it exists
+          if [ -f "terraform.tfstate" ]; then
+             IP=$(terraform output -raw ec2_instance_public_ip 2>/dev/null || echo "")
+             if [ -n "$IP" ]; then
+               echo "ip=$IP" >> $GITHUB_OUTPUT
+               exit 0
+             fi
+          fi
+          
+          # Fallback: Look up instance by tag
+          IP=$(aws ec2 describe-instances \
+            --filters "Name=tag:Project,Values=stake-casino-ai" "Name=instance-state-name,Values=running" \
+            --query "Reservations[*].Instances[*].PublicIpAddress" \
+            --output text)
+            
+          echo "ip=$IP" >> $GITHUB_OUTPUT
+
+      - name: Deploy to EC2
+        if: steps.get-ip.outputs.ip != ''
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ steps.get-ip.outputs.ip }}
+          username: ubuntu
+          key: ${{ secrets.EC2_SSH_PRIVATE_KEY }}
+          script: |
+            # Login to GHCR
+            echo ${{ secrets.GITHUB_TOKEN }} | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            
+            # Stop and remove existing container
+            docker stop stake-casino-ai || true
+            docker rm stake-casino-ai || true
+            
+            # Pull new image
+            docker pull ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
+            
+            # Run new container
+            docker run -d \
+              --name stake-casino-ai \
+              --restart unless-stopped \
+              -p 8000:8000 \
+              ${{ env.REGISTRY }}/${{ github.repository }}/${{ env.IMAGE_NAME }}:latest
