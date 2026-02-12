@@ -37,7 +37,7 @@ class UnifiedOptimizer(BaseTruthGPTOptimizer):
         result = optimizer.optimize(model)
         
         # With custom strategies
-        from optimizers.core.strategies import EnhancedStrategy, HybridStrategy
+        from optimization_core.optimizers.core.strategies import EnhancedStrategy, HybridStrategy
         strategies = [EnhancedStrategy(), HybridStrategy()]
         optimizer = UnifiedOptimizer(
             level=OptimizationLevel.ADVANCED,

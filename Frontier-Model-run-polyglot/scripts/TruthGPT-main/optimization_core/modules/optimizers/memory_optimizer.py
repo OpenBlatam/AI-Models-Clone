@@ -19,7 +19,8 @@ import psutil
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
-from .advanced_libraries import BaseOptimizer, OptimizationConfig, PerformanceMonitor
+from optimization_core.core.pytorch_optimizer_base import OptimizationConfig, PyTorchOptimizerBase as BaseOptimizer
+from optimization_core.utils.cuda_kernels import PerformanceMonitor
 
 logger = logging.getLogger(__name__)
 
@@ -54,7 +55,6 @@ class MemoryOptimizationLevel(Enum):
     ULTIMATE = "ultimate"             # 1,000,000,000,000x memory efficiency
     ABSOLUTE = "absolute"             # 10,000,000,000,000x memory efficiency
     PERFECT = "perfect"               # 100,000,000,000,000x memory efficiency
-    MASTER = "master"                 # 1,000,000,000,000,000x memory efficiency
 
 class MemoryOptimizer(BaseOptimizer):
     """Advanced memory optimizer following PyTorch best practices."""

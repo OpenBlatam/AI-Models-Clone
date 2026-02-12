@@ -12,6 +12,8 @@ This module provides organized access to module components:
 - optimization: Optimization strategies
 - training: Training components
 - transformer: Transformer components
+
+- CudaKernelOptimizer, GPUOptimizer, MemoryOptimizer: Backward compatible optimizer exports
 """
 
 from __future__ import annotations
@@ -39,6 +41,8 @@ try:
 except ImportError as e:
     import logging
     logging.getLogger(__name__).warning(f"Could not import advanced_libraries: {e}")
+
+# Backward compatible exports are handled below
 
 # Lazy imports for organized submodules
 _LAZY_IMPORTS = {

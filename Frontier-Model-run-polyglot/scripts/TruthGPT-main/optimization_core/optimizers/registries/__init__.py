@@ -1,49 +1,28 @@
 """
-Optimization Registries Module
-
-This module contains optimization registry systems.
+Registries subpackage for TruthGPT Optimizers.
 """
 
-from __future__ import annotations
+from .advanced_optimization_registry import (
+    AdvancedOptimizationConfig as AdvancedOptimizationConfigV1,
+    get_advanced_optimization_config as get_config_v1,
+    apply_advanced_optimizations as apply_v1,
+    get_advanced_optimization_report as get_report_v1
+)
 
-import importlib
+from .advanced_optimization_registry_v2 import (
+    AdvancedOptimizationConfig as AdvancedOptimizationConfigV2,
+    get_advanced_optimization_config as get_config_v2,
+    apply_advanced_optimizations as apply_v2,
+    get_advanced_optimization_report as get_report_v2
+)
 
 __all__ = [
-    # Registry modules will be imported here
+    'AdvancedOptimizationConfigV1',
+    'get_config_v1',
+    'apply_v1',
+    'get_report_v1',
+    'AdvancedOptimizationConfigV2',
+    'get_config_v2',
+    'apply_v2',
+    'get_report_v2',
 ]
-
-_LAZY_IMPORTS = {
-    'advanced_optimization_registry': '..advanced_optimization_registry',
-    'advanced_optimization_registry_v2': '..advanced_optimization_registry_v2',
-}
-
-_import_cache = {}
-
-
-def __getattr__(name: str):
-    """Lazy import system for registry modules."""
-    if name.startswith('_'):
-        raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
-    
-    if name not in _LAZY_IMPORTS:
-        raise AttributeError(f"module '{__name__}' has no attribute '{name}'")
-    
-    if name in _import_cache:
-        return _import_cache[name]
-    
-    module_path = _LAZY_IMPORTS[name]
-    try:
-        module = importlib.import_module(module_path, package=__package__)
-        _import_cache[name] = module
-        return module
-    except (ImportError, AttributeError) as e:
-        raise AttributeError(
-            f"module '{__name__}' has no attribute '{name}'. "
-            f"Failed to import: {e}"
-        ) from e
-
-
-def list_available_registries() -> list[str]:
-    """List all available registry modules."""
-    return list(_LAZY_IMPORTS.keys())
-

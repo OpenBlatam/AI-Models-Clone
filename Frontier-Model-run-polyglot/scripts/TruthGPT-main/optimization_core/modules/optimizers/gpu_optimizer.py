@@ -19,7 +19,8 @@ from abc import ABC, abstractmethod
 import psutil
 import gc
 
-from .advanced_libraries import BaseOptimizer, OptimizationConfig, PerformanceMonitor
+from optimization_core.core.pytorch_optimizer_base import OptimizationConfig, PyTorchOptimizerBase as BaseOptimizer
+from optimization_core.utils.cuda_kernels import PerformanceMonitor
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,6 @@ class GPUOptimizationLevel(Enum):
     ULTIMATE = "ultimate"             # 1,000,000,000,000x speedup
     ABSOLUTE = "absolute"             # 10,000,000,000,000x speedup
     PERFECT = "perfect"               # 100,000,000,000,000x speedup
-    MASTER = "master"                 # 1,000,000,000,000,000x speedup
 
 class GPUOptimizer(BaseOptimizer):
     """Advanced GPU optimizer following PyTorch best practices."""

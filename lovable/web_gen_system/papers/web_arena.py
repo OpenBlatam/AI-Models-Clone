@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from ..agents.base import BaseAgent
+from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
 
 class WebArenaEvaluator(BaseAgent):
     """

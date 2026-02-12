@@ -20,23 +20,10 @@ import yaml
 import tqdm
 from pathlib import Path
 
-from .advanced_libraries import BaseOptimizer, OptimizationConfig, PerformanceMonitor
+from optimization_core.core.pytorch_optimizer_base import OptimizationConfig, PyTorchOptimizerBase as BaseOptimizer
+from optimization_core.utils.cuda_kernels import PerformanceMonitor, CudaKernelConfig
 
 logger = logging.getLogger(__name__)
-
-@dataclass
-class CudaKernelConfig:
-    """Configuration for CUDA kernel optimization."""
-    threads_per_block: int = 256
-    blocks_per_grid: int = 1024
-    shared_memory: int = 16384
-    registers: int = 32
-    speedup: float = 1.0
-    use_tensor_cores: bool = True
-    use_mixed_precision: bool = True
-    memory_pool_size: int = 1024 * 1024 * 1024  # 1GB
-    kernel_launch_overhead: float = 0.001
-    gpu_utilization_threshold: float = 0.8
 
 class CudaKernelType(Enum):
     """CUDA kernel types with optimized performance."""
@@ -52,7 +39,6 @@ class CudaKernelType(Enum):
     ULTIMATE = "ultimate"              # 1,000,000,000,000x speedup
     ABSOLUTE = "absolute"              # 10,000,000,000,000x speedup
     PERFECT = "perfect"                # 100,000,000,000,000x speedup
-    MASTER = "master"                  # 1,000,000,000,000,000x speedup
 
 class CudaKernelOptimizer(BaseOptimizer):
     """Advanced CUDA kernel optimizer following PyTorch best practices."""

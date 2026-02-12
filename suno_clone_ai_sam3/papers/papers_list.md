@@ -271,3 +271,48 @@ Location: `agents\backend\onyx\server\features\suno_clone_ai_sam3\papers\`
 | 148 | Survey on Speech Large Language Models | Speech-LLM-Survey.pdf | 2402.13239 |
 | 149 | Neural Voice Conversion Survey | Neural-Voice-Conversion-Survey.pdf | 2008.05641 |
 | 150 | Future of Generative Audio | Future-of-Generative-Audio.pdf | 2411.14627 |
+
+## Batch 31 — Music Understanding & Tokenization
+| # | Paper | File | arXiv |
+|---|-------|------|-------|
+| 151 | ChatMusician: Understanding Music Intrinsically | ChatMusician.pdf | 2402.16153 |
+| 152 | MU-LLaMA: Music Understanding & Captioning | MU-LLaMA.pdf | 2308.11276 |
+| 153 | SpeechGPT: Cross-Modal Conversational LLM | SpeechGPT.pdf | 2305.11000 |
+| 154 | WavTokenizer: Efficient Discrete Codec | WavTokenizer.pdf | 2408.16532 |
+| 155 | SNAC: Multi-Scale Neural Audio Codec | SNAC.pdf | 2410.14411 |
+
+## Batch 32 — Advanced TTS & Vocoders
+| # | Paper | File | arXiv |
+|---|-------|------|-------|
+| 156 | Parler-TTS: Natural Language Guidance | Parler-TTS.pdf | 2402.01912 |
+| 157 | DiffWave: Versatile Diffusion Synthesis | DiffWave.pdf | 2009.09761 |
+| 158 | Vocos: Closing Gap Time-Frequency Domain | Vocos.pdf | 2306.00814 |
+| 159 | Fish-Speech: Unified LLM for TTS | Fish-Speech.pdf | 2411.01156 |
+| 160 | MARS6-TTS: Hierarchical Codec TTS | MARS6-TTS.pdf | 2501.05787 |
+
+## Batch 33 — Optimized Diffusion & Codecs
+| # | Paper | File | arXiv |
+|---|-------|------|-------|
+| 161 | DAC-JAX: High-Fidelity Audio Compression | DAC-JAX.pdf | 2405.11554 |
+| 162 | Efficient Diffusion Models Survey | Efficient-Diffusion-Survey.pdf | 2502.06805 |
+| 163 | Qwen2-Audio v2: Universal Understanding | Qwen2-Audio-v2.pdf | 2407.10759 |
+| 164 | WaveGrad: Estimating Gradients for Generation | WaveGrad.pdf | 2009.00713 |
+| 165 | PriorGrad: Adaptive Prior for Diffusion | PriorGrad.pdf | 2106.06406 |
+
+## Batch 34 — Multimodal Giants
+| # | Paper | File | arXiv |
+|---|-------|------|-------|
+| 166 | InternLM-XComposer2: Vision-Language-Audio | InternLM-XComposer2.pdf | 2401.16420 |
+| 167 | Gemini Audio: Multimodal Understanding | Gemini-Audio.pdf | 2312.11805 |
+| 168 | GPT-4o Audio: Omni Model Capabilities | GPT-4o-Audio.pdf | 2303.08774 |
+| 169 | GAMA: General Audio Multimodal Assistant | Gama.pdf | 2406.11768 |
+| 170 | Audio Flamingo v2: In-Context Learning | Audio-Flamingo-v2.pdf | 2405.18616 |
+
+## Batch 35 — Agents, Surveys & Benchmarks
+| # | Paper | File | arXiv |
+|---|-------|------|-------|
+| 171 | Music Agent: Autonomous Composition | Music-Agent.pdf | 2310.11954 |
+| 172 | Speech Generation Survey (LLM Era) | SpeechGen-Survey.pdf | 2305.13225 |
+| 173 | Neural Audio Codec Survey | Audio-Codec-Survey.pdf | 2407.17929 |
+| 174 | Multi-Channel Target Speaker Extraction | Multi-Channel-TSE.pdf | 2309.06480 |
+| 175 | TTS Arena: Benchmarking TTS Models | TTS-Arena.pdf | 2407.12707 |

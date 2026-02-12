@@ -37,6 +37,8 @@ from .compatibility.shims import (
     EnhancedOptimizationCore,
     HybridOptimizationCore,
 )
+from .transformer.transformer_optimizer import TransformerOptimizer
+
 from .core.component_optimizers import (
     ComponentOptimizer,
     get_component_optimizer,
@@ -46,6 +48,7 @@ from .core.component_optimizers import (
 _LAZY_IMPORTS = {
     'core': '.core',
     'truthgpt': '.truthgpt',
+    'mcts': '.mcts',
     'specialized': '.specialized',
     'optimization_cores': '.optimization_cores',
     'techniques': '.techniques',
@@ -58,6 +61,8 @@ _LAZY_IMPORTS = {
     'ProductionOptimizer': '.production.production_optimizer',
     'create_production_optimizer': '.production.production_optimizer',
     'production_optimization_context': '.production.production_optimizer',
+    'transformer': '.transformer',
+    'library': '.library',
 }
 
 import importlib
@@ -233,6 +238,7 @@ __all__ = [
     # Compatibility shims (deprecated)
     'EnhancedOptimizationCore',
     'HybridOptimizationCore',
+    'TransformerOptimizer',
     'ComponentOptimizer',
     'get_component_optimizer',
     'create_truthgpt_optimizer',
@@ -266,6 +272,7 @@ __all__ = [
     # Submodules
     'core',
     'truthgpt',
+    'mcts',
     'specialized',
     'optimization_cores',
     'techniques',
@@ -275,5 +282,7 @@ __all__ = [
     'tensorflow',
     'quantum',
     'production',
+    'transformer',
+    'library',
     'list_available_optimizer_submodules',
 ]

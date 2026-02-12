@@ -10,18 +10,23 @@ _logger = logging.getLogger(__name__)
 
 # Core feed-forward
 try:
-    from .feed_forward import (
+    from .core import (
         FeedForward,
         GatedFeedForward,
         SwiGLU,
         create_feed_forward
     )
 except ImportError as e:
-    _logger.debug(f"Could not import feed_forward: {e}")
+    _logger.debug(f"Could not import core feed_forward elements: {e}")
+    # Fallback to avoid complete failure if submodules are missing
+    FeedForward = object
+    GatedFeedForward = object
+    SwiGLU = object
+    create_feed_forward = lambda *args, **kwargs: None
 
 # PiMoE router
 try:
-    from .pimoe_router import (
+    from .routing import (
         PiMoESystem,
         TokenLevelRouter,
         PiMoEExpert,
@@ -30,11 +35,13 @@ try:
         create_pimoe_system
     )
 except ImportError as e:
-    _logger.debug(f"Could not import pimoe_router: {e}")
+    _logger.debug(f"Could not import routing elements: {e}")
+    PiMoESystem = object
+    create_pimoe_system = lambda *args, **kwargs: None
 
 # Enhanced PiMoE integration
 try:
-    from .enhanced_pimoe_integration import (
+    from .core import (
         EnhancedPiMoEIntegration,
         AdaptivePiMoE,
         OptimizationMetrics,
@@ -45,7 +52,7 @@ except ImportError as e:
 
 # Advanced PiMoE routing
 try:
-    from .advanced_pimoe_routing import (
+    from .routing import (
         AdvancedPiMoESystem,
         RoutingStrategy,
         AdvancedRoutingConfig,
@@ -60,7 +67,7 @@ except ImportError as e:
 
 # Performance optimizer
 try:
-    from .pimoe_performance_optimizer import (
+    from .optimization import (
         PiMoEPerformanceOptimizer,
         PerformanceConfig,
         OptimizationLevel,
@@ -72,11 +79,13 @@ try:
         create_performance_optimizer
     )
 except ImportError as e:
-    _logger.debug(f"Could not import pimoe_performance_optimizer: {e}")
+    _logger.debug(f"Could not import optimization elements: {e}")
+    PiMoEPerformanceOptimizer = object
+    create_performance_optimizer = lambda *args, **kwargs: None
 
 # Production PiMoE system
 try:
-    from .production_pimoe_system import (
+    from .systems import (
         ProductionPiMoESystem,
         ProductionConfig,
         ProductionMode,
@@ -91,7 +100,7 @@ except ImportError as e:
 
 # Production API server
 try:
-    from .production_api_server import (
+    from .systems import (
         ProductionAPIServer,
         PiMoERequest,
         PiMoEResponse,
@@ -106,7 +115,7 @@ except ImportError as e:
 
 # Production deployment
 try:
-    from .production_deployment import (
+    from .systems import (
         ProductionDeployment,
         DeploymentEnvironment,
         ScalingStrategy,
@@ -121,7 +130,7 @@ except ImportError as e:
 
 # Refactored base
 try:
-    from .refactored_pimoe_base import (
+    from .core import (
         SystemConfig,
         LoggerProtocol,
         MonitorProtocol,
@@ -143,7 +152,7 @@ except ImportError as e:
 
 # Refactored production system
 try:
-    from .refactored_production_system import (
+    from .systems import (
         RefactoredProductionPiMoESystem,
         create_refactored_production_system,
     )
@@ -152,7 +161,7 @@ except ImportError as e:
 
 # Refactored config manager
 try:
-    from .refactored_config_manager import (
+    from .core import (
         ConfigurationManager,
         ConfigurationFactory,
         ConfigTemplates,

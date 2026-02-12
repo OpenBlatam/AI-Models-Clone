@@ -30,15 +30,10 @@ class SwiGLU(nn.Module):
             hidden_dim = int(2 * dim / 3)
             hidden_dim = int(2 * hidden_dim / 3) * 3
         
-        try:
-            from optimization_core import OptimizedLinear
-            self.w1 = OptimizedLinear(dim, hidden_dim, bias=bias)
-            self.w2 = OptimizedLinear(hidden_dim, dim, bias=bias)
-            self.w3 = OptimizedLinear(dim, hidden_dim, bias=bias)
-        except ImportError:
-            self.w1 = nn.Linear(dim, hidden_dim, bias=bias)
-            self.w2 = nn.Linear(hidden_dim, dim, bias=bias)
-            self.w3 = nn.Linear(dim, hidden_dim, bias=bias)
+        # Use locally defined OptimizedLinear
+        self.w1 = OptimizedLinear(dim, hidden_dim, bias=bias)
+        self.w2 = OptimizedLinear(hidden_dim, dim, bias=bias)
+        self.w3 = OptimizedLinear(dim, hidden_dim, bias=bias)
 
     def forward(self, x):
         return self.w2(F.silu(self.w1(x)) * self.w3(x))
@@ -67,23 +62,12 @@ class GatedMLP(nn.Module):
         if activation == "swiglu":
             self.gate = SwiGLU(input_dim, hidden_dim, bias)
         elif activation == "gelu":
-            try:
-                from optimization_core import OptimizedLinear
-                self.gate_proj = OptimizedLinear(input_dim, hidden_dim, bias=bias)
-                self.up_proj = OptimizedLinear(input_dim, hidden_dim, bias=bias)
-                self.down_proj = OptimizedLinear(hidden_dim, output_dim, bias=bias)
-            except ImportError:
-                self.gate_proj = nn.Linear(input_dim, hidden_dim, bias=bias)
-                self.up_proj = nn.Linear(input_dim, hidden_dim, bias=bias)
-                self.down_proj = nn.Linear(hidden_dim, output_dim, bias=bias)
+            self.gate_proj = OptimizedLinear(input_dim, hidden_dim, bias=bias)
+            self.up_proj = OptimizedLinear(input_dim, hidden_dim, bias=bias)
+            self.down_proj = OptimizedLinear(hidden_dim, output_dim, bias=bias)
         else:
-            try:
-                from optimization_core import OptimizedLinear
-                self.linear1 = OptimizedLinear(input_dim, hidden_dim, bias=bias)
-                self.linear2 = OptimizedLinear(hidden_dim, output_dim, bias=bias)
-            except ImportError:
-                self.linear1 = nn.Linear(input_dim, hidden_dim, bias=bias)
-                self.linear2 = nn.Linear(hidden_dim, output_dim, bias=bias)
+            self.linear1 = OptimizedLinear(input_dim, hidden_dim, bias=bias)
+            self.linear2 = OptimizedLinear(hidden_dim, output_dim, bias=bias)
             
         self.dropout = nn.Dropout(dropout) if dropout > 0 else None
 
@@ -149,11 +133,8 @@ class MixtureOfExperts(nn.Module):
         self.output_dim = output_dim
         self.load_balancing_loss_coeff = load_balancing_loss_coeff
         
-        try:
-            from optimization_core import OptimizedLinear
-            self.gate = OptimizedLinear(input_dim, num_experts, bias=False)
-        except ImportError:
-            self.gate = nn.Linear(input_dim, num_experts, bias=False)
+
+        self.gate = OptimizedLinear(input_dim, num_experts, bias=False)
         self.experts = nn.ModuleList([
             ExpertMLP(input_dim, hidden_dim, output_dim, i, activation, bias)
             for i in range(num_experts)
@@ -220,11 +201,8 @@ class AdaptiveMLP(nn.Module):
         self.output_dim = output_dim
         self.complexity_threshold = complexity_threshold
         
-        try:
-            from optimization_core import OptimizedLinear
-            self.complexity_predictor = OptimizedLinear(input_dim, 1)
-        except ImportError:
-            self.complexity_predictor = nn.Linear(input_dim, 1)
+        
+        self.complexity_predictor = OptimizedLinear(input_dim, 1)
         
         self.base_mlp = GatedMLP(input_dim, base_hidden_dim, output_dim, activation, bias)
         self.extended_mlp = GatedMLP(input_dim, max_hidden_dim, output_dim, activation, bias)

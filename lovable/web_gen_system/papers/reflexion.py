@@ -1,5 +1,5 @@
 from typing import Dict, Any, Callable
-from ..agents.base import BaseAgent
+from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
 
 class ReflexionAgent(BaseAgent):
     """

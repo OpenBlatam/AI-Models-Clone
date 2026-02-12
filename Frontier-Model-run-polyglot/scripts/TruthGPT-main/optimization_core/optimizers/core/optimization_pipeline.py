@@ -10,7 +10,7 @@ from typing import Dict, Any, List, Optional, Tuple, Callable
 from dataclasses import dataclass
 import logging
 
-from optimizers.core.techniques import OptimizationTechnique, get_technique, TechniqueRegistry
+from optimization_core.optimizers.core.techniques import OptimizationTechnique, get_technique, TechniqueRegistry
 
 logger = logging.getLogger(__name__)
 

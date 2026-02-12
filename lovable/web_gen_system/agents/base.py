@@ -1,10 +1,10 @@
 from typing import Dict, Any, Optional, TYPE_CHECKING
 import structlog
-from ..schemas import AgentContext
+from agents.backend.onyx.server.features.lovable.web_gen_system.schemas import AgentContext
 
 if TYPE_CHECKING:
-    from ..core.event_bus import EventBus
-    from ..core.memory import SharedMemory
+    from agents.backend.onyx.server.features.lovable.web_gen_system.core.event_bus import EventBus
+    from agents.backend.onyx.server.features.lovable.web_gen_system.core.memory import SharedMemory
 
 logger = structlog.get_logger()
 

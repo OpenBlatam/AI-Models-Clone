@@ -1,7 +1,7 @@
-from .base import BaseAgent
-from .roles import ProductManagerAgent, ArchitectAgent, EngineerAgent, QAAgent
-from .visual_critic import VisualCriticAgent
-from ..papers import (
+from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from agents.backend.onyx.server.features.lovable.web_gen_system.agents.roles import ProductManagerAgent, ArchitectAgent, EngineerAgent, QAAgent
+from agents.backend.onyx.server.features.lovable.web_gen_system.agents.visual_critic import VisualCriticAgent
+from agents.backend.onyx.server.features.lovable.web_gen_system.papers import (
     SecurityScannerAgent, PlaywrightTestGenerator, HybridResearchAgent,
     AgenticInterconnector, EnterpriseTaskPlanner,
     MultimodalWebAgent, WebVoyagerAgent, MobileDeviceAgent,
