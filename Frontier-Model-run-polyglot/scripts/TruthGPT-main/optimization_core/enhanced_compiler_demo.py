@@ -35,11 +35,7 @@ from .compiler import (
 
 # Import unified TruthGPT optimizers
 try:
-    from .optimizers.compatibility import (
-        UltimateTruthGPTOptimizer,
-        TranscendentTruthGPTOptimizer,
-        InfiniteTruthGPTOptimizer,
-    )
+    from .optimizers import create_truthgpt_optimizer
     TRUTHGPT_OPTIMIZERS_AVAILABLE = True
 except ImportError:
     logger.warning("TruthGPT optimizers not available, using mock optimizers")
@@ -392,9 +388,9 @@ def demo_truthgpt_integration():
     # Create mock optimizers if TruthGPT optimizers not available
     if TRUTHGPT_OPTIMIZERS_AVAILABLE:
         optimizers = {
-            "ultimate": UltimateTruthGPTOptimizer(),
-            "transcendent": TranscendentTruthGPTOptimizer(),
-            "infinite": InfiniteTruthGPTOptimizer()
+            "ultimate": create_truthgpt_optimizer("ultimate"),
+            "transcendent": create_truthgpt_optimizer("transcendent"),
+            "infinite": create_truthgpt_optimizer("infinite")
         }
     else:
         optimizers = {

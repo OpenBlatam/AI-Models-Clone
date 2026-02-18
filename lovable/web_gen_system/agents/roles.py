@@ -1,10 +1,10 @@
 from typing import Dict, Any, List, Optional
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
-from agents.backend.onyx.server.features.lovable.web_gen_system.frameworks.nextjs import NextJSGenerator
-from agents.backend.onyx.server.features.lovable.web_gen_system.frameworks.expo import ExpoGenerator
-from agents.backend.onyx.server.features.lovable.web_gen_system.accessibility import WebAccessibilityEnhancer
-from agents.backend.onyx.server.features.lovable.web_gen_system.instruction import InstructionParser
-from agents.backend.onyx.server.features.lovable.web_gen_system.context import RepositoryContext
+from .base import BaseAgent
+from ..frameworks.nextjs import NextJSGenerator
+from ..frameworks.expo import ExpoGenerator
+from ..accessibility import WebAccessibilityEnhancer
+from ..instruction import InstructionParser
+from ..context import RepositoryContext
 
 class ProductManagerAgent(BaseAgent):
     """
@@ -19,7 +19,7 @@ class ProductManagerAgent(BaseAgent):
         Analyzes the user prompt and extracts requirements.
         """
         try:
-            prompt = context.get("prompt", "")
+            prompt = context.shared_memory.get("prompt", "")
             if not prompt:
                 self.log("No prompt provided in context.", level="warning")
                 return {"requirements": {}, "status": "failed", "error": "No prompt provided"}
@@ -58,7 +58,7 @@ class ArchitectAgent(BaseAgent):
         Designs the architecture based on requirements.
         """
         try:
-            requirements = context.get("requirements", {})
+            requirements = context.shared_memory.get("requirements", {})
             platform = requirements.get("platform", "web")
             
             self.log(f"Designing architecture for {platform}...")
@@ -98,7 +98,7 @@ class EngineerAgent(BaseAgent):
         Generates code structure and populates the repository context.
         """
         try:
-            architecture = context.get("architecture", {})
+            architecture = context.shared_memory.get("architecture", {})
             structure_type = architecture.get("structure_type", "nextjs")
             
             self.log(f"Generating code for {structure_type}...")
@@ -140,7 +140,7 @@ class QAAgent(BaseAgent):
         Reviews the generated code for issues.
         """
         try:
-            code_structure = context.get("code_structure", {})
+            code_structure = context.shared_memory.get("code_structure", {})
             self.log("Reviewing code...")
             
             issues: List[str] = []

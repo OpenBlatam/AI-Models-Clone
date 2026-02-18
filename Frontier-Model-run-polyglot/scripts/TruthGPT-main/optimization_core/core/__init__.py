@@ -325,9 +325,6 @@ _LAZY_IMPORTS = {
     'dynamic_factory': '.dynamic_factory',
     # Optimizers
     'optimizers': '.optimizers',
-    'ModernTruthGPTOptimizer': '.modern_truthgpt_optimizer',
-    'ModularOptimizer': '.modular_optimizer',
-    'PyTorchOptimizerBase': '.pytorch_optimizer_base',
     # Validation
     'validation': '.validation',
     'ConfigValidator': '.validation.config_validator',

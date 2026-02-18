@@ -19,7 +19,7 @@ import psutil
 from dataclasses import dataclass
 from abc import ABC, abstractmethod
 
-from optimization_core.core.pytorch_optimizer_base import OptimizationConfig, PyTorchOptimizerBase as BaseOptimizer
+from optimization_core.modules.optimizers.core.pytorch_optimizer_base import OptimizationConfig, PyTorchOptimizerBase as BaseOptimizer
 from optimization_core.utils.cuda_kernels import PerformanceMonitor
 
 logger = logging.getLogger(__name__)

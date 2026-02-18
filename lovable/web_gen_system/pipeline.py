@@ -1,9 +1,9 @@
 import structlog
 from typing import Dict, Union, Any, Optional
 
-from agents.backend.onyx.server.features.lovable.web_gen_system.generator import DynamicUIGenerator
-from agents.backend.onyx.server.features.lovable.web_gen_system.accessibility import WebAccessibilityEnhancer
-from agents.backend.onyx.server.features.lovable.web_gen_system.seo import SEOOptimizer
+from .generator import DynamicUIGenerator
+from .accessibility import WebAccessibilityEnhancer
+from .seo import SEOOptimizer
 from .frameworks.nextjs import NextJSGenerator
 from .frameworks.expo import ExpoGenerator
 from .schemas import WebGenRequest, WebGenResponse, AgentContext

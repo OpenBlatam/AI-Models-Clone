@@ -147,7 +147,11 @@ class ProductionAPIServer:
         # Start background tasks
         @self.app.on_event("startup")
         async def startup_event():
-            self._start_background_tasks()
+            # Start background tasks within the event loop
+            try:
+                self._start_background_tasks()
+            except Exception as e:
+                self.pimoe_system.logger.log_error("Failed to start background tasks", e)
     
     def _init_redis(self) -> Optional[redis.Redis]:
         """Initialize Redis client for caching."""

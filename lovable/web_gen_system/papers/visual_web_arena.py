@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class MultimodalWebAgent(BaseAgent):
     """
@@ -15,7 +15,7 @@ class MultimodalWebAgent(BaseAgent):
         Analyzes visual elements of the generated interface.
         """
         try:
-            screenshot_path = context.get("screenshot_path")
+            screenshot_path = context.shared_memory.get("screenshot_path")
             if not screenshot_path:
                 return {"status": "skipped", "reason": "No screenshot provided"}
 

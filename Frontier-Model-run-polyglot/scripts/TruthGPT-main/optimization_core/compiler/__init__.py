@@ -7,6 +7,7 @@ TensorFlow-style architecture with comprehensive compiler support
 # Core compiler infrastructure
 from .core.compiler_core import (
     CompilerCore, CompilationTarget, OptimizationLevel, CompilationResult,
+    CompilationConfig, CompilationContext, CompilationError,
     create_compiler_core, compilation_context
 )
 
@@ -72,6 +73,9 @@ __all__ = [
     'CompilationTarget',
     'OptimizationLevel',
     'CompilationResult',
+    'CompilationConfig',
+    'CompilationContext',
+    'CompilationError',
     'create_compiler_core',
     'compilation_context',
     
@@ -336,6 +340,9 @@ __all__ = [
     'CompilationTarget',
     'OptimizationLevel',
     'CompilationResult',
+    'CompilationConfig',
+    'CompilationContext',
+    'CompilationError',
     'create_compiler_core',
     'compilation_context',
     

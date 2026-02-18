@@ -399,7 +399,9 @@ class MemoryEfficientAttention:
         if torch.cuda.is_available():
             torch.cuda.empty_cache()
 
+# ---------------------------------------------------------------------------
 # Factory functions
+# ---------------------------------------------------------------------------
 def create_efficient_attention(
     d_model: int,
     n_heads: int,

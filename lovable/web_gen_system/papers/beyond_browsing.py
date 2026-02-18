@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class HybridResearchAgent(BaseAgent):
     """
@@ -15,7 +15,7 @@ class HybridResearchAgent(BaseAgent):
         Conducts research on a given topic, deciding between API and Browsing.
         """
         try:
-            topic = context.get("topic")
+            topic = context.shared_memory.get("topic")
             if not topic:
                 return {"status": "skipped", "reason": "No topic provided"}
 

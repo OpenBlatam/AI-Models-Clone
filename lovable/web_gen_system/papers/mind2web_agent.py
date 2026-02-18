@@ -1,5 +1,5 @@
 from typing import Dict, Any, List
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class Mind2WebAgent(BaseAgent):
     """
@@ -15,7 +15,7 @@ class Mind2WebAgent(BaseAgent):
         Plans and executes a general web task.
         """
         try:
-            task = context.get("task")
+            task = context.shared_memory.get("task")
             if not task:
                 return {"status": "skipped", "reason": "No task provided"}
 

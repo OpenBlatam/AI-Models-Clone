@@ -22,10 +22,9 @@ from ..core.refactored_pimoe_base import (
     LoggerProtocol, MonitorProtocol, ErrorHandlerProtocol, RequestQueueProtocol,
     ServiceFactory, DIContainer, EventBus, ResourceManager,
     MetricsCollector, HealthChecker, BasePiMoESystem,
-    RequestData, ResponseData, ProductionMode, LogLevel
+    RequestData, ResponseData, ProductionMode, LogLevel, OptimizationLevel
 )
 from ..routing.advanced_pimoe_routing import RoutingStrategy
-from ..optimization.pimoe_performance_optimizer import OptimizationLevel
 
 # Concrete Implementations
 

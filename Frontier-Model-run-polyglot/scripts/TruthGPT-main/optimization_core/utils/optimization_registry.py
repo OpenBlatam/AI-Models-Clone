@@ -49,8 +49,8 @@ class OptimizationRegistry:
     def _register_default_optimizations(self):
         """Register default and enhanced optimization techniques."""
         try:
-            from .cuda_kernels import CUDAOptimizations
-            from .triton_optimizations import apply_triton_optimizations
+            from .gpu.cuda_kernels import CUDAOptimizations
+            from ..optimizers.techniques.triton_optimizations import apply_triton_optimizations
             from .enhanced_grpo import create_enhanced_grpo_trainer
             try:
                 from .mcts_optimization import create_mcts_optimizer

@@ -1,5 +1,5 @@
 from typing import Dict, Any, List
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class SeeClickAgent(BaseAgent):
     """
@@ -15,7 +15,7 @@ class SeeClickAgent(BaseAgent):
         Grounds a textual element description to specific UI coordinates.
         """
         try:
-            element_description = context.get("element_description")
+            element_description = context.shared_memory.get("element_description")
             if not element_description:
                 return {"status": "skipped", "reason": "No element description provided"}
 

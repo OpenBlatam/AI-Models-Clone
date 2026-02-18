@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class PlaywrightTestGenerator(BaseAgent):
     """
@@ -17,7 +17,7 @@ class PlaywrightTestGenerator(BaseAgent):
         try:
             self.log("Generating Playwright tests...")
             
-            repo_context = context.get("repository_context")
+            repo_context = context.shared_memory.get("repository_context")
             if not repo_context:
                 self.log("No repository context found. Skipping test generation.", level="warning")
                 return {"status": "skipped"}

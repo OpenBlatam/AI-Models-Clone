@@ -10,7 +10,7 @@ from ..papers.web_voyager import WebVoyagerAgent
 from ..papers.mobile_agent import MobileDeviceAgent
 from ..papers.os_world import OSWorldAgent
 from ..papers.web_arena import WebArenaEvaluator
-from agents.backend.onyx.server.features.lovable.web_gen_system.context import RepositoryContext
+from ..context import RepositoryContext
 
 class TestTop10Agents(unittest.TestCase):
     

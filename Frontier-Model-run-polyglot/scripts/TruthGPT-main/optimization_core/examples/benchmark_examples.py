@@ -3,7 +3,7 @@ Examples for benchmarking.
 
 Demonstrates usage of benchmarking utilities.
 """
-from benchmarks import (
+from optimization_core.benchmarks import (
     BenchmarkRunner,
     run_benchmark,
     compare_benchmarks,

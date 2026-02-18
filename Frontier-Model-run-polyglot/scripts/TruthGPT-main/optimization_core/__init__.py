@@ -34,7 +34,7 @@ from .utils.memory_optimizations import (
     create_memory_optimizer
 )
 
-from .optimizers.computational_optimizations import (
+from .modules.optimizers.techniques.computational_optimizations import (
     FusedAttention,
     BatchOptimizer,
     ComputationalOptimizer,

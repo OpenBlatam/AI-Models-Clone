@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class SecurityScannerAgent(BaseAgent):
     """
@@ -17,7 +17,7 @@ class SecurityScannerAgent(BaseAgent):
         try:
             self.log("Starting security scan...")
             
-            repo_context = context.get("repository_context")
+            repo_context = context.shared_memory.get("repository_context")
             if not repo_context:
                 self.log("No repository context found. Skipping scan.", level="warning")
                 return {"status": "skipped", "issues": []}

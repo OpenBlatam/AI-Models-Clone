@@ -1,7 +1,7 @@
-from agents.backend.onyx.server.features.lovable.web_gen_system.accessibility import WebAccessibilityEnhancer
-from agents.backend.onyx.server.features.lovable.web_gen_system.seo import SEOOptimizer
-from agents.backend.onyx.server.features.lovable.web_gen_system.generator import DynamicUIGenerator
-from agents.backend.onyx.server.features.lovable.web_gen_system.pipeline import WebGenPipeline
+from .accessibility import WebAccessibilityEnhancer
+from .seo import SEOOptimizer
+from .generator import DynamicUIGenerator
+from .pipeline import WebGenPipeline
 
 __all__ = [
     "WebAccessibilityEnhancer",

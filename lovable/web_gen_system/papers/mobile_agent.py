@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class MobileDeviceAgent(BaseAgent):
     """
@@ -15,7 +15,7 @@ class MobileDeviceAgent(BaseAgent):
         Simulates mobile-specific interactions with visual perception.
         """
         try:
-            action = context.get("action")
+            action = context.shared_memory.get("action")
             if not action:
                 return {"status": "skipped"}
 

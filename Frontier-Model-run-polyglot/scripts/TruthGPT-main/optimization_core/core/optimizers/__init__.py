@@ -59,15 +59,7 @@ from ..advanced_optimizations import (
 )
 
 # Import other core optimizers
-from ..modern_truthgpt_optimizer import (
-    ModernTruthGPTOptimizer,
-)
-
-from ..modular_optimizer import (
-    ModularOptimizer,
-)
-
-from ..pytorch_optimizer_base import (
+from optimization_core.modules.optimizers.core.pytorch_optimizer_base import (
     PyTorchOptimizerBase,
 )
 
@@ -93,8 +85,6 @@ def create_core_optimizer(
             - "quantum_inspired" - QuantumInspiredOptimizer
             - "evolutionary" - EvolutionaryOptimizer
             - "meta_learning" - MetaLearningOptimizer
-            - "modern_truthgpt" - ModernTruthGPTOptimizer
-            - "modular" - ModularOptimizer
         config: Optional configuration dictionary
     
     Returns:
@@ -117,8 +107,6 @@ def create_core_optimizer(
         "quantum_inspired": lambda cfg: QuantumInspiredOptimizer(cfg),
         "evolutionary": lambda cfg: EvolutionaryOptimizer(cfg),
         "meta_learning": lambda cfg: MetaLearningOptimizer(cfg),
-        "modern_truthgpt": lambda cfg: ModernTruthGPTOptimizer(cfg),
-        "modular": lambda cfg: ModularOptimizer(cfg),
     }
     
     if optimizer_type not in factory_map:
@@ -178,14 +166,6 @@ CORE_OPTIMIZER_REGISTRY = {
         "class": MetaLearningOptimizer,
         "module": "core.advanced_optimizations",
     },
-    "modern_truthgpt": {
-        "class": ModernTruthGPTOptimizer,
-        "module": "core.modern_truthgpt_optimizer",
-    },
-    "modular": {
-        "class": ModularOptimizer,
-        "module": "core.modular_optimizer",
-    },
 }
 
 
@@ -244,8 +224,6 @@ __all__ = [
     "EvolutionaryOptimizer",
     "MetaLearningOptimizer",
     # Other core optimizers
-    "ModernTruthGPTOptimizer",
-    "ModularOptimizer",
     "PyTorchOptimizerBase",
     # Unified factory
     "create_core_optimizer",
@@ -254,4 +232,3 @@ __all__ = [
     "list_available_core_optimizers",
     "get_core_optimizer_info",
 ]
-

@@ -1,5 +1,5 @@
 from typing import List, Dict, Any
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class WebVoyagerAgent(BaseAgent):
     """
@@ -15,7 +15,7 @@ class WebVoyagerAgent(BaseAgent):
         Plans a navigation sequence for a complex user goal.
         """
         try:
-            goal = context.get("goal")
+            goal = context.shared_memory.get("goal")
             if not goal:
                 return {"status": "skipped"}
 

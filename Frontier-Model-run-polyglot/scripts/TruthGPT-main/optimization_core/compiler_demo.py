@@ -27,11 +27,7 @@ from .compiler import (
 
 # Import unified TruthGPT optimizers
 try:
-    from .optimizers.compatibility import (
-        UltimateTruthGPTOptimizer,
-        TranscendentTruthGPTOptimizer,
-        InfiniteTruthGPTOptimizer,
-    )
+    from .optimizers import create_truthgpt_optimizer
     TRUTHGPT_OPTIMIZERS_AVAILABLE = True
 except ImportError:
     logger.warning("TruthGPT optimizers not available, using mock optimizers")
@@ -98,19 +94,19 @@ def create_demo_optimizers() -> Dict[str, Any]:
     
     if TRUTHGPT_OPTIMIZERS_AVAILABLE:
         try:
-            optimizers["ultimate"] = UltimateTruthGPTOptimizer()
+            optimizers["ultimate"] = create_truthgpt_optimizer("ultimate")
             logger.info("Created Ultimate TruthGPT Optimizer")
         except Exception as e:
             logger.warning(f"Failed to create Ultimate TruthGPT Optimizer: {e}")
         
         try:
-            optimizers["transcendent"] = TranscendentTruthGPTOptimizer()
+            optimizers["transcendent"] = create_truthgpt_optimizer("transcendent")
             logger.info("Created Transcendent TruthGPT Optimizer")
         except Exception as e:
             logger.warning(f"Failed to create Transcendent TruthGPT Optimizer: {e}")
         
         try:
-            optimizers["infinite"] = InfiniteTruthGPTOptimizer()
+            optimizers["infinite"] = create_truthgpt_optimizer("infinite")
             logger.info("Created Infinite TruthGPT Optimizer")
         except Exception as e:
             logger.warning(f"Failed to create Infinite TruthGPT Optimizer: {e}")

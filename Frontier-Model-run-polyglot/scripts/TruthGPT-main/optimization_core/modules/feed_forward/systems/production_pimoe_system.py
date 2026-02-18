@@ -1,22 +1,28 @@
 """
 Production-Ready PiMoE System  (backward-compatibility shim)
 
-This module re-exports everything from the ``production`` subpackage so that
-existing ``from .production_pimoe_system import ...`` statements keep working.
+This module re-exports components from the refactored production system
+to maintain backward compatibility with existing imports.
 """
 
-# Re-export the full public API
-from ..production import (  # noqa: F401
-    LogLevel,
-    ProductionConfig,
-    ProductionErrorHandler,
+from .refactored_production_system import (
+    RefactoredProductionPiMoESystem as ProductionPiMoESystem,
+    create_refactored_production_system as create_production_pimoe_system,
     ProductionLogger,
-    ProductionMode,
     ProductionMonitor,
-    ProductionPiMoESystem,
+    ProductionErrorHandler,
     ProductionRequestQueue,
-    create_production_pimoe_system,
 )
+
+from ..core.refactored_pimoe_base import (
+    ProductionConfig,
+    ProductionMode,
+    LogLevel
+)
+
+# Dummy run_production_demo function for backward compatibility
+def run_production_demo():
+    print("Please use run_refactored_production_demo() instead.")
 
 __all__ = [
     "ProductionMode",
@@ -32,4 +38,4 @@ __all__ = [
 ]
 
 if __name__ == "__main__":
-    system = run_production_demo()
+    run_production_demo()

@@ -1,5 +1,5 @@
 from typing import Dict, Any, List
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class CogAgent(BaseAgent):
     """
@@ -15,7 +15,7 @@ class CogAgent(BaseAgent):
         Analyzes a GUI screenshot to understand elements and suggest actions.
         """
         try:
-            screenshot_path = context.get("screenshot_path")
+            screenshot_path = context.shared_memory.get("screenshot_path")
             if not screenshot_path:
                 return {"status": "skipped", "reason": "No screenshot provided"}
 

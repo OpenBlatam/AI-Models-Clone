@@ -1,5 +1,5 @@
 from typing import Dict, Any, List
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class FerretUIAgent(BaseAgent):
     """
@@ -15,7 +15,7 @@ class FerretUIAgent(BaseAgent):
         Describes a UI element or screen region with high precision.
         """
         try:
-            element_region = context.get("region")
+            element_region = context.shared_memory.get("region")
             if not element_region:
                 return {"status": "skipped", "reason": "No region provided"}
 

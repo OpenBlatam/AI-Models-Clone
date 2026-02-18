@@ -89,7 +89,7 @@ def apply_optimization_profile(model, profile_name: str = 'balanced'):
     profile = profiles[profile_name]
     
     from .memory_optimizations import create_memory_optimizer
-    from .computational_optimizations import create_computational_optimizer
+    from ..optimizers.techniques.computational_optimizations import create_computational_optimizer
     
     memory_optimizer = create_memory_optimizer(profile.memory_optimizations)
     computational_optimizer = create_computational_optimizer(profile.computational_optimizations)

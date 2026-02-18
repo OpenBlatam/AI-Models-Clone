@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class OSWorldAgent(BaseAgent):
     """
@@ -15,7 +15,7 @@ class OSWorldAgent(BaseAgent):
         Executes an OS-level command or task.
         """
         try:
-            command = context.get("command")
+            command = context.shared_memory.get("command")
             if not command:
                 return {"status": "skipped"}
 

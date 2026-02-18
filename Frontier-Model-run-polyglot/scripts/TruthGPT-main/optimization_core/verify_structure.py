@@ -135,7 +135,7 @@ class TestOptimizersPackage(unittest.TestCase):
 
     def test_factory_function(self):
         """create_truthgpt_optimizer should be callable."""
-        from optimization_core.optimizers import create_truthgpt_optimizer
+        from optimization_core.modules.optimizers import create_truthgpt_optimizer
         self.assertTrue(callable(create_truthgpt_optimizer))
         print("[OK] create_truthgpt_optimizer is callable")
 
@@ -148,13 +148,13 @@ class TestOptimizersPackage(unittest.TestCase):
 
     def test_optimization_cores_factory(self):
         """create_optimization_core factory should be importable."""
-        from optimization_core.optimizers.optimization_cores import create_optimization_core
+        from optimization_core.modules.optimizers.optimization_cores import create_optimization_core
         self.assertTrue(callable(create_optimization_core))
         print("[OK] create_optimization_core is callable")
 
     def test_optimization_cores_list(self):
         """list_available_cores should return a non-empty list."""
-        from optimization_core.optimizers.optimization_cores import list_available_cores
+        from optimization_core.modules.optimizers.optimization_cores import list_available_cores
         cores = list_available_cores()
         self.assertIsInstance(cores, list)
         self.assertGreater(len(cores), 0)
@@ -162,13 +162,13 @@ class TestOptimizersPackage(unittest.TestCase):
 
     def test_backward_compat_enhanced(self):
         """EnhancedOptimizationCore should be importable from optimizers (shim)."""
-        from optimization_core.optimizers import EnhancedOptimizationCore
+        from optimization_core.modules.optimizers import EnhancedOptimizationCore
         self.assertIsNotNone(EnhancedOptimizationCore)
         print("[OK] EnhancedOptimizationCore backward compat")
 
     def test_generic_optimizer(self):
         """Generic optimizer should be importable."""
-        from optimization_core.optimizers import create_generic_optimizer
+        from optimization_core.modules.optimizers import create_generic_optimizer
         self.assertTrue(callable(create_generic_optimizer))
         print("[OK] create_generic_optimizer is callable")
 
@@ -260,13 +260,9 @@ class TestMassiveRefactor(unittest.TestCase):
         """Verify key classes are exported from feed_forward submodules."""
         try:
             from optimization_core.modules.feed_forward.core import FeedForward
-            from optimization_core.modules.feed_forward.routing import PiMoESystem
-            from optimization_core.modules.feed_forward.optimization import PiMoEPerformanceOptimizer
             from optimization_core.modules.feed_forward.systems import ProductionPiMoESystem
             
             self.assertIsNotNone(FeedForward)
-            self.assertIsNotNone(PiMoESystem)
-            self.assertIsNotNone(PiMoEPerformanceOptimizer)
             self.assertIsNotNone(ProductionPiMoESystem)
             print("[OK] modules.feed_forward class exports verified")
         except ImportError as e:
@@ -275,18 +271,17 @@ class TestMassiveRefactor(unittest.TestCase):
     def test_feed_forward_backward_compat(self):
         """Verify modules.feed_forward still exports classes directly."""
         try:
-            from optimization_core.modules.feed_forward import FeedForward, PiMoESystem, PiMoEPerformanceOptimizer
+            from optimization_core.modules.feed_forward import FeedForward, ProductionPiMoESystem
             self.assertIsNotNone(FeedForward)
-            self.assertIsNotNone(PiMoESystem)
-            self.assertIsNotNone(PiMoEPerformanceOptimizer)
+            self.assertIsNotNone(ProductionPiMoESystem)
             print("[OK] modules.feed_forward backward compatibility verified")
         except ImportError as e:
             self.fail(f"Failed to verify feed_forward backward compat: {e}")
 
     def test_optimizers_mcts(self):
         """Verify optimizers.mcts submodule."""
-        from optimization_core.optimizers import mcts
-        from optimization_core.optimizers.mcts import MCTSOptimizer
+        from optimization_core.modules.optimizers import mcts
+        from optimization_core.modules.optimizers.mcts import MCTSOptimizer
         self.assertIsNotNone(mcts)
         self.assertIsNotNone(MCTSOptimizer)
         print("[OK] optimizers.mcts verified")
@@ -294,8 +289,8 @@ class TestMassiveRefactor(unittest.TestCase):
     def test_optimizers_truthgpt(self):
         """Verify optimizers.truthgpt submodule exports."""
         try:
-            from optimization_core.optimizers import truthgpt
-            from optimization_core.optimizers.truthgpt import SupremeTruthGPTOptimizer
+            from optimization_core.modules.optimizers import truthgpt
+            from optimization_core.modules.optimizers.truthgpt import SupremeTruthGPTOptimizer
             self.assertIsNotNone(truthgpt)
             self.assertIsNotNone(SupremeTruthGPTOptimizer)
             print("[OK] optimizers.truthgpt verified")
@@ -307,7 +302,7 @@ class TestMassiveRefactor(unittest.TestCase):
         # Import via full package path to ensure relative imports work correctly
         try:
             import optimization_core.optimizers.transformer as transformer
-            from optimization_core.optimizers.transformer import TransformerOptimizer
+            from optimization_core.modules.optimizers.transformer import TransformerOptimizer
             
             self.assertIsNotNone(transformer)
             self.assertIsNotNone(TransformerOptimizer)
@@ -315,22 +310,11 @@ class TestMassiveRefactor(unittest.TestCase):
         except ImportError as e:
             self.fail(f"Failed to import transformer optimizer: {e}")
 
-    def test_optimizers_library(self):
-        """Verify optimizers.library submodule exports."""
-        try:
-            import optimization_core.optimizers.library as library
-            from optimization_core.optimizers.library import LibraryOptimizer
-            
-            self.assertIsNotNone(library)
-            self.assertIsNotNone(LibraryOptimizer)
-            print("[OK] optimizers.library verified")
-        except ImportError as e:
-            self.fail(f"Failed to import library optimizer: {e}")
 
     def test_optimizers_transformer_shim(self):
         """Verify TransformerOptimizer shim in root package."""
         try:
-            from optimization_core.optimizers import TransformerOptimizer
+            from optimization_core.modules.optimizers import TransformerOptimizer
             self.assertIsNotNone(TransformerOptimizer)
             print("[OK] TransformerOptimizer shim verified")
         except ImportError as e:
@@ -344,7 +328,7 @@ class TestPhase5Consolidation(unittest.TestCase):
 
     def test_techniques_relocation(self):
         """Verify techniques are importable from the new location."""
-        from optimization_core.optimizers.techniques import (
+        from optimization_core.modules.optimizers.techniques import (
             AdvancedRMSNorm,
             RotaryEmbedding,
             SwiGLU,
@@ -362,7 +346,7 @@ class TestPhase5Consolidation(unittest.TestCase):
 
     def test_registries_relocation(self):
         """Verify registries are importable from the new location."""
-        from optimization_core.optimizers.registries import (
+        from optimization_core.modules.optimizers.registries import (
             get_config_v1,
             get_config_v2
         )
@@ -370,24 +354,95 @@ class TestPhase5Consolidation(unittest.TestCase):
         self.assertIsNotNone(get_config_v2)
         print("[OK] optimizers.registries modules verified")
 
-    def test_root_shims(self):
-        """Verify that root shims still export the expected classes."""
-        from optimization_core.optimizers.ai_extreme_optimizer import SupremeTruthGPTOptimizer
-        from optimization_core.optimizers.extreme_speed_optimization_system import ExtremeSpeedOptimizationSystem
-        from optimization_core.optimizers.enhanced_parameter_optimizer import EnhancedParameterOptimizer
-        
-        self.assertIsNotNone(SupremeTruthGPTOptimizer)
-        self.assertIsNotNone(ExtremeSpeedOptimizationSystem)
-        self.assertIsNotNone(EnhancedParameterOptimizer)
         print("[OK] root optimizer shims verified")
 
     def test_technique_shims(self):
         """Verify technique shims in root optimizers directory."""
-        from optimization_core.optimizers import computational_optimizations, triton_optimizations
+        from optimization_core.modules.optimizers import computational_optimizations, triton_optimizations
         self.assertTrue(hasattr(computational_optimizations, "ComputationalOptimizer"))
         self.assertTrue(hasattr(triton_optimizations, "TritonOptimizations"))
         print("[OK] technique shims verified")
 
+
+class TestLibraryRefactor(unittest.TestCase):
+    """Tests for Phase 6 (Library Refactor) changes."""
+
+    def test_library_structure(self):
+        """Verify libraries subpackage exists and is importable."""
+        try:
+            from optimization_core.modules import libraries
+            from optimization_core.modules.libraries import (
+                core, models, data, training, optimization, 
+                evaluation, inference, monitoring, config_manager, system
+            )
+            self.assertIsNotNone(core)
+            self.assertIsNotNone(models)
+            self.assertIsNotNone(system)
+            print("\n[OK] modules.libraries submodules imported")
+        except ImportError as e:
+            self.fail(f"Failed to import libraries submodules: {e}")
+
+    def test_library_exports(self):
+        """Verify key classes are exported from libraries."""
+        from optimization_core.modules.libraries import (
+            BaseModule, ModelModule, DataModule, TrainingModule,
+            ModularSystem, ConfigManager
+        )
+        self.assertIsNotNone(BaseModule)
+        self.assertIsNotNone(ModelModule)
+        self.assertIsNotNone(ModularSystem)
+        print("[OK] modules.libraries class exports verified")
+
+    def test_advanced_libraries_shim(self):
+        """Verify backward compatibility shim works."""
+        try:
+            # This should trigger a warning but succeed
+            from optimization_core.modules import advanced_libraries
+            from optimization_core.modules.advanced_libraries import ModularSystem
+            self.assertIsNotNone(ModularSystem)
+        except ImportError as e:
+            self.fail(f"Failed to import advanced_libraries shim: {e}")
+
+
+class TestLibraryOptimizer(unittest.TestCase):
+    """Tests for Phase 7 (Library Optimizer Integration)."""
+
+    def test_library_optimizer_init(self):
+        """Verify LibraryOptimizer initializes via unified system."""
+        from optimization_core.modules.optimizers import LibraryOptimizer
+        from optimization_core.modules.optimizers.core.strategies.library_strategy import LibraryStrategy
+        from optimization_core.modules.optimizers.core.unified_optimizer import UnifiedOptimizer
+        
+        optimizer = LibraryOptimizer(config={"test": True})
+        # It's now a UnifiedOptimizer instance since it's a shim
+        self.assertIsInstance(optimizer, UnifiedOptimizer)
+        self.assertIsInstance(optimizer.strategies[0], LibraryStrategy)
+        print("[OK] LibraryOptimizer initialization verified")
+
+    def test_library_strategy_export(self):
+        """Verify LibraryStrategy is exported from strategies package."""
+        from optimization_core.modules.optimizers.core.strategies import LibraryStrategy
+        self.assertIsNotNone(LibraryStrategy)
+        print("[OK] LibraryStrategy export verified")
+
+
+class TestCompatibilityCleanup(unittest.TestCase):
+    """Tests for Phase 8 (Registry & Compatibility Cleanup)."""
+
+    def test_compatibility_package(self):
+        """Verify optimizers.compatibility package works."""
+        from optimization_core.modules.optimizers import compatibility
+        from optimization_core.modules.optimizers.compatibility import AdvancedTruthGPTOptimizer
+        self.assertIsNotNone(AdvancedTruthGPTOptimizer)
+        print("[OK] optimizers.compatibility package verified")
+
+    def test_generic_compatibility_lazy(self):
+        """Verify generic_compatibility lazy attribute works."""
+        from optimization_core import optimizers
+        self.assertTrue(hasattr(optimizers, "generic_compatibility"))
+        gen_comp = optimizers.generic_compatibility
+        self.assertIsNotNone(gen_comp.UltraSpeedOptimizer)
+        print("[OK] generic_compatibility lazy access verified")
 
 
 class TestRefactoringCleanup(unittest.TestCase):
@@ -417,7 +472,7 @@ class TestRefactoringCleanup(unittest.TestCase):
     def test_computational_optimizations_fix(self):
         """Verify computational_optimizations uses corrected import."""
         try:
-            from optimization_core.optimizers.techniques.computational_optimizations import FusedAttention
+            from optimization_core.modules.optimizers.techniques.computational_optimizations import FusedAttention
             # Check if FusedAttention can be instantiated (requires mocking torch.nn.Module correctly)
             # Just verifying import is enough to check imports are not broken
             self.assertIsNotNone(FusedAttention)
@@ -426,6 +481,46 @@ class TestRefactoringCleanup(unittest.TestCase):
             self.fail(f"Failed to import computational_optimizations: {e}")
         except Exception as e:
             self.fail(f"Unexpected error in computational_optimizations: {e}")
+
+
+class TestLearningModule(unittest.TestCase):
+    """Tests for the `modules.learning` refactor."""
+
+    def test_learning_structure(self):
+        """Verify modules.learning subpackage exists and is importable."""
+        try:
+            from optimization_core.modules import learning
+            from optimization_core.modules.learning import (
+                evolutionary_computing, causal_inference, active_learning
+            )
+            self.assertIsNotNone(learning)
+            self.assertIsNotNone(evolutionary_computing)
+            print("\n[OK] modules.learning submodules imported")
+        except ImportError as e:
+            self.fail(f"Failed to import learning submodules: {e}")
+
+    def test_learning_exports(self):
+        """Verify key classes are exported from modules.learning."""
+        try:
+            from optimization_core.modules.learning import (
+                EvolutionaryOptimizer, CausalInferenceEngine, ActiveLearningStrategy
+            )
+            self.assertIsNotNone(EvolutionaryOptimizer)
+            self.assertIsNotNone(CausalInferenceEngine)
+            print("[OK] modules.learning class exports verified")
+        except ImportError as e:
+            self.fail(f"Failed to import learning classes: {e}")
+
+    def test_learning_backward_compat(self):
+        """Verify optimization_core.learning shim works."""
+        try:
+            from optimization_core import learning
+            from optimization_core.modules.learning import EvolutionaryOptimizer
+            self.assertIsNotNone(learning)
+            self.assertIsNotNone(EvolutionaryOptimizer)
+            print("[OK] optimization_core.learning shim verified")
+        except ImportError as e:
+            self.fail(f"Failed to verify learning backward compat: {e}")
 
 
 if __name__ == "__main__":

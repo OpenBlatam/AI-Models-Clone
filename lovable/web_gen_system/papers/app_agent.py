@@ -1,5 +1,5 @@
 from typing import Dict, Any, List
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from ..agents.base import BaseAgent
 
 class AppAgent(BaseAgent):
     """
@@ -15,8 +15,8 @@ class AppAgent(BaseAgent):
         Interacts with a specific app to achieve a goal.
         """
         try:
-            app_name = context.get("app_name")
-            goal = context.get("goal")
+            app_name = context.shared_memory.get("app_name")
+            goal = context.shared_memory.get("goal")
             
             if not app_name or not goal:
                 return {"status": "skipped", "reason": "Missing app_name or goal"}

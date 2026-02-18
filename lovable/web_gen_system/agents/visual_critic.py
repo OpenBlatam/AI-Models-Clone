@@ -1,5 +1,5 @@
 from typing import Dict, Any, List
-from agents.backend.onyx.server.features.lovable.web_gen_system.agents.base import BaseAgent
+from .base import BaseAgent
 
 class VisualCriticAgent(BaseAgent):
     """
@@ -14,7 +14,7 @@ class VisualCriticAgent(BaseAgent):
         Analyzes the visual layout and aesthetics of the generated code.
         """
         try:
-            code_structure = context.get("code_structure", {})
+            code_structure = context.shared_memory.get("code_structure", {})
             self.log("Analyzing visual layout and aesthetics...")
             
             feedback = self.analyze_layout(code_structure)
