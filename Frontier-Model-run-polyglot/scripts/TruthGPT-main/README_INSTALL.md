@@ -1,6 +1,6 @@
 # TruthGPT Installation Hub
 
-**Enterprise-Grade Setup for Frontier Model Training**
+**Enterprise-Grade Setup for TruthGPT Optimization Core**
 
 We provide automated installers that adhere to Python best practices:
 1.  **Isolation**: Always creates a `.venv` (virtual environment) by default.
