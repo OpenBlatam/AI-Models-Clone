@@ -149,9 +149,13 @@ try {
 
     # 6. Post-Install Health Check
     Write-Step "Verifying Installation..."
-    $HealthCheck = Join-Path $CorePath "utils\health_check.py"
-    if (Test-Path $HealthCheck) {
-        & $TargetPython $HealthCheck
+    $CheckReqs = Join-Path $CorePath "utils\check_reqs.py"
+    if (Test-Path $CheckReqs) {
+        Write-Host "   Running pre-flight checks..." -ForegroundColor Gray
+        & $TargetPython $CheckReqs
+        if ($LASTEXITCODE -ne 0) { 
+            Write-Warning "Pre-flight checks failed. Please review the errors above." 
+        }
     } else {
         Write-Host "   Skipping health check (file not found)." -ForegroundColor Yellow
         # Simple fallback check

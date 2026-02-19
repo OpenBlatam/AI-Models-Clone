@@ -1,6 +1,7 @@
 # TruthGPT Core Installation Script (PowerShell)
 
-Write-Host "🚀 Setting up TruthGPT Optimization Core..." -ForegroundColor Cyan
+Write-Host "🚀 Setting up TruthGPT Optimization Core (Dev)..." -ForegroundColor Cyan
+
 
 # 1. Upgrade pip
 Write-Host "📦 Upgrading build tools..." -ForegroundColor Yellow

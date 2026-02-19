@@ -140,6 +140,16 @@ fi
 log_info "Installing package in editable mode..."
 $TARGET_PIP install -e "$CORE_PATH" --quiet
 
+# 6. Post-Install Health Check
+log_step "Verifying Installation..."
+CHECK_REQS="$CORE_PATH/utils/check_reqs.py"
+if [ -f "$CHECK_REQS" ]; then
+    log_info "Running pre-flight checks..."
+    $TARGET_PYTHON "$CHECK_REQS" || log_error "Pre-flight checks failed."
+else
+    log_info "Skipping health check (file not found)."
+fi
+
 # 6. Success
 log_success "Installation Complete."
 if [ "$SKIP_VENV" = false ]; then
