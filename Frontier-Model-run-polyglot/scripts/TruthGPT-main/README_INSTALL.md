@@ -9,57 +9,61 @@ We provide automated installers that adhere to Python best practices:
 
 ---
 
-## ⚡ Quick Start
+## ⚡ Quick Start (The "One-Liners")
 
-### 🍎 macOS / 🐧 Linux
+### 🍎 macOS / 🐧 Linux (via curl)
 ```bash
-# Default (CUDA 11.8 on Linux, MPS on Mac)
-./install.sh
-
-# Installation with options
-./install.sh --cuda 12.1
+# Works everywhere. Installs everything.
+curl -fsSL http://your-domain.com/install.sh | bash
 ```
 
-### 🪟 Windows (PowerShell)
+### 🪟 Windows (via PowerShell)
 ```powershell
-# Default (CUDA 11.8)
-.\install.ps1
+# Works everywhere. Installs everything.
+iwr -useb http://your-domain.com/install.ps1 | iex
+```
 
-# Installation with options
-.\install.ps1 -CudaVersion "12.1"
+### 📦 Node.js (via npm / yarn)
+```bash
+npm run setup
+npm start
 ```
 
 ---
 
-## � Advanced Usage
+## 🛠️ Advanced Usage (Manual)
 
-### Windows Arguments
+If you have cloned the repository, you can run the scripts directly with arguments.
+
+### Windows (PowerShell)
+```powershell
+# Default (CUDA 11.8)
+.\install.ps1
+
+# Custom Options
+.\install.ps1 -CudaVersion "12.1" -PythonVersion "py -3.11"
+```
 
 | Parameter | Default | Description |
 | :--- | :--- | :--- |
 | `-CudaVersion` | `"11.8"` | `11.8`, `12.1`, or `cpu`. Matches PyTorch index URL. |
-| `-PythonVersion` | `"python"` | Python executable to use (e.g., `C:\Python311\python.exe`). |
+| `-PythonVersion` | `"python"` | Python executable to use. |
 | `-SkipVenv` | `False` | Pass this switch to install dependencies into the *current* active environment. |
 
-**Example**:
-```powershell
-# Install for CPU only using specific python
-.\install.ps1 -PythonVersion "py -3.10" -CudaVersion "cpu"
-```
+### macOS / Linux
+```bash
+# Default (CUDA 11.8 on Linux, MPS on Mac)
+./install.sh
 
-### Linux/macOS Arguments
+# Custom Options (Linux)
+./install.sh --cuda 12.1 --skip-venv
+```
 
 | Flag | Default | Description |
 | :--- | :--- | :--- |
 | `--cuda <ver>` | `11.8` | `11.8`, `12.1`, or `cpu`. (Ignored on macOS). |
 | `--python <path>` | `python3` | Python executable path. |
 | `--skip-venv` | `False` | Install into current environment. |
-
-**Example**:
-```bash
-# Install for CUDA 12.1 without creating a new venv
-./install.sh --cuda 12.1 --skip-venv
-```
 
 ---
 

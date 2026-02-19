@@ -19,15 +19,19 @@ console.log(`${LOG_PREFIX} Launching native installer: ${SCRIPT_NAME}...`);
 let child;
 
 if (IS_WINDOWS) {
-    // Execute PowerShell script with bypass policy
-    child = spawn('powershell', [
+    // Execute PowerShell script with bypass policy and pass through arguments
+    const psArgs = [
         '-NoProfile',
         '-ExecutionPolicy', 'Bypass',
-        '-File', SCRIPT_PATH
-    ], { stdio: 'inherit' });
+        '-File', SCRIPT_PATH,
+        ...process.argv.slice(2)
+    ];
+
+    child = spawn('powershell', psArgs, { stdio: 'inherit' });
 } else {
-    // Execute Bash script
-    child = spawn('bash', [SCRIPT_PATH], { stdio: 'inherit' });
+    // Execute Bash script and pass through arguments
+    const bashArgs = [SCRIPT_PATH, ...process.argv.slice(2)];
+    child = spawn('bash', bashArgs, { stdio: 'inherit' });
 }
 
 child.on('error', (err) => {

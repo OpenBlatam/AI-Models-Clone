@@ -18,7 +18,7 @@ call .venv\Scripts\activate.bat
 echo Launching Frontier Model Run...
 :: Replace this with the actual entry point of your application
 :: If it's a CLI tool:
-frontier --help
+frontier %*
 :: If it's a specific script:
 :: python optimization_core/cli.py
 
