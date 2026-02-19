@@ -1,6 +1,7 @@
 @echo off
 echo ============================================================
-echo   TRUTHGPT - STARTING...
+echo   TRUTHGPT - RUNNER
+echo   Enterprise Edition
 echo ============================================================
 echo.
 

@@ -4,6 +4,11 @@ echo "============================================================"
 echo "   TRUTHGPT - QUICK INSTALL (MAXIMUM SPEED)"
 echo "============================================================"
 echo ""
+echo "[WARNING] This script installs directly to the CURRENT environment."
+echo "          It does NOT create a virtual environment."
+echo ""
+sleep 3
+
 
 echo "[1/4] Installing PyTorch with CUDA..."
 pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
