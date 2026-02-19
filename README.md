@@ -1,7 +1,7 @@
 # Modelos IA
 
 [![Onyx System](https://img.shields.io/badge/Onyx-System-black?style=for-the-badge&logo=openai)](./)
-[![Modules](https://img.shields.io/badge/Modules-158-blue?style=for-the-badge)](./)
+[![Modules](https://img.shields.io/badge/Modules-176-blue?style=for-the-badge)](./)
 [![Status](https://img.shields.io/badge/Status-Active-success?style=for-the-badge)](./)
 
 Welcome to the **Models IA** directory. This repository houses the unified intelligence units, autonomous agents, and specialized engines that power the IA closed source out there. Designed for scalability, modularity, and high-performance inference.
@@ -64,6 +64,7 @@ Welcome to the **Models IA** directory. This repository houses the unified intel
 | **[Truthgpt-Spec](./truthgpt-spec/README.md)** | TruthGPT Specification & Master Summaries | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Ultra Extreme V18](./ultra_extreme_v18/README.md)** | Ultra Extreme V18 - Optimization Core | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Universal Model Benchmark Ai](./universal_model_benchmark_ai/README.md)** | Universal Model Benchmark AI - Sistema de Benchmarking de Modelos de IA ===... | `Docker, Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Utils](./utils/README.md)** | Utilidades compartidas para todo el ecosistema Blatam Academy, incluyendo sistemas de caché, lazy loading, dependencias, serialización, y optimizaciones de rendimiento. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 
 ## 🤖 Autonomous Agents
 
@@ -94,15 +95,18 @@ Welcome to the **Models IA** directory. This repository houses the unified intel
 | **[Ai Trading Platform](./ai_trading_platform/README.md)** | AI Trading Platform | `Node.js` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Ai Video](./ai_video/README.md)** | AI Video - Sistema de generación y procesamiento de video con IA ==========... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Analizador De Documentos](./analizador_de_documentos/README.md)** | Aplicación Principal - Analizador de Documentos Inteligente ===============... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Assets](./assets/README.md)** | Static assets including images, fonts, and other media files used across the application. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Audio Timeline Completion Ai](./audio_timeline_completion_ai/README.md)** | Audio Timeline Completion AI | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Blog Posts](./blog_posts/README.md)** | Main FastAPI application with improved architecture | `Python, Docker` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Brand Voice](./brand_voice/README.md)** | Brand Voice Feature Module ===========================  AI-powered brand vo... | `Python, Docker` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Bul](./bul/README.md)** | BUL API - Production Main Application ==================================== ... | `Docker, Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Bulk Chat](./bulk_chat/README.md)** | Bulk Chat - Main Entry Point =============================  Punto de entrad... | `Python, Node.js` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Burnout Prevention Ai](./burnout_prevention_ai/README.md)** | Burnout Prevention AI - Main Application ==================================... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Consultancy Strategy](./consultancy_strategy/README.md)** | Documentation and strategic documents related to consultancy services and business logic. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Content](./content/README.md)** | Static & Dynamic Content | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Content Modules](./content_modules/README.md)** | 📝 CONTENT MODULES - Advanced Content Generation System ====================... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Content Redundancy Detector](./content_redundancy_detector/README.md)** | Content Redundancy Detector - Functional FastAPI Application Following best... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Docs](./docs/README.md)** | General project documentation, guides, and architectural references. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Document Set](./document_set/README.md)** | Document Set Feature Module ============================  AI-powered docume... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Document Workflow Chain](./document_workflow_chain/README.md)** | Main Application - Complete Document Workflow Chain System | `Python, Docker` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Dog Training Coaching Ai](./dog_training_coaching_ai/README.md)** | Dog Training Coaching AI - Main Application ===============================... | `Docker, Python` | ![Active](https://img.shields.io/badge/-Active-success) |
@@ -110,6 +114,7 @@ Welcome to the **Models IA** directory. This repository houses the unified intel
 | **[Emails](./emails/README.md)** | Email Templates | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Export Ia](./export_ia/README.md)** | Export IA - Main Application ============================  Advanced documen... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Faceless Video Ai](./faceless_video_ai/README.md)** | Faceless Video AI - Sistema de generación de videos sin rostro con IA =====... | `Docker, Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Frontend](./frontend/README.md)** | Frontend moderno y ligero para el sistema BUL (Generador de Documentos con IA), construido con Next.js 14 y TypeScript. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Gamma App](./gamma_app/README.md)** | Gamma App - AI-Powered Content Generation System Advanced presentation, doc... | `Docker, Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Guides](./guides/README.md)** | Learning Path & Guides | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Image Process](./image_process/README.md)** | Image Process Feature Module =============================  AI-powered imag... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
@@ -129,8 +134,12 @@ Welcome to the **Models IA** directory. This repository houses the unified intel
 | **[Product Photography Ai](./product_photography_ai/README.md)** | Product Photography AI | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Professional Documents](./professional_documents/README.md)** | Professional Document Generation System ===================================... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Proposal Generator](./proposal_generator/README.md)** | <div align="center"> | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Public](./public/README.md)** | Publicly accessible files, static resources, and entry points for the web server. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Research Paper Code Improver](./research_paper_code_improver/README.md)** | Aplicación Principal - Research Paper Code Improver =======================... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Scripts](./scripts/README.md)** | Script completo de setup del sistema desde cero. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Social Video Transcriber Ai](./social_video_transcriber_ai/README.md)** | Social Video Transcriber AI ===========================  A powerful AI-powe... | `Docker, Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Styles](./styles/README.md)** | Global stylesheets, CSS modules, and theme definitions. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
+| **[Types](./types/README.md)** | TypeScript type definitions, interfaces, and shared data models. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Video Editor Ai](./video_editor_ai/README.md)** | Video Editor AI | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Virtual Event Planner](./virtual_event_planner/README.md)** | <div align="center"> | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Virtual Fashion Stylist Ai](./virtual_fashion_stylist_ai/README.md)** | Virtual Fashion Stylist AI | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
@@ -146,6 +155,7 @@ Welcome to the **Models IA** directory. This repository houses the unified intel
 | **[Enterprise](./enterprise/README.md)** | 🚀 ULTIMATE ENTERPRISE API ==========================  Complete enterprise-g... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Entrepreneur Coach Ai](./entrepreneur_coach_ai/README.md)** | Entrepreneur Coach AI | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Folder](./folder/README.md)** | Folder Management System | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Hooks](./hooks/README.md)** | Custom React hooks for shared logic and state management across frontend components. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Input Prompt](./input_prompt/README.md)** | Input Prompt Management | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Manufacturing Ai](./manufacturing_ai/README.md)** | Manufacturing AI - Sistema de IA para Optimización de Manufactura =========... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Marketing Funnels](./marketing_funnels/README.md)** | Marketing Funnels AI | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
@@ -160,6 +170,7 @@ Welcome to the **Models IA** directory. This repository houses the unified intel
 | Feature | Description | Tech Stack | Status |
 | :--- | :--- | :--- | :---: |
 | **[Addiction Recovery Ai](./addiction_recovery_ai/README.md)** | Servidor principal para Addiction Recovery AI Refactored to use modular app... | `Python, Node.js` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Config](./config/README.md)** | Configuration files and environment settings for various modules and services. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Dermatology Ai](./dermatology_ai/README.md)** | Dermatology AI - FastAPI Server Optimized for Microservices & Serverless.  ... | `Python, Docker` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Metrics](./metrics/README.md)** | Metrics System | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Plastic Surgery Visualization Ai](./plastic_surgery_visualization_ai/README.md)** | Plastic Surgery Visualization AI - FastAPI Server AI system that visualizes... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
@@ -172,17 +183,20 @@ Welcome to the **Models IA** directory. This repository houses the unified intel
 | Feature | Description | Tech Stack | Status |
 | :--- | :--- | :--- | :---: |
 | **[3D Prototype Ai](./3d_prototype_ai/README.md)** | 3D Prototype AI - Main Entry Point ===================================  Pun... | `Python, Docker` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Actions](./actions/README.md)** | <div align="center"> | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Addition Removal Ai](./addition_removal_ai/README.md)** | Addition Removal AI - Main Entry Point ====================================... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Ads](./ads/README.md)** | 🚀 ADS System - Main Entry Point  Main entry point for the refactored advert... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Ai Detector Multimodal](./ai_detector_multimodal/README.md)** | AI Detector Multimodal - Detector de contenido generado por IA ============... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Ai Project Generator](./ai_project_generator/README.md)** | AI Project Generator - Main Entry Point ===================================... | `Docker, Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Ai Tutor Educacional Openrouter](./ai_tutor_educacional_openrouter/README.md)** | Main entry point for AI Tutor Educacional. | `Docker, Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[App](./app/README.md)** | <div align="center"> | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Artist Manager Ai](./artist_manager_ai/README.md)** | Artist Manager AI =================  Sistema de IA para gestión de artistas... | `Docker, Python, Node.js` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Body Enhancement Ai](./body_enhancement_ai/README.md)** | Body Enhancement AI | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Bulk](./bulk/README.md)** | BUL Main Entry Point ====================  Main entry point for the Busines... | `Python, Node.js, Docker` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Character Clothing Changer Ai](./character_clothing_changer_ai/README.md)** | Character Clothing Changer AI - Main Entry Point ==========================... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Character Consistency Ai](./character_consistency_ai/README.md)** | Main Entry Point - Character Consistency AI ===============================... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Community Manager Ai](./community_manager_ai/README.md)** | Main Entry Point - Punto de Entrada Principal =============================... | `Python, Node.js` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Components](./components/README.md)** | <div align="center"> | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Contabilidad Mexicana Ai](./contabilidad_mexicana_ai/README.md)** | Main entry point for Contabilidad Mexicana AI API | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Contabilidad Mexicana Ai Sam3](./contabilidad_mexicana_ai_sam3/README.md)** | Main entry point for Contabilidad Mexicana AI SAM3 ========================... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Cybersec Toolkit](./cybersec_toolkit/README.md)** | CyberSec Toolkit | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
@@ -190,13 +204,17 @@ Welcome to the **Models IA** directory. This repository houses the unified intel
 | **[Game Development Ai](./game_development_ai/README.md)** | Game Development AI | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Integrated](./integrated/README.md)** | Integrated Discovery Modules | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Interior Design Ai](./interior_design_ai/README.md)** | Interior Design AI | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Lib](./lib/README.md)** | Shared libraries, utility functions, and helper modules used throughout the backend and frontend. | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Lovable](./lovable/README.md)** | Lovable Community SAM3 | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Lovable Community](./lovable_community/README.md)** | Aplicación principal FastAPI para la comunidad Lovable (modularizado)  Sist... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Microservices Framework](./microservices_framework/README.md)** | Diffusion Service - Refactored with Modular Architecture | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Nginx](./nginx/README.md)** | <div align="center"> | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Notifications](./notifications/README.md)** | Notifications System | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Pages](./pages/README.md)** | <div align="center"> | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Persona](./persona/README.md)** | Persona Feature Module ======================  AI-powered persona creation ... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Piel Mejorador Ai Sam3](./piel_mejorador_ai_sam3/README.md)** | Main entry point for Piel Mejorador AI SAM3 ===============================... | `Docker, Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Plugins](./plugins/README.md)** | System Plugins | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
+| **[Prisma](./prisma/README.md)** | <div align="center"> | `Unknown` | ![New](https://img.shields.io/badge/-New-blue) |
 | **[Production](./production/README.md)** | 🚀 ULTRA-OPTIMIZED PRODUCTION MAIN ENTRY POINT =============================... | `Python` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Professional Photo Ai](./professional_photo_ai/README.md)** | Professional Photo AI | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
 | **[Prompt Compiler Ai Sam3](./prompt_compiler_ai_sam3/README.md)** | Prompt Compiler AI SAM3 | `Unknown` | ![Active](https://img.shields.io/badge/-Active-success) |
