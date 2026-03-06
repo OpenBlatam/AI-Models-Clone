@@ -8,7 +8,7 @@ from typing import Dict, Optional
 import torch
 import torch.nn as nn
 
-from trainers.config import EMAConfig
+from optimization_core.trainers.config import EMAConfig
 
 logger = logging.getLogger(__name__)
 

@@ -1,5 +1,5 @@
-from factories.registry import Registry
-from trainers.callbacks import PrintLogger, WandbLogger, TensorBoardLogger
+from optimization_core.factories.registry import Registry
+from optimization_core.trainers.callbacks import PrintLogger, WandbLogger, TensorBoardLogger
 
 CALLBACKS = Registry()
 

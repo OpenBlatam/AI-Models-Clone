@@ -1,0 +1,157 @@
+Metadata-Version: 2.4
+Name: frontier-model-run
+Version: 2.0.0
+Summary: 🚀 Enterprise-grade ML inference platform with advanced features
+Author: Frontier-Model-Run Team
+License: MIT
+Project-URL: Homepage, https://github.com/frontier-model-run
+Project-URL: Documentation, https://docs.frontier-model-run.com
+Project-URL: Repository, https://github.com/frontier-model-run/frontier-model-run
+Project-URL: Issues, https://github.com/frontier-model-run/frontier-model-run/issues
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Developers
+Classifier: Intended Audience :: Science/Research
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Topic :: Scientific/Engineering :: Artificial Intelligence
+Classifier: Topic :: Software Development :: Libraries :: Python Modules
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: torch>=2.1.0
+Requires-Dist: torchvision>=0.16.0
+Requires-Dist: torchaudio>=2.1.0
+Requires-Dist: transformers>=4.35.0
+Requires-Dist: accelerate>=0.25.0
+Requires-Dist: bitsandbytes>=0.41.0
+Requires-Dist: peft>=0.6.0
+Requires-Dist: numpy>=1.26.0
+Requires-Dist: pandas>=2.1.0
+Requires-Dist: scipy>=1.11.0
+Requires-Dist: fastapi>=0.104.0
+Requires-Dist: uvicorn[standard]>=0.24.0
+Requires-Dist: pydantic>=2.5.0
+Requires-Dist: httpx>=0.25.0
+Requires-Dist: opentelemetry-api>=1.21.0
+Requires-Dist: opentelemetry-sdk>=1.21.0
+Requires-Dist: opentelemetry-instrumentation-fastapi>=0.42b0
+Requires-Dist: prometheus-client>=0.19.0
+Requires-Dist: psutil>=5.9.6
+Requires-Dist: redis>=5.0.0
+Requires-Dist: python-dotenv>=1.0.0
+Requires-Dist: pyyaml>=6.0.1
+Requires-Dist: rich>=13.7.0
+Requires-Dist: typer>=0.9.0
+Requires-Dist: tqdm>=4.66.0
+Requires-Dist: brotli>=1.1.0
+Provides-Extra: dev
+Requires-Dist: pytest>=7.4.3; extra == "dev"
+Requires-Dist: pytest-asyncio>=0.21.0; extra == "dev"
+Requires-Dist: pytest-cov>=4.1.0; extra == "dev"
+Requires-Dist: black>=23.12.0; extra == "dev"
+Requires-Dist: ruff>=0.1.6; extra == "dev"
+Requires-Dist: mypy>=1.7.0; extra == "dev"
+Requires-Dist: pre-commit>=3.5.0; extra == "dev"
+Provides-Extra: gpu
+Requires-Dist: cupy>=12.3.0; extra == "gpu"
+Requires-Dist: numba>=0.59.0; extra == "gpu"
+Requires-Dist: flash-attn>=2.4.0; platform_machine != "arm64" and extra == "gpu"
+Requires-Dist: xformers>=0.0.23; platform_machine != "arm64" and extra == "gpu"
+Provides-Extra: distributed
+Requires-Dist: deepspeed>=0.12.0; extra == "distributed"
+Requires-Dist: fairscale>=0.4.13; extra == "distributed"
+Provides-Extra: ui
+Requires-Dist: gradio>=4.7.0; extra == "ui"
+Requires-Dist: streamlit>=1.28.0; extra == "ui"
+Provides-Extra: monitoring
+Requires-Dist: wandb>=0.16.0; extra == "monitoring"
+Requires-Dist: tensorboard>=2.15.0; extra == "monitoring"
+
+<div align="center">
+
+# 🚀 TruthGPT Optimization Core
+
+**The Enterprise-Grade, Modular Training System for Frontier Models**
+
+[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
+[![PyTorch 2.1+](https://img.shields.io/badge/pytorch-2.1+-orange.svg)](https://pytorch.org/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](docs/index.md)
+
+[**Quick Start**](docs/quickstart.md) | [**Installation**](docs/installation.md) | [**Architecture**](docs/architecture.md) | [**API Reference**](docs/api/trainer.md)
+
+</div>
+
+---
+
+## 🌟 Introduction
+
+**TruthGPT Optimization Core** is a high-performance, modular framework designed to train Large Language Models (LLMs) with maximum efficiency. Built on PyTorch, it integrates state-of-the-art optimization techniques like **Flash Attention**, **TF32**, and **Torch.compile** into a unified, easy-to-use system.
+
+Whether you are fine-tuning a 7B model on a single GPU or training a massive foundation model on a cluster, TruthGPT scales with you.
+
+## ✨ Key Features
+
+-   **⚡ Ultimate Performance**: Auto-configured for speed with TF32, mixed precision (BF16/FP16), and custom CUDA kernels.
+-   **🧩 Modular Design**: Swap optimizers, attention backends, and datasets via a registry system. No code changes required.
+-   **🧠 Smart Memory**: Gradient checkpointing, dynamic padding, and 8-bit optimizers allow training larger models on consumer hardware.
+-   **🛡️ Production Ready**: Automatic error recovery, nan-detection, and seamless checkpoint resumption.
+-   **📊 Observable**: Native integration with Weights & Biases and TensorBoard.
+
+## 🚀 Quick Start
+
+Train your first model in under 5 minutes:
+
+```bash
+# 1. Install (Windows - Recommended)
+.\portable_setup.ps1
+
+# 1. Install (Windows - Advanced)
+.\install.ps1
+
+# 1. Install (Linux/macOS)
+./install.sh
+
+# 2. Use the OpenClaw CLI
+openclaw --help
+
+# 3. Run a preset via CLI
+openclaw train --config configs/presets/lora_fast.yaml
+```
+
+👉 **[Read the Full Quick Start Guide](docs/quickstart.md)**
+
+## 📖 Documentation
+
+Dive deep into the system:
+
+-   **[Installation Guide](docs/installation.md)**: Setup for Dev, Prod, Docker, and Conda.
+-   **[System Architecture](docs/architecture.md)**: Understand the registry patterns and component flow.
+-   **[Optimization Techniques](docs/optimization.md)**: Learn how we achieve high GPU utilization.
+-   **[Configuration Reference](docs/api/configuration.md)**: Every YAML option explained.
+-   **[Trainer API](docs/api/trainer.md)**: Developer documentation for the core engine.
+
+## 🛠️ Project Structure
+
+```text
+optimization_core/
+├── configs/               # YAML Configurations
+├── docs/                  # 📚 Comprehensive Documentation
+├── factories/             # Component Registries (Optimizers, etc.)
+├── trainers/              # Core Training Logic
+├── scripts/               # Utility Scripts
+└── train_llm.py           # Main Entry Point
+```
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
+
+---
+
+<div align="center">
+    Built with ❤️ by the TruthGPT Team
+</div>

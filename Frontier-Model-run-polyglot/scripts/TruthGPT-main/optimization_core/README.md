@@ -34,11 +34,20 @@ Whether you are fine-tuning a 7B model on a single GPU or training a massive fou
 Train your first model in under 5 minutes:
 
 ```bash
-# 1. Install
-./setup_dev.sh
+# 1. Install (Windows - Recommended)
+.\portable_setup.ps1
 
-# 2. Run a preset
-python train_llm.py --config configs/presets/lora_fast.yaml
+# 1. Install (Windows - Advanced)
+.\install.ps1
+
+# 1. Install (Linux/macOS)
+./install.sh
+
+# 2. Use the OpenClaw CLI
+openclaw --help
+
+# 3. Run a preset via CLI
+openclaw train --config configs/presets/lora_fast.yaml
 ```
 
 👉 **[Read the Full Quick Start Guide](docs/quickstart.md)**
@@ -52,6 +61,44 @@ Dive deep into the system:
 -   **[Optimization Techniques](docs/optimization.md)**: Learn how we achieve high GPU utilization.
 -   **[Configuration Reference](docs/api/configuration.md)**: Every YAML option explained.
 -   **[Trainer API](docs/api/trainer.md)**: Developer documentation for the core engine.
+
+## 🤖 OpenClaw Agents SDK & API
+
+TruthGPT Optimization Core now includes full **OpenClaw-compatible** autonomous agent capabilities. You can use it via Python SDK or REST API:
+
+### Python SDK
+```python
+import asyncio
+from optimization_core.agents import AgentClient
+
+async def main():
+    # Inicializa el cliente (funciona igual que OpenClaw)
+    client = AgentClient(use_swarm=False)
+    
+    # Añade herramientas (ej. file_read, python_execute, web_search)
+    client.add_tool("web_search")
+    client.add_tool("python_execute")
+    
+    # Ejecuta el agente autónomo
+    response = await client.run(user_id="user123", prompt="Busca en internet el precio de Bitcoin y calcula el 10% en Python.")
+    print(response)
+
+asyncio.run(main())
+```
+
+### REST API
+Start the inference server (`openclaw serve`) and call the agent endpoint:
+
+```bash
+curl -X POST http://localhost:8080/v1/agent/run \\
+  -H "Content-Type: application/json" \\
+  -H "Authorization: Bearer changeme" \\
+  -d '{
+    "prompt": "Escribe un script en un archivo de python que imprima hola mundo",
+    "user_id": "user123",
+    "tools": ["file_write"]
+  }'
+```
 
 ## 🛠️ Project Structure
 

@@ -12,7 +12,7 @@ This module provides:
 - GenericTrainer: Main training orchestrator
 """
 
-from trainers.config import (
+from optimization_core.trainers.config import (
     TrainerConfig,
     ModelConfig,
     TrainingConfig,
@@ -20,16 +20,16 @@ from trainers.config import (
     CheckpointConfig,
     EMAConfig,
 )
-from trainers.model_manager import ModelManager
-from trainers.optimizer_manager import OptimizerManager
-from trainers.data_manager import DataManager
-from trainers.ema_manager import EMAManager
-from trainers.evaluator import Evaluator
-from trainers.checkpoint_manager import CheckpointManager
+from optimization_core.trainers.model_manager import ModelManager
+from optimization_core.trainers.optimizer_manager import OptimizerManager
+from optimization_core.trainers.data_manager import DataManager
+from optimization_core.trainers.ema_manager import EMAManager
+from optimization_core.trainers.evaluator import Evaluator
+from optimization_core.trainers.checkpoint_manager import CheckpointManager
 
 # Import trainer last to avoid circular dependencies
 try:
-    from trainers.trainer import GenericTrainer
+    from optimization_core.trainers.trainer import GenericTrainer
 except ImportError:
     # GenericTrainer might not be updated yet
     GenericTrainer = None
@@ -49,6 +49,3 @@ __all__ = [
     "CheckpointManager",
     "GenericTrainer",
 ]
-
-
-

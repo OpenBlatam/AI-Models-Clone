@@ -10,7 +10,7 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
-from optimization_core.modules.learning.evolutionary_computing.enums import MutationMethod
+from optimization_core.modules.learning.evolutionary.enums import MutationMethod
 
 logger = logging.getLogger(__name__)
 

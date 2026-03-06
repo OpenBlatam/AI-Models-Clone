@@ -1,5 +1,5 @@
 import yaml
-from build_trainer import build_trainer
+from optimization_core.build_trainer import build_trainer
 from trainers.trainer import TrainerConfig
 
 

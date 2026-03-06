@@ -14,7 +14,10 @@ import time
 import threading
 import gc
 import psutil
-import GPUtil
+try:
+    import GPUtil
+except ImportError:
+    GPUtil = None
 from collections import defaultdict, deque
 import json
 from pathlib import Path

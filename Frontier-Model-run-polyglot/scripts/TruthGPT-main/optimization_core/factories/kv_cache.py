@@ -1,7 +1,7 @@
 from typing import Optional
 import torch
-from factories.registry import Registry
-from modules.attention.ultra_efficient_kv_cache import PagedKVCache
+from optimization_core.factories.registry import Registry
+from optimization_core.modules.attention.ultra_efficient_kv_cache import PagedKVCache
 
 KV_CACHE = Registry()
 

@@ -38,10 +38,6 @@ dependencies = [
     "bitsandbytes>=0.41.0",
     "peft>=0.6.0",
     
-    # GPU Optimization
-    "flash-attn>=2.4.0; platform_machine != 'arm64'",
-    "xformers>=0.0.23; platform_machine != 'arm64'",
-    
     # Scientific Computing
     "numpy>=1.26.0",
     "pandas>=2.1.0",
@@ -87,6 +83,8 @@ dev = [
 gpu = [
     "cupy>=12.3.0",
     "numba>=0.59.0",
+    "flash-attn>=2.4.0; platform_machine != 'arm64'",
+    "xformers>=0.0.23; platform_machine != 'arm64'",
 ]
 distributed = [
     "deepspeed>=0.12.0",
@@ -108,10 +106,13 @@ Repository = "https://github.com/frontier-model-run/frontier-model-run"
 Issues = "https://github.com/frontier-model-run/frontier-model-run/issues"
 
 [project.scripts]
-frontier = "optimization_core.cli:app"
+frontier = "cli:app"
+openclaw = "cli:app"
 
-[tool.setuptools]
-packages = ["optimization_core"]
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["*"]
+exclude = ["tests*", "docs*"]
 
 [tool.black]
 line-length = 100

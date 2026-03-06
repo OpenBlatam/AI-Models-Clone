@@ -1,9 +1,9 @@
 from typing import Any, Dict, List
 
-from build import build_components
-from factories.callbacks import CALLBACKS
-from trainers.trainer import GenericTrainer
-from trainers.config import TrainerConfig
+from optimization_core.build import build_components
+from optimization_core.factories.callbacks import CALLBACKS
+from optimization_core.trainers.trainer import GenericTrainer
+from optimization_core.trainers.config import TrainerConfig
 
 
 def build_trainer(

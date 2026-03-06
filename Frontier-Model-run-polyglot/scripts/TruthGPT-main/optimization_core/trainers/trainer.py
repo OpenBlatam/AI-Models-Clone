@@ -29,10 +29,10 @@ from transformers import (
     get_cosine_schedule_with_warmup,
     get_linear_schedule_with_warmup,
 )
-from factories.optimizer import OPTIMIZERS
-from trainers.callbacks import Callback
-from factories.collate import COLLATE
-from utils.logging_utils import TrainingLogger
+from optimization_core.factories.optimizer import OPTIMIZERS
+from optimization_core.trainers.callbacks import Callback
+from optimization_core.factories.collate import COLLATE
+from optimization_core.utils.logging_utils import TrainingLogger
 
 try:
     from peft import LoraConfig, get_peft_model, TaskType

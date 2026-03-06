@@ -7,7 +7,7 @@ Configuration class for evolutionary computing systems, parameters, and algorith
 from dataclasses import dataclass
 from typing import Optional
 
-from optimization_core.modules.learning.evolutionary_computing.enums import (
+from optimization_core.modules.learning.evolutionary.enums import (
     CrossoverMethod,
     EvolutionaryAlgorithm,
     MutationMethod,

@@ -36,49 +36,50 @@ _LAZY_IMPORTS = {
     'active_learning': '.active',
     
     # Adaptive Learning
-    'AdaptiveLearningSystem': '.adaptive_learning',
-    'AdaptiveLearningConfig': '.adaptive_learning',
-    'adaptive_learning': '.adaptive_learning',
+    'AdaptiveLearningSystem': '.adaptive',
+    'AdaptiveLearningConfig': '.adaptive',
+    'adaptive_learning': '.adaptive',
     
     # Adversarial Learning
-    'AdversarialTrainer': '.adversarial_learning',
-    'AdversarialConfig': '.adversarial_learning',
-    'AdversarialAttackType': '.adversarial_learning',
-    'GANType': '.adversarial_learning',
-    'DefenseStrategy': '.adversarial_learning',
-    'create_adversarial_learning_system': '.adversarial_learning',
-    'create_adversarial_config': '.adversarial_learning',
-    'create_adversarial_attacker': '.adversarial_learning',
-    'create_gan_trainer': '.adversarial_learning',
-    'create_adversarial_defense': '.adversarial_learning',
-    'create_robustness_analyzer': '.adversarial_learning',
-    'adversarial_learning': '.adversarial_learning',
+    'AdversarialLearningSystem': '.adversarial',
+    'AdversarialConfig': '.adversarial',
+    'AdversarialAttackType': '.adversarial',
+    'GANType': '.adversarial',
+    'DefenseStrategy': '.adversarial',
+    'create_adversarial_learning_system': '.adversarial',
+    'create_adversarial_config': '.adversarial',
+    'create_adversarial_attacker': '.adversarial',
+    'create_gan_trainer': '.adversarial',
+    'create_adversarial_defense': '.adversarial',
+    'create_robustness_analyzer': '.adversarial',
+    'adversarial_learning': '.adversarial',
     
-    # Bayesian Optimization
-    'BayesianOptimizer': '.bayesian_optimization',
-    'BayesianConfig': '.bayesian_optimization',
-    'bayesian_optimization': '.bayesian_optimization',
+    # Bayesian Optimization (Legacy mapping to new hpo package or bayesian subpackage)
+    # The implementation plan says bayesian_optimization.py -> bayesian/
+    'BayesianOptimizer': '.bayesian',
+    'BayesianConfig': '.bayesian',
+    'bayesian_optimization': '.bayesian',
     
     # Continual Learning
-    'ContinualLearner': '.continual_learning',
-    'ContinualConfig': '.continual_learning',
-    'continual_learning': '.continual_learning',
+    'ContinualLearner': '.continual',
+    'ContinualConfig': '.continual',
+    'continual_learning': '.continual',
     
     # Ensemble Learning
-    'EnsembleManager': '.ensemble_learning',
-    'EnsembleConfig': '.ensemble_learning',
-    'ensemble_learning': '.ensemble_learning',
+    'EnsembleManager': '.ensemble',
+    'EnsembleConfig': '.ensemble',
+    'ensemble_learning': '.ensemble',
     
     # Federated Learning
-    'FederatedServer': '.federated_learning',
-    'FederatedClient': '.federated_learning',
-    'FederatedConfig': '.federated_learning',
-    'federated_learning': '.federated_learning',
+    'FederatedServer': '.federated',
+    'FederatedClient': '.federated',
+    'FederatedConfig': '.federated',
+    'federated_learning': '.federated',
     
     # Hyperparameter Optimization
-    'HyperparameterOptimizer': '.hyperparameter_optimization',
-    'HPOConfig': '.hyperparameter_optimization',
-    'hyperparameter_optimization': '.hyperparameter_optimization',
+    'HyperparameterOptimizer': '.hpo',
+    'HPOConfig': '.hpo',
+    'hyperparameter_optimization': '.hpo',
     
     # Meta Learning
     'MetaLearner': '.meta',
@@ -86,9 +87,9 @@ _LAZY_IMPORTS = {
     'meta_learning': '.meta',
     
     # Multitask Learning
-    'MultitaskModel': '.multitask_learning',
-    'MultitaskConfig': '.multitask_learning',
-    'multitask_learning': '.multitask_learning',
+    'MultitaskModel': '.multitask',
+    'MultitaskConfig': '.multitask',
+    'multitask_learning': '.multitask',
     
     # NAS
     'NeuralArchitectureSearch': '.nas',
@@ -103,14 +104,14 @@ _LAZY_IMPORTS = {
     'reinforcement_learning': '.reinforcement',
     
     # Self-Supervised Learning
-    'SelfSupervisedTrainer': '.self_supervised_learning',
-    'SelfSupervisedConfig': '.self_supervised_learning',
-    'self_supervised_learning': '.self_supervised_learning',
+    'SelfSupervisedTrainer': '.self_supervised',
+    'SelfSupervisedConfig': '.self_supervised',
+    'self_supervised_learning': '.self_supervised',
     
     # Transfer Learning
-    'TransferLearningManager': '.transfer_learning',
-    'TransferLearningConfig': '.transfer_learning',
-    'transfer_learning': '.transfer_learning',
+    'TransferLearningManager': '.transfer',
+    'TransferLearningConfig': '.transfer',
+    'transfer_learning': '.transfer',
 }
 
 def __getattr__(name: str):

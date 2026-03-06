@@ -413,6 +413,16 @@ app.add_middleware(
 if ENABLE_METRICS:
     app.middleware("http")(metrics_middleware)
 
+# ============================================================================
+# Routers
+# ============================================================================
+try:
+    from ..agents.api_router import router as agent_router
+    app.include_router(agent_router)
+    print("✅ Agent API router mounted at /v1/agent")
+except ImportError as e:
+    print(f"⚠️ Warning: the Agent API router could not be loaded: {e}")
+
 
 # ============================================================================
 # Authentication
@@ -455,7 +465,9 @@ async def root():
             "metrics": "/metrics",
             "infer": "/v1/infer",
             "stream": "/v1/infer/stream",
-            "webhooks": "/webhooks/ingest"
+            "webhooks": "/webhooks/ingest",
+            "agent_run": "/v1/agent/run",
+            "agent_memory_clear": "/v1/agent/memory/{user_id}"
         }
     }
 

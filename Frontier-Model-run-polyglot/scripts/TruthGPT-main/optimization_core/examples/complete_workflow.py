@@ -5,7 +5,7 @@ Shows how to switch components via YAML without code changes.
 
 import yaml
 from pathlib import Path
-from build_trainer import build_trainer
+from optimization_core.build_trainer import build_trainer
 from trainers.trainer import TrainerConfig
 
 

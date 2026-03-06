@@ -12,7 +12,7 @@ from .config import BayesianOptimizationConfig
 logger = logging.getLogger(__name__)
 
 class MultiObjectiveOptimizer:
-    \"\"\"Multi-objective optimization\"\"\"
+    """Multi-objective optimization"""
     
     def __init__(self, config: BayesianOptimizationConfig):
         self.config = config
@@ -62,7 +62,7 @@ class MultiObjectiveOptimizer:
         return np.all(obj1 >= obj2) and np.any(obj1 > obj2)
 
 class ConstrainedOptimizer:
-    \"\"\"Constrained optimization\"\"\"
+    """Constrained optimization"""
     
     def __init__(self, config: BayesianOptimizationConfig):
         self.config = config

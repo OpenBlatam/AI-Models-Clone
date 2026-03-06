@@ -2,7 +2,7 @@
 Adversarial Learning Enums
 ==========================
 
-Attack types, GAN architectures, and defense strategies.
+Enums for attacks, GANs, and defense strategies.
 """
 from enum import Enum
 
@@ -20,7 +20,7 @@ class AdversarialAttackType(Enum):
     CWLINF = "cwlinf"
 
 class GANType(Enum):
-    """GAN architecture types"""
+    """GAN types"""
     VANILLA_GAN = "vanilla_gan"
     DCGAN = "dcgan"
     WGAN = "wgan"
@@ -31,7 +31,7 @@ class GANType(Enum):
     STYLEGAN = "stylegan"
 
 class DefenseStrategy(Enum):
-    """Adversarial defense strategies"""
+    """Defense strategies"""
     ADVERSARIAL_TRAINING = "adversarial_training"
     DISTILLATION = "distillation"
     DETECTION = "detection"

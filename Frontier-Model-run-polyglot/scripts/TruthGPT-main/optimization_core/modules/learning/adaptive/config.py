@@ -8,7 +8,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class AdaptiveLearningConfig:
-    \"\"\"Configuration for adaptive learning systems\"\"\"
+    """Configuration for adaptive learning systems"""
     # Learning parameters
     learning_rate: float = 0.001
     adaptation_rate: float = 0.01
@@ -38,7 +38,7 @@ class AdaptiveLearningConfig:
     enable_adaptation_logging: bool = True
     
     def __post_init__(self):
-        \"\"\"Validate adaptive learning configuration\"\"\"
+        """Validate adaptive learning configuration"""
         if not (0.0 <= self.exploration_rate <= 1.0):
             raise ValueError("Exploration rate must be between 0.0 and 1.0")
         if not (0.0 <= self.exploitation_rate <= 1.0):

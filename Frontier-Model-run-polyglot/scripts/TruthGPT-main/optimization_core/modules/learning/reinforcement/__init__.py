@@ -12,6 +12,10 @@ from .agents import DQNAgent, PPOAgent
 from .environment import MultiAgentEnvironment
 from .system import RLTrainingManager
 
+# Compatibility aliases
+RLSystem = RLTrainingManager
+RLBuffer = ExperienceReplay
+
 # Factory functions for convenient instantiation
 def create_rl_config(**kwargs) -> RLConfig:
     return RLConfig(**kwargs)

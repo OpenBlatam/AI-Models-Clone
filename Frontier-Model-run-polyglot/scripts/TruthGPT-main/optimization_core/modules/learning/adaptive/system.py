@@ -22,7 +22,7 @@ from .engine import SelfImprovementEngine
 logger = logging.getLogger(__name__)
 
 class AdaptiveLearningSystem:
-    \"\"\"Main adaptive learning system\"\"\"
+    """Main adaptive learning system"""
     
     def __init__(self, config: AdaptiveLearningConfig):
         self.config = config
@@ -35,7 +35,7 @@ class AdaptiveLearningSystem:
         logger.info("✅ Adaptive Learning System initialized")
     
     def adapt(self, model: nn.Module, performance_metrics: Dict[str, float]) -> nn.Module:
-        \"\"\"Adapt model based on performance metrics\"\"\"
+        """Adapt model based on performance metrics"""
         logger.info("🧠 Starting adaptive learning...")
         
         # Record performance metrics
@@ -75,7 +75,7 @@ class AdaptiveLearningSystem:
         return model
     
     def _extract_task_features(self, model: nn.Module, metrics: Dict[str, float]) -> np.ndarray:
-        \"\"\"Extract features for meta-learning\"\"\"
+        """Extract features for meta-learning"""
         features = []
         
         # Model features
@@ -97,7 +97,7 @@ class AdaptiveLearningSystem:
         return np.array(features)
     
     def _update_learning_mode(self):
-        \"\"\"Update learning mode based on performance\"\"\"
+        """Update learning mode based on performance"""
         performance_summary = self.performance_tracker.get_performance_summary()
         
         if performance_summary['overall_trend'] == 'improving':
@@ -112,7 +112,7 @@ class AdaptiveLearningSystem:
         logger.debug(f"Learning mode: {self.learning_mode.value}")
     
     def get_learning_statistics(self) -> Dict[str, Any]:
-        \"\"\"Get comprehensive learning statistics\"\"\"
+        """Get comprehensive learning statistics"""
         return {
             'performance_summary': self.performance_tracker.get_performance_summary(),
             'meta_learning_insights': self.meta_learner.get_learning_insights(),
@@ -128,7 +128,7 @@ class AdaptiveLearningSystem:
         }
     
     def save_learning_state(self, path: str):
-        \"\"\"Save learning state\"\"\"
+        """Save learning state"""
         state = {
             'performance_tracker': {
                 'metrics_history': list(self.performance_tracker.metrics_history),
@@ -153,7 +153,7 @@ class AdaptiveLearningSystem:
         logger.info(f"✅ Learning state saved to {path}")
     
     def load_learning_state(self, path: str):
-        \"\"\"Load learning state\"\"\"
+        """Load learning state"""
         with open(path, 'rb') as f:
             state = pickle.load(f)
         

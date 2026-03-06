@@ -14,8 +14,8 @@ from transformers import (
     get_linear_schedule_with_warmup,
 )
 
-from trainers.config import TrainingConfig
-from factories.optimizer import OPTIMIZERS
+from optimization_core.trainers.config import TrainingConfig
+from optimization_core.factories.optimizer import OPTIMIZERS
 
 logger = logging.getLogger(__name__)
 

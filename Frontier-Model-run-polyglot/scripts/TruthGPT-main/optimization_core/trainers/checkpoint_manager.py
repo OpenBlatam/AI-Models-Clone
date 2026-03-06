@@ -9,7 +9,7 @@ from typing import Optional, Dict, Any
 import torch
 import torch.nn as nn
 
-from trainers.config import CheckpointConfig
+from optimization_core.trainers.config import CheckpointConfig
 
 logger = logging.getLogger(__name__)
 

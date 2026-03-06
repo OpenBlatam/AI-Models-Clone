@@ -8,8 +8,8 @@ from typing import List, Dict, Any, Optional, Callable
 import torch
 from torch.utils.data import DataLoader, Dataset
 
-from trainers.config import TrainingConfig, HardwareConfig
-from factories.collate import COLLATE
+from optimization_core.trainers.config import TrainingConfig, HardwareConfig
+from optimization_core.factories.collate import COLLATE
 
 logger = logging.getLogger(__name__)
 

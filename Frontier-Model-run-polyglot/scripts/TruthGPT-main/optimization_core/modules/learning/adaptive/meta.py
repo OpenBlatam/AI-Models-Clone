@@ -18,7 +18,7 @@ from .config import AdaptiveLearningConfig
 logger = logging.getLogger(__name__)
 
 class MetaLearner:
-    \"\"\"Meta-learning system for learning how to learn\"\"\"
+    """Meta-learning system for learning how to learn"""
     
     def __init__(self, config: AdaptiveLearningConfig):
         self.config = config
@@ -30,7 +30,7 @@ class MetaLearner:
         logger.info("✅ Meta-Learner initialized")
     
     def _create_meta_model(self) -> nn.Module:
-        \"\"\"Create meta-learning model\"\"\"
+        """Create meta-learning model"""
         return nn.Sequential(
             nn.Linear(64, 128),
             nn.ReLU(),
@@ -49,7 +49,7 @@ class MetaLearner:
         )
     
     def learn_from_task(self, task_features: np.ndarray, task_performance: float):
-        \"\"\"Learn from a completed task\"\"\"
+        """Learn from a completed task"""
         # Store task information
         task_info = {
             'features': task_features,
@@ -63,7 +63,7 @@ class MetaLearner:
             self._update_meta_model()
     
     def _update_meta_model(self):
-        \"\"\"Update meta-learning model\"\"\"
+        """Update meta-learning model"""
         # Sample batch from task memory
         batch_size = min(self.config.meta_batch_size, len(self.task_memory))
         batch = random.sample(list(self.task_memory), batch_size)
@@ -92,14 +92,14 @@ class MetaLearner:
         logger.debug(f"✅ Meta-model updated (loss: {loss.item():.6f})")
     
     def predict_task_performance(self, task_features: np.ndarray) -> float:
-        \"\"\"Predict performance for a new task\"\"\"
+        """Predict performance for a new task"""
         with torch.no_grad():
             features_tensor = torch.tensor(task_features, dtype=torch.float32).unsqueeze(0)
             prediction = self.meta_model(features_tensor)
             return prediction.item()
     
     def get_learning_insights(self) -> Dict[str, Any]:
-        \"\"\"Get insights from meta-learning\"\"\"
+        """Get insights from meta-learning"""
         if not self.task_memory:
             return {'insights': 'No tasks learned yet'}
         

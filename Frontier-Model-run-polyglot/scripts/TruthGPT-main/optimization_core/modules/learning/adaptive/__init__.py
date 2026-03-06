@@ -13,11 +13,11 @@ from .system import AdaptiveLearningSystem
 
 # Factory functions
 def create_adaptive_learning_config(**kwargs) -> AdaptiveLearningConfig:
-    \"\"\"Create adaptive learning configuration\"\"\"
+    """Create adaptive learning configuration"""
     return AdaptiveLearningConfig(**kwargs)
 
 def create_adaptive_learning_system(config: AdaptiveLearningConfig) -> AdaptiveLearningSystem:
-    \"\"\"Create adaptive learning system\"\"\"
+    """Create adaptive learning system"""
     return AdaptiveLearningSystem(config)
 
 __all__ = [

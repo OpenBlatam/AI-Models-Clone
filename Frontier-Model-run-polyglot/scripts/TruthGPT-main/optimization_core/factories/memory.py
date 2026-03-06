@@ -1,5 +1,5 @@
-from factories.registry import Registry
-from modules.memory.advanced_memory_manager import create_advanced_memory_manager, create_memory_config
+from optimization_core.factories.registry import Registry
+from optimization_core.modules.memory.advanced_memory_manager import create_advanced_memory_manager, create_memory_config
 
 MEMORY_MANAGERS = Registry()
 

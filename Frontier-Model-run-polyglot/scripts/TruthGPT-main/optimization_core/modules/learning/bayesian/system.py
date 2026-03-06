@@ -17,7 +17,7 @@ from .optimization import MultiObjectiveOptimizer, ConstrainedOptimizer
 logger = logging.getLogger(__name__)
 
 class BayesianOptimizer:
-    \"\"\"Main Bayesian optimizer\"\"\"
+    """Main Bayesian optimizer"""
     
     def __init__(self, config: BayesianOptimizationConfig):
         self.config = config

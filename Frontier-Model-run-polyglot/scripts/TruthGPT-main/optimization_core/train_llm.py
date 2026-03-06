@@ -7,9 +7,9 @@ import torch
 import yaml
 from datasets import load_dataset
 
-from trainers.config import TrainerConfig
-from build_trainer import build_trainer
-from utils.logging_utils import setup_logger
+from optimization_core.trainers.config import TrainerConfig
+from optimization_core.build_trainer import build_trainer
+from optimization_core.utils.logging_utils import setup_logger
 
 logger = setup_logger(__name__)
 

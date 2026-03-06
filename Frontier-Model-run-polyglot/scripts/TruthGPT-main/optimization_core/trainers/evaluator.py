@@ -10,7 +10,7 @@ import torch
 from torch.utils.data import DataLoader
 from torch.cuda.amp import autocast
 
-from trainers.config import TrainingConfig
+from optimization_core.trainers.config import TrainingConfig
 
 logger = logging.getLogger(__name__)
 

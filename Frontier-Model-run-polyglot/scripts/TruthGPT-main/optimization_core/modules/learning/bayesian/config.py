@@ -9,7 +9,7 @@ from .enums import AcquisitionFunction, KernelType, OptimizationStrategy
 
 @dataclass
 class BayesianOptimizationConfig:
-    \"\"\"Configuration for Bayesian optimization system\"\"\"
+    """Configuration for Bayesian optimization system"""
     # Basic settings
     acquisition_function: AcquisitionFunction = AcquisitionFunction.EXPECTED_IMPROVEMENT
     kernel_type: KernelType = KernelType.RBF
@@ -43,7 +43,7 @@ class BayesianOptimizationConfig:
     enable_parallel_evaluation: bool = False
     
     def __post_init__(self):
-        \"\"\"Validate Bayesian optimization configuration\"\"\"
+        """Validate Bayesian optimization configuration"""
         if self.gp_alpha <= 0:
             raise ValueError("GP alpha must be positive")
         if self.gp_n_restarts <= 0:

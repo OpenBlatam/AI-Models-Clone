@@ -5,7 +5,7 @@ Maximum performance optimization with zero-copy operations, model compilation, G
 
 from .zero_copy_optimizer import ZeroCopyOptimizer, ZeroCopyConfig
 from .model_compiler import ModelCompiler, CompilationConfig
-from .gpu_accelerator import GPUAccelerator, GPUConfig
+from optimization_core.modules.acceleration.gpu import GPUAccelerator, GPUAcceleratorConfig as GPUConfig
 from .dynamic_batcher import DynamicBatcher, BatchingConfig
 from .intelligent_cacher import IntelligentCacher, CachingConfig
 from .distributed_optimizer import DistributedOptimizer, DistributedConfig

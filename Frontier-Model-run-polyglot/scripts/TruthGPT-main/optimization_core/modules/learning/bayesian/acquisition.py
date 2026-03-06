@@ -14,7 +14,7 @@ from .models import GaussianProcessModel
 logger = logging.getLogger(__name__)
 
 class AcquisitionFunctionOptimizer:
-    \"\"\"Acquisition function optimizer\"\"\"
+    """Acquisition function optimizer"""
     
     def __init__(self, config: BayesianOptimizationConfig):
         self.config = config
@@ -24,7 +24,7 @@ class AcquisitionFunctionOptimizer:
     def optimize_acquisition(self, gp_model: GaussianProcessModel, 
                            bounds: List[Tuple[float, float]], 
                            n_candidates: int = None) -> np.ndarray:
-        \"\"\"Optimize acquisition function\"\"\"
+        """Optimize acquisition function"""
         logger.info(f"🎯 Optimizing acquisition function: {self.config.acquisition_function.value}")
         
         if n_candidates is None:
@@ -50,7 +50,7 @@ class AcquisitionFunctionOptimizer:
     
     def _generate_candidates(self, bounds: List[Tuple[float, float]], 
                            n_candidates: int) -> np.ndarray:
-        \"\"\"Generate candidate points\"\"\"
+        """Generate candidate points"""
         n_dims = len(bounds)
         candidates = np.random.uniform(
             low=[b[0] for b in bounds],
@@ -61,7 +61,7 @@ class AcquisitionFunctionOptimizer:
     
     def _calculate_acquisition_function(self, gp_model: GaussianProcessModel, 
                                       candidates: np.ndarray) -> np.ndarray:
-        \"\"\"Calculate acquisition function values\"\"\"
+        """Calculate acquisition function values"""
         if self.config.acquisition_function == AcquisitionFunction.EXPECTED_IMPROVEMENT:
             return self._expected_improvement(gp_model, candidates)
         elif self.config.acquisition_function == AcquisitionFunction.UPPER_CONFIDENCE_BOUND:

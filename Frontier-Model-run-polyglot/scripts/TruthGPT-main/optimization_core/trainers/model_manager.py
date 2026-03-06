@@ -9,7 +9,7 @@ import torch
 import torch.nn as nn
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
-from trainers.config import ModelConfig, HardwareConfig, TrainingConfig
+from optimization_core.trainers.config import ModelConfig, HardwareConfig, TrainingConfig
 
 try:
     from peft import LoraConfig, get_peft_model, TaskType

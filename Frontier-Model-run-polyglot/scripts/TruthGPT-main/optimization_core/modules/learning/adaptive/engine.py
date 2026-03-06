@@ -15,7 +15,7 @@ from .config import AdaptiveLearningConfig
 logger = logging.getLogger(__name__)
 
 class SelfImprovementEngine:
-    \"\"\"Self-improvement engine for continuous optimization\"\"\"
+    """Self-improvement engine for continuous optimization"""
     
     def __init__(self, config: AdaptiveLearningConfig):
         self.config = config
@@ -31,7 +31,7 @@ class SelfImprovementEngine:
         logger.info("✅ Self-Improvement Engine initialized")
     
     def _initialize_strategies(self):
-        \"\"\"Initialize improvement strategies\"\"\"
+        """Initialize improvement strategies"""
         self.improvement_strategies = {
             'learning_rate_adjustment': self._adjust_learning_rate,
             'architecture_modification': self._modify_architecture,
@@ -41,7 +41,7 @@ class SelfImprovementEngine:
         }
     
     def evaluate_performance(self, current_performance: float) -> Dict[str, Any]:
-        \"\"\"Evaluate current performance and suggest improvements\"\"\"
+        """Evaluate current performance and suggest improvements"""
         evaluation = {
             'current_performance': current_performance,
             'improvement_needed': False,
@@ -71,7 +71,7 @@ class SelfImprovementEngine:
         return evaluation
     
     def _select_improvement_strategy(self) -> str:
-        \"\"\"Select best improvement strategy\"\"\"
+        """Select best improvement strategy"""
         # Analyze past improvements
         successful_strategies = []
         
@@ -96,7 +96,7 @@ class SelfImprovementEngine:
         return best_strategy
     
     def _calculate_confidence(self) -> float:
-        \"\"\"Calculate confidence in improvement suggestion\"\"\"
+        """Calculate confidence in improvement suggestion"""
         if not self.improvement_memory:
             return 0.5
         
@@ -110,7 +110,7 @@ class SelfImprovementEngine:
         return min(confidence, 0.95)  # Cap at 95%
     
     def apply_improvement(self, strategy: str, model: nn.Module, **kwargs) -> nn.Module:
-        \"\"\"Apply improvement strategy to model\"\"\"
+        """Apply improvement strategy to model"""
         if strategy not in self.improvement_strategies:
             logger.warning(f"Unknown improvement strategy: {strategy}")
             return model
@@ -126,37 +126,37 @@ class SelfImprovementEngine:
             return model
     
     def _adjust_learning_rate(self, model: nn.Module, **kwargs) -> nn.Module:
-        \"\"\"Adjust learning rate for better performance\"\"\"
+        """Adjust learning rate for better performance"""
         # This would adjust learning rates in practice
         logger.info("📈 Learning rate adjustment applied")
         return model
     
     def _modify_architecture(self, model: nn.Module, **kwargs) -> nn.Module:
-        \"\"\"Modify model architecture\"\"\"
+        """Modify model architecture"""
         # This would modify architecture in practice
         logger.info("🏗️ Architecture modification applied")
         return model
     
     def _change_optimization_strategy(self, model: nn.Module, **kwargs) -> nn.Module:
-        \"\"\"Change optimization strategy\"\"\"
+        """Change optimization strategy"""
         # This would change optimization strategy in practice
         logger.info("⚙️ Optimization strategy changed")
         return model
     
     def _adjust_regularization(self, model: nn.Module, **kwargs) -> nn.Module:
-        \"\"\"Adjust regularization\"\"\"
+        """Adjust regularization"""
         # This would adjust regularization in practice
         logger.info("🛡️ Regularization adjusted")
         return model
     
     def _enhance_data_augmentation(self, model: nn.Module, **kwargs) -> nn.Module:
-        \"\"\"Enhance data augmentation\"\"\"
+        """Enhance data augmentation"""
         # This would enhance data augmentation in practice
         logger.info("🔄 Data augmentation enhanced")
         return model
     
     def get_improvement_statistics(self) -> Dict[str, Any]:
-        \"\"\"Get self-improvement statistics\"\"\"
+        """Get self-improvement statistics"""
         if not self.improvement_memory:
             return {'statistics': 'No improvements attempted yet'}
         

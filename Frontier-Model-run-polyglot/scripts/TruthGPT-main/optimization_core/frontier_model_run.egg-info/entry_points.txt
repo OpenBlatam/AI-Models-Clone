@@ -1,0 +1,3 @@
+[console_scripts]
+frontier = cli:app
+openclaw = cli:app

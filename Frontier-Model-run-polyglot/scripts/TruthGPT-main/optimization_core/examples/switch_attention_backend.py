@@ -1,6 +1,6 @@
 import yaml
 import torch
-from build import build_components
+from optimization_core.build import build_components
 from modules.memory.advanced_memory_manager import create_advanced_memory_manager
 
 

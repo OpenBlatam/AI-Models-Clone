@@ -14,7 +14,7 @@ from .config import AdaptiveLearningConfig
 logger = logging.getLogger(__name__)
 
 class PerformanceTracker:
-    \"\"\"Track and analyze performance metrics\"\"\"
+    """Track and analyze performance metrics"""
     
     def __init__(self, config: AdaptiveLearningConfig):
         self.config = config
@@ -25,7 +25,7 @@ class PerformanceTracker:
         logger.info("✅ Performance Tracker initialized")
     
     def record_metric(self, metric_name: str, value: float, timestamp: float = None):
-        \"\"\"Record a performance metric\"\"\"
+        """Record a performance metric"""
         if timestamp is None:
             timestamp = time.time()
         
@@ -39,7 +39,7 @@ class PerformanceTracker:
         self._update_trends(metric_name, value)
     
     def _update_trends(self, metric_name: str, value: float):
-        \"\"\"Update performance trends\"\"\"
+        """Update performance trends"""
         if metric_name not in self.performance_trends:
             self.performance_trends[metric_name] = {
                 'values': deque(maxlen=100),
@@ -57,7 +57,7 @@ class PerformanceTracker:
             trend_data['improvement_rate'] = self._calculate_improvement_rate(recent_values)
     
     def _calculate_trend(self, values: List[float]) -> str:
-        \"\"\"Calculate trend direction\"\"\"
+        """Calculate trend direction"""
         if len(values) < 2:
             return 'stable'
         
@@ -76,7 +76,7 @@ class PerformanceTracker:
             return 'stable'
     
     def _calculate_improvement_rate(self, values: List[float]) -> float:
-        \"\"\"Calculate improvement rate\"\"\"
+        """Calculate improvement rate"""
         if len(values) < 2:
             return 0.0
         
@@ -90,7 +90,7 @@ class PerformanceTracker:
         return (end_value - start_value) / abs(start_value)
     
     def get_performance_summary(self) -> Dict[str, Any]:
-        \"\"\"Get performance summary\"\"\"
+        """Get performance summary"""
         summary = {
             'total_metrics': len(self.metrics_history),
             'trends': {},

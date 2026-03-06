@@ -11,6 +11,9 @@ from .acquisition import AcquisitionFunctionOptimizer
 from .optimization import MultiObjectiveOptimizer, ConstrainedOptimizer
 from .system import BayesianOptimizer
 
+# Compatibility aliases
+BayesianConfig = BayesianOptimizationConfig
+
 # Factory functions
 def create_bayesian_optimization_config(**kwargs) -> BayesianOptimizationConfig:
     return BayesianOptimizationConfig(**kwargs)
@@ -23,6 +26,7 @@ __all__ = [
     'KernelType',
     'OptimizationStrategy',
     'BayesianOptimizationConfig',
+    'BayesianConfig',
     'GaussianProcessModel',
     'AcquisitionFunctionOptimizer',
     'MultiObjectiveOptimizer',

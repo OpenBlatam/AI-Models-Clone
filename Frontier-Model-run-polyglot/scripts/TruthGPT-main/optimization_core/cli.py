@@ -27,8 +27,8 @@ from .configs.loader import load_config, parse_overrides
 from .models import build_model
 
 app = typer.Typer(
-    name="frontier",
-    help="🚀 Frontier-Model-Run CLI - Enterprise ML Platform",
+    name="openclaw",
+    help="🚀 OpenClaw CLI - Enterprise ML & Optimization Platform",
     add_completion=True,
     no_args_is_help=True
 )
@@ -177,6 +177,54 @@ def serve(
         )
     except KeyboardInterrupt:
         console.print("\n[yellow]Server stopped[/yellow]")
+
+@app.command()
+def tools(
+    name: Optional[str] = typer.Argument(None, help="Name of the tool to run"),
+    list_tools: bool = typer.Option(False, "--list", "-l", help="List available tools")
+):
+    """Access and run internal optimization tools & integration tests."""
+    from .tools import list_available_tools, get_tool_info
+    
+    available = list_available_tools()
+    
+    if list_tools or not name:
+        table = Table(title="🛠️ Available Optimization Tools")
+        table.add_column("Tool Name", style="cyan")
+        table.add_column("Status", style="green")
+        
+        for t in available:
+            info = get_tool_info(t)
+            table.add_row(t, "[green]Ready[/green]")
+            
+        console.print(table)
+        if not name:
+            console.print("\n[dim]Run 'openclaw tools <name>' to execute a specific tool.[/dim]")
+            return
+
+    if name not in available:
+        console.print(f"[red]✗ Unknown tool: {name}[/red]")
+        console.print(f"Available tools: {', '.join(available)}")
+        sys.exit(1)
+
+    console.print(f"[bold cyan]➤ Running tool: {name}...[/bold cyan]")
+    try:
+        # Import the module lazily via the tools package
+        from . import tools as tools_mod
+        tool_module = getattr(tools_mod, name)
+        
+        # Check if it has a main() or run() function, or just run it if it's a script
+        if hasattr(tool_module, "main"):
+            tool_module.main()
+        elif hasattr(tool_module, "run"):
+            tool_module.run()
+        else:
+            console.print(f"[yellow]! Tool '{name}' has no main() or run() function. It might have executed on import.[/yellow]")
+            
+        console.print(f"[green]✓ Tool '{name}' completed.[/green]")
+    except Exception as e:
+        console.print(f"[red]✗ Error running tool '{name}': {e}[/red]")
+        sys.exit(1)
 
 @app.command()
 def health(

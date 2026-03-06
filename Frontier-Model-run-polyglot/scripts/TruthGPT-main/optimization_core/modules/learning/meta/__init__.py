@@ -10,6 +10,9 @@ from .task_gen import TaskGenerator
 from .algorithms import MAML, Reptile
 from .system import MetaLearner
 
+# Compatibility aliases
+MetaConfig = MetaLearningConfig
+
 # Factory functions
 def create_meta_learning_config(**kwargs) -> MetaLearningConfig:
     return MetaLearningConfig(**kwargs)

@@ -1,6 +1,6 @@
 from typing import Any, Dict, Iterable, Iterator, Optional
 
-from factories.registry import Registry
+from optimization_core.factories.registry import Registry
 
 DATASETS = Registry()
 

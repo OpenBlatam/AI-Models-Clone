@@ -7,7 +7,7 @@ Enums for acquisition functions, kernels, and optimization strategies.
 from enum import Enum
 
 class AcquisitionFunction(Enum):
-    \"\"\"Acquisition functions\"\"\"
+    """Acquisition functions"""
     EXPECTED_IMPROVEMENT = "expected_improvement"
     UPPER_CONFIDENCE_BOUND = "upper_confidence_bound"
     PROBABILITY_OF_IMPROVEMENT = "probability_of_improvement"
@@ -17,7 +17,7 @@ class AcquisitionFunction(Enum):
     THOMPSON_SAMPLING = "thompson_sampling"
 
 class KernelType(Enum):
-    \"\"\"Kernel types\"\"\"
+    """Kernel types"""
     RBF = "rbf"
     MATERN = "matern"
     WHITE = "white"
@@ -27,7 +27,7 @@ class KernelType(Enum):
     PERIODIC = "periodic"
 
 class OptimizationStrategy(Enum):
-    \"\"\"Optimization strategies\"\"\"
+    """Optimization strategies"""
     SEQUENTIAL = "sequential"
     BATCH = "batch"
     ASYNC = "async"

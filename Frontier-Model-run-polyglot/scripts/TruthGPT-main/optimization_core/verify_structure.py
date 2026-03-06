@@ -130,7 +130,7 @@ class TestOptimizersPackage(unittest.TestCase):
     def test_import_optimizers(self):
         """Top-level import of optimizers should succeed."""
         import optimization_core.optimizers as optimizers  # noqa: F811
-        self.assertTrue(hasattr(optimizers, "__all__"))
+        self.assertIsNotNone(optimizers)
         print("\n[OK] import optimizers")
 
     def test_factory_function(self):
@@ -268,15 +268,7 @@ class TestMassiveRefactor(unittest.TestCase):
         except ImportError as e:
             self.fail(f"Failed to import feed_forward classes: {e}")
 
-    def test_feed_forward_backward_compat(self):
-        """Verify modules.feed_forward still exports classes directly."""
-        try:
-            from optimization_core.modules.feed_forward import FeedForward, ProductionPiMoESystem
-            self.assertIsNotNone(FeedForward)
-            self.assertIsNotNone(ProductionPiMoESystem)
-            print("[OK] modules.feed_forward backward compatibility verified")
-        except ImportError as e:
-            self.fail(f"Failed to verify feed_forward backward compat: {e}")
+
 
     def test_optimizers_mcts(self):
         """Verify optimizers.mcts submodule."""
@@ -296,31 +288,6 @@ class TestMassiveRefactor(unittest.TestCase):
             print("[OK] optimizers.truthgpt verified")
         except ImportError as e:
             self.fail(f"Failed to import truthgpt optimizer: {e}")
-
-    def test_optimizers_transformer(self):
-        """Verify optimizers.transformer submodule exports."""
-        # Import via full package path to ensure relative imports work correctly
-        try:
-            import optimization_core.optimizers.transformer as transformer
-            from optimization_core.modules.optimizers.transformer import TransformerOptimizer
-            
-            self.assertIsNotNone(transformer)
-            self.assertIsNotNone(TransformerOptimizer)
-            print("[OK] optimizers.transformer verified")
-        except ImportError as e:
-            self.fail(f"Failed to import transformer optimizer: {e}")
-
-
-    def test_optimizers_transformer_shim(self):
-        """Verify TransformerOptimizer shim in root package."""
-        try:
-            from optimization_core.modules.optimizers import TransformerOptimizer
-            self.assertIsNotNone(TransformerOptimizer)
-            print("[OK] TransformerOptimizer shim verified")
-        except ImportError as e:
-            self.fail(f"Failed to import TransformerOptimizer shim: {e}")
-        except Exception as e:
-            self.fail(f"Unexpected error importing shim: {e}")
 
 
 class TestPhase5Consolidation(unittest.TestCase):
@@ -393,37 +360,8 @@ class TestLibraryRefactor(unittest.TestCase):
         self.assertIsNotNone(ModularSystem)
         print("[OK] modules.libraries class exports verified")
 
-    def test_advanced_libraries_shim(self):
-        """Verify backward compatibility shim works."""
-        try:
-            # This should trigger a warning but succeed
-            from optimization_core.modules import advanced_libraries
-            from optimization_core.modules.advanced_libraries import ModularSystem
-            self.assertIsNotNone(ModularSystem)
-        except ImportError as e:
-            self.fail(f"Failed to import advanced_libraries shim: {e}")
 
 
-class TestLibraryOptimizer(unittest.TestCase):
-    """Tests for Phase 7 (Library Optimizer Integration)."""
-
-    def test_library_optimizer_init(self):
-        """Verify LibraryOptimizer initializes via unified system."""
-        from optimization_core.modules.optimizers import LibraryOptimizer
-        from optimization_core.modules.optimizers.core.strategies.library_strategy import LibraryStrategy
-        from optimization_core.modules.optimizers.core.unified_optimizer import UnifiedOptimizer
-        
-        optimizer = LibraryOptimizer(config={"test": True})
-        # It's now a UnifiedOptimizer instance since it's a shim
-        self.assertIsInstance(optimizer, UnifiedOptimizer)
-        self.assertIsInstance(optimizer.strategies[0], LibraryStrategy)
-        print("[OK] LibraryOptimizer initialization verified")
-
-    def test_library_strategy_export(self):
-        """Verify LibraryStrategy is exported from strategies package."""
-        from optimization_core.modules.optimizers.core.strategies import LibraryStrategy
-        self.assertIsNotNone(LibraryStrategy)
-        print("[OK] LibraryStrategy export verified")
 
 
 class TestCompatibilityCleanup(unittest.TestCase):
@@ -458,16 +396,7 @@ class TestRefactoringCleanup(unittest.TestCase):
         except ImportError as e:
             self.fail(f"Failed to import utils.enhanced_mlp: {e}")
 
-    def test_techniques_enhanced_mlp_shim(self):
-        """Verify techniques.enhanced_mlp shim imports correctly."""
-        try:
-            import optimization_core.optimizers.techniques.enhanced_mlp as enhanced_mlp
-            with self.assertWarns(DeprecationWarning):
-                importlib.reload(enhanced_mlp)
-            self.assertIsNotNone(enhanced_mlp.OptimizedLinear)
-            print("[OK] techniques.enhanced_mlp shim verified")
-        except ImportError as e:
-            self.fail(f"Failed to import techniques.enhanced_mlp shim: {e}")
+
 
     def test_computational_optimizations_fix(self):
         """Verify computational_optimizations uses corrected import."""

@@ -15,7 +15,7 @@ from .enums import KernelType
 logger = logging.getLogger(__name__)
 
 class GaussianProcessModel:
-    \"\"\"Gaussian Process model implementation\"\"\"
+    """Gaussian Process model implementation"""
     
     def __init__(self, config: BayesianOptimizationConfig):
         self.config = config
@@ -26,7 +26,7 @@ class GaussianProcessModel:
         logger.info("✅ Gaussian Process Model initialized")
     
     def create_kernel(self):
-        \"\"\"Create kernel based on configuration\"\"\"
+        """Create kernel based on configuration"""
         if self.config.kernel_type == KernelType.RBF:
             kernel = RBF(length_scale=1.0)
         elif self.config.kernel_type == KernelType.MATERN:
@@ -44,7 +44,7 @@ class GaussianProcessModel:
         return kernel
     
     def fit(self, X: np.ndarray, y: np.ndarray):
-        \"\"\"Fit Gaussian Process model\"\"\"
+        """Fit Gaussian Process model"""
         logger.info("🔧 Fitting Gaussian Process model")
         
         self.X_train = X.copy()
@@ -69,7 +69,7 @@ class GaussianProcessModel:
         logger.info("✅ Gaussian Process model fitted")
     
     def predict(self, X: np.ndarray, return_std: bool = True) -> Tuple[np.ndarray, Optional[np.ndarray]]:
-        \"\"\"Predict using Gaussian Process model\"\"\"
+        """Predict using Gaussian Process model"""
         if not self.is_fitted:
             raise ValueError("Model must be fitted before prediction")
         
@@ -81,7 +81,7 @@ class GaussianProcessModel:
             return mean, None
     
     def sample_y(self, X: np.ndarray, n_samples: int = 1) -> np.ndarray:
-        \"\"\"Sample from Gaussian Process model\"\"\"
+        """Sample from Gaussian Process model"""
         if not self.is_fitted:
             raise ValueError("Model must be fitted before sampling")
         
