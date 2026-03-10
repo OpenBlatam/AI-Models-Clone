@@ -21,36 +21,37 @@
 
 Whether you are fine-tuning a 7B model on a single GPU or training a massive foundation model on a cluster, TruthGPT scales with you.
 
-## ✨ Key Features
+## ✨ Key Features (SOTA 2025)
 
--   **⚡ Ultimate Performance**: Auto-configured for speed with TF32, mixed precision (BF16/FP16), and custom CUDA kernels.
--   **🧩 Modular Design**: Swap optimizers, attention backends, and datasets via a registry system. No code changes required.
--   **🧠 Smart Memory**: Gradient checkpointing, dynamic padding, and 8-bit optimizers allow training larger models on consumer hardware.
--   **🛡️ Production Ready**: Automatic error recovery, nan-detection, and seamless checkpoint resumption.
--   **📊 Observable**: Native integration with Weights & Biases and TensorBoard.
+-   **🐝 Swarm Intelligence**: Orchestrate dozens of specialized agents via the `SwarmOrchestrator`.
+-   **📄 Research Integration**: Instant access to **48+ SOTA papers** (LongRoPE, etc.) via the `PaperRegistry`.
+-   **⚡ Ultimate Performance**: Auto-configured for speed with TF32, mixed precision, and compile-time optimizations.
+-   **🧠 Hierarchical Memory**: Persistent `CoreMemory` so your agents never forget your preferences.
+-   **📡 Omnichannel**: Native support for Telegram, Signal, Email, and more.
 
-## 🚀 Quick Start
+## 🚀 Quick Start (Running TruthGPT)
 
-Train your first model in under 5 minutes:
-
+### 1. Simple CLI (Recommended)
+The fastest way to interact with the system:
 ```bash
-# 1. Install (Windows - Recommended)
-.\portable_setup.ps1
+# Ask the swarm anything
+python cli.py swarm ask "Explain the benefits of LongRoPE for 2M context"
 
-# 1. Install (Windows - Advanced)
-.\install.ps1
-
-# 1. Install (Linux/macOS)
-./install.sh
-
-# 2. Use the OpenClaw CLI
-openclaw --help
-
-# 3. Run a preset via CLI
-openclaw train --config configs/presets/lora_fast.yaml
+# List available research papers
+python cli.py papers list
 ```
 
-👉 **[Read the Full Quick Start Guide](docs/quickstart.md)**
+### 2. Researcher SDK (Python)
+Use the entire infrastructure in your own scripts:
+```python
+from truthgpt import api
+
+# Ask the swarm
+response = await api.ask("Build a research plan for sparse attention")
+print(response.content)
+```
+
+👉 **[Read the Full SOTA 2025 Quick Start Guide](docs/quickstart_sota.md)**
 
 ## 📖 Documentation
 

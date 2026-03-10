@@ -4,7 +4,8 @@ Base classes for optimization_core.
 Provides base implementations for common components.
 """
 import logging
-from typing import Any, Dict, Optional
+from abc import ABC, abstractmethod
+from typing import Any, Dict, Optional, List, Union
 from .interfaces import IComponent, IInferenceEngine, IDataProcessor, GenerationConfig
 
 logger = logging.getLogger(__name__)

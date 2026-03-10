@@ -12,6 +12,12 @@ from typing import Optional, List
 import typer
 import torch
 import httpx
+
+# Add parent directory to sys.path to allow absolute imports from optimization_core
+# regardless of how the script is called.
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
@@ -23,8 +29,12 @@ try:
 except ImportError:
     rprint = print
 
-from .configs.loader import load_config, parse_overrides
-from .models import build_model
+try:
+    from .configs.loader import load_config, parse_overrides
+    from .models import build_model
+except ImportError:
+    from configs.loader import load_config, parse_overrides
+    from models import build_model
 
 app = typer.Typer(
     name="openclaw",
@@ -32,6 +42,13 @@ app = typer.Typer(
     add_completion=True,
     no_args_is_help=True
 )
+
+swarm_app = typer.Typer(name="swarm", help="🐝 Multi-agent swarm orchestration commands")
+app.add_typer(swarm_app)
+
+papers_app = typer.Typer(name="papers", help="📄 SOTA research paper discovery commands")
+app.add_typer(papers_app)
+
 console = Console()
 
 
@@ -376,6 +393,97 @@ def test_api(
     console.print(table)
     console.print(f"\n[bold]Success Rate:[/bold] {successful}/{iterations} ({successful/iterations*100:.1f}%)")
     console.print(f"[bold]Average Latency:[/bold] {avg_latency:.2f}ms")
+
+# ============================================================================
+# Swarm Commands
+# ============================================================================
+
+@swarm_app.command(name="ask")
+def swarm_ask(
+    prompt: str = typer.Argument(..., help="Query for the agent swarm"),
+    user_id: str = typer.Option("cli_user", "--user", "-u", help="User ID for memory context"),
+    stream: bool = typer.Option(False, "--stream", "-s", help="Enable streaming output")
+):
+    """Ask the agent swarm a question."""
+    from .agents.client import AgentClient
+    import asyncio
+    
+    client = AgentClient(use_swarm=True)
+    
+    async def run_query():
+        with Progress(SpinnerColumn(), TextColumn("[progress.description]{task.description}")) as progress:
+            task = progress.add_task("Routing to experts...", total=None)
+            response = await client.run(user_id=user_id, prompt=prompt)
+            progress.update(task, description="Response received")
+            
+        console.print(Panel(response.content, title=f"🤖 {response.metadata.get('agent', 'Swarm')}", border_style="green"))
+        if response.action_type == "approval_required":
+            console.print("[yellow]⚠️  HITL: Aprobación requerida en la API.[/yellow]")
+
+    asyncio.run(run_query())
+
+@swarm_app.command(name="agents")
+def swarm_list_agents():
+    """List all agents registered in the swarm."""
+    from .agents.client import AgentClient
+    client = AgentClient(use_swarm=True)
+    
+    table = Table(title="🐝 Active Swarm Agents")
+    table.add_column("Name", style="cyan")
+    table.add_column("Role", style="green")
+    
+    # Access internal orchestrator for info
+    orchestrator = client.orchestrator
+    if hasattr(orchestrator, "agents"):
+        for name, agent in orchestrator.agents.items():
+            table.add_row(name, agent.role)
+    
+    console.print(table)
+
+
+# ============================================================================
+# Research Papers Commands
+# ============================================================================
+
+@papers_app.command(name="list")
+def papers_list(
+    limit: int = typer.Option(10, "--limit", "-n", help="Number of papers to show"),
+    category: Optional[str] = typer.Option(None, "--category", "-c", help="Filter by category")
+):
+    """List discovered research papers."""
+    from .core.papers.paper_registry import PaperRegistry
+    registry = PaperRegistry()
+    
+    stats = registry.get_stats()
+    table = Table(title=f"📚 Discovered Papers ({stats['total_papers']} total)")
+    table.add_column("ID", style="cyan")
+    table.add_column("Category", style="green")
+    
+    for paper_id in registry.list_available_papers(category=category)[:limit]:
+        paper = registry.get_paper_metadata(paper_id)
+        table.add_row(paper_id, paper.category)
+    
+    console.print(table)
+
+@papers_app.command(name="info")
+def papers_info(paper_id: str = typer.Argument(..., help="Paper ID")):
+    """Show detailed metadata for a specific paper."""
+    from .core.papers.paper_registry import PaperRegistry
+    registry = PaperRegistry()
+    
+    paper = registry.get_paper_metadata(paper_id)
+    if not paper:
+        console.print(f"[red]✗ Paper not found: {paper_id}[/red]")
+        return
+        
+    console.print(Panel(
+        f"[bold]Category:[/bold] {paper.category}\n"
+        f"[bold]Path:[/bold] {paper.file_path}\n"
+        f"[bold]Techniques:[/bold] {', '.join(paper.techniques) if paper.techniques else 'N/A'}",
+        title=f"📄 Paper: {paper_id}",
+        border_style="magenta"
+    ))
+
 
 @app.command()
 def version():

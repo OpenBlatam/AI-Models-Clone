@@ -15,7 +15,7 @@ from typing import Dict, List, Optional, Any
 logger = logging.getLogger(__name__)
 
 # Try to import from papers source
-_papers_source = Path(__file__).parent.parent.parent.parent / "truthgpt_collected" / "integration_code" / "papers"
+_papers_source = Path(__file__).parent.parent.parent / "truthgpt_collected" / "integration_code" / "papers"
 
 # Initialize availability flags
 _PAPERS_AVAILABLE = False

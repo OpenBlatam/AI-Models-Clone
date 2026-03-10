@@ -2,6 +2,7 @@ import logging
 import random
 from typing import Any, Dict, Optional
 from ..arquitecturas_fundamentales.base_agent import BaseAgent
+from ..models import AgentResponse
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +45,7 @@ class RLAgent(BaseAgent):
         self.env = env or SimpleEnv()
         self.cumulative_reward = 0.0
 
-    async def process(self, query: str, context: Optional[Dict[str, Any]] = None) -> str:
+    async def process(self, query: str, context: Optional[Dict[str, Any]] = None) -> AgentResponse:
         logger.info(f"{self.name} iniciando ciclo RL con objetivo: {query}")
         
         trajectory = []
@@ -91,7 +92,7 @@ class RLAgent(BaseAgent):
                     break
                     
             except Exception as e:
-                return f"Error crítico durante la simulación RL: {str(e)}"
+                return AgentResponse(content=f"Error crítico durante la simulación RL: {str(e)}", action_type="final_answer")
                 
         # Resumen final
         summary = (
@@ -99,8 +100,8 @@ class RLAgent(BaseAgent):
             f"- Objetivo Original: {query}\n"
             f"- Recompensa Total Acumulada: {self.cumulative_reward}\n"
             f"- Métrica de Rendimiento Final: {self.env.performance_metric}/100\n\n"
-            f"**Trayectoria de Decisiones (State -> Action -> Reward):**\n" + " \\n ".join(trajectory)
+            f"**Trayectoria de Decisiones (State -> Action -> Reward):**\n" + " \n ".join(trajectory)
         )
         self.add_to_memory("user", query)
         self.add_to_memory("assistant", summary)
-        return summary
+        return AgentResponse(content=summary, action_type="final_answer")

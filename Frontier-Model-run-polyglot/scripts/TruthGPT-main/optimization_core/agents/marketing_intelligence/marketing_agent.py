@@ -1,46 +1,73 @@
+"""
+OpenClaw Marketing Intelligence Agent.
+
+Specialised in creating marketing content and competitive analysis
+by leveraging web-search tools through the ReAct architecture.
+"""
+
 import logging
 from typing import Any, Dict, Optional
+
 from ..arquitecturas_fundamentales.base_agent import BaseAgent
 from ..razonamiento_planificacion.orchestrator import MultiUserReActAgent
-from ..razonamiento_planificacion.tools import WebSearchTool, WebReaderTool
+from ..razonamiento_planificacion.tools import WebReaderTool, WebSearchTool
+from ..models import AgentResponse
 
 logger = logging.getLogger(__name__)
 
+# Marketing-specific system prompt extension
+_MARKETING_SYSTEM_EXTENSION = (
+    "\n\n"
+    "SPECIFIC ROLE: You are an autonomous Digital Marketing Intelligence, "
+    "SEO, and Growth Hacking agent.\n"
+    "You MUST use your web tools (web_search, web_reader) to research "
+    "competitors when solving problems. Search for current trends and "
+    "provide data-driven content strategies."
+)
+
+
+class _MarketingReActAgent(MultiUserReActAgent):
+    """ReAct agent with marketing-specific system instructions."""
+
+    def _get_system_instructions(self) -> str:
+        base = super()._get_system_instructions()
+        return f"{base}{_MARKETING_SYSTEM_EXTENSION}"
+
+
 class ContentMarketingAgent(BaseAgent):
     """
-    OpenClaw Marketing Intelligence Agent
-    Especializado en crear contenido y análisis de marketing utilizando herramientas web para buscar data real.
-    """
-    def __init__(self, llm_engine: Any):
-        super().__init__(name="MarketingAgent", role="Especialista en Marketing y SEO")
-        # Utilizamos la arquitectura ReAct interna para darle autonomía real
-        self.react_agent = MultiUserReActAgent(llm_engine=llm_engine)
-        self.react_agent.register_tool(WebSearchTool())
-        self.react_agent.register_tool(WebReaderTool())
-        
-        # Sobrescribimos temporalmente las instrucciones base para que actúe como marketero
-        self.original_get_system = self.react_agent._get_system_instructions
-        
-        def custom_system_instructions() -> str:
-            base_instructions = self.original_get_system()
-            return (
-                f"{base_instructions}\n\n"
-                "ROL ESPECÍFICO DE ESTE AGENTE: Eres un agente autónomo de Inteligencia en Marketing Digital, SEO y Growth Hacking.\n"
-                "DEBES utilizar tus herramientas web (web_search, web_reader) para investigar a la competencia al resolver "
-                "problemas. Busca tendencias actuales y proporciona estrategias de contenido basadas en datos verídicos."
-            )
-        self.react_agent._get_system_instructions = custom_system_instructions
+    OpenClaw Marketing Intelligence Agent.
 
-    async def process(self, query: str, context: Optional[Dict[str, Any]] = None) -> str:
-        logger.info(f"{self.name} procesando: {query}")
-        user_id = context.get("user_id", "default_marketing_user") if context else "default_marketing_user"
-        
+    Delegates query processing to an internal ReAct agent that has
+    web-search and web-reader tools, with a marketing-focused system prompt.
+    """
+
+    def __init__(self, llm_engine: Any) -> None:
+        super().__init__(
+            name="MarketingAgent",
+            role="Marketing and SEO Specialist",
+        )
+        self._react = _MarketingReActAgent(llm_engine=llm_engine)
+        self._react.register_tool(WebSearchTool())
+        self._react.register_tool(WebReaderTool())
+
+    async def process(
+        self, query: str, context: Optional[Dict[str, Any]] = None
+    ) -> AgentResponse:
+        """Process a marketing query using the internal ReAct agent."""
+        logger.info("%s processing: %s", self.name, query)
+
+        user_id = (
+            context.get("user_id", "default_marketing_user")
+            if context
+            else "default_marketing_user"
+        )
+
         try:
-            # Delegamos al agente ReAct para que tome decisiones y use herramientas
-            response = await self.react_agent.process_message(user_id, query)
+            response: AgentResponse = await self._react.process_message(user_id, query)
             self.add_to_memory("user", query)
-            self.add_to_memory("assistant", response)
+            self.add_to_memory("assistant", response.content)
             return response
-        except Exception as e:
-            logger.error(f"Error procesando en {self.name}: {str(e)}")
-            return f"Error en {self.name}: {str(e)}"
+        except Exception:
+            logger.exception("Error processing in %s", self.name)
+            return AgentResponse(content=f"Error in {self.name}: processing failed.", action_type="final_answer")

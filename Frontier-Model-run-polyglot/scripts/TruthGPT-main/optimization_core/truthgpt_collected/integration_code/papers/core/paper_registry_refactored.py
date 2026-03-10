@@ -25,7 +25,10 @@ import threading
 from functools import lru_cache
 from concurrent.futures import ThreadPoolExecutor
 
-from .metadata_extractor import MetadataExtractor, PaperMetadata
+try:
+    from .metadata_extractor import MetadataExtractor, PaperMetadata
+except (ImportError, ValueError):
+    from metadata_extractor import MetadataExtractor, PaperMetadata
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

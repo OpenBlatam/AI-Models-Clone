@@ -22,6 +22,7 @@ class GPUPerformanceMonitor:
         self.monitor_thread = None
         self.metrics_history = []
         self.current_metrics = {}
+        self._stop_event = threading.Event()
         
         if self.config.enable_monitoring:
             self.start_monitoring()
@@ -30,21 +31,21 @@ class GPUPerformanceMonitor:
     
     def start_monitoring(self):
         """Start performance monitoring."""
-        self.monitoring = True
+        self._stop_event.clear()
         self.monitor_thread = threading.Thread(target=self._monitoring_loop, daemon=True)
         self.monitor_thread.start()
         self.logger.info("📊 Performance monitoring started")
     
     def stop_monitoring(self):
         """Stop performance monitoring."""
-        self.monitoring = False
+        self._stop_event.set()
         if self.monitor_thread:
             self.monitor_thread.join()
         self.logger.info("📊 Performance monitoring stopped")
     
     def _monitoring_loop(self):
         """Main monitoring loop."""
-        while self.monitoring:
+        while not self._stop_event.is_set():
             metrics = self._collect_metrics()
             self.current_metrics = metrics
             self.metrics_history.append(metrics)
@@ -53,7 +54,8 @@ class GPUPerformanceMonitor:
             if len(self.metrics_history) > 1000:
                 self.metrics_history.pop(0)
             
-            time.sleep(self.config.monitoring_interval)
+            # Wait for interval or until stopped
+            self._stop_event.wait(self.config.monitoring_interval)
     
     def _collect_metrics(self) -> Dict[str, Any]:
         """Collect GPU performance metrics."""

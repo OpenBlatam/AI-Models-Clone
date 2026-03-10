@@ -23,7 +23,7 @@ import sys
 from pathlib import Path
 
 # Add papers source directory to path if needed
-_papers_source = Path(__file__).parent.parent.parent.parent / "truthgpt_collected" / "integration_code" / "papers"
+_papers_source = Path(__file__).parent.parent.parent / "truthgpt_collected" / "integration_code" / "papers"
 if _papers_source.exists() and str(_papers_source) not in sys.path:
     sys.path.insert(0, str(_papers_source))
 

@@ -1,102 +1,231 @@
-import logging
-from typing import Any, Dict, List, Optional
-import asyncio
+"""
+OpenClaw Agent Client (SDK).
 
-# Imports de componentes internos
-from .memoria_aprendizaje.sqlite_memory import SQLiteMemory
-from .razonamiento_planificacion.orchestrator import MultiUserReActAgent
-from .razonamiento_planificacion.tools import (
-    SystemBashTool, WebSearchTool, WebReaderTool, 
-    FileReadTool, FileWriteTool, PythonExecutionTool
-)
+Provides a high-level interface for initialising and using autonomous agents,
+supporting both single-agent ReAct mode and multi-agent swarm mode.
+"""
+
+import logging
+import re
+from typing import Any, Dict, Optional, AsyncIterator, Union
 from .multi_agentes.swarm_orchestrator import SwarmOrchestrator
-from .marketing_intelligence.marketing_agent import ContentMarketingAgent
+from .razonamiento_planificacion.orchestrator import MultiUserReActAgent
+from .models import AgentResponse, AgentConfig
+from .registry import get_all_tools, DummyAsyncLLM
 
 logger = logging.getLogger(__name__)
 
-class DummyAsyncLLM:
-    """Fallback LLM para pruebas si no se provee uno real."""
-    async def __call__(self, prompt: str) -> str:
-        return f"Echo from OpenClaw Agent: Recibí prompt de {len(prompt)} caracteres."
+
+# Opentelemetry support (optional)
+try:
+    from opentelemetry import trace
+    tracer = trace.get_tracer(__name__)
+except ImportError:
+    tracer = None
+
+
+# ---------------------------------------------------------------------------
+# Client
+# ---------------------------------------------------------------------------
 
 class AgentClient:
     """
-    OpenClaw Agent Client (SDK)
-    Interfaz principal para inicializar y usar agentes autónomos,
-    diseñada para ser tan fácil de usar como OpenClaw.
-    """
-    
-    # Registro de herramientas disponibles
-    AVAILABLE_TOOLS = {
-        "system_bash": SystemBashTool,
-        "web_search": WebSearchTool,
-        "web_reader": WebReaderTool,
-        "file_read": FileReadTool,
-        "file_write": FileWriteTool,
-        "python_execute": PythonExecutionTool
-    }
+    High-level client for OpenClaw autonomous agents.
 
-    def __init__(self, 
-                 llm_engine: Optional[Any] = None, 
-                 memory_db_path: str = "openclaw_memory.db",
-                 use_swarm: bool = False):
-        """
-        Inicializa el cliente de agentes.
-        :param llm_engine: Motor LLM asíncrono (debe tener un método asíncrono __call__(prompt)).
-        :param memory_db_path: Ruta a la base de datos de memoria persistente.
-        :param use_swarm: Si es True, inicializa un enjambre de agentes en lugar de uno solo.
-        """
-        self.llm_engine = llm_engine or DummyAsyncLLM()
-        self.memory = SQLiteMemory(db_path=memory_db_path)
-        self.use_swarm = use_swarm
+    Args:
+        llm_engine: An async-callable LLM engine (``await engine(prompt)``).
+                    Falls back to :class:`DummyAsyncLLM` when *None*.
+        memory_db_path: Path to the SQLite database used for episodic memory.
+        use_swarm: When *True*, initialise a multi-agent swarm instead of a
+                   single ReAct agent.
+    """
+
+    AVAILABLE_TOOLS = _TOOL_REGISTRY
+
+    def __init__(
+        self,
+        config: Optional[AgentConfig] = None,
+        # Legacy positional args for backward compatibility
+        llm_engine: Optional[Any] = None,
+        memory_db_path: str = "openclaw_memory.db",
+        use_swarm: bool = False,
+        use_vector_memory: bool = False,
+        use_reflexion: bool = False,
+    ) -> None:
+        if config is None:
+            config = AgentConfig(
+                llm_engine=llm_engine,
+                memory_db_path=memory_db_path,
+                use_swarm=use_swarm,
+                use_vector_memory=use_vector_memory,
+                use_reflexion=use_reflexion
+            )
         
+        self.config = config
+        self.llm_engine = config.llm_engine or DummyAsyncLLM()
+        
+        # Lazy import to avoid circular dependency issues
+        from .memoria_aprendizaje.sqlite_memory import SQLiteMemory
+        self.memory = SQLiteMemory(db_path=config.memory_db_path)
+        
+        self.use_swarm = config.use_swarm
+        self.use_reflexion = config.use_reflexion
+        
+        # Init Vector Memory if requested
+        self.vector_memory = None
+        if config.use_vector_memory:
+            try:
+                from .memoria_aprendizaje.vector_memory import VectorMemory
+                self.vector_memory = VectorMemory()
+            except ImportError:
+                logger.warning("VectorMemory not available (chromadb missing).")
+
+        # Swarm or single-agent ReAct
+        self.swarm: Optional[SwarmOrchestrator] = None
+        self.agent: Optional[MultiUserReActAgent] = None
+
         if self.use_swarm:
             self.swarm = SwarmOrchestrator(llm_engine=self.llm_engine)
             self._init_default_swarm()
         else:
-            self.agent = MultiUserReActAgent(llm_engine=self.llm_engine, memory=self.memory)
+            self.agent = MultiUserReActAgent(
+                llm_engine=self.llm_engine,
+                memory=self.memory,
+                vector_memory=self.vector_memory,
+                use_reflexion=self.use_reflexion,
+            )
             self._register_default_tools()
 
-    def _init_default_swarm(self):
-        """Inicializa agentes por defecto para el swarm."""
-        marketing_agent = ContentMarketingAgent(llm_engine=self.llm_engine)
-        from .embodied_rl.rl_agent import RLAgent
-        rl_agent = RLAgent(llm_engine=self.llm_engine)
-        
-        self.swarm.register_agent(marketing_agent)
-        self.swarm.register_agent(rl_agent)
-        logger.info("Swarm inicializado con MarketingAgent y RLAgent por defecto.")
+    # ------------------------------------------------------------------
+    # Initialisation helpers
+    # ------------------------------------------------------------------
 
-    def _register_default_tools(self):
-        """Si no es swarm, carga las herramientas básicas al agente principal."""
-        for tool_name, tool_class in self.AVAILABLE_TOOLS.items():
+    def _init_default_swarm(self) -> None:
+        """Register the default set of agents in the swarm."""
+        assert self.swarm is not None
+
+        marketing = ContentMarketingAgent(llm_engine=self.llm_engine)
+        rl = RLAgent(llm_engine=self.llm_engine)
+        code = CodeInterpreterAgent(llm_engine=self.llm_engine)
+        data = DataAnalysisAgent(llm_engine=self.llm_engine)
+
+        self.swarm.register_agent(marketing)
+        self.swarm.register_agent(rl)
+        self.swarm.register_agent(code)
+        self.swarm.register_agent(data)
+        logger.info(
+            "Swarm initialised with default agents: %s",
+            [a.name for a in self.swarm.agents.values()],
+        )
+
+    def _register_default_tools(self) -> None:
+        """Register all built-in tools on the single-agent ReAct instance."""
+        assert self.agent is not None
+
+        for tool_name, tool_cls in get_all_tools().items():
             try:
-                self.agent.register_tool(tool_class())
-            except Exception as e:
-                logger.warning(f"No se pudo registrar herramienta {tool_name}: {e}")
+                # Need to inject self into DelegateTaskTool specifically
+                tool_instance = tool_cls()
+                if hasattr(tool_instance, "agent_client"):
+                    tool_instance.agent_client = self
+                    
+                self.agent.register_tool(tool_instance)
+            except Exception:
+                logger.warning("Could not register tool %s", tool_name, exc_info=True)
 
-    def add_tool(self, tool_name: str):
-        """Habilita una herramienta específica en el agente."""
-        if not self.use_swarm and tool_name in self.AVAILABLE_TOOLS:
-            self.agent.register_tool(self.AVAILABLE_TOOLS[tool_name]())
-            return True
-        return False
+    # ------------------------------------------------------------------
+    # Public API
+    # ------------------------------------------------------------------
 
-    async def run(self, user_id: str, prompt: str) -> str:
+    def add_tool(self, tool_name: str) -> bool:
         """
-        Ejecuta el agente o el swarm para procesar un prompt.
-        :param user_id: ID del usuario (para mantener contexto de memoria).
-        :param prompt: Instrucción o consulta.
-        :return: Respuesta final del agente.
+        Enable a specific tool on the single-agent instance.
+
+        Returns *True* if the tool was registered, *False* otherwise.
         """
-        if self.use_swarm:
-            # Swarm orchestrator maneja el enrutamiento y procesamiento
-            return await self.swarm.route_and_process(prompt, context={"user_id": user_id})
+        if self.use_swarm or self.agent is None:
+            return False
+
+        tool_cls = get_all_tools().get(tool_name)
+        if tool_cls is None:
+            logger.warning("Unknown tool requested: %s", tool_name)
+            return False
+
+        # Inject self reference for tools that need AgentClient (like DelegateTaskTool)
+        tool_instance = tool_cls()
+        if hasattr(tool_instance, "agent_client"):
+            tool_instance.agent_client = self
+
+        self.agent.register_tool(tool_instance)
+        return True
+
+    async def run(self, user_id: str, prompt: str, depth: int = 0, return_response: bool = False) -> Union[str, AgentResponse]:
+        """
+        Execute the agent (or swarm) to process *prompt*.
+        
+        If return_response is True, returns the AgentResponse object.
+        Otherwise, returns just the string content (default for BC).
+        """
+        if depth > 5:
+            err_msg = "Error: Maximum swarm handoff depth exceeded."
+            if return_response:
+                return AgentResponse(content=err_msg, action_type="error")
+            return err_msg
+            
+        final_resp: AgentResponse
+        
+        if self.use_swarm and self.swarm is not None:
+            final_resp = await self.swarm.route_and_process(
+                prompt, context={"user_id": user_id}
+            )
+            
+            # Handle recursive handoff using Pydantic metadata
+            if final_resp.action_type == "handoff" and final_resp.handoff_target:
+                res_str = await self._handle_handoff(user_id, prompt, final_resp.handoff_target, depth + 1)
+                final_resp = AgentResponse(
+                    content=res_str, 
+                    agent_name=final_resp.handoff_target,
+                    action_type="final_answer"
+                )
+
+        elif self.agent is not None:
+            final_resp = await self.agent.process_message(user_id, prompt)
+            
+            if final_resp.action_type == "handoff" and final_resp.handoff_target:
+                final_resp = await self._handle_handoff(user_id, prompt, final_resp.handoff_target, depth + 1)
         else:
-            # Agente ReAct estándar
-            return await self.agent.process_message(user_id, prompt)
+            raise RuntimeError("Neither swarm nor single agent is initialised.")
 
-    async def clear_memory(self, user_id: str):
-        """Limpia la memoria episódica del agente para un usuario dado."""
+        return final_resp if return_response else final_resp.content
+
+    async def _handle_handoff(self, user_id: str, prompt: str, target: str, depth: int) -> AgentResponse:
+        logger.info(f"AgentClient detected Handoff to {target}. Transferring control...")
+        if self.use_swarm and self.swarm and target in self.swarm.agents:
+            target_agent = self.swarm.agents[target]
+            handoff_prompt = f"[SYSTEM: CONTEXT HANDOFF]\nUser request: {prompt}\nRespond as {target}."
+            return await target_agent.process(handoff_prompt, context={"user_id": user_id})
+        else:
+            err_msg = f"Error: Cannot handoff to '{target}' (Not found or Swarm mode disabled)."
+            return AgentResponse(content=err_msg, action_type="error")
+
+    async def astream_run(self, user_id: str, prompt: str) -> AsyncIterator[str]:
+        """
+        Execute the agent and stream the response line by line (SSE Server-Sent Events).
+        """
+        if self.agent is not None:
+            async for chunk in self.agent.astream_process_message(user_id, prompt):
+                yield chunk
+        elif self.use_swarm and self.swarm is not None:
+            # Swarm streaming: For now, we yield the thinking process and then the final answer
+            import json
+            yield json.dumps({"event": "thinking", "content": "Swarm orchestrator is routing your request..."}) + "\n"
+            resp = await self.run(user_id, prompt, return_response=True)
+            yield json.dumps({"event": "final_answer", "content": resp.content}) + "\n"
+        else:
+            import json
+            yield json.dumps({"event": "error", "message": "Agent client not properly initialised."}) + "\n"
+
+    async def clear_memory(self, user_id: str) -> bool:
+        """Clear episodic memory for a given user."""
         await self.memory.clear_memory(user_id)
         return True

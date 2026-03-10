@@ -9,6 +9,21 @@ from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
 
+class ToolResult:
+    """
+    Standardized result from a tool execution.
+    Can contain the final output string and optional internal signals for the orchestrator.
+    """
+    def __init__(
+        self, 
+        output: str, 
+        metadata: Optional[Dict[Any, Any]] = None, 
+        signal: Optional[str] = None
+    ):
+        self.output = output
+        self.metadata = metadata or {}
+        self.signal = signal  # e.g., "core_memory_update"
+
 class BaseTool(ABC):
     """
     Clase base para herramientas automatizadas. 
@@ -24,10 +39,18 @@ class BaseTool(ABC):
     def description(self) -> str:
         """Descripción extraída del docstring para el LLM."""
         return self.__doc__.strip() if self.__doc__ else "No description available."
+        
+    @property
+    def requires_approval(self) -> bool:
+        """Si es True, la ejecución requerirá aprobación manual del usuario (HITL)."""
+        return False
 
     @abstractmethod
-    async def run(self, arg: str) -> str:
-        """Ejecución asíncrona de la herramienta."""
+    async def run(self, arg: str) -> Any:
+        """
+        Ejecución asíncrona de la herramienta. 
+        Puede devolver un string simple o un objeto ToolResult.
+        """
         pass
 
 # --- Herramientas de Sistema ---
@@ -38,6 +61,10 @@ class SystemBashTool(BaseTool):
     Útil para listar archivos, comprobar procesos o leer información del sistema.
     """
     name = "system_bash"
+    
+    @property
+    def requires_approval(self) -> bool:
+        return True
 
     async def run(self, cmd: str) -> str:
         # Guardrail básico: prevenir comandos destructivos
@@ -72,8 +99,8 @@ class WebSearchTool(BaseTool):
 
 class WebReaderTool(BaseTool):
     """
-    Lee el contenido textual de una URL específica. 
-    Útil para resumir artículos o leer documentación online.
+    Lee el contenido textual de una URL específica usando Crawl4AI. 
+    Extrae texto limpio y estructurado en Markdown perfecto para el LLM.
     """
     name = "web_reader"
 
@@ -82,13 +109,34 @@ class WebReaderTool(BaseTool):
             return "Error: URL inválida."
             
         try:
-            async with httpx.AsyncClient(timeout=10) as client:
-                response = await client.get(url)
-                response.raise_for_status()
-                # Extraer texto básico (en prod usar BeautifulSoup para limpiar)
-                return response.text[:2000] # Limitar a los primeros 2000 chars
+            from crawl4ai import AsyncWebCrawler
+            
+            logger.info(f"Crawling URL con Crawl4AI: {url}")
+            async with AsyncWebCrawler(verbose=True) as crawler:
+                result = await crawler.arun(url=url)
+                
+                if result.success:
+                    # Return perfectly formatted markdown
+                    markdown = result.markdown
+                    return markdown[:5000] + "\n...[Truncated]" if len(markdown) > 5000 else markdown
+                else:
+                    return f"Error al crawlear: {result.error_message}"
+                    
+        except ImportError:
+            # Fallback to bs4 if crawl4ai is not installed
+            logger.warning("crawl4ai no instalado. Usando fallback bs4.")
+            try:
+                import bs4
+                async with httpx.AsyncClient(timeout=10) as client:
+                    response = await client.get(url)
+                    response.raise_for_status()
+                    soup = bs4.BeautifulSoup(response.text, "html.parser")
+                    text = soup.get_text(separator="\n", strip=True)
+                    return text[:5000]
+            except Exception as e:
+                return f"Error en fallback bs4: {str(e)}"
         except Exception as e:
-            return f"Error al leer URL: {str(e)}"
+            return f"Error inesperado en WebReaderTool: {str(e)}"
 
 # --- Herramientas de Sistema de Archivos y Código ---
 
@@ -132,30 +180,124 @@ class FileWriteTool(BaseTool):
 
 class PythonExecutionTool(BaseTool):
     """
-    Ejecuta código Python localmente de forma asíncrona.
-    Acepta código fuente en Python y devuelve la salida (stdout/stderr).
+    Ejecuta código Python de forma asíncrona dentro de un contenedor Docker aislado (Sandbox).
+    Acepta código fuente en Python y devuelve la salida.
     """
     name = "python_execute"
+    
+    @property
+    def requires_approval(self) -> bool:
+        return True
 
     async def run(self, code: str) -> str:
-        # Guardrail básico: prevenir código destructivo obvio
-        forbidden = ["os.system", "subprocess", "os.remove", "shutil.rmtree"]
-        if any(f in code for f in forbidden):
-            return "Error: Uso de módulos prohibidos detectado."
+        try:
+            import docker
+            from docker.errors import ContainerError, ImageNotFound, APIError
+            
+            client = docker.from_env()
+            
+            def _run_docker_securely():
+                # Pull image if not exists
+                try:
+                    client.images.get("python:3.9-slim")
+                except ImageNotFound:
+                    logger.info("Descargando imagen python:3.9-slim para el sandbox...")
+                    client.images.pull("python:3.9-slim")
+
+                # Ejecutar de forma segura usando un contenedor efímero
+                result = client.containers.run(
+                    "python:3.9-slim",
+                    command=["python", "-c", code],
+                    remove=True,
+                    network_mode="none", # Aislar red
+                    mem_limit="128m",    # Limitar memoria
+                    stderr=True,
+                    stdout=True
+                )
+                return result.decode("utf-8")
+                
+            output = await asyncio.to_thread(_run_docker_securely)
+            return output[:5000] if output else "Ejecutado sin salida."
+            
+        except ImportError:
+            return "Error: La librería 'docker' no está instalada. Instala con 'pip install docker'."
+        except Exception as e:
+            return f"Error en el Sandbox de Docker: {str(e)}"
+
+
+# --- Herramientas de Delegación (Multi-Agente) ---
+
+class DelegateTaskTool(BaseTool):
+    """
+    Delega una sub-tarea compleja a otro agente del enjambre.
+    Acepta el nombre del agente y la tarea en formato 'agente:::tarea_a_completar'.
+    Ejemplo: MarketingAgent:::Escribe un tweet sobre este resumen.
+    Si no sabes qué agente usar, usa 'swarm', ej: swarm:::Crea un reporte de estos datos.
+    """
+    name = "delegate_task"
+
+    def __init__(self, agent_client: Any = None):
+        """Require AgentClient instance to allow recursive calling."""
+        self.agent_client = agent_client
+
+    async def run(self, cmd: str) -> str:
+        if not self.agent_client:
+            return "Error: DelegateTaskTool requiere una instancia de AgentClient."
             
         try:
-            # En producción se debería usar un entorno aislado (e.g. docker)
-            process = await asyncio.create_subprocess_exec(
-                sys.executable, "-c", code,
-                stdout=asyncio.subprocess.PIPE,
-                stderr=asyncio.subprocess.PIPE
-            )
-            stdout, stderr = await process.communicate()
-            output = ""
-            if stdout:
-                output += stdout.decode()
-            if stderr:
-                output += "\\nERROR:\\n" + stderr.decode()
-            return output[:5000] if output else "Ejecutado sin salida."
+            parts = cmd.split(":::", 1)
+            if len(parts) != 2:
+                return "Error: Formato inválido. Use 'agente:::tarea'."
+            
+            agent_target, task = parts
+            agent_target = agent_target.strip()
+            task = task.strip()
+            
+            logger.info(f"Delegando tarea a '{agent_target}': {task[:50]}...")
+            
+            # Isolated sub-memory namespace for the delegated task
+            sub_user_id = f"delegate_{agent_target}_temp"
+            
+            # Run the task through the orchestrator/client
+            # This allows hierarchical agent branching!
+            result = await self.agent_client.run(user_id=sub_user_id, prompt=task)
+            return f"Respuesta de {agent_target}:\n{result}"
         except Exception as e:
-            return f"Error en ejecución de Python: {str(e)}"
+            return f"Error en delegación de tarea: {str(e)}"
+
+# --- Herramientas de Interoperabilidad (MCP) ---
+
+class MCPTool(BaseTool):
+    """
+    Wrapper para herramientas externas del Model Context Protocol (MCP).
+    Permite usar herramientas servidas por un MCP Server remoto.
+    """
+    def __init__(self, mcp_client: Any, tool_info: Dict[str, Any]):
+        self.mcp_client = mcp_client
+        self._name = tool_info["name"]
+        self._description = tool_info.get("description", "No description available via MCP.")
+        self.arguments_schema = tool_info.get("inputSchema", {})
+
+    @property
+    def name(self) -> str:
+        return f"mcp_{self._name}"
+
+    @property
+    def description(self) -> str:
+        return f"[MCP Tool] {self._description}\nSchema: {json.dumps(self.arguments_schema)}"
+
+    async def run(self, arg: str) -> str:
+        """
+        Ejecuta la herramienta MCP. Intenta parsear JSON si la herramienta lo requiere.
+        """
+        try:
+            # MCP tools often expect a JSON object for arguments
+            try:
+                args_dict = json.loads(arg)
+            except json.JSONDecodeError:
+                args_dict = {"input": arg} # Fallback simple
+                
+            result = await self.mcp_client.call_tool(self._name, args_dict)
+            return str(result)
+        except Exception as e:
+            return f"Error executing MCP tool '{self._name}': {str(e)}"

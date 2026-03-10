@@ -1,23 +1,23 @@
 # TruthGPT - Unified Test System
 
-## 🚀 Quick Start
+## 🚀 SOTA 2025 Quick Start
+To use the advanced agent swarm and research paper features, head to the `optimization_core` directory:
 
 ```bash
-# 1. Check environment
-python quick_check.py
+cd optimization_core
 
-# 2. Setup if needed
-python setup_environment.py
+# Ask the agent swarm
+python cli.py swarm ask "Calculate the optimization potential of my model"
 
-# 3. Run tests
-python run_unified_tests.py
+# Discover SOTA papers
+python cli.py papers list
 ```
 
-See [QUICK_START_GUIDE.md](QUICK_START_GUIDE.md) for detailed instructions.
+For more details, see the [SOTA 2025 Quick Start Guide](optimization_core/docs/quickstart_sota.md).
 
 ---
 
-## TruthGPT
+## 🧪 Testing System
 
 Is simple add a open source model then optimize or just create a ia model for your necessity.
 
