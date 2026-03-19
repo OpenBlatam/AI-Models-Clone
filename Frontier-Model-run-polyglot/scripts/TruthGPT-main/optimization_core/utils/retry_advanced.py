@@ -6,16 +6,20 @@ Provides utilities for retry logic with exponential backoff and jitter.
 import logging
 import time
 import random
-from typing import Callable, Optional, Type, Tuple, List
+from typing import Callable, Optional, Type, Tuple, List, Any
 from functools import wraps
 from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class RetryConfig:
+from pydantic import BaseModel, ConfigDict
+
+
+class RetryConfig(BaseModel):
     """Retry configuration."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     max_attempts: int = 3
     initial_delay: float = 1.0
     max_delay: float = 60.0

@@ -14,18 +14,17 @@ from concurrent.futures import ThreadPoolExecutor, Future
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class WorkerTask:
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class WorkerTask(BaseModel):
     """Worker task definition."""
-    func: Callable
-    args: tuple = ()
-    kwargs: Dict[str, Any] = None
-    task_id: Optional[str] = None
+    model_config = ConfigDict(arbitrary_types_allowed=True)
     
-    def __post_init__(self):
-        """Initialize kwargs if None."""
-        if self.kwargs is None:
-            self.kwargs = {}
+    func: Callable
+    args: tuple = Field(default_factory=tuple)
+    kwargs: Dict[str, Any] = Field(default_factory=dict)
+    task_id: Optional[str] = None
 
 
 class WorkerPool:

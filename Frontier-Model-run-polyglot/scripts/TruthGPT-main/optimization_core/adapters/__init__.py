@@ -4,7 +4,7 @@ Unified Adapters System — Pydantic-First Architecture.
 Centralized access to all adapter classes in optimization_core.
 """
 
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional, Type, Any
 
 from pydantic import BaseModel, Field
 
@@ -154,9 +154,27 @@ def create_adapter(
 # Typed Adapter Registry
 # ---------------------------------------------------------------------------
 
-def _entry(cls: Optional[Type], module: str, description: str) -> AdapterRegistryEntry:
+def _entry(cls: Optional[Any], module: str, description: str) -> AdapterRegistryEntry:
+    """Helper to create registry entries, robust against Mock objects."""
+    name = None
+    if cls:
+        # Safely extract name even if cls is a MagicMock
+        try:
+            # Check if it's a mock by looking for mock-specific attrs
+            if hasattr(cls, "_mock_return_value") or "Mock" in str(type(cls)):
+                name = str(cls).split('.')[-1].strip('>')
+                if not name or "Mock" in name:
+                     name = "MockAdapter"
+            else:
+                name = getattr(cls, "__name__", str(cls))
+        except Exception:
+            name = "UnknownAdapter"
+            
+    if not isinstance(name, str):
+        name = str(name)
+
     return AdapterRegistryEntry(
-        adapter_class_name=cls.__name__ if cls else None,
+        adapter_class_name=name,
         module=module,
         description=description,
         available=cls is not None,

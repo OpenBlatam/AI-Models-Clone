@@ -40,8 +40,10 @@ from ...utils.truthgpt_monitoring import (
 
 logger = logging.getLogger(__name__)
 
-@dataclass
-class TruthGPTIntegrationConfig:
+from pydantic import BaseModel, Field
+
+
+class TruthGPTIntegrationConfig(BaseModel):
     """TruthGPT integration configuration."""
     # Model configuration
     model_name: str = "truthgpt"
@@ -74,33 +76,6 @@ class TruthGPTIntegrationConfig:
     batch_size: int = 32
     max_sequence_length: int = 2048
     num_workers: int = 4
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary."""
-        return {
-            'model_name': self.model_name,
-            'model_size': self.model_size,
-            'precision': self.precision,
-            'device': self.device,
-            'optimization_level': self.optimization_level,
-            'enable_quantization': self.enable_quantization,
-            'enable_pruning': self.enable_pruning,
-            'enable_distillation': self.enable_distillation,
-            'enable_parallel_processing': self.enable_parallel_processing,
-            'enable_monitoring': self.enable_monitoring,
-            'enable_analytics': self.enable_analytics,
-            'enable_dashboard': self.enable_dashboard,
-            'monitoring_interval': self.monitoring_interval,
-            'enable_mixed_precision': self.enable_mixed_precision,
-            'enable_gradient_checkpointing': self.enable_gradient_checkpointing,
-            'enable_attention_optimization': self.enable_attention_optimization,
-            'enable_memory_optimization': self.enable_memory_optimization,
-            'learning_rate': self.learning_rate,
-            'weight_decay': self.weight_decay,
-            'batch_size': self.batch_size,
-            'max_sequence_length': self.max_sequence_length,
-            'num_workers': self.num_workers
-        }
 
 class TruthGPTIntegrationManager:
     """TruthGPT integration manager."""
@@ -303,7 +278,7 @@ class TruthGPTIntegrationManager:
     def save_integration_data(self, filepath: str) -> None:
         """Save integration data."""
         integration_data = {
-            'config': self.config.to_dict(),
+            'config': self.config.model_dump(),
             'status': self.integration_status,
             'adapters': {name: type(adapter).__name__ for name, adapter in self.adapters.items()},
             'optimizers': {name: type(optimizer).__name__ for name, optimizer in self.optimizers.items()},

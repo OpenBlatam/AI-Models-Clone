@@ -33,8 +33,10 @@ except ImportError:
     
     logger = logging.getLogger(__name__)
 
-@dataclass
-class PerformanceMetrics:
+from pydantic import BaseModel, ConfigDict
+
+
+class PerformanceMetrics(BaseModel):
     """Performance metrics container."""
     inference_time: float
     memory_usage: float
@@ -43,9 +45,11 @@ class PerformanceMetrics:
     gpu_utilization: Optional[float] = None
     cpu_utilization: Optional[float] = None
 
-@dataclass
-class BenchmarkResult:
+
+class BenchmarkResult(BaseModel):
     """Benchmark result container."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     model_name: str
     metrics: PerformanceMetrics
     configuration: Dict[str, Any]

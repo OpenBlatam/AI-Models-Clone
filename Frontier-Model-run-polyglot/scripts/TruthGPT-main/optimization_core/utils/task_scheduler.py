@@ -23,31 +23,28 @@ class TaskStatus(Enum):
     CANCELLED = "cancelled"
 
 
-@dataclass
-class Task:
+from pydantic import BaseModel, ConfigDict, Field
+
+
+class Task(BaseModel):
     """Task data structure."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
     id: str
     func: Callable
-    args: tuple = ()
-    kwargs: Dict[str, Any] = None
+    args: tuple = Field(default_factory=tuple)
+    kwargs: Dict[str, Any] = Field(default_factory=dict)
     status: TaskStatus = TaskStatus.PENDING
     result: Any = None
     error: Optional[str] = None
-    created_at: float = None
+    created_at: float = Field(default_factory=time.time)
     started_at: Optional[float] = None
     completed_at: Optional[float] = None
-    
-    def __post_init__(self):
-        """Initialize timestamps."""
-        if self.created_at is None:
-            self.created_at = time.time()
-        if self.kwargs is None:
-            self.kwargs = {}
     
     @property
     def duration(self) -> Optional[float]:
         """Get task duration."""
-        if self.completed_at and self.started_at:
+        if self.completed_at is not None and self.started_at is not None:
             return self.completed_at - self.started_at
         return None
 

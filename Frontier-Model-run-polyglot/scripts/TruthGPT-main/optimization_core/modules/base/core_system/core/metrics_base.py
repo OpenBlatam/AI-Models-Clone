@@ -9,7 +9,7 @@ import math
 from typing import Dict, Any, Optional, List
 from dataclasses import dataclass, field, asdict
 from collections import defaultdict, deque
-from abc import ABC
+from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
 

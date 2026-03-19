@@ -11,8 +11,10 @@ from dataclasses import dataclass
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class TuningResult:
+from pydantic import BaseModel
+
+
+class TuningResult(BaseModel):
     """Result of performance tuning."""
     best_config: Dict[str, Any]
     best_performance: float

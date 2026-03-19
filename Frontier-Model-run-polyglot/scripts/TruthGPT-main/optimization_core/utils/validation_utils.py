@@ -17,8 +17,10 @@ import warnings
 
 logger = logging.getLogger(__name__)
 
-@dataclass
-class ValidationResult:
+from pydantic import BaseModel, Field
+
+
+class ValidationResult(BaseModel):
     """Validation result container."""
     # Basic info
     test_name: str
@@ -31,21 +33,12 @@ class ValidationResult:
     gpu_memory_used_mb: float = 0.0
     
     # Details
-    details: Dict[str, Any] = field(default_factory=dict)
-    timestamp: float = field(default_factory=time.time)
+    details: Dict[str, Any] = Field(default_factory=dict)
+    timestamp: float = Field(default_factory=time.time)
     
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary for serialization."""
-        return {
-            'test_name': self.test_name,
-            'passed': self.passed,
-            'message': self.message,
-            'execution_time': self.execution_time,
-            'memory_used_mb': self.memory_used_mb,
-            'gpu_memory_used_mb': self.gpu_memory_used_mb,
-            'details': self.details,
-            'timestamp': self.timestamp
-        }
+        return self.model_dump()
 
 class TensorValidator:
     """Advanced tensor validation utilities."""

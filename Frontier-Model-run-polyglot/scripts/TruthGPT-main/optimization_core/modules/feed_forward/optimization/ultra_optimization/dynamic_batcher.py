@@ -283,8 +283,10 @@ class PipelineOptimizer:
             })
         return stats
 
-@dataclass
-class BatchingConfig:
+from pydantic import BaseModel, Field
+
+
+class BatchingConfig(BaseModel):
     """Configuration for dynamic batching."""
     max_batch_size: int = 32
     min_batch_size: int = 1

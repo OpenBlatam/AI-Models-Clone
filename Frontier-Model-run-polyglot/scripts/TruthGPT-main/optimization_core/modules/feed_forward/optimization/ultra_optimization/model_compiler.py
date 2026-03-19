@@ -293,8 +293,10 @@ class ONNXModelWrapper(nn.Module):
         # Convert back to tensor
         return torch.from_numpy(outputs[0])
 
-@dataclass
-class CompilationConfig:
+from pydantic import BaseModel, Field
+
+
+class CompilationConfig(BaseModel):
     """Configuration for model compilation."""
     target: str = CompilationTarget.TORCHSCRIPT
     optimization_level: str = 'default'  # default, trace, script, optimize

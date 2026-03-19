@@ -236,8 +236,10 @@ class ZeroCopyTensor:
         """Delegate to underlying tensor."""
         return getattr(self.data, name)
 
-@dataclass
-class ZeroCopyConfig:
+from pydantic import BaseModel, Field
+
+
+class ZeroCopyConfig(BaseModel):
     """Configuration for zero-copy optimization."""
     enable_zero_copy: bool = True
     max_buffer_size: int = 1024 * 1024 * 1024  # 1GB

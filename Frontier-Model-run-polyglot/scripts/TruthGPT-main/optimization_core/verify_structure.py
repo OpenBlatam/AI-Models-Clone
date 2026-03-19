@@ -14,13 +14,27 @@ import importlib.util
 import importlib
 
 # ── Project root on sys.path ──────────────────────────────────────────
-PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__)) # scripts/legacy
-# Go up 3 levels to reach the directory containing 'optimization_core'
-PARENT_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(PROJECT_ROOT))) 
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+PARENT_ROOT = os.path.dirname(PROJECT_ROOT)
+if os.path.basename(PROJECT_ROOT) != 'optimization_core':
+    # If we are deeper (e.g. scripts/legacy), go up more
+    if 'optimization_core' in PROJECT_ROOT:
+         # Find the part of the path that is 'optimization_core' and take its parent
+         parts = PROJECT_ROOT.split(os.sep)
+         if 'optimization_core' in parts:
+             idx = parts.index('optimization_core')
+             PARENT_ROOT = os.sep.join(parts[:idx])
 
 # Ensure ONLY the parent of optimization_core is in sys.path to prevent "top-level" import issues
 if PARENT_ROOT not in sys.path:
+    print(f"DEBUG: Adding PARENT_ROOT to sys.path: {PARENT_ROOT}")
     sys.path.insert(0, PARENT_ROOT)
+else:
+    # Move it to the front to be sure
+    sys.path.remove(PARENT_ROOT)
+    sys.path.insert(0, PARENT_ROOT)
+
+print(f"DEBUG: sys.path: {sys.path[:3]}")
 # We EXPLICITLY do not add PROJECT_ROOT here so that 'from optimization_core.xxx' is the standard.
 # This fixes the "attempted relative import beyond top-level package" error.
 
@@ -121,37 +135,23 @@ class MockFinder:
 sys.meta_path.insert(0, MockFinder())
 
 
-# ── Robust Mocking for Frameworks ─────────────────────────────────────
+# Fix for metaclass conflict and Pydantic inheritance
+class MockModule(ABC):
+    pass
 
-# 1. Pydantic Mocking (Essential for Registry/Adapters)
 class MockBaseModel:
     def __init__(self, **kwargs):
         for k, v in kwargs.items():
             setattr(self, k, v)
-    def model_dump(self): return self.__dict__
     def dict(self): return self.__dict__
-    @classmethod
-    def construct(cls, **kwargs): return cls(**kwargs)
-
-def mock_field(*args, **kwargs):
-    m = MagicMock()
-    m.default_factory = kwargs.get("default_factory")
-    return m
-
-if "pydantic" in sys.modules:
-    sys.modules["pydantic"].BaseModel = MockBaseModel
-    sys.modules["pydantic"].Field = mock_field
-    sys.modules["pydantic"].main = MagicMock()
-    sys.modules["pydantic"].main.BaseModel = MockBaseModel
-
-# 2. PyTorch nn.Module Mocking (Fixes metaclass conflicts)
-class MockModule(ABC):
-    def __init__(self, *args, **kwargs): super().__init__()
-    def parameters(self): return iter([]) # Return empty iterator to avoid StopIteration if called
+    def model_dump(self): return self.__dict__
 
 if "torch.nn" in sys.modules:
     sys.modules["torch.nn"].Module = MockModule
-    sys.modules["torch.nn"].Parameter = MagicMock
+
+if "pydantic" in sys.modules:
+    sys.modules["pydantic"].BaseModel = MockBaseModel
+    sys.modules["pydantic"].Field = lambda *args, **kwargs: MagicMock()
 
 
 class TestOptimizersPackage(unittest.TestCase):
@@ -208,16 +208,15 @@ class TestOptimizationCoreTopLevel(unittest.TestCase):
 
     def test_import_top_level(self):
         """Top-level __init__.py should load without error."""
-        # Add parent dir so 'optimization_core' resolves as a real package
-        parent_dir = os.path.dirname(PROJECT_ROOT)
-        if parent_dir not in sys.path:
-            sys.path.insert(0, parent_dir)
+        import traceback
         try:
             import optimization_core  # noqa: F811
             self.assertTrue(hasattr(optimization_core, '__version__'))
             print("\n[OK] import optimization_core")
         except Exception as e:
-            self.fail(f"Failed to import optimization_core: {e}")
+            tb = traceback.format_exc()
+            print(f"\nDEBUG: Full traceback for optimization_core import failure:\n{tb}")
+            self.fail(f"Failed to import optimization_core: {e}\n{tb}")
 
 class TestModulesOptimizers(unittest.TestCase):
     """Tests for the `modules.optimizers` subpackage after file move."""

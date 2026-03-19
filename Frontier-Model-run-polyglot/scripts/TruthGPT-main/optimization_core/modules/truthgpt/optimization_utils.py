@@ -20,8 +20,10 @@ from enum import Enum
 
 logger = logging.getLogger(__name__)
 
-@dataclass
-class TruthGPTOptimizationConfig:
+from pydantic import BaseModel, Field
+
+
+class TruthGPTOptimizationConfig(BaseModel):
     """TruthGPT optimization configuration."""
     # Quantization configuration
     enable_quantization: bool = True
@@ -35,7 +37,7 @@ class TruthGPTOptimizationConfig:
     
     # Distillation configuration
     enable_distillation: bool = True
-    teacher_model: Optional[nn.Module] = None
+    teacher_model: Optional[Any] = None  # Using Any for mock compatibility
     distillation_temperature: float = 3.0
     distillation_alpha: float = 0.7
     
@@ -53,29 +55,6 @@ class TruthGPTOptimizationConfig:
     enable_performance_optimization: bool = True
     mixed_precision: bool = True
     jit_compilation: bool = True
-    
-    def to_dict(self) -> Dict[str, Any]:
-        """Convert to dictionary."""
-        return {
-            'enable_quantization': self.enable_quantization,
-            'quantization_bits': self.quantization_bits,
-            'quantization_scheme': self.quantization_scheme,
-            'enable_pruning': self.enable_pruning,
-            'pruning_ratio': self.pruning_ratio,
-            'pruning_method': self.pruning_method,
-            'enable_distillation': self.enable_distillation,
-            'distillation_temperature': self.distillation_temperature,
-            'distillation_alpha': self.distillation_alpha,
-            'enable_parallel_processing': self.enable_parallel_processing,
-            'num_workers': self.num_workers,
-            'batch_size': self.batch_size,
-            'enable_memory_optimization': self.enable_memory_optimization,
-            'gradient_checkpointing': self.gradient_checkpointing,
-            'memory_efficient_attention': self.memory_efficient_attention,
-            'enable_performance_optimization': self.enable_performance_optimization,
-            'mixed_precision': self.mixed_precision,
-            'jit_compilation': self.jit_compilation
-        }
 
 class TruthGPTQuantizer:
     """TruthGPT quantization utilities."""

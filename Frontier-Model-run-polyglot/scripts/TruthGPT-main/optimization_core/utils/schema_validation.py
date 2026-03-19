@@ -16,9 +16,13 @@ class ValidationError(Exception):
     pass
 
 
-@dataclass
-class FieldSchema:
+from pydantic import BaseModel, ConfigDict
+
+
+class FieldSchema(BaseModel):
     """Schema for a field."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     type: Type
     required: bool = True
     default: Any = None
