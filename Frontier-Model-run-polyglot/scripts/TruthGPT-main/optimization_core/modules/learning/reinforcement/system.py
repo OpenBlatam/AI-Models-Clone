@@ -105,3 +105,4 @@ class RLTrainingManager:
             'latest': self.training_history[-1],
             'algorithm': self.config.algorithm.value
         }
+

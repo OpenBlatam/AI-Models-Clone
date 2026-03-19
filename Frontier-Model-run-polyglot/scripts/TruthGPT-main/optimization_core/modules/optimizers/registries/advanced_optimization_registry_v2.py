@@ -346,3 +346,4 @@ def get_advanced_optimization_report(model: nn.Module) -> Dict[str, Any]:
     }
     
     return report
+

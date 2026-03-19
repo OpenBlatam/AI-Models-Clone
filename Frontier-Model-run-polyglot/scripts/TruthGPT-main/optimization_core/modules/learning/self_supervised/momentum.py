@@ -107,3 +107,4 @@ class MemoryBank:
             return self.memory_bank[selected_indices]
         else:
             return self.get_negative_samples(num_samples)
+

@@ -126,3 +126,4 @@ class MetaLearner:
             'recent_improvement': improvement,
             'learning_trend': 'improving' if improvement > 0 else 'stable'
         }
+

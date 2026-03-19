@@ -382,3 +382,4 @@ def create_rl_pruning(target_sparsity: float = 0.5, **kwargs) -> RLPruning:
 def create_rl_pruning_agent(state_dim: int = 8, action_dim: int = 5, **kwargs) -> RLPruningAgent:
     """Factory function to create RLPruningAgent."""
     return RLPruningAgent(state_dim, action_dim, **kwargs)
+

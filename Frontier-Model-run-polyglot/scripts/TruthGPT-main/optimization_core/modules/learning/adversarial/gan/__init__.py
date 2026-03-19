@@ -6,3 +6,4 @@ from .discriminator import GANDiscriminatorCreator
 from .trainer import GANTrainer
 
 __all__ = ['GANGeneratorCreator', 'GANDiscriminatorCreator', 'GANTrainer']
+

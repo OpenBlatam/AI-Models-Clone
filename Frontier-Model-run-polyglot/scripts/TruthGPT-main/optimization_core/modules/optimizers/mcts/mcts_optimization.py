@@ -560,3 +560,4 @@ def example_objective_function(config: Dict[str, Any]) -> float:
     
     base_loss = 0.5 + penalty + random.gauss(0, 0.1)
     return max(0.1, base_loss)
+

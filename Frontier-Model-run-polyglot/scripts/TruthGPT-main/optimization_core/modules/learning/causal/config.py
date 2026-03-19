@@ -83,3 +83,4 @@ class CausalConfig:
             raise ValueError("Max conditioning set size must be positive")
         if not (0 < self.caliper < 1):
             raise ValueError("Caliper must be between 0 and 1")
+

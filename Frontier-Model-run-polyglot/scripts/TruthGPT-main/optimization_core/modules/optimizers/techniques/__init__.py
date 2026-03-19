@@ -146,3 +146,4 @@ def __getattr__(name: str) -> Any:
 def list_available_techniques() -> List[str]:
     """List all available optimization techniques."""
     return sorted(list(_LAZY_IMPORTS.keys()))
+

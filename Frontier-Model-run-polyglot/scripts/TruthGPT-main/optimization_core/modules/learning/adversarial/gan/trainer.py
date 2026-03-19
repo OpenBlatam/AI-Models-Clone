@@ -89,3 +89,4 @@ class GANTrainer:
         loss.backward()
         opt.step()
         return loss.item()
+

@@ -193,3 +193,4 @@ def create_report(title: str) -> ReportGenerator:
 
 
 
+

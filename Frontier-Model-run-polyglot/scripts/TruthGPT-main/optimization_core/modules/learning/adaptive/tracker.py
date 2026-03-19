@@ -120,3 +120,4 @@ class PerformanceTracker:
             summary['overall_trend'] = 'declining'
         
         return summary
+

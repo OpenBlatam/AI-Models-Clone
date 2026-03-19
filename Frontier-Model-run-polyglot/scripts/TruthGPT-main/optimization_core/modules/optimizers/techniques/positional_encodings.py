@@ -410,3 +410,4 @@ def create_alibi(num_heads: int, **kwargs) -> AliBi:
 def create_sinusoidal_embedding(dim: int, **kwargs) -> SinusoidalPositionalEmbedding:
     """Factory function to create SinusoidalPositionalEmbedding."""
     return SinusoidalPositionalEmbedding(dim, **kwargs)
+

@@ -110,3 +110,4 @@ class ModelBuilder:
             model = self._manager.enable_torch_compile(model, self._compile_mode)
         
         return model
+

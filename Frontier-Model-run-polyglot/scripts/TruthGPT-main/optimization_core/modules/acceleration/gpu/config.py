@@ -128,3 +128,4 @@ class GPUAcceleratorConfig:
 def create_gpu_accelerator_config(**kwargs) -> GPUAcceleratorConfig:
     """Create GPU accelerator configuration."""
     return GPUAcceleratorConfig(**kwargs)
+

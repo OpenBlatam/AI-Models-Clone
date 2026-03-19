@@ -4,20 +4,18 @@ import asyncio
 from typing import List, Dict, Any, Callable, Protocol, Optional, runtime_checkable, Type
 
 # Contexto de imports
-try:
-    from agents.memoria_aprendizaje.sqlite_memory import SQLiteMemory, BaseMemory
-    from agents.memoria_aprendizaje.vector_memory import VectorMemory
-    from agents.razonamiento_planificacion.tools import BaseTool
-    from agents.razonamiento_planificacion.config import settings
-except ImportError:
-    from ..memoria_aprendizaje.sqlite_memory import SQLiteMemory, BaseMemory
-    from ..memoria_aprendizaje.vector_memory import VectorMemory
-    from ..memoria_aprendizaje.core_memory import CoreMemory
-    from ..memoria_aprendizaje.core_memory_tools import CoreMemoryAppendTool, CoreMemoryReplaceTool
-    from .tools import BaseTool, ToolResult, MCPTool
-    from .models import AgentAction, AgentResponse
-    from .config import settings
-    from .mcp_client import MCPClient
+# Standardized absolute imports for TruthGPT/OpenClaw production structure
+from agents.memoria_aprendizaje.sqlite_memory import SQLiteMemory, BaseMemory
+from agents.memoria_aprendizaje.vector_memory import VectorMemory
+from agents.memoria_aprendizaje.core_memory import CoreMemory
+from agents.memoria_aprendizaje.core_memory_tools import CoreMemoryAppendTool, CoreMemoryReplaceTool
+from agents.razonamiento_planificacion.tools import BaseTool, ToolResult, MCPTool
+from agents.models import AgentAction, AgentResponse, InferenceResult, AgentConfig
+from agents.engines import AsyncLLMEngine, safe_llm_call
+from agents.razonamiento_planificacion.config import settings
+from agents.mcp_client import MCPClient
+from agents.prompts.prompt_manager import prompt_manager
+from agents.exceptions import TruthGPTError, InferenceError, ToolExecutionError
 
 try:
     from agents.observability import global_tracer
@@ -26,21 +24,7 @@ except ImportError:
 
 logger = logging.getLogger(__name__)
 
-from .models import AgentAction, AgentResponse, InferenceResult
-
-@runtime_checkable
-class AsyncLLMEngine(Protocol):
-    """Protocolo para un motor de inferencia LLM asíncrono."""
-    async def __call__(self, prompt: str) -> Union[str, InferenceResult]:
-        ...
-
-from pydantic import BaseModel, Field
-
-class AgentAction(BaseModel):
-    tool: Optional[str] = Field(None, description="Nombre de la herramienta a usar. Null si respondes al usuario final.")
-    cmd: Optional[str] = Field(None, description="Argumento o comando a enviar a la herramienta.")
-    respuesta_final: Optional[str] = Field(None, description="Tu mensaje final dirigido al usuario usando Markdown. Null si usas una herramienta.")
-    handoff: Optional[str] = Field(None, description="[OPCIONAL] Nombre del agente experto al que quieres transferir la conversación si tú no puedes resolver la petición.")
+# AgentAction and AgentResponse are now imported from .models
 
 class MultiUserReActAgent:
     """
@@ -50,21 +34,21 @@ class MultiUserReActAgent:
 
     def __init__(
         self, 
-        llm_engine: AsyncLLMEngine, 
+        config: AgentConfig,
+        llm_engine: Optional[AsyncLLMEngine] = None, 
         memory: Optional[BaseMemory] = None,
         vector_memory: Optional[VectorMemory] = None,
-        memory_db_path: Optional[str] = None,
         custom_system_instructions: Optional[str] = None,
-        use_reflexion: bool = False,
         tools: Optional[List[BaseTool]] = None
     ):
-        self.llm = llm_engine
-        self.memory = memory or SQLiteMemory(db_path=memory_db_path or settings.DATABASE_PATH)
-        self.vector_memory = vector_memory or VectorMemory()
+        self.config = config
+        self.llm = llm_engine or config.llm_engine
+        self.memory = memory or SQLiteMemory(db_path=config.memory_db_path)
+        self.vector_memory = vector_memory
         self.core_memory = CoreMemory()
         self.tools: Dict[str, BaseTool] = {}
         self.custom_system_instructions = custom_system_instructions
-        self.use_reflexion = use_reflexion
+        self.use_reflexion = config.use_reflexion
         self.name = "MultiUserReActAgent"
 
         if tools:
@@ -95,19 +79,19 @@ class MultiUserReActAgent:
         logger.info(f"Se cargaron {len(tools_info)} herramientas MCP.")
 
     def _get_system_instructions(self) -> str:
-        """Genera instrucciones dinámicas basadas en las herramientas registradas."""
-        tools_desc = "\n".join([f"- {t.name}: {t.description}" for t in self.tools.values()])
-        base_instructions = settings.SYSTEM_PROMPT_TEMPLATE.format(name=settings.AGENT_NAME)
+        """Genera instrucciones dinámicas usando el PromptManager centralizado."""
+        tools_list = "\n".join([f"- {t.name}: {t.description}" for t in self.tools.values()])
         
+        # Build prompt using centralized templates
+        base = prompt_manager.get_prompt("base_agent", name=settings.AGENT_NAME, role="Enterprise AI Assistant")
+        react = prompt_manager.get_prompt("react_core")
+        json_schema = prompt_manager.get_prompt("json_output", schema=AgentAction.model_json_schema())
+        
+        instructions = f"{base}\n{react}\n\nTienes acceso a estas herramientas:\n{tools_list}\n\n"
         if self.custom_system_instructions:
-            base_instructions += f"\n\n{self.custom_system_instructions}"
+            instructions += f"{self.custom_system_instructions}\n\n"
             
-        return base_instructions + (
-            f"\nTienes acceso a estas herramientas:\n{tools_desc}\n\n"
-            "IMPORTANTE: Debes responder ÚNICA y EXCLUSIVAMENTE con un JSON puro que cumpla estrictamente este esquema Pydantic:\n"
-            f"{AgentAction.model_json_schema()}\n"
-            "No incluyas NADA de texto fuera del JSON, ni siquiera tildes invertidas ```json."
-        )
+        return instructions + json_schema
 
     async def _format_context(self, user_id: str) -> str:
         history = await self.memory.get_history(user_id)
@@ -144,37 +128,11 @@ class MultiUserReActAgent:
         # Iniciar traza de observabilidad
         trace_id = global_tracer.start_trace(name="process_message", agent_name="MultiUserReActAgent")
         
-        # Resilient LLM call using Tenacity
-        try:
-            from tenacity import retry, wait_exponential, stop_after_attempt
-            @retry(wait=wait_exponential(multiplier=1, min=2, max=10), stop=stop_after_attempt(3), reraise=True)
-            async def _safe_llm_call(prompt: str) -> str:
-                span = global_tracer.start_span(trace_id, name="llm_inference", kind="llm_call", input_data=prompt[-500:])
-                try:
-                    res = await self.llm(prompt)
-                    # Handle both raw string and InferenceResult
-                    res_text = res.text if hasattr(res, 'text') else str(res)
-                    span.finish(output=res_text)
-                    return res_text
-                except Exception as e:
-                    span.finish(output=str(e), status="error")
-                    raise e
-        except ImportError:
-            logger.warning("Instala 'tenacity' para reintentos automáticos (exponential backoff).")
-            async def _safe_llm_call(prompt: str) -> str:
-                span = global_tracer.start_span(trace_id, name="llm_inference", kind="llm_call", input_data=prompt[-500:])
-                try:
-                    res = await self.llm(prompt)
-                    res_text = res.text if hasattr(res, 'text') else str(res)
-                    span.finish(output=res_text)
-                    return res_text
-                except Exception as e:
-                    span.finish(output=str(e), status="error")
-                    raise e
+        # safe_llm_call handles tracing and retries internally now.
         
         for i in range(settings.MAX_ITERATIONS):
             # Inferencia asíncrona robusta (con reintentos)
-            response = await _safe_llm_call(current_prompt)
+            response = await safe_llm_call(self.llm, current_prompt, trace_id)
             
             try:
                 import json
@@ -197,7 +155,7 @@ class MultiUserReActAgent:
                             return AgentResponse(
                                 content=f"⏳ Esperando aprobación para: {action.tool}",
                                 action_type="approval_required",
-                                metadata={"tool": action.tool, "cmd": action.cmd}
+                                metadata={"tool": action.tool, "cmd": action.tool_input}
                             )
                             
                         logger.info(f"Ejecutando {action.tool} asíncronamente...")
@@ -206,7 +164,7 @@ class MultiUserReActAgent:
                         result = f"Error: La herramienta '{action.tool}' no existe."
                     current_prompt += f"{clean_resp}\nTOOL_RESULT: {result}\nTRUTHGPT: "
                     
-                elif action.respuesta_final:
+                elif action.final_answer:
                     # Llegamos a la respuesta final
                     if self.use_reflexion:
                         logger.info("Auto-Reflexion: Evaluando respuesta interna...")
@@ -217,26 +175,26 @@ class MultiUserReActAgent:
                             "Si la respuesta es perfecta y sin errores, responde EXACTAMENTE '<final>APROBADO</final>'. "
                             "Si falta información o hubo un error, escribe tu crítica y planifica el siguiente paso (puedes usar herramientas de nuevo)."
                         )
-                        critique_response = await _safe_llm_call(critique_prompt)
+                        critique_response = await safe_llm_call(self.llm, critique_prompt, trace_id)
                         
                         if "<final>APROBADO</final>" in critique_response:
                             logger.info("Auto-Reflexion: Aprobado.")
                             if self.vector_memory and self.vector_memory.enabled:
-                                await self.vector_memory.add_episodic(user_id, "ReActAgent", f"User: {message}\nSuccess: {action.respuesta_final}")
+                                await self.vector_memory.add_episodic(user_id, "ReActAgent", f"User: {message}\nSuccess: {action.final_answer}")
                                 asyncio.create_task(self.vector_memory.compact_episodic_memory(user_id, _safe_llm_call))
                             
-                            await self.memory.add_message(user_id, "assistant", action.respuesta_final)
+                            await self.memory.add_message(user_id, "assistant", action.final_answer)
                             global_tracer.finish_trace(trace_id)
-                            return AgentResponse(content=action.respuesta_final, action_type="final_answer")
+                            return AgentResponse(content=action.final_answer, action_type="final_answer")
                         else:
                             logger.info("Auto-Reflexion: Crítica detectó áreas de mejora. Reintentando...")
                             current_prompt = f"{critique_prompt}\n{critique_response}\nTRUTHGPT: "
                     else:
                         if self.vector_memory and self.vector_memory.enabled:
-                            await self.vector_memory.add_episodic(user_id, "ReActAgent", f"User: {message}\nAnswer: {action.respuesta_final}")
+                            await self.vector_memory.add_episodic(user_id, "ReActAgent", f"User: {message}\nAnswer: {action.final_answer}")
                             asyncio.create_task(self.vector_memory.compact_episodic_memory(user_id, _safe_llm_call))
-                        await self.memory.add_message(user_id, "assistant", action.respuesta_final)
-                        return AgentResponse(content=action.respuesta_final, action_type="final_answer")
+                        await self.memory.add_message(user_id, "assistant", action.final_answer)
+                        return AgentResponse(content=action.final_answer, action_type="final_answer")
                 elif action.handoff:
                     logger.info(f"Iniciando Swarm Handoff hacia: {action.handoff}")
                     await self.memory.add_message(user_id, "assistant", f"Transferring control to {action.handoff}...")
@@ -250,7 +208,8 @@ class MultiUserReActAgent:
                     
             except Exception as e:
                 logger.warning(f"Error parseando Pydantic JSON: {e}")
-                current_prompt += f"\n[ERROR DE SISTEMA]: Tu respuesta violó el esquema JSON obligatorio. Detalle: {str(e)}\nCorrige y responde solo en JSON.\nTRUTHGPT: "
+                err_msg = f"Tu respuesta violó el esquema JSON obligatorio. Detalle: {str(e)}"
+                current_prompt += f"\n[ERROR DE SISTEMA]: {err_msg}\nCorrige y responde solo en JSON.\nTRUTHGPT: "
         
         fallback = "Límite de razonamiento alcanzado. Por favor, simplifica tu petición."
         await self.memory.add_message(user_id, "assistant", fallback)
@@ -284,35 +243,12 @@ class MultiUserReActAgent:
         
         trace_id = global_tracer.start_trace(name="astream_process", agent_name="MultiUserReActAgent")
         
-        try:
-            from tenacity import retry, wait_exponential, stop_after_attempt
-            @retry(wait=wait_exponential(multiplier=1, min=2, max=10), stop=stop_after_attempt(3), reraise=True)
-            async def _safe_llm_call(prompt: str) -> str:
-                span = global_tracer.start_span(trace_id, name="llm_inference", kind="llm_call", input_data=prompt[-500:])
-                try:
-                    res = await self.llm(prompt)
-                    res_text = res.text if hasattr(res, 'text') else str(res)
-                    span.finish(output=res_text)
-                    return res_text
-                except Exception as e:
-                    span.finish(output=str(e), status="error")
-                    raise e
-        except ImportError:
-            async def _safe_llm_call(prompt: str) -> str:
-                span = global_tracer.start_span(trace_id, name="llm_inference", kind="llm_call", input_data=prompt[-500:])
-                try:
-                    res = await self.llm(prompt)
-                    res_text = res.text if hasattr(res, 'text') else str(res)
-                    span.finish(output=res_text)
-                    return res_text
-                except Exception as e:
-                    span.finish(output=str(e), status="error")
-                    raise e
+        # safe_llm_call handles tracing and retries internally now.
         
         for i in range(settings.MAX_ITERATIONS):
             yield json.dumps({"event": "thinking", "iteration": i+1}) + "\n"
             
-            response = await _safe_llm_call(current_prompt)
+            response = await safe_llm_call(self.llm, current_prompt, trace_id)
             
             try:
                 clean_resp = response.strip()
@@ -346,7 +282,7 @@ class MultiUserReActAgent:
                     yield json.dumps({"event": "tool_result", "tool": action.tool, "result": str(result)[:200] + "..."}) + "\n"
                     current_prompt += f"{clean_resp}\nTOOL_RESULT: {result}\nTRUTHGPT: "
                     
-                elif action.respuesta_final:
+                elif action.final_answer:
                     if self.use_reflexion:
                         yield json.dumps({"event": "reflexion", "status": "evaluating"}) + "\n"
                         critique_prompt = (
@@ -356,15 +292,15 @@ class MultiUserReActAgent:
                             "Si la respuesta es perfecta y sin errores, responde EXACTAMENTE '<final>APROBADO</final>'. "
                             "Si falta información o hubo un error, escribe tu crítica y planifica el siguiente paso (puedes usar herramientas de nuevo)."
                         )
-                        critique_response = await _safe_llm_call(critique_prompt)
+                        critique_response = await safe_llm_call(self.llm, critique_prompt, trace_id)
                         
                         if "<final>APROBADO</final>" in critique_response:
                             yield json.dumps({"event": "reflexion_approved"}) + "\n"
                             if self.vector_memory and self.vector_memory.enabled:
-                                await self.vector_memory.add_episodic(user_id, "ReActAgent", f"User: {message}\nSuccess: {action.respuesta_final}")
+                                await self.vector_memory.add_episodic(user_id, "ReActAgent", f"User: {message}\nSuccess: {action.final_answer}")
                                 asyncio.create_task(self.vector_memory.compact_episodic_memory(user_id, _safe_llm_call))
-                            await self.memory.add_message(user_id, "assistant", action.respuesta_final)
-                            yield json.dumps({"event": "final_answer", "content": action.respuesta_final}) + "\n"
+                            await self.memory.add_message(user_id, "assistant", action.final_answer)
+                            yield json.dumps({"event": "final_answer", "content": action.final_answer}) + "\n"
                             global_tracer.finish_trace(trace_id)
                             return
                         else:
@@ -372,10 +308,10 @@ class MultiUserReActAgent:
                             current_prompt = f"{critique_prompt}\n{critique_response}\nTRUTHGPT: "
                     else:
                         if self.vector_memory and self.vector_memory.enabled:
-                            await self.vector_memory.add_episodic(user_id, "ReActAgent", f"User: {message}\nAnswer: {action.respuesta_final}")
+                            await self.vector_memory.add_episodic(user_id, "ReActAgent", f"User: {message}\nAnswer: {action.final_answer}")
                             asyncio.create_task(self.vector_memory.compact_episodic_memory(user_id, _safe_llm_call))
-                        await self.memory.add_message(user_id, "assistant", action.respuesta_final)
-                        yield json.dumps({"event": "final_answer", "content": action.respuesta_final}) + "\n"
+                        await self.memory.add_message(user_id, "assistant", action.final_answer)
+                        yield json.dumps({"event": "final_answer", "content": action.final_answer}) + "\n"
                         return
                 elif action.handoff:
                     logger.info(f"STREAMING: Iniciando Swarm Handoff hacia: {action.handoff}")
@@ -385,7 +321,7 @@ class MultiUserReActAgent:
                     yield json.dumps({"event": "final_answer", "content": handoff_msg}) + "\n"
                     return
                 else:
-                    raise ValueError("Debes proveer 'tool', 'respuesta_final' o 'handoff' en tu JSON.")
+                    raise ValueError("Debes proveer 'tool', 'final_answer' o 'handoff' en tu JSON.")
                     
             except Exception as e:
                 logger.warning(f"Error parseando Pydantic JSON: {e}")
@@ -400,10 +336,10 @@ class MultiUserReActAgent:
     async def _execute_tool_action(self, trace_id: str, action: AgentAction, user_id: str) -> str:
         """Helper para ejecutar una herramienta y manejar señales internas (Core Memory)."""
         tool_instance = self.tools[action.tool]
-        tool_span = global_tracer.start_span(trace_id, name=action.tool, kind="tool_call", input_data=action.cmd)
+        tool_span = global_tracer.start_span(trace_id, name=action.tool, kind="tool_call", input_data=str(action.tool_input))
         
         try:
-            raw_result = await tool_instance.run(action.cmd or "")
+            raw_result = await tool_instance.run(str(action.tool_input) or "")
             
             # Handle ToolResult signals
             if isinstance(raw_result, ToolResult):
@@ -427,4 +363,5 @@ class MultiUserReActAgent:
         except Exception as e:
             logger.error(f"Error ejecutando {action.tool}: {e}")
             tool_span.finish(output=str(e), status="error")
-            return f"Error: {str(e)}"
+            raise ToolExecutionError(f"Tool {action.tool} failed: {str(e)}", metadata={"tool": action.tool})
+

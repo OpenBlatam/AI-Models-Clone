@@ -54,3 +54,4 @@ class ConfigManager:
         elif self.config_path.suffix == '.json':
             with open(self.config_path, 'w') as f:
                 json.dump(self.config, f, indent=2)
+

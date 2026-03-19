@@ -1,7 +1,7 @@
 """
-OpenClaw Scheduler -- FastAPI endpoints.
+OpenClaw Scheduler -- FastAPI endpoints — Pydantic-First Architecture.
 
-Exposes endpoints for managing scheduled agent tasks at runtime.
+Exposes typed endpoints for managing scheduled agent tasks at runtime.
 """
 
 import logging
@@ -13,6 +13,10 @@ from pydantic import BaseModel, Field
 logger = logging.getLogger(__name__)
 
 
+# ---------------------------------------------------------------------------
+# Request / Response Models
+# ---------------------------------------------------------------------------
+
 class TaskCreateRequest(BaseModel):
     task_id: str = Field(..., description="Unique task identifier.")
     user_id: str = Field("default", description="User context for the agent.")
@@ -20,6 +24,22 @@ class TaskCreateRequest(BaseModel):
     interval_seconds: float = Field(60, description="Interval between runs (seconds).")
     repeat: bool = Field(True, description="Whether the task repeats.")
     max_runs: int = Field(0, description="Max number of executions (0 = unlimited).")
+
+
+class TaskCreateResponse(BaseModel):
+    ok: bool
+    task_id: str
+    mode: str = Field(description="'recurring' or 'delayed'")
+
+
+class TaskCancelResponse(BaseModel):
+    ok: bool
+    task_id: str
+
+
+class SchedulerStatusResponse(BaseModel):
+    ok: bool
+    message: str
 
 
 class TaskStatus(BaseModel):
@@ -30,18 +50,23 @@ class TaskStatus(BaseModel):
     repeat: bool
     runs: int
     cancelled: bool
+    is_active: bool = True
 
+
+# ---------------------------------------------------------------------------
+# Router Factory
+# ---------------------------------------------------------------------------
 
 def create_scheduler_router(scheduler: "AgentScheduler") -> APIRouter:  # noqa: F821
-    """Build an APIRouter for managing scheduled tasks."""
+    """Build an APIRouter with typed responses for managing scheduled tasks."""
 
     router = APIRouter(
         prefix="/v1/scheduler",
         tags=["Scheduler"],
     )
 
-    @router.post("/tasks")
-    async def create_task(req: TaskCreateRequest):
+    @router.post("/tasks", response_model=TaskCreateResponse)
+    async def create_task(req: TaskCreateRequest) -> TaskCreateResponse:
         """Register a new scheduled task."""
         if req.repeat:
             scheduler.add_recurring(
@@ -51,6 +76,7 @@ def create_scheduler_router(scheduler: "AgentScheduler") -> APIRouter:  # noqa: 
                 interval_seconds=req.interval_seconds,
                 max_runs=req.max_runs,
             )
+            mode = "recurring"
         else:
             scheduler.add_delayed(
                 task_id=req.task_id,
@@ -58,29 +84,45 @@ def create_scheduler_router(scheduler: "AgentScheduler") -> APIRouter:  # noqa: 
                 prompt=req.prompt,
                 delay_seconds=req.interval_seconds,
             )
-        return {"ok": True, "task_id": req.task_id}
+            mode = "delayed"
+        return TaskCreateResponse(ok=True, task_id=req.task_id, mode=mode)
 
-    @router.get("/tasks")
-    async def list_tasks():
+    @router.get("/tasks", response_model=List[TaskStatus])
+    async def list_tasks() -> List[TaskStatus]:
         """List all registered tasks."""
-        return scheduler.list_tasks()
+        summaries = scheduler.list_tasks()
+        return [
+            TaskStatus(
+                task_id=s.task_id,
+                user_id=s.user_id,
+                prompt=s.prompt,
+                interval=s.interval,
+                repeat=s.repeat,
+                runs=s.runs,
+                cancelled=s.cancelled,
+                is_active=s.is_active,
+            )
+            for s in summaries
+        ]
 
-    @router.delete("/tasks/{task_id}")
-    async def cancel_task(task_id: str):
+    @router.delete("/tasks/{task_id}", response_model=TaskCancelResponse)
+    async def cancel_task(task_id: str) -> TaskCancelResponse:
         """Cancel a scheduled task."""
         success = scheduler.cancel(task_id)
-        return {"ok": success, "task_id": task_id}
+        return TaskCancelResponse(ok=success, task_id=task_id)
 
-    @router.post("/start")
-    async def start_scheduler():
+    @router.post("/start", response_model=SchedulerStatusResponse)
+    async def start_scheduler() -> SchedulerStatusResponse:
         """Start all registered tasks."""
         await scheduler.start()
-        return {"ok": True, "message": "Scheduler started."}
+        return SchedulerStatusResponse(ok=True, message="Scheduler started.")
 
-    @router.post("/stop")
-    async def stop_scheduler():
+    @router.post("/stop", response_model=SchedulerStatusResponse)
+    async def stop_scheduler() -> SchedulerStatusResponse:
         """Stop all running tasks."""
         await scheduler.stop()
-        return {"ok": True, "message": "Scheduler stopped."}
+        return SchedulerStatusResponse(ok=True, message="Scheduler stopped.")
 
     return router
+
+

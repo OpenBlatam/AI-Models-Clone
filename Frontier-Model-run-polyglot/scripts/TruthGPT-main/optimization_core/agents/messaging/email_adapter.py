@@ -103,7 +103,7 @@ class EmailAdapter(BaseMessagingAdapter):
     # Inbound helpers
     # ------------------------------------------------------------------
 
-    async def process_email(self, email_data: Dict[str, str]) -> Optional[str]:
+    async def process_email(self, email_data: Dict[str, str]) -> Optional[AgentResponse]:
         """
         Process an incoming email.
 
@@ -170,3 +170,4 @@ class EmailAdapter(BaseMessagingAdapter):
             logger.exception("Failed to check inbox")
 
         return results
+

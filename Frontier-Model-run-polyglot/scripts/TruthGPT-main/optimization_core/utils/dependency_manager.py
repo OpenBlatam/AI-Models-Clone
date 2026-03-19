@@ -13,8 +13,10 @@ from dataclasses import dataclass
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class Dependency:
+from pydantic import BaseModel
+
+
+class Dependency(BaseModel):
     """Dependency information."""
     name: str
     version: str
@@ -227,3 +229,4 @@ def resolve_lazy_import(name: str, package: str, lazy_imports: Dict[str, str]) -
                 f"module '{package}' has no attribute '{name}'. "
                 f"Failed to import: {e}"
             ) from e
+

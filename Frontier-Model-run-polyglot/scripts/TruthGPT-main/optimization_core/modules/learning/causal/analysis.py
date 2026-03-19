@@ -253,3 +253,4 @@ class RobustnessChecker:
             "trend_difference": trend_difference,
             "parallel_trends_assumption": trend_difference < 0.1,
         }
+

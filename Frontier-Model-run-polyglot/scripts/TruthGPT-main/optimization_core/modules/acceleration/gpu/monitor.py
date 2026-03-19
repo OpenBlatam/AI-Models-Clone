@@ -101,3 +101,4 @@ class GPUPerformanceMonitor:
                 avg_metrics[f'max_{key}'] = float(np.max(values))
         
         return avg_metrics
+

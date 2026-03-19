@@ -124,3 +124,4 @@ def create_data_module(data_type: str, config: Dict[str, Any]) -> DataModule:
         return AudioDataModule(config)
     else:
         raise ValueError(f"Unknown data type: {data_type}")
+

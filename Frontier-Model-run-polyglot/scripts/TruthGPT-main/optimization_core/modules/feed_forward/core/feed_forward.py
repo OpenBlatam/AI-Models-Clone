@@ -178,3 +178,4 @@ def create_swiglu(d_model: int, d_ff: int, dropout: float = 0.1, bias: bool = Tr
 
 def create_gated_ffn(d_model: int, d_ff: int, dropout: float = 0.1, bias: bool = True) -> GatedFeedForward:
     return GatedFeedForward(d_model, d_ff, dropout, bias=bias)
+

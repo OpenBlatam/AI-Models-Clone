@@ -166,3 +166,4 @@ def create_generic_optimizer(level: str = "basic", optimizer_type: str = "speed"
     opt_level = level_map.get(level.lower(), GenericOptimizationLevel.BASIC)
     return UnifiedGenericOptimizer(config=config or {}, level=opt_level, optimizer_type=optimizer_type)
 
+

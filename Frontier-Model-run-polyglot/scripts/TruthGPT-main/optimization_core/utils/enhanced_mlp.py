@@ -84,3 +84,4 @@ def create_mixture_of_experts(dim: int, num_experts: int):
 def create_adaptive_mlp(dim: int, hidden_dim: int):
     """Create AdaptiveMLP module."""
     return AdaptiveMLP(dim, hidden_dim)
+

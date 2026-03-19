@@ -68,3 +68,4 @@ class AdversarialDefense:
         """Apply random transformations to input to nullify perturbations."""
         noise = torch.randn_like(x) * 0.01
         return torch.clamp(x + noise, 0, 1)
+

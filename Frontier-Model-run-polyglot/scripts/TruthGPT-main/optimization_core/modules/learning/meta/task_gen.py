@@ -82,3 +82,4 @@ class TaskGenerator:
             labels = torch.randint(0, output_dim, (num_samples,))
             
         return data, labels
+

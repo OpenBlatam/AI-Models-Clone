@@ -41,3 +41,4 @@ class PolarsProcessorConfig(ValidatedConfig):
         if self.memory_limit is not None:
             self.validate_positive_int(self.memory_limit, "memory_limit")
 
+

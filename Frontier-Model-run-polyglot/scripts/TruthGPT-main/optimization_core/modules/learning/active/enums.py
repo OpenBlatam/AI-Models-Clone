@@ -35,3 +35,4 @@ class QueryStrategy(Enum):
     HYBRID_STRATEGY = "hybrid_strategy"
     ADAPTIVE_STRATEGY = "adaptive_strategy"
     COST_AWARE_STRATEGY = "cost_aware_strategy"
+

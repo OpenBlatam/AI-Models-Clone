@@ -70,3 +70,4 @@ class HpoConfig:
             raise ValueError("Pruning threshold must be between 0 and 1")
         if not (0 <= self.pruning_percentile <= 100):
             raise ValueError("Pruning percentile must be between 0 and 100")
+

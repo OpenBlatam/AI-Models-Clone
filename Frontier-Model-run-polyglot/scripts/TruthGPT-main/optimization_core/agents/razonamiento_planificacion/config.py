@@ -26,3 +26,4 @@ class AgentSettings(BaseSettings):
         env_prefix = "TRUTHGPT_" # Permite TRUTHGPT_MAX_ITERATIONS como var de entorno
 
 settings = AgentSettings()
+

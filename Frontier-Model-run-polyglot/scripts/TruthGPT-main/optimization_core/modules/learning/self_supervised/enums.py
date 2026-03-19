@@ -40,3 +40,4 @@ class ContrastiveLossType(Enum):
     CONTRASTIVE_LOSS = "contrastive_loss"
     SUPERVISED_CONTRASTIVE = "supervised_contrastive"
     HARD_NEGATIVE_MINING = "hard_negative_mining"
+

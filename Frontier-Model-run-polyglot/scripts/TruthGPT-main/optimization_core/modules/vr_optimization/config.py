@@ -33,3 +33,4 @@ class VROptimizationConfig:
     optimization_timeout: float = 600.0
     immersion_depth: int = 1000
     reality_layers: int = 100
+

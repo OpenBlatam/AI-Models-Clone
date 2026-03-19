@@ -38,3 +38,4 @@ class MultiAgentEnvironment:
             dones.append(np.random.random() < 0.1)
             
         return next_states, rewards, dones
+

@@ -411,3 +411,4 @@ def get_registry(papers_base_dir: Optional[Path] = None, **kwargs) -> PaperRegis
                 _global_registry = PaperRegistryRefactored(papers_base_dir, **kwargs)
     return _global_registry
 
+

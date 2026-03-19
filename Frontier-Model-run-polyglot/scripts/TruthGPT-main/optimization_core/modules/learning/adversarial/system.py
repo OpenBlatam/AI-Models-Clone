@@ -77,3 +77,4 @@ class AdversarialLearningSystem:
             lines.append(f"Robustness Gap: {m['robustness_gap']:.4f}")
             
         return "\n".join(lines)
+

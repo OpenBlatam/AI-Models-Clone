@@ -138,3 +138,4 @@ class AsyncFederatedServer(FederatedServer):
         
         # Clear processed updates
         self.async_updates.clear()
+

@@ -121,3 +121,4 @@ def create_evaluation_module(evaluation_type: str, config: Dict[str, Any]) -> Ev
         return GenerationEvaluationModule(config)
     else:
         raise ValueError(f"Unknown evaluation type: {evaluation_type}")
+

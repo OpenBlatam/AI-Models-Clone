@@ -66,3 +66,4 @@ class TrackingEngines:
     def apply_emotion(self, system: Any) -> Any:
         self.logger.info("Applying emotion optimization")
         return system
+

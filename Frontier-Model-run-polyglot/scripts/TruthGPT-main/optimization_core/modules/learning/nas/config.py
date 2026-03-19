@@ -48,3 +48,4 @@ class NASConfig:
             raise ValueError("Population size must be at least 2")
         if self.mutation_rate < 0.0 or self.mutation_rate > 1.0:
             raise ValueError("Mutation rate must be between 0.0 and 1.0")
+

@@ -6,11 +6,18 @@ from typing import Optional, Dict, Any, List
 from pydantic import BaseModel, Field, ConfigDict
 
 class AgentAction(BaseModel):
-    """Result of an LLM reasoning step."""
-    tool: Optional[str] = Field(None, description="Nombre de la herramienta a usar. Null si respondes al usuario final.")
-    cmd: Optional[str] = Field(None, description="Argumento o comando a enviar a la herramienta.")
-    respuesta_final: Optional[str] = Field(None, description="Tu mensaje final dirigido al usuario usando Markdown. Null si usas una herramienta.")
-    handoff: Optional[str] = Field(None, description="[OPCIONAL] Nombre del agente experto al que quieres transferir la conversación.")
+    """Universal model for an LLM reasoning step or action."""
+    thought: Optional[str] = Field(None, description="Internal reasoning or thought process.")
+    tool: Optional[str] = Field(None, description="Name of the tool to call. Null if providing a final answer.")
+    tool_input: Optional[Any] = Field(None, description="Arguments for the tool call (usually a string or JSON).")
+    final_answer: Optional[str] = Field(None, description="Final message to the user.")
+    handoff: Optional[str] = Field(None, description="Target agent name for a handoff transfer.")
+
+    @classmethod
+    def model_json_schema(cls, *args, **kwargs):
+        """Override to ensure LLM-friendly descriptions."""
+        schema = super().model_json_schema(*args, **kwargs)
+        return schema
 
 class AgentResponse(BaseModel):
     """Response from the agent orchestrator to the client."""
@@ -38,4 +45,6 @@ class AgentConfig(BaseModel):
     use_vector_memory: bool = False
     use_reflexion: bool = False
     max_handoff_depth: int = 5
+    default_agent_name: Optional[str] = None
     enable_telemetry: bool = True
+

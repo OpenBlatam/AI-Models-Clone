@@ -368,3 +368,4 @@ if __name__ == "__main__":
     print(f"   Extended: {metadata['extended']}")
     print(f"   Scaling factor: {metadata['scaling_factor']:.4f}")
 
+

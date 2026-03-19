@@ -60,3 +60,4 @@ Solution:
                 if word_count > 10: # Relaxed slightly for practical use, paper says 5
                     return False
         return True
+

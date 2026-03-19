@@ -126,3 +126,4 @@ class AcquisitionFunctionOptimizer:
     
     def _normal_pdf(self, x: np.ndarray) -> np.ndarray:
         return np.exp(-0.5 * x**2) / np.sqrt(2 * np.pi)
+

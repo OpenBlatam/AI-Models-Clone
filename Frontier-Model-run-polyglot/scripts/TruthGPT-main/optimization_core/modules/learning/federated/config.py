@@ -69,3 +69,4 @@ class FederatedLearningConfig:
             raise ValueError("Delta must be positive")
         if self.epsilon <= 0:
             raise ValueError("Epsilon must be positive")
+

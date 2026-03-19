@@ -890,3 +890,4 @@ def create_ultra_enhanced_optimization_core(config: Dict[str, Any]) -> UltraEnha
         multi_objective_weights=config.get('multi_objective_weights', None)
     )
     return UltraEnhancedOptimizationCore(ultra_config)
+

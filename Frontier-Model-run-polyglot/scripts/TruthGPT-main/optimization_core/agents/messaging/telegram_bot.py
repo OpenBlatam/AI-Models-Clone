@@ -69,7 +69,6 @@ class TelegramAdapter(BaseMessagingAdapter):
         response_text = response.content
         # Special handling for HITL on Telegram
         if response.action_type == "approval_required":
-            tool = response.metadata.get("tool")
             response_text = f"{response_text}\n\n⚠️ Usa la API `/approve_tool` o responde para confirmar."
 
         try:
@@ -88,7 +87,7 @@ class TelegramAdapter(BaseMessagingAdapter):
     # Webhook helpers
     # ------------------------------------------------------------------
 
-    async def process_update(self, update: dict) -> Optional[str]:
+    async def process_update(self, update: dict) -> Optional[AgentResponse]:
         """
         Parse a raw Telegram ``Update`` dict and process the message.
 
@@ -132,3 +131,4 @@ class TelegramAdapter(BaseMessagingAdapter):
         except Exception:
             logger.exception("Failed to delete Telegram webhook")
             return False
+

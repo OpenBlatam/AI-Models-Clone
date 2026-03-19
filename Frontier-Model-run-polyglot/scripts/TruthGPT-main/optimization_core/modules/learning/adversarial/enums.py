@@ -39,3 +39,4 @@ class DefenseStrategy(Enum):
     CERTIFIED_DEFENSE = "certified_defense"
     RANDOMIZATION = "randomization"
     ENSEMBLE_DEFENSE = "ensemble_defense"
+

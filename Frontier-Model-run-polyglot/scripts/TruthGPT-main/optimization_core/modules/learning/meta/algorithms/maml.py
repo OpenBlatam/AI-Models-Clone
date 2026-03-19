@@ -95,3 +95,4 @@ class MAML:
         # Note: We need grad here for the meta-update (outer loop)
         out = self.model(q_data)
         return nn.CrossEntropyLoss()(out, q_labels)
+

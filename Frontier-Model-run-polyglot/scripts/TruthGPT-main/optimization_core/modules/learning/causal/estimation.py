@@ -212,3 +212,4 @@ class CausalEffectEstimator:
             "control_post": c_post,
         }
         return effect
+

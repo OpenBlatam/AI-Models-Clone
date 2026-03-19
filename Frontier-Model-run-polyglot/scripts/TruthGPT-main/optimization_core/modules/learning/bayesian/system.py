@@ -71,3 +71,4 @@ class BayesianOptimizer:
 
     def generate_optimization_report(self, results: Dict[str, Any]) -> str:
         return f"Bayesian Optimization completed in {results.get('duration', 0):.2f}s"
+

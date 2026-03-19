@@ -47,3 +47,4 @@ class RobustnessAnalyzer:
             out = model(x)
             prec = torch.argmax(out, 1)
             return (prec == y).float().mean().item()
+

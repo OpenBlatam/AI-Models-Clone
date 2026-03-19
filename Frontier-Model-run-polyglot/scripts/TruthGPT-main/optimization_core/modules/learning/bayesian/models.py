@@ -86,3 +86,4 @@ class GaussianProcessModel:
             raise ValueError("Model must be fitted before sampling")
         
         return self.gp_model.sample_y(X, n_samples=n_samples)
+

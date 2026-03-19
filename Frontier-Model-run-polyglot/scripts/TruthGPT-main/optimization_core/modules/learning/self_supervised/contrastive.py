@@ -165,3 +165,4 @@ class ContrastiveLearner:
         loss = positive_loss + negative_loss
         
         return loss
+

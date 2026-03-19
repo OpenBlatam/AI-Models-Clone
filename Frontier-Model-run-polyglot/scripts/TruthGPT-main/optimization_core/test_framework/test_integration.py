@@ -219,9 +219,9 @@ class TestComponentIntegration(BaseTest):
     def test_optimizer_core_integration(self):
         """Test optimizer core component integration."""
         try:
-            from core.base import BaseOptimizer
-            from core.config import ConfigManager
-            from core.monitoring import MetricsCollector
+            from modules.base.core_system.core.base import BaseOptimizer
+            from modules.base.core_system.core.config import ConfigManager
+            from modules.base.core_system.core.monitoring import MetricsCollector
             
             # Test component initialization
             config_manager = ConfigManager()
@@ -304,7 +304,7 @@ class TestComponentIntegration(BaseTest):
     def test_advanced_optimizations_integration(self):
         """Test advanced optimizations component integration."""
         try:
-            from core.advanced_optimizations import AdvancedOptimizationEngine
+            from modules.base.core_system.core.advanced_optimizations import AdvancedOptimizationEngine
             
             engine = AdvancedOptimizationEngine()
             

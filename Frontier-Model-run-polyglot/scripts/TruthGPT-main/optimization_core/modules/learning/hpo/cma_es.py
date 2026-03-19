@@ -109,3 +109,4 @@ class CMAESOptimizer:
         # Update covariance (simplified)
         centered = selected_array - self.mean
         self.covariance = np.cov(centered.T)
+

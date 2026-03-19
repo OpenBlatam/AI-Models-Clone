@@ -96,3 +96,4 @@ class MultiTaskHead:
         self.task_head = task_head
         
         return task_head
+

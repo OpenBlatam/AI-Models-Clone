@@ -66,3 +66,4 @@ class SSLConfig:
             raise ValueError("Momentum must be between 0 and 1")
         if self.memory_bank_size <= 0:
             raise ValueError("Memory bank size must be positive")
+

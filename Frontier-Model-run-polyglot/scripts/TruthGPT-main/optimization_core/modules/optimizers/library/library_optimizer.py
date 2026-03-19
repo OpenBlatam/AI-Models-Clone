@@ -23,3 +23,4 @@ class LibraryOptimizer(BaseTruthGPTOptimizer):
 
 def create_library_optimizer(config: Dict[str, Any] = None) -> LibraryOptimizer:
     return LibraryOptimizer(config=config)
+

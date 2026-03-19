@@ -126,3 +126,4 @@ class AdversarialAttacker:
             x_adv = torch.clamp(x_adv, 0, 1)
             
         return x_adv
+

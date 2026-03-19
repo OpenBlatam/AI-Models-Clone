@@ -112,3 +112,4 @@ class SpecializedExpert(BaseExpert):
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """Forward pass through the expert."""
         return self.expert(x)
+

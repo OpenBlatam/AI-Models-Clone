@@ -145,3 +145,4 @@ class GANTrainer:
             'final_g_loss': g_loss.item(),
             'final_d_loss': d_loss.item()
         }
+

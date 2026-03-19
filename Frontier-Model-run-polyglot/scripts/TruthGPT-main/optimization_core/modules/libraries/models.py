@@ -213,3 +213,4 @@ def create_model_module(model_type: str, config: Dict[str, Any]) -> ModelModule:
         return QuantizedModule(config)
     else:
         raise ValueError(f"Unknown model type: {model_type}")
+

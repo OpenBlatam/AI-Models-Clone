@@ -96,3 +96,4 @@ class MultiTaskNetwork(nn.Module):
             weighted_loss = sum(task_losses.values()) / len(task_losses)
         
         return weighted_loss
+

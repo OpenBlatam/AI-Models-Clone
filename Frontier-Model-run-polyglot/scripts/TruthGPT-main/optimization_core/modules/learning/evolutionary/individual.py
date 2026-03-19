@@ -161,3 +161,4 @@ class Individual:
         for i in range(len(self.genes)):
             if random.random() < 0.1:  # 10% chance per gene
                 self.genes[i] += random.uniform(-mutation_strength, mutation_strength)
+

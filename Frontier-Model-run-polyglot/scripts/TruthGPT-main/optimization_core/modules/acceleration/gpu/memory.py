@@ -100,3 +100,4 @@ class GPUMemoryManager:
             stats['gpu_allocated'] = 0
             stats['gpu_cached'] = 0
         return stats
+

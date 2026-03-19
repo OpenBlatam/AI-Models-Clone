@@ -811,3 +811,4 @@ def create_hybrid_optimization_core(config: Optional[Dict[str, Any]] = None) -> 
     )
     
     return HybridOptimizationCore(hybrid_config)
+

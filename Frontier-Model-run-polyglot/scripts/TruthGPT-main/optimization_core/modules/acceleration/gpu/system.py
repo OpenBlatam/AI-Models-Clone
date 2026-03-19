@@ -192,3 +192,4 @@ class EnhancedGPUAccelerator(GPUAccelerator):
         super().cleanup()
         
         self.logger.info("✅ Enhanced GPU Accelerator cleanup completed")
+

@@ -76,3 +76,4 @@ class FP16Stability:
         clipped_ratio = torch.clamp(ratio, max=clip_c)
         loss = -torch.mean(clipped_ratio * advantage)
         return loss
+

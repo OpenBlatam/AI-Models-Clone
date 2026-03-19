@@ -214,3 +214,4 @@ class UltraFastOptimizationCore:
 def create_ultra_fast_optimization_core(config: Dict[str, Any] = None) -> UltraFastOptimizationCore:
     """Factory function to create UltraFastOptimizationCore."""
     return UltraFastOptimizationCore(config)
+

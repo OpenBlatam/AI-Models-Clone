@@ -90,13 +90,17 @@ def create_agent_router(agent_client: "AgentClient") -> APIRouter:  # noqa: F821
             # Switch swarm mode if requested and different from current
             if req.enable_swarm != agent_client.use_swarm:
                 agent_client.use_swarm = req.enable_swarm
-                if req.enable_swarm:
-                    from .multi_agentes.swarm_orchestrator import SwarmOrchestrator
-
-                    agent_client.swarm = SwarmOrchestrator(
-                        llm_engine=agent_client.llm_engine,
-                    )
-                    agent_client._init_default_swarm()
+                if req.enable_swarm and not getattr(agent_client, "swarm", None):
+                    # Lazy import: decouple from specific orchestrator module
+                    try:
+                        from .multi_agentes.swarm_orchestrator import SwarmOrchestrator
+                        agent_client.swarm = SwarmOrchestrator(
+                            llm_engine=agent_client.llm_engine,
+                        )
+                        agent_client._init_default_swarm()
+                    except ImportError:
+                        logger.error("SwarmOrchestrator not available; falling back to single-agent mode")
+                        agent_client.use_swarm = False
 
             # Register tools on-the-fly (single-agent mode only)
             if req.tools and not agent_client.use_swarm:
@@ -201,3 +205,4 @@ def create_agent_router(agent_client: "AgentClient") -> APIRouter:  # noqa: F821
             ) from e
 
     return router
+

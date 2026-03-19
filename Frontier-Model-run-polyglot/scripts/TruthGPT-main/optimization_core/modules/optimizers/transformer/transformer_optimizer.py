@@ -10,7 +10,7 @@ from typing import Any, Dict, List, Optional, Tuple, Union
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.cuda.amp import autocast
+from torch.amp import autocast
 from transformers import (
     AutoConfig,
     AutoModelForCausalLM,
@@ -478,3 +478,4 @@ class TransformerOptimizer(PyTorchOptimizerBase):
             "efficiency_ratio": (trainable_params / total_params) if total_params > 0 else 0.0,
             "memory_efficiency": (1.0 - (trainable_params / total_params)) if total_params > 0 else 0.0,
         }
+

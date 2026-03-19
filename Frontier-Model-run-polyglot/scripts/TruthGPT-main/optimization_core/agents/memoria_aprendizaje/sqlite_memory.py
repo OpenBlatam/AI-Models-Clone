@@ -11,9 +11,20 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any, Iterator
 
+from pydantic import BaseModel
+
 from .base import BaseMemory
 
 logger = logging.getLogger(__name__)
+
+class PydanticEncoder(json.JSONEncoder):
+    """Fallback encoder to safely serialize Pydantic instances inside dicts."""
+    def default(self, obj: Any) -> Any:
+        if isinstance(obj, BaseModel):
+            return obj.model_dump()
+        if hasattr(obj, "model_dump"):
+            return obj.model_dump()
+        return super().default(obj)
 
 _CREATE_TABLE_SQL = """\
 CREATE TABLE IF NOT EXISTS chat_history (
@@ -113,7 +124,7 @@ class SQLiteMemory(BaseMemory):
         metadata: dict[str, Any] | None = None,
     ) -> None:
         try:
-            metadata_json = json.dumps(metadata) if metadata else None
+            metadata_json = json.dumps(metadata, cls=PydanticEncoder) if metadata else None
             with self._get_connection() as conn:
                 conn.cursor().execute(
                     _INSERT_SQL, (user_id, role, content, metadata_json)
@@ -155,3 +166,4 @@ class SQLiteMemory(BaseMemory):
                 conn.commit()
         except Exception as exc:
             logger.error("Error limpiando memoria para %s: %s", user_id, exc)
+

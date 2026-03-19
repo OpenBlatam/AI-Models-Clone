@@ -41,3 +41,4 @@ class BaseModule(ABC):
             self.load_state_dict(torch.load(path, map_location=self.device))
         else:
             self.logger.warning(f"Module {self.__class__.__name__} has no load_state_dict method")
+

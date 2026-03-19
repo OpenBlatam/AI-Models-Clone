@@ -174,3 +174,4 @@ class ServiceFactory:
     @staticmethod
     def create_service(service_cls: Type[T], config: ProductionConfig, **kwargs) -> T:
         return service_cls(config, **kwargs)
+

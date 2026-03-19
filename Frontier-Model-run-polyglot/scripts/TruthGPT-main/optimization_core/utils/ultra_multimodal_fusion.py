@@ -710,3 +710,4 @@ def example_multimodal_fusion():
 if __name__ == "__main__":
     # Run example
     example_multimodal_fusion()
+

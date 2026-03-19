@@ -97,3 +97,4 @@ class UncertaintySampler:
     def _calculate_bald(self, probabilities: torch.Tensor) -> torch.Tensor:
         """Calculate BALD uncertainty (simplified)"""
         return self._calculate_entropy(probabilities)
+

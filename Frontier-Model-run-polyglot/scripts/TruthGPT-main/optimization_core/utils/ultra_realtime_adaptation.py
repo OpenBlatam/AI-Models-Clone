@@ -778,3 +778,4 @@ def example_real_time_adaptation():
 if __name__ == "__main__":
     # Run example
     example_real_time_adaptation()
+

@@ -44,3 +44,4 @@ class PyTorchOptimizerBase:
         self.device = torch.device(device)
         return self
 
+

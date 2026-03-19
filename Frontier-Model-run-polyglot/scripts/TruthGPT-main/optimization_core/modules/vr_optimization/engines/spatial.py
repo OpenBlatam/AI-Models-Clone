@@ -30,3 +30,4 @@ class SpatialComputingEngine:
         if hasattr(system, 'add_capability'):
             system.add_capability('spatial_intelligence')
         return system
+

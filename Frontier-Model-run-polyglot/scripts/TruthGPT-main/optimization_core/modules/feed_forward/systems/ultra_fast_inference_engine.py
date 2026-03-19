@@ -454,3 +454,4 @@ class UltraFastInferenceConfig:
     enable_self_healing_inference: bool = True
     enable_edge_inference: bool = True
 
+

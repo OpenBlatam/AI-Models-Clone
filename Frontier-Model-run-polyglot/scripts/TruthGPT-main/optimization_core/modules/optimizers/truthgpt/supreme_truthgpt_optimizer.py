@@ -10,7 +10,6 @@ import torch.nn.functional as F
 import torch.optim as optim
 import numpy as np
 from typing import Dict, Any, List, Optional, Tuple, Union, Callable
-from dataclasses import dataclass, field
 import time
 import logging
 import warnings
@@ -32,12 +31,13 @@ import pickle
 from pathlib import Path
 import cmath
 from abc import ABC, abstractmethod
+from pydantic import BaseModel, ConfigDict
 
 warnings.filterwarnings('ignore')
 
 logger = logging.getLogger(__name__)
 
-class SupremeOptimizationLevel(Enum):
+class SupremeOptimizationLevel(str, Enum):
     """Supreme optimization levels for TruthGPT."""
     SUPREME_BASIC = "supreme_basic"           # 100000x speedup
     SUPREME_ADVANCED = "supreme_advanced"     # 1000000x speedup
@@ -48,9 +48,10 @@ class SupremeOptimizationLevel(Enum):
     SUPREME_DIVINE = "supreme_divine"         # 100000000000x speedup
     SUPREME_OMNIPOTENT = "supreme_omnipotent" # 1000000000000x speedup
 
-@dataclass
-class SupremeOptimizationResult:
+class SupremeOptimizationResult(BaseModel):
     """Result of supreme optimization."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
     optimized_model: nn.Module
     speed_improvement: float
     memory_reduction: float
@@ -313,7 +314,7 @@ class SupremeTruthGPTOptimizer:
         """Apply supreme optimization to TruthGPT model."""
         start_time = time.perf_counter()
         
-        self.logger.info(f"👑 Supreme TruthGPT optimization started (level: {self.optimization_level.value})")
+        self.logger.info(f"👑 Supreme TruthGPT optimization started (level: {self.optimization_level})")
         
         # Apply supreme optimizations based on level
         optimized_model = model
@@ -606,7 +607,7 @@ class SupremeTruthGPTOptimizer:
             'avg_hybrid_benefit': np.mean([r.hybrid_benefit for r in results]),
             'avg_truthgpt_benefit': np.mean([r.truthgpt_benefit for r in results]),
             'avg_supreme_benefit': np.mean([r.supreme_benefit for r in results]),
-            'optimization_level': self.optimization_level.value
+            'optimization_level': self.optimization_level
         }
     
     def benchmark_supreme_performance(self, model: nn.Module, 
@@ -713,3 +714,4 @@ def example_supreme_optimization():
 if __name__ == "__main__":
     # Run example
     result = example_supreme_optimization()
+

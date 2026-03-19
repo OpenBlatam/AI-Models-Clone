@@ -72,3 +72,4 @@ class ElasticReasoning:
             "total_tokens": total_len,
             "ratio": think_len / total_len if total_len > 0 else 0
         }
+

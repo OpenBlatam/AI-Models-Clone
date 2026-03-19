@@ -44,3 +44,4 @@ class ExpectedModelChange:
         # Note: True EMC is computationally prohibitive (requires re-training or grad norms).
         # We use a random distribution here as a placeholder for the logic flow.
         return np.random.random(len(unlabeled_data))
+

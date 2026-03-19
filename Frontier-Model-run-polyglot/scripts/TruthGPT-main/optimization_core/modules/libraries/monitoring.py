@@ -113,3 +113,4 @@ def create_monitoring_module(monitoring_type: str, config: Dict[str, Any]) -> Mo
         return PerformanceMonitoringModule(config)
     else:
         raise ValueError(f"Unknown monitoring type: {monitoring_type}")
+

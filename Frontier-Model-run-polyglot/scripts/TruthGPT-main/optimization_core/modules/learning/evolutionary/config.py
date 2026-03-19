@@ -102,3 +102,4 @@ class EvolutionaryConfig:
             raise ValueError("Number of objectives must be positive")
         if self.pareto_front_size <= 0:
             raise ValueError("Pareto front size must be positive")
+

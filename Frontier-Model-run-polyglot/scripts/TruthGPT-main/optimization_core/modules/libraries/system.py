@@ -109,3 +109,4 @@ class ModularSystem:
         self.modules["model"].optimizer.load_state_dict(checkpoint["optimizer_state"])
         if checkpoint["scheduler_state"] and self.modules["model"].scheduler:
             self.modules["model"].scheduler.load_state_dict(checkpoint["scheduler_state"])
+

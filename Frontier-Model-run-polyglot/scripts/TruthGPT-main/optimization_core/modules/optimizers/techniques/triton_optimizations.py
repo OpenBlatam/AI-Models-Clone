@@ -115,3 +115,4 @@ def block_copy(dst: torch.Tensor, src: torch.Tensor, dst_offset: int) -> None:
     # Copies src tokens into dst starting at dst_offset along time dimension
     t = src.shape[-2]
     dst[..., dst_offset : dst_offset + t, :].copy_(src)
+

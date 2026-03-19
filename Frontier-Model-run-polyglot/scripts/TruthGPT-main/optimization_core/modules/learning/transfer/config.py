@@ -63,3 +63,4 @@ class TransferLearningConfig:
             raise ValueError("Alpha must be between 0 and 1")
         if not (0 <= self.beta <= 1):
             raise ValueError("Beta must be between 0 and 1")
+

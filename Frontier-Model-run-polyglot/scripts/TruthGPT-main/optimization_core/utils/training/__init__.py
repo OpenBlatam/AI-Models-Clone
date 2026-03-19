@@ -17,11 +17,11 @@ __all__ = [
 ]
 
 _LAZY_IMPORTS = {
-    'TruthGPTTrainingUtils': '..truthgpt_training_utils',
-    'TruthGPTAdvancedTraining': '..truthgpt_advanced_training',
-    'TruthGPTOptimizationUtils': '..truthgpt_optimization_utils',
-    'TruthGPTEvaluationUtils': '..truthgpt_evaluation_utils',
-    'TruthGPTAdvancedEvaluation': '..truthgpt_advanced_evaluation',
+    'TruthGPTTrainingUtils': 'optimization_core.modules.truthgpt.training',
+    'TruthGPTAdvancedTraining': 'optimization_core.modules.truthgpt.advanced_training',
+    'TruthGPTOptimizationUtils': 'optimization_core.modules.truthgpt.optimization_utils',
+    'TruthGPTEvaluationUtils': 'optimization_core.modules.truthgpt.evaluation',
+    'TruthGPTAdvancedEvaluation': 'optimization_core.modules.truthgpt.advanced_evaluation',
 }
 
 _import_cache = {}
@@ -40,7 +40,8 @@ def __getattr__(name: str):
     
     module_path = _LAZY_IMPORTS[name]
     try:
-        module = importlib.import_module(module_path, package=__package__)
+        # Use absolute imports to avoid __package__ ambiguity
+        module = importlib.import_module(module_path)
         obj = getattr(module, name)
         _import_cache[name] = obj
         return obj
@@ -49,5 +50,6 @@ def __getattr__(name: str):
             f"module '{__name__}' has no attribute '{name}'. "
             f"Failed to import: {e}"
         ) from e
+
 
 

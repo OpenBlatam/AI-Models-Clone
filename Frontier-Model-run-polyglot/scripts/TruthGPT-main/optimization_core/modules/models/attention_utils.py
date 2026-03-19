@@ -307,3 +307,4 @@ class AttentionOptimizer:
             logger.warning(f"Failed to enable xFormers attention: {e}")
 
 
+

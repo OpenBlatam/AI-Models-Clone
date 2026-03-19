@@ -143,3 +143,4 @@ class ComputationalOptimizer:
 def create_computational_optimizer(config: Dict[str, Any]) -> ComputationalOptimizer:
     """Create computational optimizer from configuration."""
     return ComputationalOptimizer(config)
+

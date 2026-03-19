@@ -27,3 +27,4 @@ class BaseMemory(ABC):
     @abstractmethod
     async def clear_memory(self, user_id: str) -> None:
         """Limpia la memoria de un usuario específico."""
+

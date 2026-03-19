@@ -135,3 +135,4 @@ class HFTransformersModel:
 def create_hf_transformers_model(config: Dict[str, Any]) -> HFTransformersModel:
     """Factory function."""
     return HFTransformersModel(config)
+

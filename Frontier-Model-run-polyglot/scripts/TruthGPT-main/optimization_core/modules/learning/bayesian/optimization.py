@@ -90,3 +90,4 @@ class ConstrainedOptimizer:
             'feasible_objectives': np.array(feasible_objectives),
             'status': 'success'
         }
+

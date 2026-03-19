@@ -242,3 +242,4 @@ class CausalDiscovery:
             Absolute value of correlation coefficient.
         """
         return float(abs(np.corrcoef(x, y)[0, 1]))
+

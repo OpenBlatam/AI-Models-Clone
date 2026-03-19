@@ -19,12 +19,12 @@ __all__ = [
 ]
 
 _LAZY_IMPORTS = {
-    'EnterpriseAuth': '..enterprise_auth',
-    'EnterpriseCache': '..enterprise_cache',
-    'EnterpriseMonitor': '..enterprise_monitor',
-    'EnterpriseMetrics': '..enterprise_metrics',
-    'EnterpriseCloudIntegration': '..enterprise_cloud_integration',
-    'EnterpriseTruthGPTAdapter': '..enterprise_truthgpt_adapter',
+    'EnterpriseAuth': 'optimization_core.modules.enterprise.auth',
+    'EnterpriseCache': 'optimization_core.modules.enterprise.cache',
+    'EnterpriseMonitor': 'optimization_core.modules.enterprise.monitor',
+    'EnterpriseMetrics': 'optimization_core.modules.enterprise.metrics',
+    'EnterpriseCloudIntegration': 'optimization_core.modules.enterprise.cloud_integration',
+    'EnterpriseTruthGPTAdapter': 'optimization_core.adapters.enterprise_truthgpt_adapter',
 }
 
 _import_cache = {}
@@ -43,7 +43,8 @@ def __getattr__(name: str):
     
     module_path = _LAZY_IMPORTS[name]
     try:
-        module = importlib.import_module(module_path, package=__package__)
+        # Use absolute imports to avoid __package__ ambiguity
+        module = importlib.import_module(module_path)
         obj = getattr(module, name)
         _import_cache[name] = obj
         return obj
@@ -52,5 +53,6 @@ def __getattr__(name: str):
             f"module '{__name__}' has no attribute '{name}'. "
             f"Failed to import: {e}"
         ) from e
+
 
 

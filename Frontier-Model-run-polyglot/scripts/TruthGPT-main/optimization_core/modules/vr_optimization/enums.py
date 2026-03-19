@@ -45,3 +45,4 @@ class ImmersiveTechnology(Enum):
     OMNIPOTENT_REALITY = "omnipotent_reality"
     INFINITE_REALITY = "infinite_reality"
     UNIVERSAL_REALITY = "universal_reality"
+

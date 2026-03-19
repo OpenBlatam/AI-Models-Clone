@@ -207,3 +207,4 @@ def create_llama_rms_norm(hidden_size: int, **kwargs) -> Union[LlamaRMSNorm, 'Fu
 def create_crms_norm(input_dim: int, cond_dim: int, **kwargs) -> CRMSNorm:
     """Factory function to create CRMSNorm."""
     return CRMSNorm(input_dim, cond_dim, **kwargs)
+

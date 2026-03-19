@@ -143,6 +143,7 @@ Issues = "https://github.com/frontier-model-run/frontier-model-run/issues"
 [project.scripts]
 frontier = "cli:app"
 openclaw = "cli:app"
+truthgpt = "cli:app"
 
 [tool.setuptools.packages.find]
 where = ["."]

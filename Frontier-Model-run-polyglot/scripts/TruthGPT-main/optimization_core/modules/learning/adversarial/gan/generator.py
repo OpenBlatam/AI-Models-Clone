@@ -62,3 +62,4 @@ class GANGeneratorCreator:
         noise = torch.randn(n, self.config.gan_latent_dim)
         with torch.no_grad():
             return self.generator(noise)
+

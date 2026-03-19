@@ -9,10 +9,10 @@ from typing import Dict
 
 # Main lazy imports - core optimization components
 _LAZY_IMPORTS: Dict[str, str] = {
-    # CUDA and Triton kernels - moved to utils.gpu
-    'OptimizedLayerNorm': '.utils.gpu.cuda_kernels',
-    'OptimizedRMSNorm': '.utils.gpu.cuda_kernels',
-    'CUDAOptimizations': '.utils.gpu.cuda_kernels',
+    # CUDA and Triton kernels - moved to modules.acceleration.gpu
+    'OptimizedLayerNorm': '.modules.acceleration.gpu.cuda_kernels',
+    'OptimizedRMSNorm': '.modules.acceleration.gpu.cuda_kernels',
+    'CUDAOptimizations': '.modules.acceleration.gpu.cuda_kernels',
     'TritonLayerNorm': '.modules.optimizers.techniques.triton_optimizations',
     'TritonOptimizations': '.modules.optimizers.techniques.triton_optimizations',
     
@@ -73,10 +73,10 @@ _LAZY_IMPORTS: Dict[str, str] = {
     'create_adaptive_mlp': '.optimizers.techniques.enhanced_mlp',
     
     # Kernel fusion and quantization
-    'FusedLayerNormLinear': '.advanced_kernel_fusion',
-    'FusedAttentionMLP': '.advanced_kernel_fusion',
-    'KernelFusionOptimizer': '.advanced_kernel_fusion',
-    'create_kernel_fusion_optimizer': '.advanced_kernel_fusion',
+    'FusedLayerNormLinear': '.modules.acceleration.gpu.kernel_fusion',
+    'FusedAttentionMLP': '.modules.acceleration.gpu.kernel_fusion',
+    'KernelFusionOptimizer': '.modules.acceleration.gpu.kernel_fusion',
+    'create_kernel_fusion_optimizer': '.modules.acceleration.gpu.kernel_fusion',
     'QuantizedLinear': '.advanced_quantization',
     'QuantizedLayerNorm': '.advanced_quantization',
     'AdvancedQuantizationOptimizer': '.advanced_quantization',
@@ -102,13 +102,13 @@ _LAZY_IMPORTS: Dict[str, str] = {
     'get_global_tensor_pool': '.utils.memory.memory_pooling',
     'get_global_activation_cache': '.utils.memory.memory_pooling',
     
-    # Enhanced CUDA - moved to utils.gpu
-    'AdvancedCUDAConfig': '.utils.gpu.enhanced_cuda_kernels',
-    'FusedKernelOptimizer': '.utils.gpu.enhanced_cuda_kernels',
-    'MemoryCoalescingOptimizer': '.utils.gpu.enhanced_cuda_kernels',
-    'QuantizationKernelOptimizer': '.utils.gpu.enhanced_cuda_kernels',
-    'EnhancedCUDAOptimizations': '.utils.gpu.enhanced_cuda_kernels',
-    'create_enhanced_cuda_optimizer': '.utils.gpu.enhanced_cuda_kernels',
+    # Enhanced CUDA - moved to modules.acceleration.gpu
+    'AdvancedCUDAConfig': '.modules.acceleration.gpu.enhanced_kernels',
+    'FusedKernelOptimizer': '.modules.acceleration.gpu.enhanced_kernels',
+    'MemoryCoalescingOptimizer': '.modules.acceleration.gpu.enhanced_kernels',
+    'QuantizationKernelOptimizer': '.modules.acceleration.gpu.enhanced_kernels',
+    'EnhancedCUDAOptimizations': '.modules.acceleration.gpu.enhanced_kernels',
+    'create_enhanced_cuda_optimizer': '.modules.acceleration.gpu.enhanced_kernels',
     
     # Learning strategies - moved to modules/learning module
     'ActiveLearner': '.modules.learning.active',
@@ -141,6 +141,11 @@ _LAZY_IMPORTS: Dict[str, str] = {
     'create_hyper_optimization_core': '.modules.optimizers.optimization_cores',
     'QuantumOptimizationCore': '.modules.optimizers.optimization_cores',
     'create_quantum_optimization_core': '.modules.optimizers.optimization_cores',
+    'NextGenOptimizationEngine': '.modules.optimizers.advanced.next_gen_engine',
+    'HyperSpeedOptimizer': '.modules.optimizers.advanced.hyper_speed',
+    'UltraAIOptimizer': '.modules.optimizers.advanced.ultra_ai',
+    'SyntheticMultiverseOptimizationSystem': '.modules.optimizers.advanced.multiverse_system',
+    'NeuralEvolutionaryOptimizer': '.modules.optimizers.advanced.evolutionary',
     'NASOptimizationCore': '.modules.advanced.neural_architecture_search',
     'create_nas_optimization_core': '.modules.advanced.neural_architecture_search',
     # Optimization cores - now organized in optimizers.optimization_cores
@@ -308,7 +313,7 @@ _CORE_LAZY_IMPORTS: Dict[str, str] = {
     'CacheManager': '.core.common_runtime',
     'PerformanceUtils': '.core.common_runtime',
     'MemoryUtils': '.core.common_runtime',
-    'GPUUtils': '.core.common_runtime',
+    'GPUUtils': '.modules.acceleration.gpu.gpu_utils',
 }
 
 # Compiler lazy imports
@@ -373,26 +378,26 @@ _ENTERPRISE_LAZY_IMPORTS: Dict[str, str] = {
     'ModuleInfo': '.modules.module_manager',
     'ModuleStatus': '.modules.module_manager',
     'get_module_manager': '.modules.module_manager',
-    'EnterpriseTruthGPTAdapter': '.utils.enterprise_truthgpt_adapter',
-    'AdapterConfig': '.utils.enterprise_truthgpt_adapter',
-    'AdapterMode': '.utils.enterprise_truthgpt_adapter',
-    'create_enterprise_adapter': '.utils.enterprise_truthgpt_adapter',
-    'EnterpriseCache': '.utils.enterprise_cache',
-    'CacheEntry': '.utils.enterprise_cache',
-    'CacheStrategy': '.utils.enterprise_cache',
-    'get_cache': '.utils.enterprise_cache',
-    'EnterpriseAuth': '.utils.enterprise_auth',
-    'User': '.utils.enterprise_auth',
-    'Role': '.utils.enterprise_auth',
-    'AuthMethod': '.utils.enterprise_auth',
-    'Permission': '.utils.enterprise_auth',
-    'get_auth': '.utils.enterprise_auth',
-    'PerformanceMonitor': '.utils.enterprise_monitor',
-    'Metric': '.utils.enterprise_monitor',
-    'Alert': '.utils.enterprise_monitor',
-    'MetricType': '.utils.enterprise_monitor',
-    'AlertLevel': '.utils.enterprise_monitor',
-    'get_monitor': '.utils.enterprise_monitor',
+    'EnterpriseTruthGPTAdapter': '.adapters.enterprise_truthgpt_adapter',
+    'AdapterConfig': '.modules.enterprise.config',
+    'AdapterMode': '.modules.enterprise.config',
+    'create_enterprise_adapter': '.adapters.enterprise_truthgpt_adapter',
+    'EnterpriseCache': '.modules.enterprise.cache',
+    'CacheEntry': '.modules.enterprise.cache',
+    'CacheStrategy': '.modules.enterprise.cache',
+    'get_cache': '.modules.enterprise.cache',
+    'EnterpriseAuth': '.modules.enterprise.auth',
+    'User': '.modules.enterprise.auth',
+    'Role': '.modules.enterprise.auth',
+    'AuthMethod': '.modules.enterprise.auth',
+    'Permission': '.modules.enterprise.auth',
+    'get_auth': '.modules.enterprise.auth',
+    'PerformanceMonitor': '.modules.enterprise.monitor',
+    'Metric': '.modules.enterprise.metrics',
+    'Alert': '.modules.enterprise.monitor',
+    'MetricType': '.modules.enterprise.metrics',
+    'AlertLevel': '.modules.enterprise.monitor',
+    'get_monitor': '.modules.enterprise.monitor',
 }
 
 # Combine all lazy imports
@@ -410,4 +415,5 @@ __all__ = [
     '_ENTERPRISE_LAZY_IMPORTS',
     '_ALL_LAZY_IMPORTS',
 ]
+
 

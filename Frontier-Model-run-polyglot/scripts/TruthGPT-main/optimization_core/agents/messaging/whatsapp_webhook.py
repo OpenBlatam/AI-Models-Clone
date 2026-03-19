@@ -55,7 +55,7 @@ class WhatsAppAdapter(BaseMessagingAdapter):
         platform_user_id: str,
         text: str,
         metadata: Optional[dict] = None,
-    ) -> Union[str, AgentResponse]:
+    ) -> AgentResponse:
         """Forward the message to the AgentClient."""
         return await self.agent_client.run(
             user_id=f"whatsapp_{platform_user_id}",
@@ -66,19 +66,16 @@ class WhatsAppAdapter(BaseMessagingAdapter):
     async def send_response(
         self,
         platform_user_id: str,
-        response: Union[str, AgentResponse],
+        response: AgentResponse,
         metadata: Optional[dict] = None,
     ) -> bool:
         """Send a WhatsApp message back via Twilio."""
         to_number = (metadata or {}).get("from_number", platform_user_id)
         url = f"{TWILIO_API}/Accounts/{self.account_sid}/Messages.json"
 
-        if isinstance(response, AgentResponse):
-            response_text = response.content
-            if response.action_type == "approval_required":
-                response_text = f"{response_text}\n\n*HITL Required:* Aprueba en la API para continuar."
-        else:
-            response_text = str(response)
+        response_text = response.content
+        if response.action_type == "approval_required":
+            response_text = f"{response_text}\n\n*HITL Required:* Aprueba en la API para continuar."
 
         payload = urlencode({
             "From": self.from_number,
@@ -105,7 +102,7 @@ class WhatsAppAdapter(BaseMessagingAdapter):
     # Webhook helpers
     # ------------------------------------------------------------------
 
-    async def process_webhook(self, form_data: dict) -> Optional[str]:
+    async def process_webhook(self, form_data: dict) -> Optional[AgentResponse]:
         """
         Parse an incoming Twilio webhook form payload.
 
@@ -126,3 +123,4 @@ class WhatsAppAdapter(BaseMessagingAdapter):
             text=body,
             metadata={"from_number": from_number},
         )
+

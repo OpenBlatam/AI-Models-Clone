@@ -13,3 +13,4 @@ class SearchStrategy(Enum):
     REINFORCEMENT = "reinforcement"
     GRADIENT_BASED = "gradient_based"
     DIFFERENTIABLE = "differentiable"
+

@@ -148,3 +148,4 @@ class CausalInferenceSystem:
             if key in causal_effect_data:
                 return float(causal_effect_data[key])
         return 0.0
+

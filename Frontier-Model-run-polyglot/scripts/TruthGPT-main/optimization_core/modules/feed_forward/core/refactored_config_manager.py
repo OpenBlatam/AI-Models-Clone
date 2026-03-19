@@ -808,3 +808,4 @@ class ConfigTemplates:
             "memory_threshold_mb": 16000.0,
             "cpu_threshold_percent": 90.0
         }
+

@@ -101,3 +101,4 @@ class CoreMemory:
             f"[USER PROFILE]:\n{core['human']}\n"
             "===========================\n"
         )
+

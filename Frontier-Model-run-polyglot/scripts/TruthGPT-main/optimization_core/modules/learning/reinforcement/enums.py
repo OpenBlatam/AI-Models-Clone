@@ -24,3 +24,4 @@ class EnvironmentType(Enum):
     MULTI_AGENT = "multi_agent"
     PARTIALLY_OBSERVABLE = "partially_observable"
     HIERARCHICAL = "hierarchical"
+

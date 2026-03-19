@@ -175,3 +175,4 @@ class AdaptiveLearningSystem:
         self.learning_mode = LearningMode(state['learning_mode'])
         
         logger.info(f"✅ Learning state loaded from {path}")
+

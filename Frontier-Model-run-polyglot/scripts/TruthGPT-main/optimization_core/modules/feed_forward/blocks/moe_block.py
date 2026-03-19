@@ -123,3 +123,4 @@ class MoEBlock(nn.Module):
             "experts_info": [e.get_info() if hasattr(e, 'get_info') else str(type(e)) for e in self.experts],
             "router_config": self.router.config
         }
+

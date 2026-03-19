@@ -65,7 +65,32 @@ python cli.py serve --port 8080 --workers 4
 ## 🛠️ 5. Developer Guide: Building Your Own Agent
 TruthGPT is a framework first. You can use its base classes to build specialized agents that integrate perfectly with the ecosystem.
 
-### Create a Custom Agent
+### 🚀 Ejemplo SOTA 2025 (Recomendado)
+
+Esta es la forma más profesional y escalable de usar el framework ahora:
+
+```python
+from openclaw import AgentClient, AgentConfig
+
+config = AgentConfig(
+    use_swarm=True,
+    max_handoff_depth=8,
+    default_agent_name="ResearchAgent"
+)
+
+client = AgentClient(config=config)
+
+async def ask():
+    response = await client.run(
+        user_id="researcher_1", 
+        prompt="¿Cuál es el estado del arte en LLMs?",
+        return_response=True
+    )
+    print(f"Agente: {response.agent_name}")
+    print(f"Respuesta: {response.content}")
+```
+
+### 🛠️ Guía del Desarrollador (Custom Agents)
 To build a new agent, inherit from `BaseAgent` and implement the `process` method.
 
 ```python

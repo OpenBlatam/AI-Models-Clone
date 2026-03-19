@@ -11,11 +11,12 @@ Environment variables:
 
 import logging
 import os
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import httpx
 
 from .base import BaseMessagingAdapter
+from ..models import AgentResponse
 
 logger = logging.getLogger(__name__)
 
@@ -52,7 +53,8 @@ class DiscordAdapter(BaseMessagingAdapter):
         platform_user_id: str,
         text: str,
         metadata: Optional[dict] = None,
-    ) -> Union[str, AgentResponse]:
+    ) -> AgentResponse:
+        # Note: agent_client.run should return AgentResponse when return_response=True
         return await self.agent_client.run(
             user_id=f"discord_{platform_user_id}",
             prompt=text,
@@ -62,7 +64,7 @@ class DiscordAdapter(BaseMessagingAdapter):
     async def send_response(
         self,
         platform_user_id: str,
-        response: Union[str, AgentResponse],
+        response: AgentResponse,
         metadata: Optional[dict] = None,
     ) -> bool:
         channel_id = (metadata or {}).get("channel_id")
@@ -70,12 +72,9 @@ class DiscordAdapter(BaseMessagingAdapter):
             logger.error("Cannot send Discord message without channel_id")
             return False
 
-        if isinstance(response, AgentResponse):
-            response_text = response.content
-            if response.action_type == "approval_required":
-                response_text = f"{response_text}\n\n⚠️ **Acción requerida:** Aprueba vía API para continuar."
-        else:
-            response_text = str(response)
+        response_text = response.content
+        if response.action_type == "approval_required":
+            response_text = f"{response_text}\n\n⚠️ **Acción requerida:** Aprueba vía API para continuar."
 
         url = f"{DISCORD_API}/channels/{channel_id}/messages"
         try:
@@ -95,7 +94,7 @@ class DiscordAdapter(BaseMessagingAdapter):
     # Webhook / Interaction helpers
     # ------------------------------------------------------------------
 
-    async def process_interaction(self, payload: dict) -> Optional[str]:
+    async def process_interaction(self, payload: dict) -> Optional[AgentResponse]:
         """
         Process an incoming Discord Interaction payload.
 
@@ -129,3 +128,4 @@ class DiscordAdapter(BaseMessagingAdapter):
             text=text,
             metadata={"channel_id": channel_id, "interaction_id": payload.get("id")},
         )
+

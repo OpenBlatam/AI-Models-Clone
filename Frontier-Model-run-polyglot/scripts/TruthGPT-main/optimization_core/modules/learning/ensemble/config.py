@@ -60,3 +60,4 @@ class EnsembleConfig:
             raise ValueError("Boosting iterations must be positive")
         if self.learning_rate <= 0:
             raise ValueError("Learning rate must be positive")
+

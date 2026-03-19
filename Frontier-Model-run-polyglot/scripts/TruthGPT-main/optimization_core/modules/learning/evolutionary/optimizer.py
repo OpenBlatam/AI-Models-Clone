@@ -209,3 +209,4 @@ class EvolutionaryOptimizer:
                 plt.show()
         except Exception as e:
             logger.warning(f"Visualization failed: {e}")
+

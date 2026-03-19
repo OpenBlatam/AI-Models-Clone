@@ -59,3 +59,4 @@ class MCPClient:
     async def close(self):
         """Clean up the httpx client."""
         await self.client.aclose()
+

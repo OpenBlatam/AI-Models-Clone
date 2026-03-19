@@ -114,3 +114,4 @@ class TrainingConfig:
 def create_training_config(**kwargs) -> TrainingConfig:
     """Create a TrainingConfig from keyword arguments."""
     return TrainingConfig(**kwargs)
+

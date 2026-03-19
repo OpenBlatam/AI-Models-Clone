@@ -925,3 +925,4 @@ class BlockchainRouter(BaseRouter):
             'blockchain_stats': self.get_blockchain_stats()
         })
         return base_info
+

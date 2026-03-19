@@ -85,7 +85,7 @@ class SignalAdapter(BaseMessagingAdapter):
     # Webhook helper
     # ------------------------------------------------------------------
 
-    async def process_webhook(self, payload: dict) -> Optional[str]:
+    async def process_webhook(self, payload: dict) -> Optional[AgentResponse]:
         """
         Process an incoming signal-cli webhook payload.
 
@@ -113,3 +113,4 @@ class SignalAdapter(BaseMessagingAdapter):
             text=text,
             metadata={"source_number": source},
         )
+

@@ -49,3 +49,4 @@ class CausalDiscoveryAlgorithm(Enum):
     FCI = "fci"
     NOTEARS = "notears"
     DYNOTEARS = "dynotears"
+

@@ -716,3 +716,4 @@ class FederatedRouter(BaseRouter):
             'privacy_metrics': self.get_privacy_metrics()
         })
         return base_info
+

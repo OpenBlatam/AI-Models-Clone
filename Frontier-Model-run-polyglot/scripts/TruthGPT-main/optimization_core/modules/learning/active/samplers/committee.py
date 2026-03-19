@@ -76,3 +76,4 @@ class QueryByCommittee:
         # Sum of variance across class dimensions for each sample
         disagreement = torch.var(preds_tensor, dim=0).sum(dim=1)
         return disagreement.numpy()
+

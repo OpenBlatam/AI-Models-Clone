@@ -73,3 +73,4 @@ class ActiveLearningConfig:
             raise ValueError("Batch size must be positive")
         if not (0 <= self.batch_diversity_weight <= 1):
             raise ValueError("Batch diversity weight must be between 0 and 1")
+

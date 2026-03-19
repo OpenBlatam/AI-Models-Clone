@@ -123,3 +123,4 @@ class ActiveLearningSystem:
         lines.append(f"Final pool size: {len(self.labeled_data)}")
         lines.append(f"Processing time: {results.get('duration', 0):.2f}s")
         return "\n".join(lines)
+

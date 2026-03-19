@@ -264,3 +264,4 @@ if __name__ == "__main__":
     print(f"   Memory efficiency: {metadata['memory_efficiency']:.2%}")
     print(f"   Computation efficiency: {metadata['computation_efficiency']:.2%}")
 
+

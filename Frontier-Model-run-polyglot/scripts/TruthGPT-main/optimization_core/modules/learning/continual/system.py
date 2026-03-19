@@ -110,3 +110,4 @@ class CLTrainer:
     
     def generate_cl_report(self, results: Dict[str, Any]) -> str:
         return f"Continual Learning Completed in {results.get('total_duration', 0):.2f}s"
+

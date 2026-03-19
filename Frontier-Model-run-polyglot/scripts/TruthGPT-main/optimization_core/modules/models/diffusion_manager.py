@@ -282,3 +282,4 @@ class DiffusionTrainer:
         return self.pipeline.unet
 
 
+

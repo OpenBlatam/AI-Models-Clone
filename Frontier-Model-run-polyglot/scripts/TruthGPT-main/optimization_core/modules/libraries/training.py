@@ -184,3 +184,4 @@ def create_training_module(training_type: str, config: Dict[str, Any]) -> Traini
         return UnsupervisedTrainingModule(config)
     else:
         raise ValueError(f"Unknown training type: {training_type}")
+

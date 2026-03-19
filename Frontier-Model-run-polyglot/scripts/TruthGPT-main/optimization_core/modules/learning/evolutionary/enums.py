@@ -45,3 +45,4 @@ class EvolutionaryAlgorithm(Enum):
     GENETIC_PROGRAMMING = "genetic_programming"
     PARTICLE_SWARM = "particle_swarm"
     ANT_COLONY = "ant_colony"
+

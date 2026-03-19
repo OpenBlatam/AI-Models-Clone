@@ -43,3 +43,4 @@ class MetaLearningConfig:
             raise ValueError("Inner steps must be at least 1")
         if self.support_size < 1 or self.query_size < 1:
             raise ValueError("Support and query sizes must be at least 1")
+

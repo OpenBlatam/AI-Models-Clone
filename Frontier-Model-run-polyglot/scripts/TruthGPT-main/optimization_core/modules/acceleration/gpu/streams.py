@@ -51,3 +51,4 @@ class GPUStreamManager:
         """Synchronize a specific stream."""
         if 0 <= index < len(self.streams):
             self.streams[index].synchronize()
+

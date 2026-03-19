@@ -124,3 +124,4 @@ class MultiTaskAdapter:
         
         self.training_history.append(adaptation_result)
         return adaptation_result
+

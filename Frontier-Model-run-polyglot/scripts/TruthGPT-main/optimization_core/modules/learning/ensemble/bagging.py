@@ -96,3 +96,4 @@ class BaggingEnsemble:
             return (avg_pred > 0.5).astype(int)
         else:
             return np.argmax(avg_pred, axis=1)
+

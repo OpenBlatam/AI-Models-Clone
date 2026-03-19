@@ -33,3 +33,4 @@ class MemoryType(Enum):
     WORKING_MEMORY = "working_memory"
     LONG_TERM_MEMORY = "long_term_memory"
     SHORT_TERM_MEMORY = "short_term_memory"
+

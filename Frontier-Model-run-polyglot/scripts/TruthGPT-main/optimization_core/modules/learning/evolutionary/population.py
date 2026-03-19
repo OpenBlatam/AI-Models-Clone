@@ -434,3 +434,4 @@ class Population:
         if max(window) <= window[0] + 1e-9:
             return True
         return False
+

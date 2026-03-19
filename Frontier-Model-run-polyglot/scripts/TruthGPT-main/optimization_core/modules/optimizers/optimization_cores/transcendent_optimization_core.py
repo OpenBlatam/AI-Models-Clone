@@ -616,3 +616,4 @@ def create_transcendent_optimization_core(config: Dict[str, Any]) -> Transcenden
         transcendent_learning_rate=config.get('transcendent_learning_rate', 1e-6)
     )
     return TranscendentOptimizationCore(transcendent_config)
+

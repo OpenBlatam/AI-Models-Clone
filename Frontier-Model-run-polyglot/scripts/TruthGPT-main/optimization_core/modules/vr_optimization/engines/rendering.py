@@ -30,3 +30,4 @@ class ImmersiveRenderingEngine:
         if hasattr(system, 'add_capability'):
             system.add_capability('transcendent_rendering')
         return system
+

@@ -130,3 +130,4 @@ class DifferentiableNAS:
             'search_history': search_history,
             'final_architecture_weights': self.architecture_weights.detach().cpu().numpy()
         }
+

@@ -24,3 +24,4 @@ class GPUUtils:
     def is_available(self):
         import torch
         return torch.cuda.is_available()
+

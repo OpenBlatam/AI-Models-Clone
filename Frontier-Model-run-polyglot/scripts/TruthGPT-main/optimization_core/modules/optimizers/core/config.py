@@ -20,3 +20,4 @@ except ImportError:
         def enable_kernel_fusion(self): return getattr(self, 'kernel_fusion', False)
         @property
         def level(self): return getattr(self, 'optimization_level', 'standard')
+

@@ -61,3 +61,4 @@ class CoreMemoryReplaceTool(BaseTool):
             signal="core_memory_replace",
             metadata={"block": block, "content": content}
         )
+

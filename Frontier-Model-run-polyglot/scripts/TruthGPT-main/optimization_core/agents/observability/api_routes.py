@@ -49,3 +49,4 @@ def create_observability_router() -> APIRouter:
         return spans
 
     return router
+

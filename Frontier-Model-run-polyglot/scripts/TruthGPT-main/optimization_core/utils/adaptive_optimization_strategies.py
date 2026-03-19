@@ -14,12 +14,12 @@ import logging
 import time
 import numpy as np
 import torch
-from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, List, Optional, Any, Union, Tuple, Callable
 from collections import defaultdict, deque
 import json
 import pickle
+from pydantic import BaseModel, ConfigDict, Field
 from datetime import datetime, timedelta
 import threading
 import queue
@@ -59,20 +59,21 @@ class AdaptationAction(Enum):
     FALLBACK_MODE = "fallback_mode"
     EMERGENCY_OPTIMIZATION = "emergency_optimization"
 
-@dataclass
-class AdaptationRule:
+class AdaptationRule(BaseModel):
     """Adaptation rule configuration"""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
     trigger: AdaptationTrigger
     condition: Callable[[Dict[str, Any]], bool]
     action: AdaptationAction
-    parameters: Dict[str, Any] = field(default_factory=dict)
+    parameters: Dict[str, Any] = Field(default_factory=dict)
     priority: int = 5  # 1-10 scale
     enabled: bool = True
     cooldown: float = 60.0  # seconds
     last_triggered: Optional[datetime] = None
 
-@dataclass
-class AdaptationContext:
+
+class AdaptationContext(BaseModel):
     """Context for adaptation decisions"""
     current_optimizer: str
     task_metrics: Dict[str, float]
@@ -84,8 +85,8 @@ class AdaptationContext:
     time_constraints: Dict[str, float]
     quality_requirements: Dict[str, float]
 
-@dataclass
-class AdaptationDecision:
+
+class AdaptationDecision(BaseModel):
     """Adaptation decision result"""
     action: AdaptationAction
     parameters: Dict[str, Any]
@@ -573,3 +574,4 @@ if __name__ == "__main__":
     # Get statistics
     stats = adaptive_system.get_adaptation_statistics()
     print(f"Adaptation statistics: {stats}")
+

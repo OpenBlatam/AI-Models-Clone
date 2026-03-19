@@ -17,11 +17,11 @@ __all__ = [
 ]
 
 _LAZY_IMPORTS = {
-    'GPUUtils': '..gpu_utils',
-    'CUDAOptimizations': '..cuda_kernels',
-    'OptimizedLayerNorm': '..cuda_kernels',
-    'OptimizedRMSNorm': '..cuda_kernels',
-    'EnhancedCUDAOptimizations': '..enhanced_cuda_kernels',
+    'GPUUtils': 'optimization_core.modules.acceleration.gpu.gpu_utils',
+    'CUDAOptimizations': 'optimization_core.modules.acceleration.gpu.cuda_kernels',
+    'OptimizedLayerNorm': 'optimization_core.modules.acceleration.gpu.cuda_kernels',
+    'OptimizedRMSNorm': 'optimization_core.modules.acceleration.gpu.cuda_kernels',
+    'EnhancedCUDAOptimizations': 'optimization_core.modules.acceleration.gpu.enhanced_kernels',
 }
 
 _import_cache = {}
@@ -40,7 +40,8 @@ def __getattr__(name: str):
     
     module_path = _LAZY_IMPORTS[name]
     try:
-        module = importlib.import_module(module_path, package=__package__)
+        # Use absolute imports to avoid __package__ ambiguity
+        module = importlib.import_module(module_path)
         obj = getattr(module, name)
         _import_cache[name] = obj
         return obj
@@ -49,5 +50,6 @@ def __getattr__(name: str):
             f"module '{__name__}' has no attribute '{name}'. "
             f"Failed to import: {e}"
         ) from e
+
 
 

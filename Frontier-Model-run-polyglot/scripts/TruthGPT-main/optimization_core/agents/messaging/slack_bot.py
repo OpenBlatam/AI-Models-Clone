@@ -13,11 +13,12 @@ import hmac
 import logging
 import os
 import time
-from typing import Any, Optional
+from typing import Any, Optional, Union
 
 import httpx
 
 from .base import BaseMessagingAdapter
+from ..models import AgentResponse
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,7 @@ class SlackAdapter(BaseMessagingAdapter):
         platform_user_id: str,
         text: str,
         metadata: Optional[dict] = None,
-    ) -> Union[str, AgentResponse]:
+    ) -> AgentResponse:
         return await self.agent_client.run(
             user_id=f"slack_{platform_user_id}",
             prompt=text,
@@ -61,18 +62,16 @@ class SlackAdapter(BaseMessagingAdapter):
     async def send_response(
         self,
         platform_user_id: str,
-        response: Union[str, AgentResponse],
+        response: AgentResponse,
         metadata: Optional[dict] = None,
     ) -> bool:
         channel = (metadata or {}).get("channel", platform_user_id)
         url = f"{SLACK_API}/chat.postMessage"
 
-        if isinstance(response, AgentResponse):
-            response_text = response.content
-            if response.action_type == "approval_required":
-                response_text = f"{response_text}\n\n⚠️ *Acción requerida:* Confirma en la API o interactúa aquí."
-        else:
-            response_text = str(response)
+        response_text = response.content
+        if response.action_type == "approval_required":
+            response_text = f"{response_text}\n\n⚠️ *Acción requerida:* Confirma en la API o interactúa aquí."
+
         try:
             async with httpx.AsyncClient(timeout=10) as client:
                 resp = await client.post(
@@ -114,7 +113,7 @@ class SlackAdapter(BaseMessagingAdapter):
     # Webhook helper
     # ------------------------------------------------------------------
 
-    async def process_event(self, payload: dict) -> Optional[str]:
+    async def process_event(self, payload: dict) -> Optional[AgentResponse]:
         """
         Process an incoming Slack Events API payload.
 
@@ -123,7 +122,9 @@ class SlackAdapter(BaseMessagingAdapter):
         """
         # Slack URL verification challenge
         if payload.get("type") == "url_verification":
-            return payload.get("challenge", "")
+            # Note: This is an exception where we return a challenge string
+            # In a real API this would be handled before reaching the adapter logic
+            return None # AgentResponse(content=payload.get("challenge", ""), action_type="final_answer")
 
         event = payload.get("event", {})
         event_type = event.get("type", "")
@@ -143,3 +144,4 @@ class SlackAdapter(BaseMessagingAdapter):
             text=text,
             metadata={"channel": channel},
         )
+

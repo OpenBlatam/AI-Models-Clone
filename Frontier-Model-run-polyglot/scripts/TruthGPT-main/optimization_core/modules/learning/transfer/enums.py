@@ -36,3 +36,4 @@ class KnowledgeDistillationType(Enum):
     ATTENTION_DISTILLATION = "attention_distillation"
     RELATION_DISTILLATION = "relation_distillation"
     SELF_DISTILLATION = "self_distillation"
+

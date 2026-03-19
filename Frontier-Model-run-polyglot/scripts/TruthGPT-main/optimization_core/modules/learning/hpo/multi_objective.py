@@ -98,3 +98,4 @@ class MultiObjectiveOptimizer:
     def _dominates(self, obj1: List[float], obj2: List[float]) -> bool:
         """Check if obj1 dominates obj2"""
         return all(o1 >= o2 for o1, o2 in zip(obj1, obj2)) and any(o1 > o2 for o1, o2 in zip(obj1, obj2))
+

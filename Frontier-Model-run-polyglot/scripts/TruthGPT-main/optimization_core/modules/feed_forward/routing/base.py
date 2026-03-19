@@ -69,3 +69,4 @@ class BaseRouter(nn.Module, ABC):
             RoutingResult object.
         """
         pass
+

@@ -287,3 +287,4 @@ class MultiTaskTrainer:
             plt.close()
         except Exception as e:
             logger.error(f"Failed to visualize results: {e}")
+

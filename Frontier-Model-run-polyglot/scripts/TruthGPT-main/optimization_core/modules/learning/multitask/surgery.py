@@ -108,3 +108,4 @@ class GradientSurgery:
         weights = [1.0 / n_tasks] * n_tasks
         
         return weights
+

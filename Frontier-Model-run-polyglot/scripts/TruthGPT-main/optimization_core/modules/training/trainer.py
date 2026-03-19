@@ -30,7 +30,7 @@ class AdvancedTrainer:
     Production-grade training engine.
 
     Features:
-    - Mixed-precision training via ``torch.cuda.amp``
+    - Mixed-precision training via ``torch.amp``
     - Gradient accumulation & clipping
     - Optional EMA weight averaging
     - Early stopping with configurable patience
@@ -61,7 +61,7 @@ class AdvancedTrainer:
         )
         self.optimizer = self._build_optimizer()
         self.scheduler = self._build_scheduler()
-        self.scaler = torch.cuda.amp.GradScaler() if config.use_mixed_precision else None
+        self.scaler = torch.amp.GradScaler() if config.use_mixed_precision else None
         self.ema = EMAManager(model, config.ema_decay) if config.use_ema else None
         self.curriculum = (
             CurriculumScheduler(config.epochs)
@@ -172,7 +172,7 @@ class AdvancedTrainer:
             batch = self._to_device(batch)
 
             # Forward
-            with torch.cuda.amp.autocast(enabled=self.config.use_mixed_precision):
+            with torch.amp.autocast(device_type=self.device.type, enabled=self.config.use_mixed_precision):
                 outputs = self.model(**batch) if isinstance(batch, dict) else self.model(batch)
                 loss = self._extract_loss(outputs, batch)
 
@@ -221,7 +221,7 @@ class AdvancedTrainer:
         with torch.no_grad():
             for batch in self.val_dataloader:
                 batch = self._to_device(batch)
-                with torch.cuda.amp.autocast(enabled=self.config.use_mixed_precision):
+                with torch.amp.autocast(device_type=self.device.type, enabled=self.config.use_mixed_precision):
                     outputs = self.model(**batch) if isinstance(batch, dict) else self.model(batch)
                     loss = self._extract_loss(outputs, batch)
                 totals["val_loss"] += loss.item()

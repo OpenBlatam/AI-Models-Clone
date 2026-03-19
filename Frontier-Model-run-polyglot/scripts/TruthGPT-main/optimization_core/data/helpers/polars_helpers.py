@@ -172,3 +172,4 @@ def log_dataframe_info(
             f"columns={len(df.columns)}, memory={df.estimated_size()}"
         )
 
+

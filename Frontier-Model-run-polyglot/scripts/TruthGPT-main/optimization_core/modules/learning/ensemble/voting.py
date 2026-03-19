@@ -148,3 +148,4 @@ class VotingEnsemble:
         # Weight by confidence (simplified for implementation)
         # This is a complex area, simplified here
         return self._soft_voting(predictions)
+

@@ -125,3 +125,4 @@ class HpoManager:
         report.append(f"Total Duration: {results.get('total_duration', 0):.2f} seconds")
         
         return "\n".join(report)
+

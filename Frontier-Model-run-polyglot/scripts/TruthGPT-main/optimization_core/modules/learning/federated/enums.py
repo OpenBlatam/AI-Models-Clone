@@ -33,3 +33,4 @@ class PrivacyLevel(Enum):
     SECURE_AGGREGATION = "secure_aggregation"
     HOMOMORPHIC_ENCRYPTION = "homomorphic_encryption"
     FEDERATED_LEARNING = "federated_learning"
+

@@ -772,3 +772,4 @@ def create_mega_enhanced_optimization_core(config: Dict[str, Any]) -> MegaEnhanc
         meta_learning_episodes=config.get('meta_learning_episodes', 50)  # Reduced for efficiency
     )
     return MegaEnhancedOptimizationCore(mega_config)
+

@@ -2,7 +2,7 @@
 Performance utilities for TruthGPT Optimization Core
 Provides benchmarking, profiling, and optimization utilities
 
-This module re-exports functionality from core.performance_utils for backward compatibility.
+This module re-exports functionality from modules.base.core_system.core.performance_utils for backward compatibility.
 New code should import directly from optimization_core.core.performance_utils.
 """
 

@@ -52,3 +52,4 @@ class RLConfig:
             raise ValueError("Gamma must be between 0.0 and 1.0")
         if self.epsilon_start < 0.0 or self.epsilon_start > 1.0:
             raise ValueError("Epsilon start must be between 0.0 and 1.0")
+

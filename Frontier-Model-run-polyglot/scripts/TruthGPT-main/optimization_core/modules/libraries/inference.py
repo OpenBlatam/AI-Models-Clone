@@ -116,3 +116,4 @@ def create_inference_module(inference_type: str, config: Dict[str, Any]) -> Infe
         return DiffusionInferenceModule(config)
     else:
         raise ValueError(f"Unknown inference type: {inference_type}")
+

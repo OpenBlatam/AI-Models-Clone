@@ -61,3 +61,4 @@ class MultiTaskConfig:
             raise ValueError("Number of epochs must be positive")
         if not (0 <= self.gradient_surgery_lambda <= 1):
             raise ValueError("Gradient surgery lambda must be between 0 and 1")
+

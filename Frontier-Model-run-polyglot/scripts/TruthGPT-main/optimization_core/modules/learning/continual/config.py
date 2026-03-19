@@ -70,3 +70,4 @@ class ContinualLearningConfig:
             raise ValueError("Task balancing weight must be between 0 and 1")
         if not (0 <= self.knowledge_retention_rate <= 1):
             raise ValueError("Knowledge retention rate must be between 0 and 1")
+

@@ -83,3 +83,4 @@ class ArchitectureGene:
         else:
             # Default to Linear
             return nn.Linear(128, 64)
+

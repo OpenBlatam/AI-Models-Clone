@@ -43,3 +43,4 @@ class AdaptiveLearningConfig:
             raise ValueError("Exploration rate must be between 0.0 and 1.0")
         if not (0.0 <= self.exploitation_rate <= 1.0):
             raise ValueError("Exploitation rate must be between 0.0 and 1.0")
+

@@ -64,3 +64,4 @@ class BatchActiveLearning:
         if dists.max() > 0:
             dists = dists / dists.max()
         return dists
+

@@ -49,14 +49,18 @@ class OptimizationRegistry:
     def _register_default_optimizations(self):
         """Register default and enhanced optimization techniques."""
         try:
-            from .gpu.cuda_kernels import CUDAOptimizations
-            from ..optimizers.techniques.triton_optimizations import apply_triton_optimizations
+            from ..modules.acceleration.gpu.cuda_kernels import CUDAOptimizations
+            from ..modules.optimizers.techniques.triton_optimizations import apply_triton_optimizations
             from .enhanced_grpo import create_enhanced_grpo_trainer
             try:
-                from .mcts_optimization import create_mcts_optimizer
+                from ..modules.optimizers.advanced.next_gen_engine import create_mcts_optimizer
                 self.register_optimization("mcts_optimization", create_mcts_optimizer)
             except ImportError:
-                warnings.warn("MCTS optimization not available")
+                try:
+                    from .mcts_optimization import create_mcts_optimizer
+                    self.register_optimization("mcts_optimization", create_mcts_optimizer)
+                except ImportError:
+                    warnings.warn("MCTS optimization not available")
             
             try:
                 from .parallel_training import create_parallel_actor
@@ -288,3 +292,4 @@ def register_optimization(name: str, optimization_func: Callable):
 def get_optimization_report(model: nn.Module) -> Dict[str, Any]:
     """Get optimization report for a model."""
     return _optimization_registry.get_optimization_report(model)
+

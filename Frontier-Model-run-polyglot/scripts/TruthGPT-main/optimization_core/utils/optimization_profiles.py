@@ -98,3 +98,4 @@ def apply_optimization_profile(model, profile_name: str = 'balanced'):
     model = computational_optimizer.optimize_model(model)
     
     return model, profile
+

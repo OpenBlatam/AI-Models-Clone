@@ -10,40 +10,45 @@ import logging
 import time
 import uuid
 import json
-from dataclasses import dataclass, field, asdict
 from typing import Any, Dict, List, Optional
 from pathlib import Path
+
+from pydantic import BaseModel, Field, ConfigDict, computed_field
 
 logger = logging.getLogger(__name__)
 
 
-@dataclass
-class Span:
-    """A single traced event in an agent execution."""
+class Span(BaseModel):
+    """A single traced event in an agent execution (Pydantic-validated)."""
 
-    span_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
+    span_id: str = Field(default_factory=lambda: str(uuid.uuid4())[:8])
     trace_id: str = ""
     parent_id: Optional[str] = None
     name: str = ""
     agent_name: str = ""
-    kind: str = "internal"  # "llm_call", "tool_call", "routing", "internal"
+    kind: str = Field(default="internal", description="llm_call | tool_call | routing | internal")
     input_data: str = ""
     output_data: str = ""
-    status: str = "ok"  # "ok", "error"
-    start_time: float = field(default_factory=time.time)
+    status: str = Field(default="ok", description="ok | error")
+    start_time: float = Field(default_factory=time.time)
     end_time: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: Dict[str, Any] = Field(default_factory=dict)
 
+    @computed_field  # type: ignore[misc]
     @property
     def duration_ms(self) -> float:
         if self.end_time == 0.0:
             return 0.0
         return round((self.end_time - self.start_time) * 1000, 2)
 
-    def finish(self, output: str = "", status: str = "ok") -> None:
+    def finish(self, output: str = "", status: str = "ok", metadata: Optional[Dict[str, Any]] = None) -> None:
         self.end_time = time.time()
         self.output_data = output[:500]
         self.status = status
+        if metadata:
+            self.metadata.update(metadata)
 
     def to_dict(self) -> dict:
         return {
@@ -87,12 +92,17 @@ class Tracer:
         self.persistence_path = Path(persistence_path)
         self._traces: Dict[str, List[Span]] = {}
         self._trace_order: List[str] = []
-        
-        # Load persisted traces
-        self._load_traces()
+        self._persistence_loaded = False
+
+    def _ensure_loaded(self) -> None:
+        """Lazy-load persisted traces on first access."""
+        if not self._persistence_loaded:
+            self._load_traces()
+            self._persistence_loaded = True
 
     def start_trace(self, name: str, agent_name: str = "") -> str:
         """Create a new trace and return its ID."""
+        self._ensure_loaded()
         trace_id = str(uuid.uuid4())[:12]
 
         root_span = Span(
@@ -123,6 +133,7 @@ class Tracer:
         metadata: Optional[Dict[str, Any]] = None,
     ) -> Span:
         """Add a new span to an existing trace."""
+        self._ensure_loaded()
         span = Span(
             trace_id=trace_id,
             parent_id=parent_id,
@@ -146,11 +157,13 @@ class Tracer:
 
     def get_trace(self, trace_id: str) -> List[dict]:
         """Return all spans for a trace as dicts."""
+        self._ensure_loaded()
         spans = self._traces.get(trace_id, [])
         return [s.to_dict() for s in spans]
 
     def get_recent_traces(self, limit: int = 20) -> List[dict]:
         """Return a summary of the most recent traces."""
+        self._ensure_loaded()
         results = []
         for tid in reversed(self._trace_order[-limit:]):
             spans = self._traces.get(tid, [])
@@ -168,6 +181,7 @@ class Tracer:
 
     def get_stats(self) -> dict:
         """Return aggregate stats across all stored traces."""
+        self._ensure_loaded()
         total_spans = sum(len(s) for s in self._traces.values())
         errors = sum(
             1
@@ -183,16 +197,16 @@ class Tracer:
         }
 
     # ------------------------------------------------------------------
-    # Persistence
+    # Persistence (uses Pydantic model_dump for serialization)
     # ------------------------------------------------------------------
 
     def _save_traces(self) -> None:
-        """Serialize current traces to a JSON file."""
+        """Serialize current traces to a JSON file via Pydantic model_dump."""
         try:
             data = {}
             for tid, spans in self._traces.items():
-                data[tid] = [asdict(s) for s in spans]
-            
+                data[tid] = [s.model_dump() for s in spans]
+
             with open(self.persistence_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=2)
         except Exception as e:
@@ -202,12 +216,12 @@ class Tracer:
         """Load traces from the history file."""
         if not self.persistence_path.exists():
             return
-            
+
         try:
             with open(self.persistence_path, "r", encoding="utf-8") as f:
                 data = json.load(f)
                 for tid, spans_data in data.items():
-                    spans = [Span(**s_data) for s_data in spans_data]
+                    spans = [Span.model_validate(s_data) for s_data in spans_data]
                     self._traces[tid] = spans
                     self._trace_order.append(tid)
             logger.info("Restored %d traces from persistence.", len(self._traces))
@@ -217,3 +231,4 @@ class Tracer:
 
 # Singleton tracer instance for the entire application
 global_tracer = Tracer()
+

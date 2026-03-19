@@ -1,7 +1,7 @@
 """
 File utilities for data processing.
 
-This module re-exports common file utilities from core.file_utils
+This module re-exports common file utilities from modules.base.core_system.core.file_utils
 for backward compatibility.
 """
 from optimization_core.core.file_utils import (
@@ -108,4 +108,5 @@ def ensure_output_directory(output_path: Union[str, Path]) -> Path:
             raise
     
     return path_obj
+
 

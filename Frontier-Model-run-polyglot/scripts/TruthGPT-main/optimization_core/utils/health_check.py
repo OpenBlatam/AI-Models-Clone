@@ -232,3 +232,4 @@ def create_default_health_checker() -> HealthChecker:
     checker.register_check("polars", check_polars_available)
     checker.register_check("gpu", check_gpu_available)
     return checker
+

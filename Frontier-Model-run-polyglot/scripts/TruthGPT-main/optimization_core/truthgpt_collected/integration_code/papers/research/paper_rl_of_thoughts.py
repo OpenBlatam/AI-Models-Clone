@@ -309,3 +309,4 @@ if __name__ == "__main__":
     print(f"   Navigation confidence: {metadata['navigation_confidence']:.4f}")
 
 
+

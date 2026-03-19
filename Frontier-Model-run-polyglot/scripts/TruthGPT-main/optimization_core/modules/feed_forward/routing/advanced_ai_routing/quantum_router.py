@@ -808,3 +808,4 @@ class QuantumRouter(BaseRouter):
             'quantum_state_history': len(self.quantum_state_history)
         })
         return base_info
+

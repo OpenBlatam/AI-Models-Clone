@@ -720,3 +720,4 @@ def example_federated_learning():
 if __name__ == "__main__":
     # Run example
     example_federated_learning()
+

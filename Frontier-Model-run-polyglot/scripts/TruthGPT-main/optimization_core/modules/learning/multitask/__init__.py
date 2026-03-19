@@ -57,3 +57,4 @@ __all__ = [
     'create_multitask_network',
     'create_multitask_trainer'
 ]
+

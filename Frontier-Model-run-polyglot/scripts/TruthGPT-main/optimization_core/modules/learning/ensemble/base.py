@@ -153,3 +153,4 @@ class BaseModel:
             confidence = np.max(predictions, axis=1)
         
         return confidence
+

@@ -12,3 +12,4 @@ class LearningMode(Enum):
     EXPLOITATION = "exploitation"
     META_LEARNING = "meta_learning"
     SELF_IMPROVEMENT = "self_improvement"
+

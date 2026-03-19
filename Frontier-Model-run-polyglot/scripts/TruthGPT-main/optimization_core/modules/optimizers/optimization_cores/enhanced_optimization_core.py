@@ -482,3 +482,4 @@ def create_enhanced_optimization_core(config: Dict[str, Any]) -> EnhancedOptimiz
         auto_optimization_interval=config.get('auto_optimization_interval', 100)
     )
     return EnhancedOptimizationCore(enhanced_config)
+

@@ -105,3 +105,4 @@ class GPUDeviceManager:
             'properties': self.device_properties,
             'memory': self._get_memory_info()
         }
+

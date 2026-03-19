@@ -1,17 +1,25 @@
 """
-OpenClaw Agent Client (SDK).
+OpenClaw Agent Client (SDK) — Pydantic-First Architecture.
 
 Provides a high-level interface for initialising and using autonomous agents,
 supporting both single-agent ReAct mode and multi-agent swarm mode.
 """
 
+import json
 import logging
-import re
-from typing import Any, Dict, Optional, AsyncIterator, Union
+import time
+from typing import Any, AsyncIterator, Dict, Optional, Union
+
 from .multi_agentes.swarm_orchestrator import SwarmOrchestrator
 from .razonamiento_planificacion.orchestrator import MultiUserReActAgent
 from .models import AgentResponse, AgentConfig
-from .registry import get_all_tools, DummyAsyncLLM
+from .registry import registry
+from .engines import DummyAsyncLLM
+from .exceptions import HandoffError
+from .marketing_intelligence.marketing_agent import ContentMarketingAgent
+from .embodied_rl.rl_agent import RLAgent
+from .code_interpreter import CodeInterpreterAgent
+from .data_analysis import DataAnalysisAgent
 
 logger = logging.getLogger(__name__)
 
@@ -33,14 +41,12 @@ class AgentClient:
     High-level client for OpenClaw autonomous agents.
 
     Args:
+        config: ``AgentConfig`` Pydantic model with all settings.
         llm_engine: An async-callable LLM engine (``await engine(prompt)``).
                     Falls back to :class:`DummyAsyncLLM` when *None*.
-        memory_db_path: Path to the SQLite database used for episodic memory.
-        use_swarm: When *True*, initialise a multi-agent swarm instead of a
-                   single ReAct agent.
     """
 
-    AVAILABLE_TOOLS = _TOOL_REGISTRY
+    AVAILABLE_TOOLS = registry.get_all_tools()
 
     def __init__(
         self,
@@ -58,19 +64,19 @@ class AgentClient:
                 memory_db_path=memory_db_path,
                 use_swarm=use_swarm,
                 use_vector_memory=use_vector_memory,
-                use_reflexion=use_reflexion
+                use_reflexion=use_reflexion,
             )
-        
+
         self.config = config
         self.llm_engine = config.llm_engine or DummyAsyncLLM()
-        
+
         # Lazy import to avoid circular dependency issues
         from .memoria_aprendizaje.sqlite_memory import SQLiteMemory
         self.memory = SQLiteMemory(db_path=config.memory_db_path)
-        
+
         self.use_swarm = config.use_swarm
         self.use_reflexion = config.use_reflexion
-        
+
         # Init Vector Memory if requested
         self.vector_memory = None
         if config.use_vector_memory:
@@ -85,14 +91,16 @@ class AgentClient:
         self.agent: Optional[MultiUserReActAgent] = None
 
         if self.use_swarm:
-            self.swarm = SwarmOrchestrator(llm_engine=self.llm_engine)
+            self.swarm = SwarmOrchestrator(
+                llm_engine=self.llm_engine,
+                default_agent_name=config.default_agent_name,
+            )
             self._init_default_swarm()
         else:
             self.agent = MultiUserReActAgent(
+                config=config,
                 llm_engine=self.llm_engine,
-                memory=self.memory,
                 vector_memory=self.vector_memory,
-                use_reflexion=self.use_reflexion,
             )
             self._register_default_tools()
 
@@ -104,10 +112,10 @@ class AgentClient:
         """Register the default set of agents in the swarm."""
         assert self.swarm is not None
 
-        marketing = ContentMarketingAgent(llm_engine=self.llm_engine)
-        rl = RLAgent(llm_engine=self.llm_engine)
-        code = CodeInterpreterAgent(llm_engine=self.llm_engine)
-        data = DataAnalysisAgent(llm_engine=self.llm_engine)
+        marketing = ContentMarketingAgent(config=self.config, llm_engine=self.llm_engine)
+        rl = RLAgent(config=self.config, llm_engine=self.llm_engine)
+        code = CodeInterpreterAgent(config=self.config, llm_engine=self.llm_engine)
+        data = DataAnalysisAgent(config=self.config, llm_engine=self.llm_engine)
 
         self.swarm.register_agent(marketing)
         self.swarm.register_agent(rl)
@@ -122,13 +130,11 @@ class AgentClient:
         """Register all built-in tools on the single-agent ReAct instance."""
         assert self.agent is not None
 
-        for tool_name, tool_cls in get_all_tools().items():
+        for tool_name, tool_cls in registry.get_all_tools().items():
             try:
-                # Need to inject self into DelegateTaskTool specifically
                 tool_instance = tool_cls()
                 if hasattr(tool_instance, "agent_client"):
                     tool_instance.agent_client = self
-                    
                 self.agent.register_tool(tool_instance)
             except Exception:
                 logger.warning("Could not register tool %s", tool_name, exc_info=True)
@@ -146,12 +152,11 @@ class AgentClient:
         if self.use_swarm or self.agent is None:
             return False
 
-        tool_cls = get_all_tools().get(tool_name)
+        tool_cls = registry.get_tool(tool_name)
         if tool_cls is None:
             logger.warning("Unknown tool requested: %s", tool_name)
             return False
 
-        # Inject self reference for tools that need AgentClient (like DelegateTaskTool)
         tool_instance = tool_cls()
         if hasattr(tool_instance, "agent_client"):
             tool_instance.agent_client = self
@@ -159,73 +164,83 @@ class AgentClient:
         self.agent.register_tool(tool_instance)
         return True
 
-    async def run(self, user_id: str, prompt: str, depth: int = 0, return_response: bool = False) -> Union[str, AgentResponse]:
+    async def run(
+        self,
+        user_id: str,
+        prompt: str,
+        depth: int = 0,
+        return_response: bool = False,
+    ) -> Union[str, AgentResponse]:
         """
         Execute the agent (or swarm) to process *prompt*.
-        
-        If return_response is True, returns the AgentResponse object.
-        Otherwise, returns just the string content (default for BC).
+
+        If ``return_response`` is True, returns the full ``AgentResponse``.
+        Otherwise, returns just the string content (default for backward compat).
         """
-        if depth > 5:
-            err_msg = "Error: Maximum swarm handoff depth exceeded."
+        if depth > self.config.max_handoff_depth:
+            err_msg = f"Error: Maximum swarm handoff depth ({self.config.max_handoff_depth}) exceeded."
             if return_response:
                 return AgentResponse(content=err_msg, action_type="error")
             return err_msg
-            
+
         final_resp: AgentResponse
-        
+
         if self.use_swarm and self.swarm is not None:
             final_resp = await self.swarm.route_and_process(
                 prompt, context={"user_id": user_id}
             )
-            
-            # Handle recursive handoff using Pydantic metadata
+
+            # Handle recursive handoff
             if final_resp.action_type == "handoff" and final_resp.handoff_target:
-                res_str = await self._handle_handoff(user_id, prompt, final_resp.handoff_target, depth + 1)
-                final_resp = AgentResponse(
-                    content=res_str, 
-                    agent_name=final_resp.handoff_target,
-                    action_type="final_answer"
+                handoff_resp = await self._handle_handoff(
+                    user_id, prompt, final_resp.handoff_target, depth + 1
                 )
+                final_resp = handoff_resp
 
         elif self.agent is not None:
             final_resp = await self.agent.process_message(user_id, prompt)
-            
+
             if final_resp.action_type == "handoff" and final_resp.handoff_target:
-                final_resp = await self._handle_handoff(user_id, prompt, final_resp.handoff_target, depth + 1)
+                final_resp = await self._handle_handoff(
+                    user_id, prompt, final_resp.handoff_target, depth + 1
+                )
         else:
             raise RuntimeError("Neither swarm nor single agent is initialised.")
 
         return final_resp if return_response else final_resp.content
 
-    async def _handle_handoff(self, user_id: str, prompt: str, target: str, depth: int) -> AgentResponse:
-        logger.info(f"AgentClient detected Handoff to {target}. Transferring control...")
+    async def _handle_handoff(
+        self, user_id: str, prompt: str, target: str, depth: int
+    ) -> AgentResponse:
+        """Transfer control to a named agent in the swarm."""
+        logger.info("AgentClient detected Handoff to %s. Transferring control...", target)
+
         if self.use_swarm and self.swarm and target in self.swarm.agents:
             target_agent = self.swarm.agents[target]
-            handoff_prompt = f"[SYSTEM: CONTEXT HANDOFF]\nUser request: {prompt}\nRespond as {target}."
+            handoff_prompt = (
+                f"[SYSTEM: CONTEXT HANDOFF]\nUser request: {prompt}\nRespond as {target}."
+            )
             return await target_agent.process(handoff_prompt, context={"user_id": user_id})
-        else:
-            err_msg = f"Error: Cannot handoff to '{target}' (Not found or Swarm mode disabled)."
-            return AgentResponse(content=err_msg, action_type="error")
+
+        raise HandoffError(
+            f"Cannot handoff to '{target}' (Not found or Swarm mode disabled).",
+            metadata={"target": target, "user_id": user_id},
+        )
 
     async def astream_run(self, user_id: str, prompt: str) -> AsyncIterator[str]:
-        """
-        Execute the agent and stream the response line by line (SSE Server-Sent Events).
-        """
+        """Execute the agent and stream the response via SSE."""
         if self.agent is not None:
             async for chunk in self.agent.astream_process_message(user_id, prompt):
                 yield chunk
         elif self.use_swarm and self.swarm is not None:
-            # Swarm streaming: For now, we yield the thinking process and then the final answer
-            import json
             yield json.dumps({"event": "thinking", "content": "Swarm orchestrator is routing your request..."}) + "\n"
             resp = await self.run(user_id, prompt, return_response=True)
             yield json.dumps({"event": "final_answer", "content": resp.content}) + "\n"
         else:
-            import json
             yield json.dumps({"event": "error", "message": "Agent client not properly initialised."}) + "\n"
 
     async def clear_memory(self, user_id: str) -> bool:
         """Clear episodic memory for a given user."""
         await self.memory.clear_memory(user_id)
         return True
+

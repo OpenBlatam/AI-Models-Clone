@@ -138,3 +138,4 @@ class StackingEnsemble:
                 return np.argmax(predictions, axis=1)
         else:
             return self.meta_learner.predict(meta_features)
+

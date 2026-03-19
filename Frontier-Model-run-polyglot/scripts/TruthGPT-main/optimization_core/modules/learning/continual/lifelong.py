@@ -93,3 +93,4 @@ class LifelongLearner:
         
         self.learning_history.append(learning_result)
         return learning_result
+

@@ -77,3 +77,4 @@ class CUDAOptimizer:
             self.logger.warning(f"Kernel fusion failed: {e}")
         
         return model
+

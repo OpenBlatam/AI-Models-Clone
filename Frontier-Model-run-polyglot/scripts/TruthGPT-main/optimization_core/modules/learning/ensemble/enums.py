@@ -29,3 +29,4 @@ class BoostingMethod(Enum):
     XGBOOST = "xgboost"
     LIGHTGBM = "lightgbm"
     CATBOOST = "catboost"
+

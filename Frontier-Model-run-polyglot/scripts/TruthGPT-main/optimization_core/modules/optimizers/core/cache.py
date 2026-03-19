@@ -15,3 +15,4 @@ class ModelCache:
 
 def create_model_cache():
     return ModelCache()
+

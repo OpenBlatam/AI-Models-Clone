@@ -10,7 +10,6 @@ import torch.nn.functional as F
 import torch.optim as optim
 import torch.quantization as quant
 from typing import Dict, Any, List, Optional, Tuple, Union, Callable
-from dataclasses import dataclass, field
 import time
 import logging
 import numpy as np
@@ -33,12 +32,13 @@ import pickle
 from pathlib import Path
 import cmath
 from abc import ABC, abstractmethod
+from pydantic import BaseModel, ConfigDict
 
 warnings.filterwarnings('ignore')
 
 logger = logging.getLogger(__name__)
 
-class TruthGPTQuantizationLevel(Enum):
+class TruthGPTQuantizationLevel(str, Enum):
     """TruthGPT Quantization optimization levels."""
     BASIC = "basic"           # Basic quantization (int8)
     ADVANCED = "advanced"     # Advanced quantization (int4, float16)
@@ -46,9 +46,10 @@ class TruthGPTQuantizationLevel(Enum):
     MASTER = "master"         # Master quantization (QAT, custom schemes)
     LEGENDARY = "legendary"   # Legendary quantization (quantum-inspired)
 
-@dataclass
-class TruthGPTQuantizationResult:
+class TruthGPTQuantizationResult(BaseModel):
     """Result of TruthGPT Quantization optimization."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+    
     optimized_model: nn.Module
     speed_improvement: float
     memory_reduction: float
@@ -408,7 +409,7 @@ class TruthGPTQuantizationOptimizer:
         """Apply TruthGPT quantization optimizations to model."""
         start_time = time.perf_counter()
         
-        self.logger.info(f"🚀 TruthGPT quantization optimization started (level: {self.optimization_level.value})")
+        self.logger.info(f"🚀 TruthGPT quantization optimization started (level: {self.optimization_level})")
         
         # Apply optimizations based on level
         optimized_model = model
@@ -620,7 +621,7 @@ class TruthGPTQuantizationOptimizer:
             'avg_compression_ratio': np.mean([r.compression_ratio for r in results]),
             'avg_accuracy_loss': np.mean([r.accuracy_loss for r in results]),
             'avg_truthgpt_quantization_benefit': np.mean([r.truthgpt_quantization_benefit for r in results]),
-            'optimization_level': self.optimization_level.value
+            'optimization_level': self.optimization_level
         }
     
     def benchmark_truthgpt_quantization_performance(self, model: nn.Module, 
@@ -723,3 +724,4 @@ def example_truthgpt_quantization_optimization():
 if __name__ == "__main__":
     # Run example
     result = example_truthgpt_quantization_optimization()
+

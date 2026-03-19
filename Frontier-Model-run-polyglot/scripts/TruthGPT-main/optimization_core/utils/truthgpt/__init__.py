@@ -30,23 +30,23 @@ __all__ = [
 
 _LAZY_IMPORTS = {
     # Core components from truthgpt_core
-    'OptimizationLevel': '..truthgpt_core',
-    'DeviceType': '..truthgpt_core',
-    'PrecisionType': '..truthgpt_core',
-    'TruthGPTConfig': '..truthgpt_core',
-    'BaseTruthGPTOptimizer': '..truthgpt_core',
-    'TruthGPTDeviceManager': '..truthgpt_core',
-    'TruthGPTPrecisionManager': '..truthgpt_core',
-    'TruthGPTMemoryManager': '..truthgpt_core',
-    'TruthGPTPerformanceManager': '..truthgpt_core',
-    'TruthGPTAttentionOptimizer': '..truthgpt_core',
-    'TruthGPTQuantizationOptimizer': '..truthgpt_core',
-    'TruthGPTPruningOptimizer': '..truthgpt_core',
-    'TruthGPTIntegratedOptimizer': '..truthgpt_core',
-    'create_truthgpt_config': '..truthgpt_core',
-    'create_truthgpt_optimizer': '..truthgpt_core',
-    'quick_truthgpt_optimization': '..truthgpt_core',
-    'truthgpt_optimization_context': '..truthgpt_core',
+    'OptimizationLevel': 'optimization_core.modules.truthgpt.core',
+    'DeviceType': 'optimization_core.modules.truthgpt.core',
+    'PrecisionType': 'optimization_core.modules.truthgpt.core',
+    'TruthGPTConfig': 'optimization_core.modules.truthgpt.core',
+    'BaseTruthGPTOptimizer': 'optimization_core.modules.truthgpt.core',
+    'TruthGPTDeviceManager': 'optimization_core.modules.truthgpt.core',
+    'TruthGPTPrecisionManager': 'optimization_core.modules.truthgpt.core',
+    'TruthGPTMemoryManager': 'optimization_core.modules.truthgpt.core',
+    'TruthGPTPerformanceManager': 'optimization_core.modules.truthgpt.core',
+    'TruthGPTAttentionOptimizer': 'optimization_core.modules.truthgpt.core',
+    'TruthGPTQuantizationOptimizer': 'optimization_core.modules.truthgpt.core',
+    'TruthGPTPruningOptimizer': 'optimization_core.modules.truthgpt.core',
+    'TruthGPTIntegratedOptimizer': 'optimization_core.modules.truthgpt.core',
+    'create_truthgpt_config': 'optimization_core.modules.truthgpt.core',
+    'create_truthgpt_optimizer': 'optimization_core.modules.truthgpt.core',
+    'quick_truthgpt_optimization': 'optimization_core.modules.truthgpt.core',
+    'truthgpt_optimization_context': 'optimization_core.modules.truthgpt.core',
 }
 
 _import_cache = {}
@@ -65,7 +65,8 @@ def __getattr__(name: str):
     
     module_path = _LAZY_IMPORTS[name]
     try:
-        module = importlib.import_module(module_path, package=__package__)
+        # Use absolute imports to avoid __package__ ambiguity
+        module = importlib.import_module(module_path)
         obj = getattr(module, name)
         _import_cache[name] = obj
         return obj
@@ -91,4 +92,5 @@ def get_truthgpt_component_info(component_name: str) -> dict[str, any]:
         'module': _LAZY_IMPORTS[component_name],
         'available': component_name in _import_cache or True,
     }
+
 

@@ -32,3 +32,4 @@ class PrunerType(Enum):
     SUCCESSIVE_HALVING = "successive_halving"
     HYPERBAND = "hyperband"
     NO_PRUNING = "no_pruning"
+

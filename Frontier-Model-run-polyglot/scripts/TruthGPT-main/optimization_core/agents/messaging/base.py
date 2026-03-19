@@ -1,3 +1,4 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import Any, Optional, Union
 from ..models import AgentResponse
@@ -8,14 +9,13 @@ logger = logging.getLogger(__name__)
 class BaseMessagingAdapter(ABC):
     """
     Abstract base for messaging platform adapters (Telegram, WhatsApp, etc.).
-
-    Each adapter translates platform-specific events into a unified
-    ``on_message`` call that forwards the text to an ``AgentClient``.
+    Unified under the Pydantic-first AgentResponse model.
     """
 
     def __init__(self, agent_client: Any) -> None:
         self.agent_client = agent_client
 
+    @abstractmethod
     async def on_message(
         self,
         platform_user_id: str,
@@ -24,8 +24,11 @@ class BaseMessagingAdapter(ABC):
     ) -> AgentResponse:
         """
         Process an incoming message and return the agent's response.
+        MUST return an AgentResponse object.
         """
+        pass
 
+    @abstractmethod
     async def send_response(
         self,
         platform_user_id: str,
@@ -35,6 +38,7 @@ class BaseMessagingAdapter(ABC):
         """
         Send a response back to the user on the platform.
         """
+        pass
 
     async def handle(
         self,
@@ -47,14 +51,12 @@ class BaseMessagingAdapter(ABC):
         """
         logger.info(
             "[%s] Message from %s: %s",
-            self.__name__,
+            self.__class__.__name__,
             platform_user_id,
             text[:80],
         )
-        # We always use the agent_client to run the logic
-        # Note: agent_client.run currently returns str for simple BC.
-        # But we can call the agent directly if we want the full AgentResponse.
         
         response = await self.on_message(platform_user_id, text, metadata)
         await self.send_response(platform_user_id, response, metadata)
         return response
+

@@ -159,3 +159,4 @@ class BoostingEnsemble:
             return (weighted_pred > 0.5).astype(int)
         else:
             return np.argmax(weighted_pred, axis=1)
+

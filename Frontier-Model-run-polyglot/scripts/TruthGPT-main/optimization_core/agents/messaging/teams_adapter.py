@@ -84,7 +84,7 @@ class TeamsAdapter(BaseMessagingAdapter):
         platform_user_id: str,
         text: str,
         metadata: Optional[dict] = None,
-    ) -> Union[str, AgentResponse]:
+    ) -> AgentResponse:
         return await self.agent_client.run(
             user_id=f"teams_{platform_user_id}",
             prompt=text,
@@ -94,7 +94,7 @@ class TeamsAdapter(BaseMessagingAdapter):
     async def send_response(
         self,
         platform_user_id: str,
-        response: Union[str, AgentResponse],
+        response: AgentResponse,
         metadata: Optional[dict] = None,
     ) -> bool:
         meta = metadata or {}
@@ -105,12 +105,9 @@ class TeamsAdapter(BaseMessagingAdapter):
             logger.error("Cannot reply to Teams without service_url and conversation_id")
             return False
 
-        if isinstance(response, AgentResponse):
-            response_text = response.content
-            if response.action_type == "approval_required":
-                response_text = f"{response_text}\n\n[HITL] Aprobación requerida para continuar."
-        else:
-            response_text = str(response)
+        response_text = response.content
+        if response.action_type == "approval_required":
+            response_text = f"{response_text}\n\n[HITL] Aprobación requerida para continuar."
 
         url = f"{service_url}v3/conversations/{conversation_id}/activities"
 
@@ -146,7 +143,7 @@ class TeamsAdapter(BaseMessagingAdapter):
     # Webhook helper
     # ------------------------------------------------------------------
 
-    async def process_activity(self, activity: dict) -> Optional[str]:
+    async def process_activity(self, activity: dict) -> Optional[AgentResponse]:
         """
         Process an incoming Bot Framework Activity.
 
@@ -171,3 +168,4 @@ class TeamsAdapter(BaseMessagingAdapter):
                 "conversation_id": conversation_id,
             },
         )
+

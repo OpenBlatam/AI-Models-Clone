@@ -22,3 +22,4 @@ class VROptimizationResult:
     optimization_applied: List[str]
     error_message: Optional[str] = None
     timestamp: datetime = field(default_factory=datetime.now)
+

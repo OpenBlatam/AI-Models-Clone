@@ -59,3 +59,4 @@ class GANDiscriminatorCreator:
             nn.LeakyReLU(0.2),
             nn.Linear(256, 1)
         )
+

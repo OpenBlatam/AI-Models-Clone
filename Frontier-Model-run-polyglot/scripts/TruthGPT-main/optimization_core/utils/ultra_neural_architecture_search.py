@@ -836,3 +836,4 @@ def example_neural_architecture_search():
 if __name__ == "__main__":
     # Run example
     example_neural_architecture_search()
+

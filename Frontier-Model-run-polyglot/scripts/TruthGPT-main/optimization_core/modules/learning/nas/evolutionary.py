@@ -191,3 +191,4 @@ class EvolutionaryNAS:
             'search_history': self.search_history,
             'best_architecture_complexity': self.best_architecture.complexity if self.best_architecture else 0.0
         }
+

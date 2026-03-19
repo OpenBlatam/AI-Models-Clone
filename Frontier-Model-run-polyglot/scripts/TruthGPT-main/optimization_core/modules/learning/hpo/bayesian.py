@@ -191,3 +191,4 @@ class BayesianOptimizer:
             'score': score,
             'best_score': self.best_score
         })
+

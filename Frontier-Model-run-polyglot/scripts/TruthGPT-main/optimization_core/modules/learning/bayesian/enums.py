@@ -34,3 +34,4 @@ class OptimizationStrategy(Enum):
     PARALLEL = "parallel"
     MULTI_START = "multi_start"
     GRADIENT_BASED = "gradient_based"
+

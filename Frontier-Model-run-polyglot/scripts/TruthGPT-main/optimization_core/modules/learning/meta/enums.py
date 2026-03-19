@@ -22,3 +22,4 @@ class TaskDistribution(Enum):
     MULTIMODAL = "multimodal"
     HIERARCHICAL = "hierarchical"
     ADAPTIVE = "adaptive"
+

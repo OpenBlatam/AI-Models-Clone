@@ -72,3 +72,4 @@ class AdversarialConfig:
             raise ValueError("Number of epochs must be positive")
         if self.learning_rate <= 0:
             raise ValueError("Learning rate must be positive")
+
